@@ -2,7 +2,7 @@
 
 
 # Tracklib
-**Tracklib** library provide a variety of tools, operators and functions to manipulate GPS traces
+**Tracklib** library provide a variety of tools, operators and functions to manipulate GPS tracks
 
 
 # Screenshots
