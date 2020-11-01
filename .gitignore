@@ -1,0 +1,17 @@
+/tracklib/__pycache__
+/tracklib/algo/__pycache__/
+/tracklib/core/__pycache__/
+/tracklib/io/__pycache__/
+/tests/__pycache__/
+/tracklib/*.pyc
+/.spyproject/
+/data/resultat/
+/tracklibenv/
+/build/
+/dist/
+/tracklib.egg-info/
+/docs/_build/
+/docs/public/
+/docs/html/
+/public/
+/cotation/
