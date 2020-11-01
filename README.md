@@ -97,16 +97,3 @@ To launch the documentation:
 
 
 
-.. |br| raw:: html
-
-   <br />
-
-
-Installing with pip
-=====================
-
-You can download it from PyPI repository using pip:
-
-.. code-block:: shell
-   
-   TODO
