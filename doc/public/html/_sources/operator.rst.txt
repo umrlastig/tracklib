@@ -1,0 +1,98 @@
+
+
+
+Operation classes for manipulating
+====================================
+
+is a high-level computational language used for performing cartographic spatial analysis using raster da
+
+La librairie tracklib propose une multitude d'opérateurs et de fonctions (containing operators and functions) (math-like expressions) with points of track.
+qui permettent de simplifier au maximum la création d'analytical features sur une trace. 
+Les opérateurs opèrent aussi bien sur les coordonnées que sur le timestamp de la trace. Il est aussi possible de se créer son propore opérateur.
+Les opérations sur les points sont fournies et leur appel évite les parcours des points de la trace.
+
+Ces opérateurs retournent aussi bien une valeur qu'un attribut de la trace ou un attribut du point
+
+Map Algebra operators, which are relational, Boolean, logical, combinatorial, and bitwise, 
+work with one or more inputs to develop new values. Functions perform specialized tasks, such as computing slope from elevation, 
+and they usually return numeric values. 
+
+
+You don't have to be a programmer to know how to use operators and functions effectively, you just have to be taught how to use them
+
+
+Operators statement syntax
+*****************************
+
+Pour créer un nouvel opérateur:
+
+
+.. code-block:: python
+
+   class <nom_operateur>(<type_operateur>):
+       
+	   def execute(self, track, af_input, kernel, af_output):
+           temp = [0]*track.size()
+           track.createAnalyticalFeature(af_output)
+           utils.addListToAF(track, af_output, temp)
+           return temp
+
+
+Depends on what you want to create, **type_operateur** will specify your choice.
+
+
+
+
+If you want a raster where your goodslope areas are "1" and the rest are NoData, Con is a good way to go about it:
+
+
+I'm trying to create a new raster from an existing slope raster where slopes are between 5 and 20 degrees. However, I'm receiving the error "ValueError: The truth value of a raster is ambiguous. Invalid use of raster with Boolean operator or function. Check the use of parentheses where applicable."
+
+It's obvious it just has to do with my Map Algebra syntax, but I can't figure it out. Here's a snippet of my code:
+
+.. code-block:: python
+
+   slope = Slope("elevation") # elevation is the name of a raster!
+   goodslope = Con((slope < 20) & (slope > 5), 1)
+   goodslope.save("Final")
+
+
+
+Functions examples
+********************
+
+Unary operator
+------------------
+
+
+
+* SUM : Sum operator (y = sum(x))
+* AVERAGER: Average operator (y = mean(x))
+* VARIANCE: (y = Var(x))
+* STDDEV = StdDev()							 # y = sqrt(Var(x))
+* MSE = Mse()									 # y = mean(x**2)
+* RMSE = Rmse()								 # y = sqrt(mean(x**2))
+* MAD = Mad()								 	 # y = median(|x|)
+* MIN = Min()									 # y = min(x)
+* MAX = Max()									 # y = max(x)
+* MEDIAN = Median()							 # y = median(x)
+* ARGMIN = Argmin()							 # y = min {t | x(t) = min(x)}
+* ARGMAX = Argmax()							 # y = min {t | x(t) = max(x)}
+* ZEROS = Zeros()								 # y = {t | x(t) = 0}
+
+
+
+Examples
+***********
+
+Slope
+---------
+
+
+
+Turning function, sinuosity ?
+------------------------------
+
+
+
+
