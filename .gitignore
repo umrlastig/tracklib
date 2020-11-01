@@ -10,8 +10,8 @@
 /build/
 /dist/
 /tracklib.egg-info/
-/docs/_build/
-/docs/public/
-/docs/html/
+/doc/_build/
+/doc/public/
+/doc/html/
 /public/
 /cotation/

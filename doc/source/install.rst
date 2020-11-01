@@ -14,7 +14,7 @@ Installing from source
 
 .. code-block:: shell
 
-   git clone https://gitlab.com/mdvandamme/tracklib.git
+   git clone https://github.com/IGNF/tracklib.git
    cd tracklib
 
 
@@ -66,7 +66,7 @@ To launch the documentation:
 
 .. code-block:: shell
 
-   cd docs
+   cd doc
    make html
 
 

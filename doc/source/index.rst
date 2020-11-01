@@ -13,8 +13,7 @@ Welcome to TrackLib’s documentation!
 .. :PyPI: https://pypi.org/project/tracklib/
 
 
-This python library provide the main objects to manipulate GPS traces and a variety of tools, operators and functions, 
-to perform spatial analysis using these objects.
+Tracklib library provide a variety of tools, operators and functions to manipulate GPS tracks.
 
 
 .. toctree::
@@ -28,13 +27,13 @@ to perform spatial analysis using these objects.
 .. toctree::
    :maxdepth: 1
    :caption: User Guide
-   
-   coreconcept
+
    loading
-   operator
-   simplify
-   interpolation
-   summarize
+..   coreconcept
+..   operator
+..   simplify
+..   interpolation
+..   summarize
 
 
 
