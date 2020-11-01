@@ -1,0 +1,127 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Algorithme de calcul des Analytical Features.
+Plus quelques fonctions utilitaires
+"""
+
+import math
+import numpy as np
+
+
+
+# =============================================================================
+#   Gestion des valeurs non renseignées et non calculées
+#   
+# =============================================================================
+NAN = float('nan')
+
+def isnan(number):
+	return number != number
+
+
+
+# =============================================================================
+''' Pour calculer l'aire des triangles dans Visvalingam '''
+def aire_visval(track, i):
+	x0 = track.getObs(i-1).position.getX()
+	y0 = track.getObs(i-1).position.getY()
+	x1 = track.getObs(i).position.getX()
+	y1 = track.getObs(i).position.getY()
+	x2 = track.getObs(i+1).position.getX()
+	y2 = track.getObs(i+1).position.getY()
+	return triangle_area(x0,y0,x1,y1,x2,y2)
+
+
+# --------------------------------------------------------------------------
+# Function to compute area of triangle with cross product
+# --------------------------------------------------------------------------
+# Input : 
+#   - x0, y0         ::     point 1 coordinates
+#   - x1, y1         ::     point 2 coordinates
+#	- x2, y2         ::     point 3 coordinates
+# --------------------------------------------------------------------------
+# Output : area of P1P2P3 in coordinate units
+# --------------------------------------------------------------------------
+def triangle_area(x0,y0,x1,y1,x2,y2):
+	return 0.5*abs((x1-x0)*(y2-y1)-(x2-x1)*(y1-y0))
+	
+	
+# --------------------------------------------------------------------------
+# Function to compute distance between a point and a segment
+# --------------------------------------------------------------------------
+# Input : 
+#   - x0, y0         ::     point coordinates
+#   - x1, y1         ::     segment first point
+#	- x2, y2         ::     segment second point
+# --------------------------------------------------------------------------
+# Output : distance between point and projection coordinates
+# --------------------------------------------------------------------------
+def distance_to_segment(x0, y0, x1, y1, x2, y2):
+
+	# Segment length
+	l = math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1))
+
+	# Normalized scalar product
+	psn = ((x0-x1)*(x2-x1) + (y0-y1)*(y2-y1))/l
+	
+	X = max(x1, x2)
+	Y = max(y1, y2)
+	
+	x = min(x1, x2)
+	y = min(y1, y2)
+	
+	xproj = x1 + psn/l*(x2-x1)
+	yproj =	y1 + psn/l*(y2-y1)
+	
+	xproj = min(max(xproj, x), X)
+	yproj = min(max(yproj, y), Y)
+	
+	# Compute distance
+	d = math.sqrt((x0-xproj)*(x0-xproj)+(y0-yproj)*(y0-yproj))
+	
+	return d 
+	
+	
+# --------------------------------------------------------------------------
+# Function to form distance matrix
+# --------------------------------------------------------------------------
+# Input : 
+#   - T1     :: a list of points
+#   - T2     :: a list of points
+# --------------------------------------------------------------------------
+# Output : numpy distance matrix between T1 and T2
+# --------------------------------------------------------------------------	
+def makeDistanceMatrix(T1, T2):
+	
+	T1 = np.array(T1)
+	T2 = np.array(T2)
+	
+	# Signal stationnarity
+	base = min(np.concatenate((T1,T2)))
+	T1 = T1 - base
+	T2 = T2 - base
+	T1 = T1.T
+	T2 = T2.T
+
+	return np.sqrt((T1**2).reshape(-1, 1) + (T2**2) - 2 * (T1.reshape(-1, 1)*T2.T))
+	
+# --------------------------------------------------------------------------
+# Function to form covariance matrix from kernel
+# --------------------------------------------------------------------------
+# Input : 
+#   - kernel :: a function describing statistical similarity between points
+#   - T1     :: a list of points
+#   - T2     :: a list of points
+#   - factor :: unit factor of std dev (default 1.0)
+# --------------------------------------------------------------------------
+# Output : numpy covariance matrix between T1 and T2
+# --------------------------------------------------------------------------	
+def makeCovarianceMatrixFromKernel(kernel, T1, T2, factor=1.0):
+	
+	D = makeDistanceMatrix(T1,T2)
+	kfunc = np.vectorize(kernel.getFunction())
+	
+	return factor**2*kfunc(D)
+
+
