@@ -10,6 +10,9 @@ Install
 Installing from source
 ==========================
 
+Developer mode 
+---------------
+
 1. You may install the latest development version by cloning the GitLab repository:
 
 .. code-block:: shell
@@ -43,7 +46,10 @@ Installing from source
 
    pip install -e .
    python setup.py install
-   
+ 
+
+Running test
+--------------
    
 5 If you want to run unit tests, you have to install these dependencies:
 
@@ -53,6 +59,9 @@ Installing from source
    pip install pytest-runner
    pip install pytest-benchmark
 
+
+Running documentation
+------------------------
 
 6. If you want to generate the documentation, you have to install some dependencies are required:
 
@@ -69,6 +78,9 @@ To launch the documentation:
    cd doc
    make html
 
+
+Spyder IDE
+-------------
 
 7. A python IDE make the development more easy. To use spyder, you have to create a new project with an existing directory. 
 

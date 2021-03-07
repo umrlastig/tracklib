@@ -6,14 +6,53 @@
 Welcome to TrackLib’s documentation!
 =======================================
 
+Tracklib library provide a variety of tools, operators and functions to manipulate GPS tracks.
+
 :Documentation: https://ignf.tracklib.readthedocs.io/
 :Source Code: https://github.com/IGNF/tracklib
+
 .. :Issue Tracker: https://github.com/tracklib/tracklib/issues
 .. :Stack Overflow: https://stackoverflow.com/questions/tagged/tracklib
 .. :PyPI: https://pypi.org/project/tracklib/
 
 
-Tracklib library provide a variety of tools, operators and functions to manipulate GPS tracks.
+Background
+=============
+
+More and more datasets of GPS trajectories are now available and they are studied very frequently in many scientific domains. 
+Python libraries for tracks are available to load, simplify, interpolate, summarize and visualize them. 
+But there is no Python library that would contain all these basic functionality.  
+The package tracklib is designed for providing a variety of tools, operators and functions to manipulate GPS tracks.
+
+
+Among tracklib features
+=========================
+* Structured data to store GPS data
+* Load GPS data from files (GPS, CSV) or from databse
+* Operation classes for manipulating track
+* Propose generic method to simplify a track. For example (Douglas Peucker, Visvalingram algorithms or kernel Filter (Gaussian, Uniform, Dirac, etc.)).
+* Resample, interpolation and smoothing functions
+
+	.. figure:: ./img/smooth.gif
+	   :width: 450px
+	   :align: center
+
+       Figure 1 : Resample with MODE_SPLINE_SPATIAL
+	   
+	   
+* Ploting speed profil
+
+	.. figure:: ./img/Profil_vitesse_spatial_1.png
+	   :width: 550px
+	   :align: center
+
+* Summarize GPS information into a grid
+
+ 	.. figure:: ./img/grille_avg_speed.png
+	   :width: 550px
+	   :align: center
+  
+  
 
 
 .. toctree::
@@ -29,17 +68,17 @@ Tracklib library provide a variety of tools, operators and functions to manipula
    :caption: User Guide
 
    loading
-..   coreconcept
-..   operator
-..   simplify
+   coreconcept
+   operator
+   simplify
 ..   interpolation
-..   summarize
+   summarize
 
 
 
-TODO :
+.. TODO :
 
-* Documentation interne
+.. * Documentation interne
 
 .. Qu'est-ce que j'ai comme fonction pour lire une trace ?
 
@@ -78,14 +117,9 @@ TODO :
 .. -----------------------------------------------------
 
 
-.. figure:: ./img/Profil_vitesse_spatial_1.png
-   :width: 550px
-   :align: center
-
-
-.. figure:: ./img/Profil_vitesse_temporel_1.png
-   :width: 550px
-   :align: center
+.. .. figure:: ./img/Profil_vitesse_temporel_1.png
+..    :width: 550px
+..    :align: center
    
    
 
