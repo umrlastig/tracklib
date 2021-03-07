@@ -1,7 +1,8 @@
-.. TrackLib documentation master file, created by
-   sphinx-quickstart on Sat Sep 12 00:35:50 2020.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+:Author: Marie-Dominique Van Damme
+:Version: 1.0
+:License: --
+:Date: 07/03/2021
+
 
 Welcome to TrackLib’s documentation!
 =======================================
@@ -25,8 +26,9 @@ But there is no Python library that would contain all these basic functionality.
 The package tracklib is designed for providing a variety of tools, operators and functions to manipulate GPS tracks.
 
 
-Among tracklib features
-=========================
+Among tracklib main functionalities
+====================================
+
 * Structured data to store GPS data
 * Load GPS data from files (GPS, CSV) or from databse
 * Operation classes for manipulating track
@@ -52,7 +54,12 @@ Among tracklib features
 	   :width: 550px
 	   :align: center
   
-  
+
+Examples
+===========
+
+* See quick start for a first example
+* Further examples of *tracklib* use-cases can be found in the *example* folder
 
 
 .. toctree::
@@ -70,9 +77,11 @@ Among tracklib features
    loading
    coreconcept
    operator
-   simplify
-..   interpolation
    summarize
+..   simplify
+..   interpolation
+
+
 
 
 

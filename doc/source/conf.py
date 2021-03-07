@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'TrackLib'
-copyright = "2021, LASTIG lab in French National Institute of Geographic and Forest Information"
+copyright = "2021, LASTIG lab, French National Institute of Geographic and Forest Information"
 author = 'Yann Méneroux, Marie-Dominique Van Damme'
 
 # The full version, including alpha/beta/rc tags
