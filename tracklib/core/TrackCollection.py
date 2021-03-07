@@ -2,7 +2,11 @@
 # Class to manage collection of tracks
 # -----------------------------------------------------------------------------
 
+import matplotlib.pyplot as plt
+
+import tracklib.core.Operator as Operator
 import tracklib.core.Plot as Plot
+import tracklib.util.CellOperator as Sum
 
 class TrackCollection:
     
@@ -40,9 +44,41 @@ class TrackCollection:
             trace.addAnalyticalFeature(algorithm, name)
             
             
-    def plot(self, template='TRACK2D', afs = []):
+    def plot(self):
+        fig = plt.figure(figsize = (10, 8))
+        
+        #plt.xlim([xmin, xmax])
+        (xmin, xmax, ymin, ymax) = self.bbox()
+        plt.xlim([xmin, xmax])
+        plt.ylim([ymin, ymax])
         
         for trace in self.__TRACES:
-            plot = Plot.Plot(trace)
-            plot.plot(template, afs)
-        #plot.show()
+            X = trace.getX()
+            Y = trace.getY()
+            plt.plot(X, Y)
+        plt.show()
+        
+    
+    #def summarize(self, ):
+        
+        
+    def bbox(self):
+        tarray_xmin = []
+        tarray_xmax = []
+        tarray_ymin = []
+        tarray_ymax = []
+        
+        for trace in self.__TRACES:
+            tarray_xmin.append(trace.operate(Operator.Operator.MIN, 'x'))
+            tarray_xmax.append(trace.operate(Operator.Operator.MAX, 'x'))
+            tarray_ymin.append(trace.operate(Operator.Operator.MIN, 'y'))
+            tarray_ymax.append(trace.operate(Operator.Operator.MAX, 'y'))
+            
+        xmin = Sum.co_min(tarray_xmin)
+        xmax = Sum.co_max(tarray_xmax)
+        ymin = Sum.co_min(tarray_ymin)
+        ymax = Sum.co_max(tarray_ymax)
+        
+        return (xmin, xmax, ymin, ymax)
+        
+        
