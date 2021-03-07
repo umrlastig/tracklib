@@ -4,6 +4,7 @@
 # -------------------------- Grid -------------------------------
 #   Matrice à 2 dimensions
 #     Opérations avec ....
+#
 # ----------------------------------------------------------------
 from datetime import datetime
 from PIL import Image
@@ -15,8 +16,10 @@ import tracklib.core.core_utils as utils
 
 
 class Grid:
-    """ Une grille est définie par son coin inférieur droit, sa taille et la taille des cellules.
-    Elle contient des SummarizeTable (tableau des valeurs et )
+    """ 
+        Une grille est définie par son coin inférieur droit, 
+        sa taille et la taille des cellules.
+        Elle contient des SummarizeTable (tableau des valeurs et )
      """
     
     NO_DATA_VALUE = 0  #-99999.00
@@ -185,8 +188,8 @@ class Grid:
     def plot (self, af_algo, aggregate):
         name = af_algo.__name__ + '#' + aggregate.__name__
         k = self.__summarizeFieldDico[name]
-        fig = plt.figure(figsize = (12, 8))
-        fig.add_subplot(111)   
+        plt.figure(figsize = (10, 8))
+        #fig.add_subplot(111)   
         # plt.imshow(self.sum[:,:,k], interpolation='nearest', cmap=plt.cm.ocean)
         
         sumPlot = np.zeros((self.nrow, self.ncol, len(self.__summarizeFieldDico)), dtype='float')    
