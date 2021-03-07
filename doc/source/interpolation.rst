@@ -3,6 +3,8 @@
 Interpolation and smoothing functions
 =======================================
 
-Resample
+.. Resample
+
+TODO
 
 
