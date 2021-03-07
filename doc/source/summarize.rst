@@ -39,7 +39,7 @@ Example
 
 	GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2s1Z")
 
-
+	# Load gpx files
 	pathdir = '/PATH/GPS/'
 	LISTFILE = os.listdir(pathdir)
 	TRACES = []
@@ -58,22 +58,25 @@ Example
 
 		TRACES.append(trace)
 
-
+	# Create a collection of tracks
 	collection = trackCollection.TrackCollection(TRACES)
 	#collection.plot()
 
-	# Calcul de l'emprise
+	# Compute bounding box
 	(Xmin, Xmax, Ymin, Ymax) = collection.bbox()
 	XSize = Xmax - Xmin
 	YSize = Ymax - Ymin
 	PixelSize = 500
 
+	# Create a grid
 	grille = g.Grid(Xmin, Ymin, XSize, YSize, PixelSize)
 
 	# Summarize
 	af_algos = [algo.speed, algo.speed]
 	cell_operators = [celloperator.co_avg, celloperator.co_max]
 	grille.addAnalyticalFunctionForSummarize(TRACES, af_algos, cell_operators)
+	
+	# Plot rasters
 	grille.plot(algo.speed, celloperator.co_avg)
 	grille.plot(algo.speed, celloperator.co_max)
 

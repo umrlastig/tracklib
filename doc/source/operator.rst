@@ -20,6 +20,10 @@ You don't have to be a programmer to know how to use operators and functions eff
 is a high-level computational language used for performing cartographic spatial analysis using raster da
 
 
+Fonctions existantes et x(), y()
+
+
+
 Operators statement syntax
 *****************************
 
@@ -84,16 +88,64 @@ Ces opérateurs permettent
 * RANDOM
 * THRESHOLDER
 
+
 Examples
 ***********
 
-Slope
----------
+Simulate GPS data
+--------------------
+
+Generate analytical track
+
+.. figure:: ./img/generate_random.png
+   :width: 350px
+   :align: center
+
+
+Création d'une trace aléatoire (avec timestamps) suivant la forme d'une cardioïde + un bruit de type marche aléatoire:
+
+.. figure:: ./img/generate.png
+   :width: 350px
+   :align: center
+
+
+.. code-block:: python
+
+   def x(t):
+       return 10*math.cos(2*math.pi*t)*(1+math.cos(2*math.pi*t))
+   def y(t):
+       return 10*math.sin(2*math.pi*t)*(1+math.cos(2*math.pi*t))
+
+   track = Track.generate(x,y)
+
+   def prob():
+       return random.random()-0.5
+
+   track.operate(Operator.RANDOM, "", prob, "randx")
+   track.operate(Operator.RANDOM, "", prob, "randy")
+
+   track.operate(Operator.INTEGRATOR, "randx", "noisex")
+   track.operate(Operator.INTEGRATOR, "randy", "noisey")
+
+   track.operate(Operator.SCALAR_MULTIPLIER, "noisex", 0.5, "noisex")
+   track.operate(Operator.SCALAR_MULTIPLIER, "noisey", 0.5, "noisey")
+
+   track.operate(Operator.ADDER, "x", "noisex", "x_noised")
+   track.operate(Operator.ADDER, "y", "noisey", "y_noised")
+
+   kernel = GaussianKernel(21)
+
+   track.operate(Operator.FILTER, "x_noised", kernel, "x_filtered")
+   track.operate(Operator.FILTER, "y_noised", kernel, "y_filtered")
+
+   plt.plot(track.getAnalyticalFeature("x"), track.getAnalyticalFeature("y"), 'k--')
+   plt.plot(track.getAnalyticalFeature("x_noised"), track.getAnalyticalFeature("y_noised"), 'b-')
+   plt.plot(track.getAnalyticalFeature("x_filtered"), track.getAnalyticalFeature("y_filtered"), 'r-')
+
+   plt.show()
 
 
 
-Turning function, sinuosity ?
-------------------------------
 
 
 
