@@ -2,6 +2,7 @@
 /tracklib/algo/__pycache__/
 /tracklib/core/__pycache__/
 /tracklib/io/__pycache__/
+tracklib/util/__pycache__/
 /tests/__pycache__/
 /tracklib/*.pyc
 /.spyproject/
