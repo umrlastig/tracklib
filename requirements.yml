@@ -3,7 +3,6 @@ matplotlib
 psycopg2
 pytest
 pytest-runner
-pytest-cov
 coverage
 sphinx
 recommonmark
