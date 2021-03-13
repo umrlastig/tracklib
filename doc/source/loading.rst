@@ -9,12 +9,6 @@ Loading GPS data
 Many solutions exists to import or build GPS Data.
 
 
-Import from CSV File
-***********************
-
-TODO
-
-
 Import from a GPX File
 *************************
 
@@ -33,6 +27,11 @@ Import from a GPX File
     	traces = gpx.GpxReader.readFromGpx(pathdir + f)
 	    trace = traces[0]
 
+
+Import from CSV File
+***********************
+
+TODO
 
 
 Import from a PostgreSQL database
