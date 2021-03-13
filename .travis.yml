@@ -8,5 +8,6 @@ install:
 	python --version
 
 script:
+  - pytest 
 
 after_success:
