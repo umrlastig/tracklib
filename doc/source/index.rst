@@ -7,10 +7,12 @@
 Welcome to TrackLib’s documentation!
 =======================================
 
-Tracklib library provide a variety of tools, operators and functions to manipulate GPS tracks.
+*tracklib library provide a variety of tools, operators and functions to manipulate GPS tracks.*
 
 .. :Documentation: https://tracklib.readthedocs.io/en/latest/index.html
 :Source Code: https://github.com/umrlastig/tracklib
+
+|travis| |codecov| |rtd| 
 
 .. |travis| image:: https://travis-ci.org/umrlastig/tracklib.svg?branch=main
 .. |codecov| image:: https://codecov.io/gh/umrlastig/tracklib/branch/main/graph/badge.svg
@@ -19,6 +21,8 @@ Tracklib library provide a variety of tools, operators and functions to manipula
 .. :Issue Tracker: https://github.com/tracklib/tracklib/issues
 .. :Stack Overflow: https://stackoverflow.com/questions/tagged/tracklib
 .. :PyPI: https://pypi.org/project/tracklib/
+
+.. contents:: :local:
 
 
 Background
