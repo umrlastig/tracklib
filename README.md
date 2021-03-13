@@ -46,6 +46,7 @@ trace.plot()
 ```
 
 Trajectory plot:
+
 ![png](https://tracklib.readthedocs.io/en/latest/_images/quickstart_1.png)
 
 ```python
@@ -58,6 +59,7 @@ trace.plotAnalyticalFeature('speed', 'BOXPLOT')
 ```
 
 Speed observations boxplot:
+
 ![png](https://tracklib.readthedocs.io/en/latest/_images/quickstart_2.png)
 
 ```python
@@ -69,6 +71,7 @@ trace.plotAnalyticalFeature("absdv", "PLOT")
 ```
 
 Speed change according to the curvilinear abscissa:
+
 ![png](https://tracklib.readthedocs.io/en/latest/_images/quickstart_3.png)
 
 ```python
@@ -106,6 +109,7 @@ plt.show()
 ```
 
 Segmentation per speed change:
+
 ![png](https://tracklib.readthedocs.io/en/latest/_images/quickstart_4.png)
 
 
