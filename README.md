@@ -2,7 +2,7 @@
 # Tracklib
 **Tracklib** library provide a variety of tools, operators and functions to manipulate GPS tracks
 
-[![build status](https://travis-ci.org/github/umrlastig/tracklib.svg?branch=master)](https://travis-ci.org/github/umrlastig/tracklib)
+[![build status](https://travis-ci.com/github/umrlastig/tracklib.svg?branch=master)](https://travis-ci.com/github/umrlastig/tracklib)
 
 
 # Authors
