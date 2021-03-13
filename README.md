@@ -45,8 +45,8 @@ for i in range(trace.size()):
 trace.plot()
 ```
 
+Trajectory plot:
 ![png](https://tracklib.readthedocs.io/en/latest/_images/quickstart_1.png)
-
 
 ```python
 # ------------------------------------------------------------------
@@ -57,8 +57,56 @@ trace.operate(Operator.DIFFERENTIATOR, "speed", "dv")
 trace.plotAnalyticalFeature('speed', 'BOXPLOT')
 ```
 
+Speed observations boxplot:
 ![png](https://tracklib.readthedocs.io/en/latest/_images/quickstart_2.png)
 
+```python
+# ------------------------------------------------------------------
+#  Compute speed change 
+# ------------------------------------------------------------------
+trace.operate(Operator.RECTIFIER, "dv", "absdv")
+trace.plotAnalyticalFeature("absdv", "PLOT")
+```
+
+Speed change according to the curvilinear abscissa:
+![png](https://tracklib.readthedocs.io/en/latest/_images/quickstart_3.png)
+
+```python
+# ------------------------------------------------------------------
+#  Segmentation
+# ------------------------------------------------------------------
+trace.segmentation(["absdv"], "speed_decoup", [1.5])
+	
+# ------------------------------------------------------------------
+# + récupération d'un sous-ensemble de traces 
+# + interpolation/lissage + ré-estimation des vitesses...
+# ------------------------------------------------------------------
+seg = trace.split_segmentation("speed_decoup")
+
+COLORS = ['k-','r-','g-','b-','y-','m-','c-']
+
+count = 0
+interp.SPLINE_PENALIZATION = 1e-2
+for i in range(len(seg)):
+	trace = seg[i]
+	if (trace.length() < 50):
+		continue
+
+	count += 1
+	trace.resample(1, interp.ALGO_THIN_SPLINES, interp.MODE_SPATIAL)
+	trace.estimate_speed()
+	diff = trace.getLastObs().timestamp-trace.getFirstObs().timestamp
+	v = round(trace.length()/diff*3.6,2)
+	vm = round(trace.operate(Operator.MAX, "speed")*3.6,2)
+	vc = round(100/(trace.getObs(150).timestamp-trace.getObs(50).timestamp)*3.6,2)
+	print("Rep", count, ":  vmoy = ", v, "km/h   vmax = ", vm, " km/h   vc = ", vc, "km/h")
+	plt.plot(trace.getX(), trace.getY(), COLORS[i%7])
+
+plt.show()
+```
+
+Segmentation per speed change:
+![png](https://tracklib.readthedocs.io/en/latest/_images/quickstart_4.png)
 
 
 # Development & Contributions
