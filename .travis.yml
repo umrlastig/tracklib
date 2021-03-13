@@ -10,9 +10,6 @@ script:
   - pytest 
   - pytest --cov=tracklib test/
 
-env:
-    - CODECOV_TOKEN=<token>#IF ONLY YOU HAVE A PRIVATE REPOSITORY
-
 after_success:
   - coveralls
 
