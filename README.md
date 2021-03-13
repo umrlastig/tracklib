@@ -5,7 +5,7 @@
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![build status](https://travis-ci.org/umrlastig/tracklib.svg?branch=main)](https://travis-ci.org/umrlastig/tracklib)
 [![codecov](https://codecov.io/gh/umrlastig/tracklib/branch/master/graph/badge.svg)](https://codecov.io/gh/umrlastig/tracklib)
-[![docs status](https://readthedocs.org/projects/tracklib/badge/?version=latest)](https://tracklib.readthedocs.io/en/latest/)
+
 
 
 # Authors
