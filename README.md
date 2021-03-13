@@ -10,7 +10,7 @@
 - Marie-Dominique Van Damme
 
 
-# Institutes
+# Institute
 - LASTIG, Univ Gustave Eiffel, ENSG, IGN
 
 
