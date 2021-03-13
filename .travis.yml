@@ -12,7 +12,7 @@ install:
 
 script:
   - pytest test/
-  - nosetests --with-coverage --cover-inclusive --with-doctest --cover-package=tracklib ./
+  - coverage run --source=./tracklib test
   - cd doc
   - make html
 
