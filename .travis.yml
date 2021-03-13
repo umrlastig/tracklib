@@ -12,7 +12,7 @@ install:
 
 script:
   - pytest test/
-  - pytest --cov-config=.coveragerc --cov=tracklib tests/
+  - pytest --cov-config=.coveragerc --cov=tracklib test/
   - cd doc
   - make html
 
