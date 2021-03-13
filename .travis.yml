@@ -1,4 +1,8 @@
+dist: xenial
 language: python
+branches:
+  only:
+    - main
 
 python:
   - "3.7"
@@ -8,7 +12,6 @@ install:
 
 script:
   - pytest --cov=tracklib test/
-  - coverage run --source=./tracklib -m py.test
   - cd doc
   - make html
 
