@@ -8,12 +8,23 @@
 [![Documentation Status](https://readthedocs.org/projects/tracklib/badge/?version=latest)](https://tracklib.readthedocs.io/en/latest/?badge=latest)
 
 
-# Documentation
+## README Contents
+
+- [Documentation](#Documentation)
+- [Quickstart](#Quickstart)
+- Development & Contributions
+    - [License](#License)
+    - [Authors](#Authors)
+	- [Institute](#Institute)
+- [Attribution (citation)](#Attribution)
+
+
+## Documentation
 
 The official documentation is available at **[ReadTheDocs](https://tracklib.readthedocs.io)**
 
 
-# Quickstart 
+## Quickstart 
 
 ```python
 import matplotlib.pyplot as plt
@@ -113,7 +124,7 @@ Segmentation per speed change:
 ![png](https://tracklib.readthedocs.io/en/latest/_images/quickstart_4.png)
 
 
-# Development & Contributions
+## Development & Contributions
 
 ### License
 - Cecill-C
