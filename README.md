@@ -8,6 +8,26 @@
 [![Documentation Status](https://readthedocs.org/projects/tracklib/badge/?version=latest)](https://tracklib.readthedocs.io/en/latest/?badge=latest)
 
 
+# Documentation
+
+The official documentation is available at **[ReadTheDocs](https://tracklib.readthedocs.io)**
+
+
+# Quickstart 
+
+```python
+import matplotlib.pyplot as plt
+
+import tracklib.algo.Interpolation as interp
+import tracklib.core.Obs as obs
+from tracklib.core.GPSTime import GPSTime
+from tracklib.io.GpxReader import GpxReader
+from tracklib.core.Coords import GeoCoords
+from tracklib.core.Operator import Operator
+```
+
+
+
 # Authors
 - Yann Méneroux
 - Marie-Dominique Van Damme
@@ -21,9 +41,7 @@
 - Cecill-C
 
 
-# Resources
 
-The official documentation is available at **[ReadTheDocs](https://tracklib.readthedocs.io)**
 
 
 

@@ -4,6 +4,8 @@
 /tracklib/io/__pycache__/
 tracklib/util/__pycache__/
 /tests/__pycache__/
+test/__pycache__/
+example/__pycache__/
 /tracklib/*.pyc
 /.spyproject/
 /data/resultat/
@@ -17,5 +19,4 @@ tracklib/util/__pycache__/
 /public/
 /cotation/
 /source/
-test/__pycache__/
 .coverage
