@@ -17,6 +17,6 @@ script:
   - make html
 
 after_success:
-  - coveralls
+  - codecov
 
   

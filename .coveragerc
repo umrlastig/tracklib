@@ -1,2 +1,2 @@
-[tool:pytest]
-addopts = --cov=tracklib --cov-report html
+[report]
+show_missing = True
