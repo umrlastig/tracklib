@@ -8,5 +8,7 @@ install:
 
 script:
   - pytest 
+  - pytest --cov=tracklib test/
+ 
 
 after_success:

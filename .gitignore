@@ -17,3 +17,5 @@ tracklib/util/__pycache__/
 /public/
 /cotation/
 /source/
+test/__pycache__/
+.coverage
