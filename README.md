@@ -45,6 +45,19 @@ for i in range(trace.size()):
 trace.plot()
 ```
 
+![png](https://tracklib.readthedocs.io/en/latest/_images/quickstart_1.png)
+
+
+```python
+# ------------------------------------------------------------------
+#  Compute local speed and display boxplot of speed observations
+# ------------------------------------------------------------------
+trace.estimate_speed()
+trace.operate(Operator.DIFFERENTIATOR, "speed", "dv")
+trace.plotAnalyticalFeature('speed', 'BOXPLOT')
+```
+
+![png](https://tracklib.readthedocs.io/en/latest/_images/quickstart_2.png)
 
 
 
