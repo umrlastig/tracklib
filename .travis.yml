@@ -11,7 +11,8 @@ install:
   - pip install -r requirements.yml
 
 script:
-  - pytest --cov=tracklib test/
+  - pytest test/
+  - pytest --cov-config=.coveragerc --cov=tracklib tests/
   - cd doc
   - make html
 

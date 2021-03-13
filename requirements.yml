@@ -8,4 +8,4 @@ coverage
 coveralls
 sphinx
 recommonmark
-sphinx_rtd_theme
+sphinx-book-theme
