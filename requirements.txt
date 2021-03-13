@@ -3,3 +3,4 @@ matplotlib
 psycopg2
 pytest
 pytest-runner
+coverage
