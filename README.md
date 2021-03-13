@@ -16,7 +16,6 @@
     - [License](#License)
     - [Authors](#Authors)
 	- [Institute](#Institute)
-- [Attribution (citation)](#Attribution)
 
 
 ## Documentation
