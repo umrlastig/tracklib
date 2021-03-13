@@ -13,6 +13,8 @@ install:
 script:
   - pytest 
   - coverage run --source=./tracklib -m py.test
+  - cd doc
+  - make html
 
 after_success:
   - coveralls
