@@ -12,6 +12,10 @@ Tracklib library provide a variety of tools, operators and functions to manipula
 :Documentation: https://tracklib.readthedocs.io/en/latest/index.html
 :Source Code: https://github.com/umrlastig/tracklib
 
+.. |travis| image:: https://travis-ci.org/umrlastig/tracklib.svg?branch=main
+.. |codecov| image:: https://codecov.io/gh/umrlastig/tracklib/branch/main/graph/badge.svg
+.. |rtd| image:: https://readthedocs.org/projects/tracklib/badge/?version=latest
+
 .. :Issue Tracker: https://github.com/tracklib/tracklib/issues
 .. :Stack Overflow: https://stackoverflow.com/questions/tagged/tracklib
 .. :PyPI: https://pypi.org/project/tracklib/
