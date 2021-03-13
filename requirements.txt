@@ -6,3 +6,6 @@ pytest-runner
 pytest-cov
 coverage
 coveralls
+sphinx
+recommonmark
+sphinx_rtd_theme
