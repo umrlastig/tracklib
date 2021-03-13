@@ -9,8 +9,8 @@ Welcome to TrackLib’s documentation!
 
 Tracklib library provide a variety of tools, operators and functions to manipulate GPS tracks.
 
-:Documentation: https://ignf.tracklib.readthedocs.io/
-:Source Code: https://github.com/IGNF/tracklib
+:Documentation: https://tracklib.readthedocs.io/en/latest/index.html
+:Source Code: https://github.com/umrlastig/tracklib
 
 .. :Issue Tracker: https://github.com/tracklib/tracklib/issues
 .. :Stack Overflow: https://stackoverflow.com/questions/tagged/tracklib
