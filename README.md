@@ -15,6 +15,37 @@ The official documentation is available at **[ReadTheDocs](https://tracklib.read
 
 # Quickstart 
 
+```python
+import matplotlib.pyplot as plt
+
+import tracklib.algo.Interpolation as interp
+import tracklib.core.Obs as obs
+from tracklib.core.GPSTime import GPSTime
+from tracklib.io.GpxReader import GpxReader
+from tracklib.core.Coords import GeoCoords
+from tracklib.core.Operator import Operator
+
+# ------------------------------------------------------------------
+# Read data and plot track
+# ------------------------------------------------------------------
+GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
+tracks = GpxReader.readFromGpx("../data/activity_5807084803.gpx")
+trace = tracks[0]
+
+base_geo = trace.getFirstObs().position
+base = GeoCoords(base_geo.getX(), base_geo.getY(), base_geo.getZ())
+for i in range(trace.size()):
+	x = trace.getObs(i).position.getX()
+	y = trace.getObs(i).position.getY()
+	z = trace.getObs(i).position.getZ()
+	geo = GeoCoords(x, y, z)
+	enu = geo.toENUCoords(base)
+	trace.setObs(i, obs.Obs(enu,trace.getObs(i).timestamp))
+
+trace.plot()
+```
+
+
 
 
 # Development & Contributions
