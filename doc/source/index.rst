@@ -23,10 +23,6 @@ Welcome to TrackLib’s documentation!
 .. :PyPI: https://pypi.org/project/tracklib/
 
 
-.. contents:: :local:
-
-
-
 Background
 =============
 
