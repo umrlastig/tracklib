@@ -9,7 +9,6 @@ Welcome to TrackLib’s documentation!
 
 *tracklib library provide a variety of tools, operators and functions to manipulate GPS tracks.*
 
-.. :Documentation: https://tracklib.readthedocs.io/en/latest/index.html
 :Source Code: https://github.com/umrlastig/tracklib
 
 |travis| |codecov| |rtd| 
@@ -18,13 +17,10 @@ Welcome to TrackLib’s documentation!
 .. |codecov| image:: https://codecov.io/gh/umrlastig/tracklib/branch/main/graph/badge.svg
 .. |rtd| image:: https://readthedocs.org/projects/tracklib/badge/?version=latest
 
-.. :Issue Tracker: https://github.com/tracklib/tracklib/issues
-.. :Stack Overflow: https://stackoverflow.com/questions/tagged/tracklib
-.. :PyPI: https://pypi.org/project/tracklib/
 
 
 Background
-=============
+**************
 
 More and more datasets of GPS trajectories are now available and they are studied very frequently in many scientific domains. 
 Python libraries for tracks are available to load, simplify, interpolate, summarize and visualize them. 
@@ -33,7 +29,7 @@ The package tracklib is designed for providing a variety of tools, operators and
 
 
 Among tracklib main functionalities
-====================================
+*************************************
 
 * Structured data to store GPS data
 * Load GPS data from files (GPS, CSV) or from databse
@@ -62,16 +58,18 @@ Among tracklib main functionalities
   
 
 Examples
-===========
+**********
 
 * See quick start for a first example
-* Further examples of *tracklib* use-cases can be found in the *example* folder
+* Further examples of *tracklib* use-cases can be found in the *example* folder: SpeedProfil.py, Interpolation.py, LoadFromDatabase.py
+
+
 
 
 .. toctree::
    :maxdepth: 1
    :caption: Tutorials
-   
+
    install
    quickstart
 ..   convention

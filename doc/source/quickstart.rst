@@ -2,6 +2,10 @@
 Quick start 
 =============
 
+- Further examples of tracklib use-cases can be found in the example folder: SpeedProfil.py, Interpolation.py, LoadFromDatabase.py
+
+
+
 .. code-block:: python
 
 	import matplotlib.pyplot as plt
