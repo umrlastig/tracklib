@@ -2,9 +2,6 @@
 Quick start 
 =============
 
-- Further examples of tracklib use-cases can be found in the example folder: SpeedProfil.py, Interpolation.py, LoadFromDatabase.py
-
-
 
 .. code-block:: python
 
@@ -118,3 +115,5 @@ Quick start
 
    Figure 4 : Segmentation per speed change
 
+
+- Further examples of tracklib use-cases can be found in the example folder: SpeedProfil.py, Interpolation.py, LoadFromDatabase.py

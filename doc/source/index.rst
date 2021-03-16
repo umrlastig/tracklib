@@ -7,7 +7,7 @@
 Welcome to TrackLib’s documentation!
 =======================================
 
-*tracklib library provide a variety of tools, operators and functions to manipulate GPS tracks.*
+*tracklib library provide a variety of tools, operators and functions to manipulate GPS trajectories.*
 
 :Source Code: https://github.com/umrlastig/tracklib
 
@@ -23,9 +23,12 @@ Background
 **************
 
 More and more datasets of GPS trajectories are now available and they are studied very frequently in many scientific domains. 
-Python libraries for tracks are available to load, simplify, interpolate, summarize and visualize them. 
+Python libraries for trajectories are available to load, simplify, interpolate, summarize and visualize them. 
 But there is no Python library that would contain all these basic functionality.  
-The package tracklib is designed for providing a variety of tools, operators and functions to manipulate GPS tracks.
+
+Furthermore, adding analytical features on a observation or on all observation of a trajectory (function of coordinates or timestamp) 
+is, in general, a complex and a boring task. So, to make it easier, *Tracklib* module offers a multitude of operators 
+and functions to simplify the creation of analytical features on a GPS traces. 
 
 
 Among tracklib main functionalities
@@ -35,13 +38,20 @@ Among tracklib main functionalities
 * Load GPS data from files (GPS, CSV) or from databse
 * Operation classes for manipulating track
 * Propose generic method to simplify a track. For example (Douglas Peucker, Visvalingram algorithms or kernel Filter (Gaussian, Uniform, Dirac, etc.)).
+
+    .. figure:: ./img/generate_random.png
+	   :width: 450px
+	   :align: center
+	   
+	   Figure 1 : Simplify with a gaussian filter
+
 * Resample, interpolation and smoothing functions
 
 	.. figure:: ./img/smooth.gif
 	   :width: 450px
 	   :align: center
 
-       Figure 1 : Resample with MODE_SPLINE_SPATIAL
+       Figure 2 : Resample with MODE_SPLINE_SPATIAL
 	   
 	   
 * Ploting speed profil

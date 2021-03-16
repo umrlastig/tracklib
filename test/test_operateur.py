@@ -87,7 +87,6 @@ class TestOperateurMethods(unittest.TestCase):
 
 		track.operate(Operator.FILTER, ("x_noised", "y_noised"), kernel, ("x_filtered", "y_filtered"))
 
-
 		plt.plot(track.getX(), track.getY(), 'k--')
 		plt.plot(track.getAnalyticalFeature("x_noised"), track.getAnalyticalFeature("y_noised"), 'b-')
 		plt.plot(track.getAnalyticalFeature("x_filtered"), track.getAnalyticalFeature("y_filtered"), 'r-')
