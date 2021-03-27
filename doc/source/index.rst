@@ -91,8 +91,9 @@ Examples
    loading
    coreconcept
    operator
+   simplify
    summarize
-..   simplify
+
 ..   interpolation
 
 

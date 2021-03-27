@@ -1,3 +1,4 @@
+:Author: Marie-Dominique Van Damme
 :Version: 1.0
 :License: --
 :Date: 20/09/2020

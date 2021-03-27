@@ -1,3 +1,7 @@
+:Author: Marie-Dominique Van Damme
+:Version: 1.0
+:License: --
+:Date: 07/03/2021
 
 
 Operation classes for manipulating track
@@ -5,7 +9,7 @@ Operation classes for manipulating track
 
 La librairie tracklib propose une multitude d'opérateurs et de fonctions 
 qui permettent de simplifier au maximum la création d'analytical features sur une trace. 
-Les opérateurs opèrent aussi bien sur les coordonnées que sur le timestamp de la trace. 
+Ils opèrent aussi bien sur les coordonnées que sur le timestamp de la trace. 
 
 .. with points of track
 .. (containing operators and functions) 
@@ -31,21 +35,140 @@ Fonctions à disposition: ds, speed, abs_curv
 D'autres algorithmes dans : AlgoAF
 
 
+Add analytical feature with available operators
+*************************************************
 
-Available operators
-***********************
+..   import tracklib as tl
+..   tl.GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+..   chemin = '../data/trace0.gps'
+..   trace = tl.FileReader.readFromFile(chemin, 1, 2, 3, -1, separator=",")
+   
 
 Unary void operator
 ----------------------
 
+These operators give us the possibility to create a new analytical feature *y(t)* on the same observation 
+according to an already existing analytical feature *x(t)*:
+
+.. figure:: ./img/op_unary_void_02.png
+   :width: 450px
+   :align: center
+	   
+   Figure 1 : Apply an unary void operator on an observation
+
+
+Example :
+
+.. code-block:: python
+
+   trace.operate(tl.Operator.DIFFERENTIATOR, "x", "dx")
+   trace.operate(tl.Operator.DIFFERENTIATOR, "y", "dy")
+   trace.operate(tl.Operator.SQUARE, "dx", "dx2")
+   trace.operate(tl.Operator.SQUARE, "dy", "dy2")
+
+
+All available unary void operator:
+
++----------------+---------------------+----------------------------------+
+| IDENTITY       | Identity            | y(t) = x(t)                      |
++----------------+---------------------+----------------------------------+
+| RECTIFIER      | Rectifier           | y(t) = \|x(t)\|                  |
++----------------+---------------------+----------------------------------+
+| INTEGRATOR     | Integrator          | y(t) = y(t-1) + y(t)             |
++----------------+---------------------+----------------------------------+
+| SHIFT_RIGHT    | ShiftRight          | y(t) = x(t-1)                    |
++----------------+---------------------+----------------------------------+
+| SHIFT_LEFT     | ShiftLeft           | y(t) = x(t+1)                    |
++----------------+---------------------+----------------------------------+
+| INVERTER       | Inverter            | y(t) = -x(t)                     |
++----------------+---------------------+----------------------------------+
+| DEBIASER       | Debiaser            | y(t) = x(t) - mean(x)            |
++----------------+---------------------+----------------------------------+
+| SQUARE         | Square              | y(t) = x(t)*x(t)                 |
++----------------+---------------------+----------------------------------+
+| SQRT           | Sqrt                | y(t) = x(t)**(0.5)               |
++----------------+---------------------+----------------------------------+
+| NORMALIZER     | Normalizer          | y(t) = (x(t) - mean(x))/sigma(x) |
++----------------+---------------------+----------------------------------+
+| DIFFERENTIATOR | Differentiator      | y(t) = x(t) - x(t-1)             |
++----------------+---------------------+----------------------------------+
+| DIODE          | Diode               | y(t) = 1[x>0] * x(t)             |
++----------------+---------------------+----------------------------------+
+| SIGN           | Sign                | y(t) = x(t)/\|x(t)\|             |
++----------------+---------------------+----------------------------------+
+| EXP            | Exp                 | y(t) = exp(x(t))                 |
++----------------+---------------------+----------------------------------+
+| LOG            | Log                 | y(t) = log(x(t))                 |
++----------------+---------------------+----------------------------------+
+
+	 
 Binary void operator
 ----------------------
 
+These operators give us the possibility to create a new analytical feature *y(t)* on the same observation 
+according to two already existing analytical features *x1(t)* and *x2(t)*:
 
+.. figure:: ./img/op_binary_void_01.png
+   :width: 450px
+   :align: center
+	   
+   Figure 2 : Apply a binary void operator on an observation
+
+
+Example :
+
+.. code-block:: python
+
+   track.operate(Operator.ADDER, "dx2", "dy2", "dx2+dy2")
+
+
+All available binary void operator:
+
++--------------------+---------------------+---------------------------------------------------+
+| ADDER              | Adder               | y(t) = x1(t) + x2(t)                              |
++--------------------+---------------------+---------------------------------------------------+
+| SUBSTRACTER        | Substracter         | y(t) = x1(t) - x2(t)                              |
++--------------------+---------------------+---------------------------------------------------+
+| MULTIPLIER         | Multiplier          | y(t) = x1(t) * x2(t)                              |
++--------------------+---------------------+---------------------------------------------------+
+| DIVIDER            | Divider             | y(t) = x1(t) / x2(t)                              |
++--------------------+---------------------+---------------------------------------------------+
+| POWER              | Power               | y(t) = x1(t) ** x2(t)                             |
++--------------------+---------------------+---------------------------------------------------+
+| RENORMALIZER       | Renormalizer        | y(t) = (x1(t)-m(x1))* s(x2)/s(x1) + m(x2)         |
++--------------------+---------------------+---------------------------------------------------+
+| DERIVATOR          | Derivator           | y(t) = (x1(t)-x1(t-1))/(x2(t)-x2(t-1)) = dx1/dx2  |
++--------------------+---------------------+---------------------------------------------------+
+| POINTWISE_EQUALER  | PointwiseEqualer    | y(t) = 1 if x1(t)=x2(t), 0 otherwise              |
++--------------------+---------------------+---------------------------------------------------+
+| CONVOLUTION        | Convolution         | y(t) = int(x1(h)*x2(t-h)dh)                       |
++--------------------+---------------------+---------------------------------------------------+
+
+ 
 Unary operator
 -----------------
 
-.. Ces opérateurs permettent 
+These operators give us the possibility to create a new analytical feature *y* on the trajectory 
+according to an already existing analytical feature *x(t)* on all observations:
+
+.. figure:: ./img/op_unary_01.png
+   :width: 450px
+   :align: center
+	   
+   Figure 3 : Apply a unary operator on a trajectory
+
+Example :
+
+.. code-block:: python
+
+   trace.addAnalyticalFeature(tl.speed)
+   moyspeed = trace.operate(tl.Operator.AVERAGER, "speed", "mspeed")
+   medspeed = trace.operate(tl.Operator.MEDIAN, "speed", "mspeed")
+   trace.plotAnalyticalFeature('speed', 'BOXPLOT')
+   print (moyspeed, medspeed)
+
+
+All available unary operator:
 
 +------------+---------------------+-------------------------------+
 | SUM        | Sum operator        | y = sum(x)                    |
@@ -79,9 +202,43 @@ Unary operator
 Binary operator
 -------------------
 
+These operators give us the possibility to create a new analytical feature *y* on the trajectory 
+according to two already existing analytical features *x1(t)* and *x2(t)* on all observations:
+
+.. figure:: ./img/op_binary_01.png
+   :width: 450px
+   :align: center
+	   
+   Figure 4 : Apply a binary operator on a trajectory
+
+
+All available unary operator:
+
++--------------+---------------------+---------------------------------------+
+| COVARIANCE   | Covariance          | y = m[x1x2] - m[x1]*m[x2]             |
++--------------+---------------------+---------------------------------------+
+| CORRELATOR   | Correlator          | y = cov(x1,x2)/(sigma(x1)*sigma(x2))  |
++--------------+---------------------+---------------------------------------+
+| L0           | L0Diff              | y = #{t | x1(t) != x2(t)}             |
++--------------+---------------------+---------------------------------------+
+| L1           | L1Diff              | y = mean(|x1(t)-x2(t)|)               |
++--------------+---------------------+---------------------------------------+
+| L2           | L2Diff              | y = mean(|x1(t)-x2(t)|**2)            |
++--------------+---------------------+---------------------------------------+
+| LINF         | LInfDiff            | y = max(|x1(t)-x2(t)|)                |
++--------------+---------------------+---------------------------------------+
+| EQUAL        | Equal               | y = 1 if {x1(t) = x2(t) for all t}    |
++--------------+---------------------+---------------------------------------+
+ 
 
 Scalar operator
 -----------------
+
+.. Ces opérateurs permettent
+
++--------------+---------------------+-----------------------------------------------+
+| AGGREGATE    | Aggregate           | y(t) = arg({x(t)})   (arg is a list function) |
++--------------+---------------------+-----------------------------------------------+
 
 
 Scalar void operator
@@ -104,9 +261,10 @@ Scalar void operator
 +---------------+---------------------+------------------------------------------------------------------------+
 
 
-Examples
-***********
+Application
+*************
 
+Calculation of the root mean square error 
 
 **TODO**
 
@@ -127,19 +285,16 @@ Examples
 ..   :align: center
 
 
+New operators statement syntax
+********************************
 
-
-
-Operators statement syntax
-*****************************
-
-To create a new operator *nom_operateur*:
+To create a new operator named *nom_operateur*:
 
 .. code-block:: python
 
    class nom_operateur (<type_operateur>):
        
-	   def execute(self, track, af_input, kernel, af_output):
+       def execute(self, track, af_input, kernel, af_output):
            temp = [0]*track.size()
            track.createAnalyticalFeature(af_output)
            utils.addListToAF(track, af_output, temp)
@@ -149,5 +304,20 @@ To create a new operator *nom_operateur*:
 Depends on what you want to create, **type_operateur** will specify your choice.
 
 
+Add analytical feature with algorithm
+***************************************
 
+.. code-block:: python
+
+   trace.addAnalyticalFeature(tl.speed)
+
+
+New algorithms statement syntax
+*********************************
+
+To create a new algorithm named *nom_operateur*:
+
+.. code-block:: python
+
+   def nom_operateur(track, i):
 

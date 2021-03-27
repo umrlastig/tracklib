@@ -87,3 +87,5 @@ Example
    :align: center
 
    Figure 2 : Two features: mean speeds (left) and max speeds (right
+
+
