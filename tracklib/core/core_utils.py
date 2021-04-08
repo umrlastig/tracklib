@@ -80,8 +80,7 @@ def distance_to_segment(x0, y0, x1, y1, x2, y2):
 	# Compute distance
 	d = math.sqrt((x0-xproj)*(x0-xproj)+(y0-yproj)*(y0-yproj))
 	
-	return d 
-	
+	return d 	
 	
 # --------------------------------------------------------------------------
 # Function to form distance matrix
@@ -124,4 +123,49 @@ def makeCovarianceMatrixFromKernel(kernel, T1, T2, factor=1.0):
 	
 	return factor**2*kfunc(D)
 
+# --------------------------------------------------------------------------
+# Function to convert RGBA color to hexadecimal
+# --------------------------------------------------------------------------
+# Input : 
+#   - color :: a 3 or 4-element array R, G, B [,alpha]
+# Each color and transparency channel is in [0,1]
+# --------------------------------------------------------------------------
+# Output : a string containing color in hexadecimal
+# --------------------------------------------------------------------------
+def rgbToHex(color):
+	if len(color) == 3:
+		color.append(1)
+	R = hex((int)(color[0]*255))[2:]
+	G = hex((int)(color[1]*255))[2:]
+	B = hex((int)(color[2]*255))[2:]
+	A = hex((int)(color[3]*255))[2:]
+	if (len(R) < 2):
+		R = "0"+R
+	if (len(G) < 2):
+		G = "0"+G
+	if (len(B) < 2):
+		B = "0"+B
+	if (len(A) < 2):
+		A = "0"+A
+	return "0x"+A+B+G+R
 
+# --------------------------------------------------------------------------
+# Function to interpolate RGBA (or RGB) color between two values
+# --------------------------------------------------------------------------
+# Input : 
+#   - v: a float value
+#   - vmin: minimal value of v (color cmin)
+#   - vmax: maximal value of v (color cmax)
+#   - cmin : a 3 or 4-element array R, G, B [,alpha]
+#   - cmax : a 3 or 4-element array R, G, B [,alpha]
+# --------------------------------------------------------------------------
+# Output : a 4-element array 
+# --------------------------------------------------------------------------
+def interpColors(v, vmin, vmax, cmin, cmax):
+	O = []
+	O.append(((vmax-v)*cmin[0] + (v-vmin)*cmax[0])/(vmax-vmin))
+	O.append(((vmax-v)*cmin[1] + (v-vmin)*cmax[1])/(vmax-vmin))
+	O.append(((vmax-v)*cmin[2] + (v-vmin)*cmax[2])/(vmax-vmin))
+	if len(cmin) == 4:
+		O.append(((vmax-v)*cmin[3] + (v-vmin)*cmax[3])/(vmax-vmin))
+	return O

@@ -8,16 +8,14 @@ import math
 import copy
 import random
 import numpy as np
+import matplotlib.pyplot as plt
 
 from tracklib.core.Coords import ENUCoords
 from tracklib.core.GPSTime import GPSTime
 from tracklib.core.Obs import Obs
 import tracklib.core.Operator as Operator
 import tracklib.core.Kernel as Kernel
-#from tracklib.core_Operator import Operator, UnaryOperator, BinaryOperator
-#from tracklib.core_Operator import UnaryVoidOperator, BinaryVoidOperator
-#from tracklib.core_Operator import ScalarOperator, ScalarVoidOperator
-#from tracklib.core_Operator import GaussianKernel#, ExponentialKernel, SincKernel
+from tracklib.core.TrackCollection import TrackCollection
 
 import tracklib.core.core_utils as utils
 import tracklib.algo.AlgoAF as algoAF
@@ -25,10 +23,7 @@ import tracklib.algo.Interpolation as Interpolation
 import tracklib.algo.Simplification as Simplification
 
 import tracklib.core.Plot as Plot
-#
-#import tracklib.io.PostgresReader as p
-#import tracklib.io.GpxReader as gpxReader
-#import tracklib.io.FileReader as fileReader
+
 
 
 class Track:
@@ -36,7 +31,7 @@ class Track:
     MODE_COMPARAISON_AND = 1
     MODE_COMPARAISON_OR = 2
 
-    def __init__(self, list_of_obs=None, used_id=0, track_id=0):
+    def __init__(self, list_of_obs=None, user_id=0, track_id=0):
         '''
         Takes a (possibly empty) list of points as input
         '''
@@ -45,8 +40,9 @@ class Track:
         else:
             self.__POINTS = list_of_obs
             
-        self.uid = used_id
+        self.uid = user_id
         self.tid = track_id
+        self.base = None   # Base (ECEF coordinates) for ENU projection
         
         self.__analyticalFeaturesDico = {}
         
@@ -59,6 +55,19 @@ class Track:
         for i in range(self.size()):
             output += (str)(self.__POINTS[i])+'\n'     
         return output
+		
+    def getSRID(self):
+        return str(type(self.getFirstObs().position)).split(".")[-1][0:-8]
+		
+    def duration(self):
+        return self.getLastObs().timestamp - self.getFirstObs().timestamp
+		
+    # Average frequency		
+    def frequency(self, mode="temporal"):
+        if mode == "spatial":
+            return self.length()/self.size()
+        if mode == "temporal":
+            return self.duration()/self.size()
     
     # =========================================================================
     # Generate analytical track
@@ -121,7 +130,65 @@ class Track:
             TRACKS.append(track)
             
         return TRACKS
-        
+		
+    # =========================================================================
+    # Track coordinate transformation
+    # =========================================================================
+    
+    def toECEFCoords(self, base=None):
+        if (self.getSRID() == "Geo"):
+            for i in range(self.size()):
+                self.getObs(i).position = self.getObs(i).position.toECEFCoords()
+            return
+        if (self.getSRID() == "ENU"):
+            if (base == None):
+                if (self.base == None):
+                    print("Error: base coordinates should be specified for conversion ENU -> ECEF")
+                    exit()
+                else:
+                    base = self.base
+            for i in range(self.size()):
+                self.getObs(i).position = self.getObs(i).position.toECEFCoords(base)
+            return
+
+    def toENUCoords(self, base=None):
+        if (self.getSRID() in ["Geo", "ECEF"]):
+            if (base == None):
+                base = self.getFirstObs().position
+                message = "Warning: no reference point (base) provided for local projection to ENU coordinates. "
+                message += "Arbitrarily used: " + str(base)
+                print(message)
+            for i in range(self.size()):
+                self.getObs(i).position = self.getObs(i).position.toENUCoords(base)
+            self.base = base.toGeoCoords() 
+            return
+        if (self.getSRID() == "ENU"):
+            if (base == None):
+                print("Error: new base coordinates should be specified for conversion ENU -> ENU")
+                exit()
+            if (self.base == None):
+                print("Error: former base coordinates should be specified for conversion ENU -> ENU")
+                exit()
+            for i in range(self.size()):
+                self.getObs(i).position = self.getObs(i).position.toENUCoords(self.base, base)          				
+            self.base = base.toGeoCoords()
+            return
+			
+    def toGeoCoords(self, base=None):
+        if (self.getSRID() == "ECEF"):
+            for i in range(self.size()):
+                self.getObs(i).position = self.getObs(i).position.toGeoCoords()            
+        if (self.getSRID() == "ENU"):
+            if (base == None):
+                if (self.base == None):
+                    print("Error: base coordinates should be specified for conversion ENU -> Geo")
+                    exit()
+                else:
+                    base = self.base
+            for i in range(self.size()):
+                self.getObs(i).position = self.getObs(i).position.toGeoCoords(base)            	
+          
+
     # =========================================================================
     # Basic methods to get metadata and/or data
     # =========================================================================
@@ -171,6 +238,57 @@ class Track:
         for i in range(self.size()):
             T.append(self.__POINTS[i].timestamp)
         return T
+		
+    def getCentroid(self):
+        m = self.getObs(0).position.copy()
+        m.setX(self.operate(Operator.Operator.AVERAGER, 'x'))
+        m.setY(self.operate(Operator.Operator.AVERAGER, 'y'))
+        m.setZ(self.operate(Operator.Operator.AVERAGER, 'z'))	
+        return m	
+		
+    def getMinX(self):
+        return self.operate(Operator.Operator.MIN, 'x')
+
+    def getMinY(self):
+        return self.operate(Operator.Operator.MIN, 'y')
+
+    def getMinZ(self):
+        return self.operate(Operator.Operator.MIN, 'z')
+
+    def getMaxX(self):
+        return self.operate(Operator.Operator.MAX, 'x')
+
+    def getMaxY(self):
+        return self.operate(Operator.Operator.MAX, 'y')
+
+    def getMaxZ(self):
+        return self.operate(Operator.Operator.MAX, 'z')	
+	
+    def getLowerLeftPoint(self):
+        ll = self.getObs(0).position.copy()
+        ll.setX(self.getMinX())
+        ll.setY(self.getMinY())
+        ll.setZ(self.getMinZ())
+        return ll
+
+    def getUpperRightPoint(self):
+        ur = self.getObs(0).position.copy()
+        ur.setX(self.getMaxX())
+        ur.setY(self.getMaxY())
+        ur.setZ(self.getMaxZ())
+        return ur
+
+    def getBBox(self):
+        return [self.getLowerLeftPoint(), self.getUpperRightPoint()]		
+
+    def shiftTo(self, idx_point, new_coords=ENUCoords(0,0,0)):
+        if (self.getSRID() != "ENU"):
+            print("Error: shift may be applied only to ENU coords")
+            exit()
+        delta = self.getObs(idx_point).position - new_coords
+        for i in range(self.size()):
+            self.getObs(i).position = delta + self.getObs(i).position
+                  
     
     def hasAnalyticalFeature(self, af_name):
         return af_name in self.__analyticalFeaturesDico
@@ -549,7 +667,82 @@ class Track:
                 output += ","
         output += "))"
         return output
-        
+		
+     
+    def toKML(self, type="LINE", af=None, c1=[0,0,1,1], c2=[1,0,0,1], name=False):
+        '''
+        Transforms track into KML string
+		   type: "POINT" or "LINE"
+		   name: number of point label for type "POINT"
+		   c1: color for min value (default blue)
+		   c2: color for max value (default red)
+        '''
+		
+        if not af is None:
+            vmin = self.operate(Operator.Operator.MIN, af)
+            vmax = self.operate(Operator.Operator.MAX, af)
+			
+        default_color = c1
+		
+        if type == "LINE":
+            output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+            output += "<kml xmlns=\"http://earth.google.com/kml/2.1\">\n"
+            output += "<Document>\n"
+            output += "<Placemark>\n"
+            output += "<name>Rover Track</name>\n"
+            output += "<Style>\n"
+            output += "<LineStyle>\n"
+            output += "<color>"+utils.rgbToHex(default_color)[2:]+"</color>\n"
+            output += "</LineStyle>\n"
+            output += "</Style>\n"
+            output += "<LineString>\n"
+            output += "<coordinates>\n"
+            
+            for i in range(self.size()):
+                output += '{:15.12f}'.format(self.getObs(i).position.getX()) + "," 
+                output += '{:15.12f}'.format(self.getObs(i).position.getY()) + ","
+                output += '{:15.12f}'.format(self.getObs(i).position.getZ()) + "\n"
+            	
+            output += "</coordinates>\n"
+            output += "</LineString>\n"
+            output += "</Placemark>\n"
+            output += "</Document>\n"
+            output += "</kml>\n"
+			
+        if type == "POINT":
+            output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+            output += "<kml xmlns=\"http://earth.google.com/kml/2.1\">\n"
+            output += "<Document>\n"
+	
+            for i in range(self.size()):
+                output += "<Placemark>"
+                if name:
+                    output += "<name>"+str(i)+"</name>"
+                output += "<Style>"
+                output += "<IconStyle>"
+                if not af is None:
+                    v = self.getObsAnalyticalFeature(af, i)
+                    default_color = utils.interpColors(v, vmin, vmax, c1, c2)
+                output += "<color>" + utils.rgbToHex(default_color)[2:] + "</color>"
+                output += "<scale>0.3</scale>"
+                output += "<Icon><href>http://maps.google.com/mapfiles/kml/pal2/icon18.png</href></Icon>"
+                output += "</IconStyle>"
+                output += "</Style>"
+                output += "<Point>"
+                output += "<coordinates>"
+                output += '{:15.12f}'.format(self.getObs(i).position.getX()) + "," 
+                output += '{:15.12f}'.format(self.getObs(i).position.getY()) + ","
+                output += '{:15.12f}'.format(self.getObs(i).position.getZ())
+                output += "</coordinates>"
+                output += "</Point>"
+                output += "</Placemark>\n"
+				
+            output += "</Document>\n"
+            output += "</kml>\n"
+			
+        return output
+		
+
 
     def extract(self, id_ini, id_fin):
         '''
@@ -581,7 +774,7 @@ class Track:
                 continue
             if (self.__POINTS[k].timestamp > tfin):
                 continue
-            track.addObs(self.__POINTS[k])
+            track.addObs(self.__POINTS[k].copy())
         track.__analyticalFeaturesDico = self.__analyticalFeaturesDico
         return track
         
@@ -787,8 +980,120 @@ class Track:
         
         return math.sqrt(rmse/track2.size())
         
+    def mapOn(self, reference, TP1, TP2=[], init=[], N_ITER_MAX=20, mode="2D", verbose=True):
+    
+        '''Geometric affine transformation to align two tracks with diferent
+		coordinate systems. For "2D" mode, coordinates must be ENU or Geo. For 
+		"3D" mode, any type of coordinates is valid. In general, it is recommended 
+		to avoid usage of non-metric Geo coordinates for mapping operation, since 
+		it is relying on an isotropic error model. Inputs:
+		   - reference: another track we want to align on or a list of points
+		   - TP1: list of tie points indices (relative to track self)
+		   - TP2: list of tie points indices (relative to track)
+		   - mode: could be "2D" (default) or "3D"
+        if TP2 is not specified, it is assumed equal to TP1.
+		TP1 and TP2 must have same size. Adjustment is performed with least squares.
+		The general transformation from point X to point X' is provided below:
+		                         X' = kRX + T
+		with: k a positive real value, R a 2D or 3D rotation matrix and T a 2D or 
+		3D translation vector. Transformation parameters are returned in standard 
+		output in the following format: [theta, k, tx, ty] (theta in radians)
+		Track argument may also be replaced ny a list of points.
+		Note that mapOn does not handle negative determinant (symetries not allowed)
+		'''   
+
+        if (mode == "3D"):
+            print("Mode 3D is not implemented yet")
+            exit()	
+
+        if (len(init) == 0):
+            init = [0,1,0,0]		
+		
+        if (len(TP2) == 0):
+            TP2 = TP1
+        if not (len(TP1) == len(TP2)):
+            print("Error: tie points lists must have same size")
+            exit()
+			
+        P1 = [self.getObs(i).position.copy() for i in TP1]
+		
+        if isinstance(reference, Track):
+            P2 = [reference.getObs(i).position.copy() for i in TP2]
+        else:
+            P2 = reference
+		
+        n = len(P1)
+
+        if verbose:
+            print("-----------------------------------------------------------------")
+            print("NUMBER OF TIE POINTS: " + str(len(TP1)))
+            print("-----------------------------------------------------------------")			
+            N = int(math.log(self.size())/math.log(10))+1
+            for i in range(len(TP1)):
+                message = "POINT " + ('{:0'+str(N)+'d}').format(TP1[i]) + "   "  
+                message += str(self.getObs(TP1[i]).timestamp) + "   ERROR = "
+                message += str('{:10.2f}'.format(P1[i].distance2DTo(P2[i]))) + " m"
+                print(message)
+            print("-----------------------------------------------------------------")
+			
+        J = np.zeros((2*n, 4))
+        B = np.zeros((2*n, 1))
+        X = np.matrix([init[1],init[0],init[2],init[3]]).transpose()
+		
+		# Iterations
+        for iter in range(N_ITER_MAX):
         
-        
+            # Current parameters
+            k  = X[0,0]        
+            tx = X[1,0]
+            ty = X[2,0]
+            a  = X[3,0]; ca = math.cos(a); sa = math.sin(a)			
+            
+            for i in range(0,2*n,2):
+                x1 = P1[int(i/2)].getX(); y1 = P1[int(i/2)].getY()
+                x2 = P2[int(i/2)].getX(); y2 = P2[int(i/2)].getY()
+                x2_th = k*(ca*x1-sa*y1)+tx
+                y2_th = k*(sa*x1+ca*y1)+ty		
+                J[i,0]   = ca*x1-sa*y1;  J[i,1]   = 1;  J[i,2]   = 0;   J[i,3]   = -k*(sa*x1+ca*y1);   B[i]   = x2-x2_th
+                J[i+1,0] = sa*x1+ca*y1;  J[i+1,1] = 0;  J[i+1,2] = 1;   J[i+1,3] = +k*(ca*x1-sa*y1);   B[i+1] = y2-y2_th
+            	
+            dX = np.linalg.solve(J.transpose()@J, J.transpose()@B)
+            X = X+dX
+			
+            cv_param = max(max(max(dX[0,0]*1e4, dX[1,0]*1e4), dX[2,0]*1e4),  dX[3,0]*1e4)
+            if (cv_param < 1):
+                break               
+            
+            if verbose:
+                N = int(math.log(N_ITER_MAX-1)/math.log(10)) + 1
+                message = "ITERATION " + ('{:0'+str(N)+'d}').format(iter) + "  "
+                message += "RMSE = " + '{:10.5f}'.format(math.sqrt(B.transpose()@B/(2*n))) + " m    "
+                message += "MAX = " + '{:10.5f}'.format(np.max(B)) + " m    "
+                print(message)
+				
+        if verbose:
+            print("-----------------------------------------------------------------")
+            print("CONVERGENCE REACHED AFTER " + str(iter) + " ITERATIONS")
+            glob_res = 0.0
+            for l in range(0,2*n,2):
+                res = math.sqrt(B[l]**2+B[l+1]**2)
+                glob_res += res
+                message = "RESIDUAL (2D) POINT " + str(int(l/2)) + ":  "
+                message += '{:4.3f}'.format(res) + " m"
+                print(message)
+            print("GLOBAL 2D RESIDUAL ON TIE POINTS: " + '{:5.3f}'.format(glob_res/n) + " m")
+            print("-----------------------------------------------------------------")
+            message = "Theta = " + '{:3.2f}'.format(X[3,0]) + " rad   k = " + '{:5.3f}'.format(X[0,0])
+            message += "  Tx = " + '{:8.3f}'.format(X[1,0]) + " m  Ty = " + '{:8.3f}'.format(X[2,0]) + " m"
+            print(message)
+            print("-----------------------------------------------------------------")
+		
+        self.rotate(X[3,0])
+        self.scale(X[0,0])
+        self.translate(X[1,0],X[2,0])
+
+        return [X[3,0], X[0,0], X[1,0], X[2,0]]
+
     # =========================================================================
     #  Adding noise to tracks
     # =========================================================================    
@@ -802,7 +1107,7 @@ class Track:
         self: the track to be smoothed (input track is not modified)
         sigma: noise amplitude(s) (in observation coordinate units)
         kernel: noise autocovariance function(s)'''
-        
+
         if not isinstance(sigma, list):
             sigma = [sigma]
             
@@ -899,7 +1204,7 @@ class Track:
     # =========================================================================
     # Track simplification (returns a new track)
     # Tolerance is in the unit of track observation coordinates
-    #     MODE_SIMPLIFY_DOUGLAS_PEUCKER (1)
+    #   MODE_SIMPLIFY_DOUGLAS_PEUCKER (1)
     #   MODE_SIMPLIFY_VISVALINGAM (2)
     # =========================================================================    
     def simplify(self, tolerance, mode = Simplification.MODE_SIMPLIFY_DOUGLAS_PEUCKER):
@@ -914,7 +1219,7 @@ class Track:
         Méthode subdivisant la liste de points de la trace (i.e. étapes), 
             selon des analyticals feature et des seuils. 
         
-        Attention une étape peut comporter qu'un seul point.
+        Attention une étape peut ne comporter qu'un seul point.
     
         Crée un AF avec des 0 si pas de changement, 1 sinon
         '''
@@ -1101,8 +1406,132 @@ class Track:
             self.getObs(i).features[idAF] = self.getObs(kernel).features[idAF]
         for i in range(len(S)-kernel, len(S)):
             self.getObs(i).features[idAF] = self.getObs(len(S) - kernel).features[idAF]  
+  
+    # ------------------------------------------------------------
+    # Rotation of 2D track (coordinates should be ENU)
+	# Input: track in ENU coords and theta angle (in radians)
+	# Output: rotated track (in ENU coords)
+    # ------------------------------------------------------------  
+    def rotate(self, theta):
+        if not (self.getSRID() == "ENU"):
+            print("Error: track to rotate must be in ENU coordinates")
+            exit()
+        for i in range(self.size()):
+            self.getObs(i).position.rotate(theta)
+
+    # ------------------------------------------------------------
+    # Homothetic transformation of 2D track (coordinates in ENU)
+	# Input: track in ENU coords and h homothetic ratio
+	# Output: scaled track (in ENU coords)
+    # ------------------------------------------------------------  
+    def scale(self, h):
+        if not (self.getSRID() == "ENU"):
+            print("Error: track to scale must be in ENU coordinates")
+            exit()
+        for i in range(self.size()):
+            self.getObs(i).position.scale(h)
+			
+    # ------------------------------------------------------------
+    # Translation of 2D track (coordinates in ENU)
+	# Input: track in ENU coords and tx, ty translation parameters
+	# Output: translated track (in ENU coords)
+    # ------------------------------------------------------------  
+    def translate(self, tx, ty):
+        if not (self.getSRID() == "ENU"):
+            print("Error: track to scale must be in ENU coordinates")
+            exit()
+        for i in range(self.size()):
+            self.getObs(i).position.translate(tx, ty)
+			
             
+	# ------------------------------------------------------------
+    # Profile of difference between two traces : t2 - t1
+	# Two possible modes: 
+	# - NN (Nearest Neighbour): O(n^2) time and O(n) space
+	# - DTW (Dynamic Time Warping): O(n^3) time and O(n^2) space
+    # Output is a track objet, with an analytical feature diff
+    # containing shortest distance of each point of track t1, to 
+    # the points of track t2. We may get profile as a list with 
+    # output.getAbsCurv() and output.getAnalyticalFeature("diff")
+	# The selected candidate in registerd in AF "pair"
+    # ------------------------------------------------------------		
+    def differenceProfile(self, track, mode="NN"):
+	
+        output = self.copy()
+        output.createAnalyticalFeature("diff");
+        output.createAnalyticalFeature("pair");
+     
+        # --------------------------------------------------------
+        # Nearest Neighbor (NN) algorithm
+        # --------------------------------------------------------
+        if mode == "NN":
+            for i in range(output.size()):
+                val_min = sys.float_info.max
+                id_min = 0
+                for j in range(track.size()):
+                    distance = output.getObs(i).distance2DTo(track.getObs(j))
+                    if distance < val_min:
+                        val_min = distance
+                        id_min = j
+                output.setObsAnalyticalFeature("diff", i, val_min)
+                output.setObsAnalyticalFeature("pair", i, id_min)
+
+        # --------------------------------------------------------
+        # Dynamic time warping (DTW) algorithm
+        # --------------------------------------------------------
+        if mode == "DTW":
             
+            track1 = self.copy()
+            track2 = track.copy()
+			
+            # Forming distance matrix
+            D = np.zeros((track1.size(), track2.size()))
+            for i in range(track1.size()):
+                for j in range(track2.size()):
+                    D[i,j] = track1.getObs(i).distance2DTo(track2.getObs(j))
+            
+            # Optimal path with dynamic programming
+            T = np.zeros((track1.size(), track2.size()))
+            M = np.zeros((track1.size(), track2.size()))
+            T[0,0] = D[0,0]
+            M[0,0] = -1
+			
+			# Forward step
+            for i in range(1,T.shape[0]):
+                T[i,0] = T[i-1,0] + D[i,0]
+                M[i,0] = 0
+                for j in range(1, T.shape[1]):
+                    K = D[i,0:(j+1)]
+                    for k in range(j-1,-1,-1):
+                        K[k] = K[k] + K[k+1]
+                    V = T[i-1,0:(j+1)] + K
+                    M[i,j] = np.argmin(V) 
+                    T[i,j] = V[int(M[i,j])]
+                    
+            
+            # Backward step
+            S = [0]*(track1.size())
+            S[track1.size()-1] = np.argmin(T[track1.size()-1,:])
+            for i in range(track1.size()-2, -1, -1):
+                S[i] = int(M[i+1,S[i+1]])
+				
+            print(T[track1.size()-1, S[track1.size()-1]] / track1.size())
+			
+            #plt.plot(S, 'r-')			
+            #plt.imshow(M)
+
+            for i in range(track1.size()):
+                x1 = track1.getObs(i).position.getX()
+                y1 = track1.getObs(i).position.getY()
+                x2 = track2.getObs(S[i]).position.getX()
+                y2 = track2.getObs(S[i]).position.getY()
+                d = track1.getObs(i).distance2DTo(track2.getObs(S[i]))
+                output.setObsAnalyticalFeature("diff", i, d)
+                output.setObsAnalyticalFeature("pair", i, S[i])
+
+        output.compute_abscurv()
+        return output
+
     # ------------------------------------------------------------
     # [+] Concatenation of two tracks
     # ------------------------------------------------------------
@@ -1110,37 +1539,93 @@ class Track:
         return Track(self.__POINTS + track.__POINTS, self.uid, self.tid)
         
     # ------------------------------------------------------------
-    # [/] Even split of two tracks (returns n+1 segments)
+    # [/] Even split of tracks (returns n+1 segments)
     # ------------------------------------------------------------
     def __truediv__(self, number):
         N = (int)(self.size()/number)
         R = self.size()-N*number
-        SPLITS = []
+        SPLITS = TrackCollection()
         for i in range(number+1):
             id_ini = i*N
             id_fin = min((i+1)*N, self.size())+1
-            SPLITS.append(Track(self.__POINTS[id_ini:id_fin]))
+            SPLITS.addTrack(Track(self.__POINTS[id_ini:id_fin]))
         return SPLITS
         
+	# ------------------------------------------------------------	
+    # [>] Removes first n points of track     
+    # ------------------------------------------------------------	
+    def __gt__(self, nb_points):
+        return Track(self.__POINTS[nb_points:self.size()], self.uid, self.tid)	
+		
+	# ------------------------------------------------------------	
+    # [<] Removes last n points of track     
+    # ------------------------------------------------------------	
+    def __lt__(self, nb_points):
+        return Track(self.__POINTS[0:(self.size()-nb_points)], self.uid, self.tid)
+		
+	# ------------------------------------------------------------	
+    # [>=] Available operator     
     # ------------------------------------------------------------
-    # [-] Remove last n points of track
+    def __ge__(self, arg):
+        return None	
+
+	# ------------------------------------------------------------	
+    # [<=] Available operator     
     # ------------------------------------------------------------
-    def __sub__(self, number):
-        return Track(self.__POINTS[0:(self.size()-number)], self.uid, self.tid)
+    def __le__(self, arg):
+        return None	
+		
+	# ------------------------------------------------------------	
+    # [!=] Available operator      
+    # ------------------------------------------------------------
+    def __neq__(self, arg):
+        return None
+		
+	# ------------------------------------------------------------	
+    # [Unary -] Available operator      
+    # ------------------------------------------------------------
+    def __neg__(self, arg):
+        return None	
+		
+	# ------------------------------------------------------------	
+    # [**] Resample (spatial) according to a number of points  
+    # Linear interpolation and temporal resampling
+    # ------------------------------------------------------------
+    def __pow__(self, nb_points):
+        output = self.copy()
+        dt = output.duration()/(nb_points) * (1-1e-3)
+        output.resample(dt) # Linear / temporal
+        return output
+	
+	# ------------------------------------------------------------	
+    # [abs] Available operator     
+    # ------------------------------------------------------------
+    def __abs__(self):
+        return None
+		
+	# ------------------------------------------------------------	
+    # [len] Number of points in track    
+    # ------------------------------------------------------------
+    def __len__(self):
+        return self.size()
+	
+	# ------------------------------------------------------------	
+    # [-] Computes difference profile of 2 tracks    
+    # ------------------------------------------------------------
+    def __sub__(self, arg):
+        if isinstance(arg, int): 
+            print("Available operator not implemented yet")
+            return None
+        else:
+            return self.differenceProfile(arg)
         
     # ------------------------------------------------------------
-    # [*] Temporal resampling of track. Base frequency is the min
-    # time difference between consecutive timestamps
+    # [*] Temporal resampling of track
     # ------------------------------------------------------------
     def __mul__(self, number):
-        f = (self.getObs(1).timestamp - self.getObs(0).timestamp)
-        for i in range(2,self.size()):
-            ft = (self.getObs(i).timestamp - self.getObs(i-1).timestamp)
-            if ft < 0:
-                f = ft
-        f /= number
         track = self.copy()
-        track.resample(f, Track.MODE_INTERP_TEMPORAL)
+        dt = (track.frequency("temporal")/number)*(1-1e-3)
+        track.resample(dt)  # Linear / Temporal
         return track
         
     # ------------------------------------------------------------
@@ -1161,5 +1646,13 @@ class Track:
     # ------------------------------------------------------------    
     def __floordiv__(self, track):
         track_resampled = self.copy()
-        track_resampled.resample(track, Track.MODE_INTERP_TEMPORAL)
+        track_resampled.resample(track, Interpolation.MODE_TEMPORAL)
         return track_resampled    
+	
+	# ------------------------------------------------------------
+    # [[n]] Get and set obs number n
+    # ------------------------------------------------------------    
+    def __getitem__(self, n):
+        return self.__POINTS[n]  
+    def __setitem__(self, n, obs):
+        self.__POINTS[n] = obs	

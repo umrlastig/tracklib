@@ -10,9 +10,10 @@ import inspect
 from tracklib.core.Obs import Obs
 from tracklib.core.GPSTime import GPSTime
 from tracklib.core.Coords import GeoCoords
+from tracklib.core.Track import Track
 
 import tracklib.io.GpxReader as gpx
-import tracklib.io.FileReader as FileReader
+import tracklib.io.FileReader as fr
 
 import tracklib.core.Track as t
 import tracklib.core.Operator as op
@@ -30,7 +31,7 @@ def search(function_name=None, package=None):
 				   GeoCoords, 
 				   Obs, 
 				   op.Operator, 
-				   FileReader,
+				   fr.FileReader,
 				   pg.PostgresReader,
 				   gpx.GpxReader]
 	else:

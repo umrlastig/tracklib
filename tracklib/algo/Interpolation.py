@@ -688,3 +688,56 @@ def __bsplines_spatial(track, ds, degree=3, knots_nb=None):
 		print(message)
 		
 
+def smooth_cv(track, smooth_function, params=[], verbose=True):
+	'''
+	Cross validation for determining optimal parameters of smoothing/interpolating/simplifying functions 
+	 - track: a (timestamped) track on which cross validation is performed
+     - smooth_function: any function with track as input and output	 
+	 - params: a list of parameters to test in smooth_function
+	 Note that if params contains a single element, smooth_cv function is a simple statistical control.
+	 If no parameters are provided in input, a default set of 1000 positive parameters sampled according
+	 to a logarithmic scale between 1e-9 and 1e9 is considered.'''
+ 
+	if verbose:
+		print("-----------------------------------------------------")
+		print("CROSS VALIDATION OF SMOOTHING FUNCTION " + smooth_function.__name__.upper())
+		print("-----------------------------------------------------")
+	
+	track_train = track % [True, False]
+	track_valid = track % [False, True]
+	
+	if not (str(type(params)) == "<class 'list'>"):
+		params = [params]
+		
+	if len(params) == 0:
+		l = (int)(math.log(1e9)/math.log(1.5))
+		params = [1.5**p for p in range(-l, l)]
+
+	opt_rmse = 1e300
+	opt_param = 0
+	
+	for param in params:
+		
+		track_test = smooth_function(track_train, param)
+		track_test //= track_valid
+		
+		RMSE = 0.0
+		for i in range(track_test.size()-1):
+			RMSE += track_test.getObs(i).distance2DTo(track_valid.getObs(i))**2
+			
+		RMSE = math.sqrt(RMSE/track_test.size())
+		if RMSE < opt_rmse:
+			opt_rmse = RMSE
+			opt_param = param
+		
+		if verbose:
+			message = smooth_function.__name__.upper() + " PARAMETER ";
+			message += '{:18.7f}'.format(param) + " -  RMSE = " + '{:7.3f}'.format(RMSE) + " m"
+			print(message)
+	
+	if verbose:
+		print("-----------------------------------------------------")
+		print("BEST PARAMETER " + '{:7.2f}'.format(opt_param) + " -  RMSE = " + '{:6.3f}'.format(opt_rmse) + " m")
+		print("-----------------------------------------------------")
+	
+	return opt_param

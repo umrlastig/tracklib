@@ -6,7 +6,7 @@ import sys
 import copy
 
 from tracklib.core.Coords import ECEFCoords
-
+from tracklib.core.GPSTime import GPSTime
 
 class Obs:
 	
@@ -14,8 +14,12 @@ class Obs:
 	# Point cooridnates in meters (ENUCoords)
 	# Timestamp of aquisition (GPSTime format)
 	# + GPS related information (DOP, std, ...)
+	# Default timestamp is 1970/01/01 00:00:00
 	# --------------------------------------------------
-	def __init__(self, position, timestamp):
+	def __init__(self, position, timestamp=None):
+	
+		if timestamp is None:
+			timestamp = GPSTime()
 	
 		self.position = position
 		self.timestamp = timestamp
