@@ -15,8 +15,8 @@ class TestVitesseMethods(unittest.TestCase):
 	def test_tableau_af_rmse_1(self):
 		
 		GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
-		chemin = './data/trace1.dat'
-		track = FileReader.readFromFile(chemin, 4, 2, 3, -1, separator=",")
+		chemin = '../data/trace1.dat'
+		track = FileReader.readFromFile(chemin, 2, 3, -1, 4, separator=",")
 		
 		track.estimate_speed()
 		
@@ -47,7 +47,7 @@ class TestVitesseMethods(unittest.TestCase):
 		
 		GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
 		chemin = './data/trace0.gps'
-		track = FileReader.readFromFile(chemin, 1, 2, 3, -1, separator=",")
+		track = FileReader.readFromFile(chemin, 2, 3, -1, 1, separator=",")
 		
 		track.estimate_speed()
 		
@@ -83,7 +83,7 @@ class TestVitesseMethods(unittest.TestCase):
 		
 		GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
 		chemin = './data/trace0.gps'
-		track = FileReader.readFromFile(chemin, 1, 2, 3, -1, separator=",")
+		track = FileReader.readFromFile(chemin, 2, 3, -1, 1, separator=",")
 		
 		# 1ère méthode
 		track.estimate_speed()
