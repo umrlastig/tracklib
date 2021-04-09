@@ -55,7 +55,7 @@ class GeoCoords:
 	
 	# --------------------------------------------------
 	# Convert geodetic coordinates to local ENU coords
-	# Base coordinates need to be provided in geo coords
+	# Base coordinates need to be provided in ECEF/Geo
 	# --------------------------------------------------
 	def toENUCoords(self, base):
 		base_ecef = base.toECEFCoords()
@@ -63,10 +63,22 @@ class GeoCoords:
 		return point_ecef.toENUCoords(base_ecef);
 		
 	# --------------------------------------------------
+	# Artificial function to ensure point is GeoCoords
+	# --------------------------------------------------
+	def toGeoCoords(self):
+		return self.copy();
+		
+	# --------------------------------------------------
 	# Distance between two geodetic coordinates
 	# --------------------------------------------------
 	def distanceTo(self, point):
 		return self.toECEFCoords().distanceTo(point.toECEFCoords())
+		
+	# --------------------------------------------------
+	# Distance between two geodetic coordinates
+	# --------------------------------------------------
+	def distance2DTo(self, point):
+		return self.toENUCoords(point).norm2D()
 	
 	# --------------------------------------------------
 	# Elevation (in rad) between two geodetic coordinates
@@ -120,9 +132,11 @@ class ENUCoords:
 		
 	# --------------------------------------------------
 	# Convert local planimetric to absolute geocentric
-	# Base coordinates need to be provided in ECEF
+	# Base coordinates need to be provided in ECEF/Geo
 	# --------------------------------------------------
 	def toECEFCoords(self, base):
+		
+		base = base.toECEFCoords()
 		
 		xyz = ECEFCoords(0.0, 0.0, 0.0);
 		
@@ -148,12 +162,23 @@ class ENUCoords:
 	
 	# --------------------------------------------------
 	# Convert local ENU coordinates to  geo coords
-	# Base coordinates need to be provided in geo coords
+	# Base coordinates need to be provided in ECEF/Geo 
 	# --------------------------------------------------
 	def toGeoCoords(self, base):
 		base_ecef = base.toECEFCoords()
 		point_ecef = self.toECEFCoords(base_ecef)
 		return point_ecef.toGeoCoords();
+		
+	# --------------------------------------------------
+	# Convert local ENU coordinates relative to base1 to
+	# local ENU coordinates relative to base2.
+	# Base coordinates should be provided in ECEF/Geo
+	# --------------------------------------------------
+	def toENUCoords(self, base1, base2):
+		base_ecef1 = base1.toECEFCoords()
+		base_ecef2 = base2.toECEFCoords()
+		point_ecef = self.toECEFCoords(base_ecef1)
+		return point_ecef.toENUCoords(base_ecef2);
 		
 	# --------------------------------------------------
 	# Planimetric euclidian norm of point
@@ -210,7 +235,31 @@ class ENUCoords:
 	# --------------------------------------------------
 	def distanceTo(self, point):
 		return (point-self).norm()
+
+	# --------------------------------------------------
+	# Rotation (2D) of point (theta in radians)
+	# --------------------------------------------------
+	def rotate(self, theta):
+		cr = math.cos(theta)
+		sr = math.sin(theta)
+		xr = +cr*self.E - sr*self.N
+		yr = +sr*self.E + cr*self.N
+		self.E = xr
+		self.N = yr
+	
+	# --------------------------------------------------
+	# Homotehtic transformation (2D) of point
+	# --------------------------------------------------
+	def scale(self, h):
+		self.E *= h
+		self.N *= h
 		
+	# --------------------------------------------------
+	# Translation (2D) of point
+	# --------------------------------------------------
+	def translate(self, tx, ty):
+		self.E += tx
+		self.N += ty
 	
 	# --------------------------------------------------
 	# Coords Alias X, Y, Z
@@ -281,9 +330,11 @@ class ECEFCoords:
 	
 	# --------------------------------------------------
 	# Convert local coordinates to absolute geocentric
-	# Base coordinates need to be provided in ECEF
+	# Base coordinates need to be provided in ECEF/Geo
 	# --------------------------------------------------	
 	def toENUCoords(self, base):
+	
+		base = base.toECEFCoords()
 	
 		enu = ENUCoords(0.0, 0.0, 0.0)
 
@@ -306,6 +357,12 @@ class ECEFCoords:
 		enu.U =  x*clon*clat  + y*slon*clat  +  z*slat;
 
 		return enu;	
+		
+	# --------------------------------------------------
+	# Artificial function to ensure point is ECEFCoords
+	# --------------------------------------------------
+	def toECEFCoords(self):
+		return self.copy();
 	
 		
 	# --------------------------------------------------

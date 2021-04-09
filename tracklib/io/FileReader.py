@@ -61,24 +61,31 @@ class FileReader:
 		time_fmt_save = GPSTime.getReadFormat()
 		GPSTime.setReadFormat(fmt.time_fmt)
 		
-		id_special = [fmt.id_E, fmt.id_N, fmt.id_U, fmt.id_T]
+		id_special = [fmt.id_E, fmt.id_N]
+		if fmt.id_U >= 0:
+			id_special.append(fmt.id_U)
+		if fmt.id_T >= 0:
+			id_special.append(fmt.id_T)
 			
 		with open(path) as fp:
 		
 			# Header
 			for i in range(fmt.h):
-				name_non_special = fp.readline()[1:].split(fmt.separator)
+				line = fp.readline()
+				if line[0] == fmt.com:
+					line = line[1:]
+				name_non_special = line.split(fmt.separator)
 				
-			line = fp.readline()
+			line = fp.readline().strip()
 			
 			while line:
 			
 				if line.strip()[0] == fmt.com:
 					name_non_special = line[1:].split(fmt.separator)
-					line = fp.readline()
+					line = fp.readline().strip()
 					continue
 
-				fields = line.split(fmt.separator)
+				fields = line.strip().split(fmt.separator)
 				fields = [s for s in fields if s]
 				
 				if fmt.id_T != -1:
@@ -111,13 +118,13 @@ class FileReader:
 					
 					track.addObs(point)				
 				
-				line = fp.readline()
+				line = fp.readline().strip()
 				
 		fp.close()
 		
 
 		# Reading other features
-		if (fmt.read_all and len(fields) > 4):
+		if (fmt.read_all):
 		
 			name_non_special = [s.strip() for s in name_non_special if s]
 		
@@ -138,16 +145,22 @@ class FileReader:
 				while line:
 				
 					if line.strip()[0] == fmt.com:
-						line = fp.readline()
+						line = fp.readline().strip()
 						continue
 			
 					fields = line.split(fmt.separator)
 					fields = [s for s in fields if s]
 					for i in range(len(fields)):
 						if not (i in id_special):
-							track.setObsAnalyticalFeature(name_non_special[i], counter, float(fields[i].strip()))
+							val = fields[i].strip()
+							if not (name_non_special[i][-1] == "&"):
+								try:
+									val = float(val)
+								except ValueError:
+									val = str(val).replace('\"', '')
+							track.setObsAnalyticalFeature(name_non_special[i], counter, val)
 					
-					line = fp.readline()
+					line = fp.readline().strip()
 					counter += 1
 					
 			fp.close()

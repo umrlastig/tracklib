@@ -25,7 +25,6 @@ import tracklib.algo.Simplification as Simplification
 import tracklib.core.Plot as Plot
 
 
-
 class Track:
     
     MODE_COMPARAISON_AND = 1
@@ -669,81 +668,6 @@ class Track:
         return output
 		
      
-    def toKML(self, type="LINE", af=None, c1=[0,0,1,1], c2=[1,0,0,1], name=False):
-        '''
-        Transforms track into KML string
-		   type: "POINT" or "LINE"
-		   name: number of point label for type "POINT"
-		   c1: color for min value (default blue)
-		   c2: color for max value (default red)
-        '''
-		
-        if not af is None:
-            vmin = self.operate(Operator.Operator.MIN, af)
-            vmax = self.operate(Operator.Operator.MAX, af)
-			
-        default_color = c1
-		
-        if type == "LINE":
-            output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            output += "<kml xmlns=\"http://earth.google.com/kml/2.1\">\n"
-            output += "<Document>\n"
-            output += "<Placemark>\n"
-            output += "<name>Rover Track</name>\n"
-            output += "<Style>\n"
-            output += "<LineStyle>\n"
-            output += "<color>"+utils.rgbToHex(default_color)[2:]+"</color>\n"
-            output += "</LineStyle>\n"
-            output += "</Style>\n"
-            output += "<LineString>\n"
-            output += "<coordinates>\n"
-            
-            for i in range(self.size()):
-                output += '{:15.12f}'.format(self.getObs(i).position.getX()) + "," 
-                output += '{:15.12f}'.format(self.getObs(i).position.getY()) + ","
-                output += '{:15.12f}'.format(self.getObs(i).position.getZ()) + "\n"
-            	
-            output += "</coordinates>\n"
-            output += "</LineString>\n"
-            output += "</Placemark>\n"
-            output += "</Document>\n"
-            output += "</kml>\n"
-			
-        if type == "POINT":
-            output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            output += "<kml xmlns=\"http://earth.google.com/kml/2.1\">\n"
-            output += "<Document>\n"
-	
-            for i in range(self.size()):
-                output += "<Placemark>"
-                if name:
-                    output += "<name>"+str(i)+"</name>"
-                output += "<Style>"
-                output += "<IconStyle>"
-                if not af is None:
-                    v = self.getObsAnalyticalFeature(af, i)
-                    default_color = utils.interpColors(v, vmin, vmax, c1, c2)
-                output += "<color>" + utils.rgbToHex(default_color)[2:] + "</color>"
-                output += "<scale>0.3</scale>"
-                output += "<Icon><href>http://maps.google.com/mapfiles/kml/pal2/icon18.png</href></Icon>"
-                output += "</IconStyle>"
-                output += "</Style>"
-                output += "<Point>"
-                output += "<coordinates>"
-                output += '{:15.12f}'.format(self.getObs(i).position.getX()) + "," 
-                output += '{:15.12f}'.format(self.getObs(i).position.getY()) + ","
-                output += '{:15.12f}'.format(self.getObs(i).position.getZ())
-                output += "</coordinates>"
-                output += "</Point>"
-                output += "</Placemark>\n"
-				
-            output += "</Document>\n"
-            output += "</kml>\n"
-			
-        return output
-		
-
-
     def extract(self, id_ini, id_fin):
         '''
         Extract between two indices from a track
@@ -1650,9 +1574,11 @@ class Track:
         return track_resampled    
 	
 	# ------------------------------------------------------------
-    # [[n]] Get and set obs number n
+    # [[n]] Get and set obs number n (or AF vector with name n)
     # ------------------------------------------------------------    
     def __getitem__(self, n):
+        if isinstance(n, str):
+            return self.getAnalyticalFeature(n)
         return self.__POINTS[n]  
     def __setitem__(self, n, obs):
         self.__POINTS[n] = obs	

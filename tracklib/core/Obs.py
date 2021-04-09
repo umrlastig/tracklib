@@ -76,4 +76,11 @@ class Obs:
 	def elevationTo(self, obs):
 		Obs.__check_call_geom2("elevationTo", self, obs)
 		return self.position.elevationTo(obs.position)
-
+		
+	# ------------------------------------------------------------
+    # [[n]] Get and set AF number
+    # ------------------------------------------------------------    
+	def __getitem__(self, af_index):
+		return self.features[af_index]
+	def __setitem__(self, af, value):
+		self.features[af_index] = value	
