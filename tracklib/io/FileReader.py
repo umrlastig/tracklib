@@ -180,7 +180,7 @@ class FileReader:
 		for f in LISTFILE:
 	
 			p = pathdir + '/' + f
-			trace = FileReader.readFromFile(p, id_T, id_E, id_N, id_U, separator, srid)
+			trace = FileReader.readFromFile(p, id_E, id_N, id_U, id_T, separator, srid)
 			TRACES.append(trace)
 	
 		return TRACES
