@@ -33,7 +33,7 @@ class TestSimplificationMethods(TestCase):
 	def test_visvalingam(self):
 		GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
 		chemin = './data/trace1.dat'
-		track = FileReader.readFromFile(chemin, 4, 2, 3, -1, separator=",")
+		track = FileReader.readFromFile(chemin, 2, 3, -1, 4, separator=",")
 		track.simplify(5, MODE_SIMPLIFY_VISVALINGAM)
 		
 		self.assertTrue((1.289 - 1.28) < 0.01)
@@ -42,7 +42,7 @@ class TestSimplificationMethods(TestCase):
 	def test_gaussien(self):
 		GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
 		chemin = './data/trace1.dat'
-		track = FileReader.readFromFile(chemin, 4, 2, 3, -1, separator=",")
+		track = FileReader.readFromFile(chemin, 2, 3, -1, 4, separator=",")
 		kernel = GaussianKernel(201)
 		track.operate(Operator.FILTER, "x", kernel, "x2")
 		track.operate(Operator.FILTER, "y", kernel, "y2")
