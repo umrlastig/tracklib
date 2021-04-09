@@ -31,7 +31,7 @@ class TestOperateurMethods(unittest.TestCase):
 	def test_abs_curv1(self):
 		GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
 		chemin = './data/trace1.dat'
-		track = FileReader.readFromFile(chemin, 4, 2, 3, -1, separator=",")
+		track = FileReader.readFromFile(chemin, 2, 3, -1, 4, separator=",")
 		
 		track.addAnalyticalFeature(algo.diffJourAnneeTrace)
 		track.operate(Operator.INVERTER, "diffJourAnneeTrace", "rando_jour_neg")
