@@ -20,3 +20,4 @@ example/__pycache__/
 /cotation/
 /source/
 .coverage
+/data_private/
