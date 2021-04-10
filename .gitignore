@@ -21,3 +21,4 @@ example/__pycache__/
 /source/
 .coverage
 /data_private/
+tracklib/cartetopo/__pycache__/
