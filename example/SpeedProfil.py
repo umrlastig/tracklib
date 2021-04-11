@@ -34,8 +34,8 @@ trace.addAnalyticalFeature(stop.stop_point_with_acceleration_criteria)
 
 # On dessine
 TAB_AFS = ['stop_point_with_time_window_criteria', 'stop_point_with_acceleration_criteria']
-trace.plot('SPATIAL_SPEED_PROFIL', TAB_AFS)
-trace.plot('SPATIAL_ALTI_PROFIL', TAB_AFS)
-trace.plot('TEMPORAL_SPEED_PROFIL', TAB_AFS)
-trace.plot('TEMPORAL_ALTI_PROFIL', TAB_AFS)
+trace.plotProfil('SPATIAL_SPEED_PROFIL', TAB_AFS)
+#trace.plotProfil('SPATIAL_ALTI_PROFIL', TAB_AFS)
+#trace.plotProfil('TEMPORAL_SPEED_PROFIL', TAB_AFS)
+#trace.plotProfil('TEMPORAL_ALTI_PROFIL', TAB_AFS)
 

@@ -7,41 +7,60 @@ lecture d'un gpx
 + interpolation/lissage + ré-estimation des vitesses...
 
 '''
-
 import matplotlib.pyplot as plt
 
-import tracklib.algo.Interpolation as interp
-import tracklib.core.Obs as obs
 from tracklib.core.GPSTime import GPSTime
 from tracklib.io.GpxReader import GpxReader
-from tracklib.core.Coords import GeoCoords
 from tracklib.core.Operator import Operator
+import tracklib.algo.AlgoAF as algo
+import tracklib.algo.Interpolation as interp
 
+import tracklib.core.Grid as g
+import tracklib.core.TrackCollection as trackCollection
+import tracklib.util.CellOperator as celloperator
 
 # ---------------------------------------------------
 # Lecture des donnees
 # ---------------------------------------------------
 GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
 tracks = GpxReader.readFromGpx("../data/activity_5807084803.gpx")
-trace = tracks[0]
+trace = tracks.getTrack(0)
 
-base_geo = trace.getFirstObs().position
-base = GeoCoords(base_geo.getX(), base_geo.getY(), base_geo.getZ())
-for i in range(trace.size()):
-	geo = GeoCoords(trace.getObs(i).position.getX(), trace.getObs(i).position.getY(), trace.getObs(i).position.getZ())
-	enu = geo.toENUCoords(base)
-	trace.setObs(i, obs.Obs(enu,trace.getObs(i).timestamp))
+# Transformation GEO coordinates to ENU
+trace.toENUCoords()
 
+# Display
 trace.plot()
+#trace.plot('POINT')
 
+# ================================================
+# SPEED : different 
 trace.estimate_speed()
-trace.operate(Operator.DIFFERENTIATOR, "speed", "dv")
+
 trace.plotAnalyticalFeature('speed', 'BOXPLOT')
+trace.plotProfil('SPATIAL_SPEED_PROFIL')
+trace.plot('POINT', 'speed')
 
+
+# =====================================================
+collection = trackCollection.TrackCollection([trace])
+(Xmin, Xmax, Ymin, Ymax) = collection.bbox()
+grille = g.Grid(Xmin-10, Ymin-10, Xmax - Xmin + 20, Ymax - Ymin + 20, 3)
+
+af_algos = [algo.speed]
+cell_operators = [celloperator.co_avg]
+grille.addAnalyticalFunctionForSummarize([trace], af_algos, cell_operators)
+grille.plot(algo.speed, celloperator.co_avg)
+
+
+# ================================================
+trace.operate(Operator.DIFFERENTIATOR, "speed", "dv")
 trace.operate(Operator.RECTIFIER, "dv", "absdv")
-trace.plotAnalyticalFeature("absdv", "PLOT")
+trace.plotProfil("SPATIAL_absdv_PROFIL")
+plt.show()
 
 
+# ================================================
 trace.segmentation(["absdv"], "speed_decoup", [1.5])
 seg = trace.split_segmentation("speed_decoup")
 
@@ -50,18 +69,19 @@ COLORS = ['k-','r-','g-','b-','y-','m-','c-']
 count = 0
 interp.SPLINE_PENALIZATION = 1e-2
 for i in range(len(seg)):
-	trace = seg[i]
-	if (trace.length() < 50):
-		continue
+    trace = seg[i]
+    if (trace.length() < 50):
+        continue
 
-	count += 1
-	trace.resample(1, interp.ALGO_THIN_SPLINES, interp.MODE_SPATIAL)
-	trace.estimate_speed()
-	v = round(trace.length()/(trace.getLastObs().timestamp-trace.getFirstObs().timestamp)*3.6,2)
-	vm = round(trace.operate(Operator.MAX, "speed")*3.6,2)
-	vc = round(100/(trace.getObs(150).timestamp-trace.getObs(50).timestamp)*3.6,2)
-	print("Rep", count, ":  vmoy = ", v, "km/h   vmax = ", vm, " km/h   vc = ", vc, "km/h")
-	plt.plot(trace.getX(), trace.getY(), COLORS[i%7])
+    count += 1
+    trace.resample(1, interp.ALGO_THIN_SPLINES, interp.MODE_SPATIAL)
+    trace.estimate_speed()
+    diff = trace.getLastObs().timestamp-trace.getFirstObs().timestamp
+    v = round(trace.length()/diff*3.6,2)
+    vm = round(trace.operate(Operator.MAX, "speed")*3.6,2)
+    vc = round(100/(trace.getObs(150).timestamp-trace.getObs(50).timestamp)*3.6,2)
+    print("Rep", count, ":  vmoy = ", v, "km/h   vmax = ", vm, " km/h   vc = ", vc, "km/h")
+    plt.plot(trace.getX(), trace.getY(), COLORS[i%7])
 
 
 plt.show()
