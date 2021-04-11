@@ -234,6 +234,7 @@ class FileReader:
                     
                 TRACES.addTrack(track)
                 line = fp.readline()
+        fp.close()
         
         return TRACES
     
