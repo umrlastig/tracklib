@@ -1105,24 +1105,52 @@ class Track:
     # =========================================================================
     # Graphical methods
     # =========================================================================
-    def plot(self, template='TRACK2D', afs = []):
+    #def plot(self, template='TRACK2D', afs = [], cmap = -1):
+    def plot(self, type='LINE', af_name = '', cmap = -1):
         '''
-        TEMPLATE: TRACK2D, SPATIAL_SPEED_PROFIL, SPATIAL_ALTI_PROFIL,
-                  TEMPORAL_SPEED_PROFILE, TEMPORAL_ALTI_PROFILE
-                  
-            afs: test si isAFTransition
+        af_name: test si isAFTransition
         '''
         plot = Plot.Plot(self)
-        plot.plot(template, afs)
-        plot.show()
+        plot.plot(type, af_name, cmap)
         
-    def plotAnalyticalFeature(self, af_name, template='PLOT'):
+        
+    def plotProfil(self, template = 'SPATIAL_SPEED_PROFIL', afs = []):
         '''
-        TEMPLATE: PLOT or BOXPLOT
+        Représentation du profil de la trace suivant une AF.
+        
+        Le nom du template doit respecter:  XXX_YYYY_PROFILE
+        avec:
+            XXX: SPATIAL ou TEMPORAL
+            YYY: ALTI, SPEED ou AF_NAME
+        
+        Le tableau de nom afs: test si isAFTransition
+        '''
+        
+        nomaxes = template.split('_')
+        if len(nomaxes) != 3:
+            sys.exit("Error: pour le profil il faut respecter XXX_YYY_PROFIL")
+            
+        if nomaxes[0] != 'SPATIAL' and nomaxes[0] != 'TEMPORAL':
+            sys.exit("Error: pour le profil il faut respecter XXX_YYY_PROFIL avec XXX SPATIAL or TEMPORAL")
+
+        if nomaxes[2] != 'PROFIL':
+            sys.exit("Error: pour le profil il faut respecter XXX_YYY_PROFIL")
+            
+        if nomaxes[1] != 'SPEED' and nomaxes[1] != 'ALTI' and not self.hasAnalyticalFeature(nomaxes[1]):
+            sys.exit("Error: pour le profil il faut respecter XXX_YYY_PROFIL avec YYY: ALTI, SPEED or existing AF")
+            
+        
+        plot = Plot.Plot(self)
+        plot.plotProfil(template, afs)
+
+        
+    def plotAnalyticalFeature(self, af_name, template='BOXPLOT'):
+        '''
+        TEMPLATE: BOXPLOT
         '''
         plot = Plot.Plot(self)
         plot.plotAnalyticalFeature(af_name, template) 
-        plot.show()
+
         
         
     # =========================================================================

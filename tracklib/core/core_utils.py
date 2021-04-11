@@ -7,7 +7,7 @@ Plus quelques fonctions utilitaires
 
 import math
 import numpy as np
-
+import matplotlib.colors as mcolors
 
 
 # =============================================================================
@@ -162,10 +162,36 @@ def rgbToHex(color):
 # Output : a 4-element array 
 # --------------------------------------------------------------------------
 def interpColors(v, vmin, vmax, cmin, cmax):
+    # norm = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax)
 	O = []
 	O.append(((vmax-v)*cmin[0] + (v-vmin)*cmax[0])/(vmax-vmin))
 	O.append(((vmax-v)*cmin[1] + (v-vmin)*cmax[1])/(vmax-vmin))
 	O.append(((vmax-v)*cmin[2] + (v-vmin)*cmax[2])/(vmax-vmin))
 	if len(cmin) == 4:
-		O.append(((vmax-v)*cmin[3] + (v-vmin)*cmax[3])/(vmax-vmin))
+		O.append( ((vmax-v)*cmin[3] + (v-vmin)*cmax[3]) / (vmax-vmin))
 	return O
+
+
+def getColorMap(cmin, cmax):
+   
+    # On définit la map color
+    cdict = {'red': [], 'green': [], 'blue': []}
+    cdict['red'].append([0.0, None, cmin[0]/255])
+    cdict['red'].append([1.0, cmax[0]/255, None])
+    cdict['green'].append([0.0, None, cmin[1]/255])
+    cdict['green'].append([1.0, cmax[1]/255, None])
+    cdict['blue'].append([0.0, None, cmin[2]/255])
+    cdict['blue'].append([1.0, cmax[2]/255, None])
+    
+    cmap = mcolors.LinearSegmentedColormap('CustomMap', cdict)
+
+    return cmap
+
+
+    
+
+
+
+
+
+

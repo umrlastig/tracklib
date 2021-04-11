@@ -7,7 +7,7 @@
 #
 # ----------------------------------------------------------------
 from datetime import datetime
-from PIL import Image
+#from PIL import Image
 import math
 import matplotlib.pyplot as plt
 import numpy as np
@@ -186,9 +186,10 @@ class Grid:
     
 
     def plot (self, af_algo, aggregate):
+        
         name = af_algo.__name__ + '#' + aggregate.__name__
         k = self.__summarizeFieldDico[name]
-        plt.figure(figsize = (10, 8))
+        plt.figure(figsize = (14, 4))
         #fig.add_subplot(111)   
         # plt.imshow(self.sum[:,:,k], interpolation='nearest', cmap=plt.cm.ocean)
         
@@ -201,7 +202,9 @@ class Grid:
                 sumPlot[i][j][k] = val
         
         # plt.imshow(sumPlot[:,:,k], cmap=plt.cm.gist_gray), cool , ocean
-        plt.imshow(sumPlot[:,:,k], cmap=plt.cm.Blues)
+        # plt.cm.Blues
+        cmap = utils.getColorMap((0,0,0), (255,255,255))
+        plt.imshow(sumPlot[:,:,k], cmap=cmap)
         plt.title(name)
         plt.colorbar()
         plt.show()
@@ -209,35 +212,35 @@ class Grid:
         #plt.boxplot(sumPlot[:,:,k], vert=False)
         
         
-    def plotImage3AF(self, afs_algo, aggs):
-        w, h = self.ncol, self.nrow
-        t = (h, w, 3)
-        A = np.zeros(t, dtype=np.uint8)
-        
-        maxs = []
-        #maxs.append(utils.co_max()
-        #        self.track.operate(Operator.Operator.MAX, afs_algo[0]))
-        
-        for i in range(h):
-            for j in range(w):
-                rgb = [100, 155, 3]
-                for k in range(len(afs_algo)):
-                    af_algo = afs_algo[k]
-                    aggregate = aggs[k]
-                    
-                    name = af_algo.__name__ + '#' + aggregate.__name__
-                    ind = self.__summarizeFieldDico[name]
-                    
-                    val = self.sum[i][j][ind]
-                    if utils.isnan(val):
-                        val = 0
-                 
-                A[i,j] = rgb
-        
-        #i = Image.fromarray(A, "RGB")
-        # im = Image.new(mode = "RGB", size = (200, 200) )
-        im = Image.fromarray(A)
-        im.show()
+#    def plotImage3AF(self, afs_algo, aggs):
+#        w, h = self.ncol, self.nrow
+#        t = (h, w, 3)
+#        A = np.zeros(t, dtype=np.uint8)
+#        
+#        maxs = []
+#        #maxs.append(utils.co_max()
+#        #        self.track.operate(Operator.Operator.MAX, afs_algo[0]))
+#        
+#        for i in range(h):
+#            for j in range(w):
+#                rgb = [100, 155, 3]
+#                for k in range(len(afs_algo)):
+#                    af_algo = afs_algo[k]
+#                    aggregate = aggs[k]
+#                    
+#                    name = af_algo.__name__ + '#' + aggregate.__name__
+#                    ind = self.__summarizeFieldDico[name]
+#                    
+#                    val = self.sum[i][j][ind]
+#                    if utils.isnan(val):
+#                        val = 0
+#                 
+#                A[i,j] = rgb
+#        
+#        #i = Image.fromarray(A, "RGB")
+#        # im = Image.new(mode = "RGB", size = (200, 200) )
+#        im = Image.fromarray(A)
+#        im.show()
         
         
         
