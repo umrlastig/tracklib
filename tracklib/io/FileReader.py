@@ -171,14 +171,14 @@ class FileReader:
     
     
     @staticmethod
-    def readFromFiles(pathdir, id_T, id_E, id_N, id_U=-1, separator=",", srid="ENUCoords"):
+    def readFromFiles(pathdir, id_T, id_E, id_N, id_U=-1, separator=",", srid="ENUCoords", no_data_value=-999999):
         
         TRACES = []
         LISTFILE = os.listdir(pathdir)
         for f in LISTFILE:
     
             p = pathdir + '/' + f
-            trace = FileReader.readFromFile(p, id_E, id_N, id_U, id_T, separator, -1, 0, "#", -999999, srid)
+            trace = FileReader.readFromFile(p, id_E, id_N, id_U, id_T, separator, -1, 0, "#", no_data_value, srid)
             TRACES.append(trace)
     
         return TRACES
