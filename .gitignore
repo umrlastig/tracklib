@@ -22,3 +22,4 @@ example/__pycache__/
 .coverage
 /data_private/
 tracklib/cartetopo/__pycache__/
+mitaka/
