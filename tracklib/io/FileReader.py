@@ -180,8 +180,8 @@ class FileReader:
             p = pathdir + '/' + f
             trace = FileReader.readFromFile(p, id_E, id_N, id_U, id_T, separator, -1, 0, "#", no_data_value, srid)
             TRACES.append(trace)
-    
-        return TRACES
+
+        return TrackCollection(TRACES)
         
     @staticmethod
     def readFromWKTFile(path, id_geom, id_user=-1, id_track=-1, separator=";", h=0, srid="ENUCoords"):
