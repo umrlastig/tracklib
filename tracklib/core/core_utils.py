@@ -188,6 +188,27 @@ def getColorMap(cmin, cmax):
     return cmap
 
 
+def getOffsetColorMap(cmin, cmax, part):
+   
+    # On définit la map color
+    cdict = {'red': [], 'green': [], 'blue': []}
+    cdict['red'].append([0.0, None, cmin[0]/255])
+    cdict['red'].append([part, cmin[0]/255, cmin[0]/255])
+    cdict['red'].append([1.0, cmax[0]/255, None])
+    
+    cdict['green'].append([0.0, None, cmin[1]/255])
+    cdict['green'].append([part, cmin[1]/255, cmin[1]/255])
+    cdict['green'].append([1.0, cmax[1]/255, None])
+    
+    cdict['blue'].append([0.0, None, cmin[2]/255])
+    cdict['blue'].append([part, cmin[2]/255, cmin[2]/255])
+    cdict['blue'].append([1.0, cmax[2]/255, None])
+    
+    cmap = mcolors.LinearSegmentedColormap('CustomMap', cdict)
+
+    return cmap
+
+
     
 
 
