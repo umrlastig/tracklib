@@ -7,10 +7,13 @@
 #
 # ----------------------------------------------------------------
 from datetime import datetime
-#from PIL import Image
 import math
 import matplotlib.pyplot as plt
 import numpy as np
+from skimage import io
+#from PIL import Image
+
+
 
 import tracklib.core.core_utils as utils
 
@@ -63,8 +66,16 @@ class Grid:
         # On initialise plus tard les agrégats    
         self.sum = np.empty((0, 0, 0))
         
+        self.color1 = (0,0,0)
+        self.color2 = (255,255,255)
+        
+        
+    def setColor(self, c1, c2):
+        self.color1 = c1
+        self.color2 = c2
     
-    def addAnalyticalFunctionForSummarize(self, TRACES, af_algos, aggregates):
+    
+    def addAnalyticalFunctionForSummarize(self, collection, af_algos, aggregates):
        
         if len(af_algos) == 0:
             print("Error: af_algos is empty")
@@ -85,10 +96,11 @@ class Grid:
             if idx > 50:
                 break
         
-        # Les valeurs agrégées
-        self.sum = np.zeros((self.nrow, self.ncol, len(af_algos)), dtype='float')    
-        
         n = len(self.__summarizeFieldDico)
+        
+        # Les valeurs agrégées
+        self.sum = np.zeros((self.nrow, self.ncol, n), dtype='float')    
+        
         self.tabval = [[[[] for k in range(n)] for j in range(self.ncol)] for i in range(self.nrow)]
         
         
@@ -97,27 +109,26 @@ class Grid:
             name = af_algo.__name__ + '#' + aggregate.__name__
             k = self.__summarizeFieldDico[name]
                 
-            # Et on saupoudre l'AF dans les cellules
-            self.__addAFValueInCell(TRACES, af_algo, k)
+            # On saupoudre l'AF dans les cellules
+            self.__addAFValueInCell(collection, af_algo, k)
                     
-            # Et on summarize
+            # On summarize
             self.__summarize(af_algo, aggregate)
             
             if idx > 50:
                 break
                     
             
-    def __addAFValueInCell(self, TRACES, af_algo, k):
+    def __addAFValueInCell(self, collection, af_algo, k):
         ''' 
         On dispatch les valeurs de l'AF dans les cellules.
         Avant on vérifie si l'AF existe, sinon on la calcule
         '''
-        for trace in TRACES:
-            
-            # On calcule l'AF si ce n'est pas fait
-            if trace.size() > 0:
-                if not trace.hasAnalyticalFeature(af_algo.__name__):
-                    trace.addAnalyticalFeature(af_algo)
+        
+        # On calcule l'AF si ce n'est pas fait
+        collection.addAnalyticalFeature(af_algo)
+        
+        for trace in collection.getTracks():
             
             # On eparpille dans les cellules
             for i in range(trace.size()):
@@ -149,67 +160,101 @@ class Grid:
             for j in range(self.ncol):
                 tarray = self.tabval[i][j][k]
                 sumval = aggregate(tarray)
+                if ((self.nrow-1 - i) == 1270 and j == 1188):
+                    print (tarray, sumval)
+                if ((self.nrow-1 - i) == 1270 and j == 1234):
+                    print (tarray, sumval)
+                
                 self.sum[self.nrow-1 - i][j][k] = sumval
-        
-
-    def exportToAsc(self, path, af, aggregate):
-        
-        name = af.__name__ + '#' + aggregate.__name__
-        filepath = path + name + "_" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".asc"
-
-        k = self.__summarizeFieldDico[name]
-        
-        ascContent = 'ncols\t\t' + str(self.ncol) + '\n'
-        ascContent = ascContent + 'nrows\t\t' + str(self.nrow) + '\n'
-        ascContent = ascContent + 'xllcorner\t' + str(self.XOrigin) + '\n'
-        ascContent = ascContent + 'yllcorner\t' + str(self.YOrigin) + '\n'
-        ascContent = ascContent + 'cellsize\t' + str(self.XPixelSize) + '\n'
-        ascContent = ascContent + 'NODATA_value\t' + str(Grid.NO_DATA_VALUE) + '\n'
-        
-        for i in range(self.nrow):
-            for j in range(self.ncol):
-                if j > 0:
-                    ascContent = ascContent + '\t'
-                val = self.sum[i][j][k]
-                if utils.isnan(val):
-                    val = Grid.NO_DATA_VALUE
-                ascContent = ascContent + str(val)
-            ascContent = ascContent + '\n'
-    
-        try:
-            f = open(filepath, "a")
-            f.write(ascContent)
-            f.close() 
-        except:
-            raise Warning("impossible d'écrire le fichier asc")
+                
     
     
-
-    def plot (self, af_algo, aggregate):
+    def plot (self, af_algo, aggregate, valmax = None, startpixel = 0):
         
         name = af_algo.__name__ + '#' + aggregate.__name__
         k = self.__summarizeFieldDico[name]
-        plt.figure(figsize = (14, 4))
-        #fig.add_subplot(111)   
-        # plt.imshow(self.sum[:,:,k], interpolation='nearest', cmap=plt.cm.ocean)
         
-        sumPlot = np.zeros((self.nrow, self.ncol, len(self.__summarizeFieldDico)), dtype='float')    
+        sumPlot = np.zeros((self.nrow, self.ncol, len(self.__summarizeFieldDico)), dtype='uint8')    
         for i in range(self.nrow):
             for j in range(self.ncol):
                 val = self.sum[i][j][k]
                 if utils.isnan(val):
                     val = 0
+                elif valmax != None and val > valmax:
+                    val = startpixel
+                else:
+                    if valmax != None:
+                        val = int(startpixel + (255 - startpixel) * (valmax - val) / valmax)
+                        #print (i,j,val)
+
+                    
                 sumPlot[i][j][k] = val
         
-        # plt.imshow(sumPlot[:,:,k], cmap=plt.cm.gist_gray), cool , ocean
-        # plt.cm.Blues
-        cmap = utils.getColorMap((0,0,0), (255,255,255))
+        # plt.figure(figsize = (25, 8))
+        #my_dpi = 96
+        #fig = plt.figure(figsize=(1629/my_dpi, 1309/my_dpi), dpi=my_dpi)
+        
+        cmap = utils.getOffsetColorMap(self.color1, self.color2, startpixel / 255)
         plt.imshow(sumPlot[:,:,k], cmap=cmap)
         plt.title(name)
         plt.colorbar()
         plt.show()
         
-        #plt.boxplot(sumPlot[:,:,k], vert=False)
+        #fig.savefig('/home/marie-dominique/DEV/WORKSPACE/python/tracklib/mitaka/4mmpx_output/descriptors/image1.png', dpi=my_dpi)
+        io.imsave('/home/marie-dominique/DEV/WORKSPACE/python/tracklib/mitaka/4mmpx_output/test/image1.png', sumPlot)
+        
+        
+#    def boxplot(self, af_algo, aggregate):
+#        name = af_algo.__name__ + '#' + aggregate.__name__
+#        k = self.__summarizeFieldDico[name]
+#        
+#        sumPlot = np.zeros((self.nrow, self.ncol, len(self.__summarizeFieldDico)), dtype='float')    
+#        for i in range(self.nrow):
+#            for j in range(self.ncol):
+#                val = self.sum[i][j][k]
+#                if utils.isnan(val):
+#                    val = 0
+#                sumPlot[i][j][k] = val
+#        
+#        sumPlot = self.__getSumArray(af_algo, aggregate)
+#        
+#        plt.boxplot(sumPlot[:,:,k], vert=False)
+        
+
+#    def exportToAsc(self, path, af, aggregate):
+#        
+#        name = af.__name__ + '#' + aggregate.__name__
+#        filepath = path + name + "_" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".asc"
+#
+#        k = self.__summarizeFieldDico[name]
+#        
+#        ascContent = 'ncols\t\t' + str(self.ncol) + '\n'
+#        ascContent = ascContent + 'nrows\t\t' + str(self.nrow) + '\n'
+#        ascContent = ascContent + 'xllcorner\t' + str(self.XOrigin) + '\n'
+#        ascContent = ascContent + 'yllcorner\t' + str(self.YOrigin) + '\n'
+#        ascContent = ascContent + 'cellsize\t' + str(self.XPixelSize) + '\n'
+#        ascContent = ascContent + 'NODATA_value\t' + str(Grid.NO_DATA_VALUE) + '\n'
+#        
+#        for i in range(self.nrow):
+#            for j in range(self.ncol):
+#                if j > 0:
+#                    ascContent = ascContent + '\t'
+#                val = self.sum[i][j][k]
+#                if utils.isnan(val):
+#                    val = Grid.NO_DATA_VALUE
+#                ascContent = ascContent + str(val)
+#            ascContent = ascContent + '\n'
+#    
+#        try:
+#            f = open(filepath, "a")
+#            f.write(ascContent)
+#            f.close() 
+#        except:
+#            raise Warning("impossible d'écrire le fichier asc")
+    
+    
+
+
         
         
 #    def plotImage3AF(self, afs_algo, aggs):
