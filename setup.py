@@ -7,7 +7,8 @@ current_path = os.path.abspath(os.path.dirname(__file__))
 requirements = (
     'numpy',
     'matplotlib',
-	'psycopg2'
+	'psycopg2',
+    'skimage'
 )
 
 dev_requirements = (
