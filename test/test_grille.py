@@ -6,6 +6,7 @@ from tracklib.core import (
   Track, Obs, Coords, GPSTime, Grid)
 from tracklib.algo import (AlgoAF)
 from tracklib.util import (CellOperator) 
+from tracklib.core.TrackCollection import TrackCollection
 
 class TestGrille(TestCase):
     
