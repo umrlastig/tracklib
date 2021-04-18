@@ -8,7 +8,7 @@ requirements = (
     'numpy',
     'matplotlib',
 	'psycopg2',
-    'skimage'
+    'scikit-image'
 )
 
 dev_requirements = (

@@ -1,7 +1,7 @@
 numpy
 matplotlib
 psycopg2
-skimage
+scikit-image
 pytest
 pytest-runner
 coverage
