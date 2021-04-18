@@ -13,9 +13,40 @@ import numpy as np
 from skimage import io
 #from PIL import Image
 
-
-
 import tracklib.core.core_utils as utils
+
+
+class Cell:
+    '''
+    '''
+    
+    def __init__(self, line_pos, col_pos, af_names, cles):
+        
+        self.line_pos = line_pos
+        self.col_pos = col_pos
+        
+        # List of values of each observations for algo_names (speed, stop)
+        self.vals = {} 
+        for name in af_names:
+            self.vals[name] = []
+            
+        # Dictionary for an af value is the aggregate
+        self.af_agg = {} #
+        for cle in cles:
+            self.af_agg[cle] = Grid.NO_DATA_VALUE
+        
+        
+        
+    def compute(self, cle, aggregate):
+        
+        tabnames = cle.split('#')
+        tarray = self.vals[tabnames[0]]
+        sumval = aggregate(tarray)
+        self.af_agg[cle] = sumval
+                
+        
+        
+
 
 
 class Grid:
@@ -28,7 +59,7 @@ class Grid:
     NO_DATA_VALUE = 0  #-99999.00
     
     
-    def __init__(self, XOrigin, YOrigin, XSize, YSize, XPixelSize, YPixelSize = None):
+    def __init__(self, Xmin, Ymin, Xmax, Ymax, XPixelSize, YPixelSize = None):
         '''
         Grid constructor. 
         The origin is the lower-left corner of the grid.
@@ -43,10 +74,12 @@ class Grid:
         :type YOrigin: double
         '''
         
-        self.XOrigin = XOrigin 
-        self.YOrigin = YOrigin
-        self.XSize = XSize
-        self.YSize = YSize
+        self.XSize = Xmax - Xmin
+        self.YSize = Ymax - Ymin
+        
+        self.XOrigin = Xmin 
+        self.YOrigin = Ymin + self.YSize
+        
         self.XPixelSize = XPixelSize
         if YPixelSize == None:
             self.YPixelSize = XPixelSize
@@ -54,17 +87,8 @@ class Grid:
             self.YPixelSize = YPixelSize
         
         # 
-        self.ncol = int(self.XSize / self.XPixelSize) + 1
-        self.nrow = int(self.YSize / self.YPixelSize) + 1
-        
-        # les aggrégats
-        self.__summarizeFieldDico = {}
-        
-        # Pour stocker les valeurs des AF
-        self.tabval = [[[] for j in range(self.ncol)] for i in range(self.nrow)]
-        
-        # On initialise plus tard les agrégats    
-        self.sum = np.empty((0, 0, 0))
+        self.ncol = math.ceil(self.XSize / self.XPixelSize)
+        self.nrow = math.ceil(self.YSize / self.YPixelSize)
         
         self.color1 = (0,0,0)
         self.color2 = (255,255,255)
@@ -85,50 +109,53 @@ class Grid:
             print("Error: af_names and aggregates must have the same number elements")
             return 0
         
+        # ---------------------------------------------------------------------
+        # Tableau des noms
+        self.af_names = [] # Utile pour stocker une seule fois l'af
+        self.__summarizeFields = {}  # cle nom_algo#nom_agg
+        
         for idx, af_algo in enumerate(af_algos):
             aggregate = aggregates[idx]
-            name = af_algo.__name__ + '#' + aggregate.__name__
+            name = af_algo.__name__
+            cle = af_algo.__name__ + '#' + aggregate.__name__
+            
+            if name not in self.af_names:
+                self.af_names.append(name)
+            if cle not in self.__summarizeFields.keys():
+                self.__summarizeFields[cle] = aggregate
+        
+        # ---------------------------------------------------------------------        
+        #  On construit des cellules vides
+        self.tabcel = []
+        for i in range(self.nrow):
+            self.tabcel.append([])
+            for j in range(self.ncol):
+                self.tabcel[i].append(Cell(i, j, self.af_names, self.__summarizeFields.keys()))
+        
+        # ---------------------------------------------------------------------
+        #  On ajoute les valeurs des af dans les cellules
+        for af_algo in af_algos:
+            self.__addAFValueInCell(collection, af_algo)
 
-            if name not in self.__summarizeFieldDico:
-                idAF = len(self.__summarizeFieldDico)
-                self.__summarizeFieldDico[name] = idAF
-                
-            if idx > 50:
-                break
-        
-        n = len(self.__summarizeFieldDico)
-        
-        # Les valeurs agrégées
-        self.sum = np.zeros((self.nrow, self.ncol, n), dtype='float')    
-        
-        self.tabval = [[[[] for k in range(n)] for j in range(self.ncol)] for i in range(self.nrow)]
-        
-        
-        for idx, af_algo in enumerate(af_algos):
-            aggregate = aggregates[idx]
-            name = af_algo.__name__ + '#' + aggregate.__name__
-            k = self.__summarizeFieldDico[name]
-                
-            # On saupoudre l'AF dans les cellules
-            self.__addAFValueInCell(collection, af_algo, k)
-                    
-            # On summarize
-            self.__summarize(af_algo, aggregate)
-            
-            if idx > 50:
-                break
+        # On calcule les agregats            
+        for cle in self.__summarizeFields.keys():
+            self.__summarize(cle, self.__summarizeFields[cle])
+              
+
                     
             
-    def __addAFValueInCell(self, collection, af_algo, k):
+    def __addAFValueInCell(self, collection, af_algo):
         ''' 
         On dispatch les valeurs de l'AF dans les cellules.
-        Avant on vérifie si l'AF existe, sinon on la calcule
+        Avant on vérifie si l'AF existe, sinon on la calcule.
         '''
         
-        # On calcule l'AF si ce n'est pas fait
-        collection.addAnalyticalFeature(af_algo)
+        af_name = af_algo.__name__
         
         for trace in collection.getTracks():
+            
+            # On calcule l'AF si ce n'est pas fait
+            trace.addAnalyticalFeature(af_algo)
             
             # On eparpille dans les cellules
             for i in range(trace.size()):
@@ -138,46 +165,36 @@ class Grid:
                 X = float(obs.position.getX()) - self.XOrigin
                 column = math.floor(X / self.XPixelSize)
                 
-                Y = float(obs.position.getY()) - self.YOrigin
+                #Y = float(obs.position.getY()) - self.YOrigin
+                Y = self.YOrigin - float(obs.position.getY())
                 line = math.floor(Y / self.YPixelSize)
                 
-                if (column >= 0 and column < self.ncol and line >= 0 and line < self.nrow):
-                    val = trace.getObsAnalyticalFeature(af_algo.__name__, i)
-                    self.tabval[line][column][k].append(val)
-#                else:
-#                    print ("Warning: position outer of zone. " \
-#                       + "Row: [0, " + str(line) + ', ' + str(self.nrow) + '], ' \
-#                       + "Column: [0, " + str(column) + ', ' + str(self.ncol) + ']' + str(obs.position))
-#    
-    def __summarize(self, af_algo, aggregate):
-        '''
-        Le tableau est inversé en i: le zero est en haut à gauche.
-        '''
-        name = af_algo.__name__ + '#' + aggregate.__name__
-        k = self.__summarizeFieldDico[name]
-        
-        for i in range(self.nrow):
-            for j in range(self.ncol):
-                tarray = self.tabval[i][j][k]
-                sumval = aggregate(tarray)
-                if ((self.nrow-1 - i) == 1270 and j == 1188):
-                    print (tarray, sumval)
-                if ((self.nrow-1 - i) == 1270 and j == 1234):
-                    print (tarray, sumval)
+                if (0 <= column and column < self.ncol and 0 <= line and line < self.nrow):
+                    val = trace.getObsAnalyticalFeature(af_name, i)
+                    self.tabcel[line][column].vals[af_name].append(val)
+##                else:
+##                    print ("Warning: position outer of zone. " \
+##                       + "Row: [0, " + str(line) + ', ' + str(self.nrow) + '], ' \
+##                       + "Column: [0, " + str(column) + ', ' + str(self.ncol) + ']' + str(obs.position))
+##    
+                    
+                    
+    def __summarize(self, cle, aggregate):
+       for i in range(self.nrow):
+           for j in range(self.ncol):
+                cell = self.tabcel[i][j]
+                cell.compute(cle, aggregate)
                 
-                self.sum[self.nrow-1 - i][j][k] = sumval
                 
     
-    
-    def plot (self, af_algo, aggregate, valmax = None, startpixel = 0):
+    def __buildArray__(self, af_algo, aggregate, valmax = None, startpixel = 0):
         
         name = af_algo.__name__ + '#' + aggregate.__name__
-        k = self.__summarizeFieldDico[name]
         
-        sumPlot = np.zeros((self.nrow, self.ncol, len(self.__summarizeFieldDico)), dtype='uint8')    
+        sumPlot = np.zeros((self.nrow, self.ncol, len(self.__summarizeFields)), dtype='uint8')    
         for i in range(self.nrow):
             for j in range(self.ncol):
-                val = self.sum[i][j][k]
+                val = self.tabcel[i][j].af_agg[name]
                 if utils.isnan(val):
                     val = 0
                 elif valmax != None and val > valmax:
@@ -185,23 +202,31 @@ class Grid:
                 else:
                     if valmax != None:
                         val = int(startpixel + (255 - startpixel) * (valmax - val) / valmax)
-                        #print (i,j,val)
 
-                    
-                sumPlot[i][j][k] = val
+                sumPlot[i][j][0] = val
+    
+        return sumPlot
+    
+    
+    def plot (self, af_algo, aggregate, valmax = None, startpixel = 0):
         
-        # plt.figure(figsize = (25, 8))
-        #my_dpi = 96
-        #fig = plt.figure(figsize=(1629/my_dpi, 1309/my_dpi), dpi=my_dpi)
+        name = af_algo.__name__ + '#' + aggregate.__name__
+        
+        sumPlot = self.__buildArray__(af_algo, aggregate, valmax, startpixel)
         
         cmap = utils.getOffsetColorMap(self.color1, self.color2, startpixel / 255)
-        plt.imshow(sumPlot[:,:,k], cmap=cmap)
+        plt.imshow(sumPlot[:,:,0], cmap=cmap)
         plt.title(name)
         plt.colorbar()
         plt.show()
         
-        #fig.savefig('/home/marie-dominique/DEV/WORKSPACE/python/tracklib/mitaka/4mmpx_output/descriptors/image1.png', dpi=my_dpi)
-        io.imsave('/home/marie-dominique/DEV/WORKSPACE/python/tracklib/mitaka/4mmpx_output/test/image1.png', sumPlot)
+        
+        
+    
+    def saveGrid(self, filename, af_algo, aggregate, valmax = None, startpixel = 0):
+        
+        sumPlot = self.__buildArray__(af_algo, aggregate, valmax, startpixel)
+        io.imsave(filename, sumPlot)
         
         
 #    def boxplot(self, af_algo, aggregate):
@@ -221,11 +246,11 @@ class Grid:
 #        plt.boxplot(sumPlot[:,:,k], vert=False)
         
 
-#    def exportToAsc(self, path, af, aggregate):
-#        
-#        name = af.__name__ + '#' + aggregate.__name__
-#        filepath = path + name + "_" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".asc"
-#
+    def exportToAsc(self, path, af, aggregate):
+        
+        name = af.__name__ + '#' + aggregate.__name__
+        filepath = path + name + "_" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".asc"
+
 #        k = self.__summarizeFieldDico[name]
 #        
 #        ascContent = 'ncols\t\t' + str(self.ncol) + '\n'
