@@ -23,7 +23,7 @@ class Plot:
         self.track = track
         
         
-    def plot(self, template='TRACK2D', afs = []):
+    def plot(self, template='TRACK2D', afs = [], symbol='g-'):
         '''
         Représentation d'une trace ou du profil de la trace.
         
@@ -91,7 +91,7 @@ class Plot:
 
     
         fig, ax1 = plt.subplots(figsize=(10, 3))
-        l = ax1.plot(X, Y, '-', color='forestgreen', label=axe3)
+        l = ax1.plot(X, Y, symbol, label=axe3)
         tabplot.append(l)
         # plt.ylim([0, ymax + len(afs) * 0.3])
         plt.xlim([xmin, xmax])

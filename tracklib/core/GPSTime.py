@@ -160,7 +160,7 @@ class GPSTime:
     # Generate random date between 01/01/1970 and 01/01/2050
     # ------------------------------------------------------------    
     def random():
-        t0 = GPSTime("2050-01-01 00:00:00")
+        t0 = GPSTime(2050,1,1,0,0,0,0)
         s0 = t0.toAbsTime()
         return GPSTime.readUnixTime(random.random()*s0)
         

@@ -8,76 +8,57 @@ from xml.dom import minidom
 from tracklib.core.GPSTime import GPSTime
 from tracklib.core.Coords import ENUCoords, GeoCoords
 from tracklib.core.Obs import Obs
+import tracklib.core.core_utils as utils
 import tracklib.core.Track as t
+from tracklib.core.TrackCollection import TrackCollection
 
 
 class GpxReader:
 
     @staticmethod
-    def readFromGpx(path, ref=None):
+    def readFromGpx(path, srid="GEO"):
         '''
-        The method assumes a single track in file
-        Needs to provide a reference pt in geodetic coords
+        Reads (multiple) tracks in .gpx file
         '''
         
-        tracks = []
+        tracks = TrackCollection()
         
         format_old = GPSTime.getReadFormat()
         GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         
         doc = minidom.parse(path)
-        trkpts = doc.getElementsByTagName('trkpt')
+		
+        trks = doc.getElementsByTagName('trk')
         
-        trace = t.Track()
-        for trkpt in trkpts:
-            lon = float(trkpt.attributes['lon'].value)
-            lat = float(trkpt.attributes['lat'].value)
+        for trk in trks:
+            trace = t.Track()
+            trkpts = trk.getElementsByTagName('trkpt')
+            for trkpt in trkpts:
+                lon = float(trkpt.attributes['lon'].value)
+                lat = float(trkpt.attributes['lat'].value)
             
-            hgt = 0
-            eles = trkpt.getElementsByTagName('ele')
-            if eles.length > 0:
-               hgt = float(eles[0].firstChild.data)
+                hgt = 0
+                eles = trkpt.getElementsByTagName('ele')
+                if eles.length > 0:
+                   hgt = float(eles[0].firstChild.data)
             
-            time = ''
-            times = trkpt.getElementsByTagName('time')
-            if times.length > 0:
-                time = GPSTime(times[0].firstChild.data)
+                time = ''
+                times = trkpt.getElementsByTagName('time')
+                if times.length > 0:
+                    time = GPSTime(times[0].firstChild.data)
+                else:
+                    time = GPSTime()
             
-            if (ref == None):
-                coords = ENUCoords(lon, lat, hgt)
-            else:
-                coords =  (GeoCoords(lon, lat, hgt)).toENUCoords(ref)
+                point = Obs(utils.makeCoords(lon, lat, hgt, srid), time)
+                trace.addObs(point)
             
-            point = Obs(coords, time)
-            trace.addObs(point)
-            
-        tracks.append(trace)
+            tracks.addTrack(trace)
 
-        # pourquoi ?
+        # pourquoi ? 
+		# --> pour remettre le format comme il etait avant la lectre :)
         GPSTime.setReadFormat(format_old)
         
         return tracks
     
-    
-    @staticmethod
-    def readFirstPointFromGpx(path):
-        
-        r = ()
-        
-        doc = minidom.parse(path)
-        trkpts = doc.getElementsByTagName('trkpt')
-        
-        for trkpt in trkpts:
-            lon = float(trkpt.attributes['lon'].value)
-            lat = float(trkpt.attributes['lat'].value)
-            
-            hgt = 0
-            eles = trkpt.getElementsByTagName('ele')
-            if eles.length > 0:
-               hgt = float(eles[0].firstChild.data)
-            
-            r = (lon,lat,hgt)
-        
-        return r
                 
         

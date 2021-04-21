@@ -8,6 +8,10 @@ Plus quelques fonctions utilitaires
 import math
 import numpy as np
 
+from tracklib.core.Coords import GeoCoords
+from tracklib.core.Coords import ENUCoords
+from tracklib.core.Coords import ECEFCoords
+
 
 
 # =============================================================================
@@ -32,6 +36,24 @@ def aire_visval(track, i):
 	y2 = track.getObs(i+1).position.getY()
 	return triangle_area(x0,y0,x1,y1,x2,y2)
 
+# --------------------------------------------------------------------------
+# Function to form coords object from (x,y,z) data
+# --------------------------------------------------------------------------
+# Input : 
+#   - x       ::     1st coordinate (X, lon or E)
+#   - y       ::     2nd coordinate (Y, lat or N)
+#	- z       ::     3rd coordinate (Z, hgt or U)
+#   - srid    ::     Id of coord system (ECEF, GEO or ENU)
+# --------------------------------------------------------------------------
+# Output : Coords object in the proper srid
+# --------------------------------------------------------------------------
+def makeCoords(x, y, z, srid):
+	if (srid.upper() in ["ENUCOORDS", "ENU"]):
+		return ENUCoords(x, y, z)
+	if (srid.upper() in ["GEOCOORDS", "GEO"]):
+		return GeoCoords(x, y, z)
+	if (srid.upper() in ["ECEFCOORDS", "ECEF"]):
+		return ECEFCoords(x, y, z)
 
 # --------------------------------------------------------------------------
 # Function to compute area of triangle with cross product

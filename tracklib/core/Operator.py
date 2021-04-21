@@ -181,6 +181,17 @@ class Power(BinaryVoidOperator):
 			temp[i] = track.getObsAnalyticalFeature(af_input1, i) ** track.getObsAnalyticalFeature(af_input2, i)
 		algoAF.addListToAF(track, af_output, temp)
 		return temp
+		
+class QuadraticAdder(BinaryVoidOperator):
+	def execute(self, track, af_input1, af_input2, af_output):
+		track.createAnalyticalFeature(af_output)
+		temp = [0]*track.size()
+		for i in range(0, track.size()):
+			temp[i]  = track.getObsAnalyticalFeature(af_input1, i)**2
+			temp[i] += track.getObsAnalyticalFeature(af_input2, i)**2
+			temp[i]  = temp[i]**0.5
+		algoAF.addListToAF(track, af_output, temp)
+		return temp
 	
 class Derivator(BinaryVoidOperator):
 	def execute(self, track, af_input1, af_input2, af_output):
@@ -643,6 +654,7 @@ class Operator:
 	MULTIPLIER = Multiplier()					 # y(t) = x1(t) * x2(t)
 	DIVIDER = Divider()							 # y(t) = x1(t) / x2(t)
 	POWER = Power()								 # y(t) = x1(t) ** x2(t)
+	QUAD_ADDER = QuadraticAdder()                # y(t) = (x1(t)**2 + x2(t)**2)**0.5
 	RENORMALIZER = Renormalizer()				 # y(t) = (x1(t)-m(x1))* s(x2)/s(x1) + m(x2)
 	DERIVATOR = Derivator()                      # y(t) = (x1(t)-x1(t-1))/(x2(t)-x2(t-1)) = dx1/dx2
 	POINTWISE_EQUALER = PointwiseEqualer()       # y(t) = 1 if x1(t)=x2(t), 0 otherwise

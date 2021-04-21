@@ -22,7 +22,7 @@ class TrackCollection:
         '''
         TRACES: list of Track
         '''
-        self.__TRACES = TRACES
+        self.__TRACES = TRACES.copy()
 		
     def addTrack(self, track):
         self.__TRACES.append(track)
