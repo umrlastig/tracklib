@@ -1,6 +1,7 @@
 # -------------------------- Track Collection ---------------------------------
 # Class to manage collection of tracks
 # -----------------------------------------------------------------------------
+import copy
 import random
 
 import matplotlib.pyplot as plt
@@ -48,7 +49,8 @@ class TrackCollection:
         for track in self:
             m += track.frequency(mode)
         return m/self.size()
-		
+    
+    
     # =========================================================================
     # Track collection coordinate transformation
     # =========================================================================	
@@ -349,3 +351,48 @@ class TrackCollection:
         return self.__TRACES[n]  
     def __setitem__(self, n, track):
         self.__TRACES[n] = track  	
+        
+        
+        
+    # =========================================================================
+    def removeTrack(self, track):
+        self.__TRACES.remove(track)
+    
+    def removeTrackEmpty(self):
+        '''
+        Remove track which have no observation
+        '''
+        for track in self.__TRACES:
+            if track.size() <= 0:
+                self.removeTrack(track)
+        
+    # =========================================================================
+    #    SEGMENTATION, EXTRACT, REMOVE
+    
+    def segmentation(self, afs_input, af_output, thresholds_max, mode_comparaison = 1):
+        for t in self.__TRACES:
+            t.segmentation(afs_input, af_output, thresholds_max, mode_comparaison)
+
+        
+    def split_segmentation(self, af_output):
+        '''
+        Découpe les traces suivant la segmentation définie par le paramètre af_output ET
+        Remplace la trace par les traces splittées s'il y a une segmentation.
+        '''
+        NEW_TRACES = []
+        for track in self.__TRACES:
+           TRACES_SPLIT = track.split_segmentation(af_output)
+           # Si le tableau est nulle pas de segmentation, on ne fait rien
+           # sinon on supprime la trace et on ajoute les traces splittées
+           if len(TRACES_SPLIT) > 0:
+               for split in TRACES_SPLIT:
+                   #print (split.size())
+                   NEW_TRACES.append(split)
+           else:
+                NEW_TRACES.append(track)
+        
+        self.__TRACES = NEW_TRACES
+
+               
+               
+               

@@ -6,7 +6,7 @@ Read GPS track from gpx file.
 from xml.dom import minidom
 
 from tracklib.core.GPSTime import GPSTime
-from tracklib.core.Coords import ENUCoords, GeoCoords
+from tracklib.core.Coords import GeoCoords
 from tracklib.core.Obs import Obs
 import tracklib.core.core_utils as utils
 import tracklib.core.Track as t
@@ -16,6 +16,7 @@ from tracklib.core.TrackCollection import TrackCollection
 class GpxReader:
 
     @staticmethod
+
     def readFromGpx(path, srid="GEO"):
         '''
         Reads (multiple) tracks in .gpx file
@@ -48,7 +49,7 @@ class GpxReader:
                     time = GPSTime(times[0].firstChild.data)
                 else:
                     time = GPSTime()
-            
+
                 point = Obs(utils.makeCoords(lon, lat, hgt, srid), time)
                 trace.addObs(point)
             
@@ -58,7 +59,7 @@ class GpxReader:
 		# --> pour remettre le format comme il etait avant la lectre :)
         GPSTime.setReadFormat(format_old)
         
-        return tracks
+        collection = TrackCollection(tracks)
+        return collection
     
-                
-        
+

@@ -5,16 +5,7 @@ File format to read and write GPS tracks to CSV file(s).
 
 '''
 
-import os
-
 from tracklib.core.GPSTime import GPSTime
-from tracklib.core.Coords import ENUCoords
-from tracklib.core.Coords import GeoCoords
-from tracklib.core.Coords import ECEFCoords
-from tracklib.core.Obs import Obs
-from tracklib.core.Track import Track
-from tracklib.core.Coords import ECEFCoords
-from tracklib.core.TrackCollection import TrackCollection
 
 
 class FileFormat:

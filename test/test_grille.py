@@ -6,6 +6,7 @@ from tracklib.core import (
   Track, Obs, Coords, GPSTime, Grid)
 from tracklib.algo import (AlgoAF)
 from tracklib.util import (CellOperator) 
+from tracklib.core.TrackCollection import TrackCollection
 
 class TestGrille(TestCase):
     
@@ -30,6 +31,7 @@ class TestGrille(TestCase):
         
         TRACES.append(trace1)
         
+        
         Xmin = 0
         Xmax = 400
         Ymin = 0
@@ -45,7 +47,7 @@ class TestGrille(TestCase):
         # 
         af_algos = [AlgoAF.speed] #, utils.stop_point]
         cell_operators = [CellOperator.co_avg] #, utils.sum]
-        grille.addAnalyticalFunctionForSummarize(TRACES, af_algos, cell_operators)
+        grille.addAnalyticalFunctionForSummarize(TrackCollection(TRACES), af_algos, cell_operators)
         
         #grille.plot(utils.orientation, utils.co_dominant)
         grille.plot(AlgoAF.speed, CellOperator.co_avg)

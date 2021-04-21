@@ -28,30 +28,26 @@ The official documentation is available at **[ReadTheDocs](https://tracklib.read
 ```python
 import matplotlib.pyplot as plt
 
+import tracklib.algo.AlgoAF as algo
 import tracklib.algo.Interpolation as interp
-import tracklib.core.Obs as obs
 from tracklib.core.GPSTime import GPSTime
-from tracklib.io.GpxReader import GpxReader
-from tracklib.core.Coords import GeoCoords
+import tracklib.core.Grid as g
 from tracklib.core.Operator import Operator
+import tracklib.core.TrackCollection as trackCollection
+from tracklib.io.GpxReader import GpxReader
+import tracklib.util.CellOperator as celloperator
 
 # ------------------------------------------------------------------
 # Read data and plot track
 # ------------------------------------------------------------------
 GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
 tracks = GpxReader.readFromGpx("../data/activity_5807084803.gpx")
-trace = tracks[0]
+trace = tracks.getTrack(0)
 
-base_geo = trace.getFirstObs().position
-base = GeoCoords(base_geo.getX(), base_geo.getY(), base_geo.getZ())
-for i in range(trace.size()):
-	x = trace.getObs(i).position.getX()
-	y = trace.getObs(i).position.getY()
-	z = trace.getObs(i).position.getZ()
-	geo = GeoCoords(x, y, z)
-	enu = geo.toENUCoords(base)
-	trace.setObs(i, obs.Obs(enu,trace.getObs(i).timestamp))
+# Transform GEO coordinates to ENU coordinates
+trace.toENUCoords()
 
+# Plot
 trace.plot()
 ```
 
@@ -64,13 +60,29 @@ Trajectory plot:
 #  Compute local speed and display boxplot of speed observations
 # ------------------------------------------------------------------
 trace.estimate_speed()
-trace.operate(Operator.DIFFERENTIATOR, "speed", "dv")
-trace.plotAnalyticalFeature('speed', 'BOXPLOT')
+	
+trace.plotAnalyticalFeature('speed', 'BOXPLOT')   # figure (a)
+trace.plotProfil('SPATIAL_SPEED_PROFIL')          # figure (b)
+trace.plot('POINT', 'speed')                      # figure (c)
 ```
 
-Speed observations boxplot:
+Speed observations figures: boxplot (a), profil (b), plot (c) and grid (d):
 
-![png](https://tracklib.readthedocs.io/en/latest/_images/quickstart_2.png)
+![png](https://tracklib.readthedocs.io/en/latest/_images/Plot_Speed_4methods.png)
+
+```python
+# ------------------------------------------------------------------
+#  Summarize analytical features and plot it in image
+# ------------------------------------------------------------------
+collection = trackCollection.TrackCollection([trace])
+(Xmin, Xmax, Ymin, Ymax) = collection.bbox()
+grille = g.Grid(Xmin-10, Ymin-10, Xmax - Xmin + 20, Ymax - Ymin + 20, 3)
+
+af_algos = [algo.speed]
+cell_operators = [celloperator.co_avg]
+grille.addAnalyticalFunctionForSummarize([trace], af_algos, cell_operators)
+grille.plot(algo.speed, celloperator.co_avg)      # figure (d)
+```
 
 ```python
 # ------------------------------------------------------------------
