@@ -6,8 +6,8 @@ import math
 import numpy as np
 from abc import abstractmethod
 
-import tracklib.algo.AlgoAF as algoAF
-import tracklib.core.core_utils as utils
+import tracklib.algo.Analytics as algoAF
+import tracklib.core.Utils as utils
 from tracklib.core.Kernel import Kernel
 
 class UnaryOperator():

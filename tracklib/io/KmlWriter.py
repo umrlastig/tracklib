@@ -7,7 +7,7 @@ Write GPS track in KML file(s).
 
 import os
 from tracklib.core.Track import Track
-import tracklib.core.core_utils as utils
+import tracklib.core.Utils as utils
 import tracklib.core.Operator as Operator
 
 

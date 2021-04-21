@@ -6,7 +6,7 @@ import sys
 import numpy as np
 
 import tracklib.core.Track as Track
-import tracklib.core.core_utils as utils
+import tracklib.core.Utils as utils
 import tracklib.core.Operator as Operator
 
 MODE_SIMPLIFY_DOUGLAS_PEUCKER = 1

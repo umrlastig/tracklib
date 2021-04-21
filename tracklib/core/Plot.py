@@ -3,13 +3,9 @@
 # ----------------------------------------------------------------
 
 import matplotlib.pyplot as plt
-
-import tracklib.algo.AlgoAF as algo
-# Pour le calcul des échelles on a besoin du max 
+import tracklib.algo.Analytics as algo
 import tracklib.core.Operator as Operator
-
-# Nan
-import tracklib.core.core_utils as utils
+import tracklib.core.Utils as utils
 
 #MODE_REPRESENT_TRACK2D = 1
 #MODE_REPRESENT_SPEED_PROFIL = 2

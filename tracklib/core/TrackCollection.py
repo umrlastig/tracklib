@@ -10,7 +10,7 @@ import tracklib.core.Operator as Operator
 import tracklib.core.Plot as Plot
 import tracklib.util.CellOperator as Sum
 
-import tracklib.core.core_utils as utils
+import tracklib.core.Utils as utils
 import tracklib.algo.Interpolation as Interpolation
 import tracklib.algo.Simplification as Simplification
 

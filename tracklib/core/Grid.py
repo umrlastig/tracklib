@@ -13,7 +13,7 @@ import numpy as np
 from skimage import io
 #from PIL import Image
 
-import tracklib.core.core_utils as utils
+import tracklib.core.Utils as utils
 
 
 class Cell:

@@ -8,7 +8,7 @@ from tracklib.core.Obs import Obs
 from tracklib.core.Coords import ENUCoords
 import tracklib.core.Track as t
 from tracklib.core.TrackCollection import TrackCollection
-import tracklib.core.core_utils as utils
+import tracklib.core.Utils as utils
 
 try:
     import psycopg2

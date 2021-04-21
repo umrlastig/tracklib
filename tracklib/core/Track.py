@@ -18,9 +18,9 @@ import tracklib.core.Kernel as Kernel
 from tracklib.core.Kernel import GaussianKernel
 from tracklib.core.TrackCollection import TrackCollection
 
-import tracklib.core.core_utils as utils
-import tracklib.algo.AlgoAF as algoAF
-import tracklib.algo.Analytics as Analytics
+import tracklib.core.Utils as utils
+import tracklib.algo.Analytics as algoAF
+import tracklib.algo.Geometrics as Geometrics
 import tracklib.algo.Interpolation as Interpolation
 import tracklib.algo.Simplification as Simplification
 
@@ -28,9 +28,6 @@ import tracklib.core.Plot as Plot
 
 
 class Track:
-    
-    MODE_COMPARAISON_AND = 1
-    MODE_COMPARAISON_OR = 2
 
     def __init__(self, list_of_obs=None, user_id=0, track_id=0):
         '''
@@ -1191,144 +1188,6 @@ class Track:
     def simplify(self, tolerance, mode = Simplification.MODE_SIMPLIFY_DOUGLAS_PEUCKER):
         return Simplification.simplify(self, tolerance, mode)
         
-    # -------------------------------------------------------------------------
-    #   Segmentation and Split track
-    # -------------------------------------------------------------------------
-        
-    def segmentation(self, afs_input, af_output, thresholds_max, mode_comparaison = MODE_COMPARAISON_AND):
-        '''
-        Méthode subdivisant la liste de points de la trace (i.e. étapes), 
-            selon des analyticals feature et des seuils. 
-        
-        Attention une étape peut ne comporter qu'un seul point.
-    
-        Crée un AF avec des 0 si pas de changement, 1 sinon
-        '''
-		
-        # Gestion cas un seul AF        
-        if not isinstance(afs_input, list):
-            afs_input = [afs_input]		
-        if not isinstance(thresholds_max, list):
-            thresholds_max = [thresholds_max]	
-		
-        self.createAnalyticalFeature(af_output)
-        
-        for i in range(len(self.__POINTS)):
-            
-            # On cumule les comparaisons pour chaque af_input
-            comp = (1 == 1)
-                
-            for index, af_input in enumerate(afs_input):
-                current_value = self.getObsAnalyticalFeature(af_input, i)
-                
-                # on compare uniquement si on peut
-                if not utils.isnan(current_value):
-                
-                    seuil_max =  sys.float_info.max
-                    if thresholds_max != None and len(thresholds_max) >= index:
-                        seuil_max = thresholds_max[index]
-                    
-                    if mode_comparaison == self.MODE_COMPARAISON_AND:
-                        comp = comp and (current_value <= seuil_max)
-                    else:
-                        comp = comp or (current_value <= seuil_max)
-            
-            #  On clot l'intervalle, on le marque a 1
-            if not comp:
-                self.setObsAnalyticalFeature(af_output, i, 1)
-            else:
-                self.setObsAnalyticalFeature(af_output, i, 0)
-                
-    
-    
-    def split_segmentation(self, af_output):
-        '''
-        Découpe les traces suivant la segmentation définie par le paramètre af_output.
-        Retourne aucune trace s'il n'y a pas de segmentation, 
-                 sinon un tableau de nouvelles traces
-        '''
-        
-        NEW_TRACES = TrackCollection()
-        
-        # Initialisation du compteur des étapes
-        count = 0
-        
-        # indice du premier point de l'étape
-        begin = 0
-        
-        for i in range(self.size()):
-            
-            if self.getObsAnalyticalFeature(af_output, i) == 1:
-                # Nouvelle trajectoire
-                
-                # L'identifiant de la trace subdivisée est obtenue par concaténation 
-                # de l'identifiant de la trace initiale et du compteur
-                new_id = str(self.uid) + '.' + str(count)
-                
-                # La liste de points correspondant à l'intervalle de subdivision est créée
-                new_traj = self.extract(begin, i)
-                new_traj.setUid(new_id)
-                
-                NEW_TRACES.addTrack(new_traj)
-                count += 1
-                begin = i+1
-                
-        # Si tous les points sont dans la même classe, la liste d'étapes reste vide
-        # sinon, on clôt la derniere étape et on l'ajoute à la liste
-        if begin != 0:
-            new_id = str(self.uid) + '.' + str(count)
-            new_traj = self.extract(begin, self.size() - 1)
-            new_traj.setUid(new_id)
-            NEW_TRACES.addTrack(new_traj)
-               
-        return NEW_TRACES
-    
-    # -------------------------------------------------------------------
-	# Function to extract stop positions from a track
-	# Inputs:
-	#     - duration: minimal stop duration (in seconds)
-	#     - speed: maximal speed during stop (in ground units / sec)
-	# Output: a track with centroids (and first time of stop sequence)
-	# Default is set for precise RTK GNSS survey (1 cm / sec for 5 sec)
-	# For classical standard GPS track set 1 m/s for 10 sec)
-	# -------------------------------------------------------------------
-    def extractStops(self, speed=1e-2, duration=5):        
-        
-        track = self.copy()
-        stops = Track()
-       
-        track.segmentation("speed", "#mark", speed)
-        track.operate(Operator.Operator.DIFFERENTIATOR, "#mark")
-        track.operate(Operator.Operator.RECTIFIER, "#mark")
-
-        TRACES = track.split_segmentation("#mark")			
-
-        TMP_SIGMA_X = []	
-        TMP_SIGMA_Y = []	
-        TMP_DURATION = []
-        TMP_NBPOINTS = []		
-		
-        for i in range(0,len(TRACES),2):
-            if (TRACES[i].duration() < duration):
-                continue
-            stops.addObs(Obs(TRACES[i].getCentroid().copy(), TRACES[i].getFirstObs().timestamp.copy()))
-            TMP_SIGMA_X.append(TRACES[i].operate(Operator.Operator.STDDEV, 'x'))
-            TMP_SIGMA_Y.append(TRACES[i].operate(Operator.Operator.STDDEV, 'y'))
-            TMP_NBPOINTS.append(TRACES[i].size())
-            TMP_DURATION.append(TRACES[i].duration())
-            
-        if (stops.size() > 0):
-            stops.createAnalyticalFeature("sigma_x")
-            stops.createAnalyticalFeature("sigma_y")
-            stops.createAnalyticalFeature("duration")	
-            stops.createAnalyticalFeature("nb_points")
-            for i in range(len(TMP_SIGMA_X)):
-                stops.setObsAnalyticalFeature("sigma_x", i, TMP_SIGMA_X[i])
-                stops.setObsAnalyticalFeature("sigma_y", i, TMP_SIGMA_Y[i])
-                stops.setObsAnalyticalFeature("duration", i, TMP_DURATION[i])
-                stops.setObsAnalyticalFeature("nb_points", i, TMP_NBPOINTS[i])
-        stops.operate(Operator.Operator.QUAD_ADDER, "sigma_x", "sigma_y", "rmse")
-        return stops
     
     # =========================================================================
     #    Built-in Analytical Features 

@@ -8,7 +8,7 @@ from xml.dom import minidom
 from tracklib.core.GPSTime import GPSTime
 from tracklib.core.Coords import GeoCoords
 from tracklib.core.Obs import Obs
-import tracklib.core.core_utils as utils
+import tracklib.core.Utils as utils
 import tracklib.core.Track as t
 from tracklib.core.TrackCollection import TrackCollection
 

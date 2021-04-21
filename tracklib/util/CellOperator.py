@@ -3,7 +3,7 @@
 #  - 
 # -----------------------------------------------------------------------------
 
-import tracklib.core.core_utils as utils
+import tracklib.core.Utils as utils
 
 def co_sum(tarray):
 	somme = 0
