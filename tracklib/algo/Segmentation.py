@@ -19,6 +19,9 @@ MODE_COMPARAISON_OR = 2
 MODE_STOPS_LOCAL = 0
 MODE_STOPS_GLOBAL = 1
 
+MODE_AR_EXHAUSTIVE = 0
+MODE_AR_FFT = 1
+
 # -------------------------------------------------------------------------
 # Segmentation and Split track
 # -------------------------------------------------------------------------
@@ -310,7 +313,12 @@ def findStopsGlobal(track, diameter=2e-2, duration=10, downsampling=1):
 	stops.operate(Operator.Operator.QUAD_ADDER, "sigma_x", "sigma_y", "rmse")
 				
 	return stops
-		
+
+def splitAR(track, mode):
+    if mode == MODE_AR_EXHAUSTIVE
+        return splitAR1(track)
+    if mode == MODE_AR_FFT
+        return splitAR2(track)		
 		
 def splitAR1(track):
 	'''Separation trace Aller/retour'''
