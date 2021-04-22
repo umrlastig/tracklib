@@ -11,7 +11,8 @@ from tracklib.core.Obs import Obs
 from tracklib.core.Coords import ENUCoords
 from tracklib.core.GPSTime import GPSTime
 
-import tracklib.core.Utils as utils
+import tracklib.core.Track as Track
+import tracklib.core.Utils as Utils
 import tracklib.core.Operator as Operator
 import tracklib.core.TrackCollection as TrackCollection
 
@@ -20,7 +21,250 @@ import tracklib.algo.Interpolation as interp
 
 def __right(a,b,c):
     return ((a == c) or (b[0]-a[0])*(c[1]-a[1])-(c[0]-a[0])*(b[1]-a[1]) < 0)
-            
+
+# ----------------------------------------
+# Fonction equation cartesienne
+# Entree : segment
+# Sortie : liste de parametres (a,b,c)
+# ----------------------------------------
+def __cartesienne(segment):
+    
+    parametres = list();
+    
+    x1 = segment[0]
+    y1 = segment[1]
+    x2 = segment[2]
+    y2 = segment[3]
+    
+    u1 = x2-x1
+    u2 = y2-y1
+    
+    b = -u1
+    a = u2
+    
+    c = -(a*x1+b*y1)
+    
+    parametres.append(a)
+    parametres.append(b)
+    parametres.append(c)
+    
+    return parametres		
+
+# ----------------------------------------
+# Fonction de test d'equation de droite
+# Entrees : paramatres et coords (x,y)
+# Sortie : en particulier 0 si le point 
+# appartient a la droite
+# ----------------------------------------
+def __eval(param, x, y):
+    
+    a = param[0]
+    b = param[1]
+    c = param[2]
+    
+    return a*x+b*y+c
+
+# ----------------------------------------
+# Fonction booleenne d'intersection
+# Entrees : segment1 et segment2
+# Sortie : true s'il y a intersection
+# ----------------------------------------
+def __intersects(segment1, segment2):
+    
+    param_1 = __cartesienne(segment1)
+    param_2 = __cartesienne(segment2)
+
+    a1 = param_1[0]
+    b1 = param_1[1]
+    c1 = param_1[2]
+    
+    a2 = param_2[0]
+    b2 = param_2[1]
+    c2 = param_2[2]
+
+    x11 = segment1[0]
+    y11 = segment1[1]
+    x12 = segment1[2]
+    y12 = segment1[3]
+    
+    x21 = segment2[0]
+    y21 = segment2[1]
+    x22 = segment2[2]
+    y22 = segment2[3]
+    
+    
+    val11 = __eval(param_1,x21,y21)
+    val12 = __eval(param_1,x22,y22)
+    
+    val21 = __eval(param_2,x11,y11)
+    val22 = __eval(param_2,x12,y12)
+    
+    val1 = val11*val12
+    val2 = val21*val22
+    
+    return (val1 <= 0) & (val2 <= 0)
+    
+ 
+# ----------------------------------------
+# Intersection between two track
+# withTime: time constraint (in secs)
+# (-1 if no time constraint)
+# ---------------------------------------- 
+def intersection(track1, track2, withTime=-1):
+
+	if not (track1.getSRID() == track2.getSRID()):
+		print("Error: tracks must have same SRID to compute intersections")
+		exit()
+	
+	I = Track.Track()
+	TMP_I = []
+	TMP_J = []
+	TMP_TPS2 = []
+	
+	for i in range(len(track1)-1):
+	
+		x11 = track1[i].position.getX()
+		y11 = track1[i].position.getY()
+		x12 = track1[i+1].position.getX()
+		y12 = track1[i+1].position.getY()
+		seg1 = [x11,y11,x12,y12]
+	
+		for j in range(len(track2)-1):
+			
+			x21 = track2[j].position.getX()
+			y21 = track2[j].position.getY()
+			x22 = track2[j+1].position.getX()
+			y22 = track2[j+1].position.getY()
+			seg2 = [x21,y21,x22,y22]
+			
+			if (__intersects(seg1, seg2)):
+				P1 = __cartesienne(seg1)
+				P2 = __cartesienne(seg2)
+				A = np.zeros((2,2))
+				B = np.zeros((2,1))
+				A[0,0] = P1[0]; A[0,1] = P1[1]; B[0,0] = -P1[2]
+				A[1,0] = P2[0]; A[1,1] = P2[1]; B[1,0] = -P2[2]
+				
+				X = np.linalg.solve(A,B)
+				
+				x = X[0,0]
+				y = X[1,0]
+				p = Utils.makeCoords(x, y, 0, track1.getSRID())
+				
+				# Linear interpolation on track 1
+				w1 = p.distance2DTo(track1[i].position)
+				w2 = p.distance2DTo(track1[i+1].position)
+				p.setZ((w1*track1[i+1].position.getZ() + w2*track1[i].position.getZ())/(w1+w2))
+				t1 = track1[i].timestamp.toAbsTime()
+				t2 = track1[i].timestamp.toAbsTime()
+				ta = (w1*t2 + w2*t1)/(w1+w2)
+				
+				# Linear interpolation on track 2
+				w1 = p.distance2DTo(track2[j].position)
+				w2 = p.distance2DTo(track2[j+1].position)
+				t1 = track2[i].timestamp.toAbsTime()
+				t2 = track2[i].timestamp.toAbsTime()
+				tb = (w1*t2 + w2*t1)/(w1+w2)
+				
+				# Add intersection
+				if ((withTime==-1) or (abs(tb-ta) < withTime)):
+				    I.addObs(Obs(p, GPSTime.readUnixTime(ta)))
+				    TMP_TPS2.append(GPSTime.readUnixTime(tb))
+				    TMP_I.append(i)
+				    TMP_J.append(j)
+				
+	if I.size() > 0:
+		I.createAnalyticalFeature("timestamp2", TMP_TPS2);
+		I.createAnalyticalFeature("id1", TMP_I)
+		I.createAnalyticalFeature("id2", TMP_J)
+	
+	return I
+ 
+# ----------------------------------------
+# Intersection between two track (boolean)
+# ---------------------------------------- 
+def intersects(track1, track2):
+
+	for i in range(len(track1)-1):
+	
+		x11 = track1[i].position.getX()
+		y11 = track1[i].position.getY()
+		x12 = track1[i+1].position.getX()
+		y12 = track1[i+1].position.getY()
+		seg1 = [x11,y11,x12,y12]
+	
+		for j in range(len(track2)-1):
+			
+			x21 = track2[j].position.getX()
+			y21 = track2[j].position.getY()
+			x22 = track2[j+1].position.getX()
+			y22 = track2[j+1].position.getY()
+			seg2 = [x21,y21,x22,y22]
+			
+			if __intersects(seg1, seg2):
+				return True
+				
+	return False
+   
+def __dist_point_droite(param, x, y):
+    
+    a = param[0]
+    b = param[1]
+    c = param[2]
+
+    distance = math.fabs(a*x+b*y+c)
+    distance /= math.sqrt(a*a+b*b)
+    
+    return distance		
+		
+def __transform(theta, tx, ty, X, Y):
+
+	XR = [0] * len(X)
+	YR = [0] * len(Y)
+	
+	ct = math.cos(theta)
+	st = math.sin(theta)
+
+	for j in range(len(X)):
+		XR[j] = ct*(X[j]-tx)+st*(Y[j]-ty)
+		YR[j] = -st*(X[j]-tx)+ct*(Y[j]-ty)
+		
+	return XR, YR
+		
+def __transform_inverse(theta, tx, ty, X, Y):
+		
+	XR = [0] * len(X)
+	YR = [0] * len(Y)
+	
+	ct = math.cos(theta)
+	st = math.sin(theta)
+	
+	for j in range(len(X)):
+		XR[j] = ct*X[j]-st*Y[j]+tx
+		YR[j] = st*X[j]+ct*Y[j]+ty
+		
+	return XR, YR
+	            
+
+def __convexHull(T):
+	'''
+	Finds the convex hull of a set of coordinates, returned as 
+	a list of x an y coordinates : [x1, y1, x2, y2,...]
+	Computation is performed with Jarvis march algorithm
+	with O(n^2) time complexity. It may be needed to resample
+	track if computation is too long.'''
+		
+	X = [p[0] for p in T]
+	H = [X.index(min(X))]
+
+	while((len(H) < 3) or (H[-1] != H[0])):
+		H.append(0)
+		for i in range(len(T)):
+			if not (__right(T[H[-2]], T[H[-1]], T[i])):
+				H[-1] = i
+   
+	return (H)
+
 
 def convexHull(track):
 	'''
@@ -42,8 +286,11 @@ def convexHull(track):
 		for i in range(len(T)):
 			if not (__right(T[H[-2]], T[H[-1]], T[i])):
 				H[-1] = i
-   
-	return (H)
+	T2 = []
+	for i in range(len(H)):
+		T2.append(T[H[i]][0])
+		T2.append(T[H[i]][1])
+	return T2
 
 
 def diameter(track):
@@ -167,6 +414,22 @@ def plotCircle(S, color=[1,0,0,1]):
 	Y[len(Y)-1] = Y[0]
 	plt.plot(X, Y, '-', color=color)
 	
+def plotRectangle(R, color=[1,0,0,1]):
+	'''Function to plot an oriented rectangle from a vector:
+	R = [[x1,y1],[x2,y2],[x3,y3],[x4,y4]]
+    Needs to call plt.show() after this function'''	
+	XR = [p[0] for p in R]
+	YR = [p[1] for p in R]
+	plt.plot(XR, YR, color=color)
+	
+def plotPolygon(P, color=[1,0,0,1]):
+	'''Function to plot a polygon  from a vector:
+	R = [x1,y1,x2,y2,x3,y3,...x1,y1]
+    Needs to call plt.show() after this function'''	
+	XR = P[::2]
+	YR = P[1::2]
+	plt.plot(XR, YR, color=color)
+	
 
 def minCircle(track):
 	'''
@@ -205,4 +468,53 @@ def minCircleMatrix(track):
 	M = M + np.transpose(M)
 	return M
 	
+def __mbr(COORDS):
+		
+	HULL = __convexHull(COORDS)
+	XH = [COORDS[p][0] for p in HULL]
+	YH = [COORDS[p][1] for p in HULL]
+
+		
+	BEST_RECTANGLE = []
+	RECTANGLE_AREA = 10**301
 	
+	for i in range(len(HULL)-1):
+	
+		param = __cartesienne([XH[i], YH[i], XH[i+1], YH[i+1]])	
+		theta = math.atan((YH[i+1]-YH[i])/(XH[i+1]-XH[i]))
+	
+		# 3 parameters transformation
+		XHR, YHR = __transform(theta, XH[i], YH[i], XH, YH)
+			
+		mx = min(XHR)
+		my = min(YHR)
+		if (max(YHR) > abs(min(YHR))):
+			my = max(YHR)
+		Mx = max(XHR)
+
+		
+		XRR = [mx, Mx, Mx, mx, mx]
+		YRR = [0, 0, my, my, 0]
+	
+		# 3 parameters inverse transformation
+		XR, YR = __transform_inverse(theta,  XH[i], YH[i], XRR, YRR)
+			
+		if ((Mx-mx)*abs(my) < RECTANGLE_AREA):
+			BEST_RECTANGLE = [[XR[0], YR[0]], [XR[1], YR[1]], [XR[2], YR[2]], [XR[3], YR[3]], [XR[0], YR[0]]]
+		
+	return BEST_RECTANGLE
+	
+
+def minimumBoundingRectangle(track):	
+    T = []
+    for i in range(len(track)):
+        T.append([track[i].position.getX(), track[i].position.getY()])
+    return __mbr(T)
+
+
+
+
+
+
+
+

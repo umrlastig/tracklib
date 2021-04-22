@@ -7,6 +7,7 @@ import sys
 import math
 import copy
 import random
+import progressbar
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -21,6 +22,8 @@ from tracklib.core.TrackCollection import TrackCollection
 import tracklib.core.Utils as utils
 import tracklib.algo.Analytics as algoAF
 import tracklib.algo.Geometrics as Geometrics
+import tracklib.algo.Stochastics as Stochastics
+import tracklib.algo.Comparison as Comparison
 import tracklib.algo.Interpolation as Interpolation
 import tracklib.algo.Simplification as Simplification
 
@@ -71,77 +74,7 @@ class Track:
     def interval(self, mode="temporal"):
         return 1.0/self.frequency(mode)
     
-    # =========================================================================
-    # Generate analytical track
-    # =========================================================================
-    @staticmethod
-    def generate(x_t=30, y_t=None, z_t=None, date_ini=None, date_fin=None, dt=None):
-        randomTrack = (y_t is None)
-        if randomTrack:
-            scope = 100*x_t
-            x1 = random.random()*100; y1 = random.random()*100
-            x2 = random.random()*100; y2 = random.random()*100		
-            x_t = lambda t: x1*(1-t) + x2*t
-            y_t = lambda t: y1*(1-t) + y2*t
-        if date_ini == None:
-            date_ini = GPSTime.random()
-        if date_fin == None:
-            date_fin = date_ini.addHour(1)    
-        if dt == None:
-            dt = (date_fin-date_ini)/100
-        track = Track()
-        tps = date_ini.copy()
-        N = (date_fin-date_ini)/dt
-        print("Generating track from", date_ini, "to", date_fin)
-        for i in range((int)(N)):
-            t = i/(N-1.0)
-            tps = tps.addSec(dt)
-            if (z_t == None):
-                obs = Obs(ENUCoords(x_t(t), y_t(t)), tps)
-            else:
-                obs = Obs(ENUCoords(x_t(t), y_t(t), z_t(t)), tps)
-            track.addObs(obs)
-        if randomTrack:
-            track = track.noise(50, Kernel.GaussianKernel(scope))
-        return track;
-        
-    
-    # =========================================================================
-    # Generate field of tracks from integral curves of vector field
-    # =========================================================================
-    def generateDataSet(vx, vy, N=100, pmin=(0,0), pmax=(100,100), Nbmax=1000):
-    
-        TRACKS = []
-        for i in range(N):
-        
-            track = Track()
-            xini = random.random()*(pmax[0]-pmin[0]) + pmin[0]
-            yini = random.random()*(pmax[1]-pmin[1]) + pmin[1]
-            date_ini = GPSTime.random()
-            
-            xi = xini
-            yi = yini
-            date = date_ini
-            track.addObs(Obs(ENUCoords(xi,yi), date))
-            while (1):
-                dx = vx(xi,yi)
-                dy = vy(xi,yi)
-                xi += dx
-                yi += dy
-                if (xi < pmin[0]) or (xi > pmax[0]):
-                    break
-                if (yi < pmin[1]) or (yi > pmax[1]):
-                    break
-                date = date.copy()
-                date = date.addSec(1)
-                track.addObs(Obs(ENUCoords(xi,yi), date))
-                if track.size() > Nbmax/2:
-                    break
-            
-            TRACKS.append(track)
-            
-        return TRACKS
-		
+
     # =========================================================================
     # Track coordinate transformation
     # =========================================================================
@@ -570,25 +503,47 @@ class Track:
             if (id == N):
                 break
         return id
-
-
-    
+		
+		
+    def print(self, af_names="#all_features"):
+        '''Console print of track with analytical features'''
+        if self.size() == 0:
+            return
+        if af_names == "#all_features":
+            af_names = self.getListAnalyticalFeatures()
+        if not isinstance(af_names, list):
+            af_names = [af_names]
+        print("-----------------------------------------------------------------")
+        line = "Analytical features:  "
+        for i in range(len(af_names)):
+            line += af_names[i]+"  "
+        print(line)
+        print("-----------------------------------------------------------------")
+        for i in range(self.size()):
+            output = (str)(self.__POINTS[i])+ ",  "
+            for j in range(len(af_names)):
+                output += str(self.getObsAnalyticalFeature(af_names[j], i))
+                if j < len(af_names)-1:
+                    output += ","
+            print(output)
+		 
     def summary(self):
         '''
         Print summary (complete wkt below)
         '''
         output  = "-------------------------------------\n"
-        output += "GPS track of user " + str(self.uid) + ":\n"
+        output += "GPS track #" + str(self.tid) +" of user " + str(self.uid) + ":\n"
         output += "-------------------------------------\n"
         output += "  Nb of pt(s):   " + str(len(self.__POINTS)) + "\n"
         if (len(self.__POINTS) > 0):
             t1 = self.getFirstObs().timestamp
             t2 = self.getLastObs().timestamp
-            output += "  Starting at: " + (str)(t1) + "\n"
-            output += "  Ending at:   " + (str)(t2) + "\n"
-            output += "  Duration:    " + (str)('{:7.3f}'.format(t2-t1)) + " s\n"
-            output += "  Length:      " + (str)('{:7.3f}'.format(self.length())) + " m\n"
-            output += "-------------------------------------\n"
+            output += "  Ref sys id   : " + self.getSRID() + "\n"
+            output += "  Starting at  : " + (str)(t1) + "\n"
+            output += "  Ending at    : " + (str)(t2) + "\n"
+            output += "  Duration     : " + (str)('{:7.3f}'.format(t2-t1)) + " s\n"
+            output += "  Length       : " + (str)('{:1.3f}'.format(self.length())) + " m\n"
+        output += "-------------------------------------\n"
         print(output)
         
         
@@ -638,43 +593,7 @@ class Track:
     
         return dn
         
-    
-    # =========================================================================
-    #    Reader and writer Track
-    # =========================================================================
-    
-#    @staticmethod
-#    def readFromCSV(path, id_T, id_E, id_N, id_U=-1, separator=","):
-#        '''
-#        Read GPS track from csv file
-#        The method assumes a single track in file
-#        Column indices: id_T, id_E, id_N, id_Z (optional)
-#        '''
-#        track = fileReader.FileReader.readFromFile(path, id_T, id_E, id_N, id_U, separator)
-#        return track
-#    
-#    
-#    @staticmethod   
-#    def readFromGpx(path, ref=None):
-#        '''
-#        Read GPS track from gpx file
-#        The method assumes a single track in file
-#        Needs to provide a reference pt in geodetic coords
-#        '''
-#        tracks = gpxReader.GpxReader.readFromGpx(path, ref)
-#        return tracks
-#        
-#    @staticmethod
-#    def readFromDataBase(classname, sql, id_T, id_E, id_N, id_U = -1):    
-#        '''
-#        Read GPS track from database
-#        '''
-#        tracks = []
-#        if classname == 'postgres':
-#            tracks = p.PostgresReader.readFromDataBase(sql, id_T, id_E, id_N, id_U)
-#        return tracks
-    
-
+   
     def toWKT(self):
         '''
         Transforms track into WKT string
@@ -775,8 +694,12 @@ class Track:
             return
         idAF = len(self.__analyticalFeaturesDico)
         self.__analyticalFeaturesDico[name] = idAF
-        for i in range(self.size()):
-            self.getObs(i).features.append(val_init)
+        if isinstance(val_init, list):
+            for i in range(self.size()):
+                self.getObs(i).features.append(val_init[i])
+        else:
+            for i in range(self.size()):
+                self.getObs(i).features.append(val_init)
 
 
     def removeAnalyticalFeature(self, name):
@@ -887,49 +810,15 @@ class Track:
 			
         Interpolation.resample(self, delta, algo, mode)
         self.__analyticalFeaturesDico = {}
+   
     
-    def gaussian_process(self, timestamps, kernel, factor=1.0, sigma=0.0, cp_var=False):
-        '''Track interpolation and smoothing with Gaussian Process (GP)
-        self: a track to smooth (not modified by this function)
-        timestamps: points where interpolation must be computed. May be
-        a list of timestamps, a track or a number of seconds
-        kernel: a symetric function k(xi-xj) describing the statistical
-        similarity between the coordinates X,Y,Z taken in two points : 
-                        k(t2-t1) = Cov(X(t1), X(t2))
-                        k(t2-t1) = Cov(Y(t1), Y(t2))
-                        k(t2-t1) = Cov(Z(t1), Z(t2))
-        factor: unit factor of variance if the kernel must be scaled
-        sigma: observation noise standard deviation (in coords units)
-        cp_var: compute covariance matrix and store pointwise sigmas
-        returns: interpolated/smoothed track (without AF)'''
+    def incrementTime(self, dt=1):  
+        '''Add 1 sec to each subsequent record. Use incrementTime to 
+        get valid timestamps sequence when timestamps are set as default 
+        date on 1970/01/01 00:00:00 for example''' 
+        for i in range(len(self)):
+            self.getObs(i).timestamp = self.getObs(i).timestamp.addSec(i*dt)
         
-        return Interpolation.gaussian_process(self, timestamps, kernel, factor, sigma, cp_var)
-        
-        
-    def synchronize(self, track):
-        
-        '''Resampling of 2 tracks with linear interpolation
-        on a common base of timestamps
-        track: track to synchronize with'''
-        
-        Interpolation.synchronize(self, track)
-        
-    def compare(self, track):
-    
-        '''Comparison of 2 tracks. Tracks are interpolated
-        linearly on a common base of timestamps
-        track: track to compare with'''
-        
-        track2 = self.copy()
-        track3 = track.copy()
-        
-        track2.synchronize(track3)
-        
-        rmse = 0
-        for i in range(track2.size()):
-            rmse += track2.getObs(i).distanceTo(track3.getObs(i))**2
-        
-        return math.sqrt(rmse/track2.size())
         
     def mapOn(self, reference, TP1, TP2=[], init=[], N_ITER_MAX=20, mode="2D", verbose=True):
     
@@ -1047,91 +936,20 @@ class Track:
 
     # =========================================================================
     #  Adding noise to tracks
-    # =========================================================================    
-        
+    # =========================================================================   
     def noise(self, sigma=[7], kernel=[Kernel.GaussianKernel(650)]):
-        '''Track noising with Cholesky factorization of gaussian 
-        process covariance matrix: h(x2-x1)=exp(-((x2-x1)/scope)**2)
-        If X is a gaussian white noise, Cov(LX) = L^t*L => if L is a 
-        Cholesky factorization of a semi-postive-definite matrix S,
-        then Cov(LX) = L^T*L = S and Y=LX has S as covariance matrix.
-        self: the track to be smoothed (input track is not modified)
-        sigma: noise amplitude(s) (in observation coordinate units)
-        kernel: noise autocovariance function(s)'''
+        return Stochastics.noise(self, sigma, kernel)
+        
 
-        if not isinstance(sigma, list):
-            sigma = [sigma]
-            
-        if not isinstance(kernel, list):
-            kernel = [kernel]
-            
-        if len(sigma) != len(kernel):
-            sys.exit("Error: amplitude and kernel arrays must have same size in 'noise' function")
-        
-        N = self.size()
-        self.compute_abscurv()
-        
-        noised_track = self.copy()
-        
-        for n in range(len(sigma)):
-
-            S = self.getAnalyticalFeature(algoAF.BIAF_ABS_CURV)
-            SIGMA_S = utils.makeCovarianceMatrixFromKernel(kernel[n], S, S)
-            SIGMA_S += np.identity(N)*1e-12
-            SIGMA_S *= sigma[n]**2/SIGMA_S[0,0]
-        
-            # Cholesky decomposition
-            L = np.linalg.cholesky(SIGMA_S)
-        
-            # Noise simulation
-            Xx = np.random.normal(0.0, 1.0, N)
-            Xy = np.random.normal(0.0, 1.0, N)
-            Xz = np.random.normal(0.0, 1.0, N)
-            Yx = np.matmul(L, Xx)
-            Yy = np.matmul(L, Xy)
-            Yz = np.matmul(L, Xz)
-        
-            # Building noised track
-            for i in range(N):
-                pt = noised_track.getObs(i).position
-                pt.setX(pt.getX()+Yx[i])
-                pt.setY(pt.getY()+Yy[i])
-                pt.setZ(pt.getZ()+Yz[i])
-                obs = Obs(pt, self.getObs(i).timestamp)
-            
-        return noised_track
-            
-        
-    def randomizer(input, f, sigma=[7], kernel=[Kernel.GaussianKernel(650)], N=10):
-        '''Randomizing traces for sensitivity analysis on output f
-        input: a track, or list of tracks to be randomized
-        f: a function taking a list of tracks as input 
-        sigma: noise amplitude (in observation coordinate units)
-        N: number of simulations to generate (default is 100)
-        scope_s: spatial autocorrelation scope (measured along track 
-            curvilinear abscissa in observation coordinate units)'''
-        
-        noised_output = []
-        
-        if not isinstance(input, list):
-            input = [input]
-            
-        for i in range(N):
-            noised_input = []
-            print("  Randomizing tracks:", ('{}/'+(str)(N)+'\r').format(i+1), end="")
-            for j in range(len(input)):
-                noised_track = input[j].noise(sigma, kernel)
-                noised_input.append(noised_track)    
-            noised_output.append(f(noised_input))
-        print("")
-
-        return noised_output
-            
-    
-    
     # =========================================================================
     # Graphical methods
     # =========================================================================
+    def plotAsMarkers(self, size=8, frg='k', bkg='w', sym='+'):
+        plt.plot(self.getX(), self.getY(), frg+'o', markersize=size)
+        plt.plot(self.getX(), self.getY(), bkg+'o', markersize=int(0.8*size))
+        plt.plot(self.getX(), self.getY(), frg+sym, markersize=int(0.8*size))
+	
+	
     def plot(self, type='LINE', af_name = '', cmap = -1):
         '''
         af_name: test si isAFTransition
@@ -1360,7 +1178,6 @@ class Track:
         if mode == "end":
             init_center = track.extract(n-5,n-1).getCentroid()
             for i in range(n-5,5,-1):
-                print(i)
                 portion = track.extract(i-4,i)
                 d = portion.getCentroid().distance2DTo(init_center)
                 sdx = portion.operate(Operator.Operator.STDDEV, "x")
@@ -1372,102 +1189,6 @@ class Track:
                 return track
             return track.extract(0,i-4)	
             
-	# ------------------------------------------------------------
-    # Profile of difference between two traces : t2 - t1
-	# Two possible modes: 
-	# - NN (Nearest Neighbour): O(n^2) time and O(n) space
-	# - DTW (Dynamic Time Warping): O(n^3) time and O(n^2) space
-    # Output is a track objet, with an analytical feature diff
-    # containing shortest distance of each point of track t1, to 
-    # the points of track t2. We may get profile as a list with 
-    # output.getAbsCurv() and output.getAnalyticalFeature("diff")
-	# The selected candidate in registerd in AF "pair"
-    # Set "ends" parameter to True to force end points to meet
-	# p is Minkowski's exponent for distance computation. Default 
-	# value is 1 for summation of distances, 2 for least squares 
-	# solution and 10 for an approximation of Frechet solution. 
-    # ------------------------------------------------------------		
-    def differenceProfile(self, track, mode="NN", ends=False, p=1):
-	
-        output = self.copy()
-        output.createAnalyticalFeature("diff");
-        output.createAnalyticalFeature("pair");
-     
-        # --------------------------------------------------------
-        # Nearest Neighbor (NN) algorithm
-        # --------------------------------------------------------
-        if mode == "NN":
-            for i in range(output.size()):
-                val_min = sys.float_info.max
-                id_min = 0
-                for j in range(track.size()):
-                    distance = output.getObs(i).distance2DTo(track.getObs(j))
-                    if distance < val_min:
-                        val_min = distance
-                        id_min = j
-                output.setObsAnalyticalFeature("diff", i, val_min)
-                output.setObsAnalyticalFeature("pair", i, id_min)
-
-        # --------------------------------------------------------
-        # Dynamic time warping (DTW) algorithm
-        # --------------------------------------------------------
-        if mode == "DTW":
-		
-            p = max(min(p,15),1e-2)
-            
-            track1 = self.copy()
-            track2 = track.copy()
-			
-            # Forming distance matrix
-            D = np.zeros((track1.size(), track2.size()))
-            for i in range(track1.size()):
-                for j in range(track2.size()):
-                    D[i,j] = track1.getObs(i).distance2DTo(track2.getObs(j))**p
-            
-            # Optimal path with dynamic programming
-            T = np.zeros((track1.size(), track2.size()))
-            M = np.zeros((track1.size(), track2.size()))
-            T[0,0] = D[0,0]
-            M[0,0] = -1
-			
-			# Forward step
-            for i in range(1,T.shape[0]):
-                T[i,0] = T[i-1,0] + D[i,0]
-                M[i,0] = 0
-                for j in range(1, T.shape[1]):
-                    K = D[i,0:(j+1)]
-                    for k in range(j-1,-1,-1):
-                        K[k] = K[k] + K[k+1]
-                    V = T[i-1,0:(j+1)] + K
-                    M[i,j] = np.argmin(V) 
-                    T[i,j] = V[int(M[i,j])]
-                    
-            
-            # Backward step
-            S = [0]*(track1.size())
-            if ends:
-                S[track1.size()-1] = int(M[track1.size()-1,track2.size()-1]) 
-            else:
-                S[track1.size()-1] = np.argmin(T[track1.size()-1,:])
-            for i in range(track1.size()-2, -1, -1):
-                S[i] = int(M[i+1,S[i+1]])
-				
-            print((T[track1.size()-1, S[track1.size()-1]] / track1.size())**(1.0/p))
-			
-            #plt.plot(S, 'r-')			
-            #plt.imshow(M)
-
-            for i in range(track1.size()):
-                x1 = track1.getObs(i).position.getX()
-                y1 = track1.getObs(i).position.getY()
-                x2 = track2.getObs(S[i]).position.getX()
-                y2 = track2.getObs(S[i]).position.getY()
-                d = track1.getObs(i).distance2DTo(track2.getObs(S[i]))
-                output.setObsAnalyticalFeature("diff", i, d)
-                output.setObsAnalyticalFeature("pair", i, S[i])
-
-        output.compute_abscurv()
-        return output
 
     # ------------------------------------------------------------
     # [+] Concatenation of two tracks
@@ -1489,31 +1210,55 @@ class Track:
         return SPLITS
         
 	# ------------------------------------------------------------	
-    # [>] Removes first n points of track     
+    # [>] Removes first n points of track or time comp    
     # ------------------------------------------------------------	
-    def __gt__(self, nb_points):
-        return Track(self.__POINTS[nb_points:self.size()], self.uid, self.tid)	
+    def __gt__(self, arg):
+        if isinstance(arg, Track):
+            t1i = self.getFirstObs().timestamp
+            t2f = arg.getLastObs().timestamp            
+            return (t1i > t2f)			
+        else:
+            return Track(self.__POINTS[arg:self.size()], self.uid, self.tid)	
 		
 	# ------------------------------------------------------------	
-    # [<] Removes last n points of track     
+    # [<] Removes last n points of track or time comp  
     # ------------------------------------------------------------	
-    def __lt__(self, nb_points):
-        return Track(self.__POINTS[0:(self.size()-nb_points)], self.uid, self.tid)
+    def __lt__(self, arg):
+        if isinstance(arg, Track):
+            t1f = self.getLastObs().timestamp
+            t2i = arg.getFirstObs().timestamp            
+            return (t1f < t2i)
+        else:
+            return Track(self.__POINTS[0:(self.size()-arg)], self.uid, self.tid)
 		
 	# ------------------------------------------------------------	
-    # [>=] Remove idle points at the start of track    
+    # [>=] Remove idle points at the start of track or time comp   
     # ------------------------------------------------------------
     def __ge__(self, arg):
-        return self.removeIdleEnds(arg, "begin")
+        if isinstance(arg, Track):
+            t1i = self.getFirstObs().timestamp
+            t1f = self.getLastObs().timestamp
+            t2i = arg.getFirstObs().timestamp
+            t2f = arg.getLastObs().timestamp            
+            return ((t1f >= t2f) and (t1i >= t2i))
+        else:
+            return self.removeIdleEnds(arg, "begin")
 
 	# ------------------------------------------------------------	
-    # [<=] Remove idle points at the end of track      
+    # [<=] Remove idle points at the end of track or time comp    
     # ------------------------------------------------------------
     def __le__(self, arg):
-        return self.removeIdleEnds(arg, "end")
+        if isinstance(arg, Track):
+            t1i = self.getFirstObs().timestamp
+            t1f = self.getLastObs().timestamp
+            t2i = arg.getFirstObs().timestamp
+            t2f = arg.getLastObs().timestamp            
+            return ((t1f <= t2f) and (t1i <= t2i))
+        else:
+            return self.removeIdleEnds(arg, "end")
 		
 	# ------------------------------------------------------------	
-    # [!=] Remove idle points both at the start and end of track         
+    # [!=] Available operator       
     # ------------------------------------------------------------
     def __neq__(self, arg):
         return None
@@ -1554,16 +1299,19 @@ class Track:
             print("Available operator not implemented yet")
             return None
         else:
-            return self.differenceProfile(arg)
+            return Comparison.differenceProfile(self, arg)
         
     # ------------------------------------------------------------
-    # [*] Temporal resampling of track
+    # [*] Temporal resampling of track or track intersections
     # ------------------------------------------------------------
-    def __mul__(self, number):
-        track = self.copy()
-        dt = (track.frequency("temporal")/number)*(1-1e-3)
-        track.resample(dt)  # Linear / Temporal
-        return track
+    def __mul__(self, arg):
+        if isinstance(arg, Track):
+            return Geometrics.intersection(self, arg)
+        else:
+            track = self.copy()
+            dt = (track.frequency("temporal")/arg)*(1-1e-3)
+            track.resample(dt)  # Linear / Temporal
+            return track
         
     # ------------------------------------------------------------
     # [%] Remove one point out of n (or according to list pattern)

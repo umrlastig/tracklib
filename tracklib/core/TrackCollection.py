@@ -122,10 +122,12 @@ class TrackCollection:
             trace.addAnalyticalFeature(algorithm, name)
             
             
-    def plot(self, symbols=['r-'], markersize=[4]):
+    def plot(self, symbols=['r-'], markersize=[4], margin=0.05):
         (xmin, xmax, ymin, ymax) = self.bbox()
-        plt.xlim([xmin, xmax])
-        plt.ylim([ymin, ymax])
+        dx = margin*(xmax-xmin)
+        dy = margin*(ymax-ymin)
+        plt.xlim([xmin-dx, xmax+dx])
+        plt.ylim([ymin-dy, ymax+dy])
         Ns = len(symbols)
         Ms = len(markersize)
         for i in range(len(self.__TRACES)):
@@ -133,8 +135,6 @@ class TrackCollection:
             X = trace.getX()
             Y = trace.getY()
             plt.plot(X, Y, symbols[i%Ns], markersize=markersize[i%Ms])
-        plt.show()
-        
     
     #def summarize(self, ):
         
@@ -358,9 +358,9 @@ class TrackCollection:
     def removeTrack(self, track):
         self.__TRACES.remove(track)
     
-    def removeTrackEmpty(self):
+    def removeEmptyTrack(self):
         '''
-        Remove track which have no observation
+        Remove tracks without observation
         '''
         for track in self.__TRACES:
             if track.size() <= 0:
