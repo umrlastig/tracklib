@@ -240,7 +240,7 @@ class GPSTime:
     # ------------------------------------------------------------        
     @staticmethod
     def readTimestamp(timeAsString):
-    
+
         time = GPSTime()
         PCL = GPSTime.__PRECOMPILED_READ_FMT
         

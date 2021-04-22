@@ -256,6 +256,10 @@ class Track:
             for i in range(self.size()):
                 AF.append(self.__POINTS[i].timestamp.toAbsTime())
             return AF
+        if af_name == "timestamp":
+            for i in range(self.size()):
+                AF.append(self.__POINTS[i].timestamp)
+            return AF
         if not self.hasAnalyticalFeature(af_name):
             sys.exit("Error: track does not contain analytical feature '" + af_name +"'")
         index = self.__analyticalFeaturesDico[af_name]
@@ -272,6 +276,8 @@ class Track:
             return self.getObs(i).position.getZ()
         if af_name == "t":
             return self.getObs(i).timestamp.toAbsTime()
+        if af_name == "timestamp":
+            return self.getObs(i).timestamp
         if not af_name in self.__analyticalFeaturesDico:
             sys.exit("Error: track does not contain analytical feature '" + af_name +"'") 
         index = self.__analyticalFeaturesDico[af_name]
@@ -654,7 +660,7 @@ class Track:
     # Analytical algorithms
     # =========================================================================
     def __controlName(name):
-        if (name in ["x", "y", "z", "t"]):
+        if (name in ["x", "y", "z", "t", "timestamp"]):
             sys.exit("Error: analytical feature name '" + name +"' is not available")
     
     def addAnalyticalFeature(self, algorithm, name=None):
@@ -1082,15 +1088,23 @@ class Track:
     # ------------------------------------------------------------
     # Tools to query obs in a track with SQL-like commands
     # Output track is a copy of the original track
+	# Maximum one aggregator per query (no GROUP BY clause)
 	# Blank spaces should be used between each word or symbol
-	# Be careful, parenthesis not allowed ! Use De Morgan rules.
+	# Capital letters must be used for SQL keywords
+	# Be careful, parenthesis not allowed ! Use boolean algebra 
+	# rules to reformulate query without parenthesis: 
+	# e.g. A AND (B OR C) = A AND B OR A AND C
 	# TO DO: problem with AF transmission (as usual)
     # ------------------------------------------------------------  
     def __condition(val1, operator, val2):
+    
         if isinstance(val1, int):
             val2 = int(val2)
         if isinstance(val1, float):
             val2 = float(val2)
+        if isinstance(val1, GPSTime):
+            val2 = GPSTime.readTimestamp(val2)
+			
         if operator == "<":
             return val1 < val2
         if operator == ">":
@@ -1107,20 +1121,34 @@ class Track:
     def query(self, cmd):
 	
         cmd = cmd.strip()
-        if ("(" in cmd) or ("(" in cmd):
-            print("Error: parenthesis not allowed in query. Use De Morgan rules to reformulate query")
-            exit()
+		
+        AGG = ["SUM", "AVG", "COUNT", "VAR", "MEDIAN", "MIN", "MAX", "RMSE", "MAD", "STDDEV", "ARGMIN", "ARGMAX", "ZEROS"]
 			
         select_part = cmd.split("SELECT")[1].split("WHERE")[0].strip()
+        aggregator = -1
+        for i in range(len(AGG)):
+            if ((AGG[i]+"(") in select_part):
+                aggregator = i
+			
+        if aggregator > -1:
+            select_part = select_part[len(AGG[aggregator])+1:-1]
+           
         temp = cmd.split("WHERE")
         if len(temp) < 2:
             where_part = -1
         else:
             where_part = temp[1]
+            if ("(" in where_part) or ("(" in where_part):
+                message = "Error: parenthesis not allowed in conditions."
+                message += "Use boolean algebra rules to reformulate query or use successive queries"
+                print(message)
+                exit()
 		
         if not select_part == "*":
             select_part = select_part.split(",")
-            print(select_part)
+            LAF = []
+            for i in range(len(select_part)):
+                LAF.append([])
 		
         output = Track()
         BOOL = []		
@@ -1137,15 +1165,60 @@ class Track:
                     for c3 in c2:
                         c4 = c3.strip().split(" ")
                         operator = c4[1]
+                        for k in range(3,len(c4)):
+                            c4[2] += " " + c4[k]
                         select = select and Track.__condition(self[c4[0]][i], operator, c4[2])
                     select_all = select_all or select
             BOOL.append(select_all)
-			
-        for i in range(len(BOOL)):
-            if BOOL[i]:
-                output.addObs(self[i])
-        if select_part == "*":
+			 
+        if select_part == "*":			
+            for i in range(len(BOOL)):
+                if BOOL[i]:
+                    output.addObs(self[i])
             return output
+        else:
+            for i in range(len(BOOL)):
+                if BOOL[i]:
+                    for j in range(len(select_part)):
+                        LAF[j].append(self[select_part[j].strip()][i])
+            if len(LAF) == 1:
+                LAF = LAF[0]
+                if AGG[aggregator] == "COUNT":
+                    return len(LAF)
+                if (aggregator > -1) and (len(LAF) == 0):
+                    return None
+                if (aggregator > -1) and (len(LAF) > 0):
+                    tmp = Track()
+                    for i in range(len(LAF)):
+                        tmp.addObs(Obs(ENUCoords(0,0,0)))
+                    tmp.createAnalyticalFeature("#tmp", LAF)
+                    if AGG[aggregator] == "SUM":
+                        return tmp.operate(Operator.Operator.SUM, "#tmp") 
+                    if AGG[aggregator] == "AVG":
+                        return tmp.operate(Operator.Operator.AVERAGER, "#tmp") 
+                    if AGG[aggregator] == "VAR":
+                        return tmp.operate(Operator.Operator.VARIANCE, "#tmp") 
+                    if AGG[aggregator] == "MEDIAN":
+                        return tmp.operate(Operator.Operator.MEDIAN, "#tmp") 
+                    if AGG[aggregator] == "MIN":
+                        return tmp.operate(Operator.Operator.MIN, "#tmp") 
+                    if AGG[aggregator] == "MAX":
+                        return tmp.operate(Operator.Operator.MAX, "#tmp") 
+                    if AGG[aggregator] == "RMSE":
+                        return tmp.operate(Operator.Operator.RMSE, "#tmp") 
+                    if AGG[aggregator] == "STDDEV":
+                        return tmp.operate(Operator.Operator.STDDEV, "#tmp") 
+                    if AGG[aggregator] == "ARGMIN":
+                        return tmp.operate(Operator.Operator.ARGMIN, "#tmp")
+                    if AGG[aggregator] == "ARGMAX":
+                        return tmp.operate(Operator.Operator.ARGMAX, "#tmp")
+                    if AGG[aggregator] == "ZEROS":
+                        return tmp.operate(Operator.Operator.ZEROS, "#tmp")
+                    if AGG[aggregator] == "MAD":
+                        return tmp.operate(Operator.Operator.MAD, "#tmp")
+						
+            return LAF
+
   
     # ------------------------------------------------------------
     # Rotation of 2D track (coordinates should be ENU)
