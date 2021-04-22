@@ -18,9 +18,26 @@ import tracklib.core.TrackCollection as TrackCollection
 
 import tracklib.algo.Interpolation as interp
 
+MODE_ENCLOSING_BBOX = 0
+MODE_ENCLOSING_MBR = 1
+MODE_ENCLOSING_CIRCLE = 2
+MODE_ENCLOSING_CONVEX = 3
 
 def __right(a,b,c):
     return ((a == c) or (b[0]-a[0])*(c[1]-a[1])-(c[0]-a[0])*(b[1]-a[1]) < 0)
+
+# ----------------------------------------
+# Function to get enclosing shape
+# ----------------------------------------
+def boundingShape(track, mode=MODE_ENCLOSING_BBOX):
+    if mode == MODE_ENCLOSING_BBOX:
+        return track.getBBox()
+    if mode == MODE_ENCLOSING_MBR:
+        return minimumBoundingRectangle(track)
+    if mode == MODE_ENCLOSING_CIRCLE:
+        return minCircle(track)
+    if mode == MODE_ENCLOSING_CONVEX:
+        return convexHull(track)
 
 # ----------------------------------------
 # Fonction equation cartesienne
@@ -106,7 +123,7 @@ def __intersects(segment1, segment2):
     
  
 # ----------------------------------------
-# Intersection between two track
+# Intersection between 2 tracks
 # withTime: time constraint (in secs)
 # (-1 if no time constraint)
 # ---------------------------------------- 
@@ -181,7 +198,7 @@ def intersection(track1, track2, withTime=-1):
 	return I
  
 # ----------------------------------------
-# Intersection between two track (boolean)
+# Intersection between 2 tracks (boolean)
 # ---------------------------------------- 
 def intersects(track1, track2):
 

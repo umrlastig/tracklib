@@ -22,6 +22,7 @@ from tracklib.core.TrackCollection import TrackCollection
 import tracklib.core.Utils as utils
 import tracklib.algo.Analytics as algoAF
 import tracklib.algo.Geometrics as Geometrics
+import tracklib.algo.Cinematics as Cinematics
 import tracklib.algo.Stochastics as Stochastics
 import tracklib.algo.Comparison as Comparison
 import tracklib.algo.Interpolation as Interpolation
@@ -937,7 +938,7 @@ class Track:
     # =========================================================================
     #  Adding noise to tracks
     # =========================================================================   
-    def noise(self, sigma=[7], kernel=[Kernel.GaussianKernel(650)]):
+    def noise(self, sigma=5, kernel=Kernel.DiracKernel()):
         return Stochastics.noise(self, sigma, kernel)
         
 
@@ -1003,6 +1004,7 @@ class Track:
     #   MODE_SIMPLIFY_DOUGLAS_PEUCKER (1)
     #   MODE_SIMPLIFY_VISVALINGAM (2)
     # =========================================================================    
+    # DEPRECATED
     def simplify(self, tolerance, mode = Simplification.MODE_SIMPLIFY_DOUGLAS_PEUCKER):
         return Simplification.simplify(self, tolerance, mode)
         
@@ -1010,16 +1012,23 @@ class Track:
     # =========================================================================
     #    Built-in Analytical Features 
     # =========================================================================
-    
-    def estimate_speed(self):
-        '''
-        Compute and return speed for each points
-        Difference finie arriere-avant
-        '''
-        if self.hasAnalyticalFeature(algoAF.BIAF_SPEED):
-            return self.getAnalyticalFeature(algoAF.BIAF_SPEED)
+    def estimate_speed(self, kernel=None):
+        '''Compute and return speed for each points
+        2nd order time centered time finite difference 
+        if raw speeds are required. If kernel is specified  
+        smoothed speed estimation is computed.'''
+        if kernel is None:
+            return self.estimate_raw_speed()
         else:
-            return self.addAnalyticalFeature(algoAF.speed)
+            return self.smoothed_speed_calculation(kernel)
+	
+	# DEPRECATED
+    def estimate_raw_speed(self):
+        return Cinematics.estimate_speed(self)
+	
+	# DEPRECATED	
+    def smoothed_speed_calculation(self, kernel):
+        return Cinematics.smoothed_speed_calculation(self, kernel)
         
     def getSpeed(self):
         if self.hasAnalyticalFeature(algoAF.BIAF_SPEED):
@@ -1027,41 +1036,29 @@ class Track:
         else:
             sys.exit("Error: 'estimate_speed' has not been called yet")
 
-
-    def computeAvgSpeed(self, id_ini, id_fin):
-        '''
-        Computes integrated speed (m/s) between two points
-        TODO : à adapter
-        '''
-        d = self.getCurvAbsBetweenTwoPoints(id_ini, id_fin)
-        t = self.__POINTS[id_fin].timestamp-self.__POINTS[id_ini].timestamp
-        return d/t
+    # DEPRECATED
+    def computeAvgSpeed(self, id_ini=0, id_fin=None):
+        '''Computes mean speed (m/s) between two points'''
+        if id_fin is None:
+            id_fin = self.size()-1
+        return Cinematics.computeAvgSpeed(self, id_ini, id_fin)
     
-    
-    def computeAvgAscSpeed(self, id_ini, id_fin):
+    # DEPRECATED
+    def computeAvgAscSpeed(self, id_ini=0, id_fin=None):
         '''
         Computes average ascending speed (m/s)
         TODO : à adapter
         '''
-        dp =  self.computeAscDeniv(id_ini, id_fin)
-        t = self.__POINTS[id_fin].timestamp - self.__POINTS[id_ini].timestamp
-        return dp/t
+        if id_fin is None:
+            id_fin = self.size()-1
+        return Cinematics.computeAvgAscSpeed(self, id_ini, id_fin)
     
-        
-    
+    # DEPRECATED    
     def compute_abscurv(self):
         '''
         Compute and return curvilinear abscissa for each points
         '''
-        
-        if not self.hasAnalyticalFeature(algoAF.BIAF_DS):
-            self.addAnalyticalFeature(algoAF.ds, algoAF.BIAF_DS)
-        if not self.hasAnalyticalFeature(algoAF.BIAF_ABS_CURV):
-            self.operate(Operator.Operator.INTEGRATOR, algoAF.BIAF_DS, algoAF.BIAF_ABS_CURV)
-        
-        self.removeAnalyticalFeature(algoAF.BIAF_DS)
-        
-        return self.getAnalyticalFeature(algoAF.BIAF_ABS_CURV)
+        return Cinematics.computeAbsCurv(self)
         
     def getAbsCurv(self):
         if self.hasAnalyticalFeature(algoAF.BIAF_ABS_CURV):
@@ -1070,50 +1067,78 @@ class Track:
             sys.exit("Error: 'compute_abscurv' has not been called yet")
 
     
-    def getCurvAbsBetweenTwoPoints(self, id_ini, id_fin):
+	# DEPRECATED
+    def getCurvAbsBetweenTwoPoints(self, id_ini=0, id_fin=None):
         '''
         Computes and return the curvilinear abscissa between two points
-        
         TODO : adapter avec le filtre
         '''
-        s = 0
-        
-        for i in range(id_ini, id_fin):
-            s = s + self.__POINTS[i].position.distance2DTo(self.__POINTS[i+1].position)
-    
-        return s
+        if id_fin is None:
+            id_fin = self.size()-1
+        return Cinematics.computeCurvAbsBetweenTwoPoints(self, id_ini, id_fin)
 
-    
-    
 
-    # --------------------------------------------------
-    '''
-    Méthode calculant le paramètre 'speed' pour chaque point de la trace
-    '''
-    # Difference finie centree lissee
-    # --------------------------------------------------
-    def smoothed_speed_calculation(self, kernel):
-        
-        S = self.compute_abscurv()
-        self.estimate_speed()
-        
-        if self.size() < kernel:
-            print ('warning: nombre de point insuffisant pour ce kernel')
-            return None
-        
-        idAF = self.__analyticalFeaturesDico['speed']
-    
-        for i in range(kernel, len(S)-kernel):
-            ds = S[i+kernel] - S[i-kernel]
-            dt = self.__POINTS[i+kernel].timestamp - self.__POINTS[i-kernel].timestamp
-            
-            if dt != 0:
-                self.getObs(i).features[idAF] = ds/dt
-    
-        for i in range(kernel):
-            self.getObs(i).features[idAF] = self.getObs(kernel).features[idAF]
-        for i in range(len(S)-kernel, len(S)):
-            self.getObs(i).features[idAF] = self.getObs(len(S) - kernel).features[idAF]  
+
+    # ------------------------------------------------------------
+    # Tools to query obs in a track with SQL-like commands
+    # Output track is a copy of the original track
+	# Blank spaces should be used between each word or symbol
+	# Be careful, parenthesis not allowed ! Use De Morgan rules.
+	# TO DO: problem with AF transmission (as usual)
+    # ------------------------------------------------------------  
+    def __condition(val1, operator, val2):
+        if isinstance(val1, int):
+            val2 = int(val2)
+        if isinstance(val1, float):
+            val2 = float(val2)
+        if operator == "<":
+            return val1 < val2
+        if operator == ">":
+            return val1 > val2
+        if operator == "<=":
+            return val1 <= val2
+        if operator == ">=":
+            return val1 >= val2
+        if (operator == "=") or (operator == "=="):
+            return val1 == val2
+        if operator == "!=":
+            return val1 != val2				
+	
+    def query(self, cmd):
+	
+        cmd = cmd.strip()
+        if ("(" in cmd) or ("(" in cmd):
+            print("Error: parenthesis not allowed in query. Use De Morgan rules to reformulate query")
+            exit()
+			
+        select_part = cmd.split("SELECT")[1].split("WHERE")[0].strip()
+        where_part = cmd.split("WHERE")[1]
+		
+        if not select_part == "*":
+            select_part = select_part.split(",")
+            print(select_part)
+		
+        output = Track()
+        BOOL = []		
+		
+        for i in range(self.size()):
+            c0 = where_part.split("OR")
+            select_all = False
+            for c1 in c0:
+                c2 = c1.split("AND")
+                select = True
+                for c3 in c2:
+                    c4 = c3.strip().split(" ")
+                    operator = c4[1]
+                    select = select and Track.__condition(self[c4[0]][i], operator, c4[2])
+                select_all = select_all or select
+            BOOL.append(select_all)
+			
+        for i in range(len(BOOL)):
+            if BOOL[i]:
+                output.addObs(self[i])
+        if select_part == "*":
+            return output
   
     # ------------------------------------------------------------
     # Rotation of 2D track (coordinates should be ENU)
