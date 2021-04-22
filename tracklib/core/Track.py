@@ -1112,7 +1112,11 @@ class Track:
             exit()
 			
         select_part = cmd.split("SELECT")[1].split("WHERE")[0].strip()
-        where_part = cmd.split("WHERE")[1]
+        temp = cmd.split("WHERE")
+        if len(temp) < 2:
+            where_part = -1
+        else:
+            where_part = temp[1]
 		
         if not select_part == "*":
             select_part = select_part.split(",")
@@ -1122,16 +1126,19 @@ class Track:
         BOOL = []		
 		
         for i in range(self.size()):
-            c0 = where_part.split("OR")
-            select_all = False
-            for c1 in c0:
-                c2 = c1.split("AND")
-                select = True
-                for c3 in c2:
-                    c4 = c3.strip().split(" ")
-                    operator = c4[1]
-                    select = select and Track.__condition(self[c4[0]][i], operator, c4[2])
-                select_all = select_all or select
+            if where_part== -1:
+                select_all = True
+            else:
+                c0 = where_part.split("OR")
+                select_all = False
+                for c1 in c0:
+                    c2 = c1.split("AND")
+                    select = True
+                    for c3 in c2:
+                        c4 = c3.strip().split(" ")
+                        operator = c4[1]
+                        select = select and Track.__condition(self[c4[0]][i], operator, c4[2])
+                    select_all = select_all or select
             BOOL.append(select_all)
 			
         for i in range(len(BOOL)):
