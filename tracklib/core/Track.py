@@ -1028,7 +1028,7 @@ class Track:
 	
         cmd = cmd.strip()
 		
-        AGG = ["SUM", "AVG", "COUNT", "VAR", "MEDIAN", "MIN", "MAX", "RMSE", "MAD", "STDDEV", "ARGMIN", "ARGMAX", "ZEROS"]
+        AGG = ["SUM", "AVG", "COUNT", "VAR", "MEDIAN", "ARGMIN", "ARGMAX", "MIN", "MAX", "RMSE", "MAD", "STDDEV", "ZEROS"]
 			
         select_part = cmd.split("SELECT")[1].split("WHERE")[0].strip()
 		
