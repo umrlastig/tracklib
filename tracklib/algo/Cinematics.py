@@ -79,9 +79,7 @@ def computeAvgAscSpeed(track, id_ini=0, id_fin=None):
     return dp/t
 	
 def computeAbsCurv(track):
-    '''
-    Compute and return curvilinear abscissa for each points
-    '''
+    '''Compute and return curvilinear abscissa for each points'''
     
     if not track.hasAnalyticalFeature(Analytics.BIAF_DS):
         track.addAnalyticalFeature(Analytics.ds, Analytics.BIAF_DS)
@@ -93,13 +91,49 @@ def computeAbsCurv(track):
 	
     
 def computeCurvAbsBetweenTwoPoints(track, id_ini=0, id_fin=None):
-    '''
-    Computes and return the curvilinear abscissa between two points
-    TODO : adapter avec le filtre
-    ''' 
+    '''Computes and return the curvilinear abscissa between two points
+    TODO : adapter avec le filtre''' 
     if id_fin is None:
         id_fin = track.size()-1
     s = 0
     for i in range(id_ini, id_fin):
         s = s + track[i].position.distance2DTo(track[i+1].position)
     return s
+	
+def computeNetDeniv(track, id_ini=0, id_fin=None):
+    '''Computes net denivellation (in meters)'''
+    if id_fin is None:
+        id_fin = track.size()-1
+    return track[id_fin].position.getZ() - track[id_ini].position.getZ()
+	
+	
+def computeAscDeniv(track, id_ini=0, id_fin=None):
+        '''Computes positive denivellation (in meters)'''  		
+        if id_fin is None:
+            id_fin = track.size()-1
+        
+        dp = 0
+        
+        for i in range(id_ini, id_fin):
+            Z1 = track[i].position.getZ()
+            Z2 = track[i+1].position.getZ()
+            if (Z2 > Z1):
+                dp += Z2-Z1
+    
+        return dp 
+    
+ 
+def computeDescDeniv(track, id_ini=0, id_fin=None):
+    '''Computes negative denivellation (in meters)'''
+    if id_fin is None:
+        id_fin = track.size()-1 
+		
+    dn = 0
+    
+    for i in range(id_ini, id_fin):
+        Z1 = track[i].position.getZ()
+        Z2 = track[i+1].position.getZ()
+        if (Z2 < Z1):
+            dn += Z2-Z1
+
+    return dn

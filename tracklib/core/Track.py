@@ -22,6 +22,7 @@ from tracklib.core.TrackCollection import TrackCollection
 import tracklib.core.Utils as utils
 import tracklib.algo.Analytics as algoAF
 import tracklib.algo.Geometrics as Geometrics
+import tracklib.algo.Mapping as Mapping
 import tracklib.algo.Cinematics as Cinematics
 import tracklib.algo.Stochastics as Stochastics
 import tracklib.algo.Comparison as Comparison
@@ -234,7 +235,10 @@ class Track:
         for i in range(self.size()):
             self.getObs(i).position = delta + self.getObs(i).position
                   
-    
+    # Internal method
+    def __transmitAF(self, track):
+        self.__analyticalFeaturesDico = track.__analyticalFeaturesDico.copy()
+	
     def hasAnalyticalFeature(self, af_name):
         return af_name in self.__analyticalFeaturesDico
         
@@ -313,22 +317,6 @@ class Track:
     def setTFromAnalyticalFeature(self, af_name):
         for i in range(self.size()):
             self.getObs(i).timestamp = self.getObsAnalyticalFeature(af_name,i)
-            
-    def isAFTransition(self, af_name):
-        '''
-        Return true if AF is transition marker.
-        For example return true if AF values are like: 
-            000000000000010000100000000000000000001000000100000
-        Values are contained in {0, 1}. 1 means there is a regime change
-        '''
-        tabmarqueurs = self.getAnalyticalFeature(af_name)
-        marqueurs = set(tabmarqueurs)
-        if utils.NAN in marqueurs:
-            marqueurs.remove(utils.NAN)
-        if len(marqueurs.intersection([0, 1])) == 2:
-            return True
-        else:
-            return False
     
     # =========================================================================
     # Basic methods to handle track object
@@ -563,48 +551,33 @@ class Track:
             s += self.getObs(i-1).distanceTo(self.getObs(i))
         return s
         
-    
-    def computeNetDeniv(self, id_ini, id_fin):
+    # DEPRECATED
+    def computeNetDeniv(self, id_ini=0, id_fin=None):
         '''
         Computes net denivellation (in meters)
         '''
-        return self.__POINTS[id_fin].position.getZ() - self.__POINTS[id_ini].position.getZ()
+        if id_fin is None:
+            id_fin = track.size()-1
+        return Cinematics.computeNetDeniv(self, id_ini, id_fin)
 
-
-    def computeAscDeniv(self, id_ini, id_fin):
-        '''
-        Computes positive denivellation (in meters)
-        '''
-        dp = 0
-        
-        for i in range(id_ini, id_fin):
-            Z1 = self.__POINTS[i].position.getZ()
-            Z2 = self.__POINTS[i+1].position.getZ()
-            if (Z2 > Z1):
-                dp += Z2-Z1
+    # DEPRECATED
+    def computeAscDeniv(self, id_ini=0, id_fin=None):
+        '''Computes positive denivellation (in meters)'''        
+        if id_fin is None:
+            id_fin = track.size()-1
+        return  computeAscDeniv(self, id_ini, id_fin)
     
-        return dp 
-    
-    
-    def computeDescDeniv(self, id_ini, id_fin):
-        '''
-        Computes negative denivellation (in meters)
-        '''
-        dn = 0
-        
-        for i in range(id_ini, id_fin):
-            Z1 = self.__POINTS[i].position.getZ()
-            Z2 = self.__POINTS[i+1].position.getZ()
-            if (Z2 < Z1):
-                dn += Z2-Z1
-    
-        return dn
+     # DEPRECATED   
+    def computeDescDeniv(self, id_ini=0, id_fin=None):
+        '''Computes negative denivellation (in meters)'''
+        if id_fin is None:
+            id_fin = track.size()-1 
+        return Cinematics.computeDescDeniv(self, id_ini, id_fin)
         
    
+   # DEPRECATED
     def toWKT(self):
-        '''
-        Transforms track into WKT string
-        '''
+        '''Transforms track into WKT string'''
         output = "LINESTRING(("
         for i in range(self.size()):
             output += (str)(self.__POINTS[i].position.E) + " " 
@@ -625,7 +598,7 @@ class Track:
         track.setUid(self.uid)
         for k in range(id_ini, id_fin+1):
             track.addObs(self.__POINTS[k])
-        #track.__analyticalFeaturesDico = self.__analyticalFeaturesDico
+        track.__transmitAF(self)
         return track
         
     
@@ -646,7 +619,7 @@ class Track:
             if (self.__POINTS[k].timestamp > tfin):
                 continue
             track.addObs(self.__POINTS[k].copy())
-        track.__analyticalFeaturesDico = self.__analyticalFeaturesDico
+        track.__transmitAF(self)
         return track
         
     def addSeconds(self, sec_number):
@@ -827,6 +800,7 @@ class Track:
             self.getObs(i).timestamp = self.getObs(i).timestamp.addSec(i*dt)
         
         
+	# DEPRECATED
     def mapOn(self, reference, TP1, TP2=[], init=[], N_ITER_MAX=20, mode="2D", verbose=True):
     
         '''Geometric affine transformation to align two tracks with diferent
@@ -849,97 +823,7 @@ class Track:
 		Note that mapOn does not handle negative determinant (symetries not allowed)
 		'''   
 
-        if (mode == "3D"):
-            print("Mode 3D is not implemented yet")
-            exit()	
-
-        if (len(init) == 0):
-            init = [0,1,0,0]		
-		
-        if (len(TP2) == 0):
-            TP2 = TP1
-        if not (len(TP1) == len(TP2)):
-            print("Error: tie points lists must have same size")
-            exit()
-			
-        P1 = [self.getObs(i).position.copy() for i in TP1]
-		
-        if isinstance(reference, Track):
-            P2 = [reference.getObs(i).position.copy() for i in TP2]
-        else:
-            P2 = reference
-		
-        n = len(P1)
-
-        if verbose:
-            print("-----------------------------------------------------------------")
-            print("NUMBER OF TIE POINTS: " + str(len(TP1)))
-            print("-----------------------------------------------------------------")			
-            N = int(math.log(self.size())/math.log(10))+1
-            for i in range(len(TP1)):
-                message = "POINT " + ('{:0'+str(N)+'d}').format(TP1[i]) + "   "  
-                message += str(self.getObs(TP1[i]).timestamp) + "   ERROR = "
-                message += str('{:10.2f}'.format(P1[i].distance2DTo(P2[i]))) + " m"
-                print(message)
-            print("-----------------------------------------------------------------")
-			
-        J = np.zeros((2*n, 4))
-        B = np.zeros((2*n, 1))
-        X = np.matrix([init[1],init[0],init[2],init[3]]).transpose()
-		
-		# Iterations
-        for iter in range(N_ITER_MAX):
-        
-            # Current parameters
-            k  = X[0,0]        
-            tx = X[1,0]
-            ty = X[2,0]
-            a  = X[3,0]; ca = math.cos(a); sa = math.sin(a)			
-            
-            for i in range(0,2*n,2):
-                x1 = P1[int(i/2)].getX(); y1 = P1[int(i/2)].getY()
-                x2 = P2[int(i/2)].getX(); y2 = P2[int(i/2)].getY()
-                x2_th = k*(ca*x1-sa*y1)+tx
-                y2_th = k*(sa*x1+ca*y1)+ty		
-                J[i,0]   = ca*x1-sa*y1;  J[i,1]   = 1;  J[i,2]   = 0;   J[i,3]   = -k*(sa*x1+ca*y1);   B[i]   = x2-x2_th
-                J[i+1,0] = sa*x1+ca*y1;  J[i+1,1] = 0;  J[i+1,2] = 1;   J[i+1,3] = +k*(ca*x1-sa*y1);   B[i+1] = y2-y2_th
-            	
-            dX = np.linalg.solve(J.transpose()@J, J.transpose()@B)
-            X = X+dX
-			
-            cv_param = max(max(max(dX[0,0]*1e4, dX[1,0]*1e4), dX[2,0]*1e4),  dX[3,0]*1e4)
-            if (cv_param < 1):
-                break               
-            
-            if verbose:
-                N = int(math.log(N_ITER_MAX-1)/math.log(10)) + 1
-                message = "ITERATION " + ('{:0'+str(N)+'d}').format(iter) + "  "
-                message += "RMSE = " + '{:10.5f}'.format(math.sqrt(B.transpose()@B/(2*n))) + " m    "
-                message += "MAX = " + '{:10.5f}'.format(np.max(B)) + " m    "
-                print(message)
-				
-        if verbose:
-            print("-----------------------------------------------------------------")
-            print("CONVERGENCE REACHED AFTER " + str(iter) + " ITERATIONS")
-            glob_res = 0.0
-            for l in range(0,2*n,2):
-                res = math.sqrt(B[l]**2+B[l+1]**2)
-                glob_res += res
-                message = "RESIDUAL (2D) POINT " + str(int(l/2)) + ":  "
-                message += '{:4.3f}'.format(res) + " m"
-                print(message)
-            print("GLOBAL 2D RESIDUAL ON TIE POINTS: " + '{:5.3f}'.format(glob_res/n) + " m")
-            print("-----------------------------------------------------------------")
-            message = "Theta = " + '{:3.2f}'.format(X[3,0]) + " rad   k = " + '{:5.3f}'.format(X[0,0])
-            message += "  Tx = " + '{:8.3f}'.format(X[1,0]) + " m  Ty = " + '{:8.3f}'.format(X[2,0]) + " m"
-            print(message)
-            print("-----------------------------------------------------------------")
-		
-        self.rotate(X[3,0])
-        self.scale(X[0,0])
-        self.translate(X[1,0],X[2,0])
-
-        return [X[3,0], X[0,0], X[1,0], X[2,0]]
+        return Mapping.mapOn(self, reference, TP1, TP2, init, N_ITER_MAX, mode, verbose)
 
     # =========================================================================
     #  Adding noise to tracks
@@ -974,7 +858,7 @@ class Track:
             XXX: SPATIAL ou TEMPORAL
             YYY: ALTI, SPEED ou AF_NAME
         
-        Le tableau de nom afs: test si isAFTransition
+        Le tableau de nom afs: teste si isAFTransition
         '''
         
         nomaxes = template.split('_')
@@ -1334,7 +1218,15 @@ class Track:
     # [+] Concatenation of two tracks
     # ------------------------------------------------------------
     def __add__(self, track):
-        return Track(self.__POINTS + track.__POINTS, self.uid, self.tid)
+        AF1 = self.getListAnalyticalFeatures()
+        AF2 = track.getListAnalyticalFeatures()
+        track = Track(self.__POINTS + track.__POINTS, self.uid, self.tid)
+        same = True
+        for i in range(len(AF1)):
+            same = same and (AF1[i] == AF2[i])
+        if same:
+            track.__transmitAF(self)		
+        return track
         
     # ------------------------------------------------------------
     # [/] Even split of tracks (returns n+1 segments)
@@ -1346,7 +1238,9 @@ class Track:
         for i in range(number+1):
             id_ini = i*N
             id_fin = min((i+1)*N, self.size())+1
-            SPLITS.addTrack(Track(self.__POINTS[id_ini:id_fin]))
+            portion = Track(self.__POINTS[id_ini:id_fin])
+            portion.__transmitAF(self)
+            SPLITS.addTrack(portion)
         return SPLITS
         
 	# ------------------------------------------------------------	
@@ -1358,7 +1252,9 @@ class Track:
             t2f = arg.getLastObs().timestamp            
             return (t1i > t2f)			
         else:
-            return Track(self.__POINTS[arg:self.size()], self.uid, self.tid)	
+            output = Track(self.__POINTS[arg:self.size()], self.uid, self.tid)
+            output.__transmitAF(self)
+            return output
 		
 	# ------------------------------------------------------------	
     # [<] Removes last n points of track or time comp  
@@ -1369,7 +1265,9 @@ class Track:
             t2i = arg.getFirstObs().timestamp            
             return (t1f < t2i)
         else:
-            return Track(self.__POINTS[0:(self.size()-arg)], self.uid, self.tid)
+            output = Track(self.__POINTS[0:(self.size()-arg)], self.uid, self.tid)
+            output.__transmitAF(self)
+            return output
 		
 	# ------------------------------------------------------------	
     # [>=] Remove idle points at the start of track or time comp   
@@ -1458,12 +1356,15 @@ class Track:
     # ------------------------------------------------------------    
     def __mod__(self, sample):
         if isinstance(sample, int):
-            return Track(self.__POINTS[::sample], self.uid, self.tid)
+            track = Track(self.__POINTS[::sample], self.uid, self.tid)
+            track.__transmitAF(self)
+            return track
         if isinstance(sample, list):
             track = Track()
             for i in range(self.size()):
                 if (sample[i%len(sample)]):
                     track.addObs(self.getObs(i))
+            track.__transmitAF(self)
             return track
         
     # ------------------------------------------------------------

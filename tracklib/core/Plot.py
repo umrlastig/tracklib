@@ -23,6 +23,22 @@ class Plot:
         self.h = 3
         self.pointsize = 5
         
+    def __isAFTransition(track, af_name):
+        '''
+        Return true if AF is transition marker.
+        For example return true if AF values are like: 
+            000000000000010000100000000000000000001000000100000
+        Values are contained in {0, 1}. 1 means there is a regime change
+        '''
+        tabmarqueurs = track.getAnalyticalFeature(af_name)
+        marqueurs = set(tabmarqueurs)
+        if utils.NAN in marqueurs:
+            marqueurs.remove(utils.NAN)
+        if len(marqueurs.intersection([0, 1])) == 2:
+            return True
+        else:
+            return False		
+		
     
     def plot(self, type='LINE', af_name = '', cmap=-1):
 
@@ -141,7 +157,7 @@ class Plot:
         limit = ymax + 0.5
         for (indice, af_name) in enumerate(afs):
 
-            if self.track.isAFTransition(af_name):
+            if __isAFTransition(self.track, af_name):
                 print ('---')
             
                 tabmarqueurs = self.track.getAnalyticalFeature(af_name)
