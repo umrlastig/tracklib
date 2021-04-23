@@ -1115,7 +1115,6 @@ class Track:
 	#     - Important: no computation allowed in WHERE conditions. E.g. "... WHERE z-2 > 10" not allowed
 	#     - Available aggregators: all unary operators as described in Operator.py, except MSE
 	#     - Capital letters must be used for SQL keywords SELECT, WHERE, AND, OR and aggregators 
-	# TO DO: problem with AF transmission (as usual)
     # ----------------------------------------------------------------------------------------------------
     def __condition(val1, operator, val2):
     
@@ -1200,6 +1199,7 @@ class Track:
             for i in range(len(BOOL)):
                 if BOOL[i]:
                     output.addObs(self[i])
+            output.__analyticalFeaturesDico = self.__analyticalFeaturesDico.copy()
             return output
         else:
             for i in range(len(BOOL)):
