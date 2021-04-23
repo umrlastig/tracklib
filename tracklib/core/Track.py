@@ -1085,17 +1085,38 @@ class Track:
 
 
 
-    # ------------------------------------------------------------
-    # Tools to query obs in a track with SQL-like commands
-    # Output track is a copy of the original track
-	# Maximum one aggregator per query (no GROUP BY clause)
-	# Blank spaces should be used between each word or symbol
-	# Capital letters must be used for SQL keywords
-	# Be careful, parenthesis not allowed ! Use boolean algebra 
-	# rules to reformulate query without parenthesis: 
-	# e.g. A AND (B OR C) = A AND B OR A AND C
+    # ----------------------------------------------------------------------------------------------------
+    # Tools to query observations in a track with SQL-like commands. Output depends on the SELECT clause:
+	#     - If "SELECT *" then output is a copied track of the original track (with all its AF hopefully)
+	#     - If "SELECT f1, f2... fp", then output is a (p x n)-dimensional array, with p = number of fields 
+	#       queried and n = number of observations selected by the WHERE conditions.
+	#     - If "SELECT AGG1(f1), AGG2(f2)... AGGp(fp)", with AGG1, AGG2,.. AGGp, a set of p aggregators, 
+	#       then output is a p-dimensional array, with on value for each aggregator
+	#     - If "SELECT AGG(f)", then output is the floating point value returned by the operator.
+	# Note that operators take as input only analytical feature names. Therefore, "SELECT COUNT(*)" syntax 
+	# is not allowed and must be replaced equivalently by "SELECT COUNT(f)" with any AF name f.
+    # General rules: 
+	#     - Only SELECT and WHERE keywords (SET and DELETE available soon)
+	#     - All analytical features + x, y, z, t, and timestamp are available as fields
+	#     - Fields are written without quotes. They must not contain blank spaces
+	#     - "t" is time as integer in seconds since 1970/01/01 00:00:00, and "timestamp" is GPSTIme object
+	#     - Blank space must be used between every other words, symbols and operators
+	#     - WHERE clause may contain as many conditions as needed, separated by OR/AND key words
+	#     - Parenthesis are not allowed within WHERE clause. Use boolean algebra rules to reformulate 
+	#       query without parenthesis: e.g. A AND (B OR C) = A AND B OR A AND C. Or use successive queries.
+	#     - Each condition must contain exactly 3 parts (separated by blank spaces) in this exact order:
+	#         (1) the name of an analytical feature to test
+	#         (2) a comparison operator among >, <, >=, <=, == and != (LIKE with % not available yet)
+	#         (3) a threshold value which is automatically casted to the type of the AF given in (1). 
+	#             Intended types accepted are: integers, floats, strings, boolean and GPSTime. 
+	#             When GPSTime is used as a threshold value, eventhough it may contain 2 parts 
+	#            (date and time), it must not be enclosed within quotes. For boolean, "1", "T" and "TRUE"
+    #             are considered as logical True, all other values are considered as False.	
+	#     - Important: no computation allowed in WHERE conditions. E.g. "... WHERE z-2 > 10" not allowed
+	#     - Available aggregators: all unary operators as described in Operator.py, except MSE
+	#     - Capital letters must be used for SQL keywords SELECT, WHERE, AND, OR and aggregators 
 	# TO DO: problem with AF transmission (as usual)
-    # ------------------------------------------------------------  
+    # ----------------------------------------------------------------------------------------------------
     def __condition(val1, operator, val2):
     
         if isinstance(val1, int):
@@ -1104,6 +1125,8 @@ class Track:
             val2 = float(val2)
         if isinstance(val1, GPSTime):
             val2 = GPSTime.readTimestamp(val2)
+        if isinstance(val1, bool):
+            val2 = (val2.upper == "TRUE") or (val2.upper == "T") or (val2 == "1")
 			
         if operator == "<":
             return val1 < val2
@@ -1125,13 +1148,16 @@ class Track:
         AGG = ["SUM", "AVG", "COUNT", "VAR", "MEDIAN", "MIN", "MAX", "RMSE", "MAD", "STDDEV", "ARGMIN", "ARGMAX", "ZEROS"]
 			
         select_part = cmd.split("SELECT")[1].split("WHERE")[0].strip()
-        aggregator = -1
-        for i in range(len(AGG)):
-            if ((AGG[i]+"(") in select_part):
-                aggregator = i
-			
-        if aggregator > -1:
-            select_part = select_part[len(AGG[aggregator])+1:-1]
+		
+        if not select_part == "*":
+            select_part = select_part.split(",")
+            aggregator = []
+            for i  in range(len(select_part)):
+                for j in range(len(AGG)):
+                    if ((AGG[j]+"(") in select_part[i]):
+                        aggregator.append(j)
+                        select_part[i] = select_part[i].strip()[len(AGG[j])+1:-1]
+                        break
            
         temp = cmd.split("WHERE")
         if len(temp) < 2:
@@ -1145,7 +1171,6 @@ class Track:
                 exit()
 		
         if not select_part == "*":
-            select_part = select_part.split(",")
             LAF = []
             for i in range(len(select_part)):
                 LAF.append([])
@@ -1181,43 +1206,53 @@ class Track:
                 if BOOL[i]:
                     for j in range(len(select_part)):
                         LAF[j].append(self[select_part[j].strip()][i])
-            if len(LAF) == 1:
-                LAF = LAF[0]
-                if AGG[aggregator] == "COUNT":
-                    return len(LAF)
-                if (aggregator > -1) and (len(LAF) == 0):
+				
+     
+            if len(aggregator) == 0:
+                return LAF
+				
+            OUTPUT = []
+            for af in range(len(LAF)):
+                AF = LAF[af]
+                if AGG[aggregator[af]] == "COUNT":
+                    OUTPUT.append(len(AF))
+                if (len(aggregator) > 0) and (len(AF) == 0):
                     return None
-                if (aggregator > -1) and (len(LAF) > 0):
+                if (len(aggregator) > 0) and (len(AF) > 0):
                     tmp = Track()
-                    for i in range(len(LAF)):
+                    for i in range(len(AF)):
                         tmp.addObs(Obs(ENUCoords(0,0,0)))
-                    tmp.createAnalyticalFeature("#tmp", LAF)
-                    if AGG[aggregator] == "SUM":
-                        return tmp.operate(Operator.Operator.SUM, "#tmp") 
-                    if AGG[aggregator] == "AVG":
-                        return tmp.operate(Operator.Operator.AVERAGER, "#tmp") 
-                    if AGG[aggregator] == "VAR":
-                        return tmp.operate(Operator.Operator.VARIANCE, "#tmp") 
-                    if AGG[aggregator] == "MEDIAN":
-                        return tmp.operate(Operator.Operator.MEDIAN, "#tmp") 
-                    if AGG[aggregator] == "MIN":
-                        return tmp.operate(Operator.Operator.MIN, "#tmp") 
-                    if AGG[aggregator] == "MAX":
-                        return tmp.operate(Operator.Operator.MAX, "#tmp") 
-                    if AGG[aggregator] == "RMSE":
-                        return tmp.operate(Operator.Operator.RMSE, "#tmp") 
-                    if AGG[aggregator] == "STDDEV":
-                        return tmp.operate(Operator.Operator.STDDEV, "#tmp") 
-                    if AGG[aggregator] == "ARGMIN":
-                        return tmp.operate(Operator.Operator.ARGMIN, "#tmp")
-                    if AGG[aggregator] == "ARGMAX":
-                        return tmp.operate(Operator.Operator.ARGMAX, "#tmp")
-                    if AGG[aggregator] == "ZEROS":
-                        return tmp.operate(Operator.Operator.ZEROS, "#tmp")
-                    if AGG[aggregator] == "MAD":
-                        return tmp.operate(Operator.Operator.MAD, "#tmp")
-						
-            return LAF
+                    tmp.createAnalyticalFeature("#tmp", AF)
+                    if AGG[aggregator[af]] == "SUM":
+                        OUTPUT.append(tmp.operate(Operator.Operator.SUM, "#tmp"))
+                    if AGG[aggregator[af]] == "AVG":
+                        OUTPUT.append(tmp.operate(Operator.Operator.AVERAGER, "#tmp"))
+                    if AGG[aggregator[af]] == "VAR":
+                        OUTPUT.append(tmp.operate(Operator.Operator.VARIANCE, "#tmp")) 
+                    if AGG[aggregator[af]] == "MEDIAN":
+                        OUTPUT.append(tmp.operate(Operator.Operator.MEDIAN, "#tmp")) 
+                    if AGG[aggregator[af]] == "MIN":
+                        OUTPUT.append(tmp.operate(Operator.Operator.MIN, "#tmp")) 
+                    if AGG[aggregator[af]] == "MAX":
+                        OUTPUT.append(tmp.operate(Operator.Operator.MAX, "#tmp")) 
+                    if AGG[aggregator[af]] == "RMSE":
+                        OUTPUT.append(tmp.operate(Operator.Operator.RMSE, "#tmp")) 
+                    if AGG[aggregator[af]] == "STDDEV":
+                        OUTPUT.append(tmp.operate(Operator.Operator.STDDEV, "#tmp")) 
+                    if AGG[aggregator[af]] == "ARGMIN":
+                        OUTPUT.append(tmp.operate(Operator.Operator.ARGMIN, "#tmp"))
+                    if AGG[aggregator[af]] == "ARGMAX":
+                        OUTPUT.append(tmp.operate(Operator.Operator.ARGMAX, "#tmp"))
+                    if AGG[aggregator[af]] == "ZEROS":
+                        OUTPUT.append(tmp.operate(Operator.Operator.ZEROS, "#tmp"))
+                    if AGG[aggregator[af]] == "MAD":
+                        OUTPUT.append(tmp.operate(Operator.Operator.MAD, "#tmp"))
+			
+            if (len(OUTPUT) == 1):
+                return OUTPUT[0]			
+
+            return OUTPUT			
+   
 
   
     # ------------------------------------------------------------
