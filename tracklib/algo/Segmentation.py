@@ -46,7 +46,7 @@ def segmentation(track, afs_input, af_output, thresholds_max, mode_comparaison =
     
     track.createAnalyticalFeature(af_output)
     
-    for i in range(len(track.__POINTS)):
+    for i in range(track.size()):
         
         # On cumule les comparaisons pour chaque af_input
         comp = (1 == 1)
@@ -61,7 +61,7 @@ def segmentation(track, afs_input, af_output, thresholds_max, mode_comparaison =
                 if thresholds_max != None and len(thresholds_max) >= index:
                     seuil_max = thresholds_max[index]
                 
-                if mode_comparaison == track.MODE_COMPARAISON_AND:
+                if mode_comparaison == MODE_COMPARAISON_AND:
                     comp = comp and (current_value <= seuil_max)
                 else:
                     comp = comp or (current_value <= seuil_max)
