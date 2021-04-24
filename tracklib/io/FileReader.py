@@ -15,7 +15,7 @@ from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
 from tracklib.core.Coords import ECEFCoords
 from tracklib.core.TrackCollection import TrackCollection
-
+import tracklib.core.Utils as utils
 from tracklib.io.FileFormat import FileFormat
 
 
@@ -107,7 +107,10 @@ class FileReader:
 				
 				if (int(E) != fmt.no_data_value) and (int(N) != fmt.no_data_value):
 					
-					U = (float)(fields[fmt.id_U])
+					if fmt.id_U >= 0:
+						U = (float)(fields[fmt.id_U])
+					else:
+						U = utils.NAN
 					
 					if not fmt.srid.upper() in ["ENUCOORDS", "ENU", "GEOCOORDS", "GEO", "ECEFCOORDS", "ECEF"]:
 						print("Error: unknown coordinate type ["+str(srid)+"]")
