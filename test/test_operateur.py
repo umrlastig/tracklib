@@ -16,6 +16,7 @@ import tracklib.algo.Interpolation as interpolation
 from tracklib.io.FileReader import FileReader
 import tracklib.core.Track as core_Track
 import tracklib.algo.Segmentation as seg
+import tracklib.algo.Synthetics as synth
 
 class TestOperateurMethods(unittest.TestCase):
 	
@@ -73,26 +74,27 @@ class TestOperateurMethods(unittest.TestCase):
 	def prob():
 		return random.random()-0.5
 		
-#	def test_random(self):
-#		GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
-#		track = core_Track.Track.generate(TestOperateurMethods.x, TestOperateurMethods.y)
-#
-#		track.createAnalyticalFeature("a")
-#
-#		track.operate(Operator.RANDOM, ("a","a"), TestOperateurMethods.prob, ("x_noised","y_noised"))
-#		track.operate(Operator.INTEGRATOR, ("x_noised","y_noised"))
-#		track.operate(Operator.SCALAR_MULTIPLIER, ("x_noised","y_noised"), 0.02)
-#		track.operate(Operator.ADDER, ("x_noised","y_noised"), ("x","y"))
-#
-#		kernel = GaussianKernel(21)
-#		kernel.setFilterBoundary(True)
-#
-#		track.operate(Operator.FILTER, ("x_noised", "y_noised"), kernel, ("x_filtered", "y_filtered"))
-#
-#		plt.plot(track.getX(), track.getY(), 'k--')
-#		plt.plot(track.getAnalyticalFeature("x_noised"), track.getAnalyticalFeature("y_noised"), 'b-')
-#		plt.plot(track.getAnalyticalFeature("x_filtered"), track.getAnalyticalFeature("y_filtered"), 'r-')
-#		plt.show()	
+	def test_random(self):
+		GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+		#track = core_Track.Track.generate(TestOperateurMethods.x, TestOperateurMethods.y)
+		track = synth.generate(TestOperateurMethods.x, TestOperateurMethods.y)
+
+		track.createAnalyticalFeature("a")
+
+		track.operate(Operator.RANDOM, ("a","a"), TestOperateurMethods.prob, ("x_noised","y_noised"))
+		track.operate(Operator.INTEGRATOR, ("x_noised","y_noised"))
+		track.operate(Operator.SCALAR_MULTIPLIER, ("x_noised","y_noised"), 0.02)
+		track.operate(Operator.ADDER, ("x_noised","y_noised"), ("x","y"))
+
+		kernel = GaussianKernel(21)
+		kernel.setFilterBoundary(True)
+
+		track.operate(Operator.FILTER, ("x_noised", "y_noised"), kernel, ("x_filtered", "y_filtered"))
+
+		plt.plot(track.getX(), track.getY(), 'k--')
+		plt.plot(track.getAnalyticalFeature("x_noised"), track.getAnalyticalFeature("y_noised"), 'b-')
+		plt.plot(track.getAnalyticalFeature("x_filtered"), track.getAnalyticalFeature("y_filtered"), 'r-')
+		plt.show()	
 		
 		
 	def x2(t):
@@ -100,42 +102,43 @@ class TestOperateurMethods(unittest.TestCase):
 	def y2(t):
 		return 10*math.sin(2*math.pi*t)*(1+math.cos(2*math.pi*t))	
 
-#	def test_generate(self):
-#		GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
-#		track = core_Track.Track.generate(TestOperateurMethods.x2, TestOperateurMethods.y2)
-#		
-#		track.createAnalyticalFeature("a")
-#		track.operate(Operator.RANDOM, "a", TestOperateurMethods.prob, "randx")
-#		track.operate(Operator.RANDOM, "a", TestOperateurMethods.prob, "randy")
-#
-#		track.operate(Operator.INTEGRATOR, "randx", "randx")
-#		track.operate(Operator.INTEGRATOR, "randy", "randy")
-#
-#		track.operate(Operator.SCALAR_MULTIPLIER, "randx", 0.5, "noisex")
-#		track.operate(Operator.SCALAR_MULTIPLIER, "randx", 0.5, "noisey")
-#
-#		track.operate(Operator.ADDER, "x", "noisex", "x_noised")
-#		track.operate(Operator.ADDER, "y", "noisey", "y_noised")
-#
-#		kernel = GaussianKernel(31)
-#
-#		track.operate(Operator.FILTER, "x_noised", kernel, "x_filtered")
-#		track.operate(Operator.FILTER, "y_noised", kernel, "y_filtered")
-#
-#
-#		plt.plot(track.getAnalyticalFeature("x"), track.getAnalyticalFeature("y"), 'k--')
-#		plt.plot(track.getAnalyticalFeature("x_noised"), track.getAnalyticalFeature("y_noised"), 'b-')
-#		plt.plot(track.getAnalyticalFeature("x_filtered"), track.getAnalyticalFeature("y_filtered"), 'r-')
-#
-#		plt.show()
+	def test_generate(self):
+		GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+		#track = core_Track.Track.generate(TestOperateurMethods.x2, TestOperateurMethods.y2)
+		track = synth.generate(TestOperateurMethods.x2, TestOperateurMethods.y2)
+		
+		track.createAnalyticalFeature("a")
+		track.operate(Operator.RANDOM, "a", TestOperateurMethods.prob, "randx")
+		track.operate(Operator.RANDOM, "a", TestOperateurMethods.prob, "randy")
+
+		track.operate(Operator.INTEGRATOR, "randx", "randx")
+		track.operate(Operator.INTEGRATOR, "randy", "randy")
+
+		track.operate(Operator.SCALAR_MULTIPLIER, "randx", 0.5, "noisex")
+		track.operate(Operator.SCALAR_MULTIPLIER, "randx", 0.5, "noisey")
+
+		track.operate(Operator.ADDER, "x", "noisex", "x_noised")
+		track.operate(Operator.ADDER, "y", "noisey", "y_noised")
+
+		kernel = GaussianKernel(31)
+
+		track.operate(Operator.FILTER, "x_noised", kernel, "x_filtered")
+		track.operate(Operator.FILTER, "y_noised", kernel, "y_filtered")
+
+
+		plt.plot(track.getAnalyticalFeature("x"), track.getAnalyticalFeature("y"), 'k--')
+		plt.plot(track.getAnalyticalFeature("x_noised"), track.getAnalyticalFeature("y_noised"), 'b-')
+		plt.plot(track.getAnalyticalFeature("x_filtered"), track.getAnalyticalFeature("y_filtered"), 'r-')
+
+		plt.show()
 
 
 		
 if __name__ == '__main__':
 	suite = unittest.TestSuite()
 	suite.addTest(TestOperateurMethods("test_abs_curv1"))
-	# suite.addTest(TestOperateurMethods("test_random"))
-	# suite.addTest(TestOperateurMethods("test_generate"))
+	suite.addTest(TestOperateurMethods("test_random"))
+	suite.addTest(TestOperateurMethods("test_generate"))
 	runner = unittest.TextTestRunner()
 	runner.run(suite)
 	
