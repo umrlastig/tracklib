@@ -8,12 +8,11 @@ import matplotlib.pyplot as plt
 
 import tracklib.core.Operator as Operator
 import tracklib.core.Plot as Plot
-import tracklib.util.CellOperator as Sum
 
 import tracklib.core.Utils as utils
 import tracklib.algo.Interpolation as Interpolation
 import tracklib.algo.Simplification as Simplification
-
+import tracklib.algo.Summarize as Sum
 
 
 class TrackCollection:
