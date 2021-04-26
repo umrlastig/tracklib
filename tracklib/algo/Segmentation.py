@@ -91,7 +91,7 @@ def split(track, source):
     
         for i in range(track.size()):
         
-            if track.getObsAnalyticalFeature(af_output, i) == 1:  # Nouvelle trajectoire
+            if track.getObsAnalyticalFeature(source, i) == 1:  # Nouvelle trajectoire
                 
                 # L'identifiant de la trace subdivisée est obtenue par concaténation 
                 # de l'identifiant de la trace initiale et du compteur
