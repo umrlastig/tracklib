@@ -144,7 +144,7 @@ def findStopsLocal(track, speed=1e-2, duration=5):
     track.operate(Operator.Operator.DIFFERENTIATOR, "#mark")
     track.operate(Operator.Operator.RECTIFIER, "#mark")
 
-    TRACES = slit(track, "#mark")            
+    TRACES = split(track, "#mark")            
 
     TMP_MEAN_X = []
     TMP_MEAN_Y = []
