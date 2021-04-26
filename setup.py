@@ -9,7 +9,8 @@ requirements = (
     'matplotlib',
 	'psycopg2',
     'scikit-image',
-	'progressbar'
+	'progressbar',
+    'progressbar2'
 )
 
 dev_requirements = (

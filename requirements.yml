@@ -3,6 +3,7 @@ matplotlib
 psycopg2
 scikit-image
 progressbar
+progressbar2
 pytest
 pytest-runner
 coverage
