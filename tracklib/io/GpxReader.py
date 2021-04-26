@@ -38,7 +38,7 @@ class GpxReader:
                 lon = float(trkpt.attributes['lon'].value)
                 lat = float(trkpt.attributes['lat'].value)
             
-                hgt = 0
+                hgt = utils.NAN
                 eles = trkpt.getElementsByTagName('ele')
                 if eles.length > 0:
                    hgt = float(eles[0].firstChild.data)

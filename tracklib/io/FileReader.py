@@ -15,7 +15,7 @@ from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
 from tracklib.core.Coords import ECEFCoords
 from tracklib.core.TrackCollection import TrackCollection
-
+import tracklib.core.Utils as utils
 from tracklib.io.FileFormat import FileFormat
 
 
@@ -124,7 +124,6 @@ class FileReader:
                 line = fp.readline().strip()
                 
         fp.close()
-        
 
         # Reading other features
         if (fmt.read_all):

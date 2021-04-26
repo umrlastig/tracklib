@@ -9,13 +9,14 @@ import random
 import unittest
 
 from tracklib.core.GPSTime import GPSTime
-import tracklib.algo.AlgoAF as algo
+import tracklib.algo.Analytics as algo
 from tracklib.core.Operator import Operator
 from tracklib.core.Kernel import GaussianKernel
 import tracklib.algo.Interpolation as interpolation
 from tracklib.io.FileReader import FileReader
 import tracklib.core.Track as core_Track
-
+import tracklib.algo.Segmentation as seg
+import tracklib.algo.Synthetics as synth
 
 class TestOperateurMethods(unittest.TestCase):
 	
@@ -31,14 +32,16 @@ class TestOperateurMethods(unittest.TestCase):
 	def test_abs_curv1(self):
 		GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
 		chemin = './data/trace1.dat'
-		track = FileReader.readFromFile(chemin, 2, 3, -1, 4, separator=",")
+        
+		track = FileReader.readFromFile(chemin, 2, 3, -1, 4, separator=",", DateIni=-1, h=0, com="#", no_data_value=-999999, srid="ENUCoords")
 		
 		track.addAnalyticalFeature(algo.diffJourAnneeTrace)
 		track.operate(Operator.INVERTER, "diffJourAnneeTrace", "rando_jour_neg")
-		track.segmentation(["rando_jour_neg"], "rando_jour", [-1])
+		#track.segmentation(["rando_jour_neg"], "rando_jour", [-1])
+		seg.segmentation(track, ["rando_jour_neg"], "rando_jour", [-1])
 		self.mafonct(track, "rando_jour")
 		
-		TRACES = track.split_segmentation("rando_jour")
+		TRACES = seg.split(track, "rando_jour")
 		
 		
 		self.assertTrue(len(TRACES) == 4)
@@ -73,7 +76,8 @@ class TestOperateurMethods(unittest.TestCase):
 		
 	def test_random(self):
 		GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
-		track = core_Track.Track.generate(TestOperateurMethods.x, TestOperateurMethods.y)
+		#track = core_Track.Track.generate(TestOperateurMethods.x, TestOperateurMethods.y)
+		track = synth.generate(TestOperateurMethods.x, TestOperateurMethods.y)
 
 		track.createAnalyticalFeature("a")
 
@@ -100,7 +104,8 @@ class TestOperateurMethods(unittest.TestCase):
 
 	def test_generate(self):
 		GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
-		track = core_Track.Track.generate(TestOperateurMethods.x2, TestOperateurMethods.y2)
+		#track = core_Track.Track.generate(TestOperateurMethods.x2, TestOperateurMethods.y2)
+		track = synth.generate(TestOperateurMethods.x2, TestOperateurMethods.y2)
 		
 		track.createAnalyticalFeature("a")
 		track.operate(Operator.RANDOM, "a", TestOperateurMethods.prob, "randx")

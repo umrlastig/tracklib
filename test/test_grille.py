@@ -4,9 +4,10 @@ from unittest import TestCase, TestSuite, TextTestRunner
 
 from tracklib.core import (
   Track, Obs, Coords, GPSTime, Grid)
-from tracklib.algo import (AlgoAF)
+from tracklib.algo import (Analytics)
 from tracklib.util import (CellOperator) 
 from tracklib.core.TrackCollection import TrackCollection
+
 
 class TestGrille(TestCase):
     
@@ -45,12 +46,12 @@ class TestGrille(TestCase):
         grille = Grid.Grid(Xmin, Ymin, XSize, YSize, PixelSize)
         
         # 
-        af_algos = [AlgoAF.speed] #, utils.stop_point]
+        af_algos = [Analytics.speed] #, utils.stop_point]
         cell_operators = [CellOperator.co_avg] #, utils.sum]
         grille.addAnalyticalFunctionForSummarize(TrackCollection(TRACES), af_algos, cell_operators)
         
         #grille.plot(utils.orientation, utils.co_dominant)
-        grille.plot(AlgoAF.speed, CellOperator.co_avg)
+        grille.plot(Analytics.speed, CellOperator.co_avg)
 
 
 if __name__ == '__main__':
