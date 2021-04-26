@@ -155,34 +155,49 @@ class Track:
             raise IndexError
         return self.__POINTS[i]
     
-    def getX(self):
-        X = []
-        for i in range(self.size()):
-            X.append(self.__POINTS[i].position.getX())
+    def getX(self, i=None):
+        if i is None:
+            X = []
+            for i in range(self.size()):
+                X.append(self.__POINTS[i].position.getX())
+        else:
+            X = self.__POINTS[i].position.getX()
         return X
         
-    def getY(self):
-        Y = []
-        for i in range(self.size()):
-            Y.append(self.__POINTS[i].position.getY())
+    def getY(self, i=None):
+        if i is None:
+            Y = []
+            for i in range(self.size()):
+                Y.append(self.__POINTS[i].position.getY())
+        else:
+            Y = self.__POINTS[i].position.getY()
         return Y
         
-    def getZ(self):
-        Z = []
-        for i in range(self.size()):
-            Z.append(self.__POINTS[i].position.getZ())
+    def getZ(self, i=None):
+        if i is None:
+            Z = []
+            for i in range(self.size()):
+                Z.append(self.__POINTS[i].position.getZ())
+        else:
+            Z = self.__POINTS[i].position.getZ()
         return Z
         
-    def getT(self):
-        T = []
-        for i in range(self.size()):
-            T.append(self.__POINTS[i].timestamp.toAbsTime())
+    def getT(self, i=None):
+        if i is None:
+            T = []
+            for i in range(self.size()):
+                T.append(self.__POINTS[i].timestamp.toAbsTime())
+        else:
+            T = self.__POINTS[i].timestamp.toAbsTime()
         return T
     
-    def getTimestamps(self):
-        T = []
-        for i in range(self.size()):
-            T.append(self.__POINTS[i].timestamp)
+    def getTimestamps(self, i=None):
+        if i is None:
+            T = []
+            for i in range(self.size()):
+                T.append(self.__POINTS[i].timestamp)
+        else:
+            T = self.__POINTS[i].timestamp
         return T
 		
     def getCentroid(self):

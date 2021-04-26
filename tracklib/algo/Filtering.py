@@ -8,6 +8,7 @@ import numpy as np
 import tracklib.core.Track as Track
 import tracklib.core.Utils as utils
 import tracklib.core.Operator as Operator
+import tracklib.algo.Dynamics as Dynamics
 
 FILTER_LOW_PASS = 0
 FILTER_HIGH_PASS = 1
@@ -52,6 +53,53 @@ def KLFiltering(track):
 # --------------------------------------------------------------------------
 def Kalman(track):
     return None
+	
+# --------------------------------------------------------------------------
+# Filtering with Markov process based on speed ragularization
+# Inputs:
+#    - track: a track to filter
+#    - sigma: Positional standard deviation (in ground units)
+#    - speed: a function describing the speed distribution. It is a 3-valued 
+#      function, where f(v,k,t) describes the (possibly non-normalized) 
+#      probability value that track t is moving with speed v at epoch k. It 
+#      may be (if necessary) computed with track analytical features or 
+#      global external data such as DTM slope.
+#    - resolution: search grid resolution (in ground units). Note that the 
+#      number N of states varies as the inverse of O(r^2), with r being the 
+#      search grid resolution, while the time complexity of the overall 
+#      algorithm is O(n^2). Therefore, the time required to compute a 
+#      solution is proportional to the 4th power of (1/r). A resolution 
+#      twice thinner implies 16 times longer computation. As thumb rule, the 
+#      resoluton should be chosen around sigma/3, where sigma is the 
+#      positional standrad deviation (in ground units). So, for a typical 
+#      (standard positioning) GPS receiver with 3 m error, a search grid 
+#      resolution of 1 m provides a thin modelization.    
+# --------------------------------------------------------------------------
+def __Markov_S(track, i):
+    N = 4; resolution = 10
+    etats = []
+    for kx in range(-N,N+1):
+        for ky in range(-N,N+1):
+            p = track[i].position.copy()
+            p.translate(resolution*kx, resolution*ky)
+            etats.append(p)
+    return etats 
+	
+def __Markov_Qlog(pi, pj, k, track):
+    v = pi.distance2DTo(pj)
+    return -(v/1)**2
+	
+def __Markov_Plog(pi, y, k, track):
+    return -(pi.distance2DTo(y)/20)**2
+	
+def MarkovRegularization(track, sigma, speed, resolution):
+    N = 3*sigma/resolution
+    model = Dynamics.HMM()
+    model.setStates(__Markov_S)
+    model.setTransitionModel(__Markov_Qlog)
+    model.setObservationModel(__Markov_Plog)
+    model.setLog(True)
+    model.estimate(track, obs=["x","y","z"], mode=Dynamics.MODE_OBS_AND_STATES_AS_3D_POSITIONS)
 
 # --------------------------------------------------------------------------
 # Generic method to filter a track with Fast Fourier Transforms

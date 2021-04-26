@@ -21,8 +21,16 @@ import tracklib.core.Operator as Operator
 import tracklib.core.Kernel as Kernel
 
 MODE_OBS_AS_SCALAR = 0
-MODE_OBS_AS_2D_POSITION = 1
-MODE_OBS_AS_3D_POSITION = 2
+MODE_OBS_AS_2D_POSITIONS = 1
+MODE_OBS_AS_3D_POSITIONS = 2
+MODE_OBS_AND_STATES_AS_2D_POSITIONS = 3
+MODE_OBS_AND_STATES_AS_3D_POSITIONS = 4
+MODE_STATES_AS_POSITIONS = 5
+
+MODE_VERBOSE_NONE = 0
+MODE_VERBOSE_ALL = 1
+MODE_VERBOSE_PROGRESS = 2
+MODE_VERBOSE_PROGRESS_BY_EPOCH = 3
 
 # -------------------------------------------------------
 # Hidden Markov Model is designed to estimate discrete 
@@ -86,7 +94,7 @@ class HMM:
         p = self.P(s, y, k, track)
         if not (self.log):
             p = math.log(p + 1e-300)
-        return p 	
+        return p     
 
     # ------------------------------------------------------------
     # Internal function to get all observations at epoch k in a 
@@ -97,7 +105,7 @@ class HMM:
     
         y = track.getObsAnalyticalFeatures(obs,k)
         
-        if mode == MODE_OBS_AS_2D_POSITION:    
+        if mode in [MODE_OBS_AS_2D_POSITIONS, MODE_OBS_AND_STATES_AS_2D_POSITIONS]:    
             if len(y) < 2:
                 print("Error: wrong number of observations in HMM to form 2D position")
                 exit()
@@ -105,7 +113,7 @@ class HMM:
             for remain in range(2,len(y)):
                 ytemp.append(y[remain])
             y = ytemp
-        if mode == MODE_OBS_AS_3D_POSITION:     
+        if mode in [MODE_OBS_AS_3D_POSITIONS, MODE_OBS_AND_STATES_AS_3D_POSITIONS]:     
             if len(y) < 3:
                 print("Error: wrong number of observations in HMM to form 3D position")
                 exit()
@@ -115,6 +123,20 @@ class HMM:
             y = ytemp
 
         return utils.unlistify(y)
+        
+    # Method to deal with computation trace    
+    def printTrace(self, message, importance, level):
+        if level in importance:
+            print(message)
+            
+    def printSeparator(self, importance, level, type):
+        if level in importance:
+            if type == 0:
+                style = "--------------------------------------"
+            if type == 1:
+                style = "======================================"
+            print(style+style)
+
 
     # ------------------------------------------------------------
     # Main function of HMM object, to estimate (decode) the 
@@ -129,28 +151,32 @@ class HMM:
     #        - MODE_OBS_AS_2D_POSITION: the first two fields 
     #          of  obs are used to make a Coords object. 
     #          Z component is set to 0 as default.
-    #        - MODE_OBS_AS_3D_POSITION: the first three fields
+    #        - MODE_OBS_AS_3D_POSITIONS: the first three fields
     #          of obs are used to make a Coords object
-    #     For MODE_OBS_AS_2D_POSITION and MODE_OBS_AS_3D_POSITION
+    #     For MODE_OBS_AS_2D_POSITIONS / MODE_OBS_AS_3D_POSITIONS
     #     modes, coordinates SRID is the same as track SRID.
     # ------------------------------------------------------------
-    def estimate(self, track, obs, log=False, mode=MODE_OBS_AS_SCALAR, verbose=True):
+    def estimate(self, track, obs, log=False, mode=MODE_OBS_AS_SCALAR, verbose=MODE_VERBOSE_PROGRESS_BY_EPOCH):
         
-	    # -----------------------------------------------
+        # -----------------------------------------------
         # Preprocessing
-        # -----------------------------------------------	
-        print("Compilation of states on track")
+        # -----------------------------------------------
+        self.printTrace("Compilation of states on track", [1,2,3], verbose)
+            
         N = len(track); STATES = []
         for k in range(N):
             STATES.append(self.S(track, k))
-			
+            
         TAB_MRK = []; TAB_VAL = []; 
-        print("Cost and marker matrix initialization")
+        
+        self.printTrace("Cost and marker matrix initialization", [1,2,3], verbose)
+        
         for k in range(N):
             TAB_MRK.append([0]*len(STATES[k]))
             TAB_VAL.append([0]*len(STATES[k]))
-            
-        print("Compilation of observations on track")
+             
+        self.printTrace("Compilation of observations on track", [1,2,3], verbose)
+
         OBS = []
         for k in range(N):
             OBS.append(self.__getObs(track, obs, k, mode))
@@ -158,35 +184,71 @@ class HMM:
         for l in range(len(TAB_MRK[0])):
             TAB_MRK[0][l] = -1
             TAB_VAL[0][l] =  -self.Plog(STATES[0][l],OBS[0],0,track)
-	
-	    # -----------------------------------------------
+    
+        # -----------------------------------------------
         # Forward step
-        # -----------------------------------------------		
-        print("Optimal sequence computation")
-        for k in range(1, N):
-            print("Epoch", str(k+1)+"/"+str((len(TAB_MRK))), " ("+str(len(TAB_MRK[k]))+" states)")
+        # -----------------------------------------------    
+        self.printTrace("Optimal sequence computation", [1,2,3], verbose)        
+
+        EPOCHS = range(1, N)
+        if verbose == MODE_VERBOSE_PROGRESS:
+            EPOCHS = progressbar.progressbar(EPOCHS)
+        for k in EPOCHS:
+
             y  = OBS[k]
-            for l in progressbar.progressbar(range(len(TAB_MRK[k]))):
+            STATES_TO_TEST = range(len(TAB_MRK[k]))
+
+            message = "Epoch "+str(k+1)+"/"+str((len(TAB_MRK)))+" ("+str(len(TAB_MRK[k]))+" states)"
+            self.printTrace(message, [1,3], verbose)
+
+            if (verbose == MODE_VERBOSE_PROGRESS_BY_EPOCH):
+                STATES_TO_TEST = progressbar.progressbar(STATES_TO_TEST)
+
+            for l in STATES_TO_TEST:
+
                 best_val = 1e300
                 best_ant = 0
                 s2 = STATES[k][l]
+
                 for m in range(len(TAB_MRK[k-1])):
+
                     s1 = STATES[k-1][m]
-                    val  = -self.Qlog(s1,s2,k-1,track) + TAB_VAL[k-1][m]
+                    q = -self.Qlog(s1,s2,k-1,track)
+                    val  = q + TAB_VAL[k-1][m]
+
+                    message  = "State "+str(l)+"/"+str(k-1)+" "+str(s1)+" --> " 
+                    message += "state "+str(m)+"/"+str(k)  +" "+str(s2) 
+                    message += " TRANSITION COST = " + str(q)
+                    self.printTrace(message, [1], verbose)
+
                     if val < best_val:
                         best_val = val
                         best_ant = m
+
+                p = -self.Plog(s2,y,k,track)
                 TAB_MRK[k][l] = best_ant
-                TAB_VAL[k][l] = best_val - self.Plog(s2,y,k,track)			
+                TAB_VAL[k][l] = best_val + p
+
+                message  = "State "+str(l)+"/"+str(k-1)+" "+str(s1)+" to "
+                message += str(y)+"  OBS COST = "+str(p)
+                self.printTrace(message, [1], verbose)
+                self.printSeparator([1], verbose, 0)
+
+            self.printSeparator([1], verbose, 1)    
         
-		# -----------------------------------------------
-        # Backward step	
-		# -----------------------------------------------
-        track.createAnalyticalFeature("hmm_output")
+        # -----------------------------------------------
+        # Backward step    
+        # -----------------------------------------------
+        self.printTrace("Backward reconstruction phase", [1,2,3], verbose) 
+        track.createAnalyticalFeature("hmm_inference")
+        track.createAnalyticalFeature("hmm_cost")
         idk = np.argmin(TAB_VAL[-1])
         for k in range(N-1,-1,-1):
-            track.setObsAnalyticalFeature("hmm_output", k, STATES[k][idk])
-            track[k].position = STATES[k][idk]
+            self.printTrace("Step "+str(k)+": state "+str(idk)+" (cost: "+str(TAB_VAL[k][idk])+")", [1], verbose)
+            track.setObsAnalyticalFeature("hmm_inference", k, STATES[k][idk])
+            track.setObsAnalyticalFeature("hmm_cost", k, TAB_VAL[k][idk])
+            if mode in [3,4,5]:
+                track[k].position = STATES[k][idk]
             idk = TAB_MRK[k][idk]
- 
-        return track["hmm_output"]
+
+        self.printSeparator([1], verbose, 1)  
