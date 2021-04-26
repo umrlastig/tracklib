@@ -72,7 +72,6 @@ def speed(track, i):
         return ds / dt
             
     
-    
 def acceleration(track, i):
     ''' Acceleration instantannée de la trace '''
     if i == 0:

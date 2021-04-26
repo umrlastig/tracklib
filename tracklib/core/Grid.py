@@ -10,7 +10,7 @@ from datetime import datetime
 import math
 import matplotlib.pyplot as plt
 import numpy as np
-from skimage import io
+#from skimage import io
 #from PIL import Image
 
 import tracklib.core.Utils as utils
@@ -100,7 +100,12 @@ class Grid:
     
     
     def addAnalyticalFunctionForSummarize(self, collection, af_algos, aggregates):
-       
+
+        if not isinstance(af_algos, list):
+            af_algos = [af_algos]
+        if not isinstance(aggregates, list):
+            aggregates = [aggregates]
+
         if len(af_algos) == 0:
             print("Error: af_algos is empty")
             return 0
@@ -168,8 +173,9 @@ class Grid:
                 #Y = float(obs.position.getY()) - self.YOrigin
                 Y = self.YOrigin - float(obs.position.getY())
                 line = math.floor(Y / self.YPixelSize)
-                
+
                 if (0 <= column and column < self.ncol and 0 <= line and line < self.nrow):
+
                     val = trace.getObsAnalyticalFeature(af_name, i)
                     self.tabcel[line][column].vals[af_name].append(val)
 ##                else:

@@ -34,7 +34,7 @@ import tracklib.core.Plot as Plot
 
 class Track:
 
-    def __init__(self, list_of_obs=None, user_id=0, track_id=0):
+    def __init__(self, list_of_obs=None, user_id=0, track_id=0, base=None):
         '''
         Takes a (possibly empty) list of points as input
         '''
@@ -45,7 +45,7 @@ class Track:
             
         self.uid = user_id
         self.tid = track_id
-        self.base = None   # Base (ECEF coordinates) for ENU projection
+        self.base = base   # Base (ECEF coordinates) for ENU projection
         
         self.__analyticalFeaturesDico = {}
         
@@ -155,34 +155,49 @@ class Track:
             raise IndexError
         return self.__POINTS[i]
     
-    def getX(self):
-        X = []
-        for i in range(self.size()):
-            X.append(self.__POINTS[i].position.getX())
+    def getX(self, i=None):
+        if i is None:
+            X = []
+            for i in range(self.size()):
+                X.append(self.__POINTS[i].position.getX())
+        else:
+            X = self.__POINTS[i].position.getX()
         return X
         
-    def getY(self):
-        Y = []
-        for i in range(self.size()):
-            Y.append(self.__POINTS[i].position.getY())
+    def getY(self, i=None):
+        if i is None:
+            Y = []
+            for i in range(self.size()):
+                Y.append(self.__POINTS[i].position.getY())
+        else:
+            Y = self.__POINTS[i].position.getY()
         return Y
         
-    def getZ(self):
-        Z = []
-        for i in range(self.size()):
-            Z.append(self.__POINTS[i].position.getZ())
+    def getZ(self, i=None):
+        if i is None:
+            Z = []
+            for i in range(self.size()):
+                Z.append(self.__POINTS[i].position.getZ())
+        else:
+            Z = self.__POINTS[i].position.getZ()
         return Z
         
-    def getT(self):
-        T = []
-        for i in range(self.size()):
-            T.append(self.__POINTS[i].timestamp.toAbsTime())
+    def getT(self, i=None):
+        if i is None:
+            T = []
+            for i in range(self.size()):
+                T.append(self.__POINTS[i].timestamp.toAbsTime())
+        else:
+            T = self.__POINTS[i].timestamp.toAbsTime()
         return T
     
-    def getTimestamps(self):
-        T = []
-        for i in range(self.size()):
-            T.append(self.__POINTS[i].timestamp)
+    def getTimestamps(self, i=None):
+        if i is None:
+            T = []
+            for i in range(self.size()):
+                T.append(self.__POINTS[i].timestamp)
+        else:
+            T = self.__POINTS[i].timestamp
         return T
 		
     def getCentroid(self):
@@ -235,13 +250,20 @@ class Track:
         for i in range(self.size()):
             self.getObs(i).position = delta + self.getObs(i).position
                   
-    # Internal method
+    # Internal methods
     def __transmitAF(self, track):
         self.__analyticalFeaturesDico = track.__analyticalFeaturesDico.copy()
 	
     def hasAnalyticalFeature(self, af_name):
         return af_name in self.__analyticalFeaturesDico
-        
+
+    def getAnalyticalFeatures(self, af_names): 
+        af_names = utils.listify(af_names) 
+        output = []
+        for af in af_names:
+            output.append(self.getAnalyticalFeature(af))
+        return output	
+ 
     def getAnalyticalFeature(self, af_name):
         AF = []
         if af_name == "x":
@@ -270,7 +292,14 @@ class Track:
         for i in range(self.size()):
             AF.append(self.__POINTS[i].features[index])
         return AF    
-                
+  
+    def getObsAnalyticalFeatures(self, af_names, i):
+        af_names = utils.listify(af_names)
+        output = []
+        for af in af_names:
+            output.append(self.getObsAnalyticalFeature(af, i))
+        return output	
+
     def getObsAnalyticalFeature(self, af_name, i):
         if af_name == "x":
             return self.getObs(i).position.getX()
@@ -539,6 +568,11 @@ class Track:
             output += "  Duration     : " + (str)('{:7.3f}'.format(t2-t1)) + " s\n"
             output += "  Length       : " + (str)('{:1.3f}'.format(self.length())) + " m\n"
         output += "-------------------------------------\n"
+        if len(self.getListAnalyticalFeatures()) > 0:
+            output += "Analytical feature(s):"
+            for i in range(len(self.getListAnalyticalFeatures())):
+                output += "\n - "+self.getListAnalyticalFeatures()[i] 
+            output += "\n-------------------------------------\n"		    			
         print(output)
         
         
@@ -594,7 +628,7 @@ class Track:
         id_ini: Initial index of extraction
         id_fin: final index of extraction
         '''
-        track = Track()
+        track = Track(base=self.base)
         track.setUid(self.uid)
         for k in range(id_ini, id_fin+1):
             track.addObs(self.__POINTS[k])
@@ -612,7 +646,7 @@ class Track:
             ttemp = tini
             tini = tfin
             tfin = ttemp
-        track = Track([], self.uid)
+        track = Track([], self.uid, base=self.base)
         for k in range(self.size()):
             if (self.__POINTS[k].timestamp < tini):
                 continue
@@ -835,10 +869,26 @@ class Track:
     # =========================================================================
     # Graphical methods
     # =========================================================================
-    def plotAsMarkers(self, size=8, frg='k', bkg='w', sym='+'):
-        plt.plot(self.getX(), self.getY(), frg+'o', markersize=size)
-        plt.plot(self.getX(), self.getY(), bkg+'o', markersize=int(0.8*size))
-        plt.plot(self.getX(), self.getY(), frg+sym, markersize=int(0.8*size))
+    def plotAsMarkers(self, size=8, frg='k', bkg='w', sym_frg='+', sym_bkg='o', type=None):
+        if not type is None:
+            if type == Plot.MARKERS_TYPE_NO_ENTRY:
+                frg='w'; bkg='r'; sym_frg='_'; sym_bkg='o'
+            if type == Plot.MARKERS_TYPE_INTERDICTION:
+                frg='w'; bkg='r'; sym_frg='.'; sym_bkg='o'
+            if type == Plot.MARKERS_TYPE_SPOT:
+                frg='r'; bkg='w'; sym_frg='.'; sym_bkg='o'
+            if type == Plot.MARKERS_TYPE_WARNING:
+                frg='r'; bkg='w'; sym_frg=' '; sym_bkg='^'
+            if type == Plot.MARKERS_TYPE_GIVE_WAY:
+                frg='r'; bkg='w'; sym_frg=' '; sym_bkg='v'
+            if type == Plot.MARKERS_TYPE_NO_STOP:
+                frg='r'; bkg='b'; sym_frg='x'; sym_bkg='o'
+            if type == Plot.MARKERS_TYPE_INFORMATION:
+                frg='b'; bkg='w'; sym_frg=' '; sym_bkg='s'
+
+        plt.plot(self.getX(), self.getY(), frg+sym_bkg, markersize=size)
+        plt.plot(self.getX(), self.getY(), bkg+sym_bkg, markersize=int(0.8*size))
+        plt.plot(self.getX(), self.getY(), frg+sym_frg, markersize=int(0.8*size))
 	
 	
     def plot(self, type='LINE', af_name = '', cmap = -1):
@@ -1218,12 +1268,17 @@ class Track:
     # [+] Concatenation of two tracks
     # ------------------------------------------------------------
     def __add__(self, track):
+        t1 = self   # copy (long) ?
+        t2 = track  # copy (long) ?
         AF1 = self.getListAnalyticalFeatures()
         AF2 = track.getListAnalyticalFeatures()
-        track = Track(self.__POINTS + track.__POINTS, self.uid, self.tid)
+        track = Track(t1.__POINTS + t2.__POINTS, t1.uid, t1.tid, base=t1.base)
         same = True
-        for i in range(len(AF1)):
-            same = same and (AF1[i] == AF2[i])
+        if len(AF1) != len(AF2):
+            same = False
+        else:
+            for i in range(len(AF1)):
+                same = same and (AF1[i] == AF2[i])
         if same:
             track.__transmitAF(self)		
         return track
@@ -1238,7 +1293,7 @@ class Track:
         for i in range(number+1):
             id_ini = i*N
             id_fin = min((i+1)*N, self.size())+1
-            portion = Track(self.__POINTS[id_ini:id_fin])
+            portion = Track(self.__POINTS[id_ini:id_fin], base=self.base)
             portion.__transmitAF(self)
             SPLITS.addTrack(portion)
         return SPLITS
@@ -1252,7 +1307,7 @@ class Track:
             t2f = arg.getLastObs().timestamp            
             return (t1i > t2f)			
         else:
-            output = Track(self.__POINTS[arg:self.size()], self.uid, self.tid)
+            output = Track(self.__POINTS[arg:self.size()], self.uid, self.tid, self.base)
             output.__transmitAF(self)
             return output
 		
@@ -1265,7 +1320,7 @@ class Track:
             t2i = arg.getFirstObs().timestamp            
             return (t1f < t2i)
         else:
-            output = Track(self.__POINTS[0:(self.size()-arg)], self.uid, self.tid)
+            output = Track(self.__POINTS[0:(self.size()-arg)], self.uid, self.tid, self.base)
             output.__transmitAF(self)
             return output
 		
@@ -1356,11 +1411,11 @@ class Track:
     # ------------------------------------------------------------    
     def __mod__(self, sample):
         if isinstance(sample, int):
-            track = Track(self.__POINTS[::sample], self.uid, self.tid)
+            track = Track(self.__POINTS[::sample], self.uid, self.tid, base=self.base)
             track.__transmitAF(self)
             return track
         if isinstance(sample, list):
-            track = Track()
+            track = Track(base=self.base)
             for i in range(self.size()):
                 if (sample[i%len(sample)]):
                     track.addObs(self.getObs(i))
