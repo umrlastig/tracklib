@@ -82,7 +82,7 @@ Examples
 
    install
    quickstart
-..   convention
+   convention
    
 .. toctree::
    :maxdepth: 1

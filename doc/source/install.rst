@@ -10,8 +10,8 @@ Install
 Installing from source
 ==========================
 
-Developer mode 
----------------
+Tracklib developer mode 
+-------------------------
 
 1. You may install the latest development version by cloning the GitLab repository:
 
