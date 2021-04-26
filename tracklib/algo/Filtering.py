@@ -24,6 +24,13 @@ FILTER_XZ = ["x","z"]
 FILTER_YZ = ["y","z"]
 FILTER_XYZ = ["x","y","z"]
 
+# -----------------------------------------
+# Global variables for Markov filtering
+# -----------------------------------------
+sig = 0
+res = 0
+# -----------------------------------------
+
 # --------------------------------------------------------------------------
 # TO DO: Gaussian process filtering
 # --------------------------------------------------------------------------
@@ -76,27 +83,25 @@ def Kalman(track):
 #      resolution of 1 m provides a thin modelization.    
 # --------------------------------------------------------------------------
 def __Markov_S(track, i):
-    N = 4; resolution = 10
     etats = []
+    N = int(3*sig/res)+1
     for kx in range(-N,N+1):
         for ky in range(-N,N+1):
             p = track[i].position.copy()
-            p.translate(resolution*kx, resolution*ky)
+            p.translate(res*kx, res*ky)
             etats.append(p)
     return etats 
-	
-def __Markov_Qlog(pi, pj, k, track):
-    v = pi.distance2DTo(pj)
-    return -(v/1)**2
 	
 def __Markov_Plog(pi, y, k, track):
     return -(pi.distance2DTo(y)/20)**2
 	
 def MarkovRegularization(track, sigma, speed, resolution):
-    N = 3*sigma/resolution
+    global res, sig
+    sig = sigma
+    res = resolution
     model = Dynamics.HMM()
     model.setStates(__Markov_S)
-    model.setTransitionModel(__Markov_Qlog)
+    model.setTransitionModel(speed)
     model.setObservationModel(__Markov_Plog)
     model.setLog(True)
     model.estimate(track, obs=["x","y","z"], mode=Dynamics.MODE_OBS_AND_STATES_AS_3D_POSITIONS)
