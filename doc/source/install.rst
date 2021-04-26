@@ -17,7 +17,7 @@ Tracklib developer mode
 
 .. code-block:: shell
 
-   git clone https://github.com/IGNF/tracklib.git
+   git clone https://github.com/umrlastig/tracklib.git
    cd tracklib
 
 
