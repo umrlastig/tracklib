@@ -139,53 +139,54 @@ class HMM:
 	    # -----------------------------------------------
         # Preprocessing
         # -----------------------------------------------	
-        TAB_ARG = []; TAB_MIN = [];
-        print("Dynamic programming matrix initialization")
-        for k in range(len(track)):
-            TAB_ARG.append([0]*len(self.S(track, k)))
-            TAB_MIN.append([0]*len(self.S(track, k)))
-            
         print("Compilation of states on track")
-        STATES = []
-        for k in range(len(track)):
+        N = len(track); STATES = []
+        for k in range(N):
             STATES.append(self.S(track, k))
+			
+        TAB_MRK = []; TAB_VAL = []; 
+        print("Cost and marker matrix initialization")
+        for k in range(N):
+            TAB_MRK.append([0]*len(STATES[k]))
+            TAB_VAL.append([0]*len(STATES[k]))
             
         print("Compilation of observations on track")
         OBS = []
-        for k in range(len(track)):
+        for k in range(N):
             OBS.append(self.__getObs(track, obs, k, mode))
-    
+   
+        for l in range(len(TAB_MRK[0])):
+            TAB_MRK[0][l] = -1
+            TAB_VAL[0][l] =  -self.Plog(STATES[0][l],OBS[0],0,track)
+	
 	    # -----------------------------------------------
         # Forward step
         # -----------------------------------------------		
         print("Optimal sequence computation")
-        for k in range(1, len(TAB_ARG)):
-            print("Epoch", str(k)+"/"+str((len(TAB_ARG)-1)), " ("+str(len(TAB_ARG[k]))+" states)")
+        for k in range(1, N):
+            print("Epoch", str(k+1)+"/"+str((len(TAB_MRK))), " ("+str(len(TAB_MRK[k]))+" states)")
             y  = OBS[k]
-            for l in progressbar.progressbar(range(len(TAB_ARG[k]))):
+            for l in progressbar.progressbar(range(len(TAB_MRK[k]))):
                 best_val = 1e300
                 best_ant = 0
                 s2 = STATES[k][l]
-                for m in range(len(TAB_ARG[k-1])):
+                for m in range(len(TAB_MRK[k-1])):
                     s1 = STATES[k-1][m]
-                    val  = -(self.Qlog(s1,s2,k,track) + self.Plog(s1,y,k-1,track))
-                    val += TAB_MIN[k-1][l]
+                    val  = -self.Qlog(s1,s2,k-1,track) + TAB_VAL[k-1][m]
                     if val < best_val:
                         best_val = val
-                        best_ant = m	
-
-                TAB_ARG[k][l] = best_ant
-                TAB_MIN[k][l] = best_val
-            idx_min = np.argmin(TAB_MIN[k])
+                        best_ant = m
+                TAB_MRK[k][l] = best_ant
+                TAB_VAL[k][l] = best_val - self.Plog(s2,y,k,track)			
         
 		# -----------------------------------------------
         # Backward step	
 		# -----------------------------------------------
         track.createAnalyticalFeature("hmm_output")
-        idk = np.argmin(TAB_MIN[-1])
-        for k in range(len(TAB_ARG)-1,-1,-1):
+        idk = np.argmin(TAB_VAL[-1])
+        for k in range(N-1,-1,-1):
             track.setObsAnalyticalFeature("hmm_output", k, STATES[k][idk])
             track[k].position = STATES[k][idk]
-            idk = TAB_ARG[k][idk]
+            idk = TAB_MRK[k][idk]
  
         return track["hmm_output"]

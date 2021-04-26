@@ -21,10 +21,13 @@ import tracklib.algo.Interpolation as Interpolation
 import tracklib.core.Operator as Operator
 import tracklib.core.Kernel as Kernel
 
+DISTRIBUTION_NORMAL = 1
+DISTRIBUTION_UNIFORM = 2
+DISTRIBUTION_LAPLACE = 3
 
 class NoiseProcess:
 
-    def __init__(self, amps=None, kernels=None):
+    def __init__(self, amps=None, kernels=None, distribution=DISTRIBUTION_NORMAL):
 		
         if amps is None:
            self.amplitudes = [1]
@@ -32,6 +35,8 @@ class NoiseProcess:
         else:
            self.amplitudes = utils.listify(amps)
            self.kernels = utils.listify(kernels)
+
+        self.distribution = distribution
 
         if len(self.amplitudes) != len(self.kernels): 
             print("Error: amplitude and kernel lists must have same size in NoiseProcess")
@@ -46,7 +51,7 @@ class NoiseProcess:
         return output
 		
     def noise(self, track):
-        return track.noise(self.amplitudes, self.kernels) 
+        return noise(track, self.amplitudes, self.kernels, self.distribution) 
 		
     def plot(self):
         dh = self.kernels[0].support/500.0
@@ -81,7 +86,7 @@ def gaussian_process(self, timestamps, kernel, factor=1.0, sigma=0.0, cp_var=Fal
 def randomColor():
     return [random.random(),random.random(),random.random()]
 	
-def noise(track, sigma=[1], kernel=[Kernel.DiracKernel()]):
+def noise(track, sigma=[1], kernel=[Kernel.DiracKernel()], distribution=DISTRIBUTION_NORMAL):
     '''Track noising with Cholesky factorization of gaussian 
     process covariance matrix: h(x2-x1)=exp(-((x2-x1)/scope)**2)
     If X is a gaussian white noise, Cov(LX) = L^t*L => if L is a 
@@ -90,12 +95,10 @@ def noise(track, sigma=[1], kernel=[Kernel.DiracKernel()]):
     track: the track to be smoothed (input track is not modified)
     sigma: noise amplitude(s) (in observation coordinate units)
     kernel: noise autocovariance function(s)'''
-    if not isinstance(sigma, list):
-        sigma = [sigma]
-        
-    if not isinstance(kernel, list):
-        kernel = [kernel]
-        
+	
+    sigma = utils.listify(sigma)
+    kernel = utils.listify(kernel)       
+
     if len(sigma) != len(kernel):
         sys.exit("Error: amplitude and kernel arrays must have same size in 'noise' function")
     
@@ -113,15 +116,24 @@ def noise(track, sigma=[1], kernel=[Kernel.DiracKernel()]):
     
         # Cholesky decomposition
         L = np.linalg.cholesky(SIGMA_S)
-    
+   
         # Noise simulation
-        Xx = np.random.normal(0.0, 1.0, N)
-        Xy = np.random.normal(0.0, 1.0, N)
-        Xz = np.random.normal(0.0, 1.0, N)
+        if distribution == DISTRIBUTION_NORMAL:
+            Xx = np.random.normal(0.0, 1.0, N)
+            Xy = np.random.normal(0.0, 1.0, N)
+            Xz = np.random.normal(0.0, 1.0, N)
+        if distribution == DISTRIBUTION_UNIFORM:
+            Xx = np.random.uniform(-1.73205, 1.73205, N)
+            Xy = np.random.uniform(-1.73205, 1.73205, N)
+            Xz = np.random.uniform(-1.73205, 1.73205, N)
+        if distribution == DISTRIBUTION_LAPLACE:
+            Xx = np.random.laplace(0.0, 0.5, N)
+            Xy = np.random.laplace(0.0, 0.5, N)
+            Xz = np.random.laplace(0.0, 0.5, N)
         Yx = np.matmul(L, Xx)
         Yy = np.matmul(L, Xy)
         Yz = np.matmul(L, Xz)
-    
+ 
         # Building noised track
         for i in range(N):
             pt = noised_track.getObs(i).position
