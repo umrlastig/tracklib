@@ -13,6 +13,10 @@ from tracklib.core.GPSTime import GPSTime
 
 import tracklib.core.Track as Track
 import tracklib.core.Utils as Utils
+import tracklib.core.Operator as Operator
+import tracklib.core.TrackCollection as TrackCollection
+
+import tracklib.algo.Interpolation as interp
 
 MODE_ENCLOSING_BBOX = 0
 MODE_ENCLOSING_MBR = 1
@@ -87,13 +91,13 @@ def __intersects(segment1, segment2):
     param_1 = __cartesienne(segment1)
     param_2 = __cartesienne(segment2)
 
-#    a1 = param_1[0]
-#    b1 = param_1[1]
-#    c1 = param_1[2]
-#    
-#    a2 = param_2[0]
-#    b2 = param_2[1]
-#    c2 = param_2[2]
+    a1 = param_1[0]
+    b1 = param_1[1]
+    c1 = param_1[2]
+    
+    a2 = param_2[0]
+    b2 = param_2[1]
+    c2 = param_2[2]
 
     x11 = segment1[0]
     y11 = segment1[1]
@@ -382,8 +386,7 @@ def __circle(p1, p2=None, p3=None):
 	centre.setY(-np.imag(c));	
 	return [centre, np.abs(c+x)]
 	
-
-def welzl(P, R):
+def __welzl(P, R):
 	'''Finds minimal bounding circle with Welzl's algorithm'''
 	
 	P = P.copy()
@@ -406,12 +409,13 @@ def welzl(P, R):
 			continue
 		P2.append(P[i])
 	P = P2
-	D = welzl(P, R)
+	D = __welzl(P, R)
 	if (p.distance2DTo(D[0]) < D[1]):
 		return D
 	else:
 		R.append(p)
-		return welzl(P, R)
+		return __welzl(P, R)
+	
 	
 	
 def plotCircle(S, color=[1,0,0,1]):
@@ -450,8 +454,7 @@ def minCircle(track):
 	algorithm in O(n) complexity. Output is given as a list 
 	[p, R], where p is a Coords object defining circle center
 	and R is its radius. Due to recursion limits, only tracks 
-	with fewer than 800 points can be processed
-    '''	
+	with fewer than 800 points can be processed'''	
 	if not track.getSRID() == "ENU":
 		print("Error: ENU coordinates are required for min circle computation")
 		exit()
@@ -462,13 +465,13 @@ def minCircle(track):
 		print(message)
 		exit()
 	
-	#centre = track.getFirstObs().position.copy()
+	centre = track.getFirstObs().position.copy()
+	
 	P = [obs.position for obs in track]
 	R = []
 		
-	return welzl(P,R)
+	return __welzl(P,R)
 	
-
 def minCircleMatrix(track):
 	'''Computes matrix of all min circles in a track.
 		M[i,j] gives the radius of the min circle enclosing 
@@ -494,7 +497,7 @@ def __mbr(COORDS):
 	
 	for i in range(len(HULL)-1):
 	
-		#param = __cartesienne([XH[i], YH[i], XH[i+1], YH[i+1]])	
+		param = __cartesienne([XH[i], YH[i], XH[i+1], YH[i+1]])	
 		theta = math.atan((YH[i+1]-YH[i])/(XH[i+1]-XH[i]))
 	
 		# 3 parameters transformation
