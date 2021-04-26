@@ -8,12 +8,13 @@ import progressbar
 import numpy as np
 import matplotlib.pyplot as plt
 
+from tracklib.core.Coords import ENUCoords
 from tracklib.core.Obs import Obs
+from tracklib.core.Track import Track
 from tracklib.core.TrackCollection import TrackCollection
 from tracklib.core.Kernel import GaussianKernel
 from tracklib.core.GPSTime import GPSTime
-from tracklib.core.Track import Track
-from tracklib.core.Coords import ENUCoords
+
 
 import tracklib.core.Utils as utils
 import tracklib.algo.Analytics as Analytics
