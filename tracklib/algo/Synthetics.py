@@ -25,7 +25,8 @@ import tracklib.core.Kernel as Kernel
 # =========================================================================
 # Generate analytical track
 # =========================================================================
-def generate(x_t=0.3, y_t=None, z_t=None, date_ini=None, date_fin=None, dt=None):
+def generate(x_t=0.3, y_t=None, z_t=None, date_ini=None, date_fin=None, dt=None, verbose=True):
+    random.seed(123)
     randomTrack = (y_t is None)
     if randomTrack:
         scope = 100*x_t
@@ -42,7 +43,8 @@ def generate(x_t=0.3, y_t=None, z_t=None, date_ini=None, date_fin=None, dt=None)
     track = Track()
     tps = date_ini.copy()
     N = (date_fin-date_ini)/dt
-    print("Generating track from", date_ini, "to", date_fin)
+    if verbose:
+        print("Generating track from", date_ini, "to", date_fin)
     for i in range((int)(N)):
         t = i/(N-1.0)
         tps = tps.addSec(dt)

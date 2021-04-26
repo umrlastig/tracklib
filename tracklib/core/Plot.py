@@ -12,6 +12,13 @@ import tracklib.core.Utils as utils
 
 COLOR_POINT = ['gold', 'orangered', 'dodgerblue', 'purple', 'lime', 'turquoise']
 
+MARKERS_TYPE_NO_ENTRY = 0
+MARKERS_TYPE_INFORMATION = 1
+MARKERS_TYPE_NO_STOP = 2
+MARKERS_TYPE_GIVE_WAY = 3
+MARKERS_TYPE_WARNING = 4
+MARKERS_TYPE_SPOT = 5
+MARKERS_TYPE_INTERDICTION = 6
 
 class Plot:
     

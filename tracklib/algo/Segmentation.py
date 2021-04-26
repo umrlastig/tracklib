@@ -6,10 +6,11 @@ import sys
 import progressbar
 import numpy as np
 
-from tracklib.core.Track import Track
 from tracklib.core.Obs import Obs
-from tracklib.core.TrackCollection import TrackCollection
+from  tracklib.core.Coords import ENUCoords
 
+import tracklib.core.Track as core_track
+import tracklib.core.Track as core_trackCollection
 import tracklib.core.Utils as utils
 import tracklib.algo.Geometrics as Geometrics
 import tracklib.algo.Interpolation as interp
@@ -24,19 +25,16 @@ MODE_STOPS_GLOBAL = 1
 MODE_SPLIT_RETURN_EXHAUSTIVE = 0
 MODE_SPLIT_RETURN_FAST = 1
 
+MODE_SEGMENTATION_MINIMIZE = 0
+MODE_SEGMENTATION_MAXIMIZE = 1
+
 # -------------------------------------------------------------------------
 # Segmentation and Split track
 # -------------------------------------------------------------------------
     
 def segmentation(track, afs_input, af_output, thresholds_max, mode_comparaison = MODE_COMPARAISON_AND):
-    '''
-    Méthode subdivisant la liste de points de la trace (i.e. étapes), 
-        selon des analyticals feature et des seuils. 
-    
-    Attention une étape peut ne comporter qu'un seul point.
-
-    Crée un AF avec des 0 si pas de changement, 1 sinon
-    '''
+    ''' Method to divide a track into multiple according to analytical feaures value
+    Creates an AF with 0 if change of division, 1 otherwise'''
     
     # Gestion cas un seul AF        
     if not isinstance(afs_input, list):
@@ -74,57 +72,65 @@ def segmentation(track, afs_input, af_output, thresholds_max, mode_comparaison =
             
 
 
-def split(track, af_output):
+def split(track, source):
+    '''Splits track according to:
+	   - af name (considered as a marker) if source is a string 
+       - list of index if source is a list
+	Returns no trrack if no segmentation, otherwise a TrackCollection object
     '''
-    Découpe les traces suivant la segmentation définie par le paramètre af_output.
-    Retourne aucune trace s'il n'y a pas de segmentation, 
-             sinon un tableau de nouvelles traces
-    '''
     
-    NEW_TRACES = TrackCollection()
+    NEW_TRACES = core_trackCollection.TrackCollection()
     
-    # Initialisation du compteur des étapes
-    count = 0
+	# --------------------------------------------
+	# Split from analytical feature name
+	# --------------------------------------------
+    if isinstance(source, str):
+	
+        count = 0  # Initialisation du compteur des étapes
+        begin = 0  # indice du premier point de l'étape
     
-    # indice du premier point de l'étape
-    begin = 0
-    
-    for i in range(track.size()):
+        for i in range(track.size()):
         
-        if track.getObsAnalyticalFeature(af_output, i) == 1:
-            # Nouvelle trajectoire
+            if track.getObsAnalyticalFeature(af_output, i) == 1:  # Nouvelle trajectoire
+                
+                # L'identifiant de la trace subdivisée est obtenue par concaténation 
+                # de l'identifiant de la trace initiale et du compteur
+                new_id = str(track.uid) + '.' + str(count)
             
-            # L'identifiant de la trace subdivisée est obtenue par concaténation 
-            # de l'identifiant de la trace initiale et du compteur
+                # La liste de points correspondant à l'intervalle de subdivision est créée
+                new_traj = track.extract(begin, i)
+                new_traj.setUid(new_id)
+            
+                NEW_TRACES.addTrack(new_traj)
+                count += 1
+                begin = i+1
+            
+        # Si tous les points sont dans la même classe, la liste d'étapes reste vide
+        # sinon, on clôt la derniere étape et on l'ajoute à la liste
+        if begin != 0:
             new_id = str(track.uid) + '.' + str(count)
-            
-            # La liste de points correspondant à l'intervalle de subdivision est créée
-            new_traj = track.extract(begin, i)
+            new_traj = track.extract(begin, track.size() - 1)
             new_traj.setUid(new_id)
-            
             NEW_TRACES.addTrack(new_traj)
-            count += 1
-            begin = i+1
-            
-    # Si tous les points sont dans la même classe, la liste d'étapes reste vide
-    # sinon, on clôt la derniere étape et on l'ajoute à la liste
-    if begin != 0:
-        new_id = str(track.uid) + '.' + str(count)
-        new_traj = track.extract(begin, track.size() - 1)
-        new_traj.setUid(new_id)
-        NEW_TRACES.addTrack(new_traj)
-           
+    
+	# --------------------------------------------
+	# Split from list of indices
+	# --------------------------------------------
+    if isinstance(source, list):
+        for i in range(len(source)-1):
+           NEW_TRACES.addTrack(track.extract(source[i], source[i+1]))
+
     return NEW_TRACES
     
     
 # -------------------------------------------------------------------
 # Function to find stop positions from a track
 # -------------------------------------------------------------------
-def findStops(track, spatial, temporal, mode):  
+def findStops(track, spatial, temporal, mode, verbose=True):  
     if mode == MODE_STOPS_LOCAL:
         return findStopsLocal(track, spatial, temporal)
     if mode == MODE_STOPS_GLOBAL:
-        return findStopsGlobal(track, spatial, temporal)
+        return findStopsGlobal(track, spatial, temporal, verbose)
     
 # -------------------------------------------------------------------
 # Function to find stop positions from a track
@@ -138,7 +144,7 @@ def findStops(track, spatial, temporal, mode):
 def findStopsLocal(track, speed=1e-2, duration=5):        
     
     track = track.copy()
-    stops = Track()
+    stops = core_track.Track()
    
     track.segmentation("speed", "#mark", speed)
     track.operate(Operator.Operator.DIFFERENTIATOR, "#mark")
@@ -201,9 +207,9 @@ def backward(B):
     n = B.shape[0]
     return backtracking(B, 0, n-1) + [n-1]
 
-def plotStops(stops):
+def plotStops(stops, x="x", y="y", r="radius", rf=1, sym='r-'):
     for i in range(len(stops)):
-        plotCircle([stops[i].position, stops["radius"][i]])
+        Geometrics.plotCircle([ENUCoords(stops[x][i], stops[y][i]), rf*stops[r][i]], sym)
     
 def removeStops(track, stops=None):    
     if stops is None:
@@ -214,7 +220,8 @@ def removeStops(track, stops=None):
     output = output + track.extract(stops["id_end"][-1], track.size()-1)
     return output
     
-def findStopsGlobal(track, diameter=2e-2, duration=10, downsampling=1):
+		
+def findStopsGlobal(track, diameter=2e-2, duration=10, downsampling=1, verbose=True):
     '''Find stop points in a track based on two parameters:
         Maximal size of a stop (as the diameter of enclosing circle, 
         in ground units) and minimal time duration (in seconds)
@@ -227,13 +234,16 @@ def findStopsGlobal(track, diameter=2e-2, duration=10, downsampling=1):
     
     # ---------------------------------------------------------------------------
     # Computes cost matrix as :
-    #    Cij = 0 if size of enclosing circle of pi, pi+1, ... pj is > diameter
-    #    Cij = 0 if time duration between pi and pj is < duration
-    #    Cij = (j-i+1)**2 = square of the number of points of segment otherwise
+    #    Cij = 0 if size of enclosing circle of pi, pi+1, ... pj-1 is > diameter
+    #    Cij = 0 if time duration between pi and p-1 is < duration
+    #    Cij = (j-i)**2 = square of the number of points of segment otherwise
     # ---------------------------------------------------------------------------
     C = np.zeros((track.size(), track.size()))
-    print("Minimal enclosing circles computation:")
-    for i in progressbar.progressbar(range(track.size()-2)):
+    RANGE = range(track.size()-2)
+    if verbose:
+        print("Minimal enclosing circles computation:")
+        RANGE = progressbar.progressbar(RANGE)
+    for i in RANGE:
         for j in range(i+1, track.size()-1):
             if (track[i].distance2DTo(track[j-1]) > diameter):
                 C[i,j] = 0
@@ -248,31 +258,9 @@ def findStopsGlobal(track, diameter=2e-2, duration=10, downsampling=1):
     # ---------------------------------------------------------------------------
     # Computes optimal partition with dynamic programing
     # ---------------------------------------------------------------------------
-    D = np.zeros((track.size()-1, track.size()-1))
-    M = np.zeros((track.size()-1, track.size()-1))
-    N = D.shape[0]
+    segmentation = optimalPartition(C, MODE_SEGMENTATION_MAXIMIZE, verbose)
     
-    for i in range(N):
-        for j in range(i,N):
-            D[i,j] = C[i,j]
-            M[i,j] = -1
-    
-    print("Optimal split search:")
-    for diag in progressbar.progressbar(range(2,N)):
-        for i in range(0,N-diag):
-            j=i+diag
-            for k in range(i+1,j):
-                val = D[i,k] + D[k,j]
-                if val > D[i,j]:
-                    D[i,j] =  val
-                    M[i,j] = k
-                    
-    # ---------------------------------------------------------------------------
-    # Backward phase to form optimal split
-    # ---------------------------------------------------------------------------
-    segmentation = backward(M)
-    
-    stops = Track()
+    stops = core_track.Track()
     
     TMP_RADIUS = []
     TMP_MEAN_X = []
@@ -389,3 +377,83 @@ def splitReturnTripFast(track, side_effect=0.1, sampling=1):
     TRACKS.addTrack(second_part)
     
     return TRACKS
+	
+	
+# -------------------------------------------------------------------------
+#  Generic method to segment a track with dynamic programming
+# -------------------------------------------------------------------------
+# Inputs: 
+#    - track: A track to segment (potentially with analytical features)
+#    - cost: a three or four-valued function taking as input a track, two 
+#      integers i < j and an optional global parameter, and returning 
+#      the cost of a segment from i to j (both included) in track
+#      Note that cost function may as well be considered as a reward 
+#      function, simply by setting mode to MODE_SEGMENTATION_MAXIMIZE
+#    - mode: a parameter inidcating wether cost function must be minnimized
+#      (MODE_SEGMENTATION_MINIMIZE) or maximized (MODE_SEGMENTATION_MAXIMIZE)
+#    - verbose: parameter to enable progress bar and console displays
+# Output: 
+#    - A optimal segmentation, represented as a list of indices in track
+# -------------------------------------------------------------------------
+def optimalPartition(cost_matrix, mode=MODE_SEGMENTATION_MINIMIZE, verbose=True):
+
+    N = cost_matrix.shape[0]-1
+    D = np.zeros((N,N))
+    M = np.zeros((N,N))
+    
+    for i in range(N):
+        for j in range(i,N):
+            D[i,j] = cost_matrix[i,j]
+            M[i,j] = -1
+    	
+	# ---------------------------------------------------------------------------
+    # Computes optimal partition with dynamic programing
+    # ---------------------------------------------------------------------------    
+    RANGE = range(2,N)
+    if verbose:
+        print("Optimal split search:")
+        RANGE = progressbar.progressbar(RANGE)
+    for diag in RANGE:
+        for i in range(0,N-diag):
+            j=i+diag
+            for k in range(i+1,j):
+                val = D[i,k] + D[k,j]
+                if val < D[i,j] and MODE_SEGMENTATION_MINIMIZE:
+                    D[i,j] = val
+                    M[i,j] = k
+                if val > D[i,j] and MODE_SEGMENTATION_MAXIMIZE:
+                    D[i,j] = val
+                    M[i,j] = k  					
+
+	# ---------------------------------------------------------------------------
+    # Backward phase to form optimal split
+    # ---------------------------------------------------------------------------
+    return backward(M)
+
+def optimalSegmentation(track, cost, glob_param=None, mode=MODE_SEGMENTATION_MINIMIZE, verbose=True):
+	
+	# ---------------------------------------------------------------------------
+    # Computes cost matrix as :
+    #    Cij = width of MBR of point set pi, pi+1, ... pj-1
+    # ---------------------------------------------------------------------------
+    C = np.zeros((track.size(), track.size()))
+
+    RANGE = range(track.size()-2)
+    if verbose:
+        print("Cost matrix computation:")
+        RANGE = progressbar.progressbar(RANGE)
+    for i in RANGE:
+        for j in range(i, track.size()-1): 
+            if glob_param is None:
+                C[i,j] = cost(track, i, j-1)
+            else:
+                C[i,j] = cost(track, i, j-1, glob_param)
+				
+    C = C + np.transpose(C)
+
+    return optimalPartition(C, mode, verbose)
+
+                    
+
+
+

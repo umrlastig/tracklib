@@ -418,7 +418,7 @@ def __welzl(P, R):
 	
 	
 	
-def plotCircle(S, color=[1,0,0,1]):
+def plotCircle(S, sym='r-'):
 	'''Function to plot a circle from a vector:
 	S = [Coords, radius], where Coords is ECEF, ECEF or GEO
 	Needs to call plt.show() after this function'''	
@@ -429,14 +429,14 @@ def plotCircle(S, color=[1,0,0,1]):
 		Y[t] = S[1]*math.sin(2*math.pi*t/len(Y)) + S[0].getY()
 	X[len(X)-1] = X[0]
 	Y[len(Y)-1] = Y[0]
-	plt.plot(X, Y, '-', color=color)
+	plt.plot(X, Y, sym)
 	
 def plotRectangle(R, color=[1,0,0,1]):
 	'''Function to plot an oriented rectangle from a vector:
-	R = [[x1,y1],[x2,y2],[x3,y3],[x4,y4]]
+	R = [[x1,y1],[x2,y2],[x3,y3],[x4,y4], area, l, L]
     Needs to call plt.show() after this function'''	
-	XR = [p[0] for p in R]
-	YR = [p[1] for p in R]
+	XR = [p[0] for p in R[0]]
+	YR = [p[1] for p in R[0]]
 	plt.plot(XR, YR, color=color)
 	
 def plotPolygon(P, color=[1,0,0,1]):
@@ -485,6 +485,9 @@ def minCircleMatrix(track):
 	M = M + np.transpose(M)
 	return M
 	
+# ------------------------------------------------------------
+# Output : 	R = [[x1,y1],[x2,y2],[x3,y3],[x4,y4], area, l, L]	
+# ------------------------------------------------------------
 def __mbr(COORDS):
 		
 	HULL = __convexHull(COORDS)
@@ -494,6 +497,8 @@ def __mbr(COORDS):
 		
 	BEST_RECTANGLE = []
 	RECTANGLE_AREA = 10**301
+	BEST_l = 0
+	BEST_L = 0
 	
 	for i in range(len(HULL)-1):
 	
@@ -516,10 +521,17 @@ def __mbr(COORDS):
 		# 3 parameters inverse transformation
 		XR, YR = __transform_inverse(theta,  XH[i], YH[i], XRR, YRR)
 			
-		if ((Mx-mx)*abs(my) < RECTANGLE_AREA):
+		new_area = (Mx-mx)*abs(my)
+		if (new_area < RECTANGLE_AREA):
 			BEST_RECTANGLE = [[XR[0], YR[0]], [XR[1], YR[1]], [XR[2], YR[2]], [XR[3], YR[3]], [XR[0], YR[0]]]
+			RECTANGLE_AREA = new_area
+			BEST_l = (Mx-mx)
+			BEST_L = abs(my)
+			
+	if BEST_L < BEST_l:
+		G = BEST_l; BEST_l = BEST_L; BEST_L = G
 		
-	return BEST_RECTANGLE
+	return [BEST_RECTANGLE, RECTANGLE_AREA, BEST_l, BEST_L]
 	
 
 def minimumBoundingRectangle(track):	

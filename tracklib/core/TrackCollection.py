@@ -138,7 +138,23 @@ class TrackCollection:
     
     #def summarize(self, ):
         
-        
+    def filterOnBBox(self, bbox):
+        xmin = bbox[0]
+        ymin = bbox[1]
+        xmax = bbox[2]
+        ymax = bbox[3]
+        for i in range(len(self)-1,-1,-1):
+            track = self[i]
+            for j in range(len(track)):
+                inside = True
+                inside = inside & (track[j].position.getX() > xmin)
+                inside = inside & (track[j].position.getY() > ymin)	
+                inside = inside & (track[j].position.getX() < xmax)
+                inside = inside & (track[j].position.getY() < ymax)				
+                if not inside:
+                    self.removeTrack(track)
+                    break
+    
     def bbox(self):
         tarray_xmin = []
         tarray_xmax = []
