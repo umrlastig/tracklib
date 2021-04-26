@@ -107,7 +107,10 @@ class FileReader:
                 
                 if (int(E) != fmt.no_data_value) and (int(N) != fmt.no_data_value):
                     
-                    U = (float)(fields[fmt.id_U])
+                    if fmt.id_U >= 0:
+                        U = (float)(fields[fmt.id_U])
+                    else:
+                        U = utils.NAN
                     
                     if not fmt.srid.upper() in ["ENUCOORDS", "ENU", "GEOCOORDS", "GEO", "ECEFCOORDS", "ECEF"]:
                         print("Error: unknown coordinate type ["+str(srid)+"]")
