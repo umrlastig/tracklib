@@ -30,9 +30,10 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
     
     def test1(self):
         
-        P = [obs.position for obs in self.trace1]
-        R = []
-        C = geom.welzl(P, R)
+        #P = [obs.position for obs in self.trace1]
+        #R = []
+        # C = geom.__welzl(P, R)
+        C = geom.minCircle(self.trace1)
         # print (C[0].getX(), C[0].getY(), C[1])
         
         self.assertLessEqual((100 - C[1]), self.__epsilon, "Rayon du cercle")
