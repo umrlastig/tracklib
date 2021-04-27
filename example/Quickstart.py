@@ -12,12 +12,13 @@ import matplotlib.pyplot as plt
 from tracklib.core.GPSTime import GPSTime
 from tracklib.io.GpxReader import GpxReader
 from tracklib.core.Operator import Operator
-import tracklib.algo.AlgoAF as algo
+
+import tracklib.algo.Analytics as algo
 import tracklib.algo.Interpolation as interp
 
 import tracklib.core.Grid as g
 import tracklib.core.TrackCollection as trackCollection
-import tracklib.util.CellOperator as celloperator
+import tracklib.algo.Summarize as summ
 
 # ---------------------------------------------------
 # Lecture des donnees
@@ -48,9 +49,9 @@ collection = trackCollection.TrackCollection([trace])
 grille = g.Grid(Xmin-10, Ymin-10, Xmax - Xmin + 20, Ymax - Ymin + 20, 3)
 
 af_algos = [algo.speed]
-cell_operators = [celloperator.co_avg]
-grille.addAnalyticalFunctionForSummarize([trace], af_algos, cell_operators)
-grille.plot(algo.speed, celloperator.co_avg)
+cell_operators = [summ.co_avg]
+grille.addAnalyticalFunctionForSummarize(collection, af_algos, cell_operators)
+grille.plot(algo.speed, summ.co_avg)
 
 
 # ================================================

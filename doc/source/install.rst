@@ -10,14 +10,14 @@ Install
 Installing from source
 ==========================
 
-Developer mode 
----------------
+Tracklib developer mode 
+-------------------------
 
 1. You may install the latest development version by cloning the GitLab repository:
 
 .. code-block:: shell
 
-   git clone https://github.com/IGNF/tracklib.git
+   git clone https://github.com/umrlastig/tracklib.git
    cd tracklib
 
 

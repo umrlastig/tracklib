@@ -10,7 +10,7 @@ from datetime import datetime
 import math
 import matplotlib.pyplot as plt
 import numpy as np
-#from skimage import io
+from skimage import io
 #from PIL import Image
 
 import tracklib.core.Utils as utils
@@ -97,8 +97,8 @@ class Grid:
     def setColor(self, c1, c2):
         self.color1 = c1
         self.color2 = c2
-    
-    
+        
+        
     def addAnalyticalFunctionForSummarize(self, collection, af_algos, aggregates):
 
         if not isinstance(af_algos, list):
@@ -121,8 +121,11 @@ class Grid:
         
         for idx, af_algo in enumerate(af_algos):
             aggregate = aggregates[idx]
-            name = af_algo.__name__
-            cle = af_algo.__name__ + '#' + aggregate.__name__
+            if af_algo != 'uid':
+                name = af_algo.__name__
+            else:
+                name = 'uid'
+            cle = name + '#' + aggregate.__name__
             
             if name not in self.af_names:
                 self.af_names.append(name)
@@ -155,12 +158,16 @@ class Grid:
         Avant on vérifie si l'AF existe, sinon on la calcule.
         '''
         
-        af_name = af_algo.__name__
+        if af_algo != 'uid':
+            af_name = af_algo.__name__
+        else:
+            af_name = 'uid'
         
         for trace in collection.getTracks():
             
-            # On calcule l'AF si ce n'est pas fait
-            trace.addAnalyticalFeature(af_algo)
+            if af_algo != "uid":
+                # On calcule l'AF si ce n'est pas fait
+                trace.addAnalyticalFeature(af_algo)
             
             # On eparpille dans les cellules
             for i in range(trace.size()):
@@ -176,8 +183,13 @@ class Grid:
 
                 if (0 <= column and column < self.ncol and 0 <= line and line < self.nrow):
 
-                    val = trace.getObsAnalyticalFeature(af_name, i)
+                    if af_algo != "uid":
+                        val = trace.getObsAnalyticalFeature(af_name, i)
+                    else:
+                        val = trace.uid
+                    
                     self.tabcel[line][column].vals[af_name].append(val)
+
 ##                else:
 ##                    print ("Warning: position outer of zone. " \
 ##                       + "Row: [0, " + str(line) + ', ' + str(self.nrow) + '], ' \
@@ -193,9 +205,12 @@ class Grid:
                 
                 
     
-    def __buildArray__(self, af_algo, aggregate, valmax = None, startpixel = 0):
+    def buildArray(self, af_algo, aggregate, valmax = None, startpixel = 0):
         
-        name = af_algo.__name__ + '#' + aggregate.__name__
+        if af_algo != 'uid':
+            name = af_algo.__name__ + '#' + aggregate.__name__
+        else:
+            name = 'uid' + '#' + aggregate.__name__
         
         sumPlot = np.zeros((self.nrow, self.ncol, len(self.__summarizeFields)), dtype='uint8')    
         for i in range(self.nrow):
@@ -216,9 +231,12 @@ class Grid:
     
     def plot (self, af_algo, aggregate, valmax = None, startpixel = 0):
         
-        name = af_algo.__name__ + '#' + aggregate.__name__
+        if af_algo != 'uid':
+            name = af_algo.__name__ + '#' + aggregate.__name__
+        else:
+            name = 'uid' + '#' + aggregate.__name__
         
-        sumPlot = self.__buildArray__(af_algo, aggregate, valmax, startpixel)
+        sumPlot = self.buildArray(af_algo, aggregate, valmax, startpixel)
         
         cmap = utils.getOffsetColorMap(self.color1, self.color2, startpixel / 255)
         plt.imshow(sumPlot[:,:,0], cmap=cmap)
@@ -231,7 +249,7 @@ class Grid:
     
     def saveGrid(self, filename, af_algo, aggregate, valmax = None, startpixel = 0):
         
-        sumPlot = self.__buildArray__(af_algo, aggregate, valmax, startpixel)
+        sumPlot = self.buildArray(af_algo, aggregate, valmax, startpixel)
         io.imsave(filename, sumPlot)
         
         

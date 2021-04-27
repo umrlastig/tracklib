@@ -14,8 +14,14 @@ Welcome to TrackLib’s documentation!
 |travis| |codecov| |rtd| 
 
 .. |travis| image:: https://travis-ci.org/umrlastig/tracklib.svg?branch=main
+                  :alt: Travis build status
+                  :target: https://travis-ci.org/github/umrlastig/tracklib
 .. |codecov| image:: https://codecov.io/gh/umrlastig/tracklib/branch/main/graph/badge.svg
+                   :alt: Code coverage
+                   :target: https://app.codecov.io/gh/umrlastig/tracklib
 .. |rtd| image:: https://readthedocs.org/projects/tracklib/badge/?version=latest
+               :alt: Documentation status
+               :target: https://tracklib.readthedocs.io/en/latest/?badge=latest
 
 
 
@@ -82,7 +88,7 @@ Examples
 
    install
    quickstart
-..   convention
+   convention
    
 .. toctree::
    :maxdepth: 1

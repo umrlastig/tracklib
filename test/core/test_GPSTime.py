@@ -22,7 +22,15 @@ class TestGPSTime(unittest.TestCase):
         t = GPSTime.readTimestamp(madate)
         self.assertEqual("31/01/2018 11:17:46", str(t))
         
-        print (GPSTime.readUnixTime(1550941038.0))
+        d = GPSTime.readUnixTime(1550941038.0)
+        self.assertIsInstance(d, GPSTime)
+        self.assertEqual('23/02/2019 16:57:18', str(d))
+        self.assertEqual(23, d.day)
+        self.assertEqual(2, d.month)
+        self.assertEqual(2019, d.year)
+        self.assertEqual(16, d.hour)
+        self.assertEqual(57, d.min)
+        self.assertEqual(18, d.sec)
         
         
 if __name__ == '__main__':
