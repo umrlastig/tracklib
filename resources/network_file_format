@@ -1,0 +1,19 @@
+#
+# --------------------------------------------------------------------------------------------------------------------
+#  name, edge_id, source, target, wkt, poids, orientation, sep, header, srid
+# --------------------------------------------------------------------------------------------------------------------
+#
+#   name:      format name (used as input in FileReader and FileWriter)
+#   edge_id:   index (starts from 0) of column containing edge identifier
+#   source:    index (starts from 0) of column containing source node identifier
+#   target:    index (starts from 0) of column containing targer node identifier
+#   wkt:       geometry of edge in wkt format
+#   poids:     un coût de parcours (arbitrairement fixé comme étant proportionnel à la longueur du WKT si non-renseigné (-1))
+#   sens:      un booléen de sens-unique (arbitrairement fixé à 0 pour indiquer le double-sens, 
+#                                         si non-renseigné, 1 direct, -1 indirect).
+#   sep:       separating characters (can be multiple characters). Can be c (comma), b (blankspace), s (semi-column)
+#   header:    number of heading line in format 
+#   srid:      coordinate system of points (ENU, Geo or ECEF) 
+#
+# --------------------------------------------------------------------------------------------------------------------
+IGN, 0, 2, 3, 6, -1, 0, c, 1, ENU
