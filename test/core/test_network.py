@@ -9,7 +9,7 @@ from tracklib.core.Network import Node
 class TestDijkstra(TestCase):
     
     def test_dijkstra(self):
-        chemin = '../data/network_test.csv'
+        chemin = './data/network_test.csv'
         network = NetworkReader.readFromFile(chemin, 'TEST_UNITAIRE')
         
         #self.assertEqual(sumPlot[0][7][0], 1)
