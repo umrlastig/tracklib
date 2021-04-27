@@ -4,7 +4,7 @@
 
 class NetworkFormat:
 
-    NETWORK_FILE_FORMAT = "../../resources/network_file_format"
+    NETWORK_FILE_FORMAT = "../resources/network_file_format"
 
 
     # -------------------------------------------------------------
