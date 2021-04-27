@@ -20,22 +20,31 @@ class NetworkFormat:
                     line = ffmt.readline().strip()
                     continue
                 tab = line.split(",")
-                print (tab)
                 if tab[0].strip() == name:
                     FIELDS = tab
                     break
                 line = ffmt.readline().strip()
         ffmt.close()
         
+        if len(FIELDS) < 1:
+            print("Error: import format not recognize")
+            exit()
+        
         self.name = name
-        self.edge_id = int(FIELDS[1].strip())
-        self.source = int(FIELDS[2].strip())
-        self.target = int(FIELDS[3].strip())
-        self.wkt = str(FIELDS[4].strip())
-        self.poids = float(FIELDS[5].strip())
-        self.sens = int(FIELDS[6].strip())
-        self.separator = FIELDS[7].strip()            
+        self.pos_edge_id = int(FIELDS[1].strip())
+        self.pos_source = int(FIELDS[2].strip())
+        self.pos_target = int(FIELDS[3].strip())
+        self.pos_wkt = int(FIELDS[4].strip())
+        self.pos_poids = int(FIELDS[5].strip())
+        self.pos_sens = int(FIELDS[6].strip())
+
         self.h = int(FIELDS[8].strip())
-        self.srid = FIELDS[9].strip()
+        self.doublequote = True
+        self.encode = 'utf-8'
         
+        self.srid = FIELDS[11].strip()
         
+        self.separator = FIELDS[7].strip()
+        self.separator = self.separator.replace("b", " ")
+        self.separator = self.separator.replace("c", ",")
+        self.separator = self.separator.replace("s", ";")	
