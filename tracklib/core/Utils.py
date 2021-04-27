@@ -35,7 +35,21 @@ def listify(input):
 def unlistify(input):
     if len(input) == 1:
         input = input[0]   
-    return input		
+    return input
+
+# LIKE comparisons
+def compLike(s1, s2):
+	tokens = s2.split('%')
+	occ = []
+	s = s1
+	d = len(s)
+	for tok in tokens:
+		id = s.find(tok)
+		if id < 0:
+			return False
+		occ.append(id)
+		s = s[id+len(tok):len(s)]
+	return True	
 
 # =============================================================================
 ''' Pour calculer l'aire des triangles dans Visvalingam '''

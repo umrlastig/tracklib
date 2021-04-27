@@ -142,7 +142,7 @@ class Polygon:
 # --------------------------------------------------------
 def inclusion(X, Y, x, y):
     
-    cmax = 1e300
+    cmax = 2*max(np.max(X), np.max(Y))
     segment = list()
     
     segment.append(x)
