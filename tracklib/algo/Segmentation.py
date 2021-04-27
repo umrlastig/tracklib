@@ -209,7 +209,7 @@ def backward(B):
 
 def plotStops(stops, x="x", y="y", r="radius", rf=1, sym='r-'):
     for i in range(len(stops)):
-        Geometrics.plotCircle([ENUCoords(stops[x][i], stops[y][i]), rf*stops[r][i]], sym)
+        Circle(ENUCoords(stops[x][i], stops[y][i]), rf*stops[r][i]).plot(sym)
     
 def removeStops(track, stops=None):    
     if stops is None:
