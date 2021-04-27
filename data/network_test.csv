@@ -1,0 +1,9 @@
+edge_id,source,target,direction,poids,wkt
+1,0,1,1,6,"LINESTRING (0 0, 0 6)"
+2,1,4,1,11,"LINESTRING (0 6, 11 6)"
+3,0,3,1,18,"LINESTRING (0 0, 18 0)"
+4,0,2,1,8,"LINESTRING (0 0, -4 -2)"
+5,2,3,1,9,"LINESTRING (-4 -2, 18 0)"
+6,4,5,1,3,"LINESTRING (11 6, 20 0)"
+7,5,3,1,4,"LINESTRING (20 0, 18 0)"
+8,5,2,1,7,"LINESTRING (20 0, -4 -2)"
