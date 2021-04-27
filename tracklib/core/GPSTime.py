@@ -171,6 +171,7 @@ class GPSTime:
         seconds = self.toAbsTime()
         return GPSTime.__day_names[((int)(seconds/86400) + GPSTime.__day_of_base_date) % 7]
         
+
     # ------------------------------------------------------------
     # Adding value in a field according to code 
     # ------------------------------------------------------------    

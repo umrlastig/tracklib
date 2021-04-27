@@ -3,6 +3,7 @@
 # -----------------------------------------------------------------------------
 import sys
 import math
+import copy
 import numpy as np
 import random
 import matplotlib.pyplot as plt
@@ -42,8 +43,13 @@ class Circle:
         
     def contains(self, point):
         return (point.getX()-self.center.getX())**2 + (point.getX()-self.center.getY())**2 <= self.radius**2
-
-
+        
+    def copy(self):
+        return copy.deepcopy(self)
+        
+    def translate(self, dx, dy):
+       self.center.translate(dx, dy)    
+       
 class Rectangle:
 
     def __init__(self, pmin, pmax):
@@ -58,11 +64,31 @@ class Rectangle:
     def contains(self, point):
         inside_x = (self.pmin.getX() < point.getX()) and (point.getX() < self.pmax.getX())
         inside_y = (self.pmin.getY() < point.getY()) and (point.getY() < self.pmax.getY())
-        return inside_x and inside_y        
+        return inside_x and inside_y
 
-def __right(a,b,c):
-    return ((a == c) or (b[0]-a[0])*(c[1]-a[1])-(c[0]-a[0])*(b[1]-a[1]) < 0)
+    def copy(self):
+        return copy.deepcopy(self)
+        
+    # --------------------------------------------------
+    # Translation (2D) of shape (dx, dy in ground units)
+    # --------------------------------------------------
+    def translate(self, dx, dy):
+       self.pmin.translate(dx, dy)    
+       self.pmax.translate(dx, dy)
+       
+    # --------------------------------------------------
+    # Rotation (2D) of shape (theta in radians)
+    # --------------------------------------------------
+    def rotate(self, theta):
+        self.pmin = self.pmin.rotate(theta)
+        self.pmax = self.pmax.rotate(theta)
     
+    # --------------------------------------------------
+    # Homotehtic transformation (2D) of shape
+    # --------------------------------------------------
+    def scale(self, h):
+        self.pmin = self.pmin.scale(h)
+        self.pmax = self.pmax.scale(h)
 
 class Polygon:
 
@@ -78,6 +104,37 @@ class Polygon:
         
     def contains(self, point):
         return inclusion(self.X, self.Y, point.getX(), point.getY())
+        
+    def copy(self):
+        return copy.deepcopy(self) 
+
+    # --------------------------------------------------
+    # Translation (2D) of shape (dx, dy in ground units)
+    # --------------------------------------------------
+    def translate(self, dx, dy):
+       for i in range(len(self.X)):
+           self.X[i] = self.X[i] + dx
+           self.Y[i] = self.Y[i] + dy    
+           
+    # --------------------------------------------------
+    # Rotation (2D) of shape (theta in radians)
+    # --------------------------------------------------
+    def rotate(self, theta):
+        cr = math.cos(theta)
+        sr = math.sin(theta)
+        for i in range(len(self.X)):
+            xr = +cr*self.X[i] - sr*self.Y[i]
+            yr = +sr*self.X[i] + cr*self.Y[i]
+            self.X[i] = xr
+            self.Y[i] = yr
+    
+    # --------------------------------------------------
+    # Homotehtic transformation (2D) of shape
+    # --------------------------------------------------
+    def scale(self, h):
+        for i in range(len(self.X)):
+            self.X[i] *= h
+            self.Y[i] *= h
         
 # --------------------------------------------------------
 # Fonction booleenne d'inlcusion d'un pt dans un polygone
@@ -108,7 +165,9 @@ def inclusion(X, Y, x, y):
             
     return (n % 2 == 1)
 
-
+def __right(a,b,c):
+    return ((a == c) or (b[0]-a[0])*(c[1]-a[1])-(c[0]-a[0])*(b[1]-a[1]) < 0)
+    
 # ----------------------------------------
 # Function to get enclosing shape
 # ----------------------------------------

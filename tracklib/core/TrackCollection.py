@@ -122,6 +122,7 @@ class TrackCollection:
             
             
     def plot(self, symbols=['r-'], markersize=[4], margin=0.05):
+        symbols = utils.listify(symbols)
         (xmin, xmax, ymin, ymax) = self.bbox()
         dx = margin*(xmax-xmin)
         dy = margin*(ymax-ymin)

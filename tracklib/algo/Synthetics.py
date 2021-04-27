@@ -26,13 +26,18 @@ import tracklib.core.Kernel as Kernel
 # =========================================================================
 # Generate analytical track
 # =========================================================================
-def generate(x_t=0.3, y_t=None, z_t=None, date_ini=None, date_fin=None, dt=None, verbose=True):
-    random.seed(123)
+def generate(x_t=0.3, y_t=None, z_t=None, date_ini=None, date_fin=None, dt=None, verbose=True, N=1):
     randomTrack = (y_t is None)
+    if randomTrack:
+        if N > 1:
+            tracks = TrackCollection()
+            for i in range(N):
+               tracks.addTrack(generate(x_t, N=1, verbose=verbose))
+            return tracks
     if randomTrack:
         scope = 100*x_t
         x1 = random.random()*100; y1 = random.random()*100
-        x2 = random.random()*100; y2 = random.random()*100		
+        x2 = random.random()*100; y2 = random.random()*100        
         x_t = lambda t: x1*(1-t) + x2*t
         y_t = lambda t: y1*(1-t) + y2*t
     if date_ini == None:
@@ -94,4 +99,4 @@ def generateDataSet(vx, vy, N=100, pmin=(0,0), pmax=(100,100), Nbmax=1000):
         TRACKS.append(track)
         
     return TRACKS
-		
+        
