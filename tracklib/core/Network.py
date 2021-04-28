@@ -3,8 +3,11 @@
 # 
 # -----------------------------------------------------------------------------
 
-from tracklib.core import (Coords)
+#from tracklib.core import (Coords)
 
+# =============================================================================
+#
+#
 class Node:
     
     def __init__(self, id, coord):
@@ -160,13 +163,13 @@ class Node:
         
         # transformation du sens géométrique au sens de circulation
         for arc in arcsEntrants:
-            if arc.getOrientation() == -1 or arc.getOrientation() == 2:
+            if arc.getOrientation() == -1 or arc.getOrientation() == 0:
                 if arc.getNoeudIni() != None:
                     arcsVoisins.append(arc)
                     noeudsVoisins.append(arc.getNoeudIni())
                     distancesVoisins.append(arc.getPoids())
         for arc in arcsSortants:
-            if arc.getOrientation() == 1 or arc.getOrientation() == 2:
+            if arc.getOrientation() == 1 or arc.getOrientation() == 0:
                 if arc.getNoeudFin() != None:
                     arcsVoisins.append(arc)
                     noeudsVoisins.append(arc.getNoeudFin())
@@ -182,8 +185,13 @@ class Node:
             return True
         return False
         
+    def __str__(self):
+        return self.id
         
 
+# =============================================================================
+#
+#
 class Edge:
     
     '''
@@ -255,7 +263,13 @@ class Edge:
             return True
         return False
 
+    def __str__(self):
+        return self.id
 
+
+# =============================================================================
+#
+#
 class Network:
 
     def __init__(self):
@@ -276,6 +290,15 @@ class Network:
             if node.id == id:
                 return node
         return None
+    
+    
+    def shortest_path(self, node1, node2):
+        return node1.plusCourtChemin(node2)
+    
+    
+    def shortest_path_distance(self, node1, node2):
+        PPC = node1.plusCourtChemin(node2)
+        return PPC[0].distance
 
 
 #if __name__ == '__main__':
