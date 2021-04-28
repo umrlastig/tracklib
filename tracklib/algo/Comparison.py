@@ -18,12 +18,12 @@ import tracklib.core.Operator as Operator
 # ------------------------------------------------------------
 # Difference profile plot
 # ------------------------------------------------------------	
-def plotDifferenceProfile(profile, track2):
+def plotDifferenceProfile(profile, track2, af_name="pair"):
     for i in range(profile.size()):
         x1 = profile.getObs(i).position.getX()
         y1 = profile.getObs(i).position.getY()
-        x2 = track2.getObs(profile.getObsAnalyticalFeature("pair", i)).position.getX()
-        y2 = track2.getObs(profile.getObsAnalyticalFeature("pair", i)).position.getY()
+        x2 = track2.getObs(profile.getObsAnalyticalFeature(af_name, i)).position.getX()
+        y2 = track2.getObs(profile.getObsAnalyticalFeature(af_name, i)).position.getY()
         plt.plot([x1,x2],[y1,y2],'g--',linewidth=0.5)
 
 # ------------------------------------------------------------
