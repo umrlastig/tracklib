@@ -11,7 +11,7 @@ import tracklib.util.Wkt as wkt
 class NetworkReader:
     
     @staticmethod
-    def readFromFile(path, formatfile = 'IGN'):
+    def readFromFile(path, formatfile = 'DEFAULT'):
         '''
         TODO : posSol
         '''

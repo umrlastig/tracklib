@@ -1,7 +1,7 @@
-# -------------------------- Track -------------------------------
-# Class to manage GPS tracks
-# Points are referenced in geodetic coordinates
-# ----------------------------------------------------------------
+# -------------------------- Network ------------------------------------------
+# Class to manage Network
+# 
+# -----------------------------------------------------------------------------
 
 from tracklib.core import (Coords)
 
@@ -35,7 +35,7 @@ class Node:
 
     def plusCourtChemin(self, arrivee):
         '''
-        Plus court chemin de this vers arrivée, en tenant compte du sens de circulation. 
+        Plus court chemin de self vers arrivée, en tenant compte du sens de circulation. 
         Le pcc s'appuie sur l'attribut 'poids' des arcs, qui doit être rempli auparavant.
         '''
         PPC = []
@@ -46,12 +46,110 @@ class Node:
         
         self.distance = 0
         
-        self.__chercheArcsNoeudsVoisins()
+        (arcsVoisins, noeudsVoisins, distancesVoisins) = self.__chercheArcsNoeudsVoisins()
     
+        noeudsTraites = []
+        noeudsATraiter = []
+        
+        for i in range(len(noeudsVoisins)):
+            noeudVoisin = noeudsVoisins[i]
+            arcVoisin = arcsVoisins[i]
+            dist = float(distancesVoisins[i])
+            noeudVoisin.distance = dist
+            noeudVoisin.arcPrecedent = arcVoisin
+            noeudVoisin.noeudPrecedent = self
+      
+        noeudsATraiter += noeudsVoisins
+        
+        # Phase "avant"
+        while len(noeudsATraiter) > 0:
+            # on choisit le noeud à marquer comme traité parmi les voisins
+            plusProche = noeudsATraiter[0]
+            for i in range(1, len(noeudsATraiter)):
+                if noeudsATraiter[i].distance < plusProche.distance:
+                    plusProche = noeudsATraiter[i]
+
+            noeudsTraites.append(plusProche)
+            noeudsATraiter.remove(plusProche)
+            
+            # Il s'agit du noeud d'arrivée
+            if plusProche == arrivee:
+                # Arrivé !!!
+                break
+        
+            (arcsVoisins, noeudsVoisins, distancesVoisins) = plusProche.__chercheArcsNoeudsVoisins()
+        
+            for i in range(len(noeudsVoisins)):
+                noeudVoisin = noeudsVoisins[i]
+                arcVoisin = arcsVoisins[i]
+                dist = float(distancesVoisins[i])
+                
+                if noeudVoisin in noeudsTraites:
+                    # Noeud est déjà traité
+                    continue
+                
+                if noeudVoisin in noeudsATraiter:
+                    # Noeud déjà atteint, on voit si on a trouvé 
+                    #       un chemin plus court pour y accèder
+                    if noeudVoisin.distance > (plusProche.distance + dist):
+                        noeudVoisin.distance = plusProche.distance + dist
+                        noeudVoisin.arcPrecedent = arcVoisin
+                        noeudVoisin.noeudPrecedent = plusProche
+            
+                    continue
+          
+                # Nouveau noeud atteint, on l'initialise
+                noeudVoisin.distance = plusProche.distance + dist
+                noeudVoisin.arcPrecedent = arcVoisin
+                noeudVoisin.noeudPrecedent = plusProche
+                noeudsATraiter.append(noeudVoisin)
+        
+        
+        # Phase "arriere"
+        if arrivee not in noeudsTraites:
+            # Couldn't reach it
+            # sys.exit("Error: Couldn't reach it")
+            return None
+        
+        if arrivee not in PPC:
+            PPC.append(arrivee)
+            
+        arcsFinaux = []
+        noeudsFinaux = []
+        
+        suivant = arrivee
+        while (True):
+            arcsFinaux.insert(0, suivant.arcPrecedent)
+            #suivant.arcPrecedent.addGroupe(plusCourtChemin)
+            if suivant.arcPrecedent not in PPC:
+                PPC.append(suivant.arcPrecedent)
+            suivant = suivant.noeudPrecedent
+            if suivant == self:
+                break
+        
+            noeudsFinaux.insert(0, suivant)
+            #suivant.addGroupe(plusCourtChemin)
+            if suivant not in PPC:
+                PPC.append(suivant)
+                
+        noeudsFinaux.insert(0, self)
+        # self.addGroupe(plusCourtChemin)
+        if self not in PPC:
+            PPC.append(self)
+        noeudsFinaux.insert(0, arrivee)
+        # arrivee.addGroupe(plusCourtChemin)
+        
+
+#        plusCourtChemin.setListeArcs(arcsFinaux);
+#        plusCourtChemin.setListeNoeuds(noeudsFinaux);
+#        plusCourtChemin.setLength(arrivee.distance);
+#        
+        return PPC
+            
     
     def __chercheArcsNoeudsVoisins(self):
         '''
-            
+            Tient compte du sens de la circulation
         '''
         noeudsVoisins = []
         distancesVoisins = []
@@ -74,6 +172,8 @@ class Node:
                     noeudsVoisins.append(arc.getNoeudFin())
                     distancesVoisins.append(arc.getPoids())
         
+        return (arcsVoisins, noeudsVoisins, distancesVoisins)
+    
     
     def __eq__(self, other):
         if not isinstance(other, Node):
@@ -109,7 +209,7 @@ class Edge:
     def setNoeudIni(self, noeud):
         
         if self.noeudIni != None:
-            self.noeudIni.getArcSortants().remove(self);
+            self.noeudIni.getArcSortants().remove(self)
     
         if noeud != None:
             self.noeudIni = noeud

@@ -3,13 +3,20 @@
 from unittest import TestCase, TestSuite, TextTestRunner
 
 from tracklib.io.NetworkReader import NetworkReader
-from tracklib.core.Network import Node
+from tracklib.core.Network import Node, Edge
 
 
 class TestDijkstra(TestCase):
     
+    #chemin = '../../data/network_ecrin.wkt'
+    #network = NetworkReader.readFromFile(chemin, 'TEST1')
+
+    #chemin = '../../data/network_ecrin_extrait.csv'
+    #network = NetworkReader.readFromFile(chemin, 'TEST2')
+    
     def test_dijkstra(self):
-        chemin = './data/network_test.csv'
+        
+        chemin = 'data/network_test.csv'
         network = NetworkReader.readFromFile(chemin, 'TEST_UNITAIRE')
         
         #self.assertEqual(sumPlot[0][7][0], 1)
@@ -31,7 +38,15 @@ class TestDijkstra(TestCase):
         self.assertEqual(1, len(node5.getArcEntrants()))
         self.assertEqual(2, len(node5.getArcSortants()))
         
-        node0.plusCourtChemin(node5)
+        PPC = node0.plusCourtChemin(node5)
+        for i in range(len(PPC)):
+            elt = PPC[i]
+            if isinstance(elt, Node):
+                print ('noeud' + elt.id + ',' + str(elt.distance))
+            if isinstance(elt, Edge):
+                print ('arc' + elt.id)
+        
+        #print (len(PPC))
         
 
 if __name__ == '__main__':
