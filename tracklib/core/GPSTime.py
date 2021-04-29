@@ -325,6 +325,7 @@ class GPSTime:
             return False
         if self.year != time.year:
             return False
+        return True
 
     def __ne__(self, time):
         return not (time == self)

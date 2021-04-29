@@ -1040,7 +1040,7 @@ class Track:
 	#       query without parenthesis: e.g. A AND (B OR C) = A AND B OR A AND C. Or use successive queries.
 	#     - Each condition must contain exactly 3 parts (separated by blank spaces) in this exact order:
 	#         (1) the name of an analytical feature to test
-	#         (2) a comparison operator among >, <, >=, <=, == and != (LIKE with % not available yet)
+	#         (2) a comparison operator among >, <, >=, <=, ==, != and LIKE (with % in str and timestamps)
 	#         (3) a threshold value which is automatically casted to the type of the AF given in (1). 
 	#             Intended types accepted are: integers, floats, strings, boolean and GPSTime. 
 	#             When GPSTime is used as a threshold value, eventhough it may contain 2 parts 
@@ -1051,7 +1051,10 @@ class Track:
 	#     - Capital letters must be used for SQL keywords SELECT, WHERE, AND, OR and aggregators 
     # ----------------------------------------------------------------------------------------------------
     def __condition(val1, operator, val2):
-    
+
+        if operator == "LIKE":
+            return utils.compLike(str(val1), val2)
+
         if isinstance(val1, int):
             val2 = int(val2)
         if isinstance(val1, float):
@@ -1072,7 +1075,7 @@ class Track:
         if (operator == "=") or (operator == "=="):
             return val1 == val2
         if operator == "!=":
-            return val1 != val2				
+            return val1 != val2			
 	
     def query(self, cmd):
 	
