@@ -39,17 +39,19 @@ def unlistify(input):
 
 # LIKE comparisons
 def compLike(s1, s2):
-	tokens = s2.split('%')
-	occ = []
-	s = s1
-	d = len(s)
-	for tok in tokens:
-		id = s.find(tok)
-		if id < 0:
-			return False
-		occ.append(id)
-		s = s[id+len(tok):len(s)]
-	return True	
+    tokens = s2.split('%')
+    if len(tokens) == 1:
+        return s1 in s2  # 'in' or 'equal' yet to be decided 
+    occ = []
+    s = s1
+    d = len(s)
+    for tok in tokens:
+        id = s.find(tok)
+        if id < 0:
+            return False
+        occ.append(id)
+        s = s[id+len(tok):len(s)]
+    return True    
 
 # =============================================================================
 ''' Pour calculer l'aire des triangles dans Visvalingam '''
