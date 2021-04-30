@@ -9,13 +9,13 @@
 # For example, given two circles C1 and C2, and two rectangles R1 and R2, to 
 # select tracks crossing either C1 or C2, and either R1 or R2, we would like to 
 # write the following combination of constraints : F = (C1 + C2).(R1 + R2), 
-# where '+' and '.' operator denote OR and AND respectively. Such a constraint 
+# where + and . operators denote OR and AND respectively. Such a constraint 
 # requires two different combination rules, and therefore cannot be expressed 
 # with a single selector. A solution is to create two disjonctive (OR) type 
 # selectors S1 and S2 with S1 = C1 + C2 and S2 = R1 + R2. Then S1 and S2 are 
-# combined in a conjunctive (AND) type global seleector. Note that boolean 
-# algebraic rules show that it is possible as well to combine 4 conjunctive
-# type selectors (C1.R1, C1.R2, C2.R1 and C2.R2) in a disjunctive type global 
+# combined in a conjunctive (AND) type global selector. Note that boolean 
+# algebraic rules show that it is possible as well to combine 4 conjunctive-
+# type selectors (C1.R1, C1.R2, C2.R1 and C2.R2) in a disjunctive-type global 
 # selector. 
 # Constraints may be based on:
 #    - a geometrical shape (Rectangle, circle or polygon in Geometrics). This 
@@ -31,7 +31,7 @@
 #         (at least once) the toll gate are selected 
 # All these constraint may be provided with an additional time constraint, 
 # specifying the time interval (between two GPSTime dates) where crossing /
-# containing /getting in / getting out... operations are tested. 
+# containing / getting in / getting out... operations are tested. 
 # Besides, there are two types of selection:
 #    - TYPE_SELECT: tracks abiding by constraints are returned as they are
 #    - TYPE_CUT_AND_SELECT: tracks abiding by constraints are cut and returned
@@ -90,7 +90,7 @@ def printMode(constraint):
 # ------------------------------- TIME CONSTRAINTS ----------------------------
 class TimeConstraint:
 
-    def __init__(self, begin=None, end=None):
+    def __init__(self, begin=None, end=None, pattern=None):
         if begin is None:
             self.minTimestamp = GPSTime(0,0,0,0,0,0)
         else:
@@ -99,11 +99,16 @@ class TimeConstraint:
             self.maxTimestamp = GPSTime(2100,0,0,0,0,0)
         else:
            self.maxTimestamp = end 
+        self.pattern = pattern
            
     def __str__(self):
-        output  = "Temporal constraint: " 
-        output += str(self.minTimestamp) + " <= t <= " 
-        output += str(self.maxTimestamp)
+        output  = "Temporal constraint: \n" 
+        if self.minTimestamp - GPSTime(0,0,0,0,0,0) != 0:
+            if self.maxTimestamp - GPSTime(2100,0,0,0,0,0) != 0:
+                output += "    -" + str(self.minTimestamp) + " <= t <= " 
+                output += str(self.maxTimestamp) + "\n"
+        if not self.pattern is None:
+            output += "    - timestamp pattern: " + self.pattern
         return output
        
     def setMinTimestamp(self, timestamp):
@@ -113,7 +118,10 @@ class TimeConstraint:
         self.maxTimestamp = timestamp              
 
     def contains(self, timestamp):
-       return (self.minTimestamp <= timestamp) and (timestamp <= self.maxTimestamp)        
+        output = (self.minTimestamp <= timestamp) and (timestamp <= self.maxTimestamp)
+        if not (self.pattern is None):
+            output = output & utils.compLike(str(timestamp), self.pattern)
+        return output
 
 # ------------------------------- CONSTRAINTS ----------------------------
 
@@ -130,6 +138,8 @@ class TrackConstraint:
 
     def __str__(self):
         output = "Track-based selecting constraint (mode '"+printMode(self)+"')"
+        output += "(mode '"+ str(printMode(self)) +"')"              
+        output += " with " + str(self.time).lower()		
         return output
         
     def contains(self, track):  # TO DO (in track)
@@ -150,6 +160,8 @@ class TollGateConstraint:
 
     def __str__(self):
         output = "Toll gate selecting constraint"
+        output += "(mode '"+ str(printMode(self)) +"')"              
+        output += " with " + str(self.time).lower()
         return output
         
     def plot(self, sym='ro-'):
@@ -180,10 +192,7 @@ class Constraint:
 
     def __str__(self):
         output  = str(type(self.shape))[33:-2] + "-shaped selecting constraint "
-        output += "(mode '"+ str(printMode(self)) +"')"
-        if self.time.minTimestamp - GPSTime(0,0,0,0,0,0) == 0:
-            if self.time.maxTimestamp - GPSTime(2100,0,0,0,0,0) == 0:
-                return output                
+        output += "(mode '"+ str(printMode(self)) +"')"              
         output += " with " + str(self.time).lower()
         return output
 

@@ -121,15 +121,16 @@ class TrackCollection:
             trace.addAnalyticalFeature(algorithm, name)
             
             
-    def plot(self, symbols=['r-'], markersize=[4], margin=0.05):
+    def plot(self, symbols=['r-'], markersize=[4], margin=0.05, append=False):
         if len(self) == 0:
             return
         symbols = utils.listify(symbols)
-        (xmin, xmax, ymin, ymax) = self.bbox()
-        dx = margin*(xmax-xmin)
-        dy = margin*(ymax-ymin)
-        plt.xlim([xmin-dx, xmax+dx])
-        plt.ylim([ymin-dy, ymax+dy])
+        if not append:
+            (xmin, xmax, ymin, ymax) = self.bbox()
+            dx = margin*(xmax-xmin)
+            dy = margin*(ymax-ymin)
+            plt.xlim([xmin-dx, xmax+dx])
+            plt.ylim([ymin-dy, ymax+dy])
         Ns = len(symbols)
         Ms = len(markersize)
         for i in range(len(self.__TRACES)):
