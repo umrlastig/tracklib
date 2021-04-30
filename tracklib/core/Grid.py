@@ -120,11 +120,14 @@ class Grid:
         self.__summarizeFields = {}  # cle nom_algo#nom_agg
         
         for idx, af_algo in enumerate(af_algos):
+            
             aggregate = aggregates[idx]
-            if af_algo != 'uid':
-                name = af_algo.__name__
+            
+            if isinstance(af_algo, str):
+                name = af_algo
             else:
-                name = 'uid'
+                name = af_algo.__name__
+                
             cle = name + '#' + aggregate.__name__
             
             if name not in self.af_names:
@@ -158,14 +161,14 @@ class Grid:
         Avant on vérifie si l'AF existe, sinon on la calcule.
         '''
         
-        if af_algo != 'uid':
+        if not isinstance(af_algo, str):
             af_name = af_algo.__name__
         else:
-            af_name = 'uid'
+            af_name = af_algo
         
         for trace in collection.getTracks():
             
-            if af_algo != "uid":
+            if not isinstance(af_algo, str):
                 # On calcule l'AF si ce n'est pas fait
                 trace.addAnalyticalFeature(af_algo)
             
@@ -183,8 +186,10 @@ class Grid:
 
                 if (0 <= column and column < self.ncol and 0 <= line and line < self.nrow):
 
-                    if af_algo != "uid":
+                    if not isinstance(af_algo, str):
                         val = trace.getObsAnalyticalFeature(af_name, i)
+                    elif af_algo != "uid":
+                        val = trace.getObsAnalyticalFeature(af_algo, i)
                     else:
                         val = trace.uid
                     
@@ -207,7 +212,7 @@ class Grid:
     
     def buildArray(self, af_algo, aggregate, valmax = None, startpixel = 0):
         
-        if af_algo != 'uid':
+        if not isinstance(af_algo, str):
             name = af_algo.__name__ + '#' + aggregate.__name__
         else:
             name = 'uid' + '#' + aggregate.__name__

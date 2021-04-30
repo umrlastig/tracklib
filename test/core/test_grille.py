@@ -47,7 +47,42 @@ class TestGrille(TestCase):
         self.grille = Grid.Grid(Xmin, Ymin, Xmax, Ymax, PixelSize)
     
     
-    def test_summarize(self):
+    def test_summarize_af(self):
+        
+        collection = TrackCollection(self.TRACES)
+        collection.addAnalyticalFeature(Analytics.speed)
+
+        # 
+        af_algos = ['speed'] #, utils.stop_point]
+        cell_operators = [Summarize.co_avg] #, utils.sum]
+        self.grille.addAnalyticalFunctionForSummarize(collection, af_algos, cell_operators)
+        
+        #
+        self.grille.plot(Analytics.speed, Summarize.co_avg)
+        print ('')
+        
+        sumPlot = self.grille.buildArray(Analytics.speed, Summarize.co_avg)
+        
+        self.assertEqual(sumPlot[0][0][0], 0)
+        self.assertEqual(sumPlot[1][0][0], 0)
+        self.assertEqual(sumPlot[2][0][0], 8)
+        self.assertEqual(sumPlot[3][0][0], 0)
+        self.assertEqual(sumPlot[4][0][0], 8)
+        
+        self.assertEqual(sumPlot[0][6][0], 0)
+        self.assertEqual(sumPlot[1][6][0], 0)
+        self.assertEqual(sumPlot[2][6][0], 3)
+        self.assertEqual(sumPlot[3][6][0], 0)
+        self.assertEqual(sumPlot[4][6][0], 0)
+        
+        self.assertEqual(sumPlot[0][7][0], 1)
+        self.assertEqual(sumPlot[1][7][0], 0)
+        self.assertEqual(sumPlot[2][7][0], 0)
+        self.assertEqual(sumPlot[3][7][0], 0)
+        self.assertEqual(sumPlot[4][7][0], 0)
+        
+    
+    def test_summarize_aa(self):
 
         # 
         af_algos = [Analytics.speed] #, utils.stop_point]
@@ -110,12 +145,46 @@ class TestGrille(TestCase):
         self.assertEqual(sumPlot[4][7][0], 0)
         
         
+    def test_mixte_aa_af_uid(self):
+        
+        collection = TrackCollection(self.TRACES)
+        collection.addAnalyticalFeature(Analytics.speed)
+        
+        af_algos = ['uid', 'speed', Analytics.speed]
+        cell_operators = [Summarize.co_count, Summarize.co_avg, Summarize.co_avg] 
+        
+        self.grille.addAnalyticalFunctionForSummarize(collection, af_algos, cell_operators)
+        
+        self.grille.plot('uid', Summarize.co_count)
+        print ('')
+        
+        sumPlot = self.grille.buildArray('uid', Summarize.co_count)
+        
+        self.assertEqual(sumPlot[0][0][0], 0)
+        self.assertEqual(sumPlot[1][0][0], 0)
+        self.assertEqual(sumPlot[2][0][0], 2)
+        self.assertEqual(sumPlot[3][0][0], 0)
+        self.assertEqual(sumPlot[4][0][0], 2)
+        
+        self.assertEqual(sumPlot[0][6][0], 0)
+        self.assertEqual(sumPlot[1][6][0], 0)
+        self.assertEqual(sumPlot[2][6][0], 1)
+        self.assertEqual(sumPlot[3][6][0], 0)
+        self.assertEqual(sumPlot[4][6][0], 0)
+        
+        self.assertEqual(sumPlot[0][7][0], 1)
+        self.assertEqual(sumPlot[1][7][0], 0)
+        self.assertEqual(sumPlot[2][7][0], 0)
+        self.assertEqual(sumPlot[3][7][0], 0)
+        self.assertEqual(sumPlot[4][7][0], 0)
 
 
 if __name__ == '__main__':
     suite = TestSuite()
-    suite.addTest(TestGrille("test_summarize"))
+    suite.addTest(TestGrille("test_summarize_aa"))
+    suite.addTest(TestGrille("test_summarize_af"))
     suite.addTest(TestGrille("test_sum_trace"))
+    suite.addTest(TestGrille("test_mixte_aa_af_uid"))
     runner = TextTestRunner()
     runner.run(suite)
     

@@ -6,6 +6,7 @@
 import tracklib.core.Utils as utils
 
 def co_sum(tarray):
+	tarray = utils.listify(tarray)
 	somme = 0
 	for i in range(len(tarray)):
 		val = tarray[i]
@@ -15,6 +16,7 @@ def co_sum(tarray):
 	return somme
 
 def co_min (tarray):
+	tarray = utils.listify(tarray)
 	if len(tarray) <= 0:
 		return utils.NAN
 	min = tarray[0]
@@ -27,6 +29,7 @@ def co_min (tarray):
 	return min
 	
 def co_max (tarray):
+	tarray = utils.listify(tarray)
 	if len(tarray) <= 0:
 		return utils.NAN
 	max = tarray[0]
@@ -39,6 +42,7 @@ def co_max (tarray):
 	return max
 
 def co_count(tarray):
+	tarray = utils.listify(tarray)
 	count = 0
 	for i in range(len(tarray)):
 		val = tarray[i]
@@ -48,6 +52,7 @@ def co_count(tarray):
 	return count
 
 def co_avg (tarray):
+	tarray = utils.listify(tarray)
 	if len(tarray) <= 0:
 		return utils.NAN
 	mean = 0		
@@ -63,6 +68,7 @@ def co_avg (tarray):
 	return mean/count
 
 def co_dominant(tarray):
+	tarray = utils.listify(tarray)
 	''' Most frequent value '''
 	if len(tarray) <= 0:
 		return utils.NAN
@@ -87,6 +93,7 @@ def co_dominant(tarray):
 	return dominant_value
 					
 def co_median (tarray):
+	tarray = utils.listify(tarray)
 	if len(tarray) <= 0:
 		return utils.NAN
 	
