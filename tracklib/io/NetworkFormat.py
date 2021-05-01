@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 
 
-
 class NetworkFormat:
 
     NETWORK_FILE_FORMAT = "resources/network_file_format"
-
 
     # -------------------------------------------------------------
     # Load file format from network_file_format
