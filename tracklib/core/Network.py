@@ -2,8 +2,11 @@
 # Class to manage Network
 # 
 # -----------------------------------------------------------------------------
+import matplotlib.pyplot as plt
 
-#from tracklib.core import (Coords)
+from tracklib.core.Track import Track
+from tracklib.core.GPSTime import GPSTime
+from tracklib.core.Obs import Obs
 
 # =============================================================================
 #
@@ -19,15 +22,17 @@ class Node:
         self.sortants = []
         
         # Pour le ppc:
-        self.noeudPrecedent = None
-        self.distance = -1
-        self.arcPrecedent = None
+        self.__noeudPrecedent = None
+        self.__distance = -1
+        self.__arcPrecedent = None
         
+    def getDistance(self):
+        return self.__distance
         
-    def getArcEntrants(self):
+    def getArcsEntrants(self):
         return self.entrants
     
-    def getArcSortants(self):
+    def getArcsSortants(self):
         return self.sortants
     
     def addArcSortant(self, edge):
@@ -44,10 +49,13 @@ class Node:
         PPC = []
         
         if self == arrivee:
-            PPC.add(self)
-            return PPC
+            trace = Track()
+            trace.addObs(Obs(self.coord, GPSTime()))
+            #PPC.add(self)
+            #return PPC
+            return trace
         
-        self.distance = 0
+        self.__distance = 0
         
         (arcsVoisins, noeudsVoisins, distancesVoisins) = self.__chercheArcsNoeudsVoisins()
     
@@ -58,9 +66,9 @@ class Node:
             noeudVoisin = noeudsVoisins[i]
             arcVoisin = arcsVoisins[i]
             dist = float(distancesVoisins[i])
-            noeudVoisin.distance = dist
-            noeudVoisin.arcPrecedent = arcVoisin
-            noeudVoisin.noeudPrecedent = self
+            noeudVoisin.__distance = dist
+            noeudVoisin.__arcPrecedent = arcVoisin
+            noeudVoisin.__noeudPrecedent = self
       
         noeudsATraiter += noeudsVoisins
         
@@ -69,7 +77,7 @@ class Node:
             # on choisit le noeud à marquer comme traité parmi les voisins
             plusProche = noeudsATraiter[0]
             for i in range(1, len(noeudsATraiter)):
-                if noeudsATraiter[i].distance < plusProche.distance:
+                if noeudsATraiter[i].__distance < plusProche.__distance:
                     plusProche = noeudsATraiter[i]
 
             noeudsTraites.append(plusProche)
@@ -81,7 +89,7 @@ class Node:
                 break
         
             (arcsVoisins, noeudsVoisins, distancesVoisins) = plusProche.__chercheArcsNoeudsVoisins()
-        
+            
             for i in range(len(noeudsVoisins)):
                 noeudVoisin = noeudsVoisins[i]
                 arcVoisin = arcsVoisins[i]
@@ -94,17 +102,17 @@ class Node:
                 if noeudVoisin in noeudsATraiter:
                     # Noeud déjà atteint, on voit si on a trouvé 
                     #       un chemin plus court pour y accèder
-                    if noeudVoisin.distance > (plusProche.distance + dist):
-                        noeudVoisin.distance = plusProche.distance + dist
-                        noeudVoisin.arcPrecedent = arcVoisin
-                        noeudVoisin.noeudPrecedent = plusProche
+                    if noeudVoisin.__distance > (plusProche.__distance + dist):
+                        noeudVoisin.__distance = plusProche.__distance + dist
+                        noeudVoisin.__arcPrecedent = arcVoisin
+                        noeudVoisin.__noeudPrecedent = plusProche
             
                     continue
           
                 # Nouveau noeud atteint, on l'initialise
-                noeudVoisin.distance = plusProche.distance + dist
-                noeudVoisin.arcPrecedent = arcVoisin
-                noeudVoisin.noeudPrecedent = plusProche
+                noeudVoisin.__distance = plusProche.__distance + dist
+                noeudVoisin.__arcPrecedent = arcVoisin
+                noeudVoisin.__noeudPrecedent = plusProche
                 noeudsATraiter.append(noeudVoisin)
         
         
@@ -122,11 +130,11 @@ class Node:
         
         suivant = arrivee
         while (True):
-            arcsFinaux.insert(0, suivant.arcPrecedent)
-            #suivant.arcPrecedent.addGroupe(plusCourtChemin)
-            if suivant.arcPrecedent not in PPC:
-                PPC.append(suivant.arcPrecedent)
-            suivant = suivant.noeudPrecedent
+            arcsFinaux.insert(0, suivant.__arcPrecedent)
+            #suivant.__arcPrecedent.addGroupe(plusCourtChemin)
+            if suivant.__arcPrecedent not in PPC:
+                PPC.append(suivant.__arcPrecedent)
+            suivant = suivant.__noeudPrecedent
             if suivant == self:
                 break
         
@@ -142,12 +150,17 @@ class Node:
         noeudsFinaux.insert(0, arrivee)
         # arrivee.addGroupe(plusCourtChemin)
         
-
-#        plusCourtChemin.setListeArcs(arcsFinaux);
-#        plusCourtChemin.setListeNoeuds(noeudsFinaux);
-#        plusCourtChemin.setLength(arrivee.distance);
-#        
-        return PPC
+        # On construit le PCC en Track
+        trace = Track()
+        DIST_TAB = []
+        for i in range(len(PPC)-1, -1, -1):
+            elt = PPC[i]
+            if isinstance(elt, Node):
+                trace.addObs(Obs(elt.coord, GPSTime()))
+                DIST_TAB.append(elt.getDistance())
+        trace.createAnalyticalFeature('DISTANCE', DIST_TAB)
+        #return PPC
+        return trace
             
     
     def __chercheArcsNoeudsVoisins(self):
@@ -158,8 +171,8 @@ class Node:
         distancesVoisins = []
         arcsVoisins = []
         
-        arcsEntrants = self.getArcEntrants()
-        arcsSortants = self.getArcSortants()
+        arcsEntrants = self.getArcsEntrants()
+        arcsSortants = self.getArcsSortants()
         
         # transformation du sens géométrique au sens de circulation
         for arc in arcsEntrants:
@@ -217,12 +230,12 @@ class Edge:
     def setNoeudIni(self, noeud):
         
         if self.noeudIni != None:
-            self.noeudIni.getArcSortants().remove(self)
+            self.noeudIni.getArcsSortants().remove(self)
     
         if noeud != None:
             self.noeudIni = noeud
       
-        if self not in noeud.getArcSortants():
+        if self not in noeud.getArcsSortants():
             noeud.addArcSortant(self)
         else:
             self.noeudIni = None
@@ -234,12 +247,12 @@ class Edge:
         #self.noeudFin = noeudFin
         
         if self.noeudFin != None:
-            self.getNoeudFin().getArcEntrants().remove(self)
+            self.getNoeudFin().getArcsEntrants().remove(self)
     
         if noeud != None:
             self.noeudFin = noeud
       
-        if self not in noeud.getArcEntrants():
+        if self not in noeud.getArcsEntrants():
             noeud.addArcEntrant(self)
         else:
             self.noeudFin = None
@@ -292,13 +305,90 @@ class Network:
         return None
     
     
+    def select(self, node, distance):
+        '''
+        Selection des autres noeuds dans le cercle dont node.coord est le centre, 
+        de rayon distance
+
+        Parameters
+        ----------
+        node : Node
+            le centre du cercle de recherche.
+        tolerance : double
+            le rayon du cercle de recherche.
+
+        Returns
+        -------
+        NODES : tableau de NODES
+            liste des noeuds dans le cercle
+
+        '''
+        NODES = []
+        
+        for n in self.NODES:
+            if n.coord.distance2DTo(node.coord) <= distance:
+                NODES.append(n)
+        
+        return NODES
+    
+    
+    
     def shortest_path(self, node1, node2):
         return node1.plusCourtChemin(node2)
     
     
     def shortest_path_distance(self, node1, node2):
-        PPC = node1.plusCourtChemin(node2)
-        return PPC[0].distance
+        trace = node1.plusCourtChemin(node2)
+        DISTS = trace.getAnalyticalFeature('DISTANCE')
+        return DISTS[len(DISTS) - 1]
+    
+    
+    def shortest_path_distances(node1, cut=None):
+        '''
+        Une fonction plus efficace pour le calcul global, qui donne les distances 
+        des plus courts chemins entre node1 et tous les nœuds du réseau. 
+        Lorsque cut est renseigné, on arrête le calcul dès qu’on dépasse 
+        la distance cut. Par exemple : shortest_path_distances(n, 300) va 
+        retourner les plus courtes distances de n à tous les autres nœuds 
+        du réseau situés à moins de 300 unités
+        
+        cette fonction (dite de Dijkstra omnidirectionnel) est en réalité 
+        la sortie de base de Dijkstra. Il ne faut pas calculer n fois un 
+        Dijkstra unidirectionnel.
+        '''
+        pass
+    
+    
+    def shortest_path_all_distances(node1, cut=None):
+        pass
+    
+    
+    def plot(self, pcc = None, node1 = None, node2 = None):
+        
+        for edge in self.EDGES:
+            X = edge.track.getX()
+            Y = edge.track.getY()
+            if edge.orientation == Edge.DOUBLE_SENS:
+                plt.plot(X, Y, '-', color="blue", linewidth = 0.5)
+            else:
+                plt.plot(X, Y, '-', color="gray", linewidth = 0.5)
+            #edge.track.plot()
+            
+        for node in self.NODES:
+            #print (str(len(node.getArcsEntrants())) + '-' + str(len(node.getArcsSortants()))) 
+            plt.plot(node.coord.getX(), node.coord.getY(), 'gx', markersize=2)
+            
+        if pcc != None:
+            X = pcc.getX()
+            Y = pcc.getY()
+            plt.plot(X, Y, '-', color="red", dashes=[4, 3], lw=2)
+            
+        if node1 != None:
+            plt.plot(node1.coord.getX(), node1.coord.getY(), 'rx', markersize=5)
+        if node2 != None:
+            plt.plot(node2.coord.getX(), node2.coord.getY(), 'rx', markersize=5)
+        
+        plt.show()
 
 
 #if __name__ == '__main__':

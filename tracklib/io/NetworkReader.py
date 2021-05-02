@@ -8,6 +8,7 @@ from tracklib.core.Track import Track
 from tracklib.io.NetworkFormat import NetworkFormat
 import tracklib.util.Wkt as wkt
 
+
 class NetworkReader:
     
     @staticmethod
@@ -46,8 +47,8 @@ class NetworkReader:
                 track = Track(TAB_OBS)
 
                 # Transformation GEO coordinates to ENU
-                if (fmt.srid.upper() in ["GEOCOORDS", "GEO", "ECEFCOORDS", "ECEF"]):
-                    track.toENUCoords()
+                #if (fmt.srid.upper() in ["GEOCOORDS", "GEO", "ECEFCOORDS", "ECEF"]):
+                #    track.toENUCoords()
                 
                 edge = Edge(edge_id, track)
                 
@@ -66,7 +67,7 @@ class NetworkReader:
                 
                 # source node 
                 source = str(row[fmt.pos_source])
-                noeudIni = Node(source, track.getFirstObs())
+                noeudIni = Node(source, track.getFirstObs().position)
                 if noeudIni not in network.NODES:
                     edge.setNoeudIni(noeudIni)
                     network.addNode(noeudIni)
@@ -76,7 +77,7 @@ class NetworkReader:
                 
                 # target node 
                 target = str(row[fmt.pos_target])
-                noeudFin = Node(target, track.getLastObs())
+                noeudFin = Node(target, track.getLastObs().position)
                 if noeudFin not in network.NODES:
                     edge.setNoeudFin(noeudFin)
                     network.addNode(noeudFin)
