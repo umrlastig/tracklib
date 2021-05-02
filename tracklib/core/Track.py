@@ -134,7 +134,22 @@ class Track:
             for i in range(self.size()):
                 self.getObs(i).position = self.getObs(i).position.toGeoCoords(base)            	
           
-
+    # Function to convert 2D coordinates (GEO or ENU) into image local coordinates
+    # Input: two points p1, p2 (image coordinates), P1, P2 (track coordinate system)
+    # p1 and p2 are provided as lists. P1 and P2 are GeoCoords or ENUCoords.	
+    def toImageCoords(self, P1, P2, p1, p2):
+        if not (self.getSRID() in ["Geo", "ENU"]):	
+            print("Error: track coordinate system must be GEO or ENU for image projection")
+            exit()
+			
+        sx = (p2[0]-p1[0])/(P2.getX() - P1.getX())
+        sy = (p2[1]-p1[1])/(P2.getY() - P1.getY())
+    
+        for i in range(len(self)):
+            xi = (self[i].position.getX()-P1.getX())*sx + p1[0]
+            yi = (self[i].position.getY()-P1.getY())*sy + p1[1]
+            self[i].position = ENUCoords(xi, yi, self[i].position.getZ())	
+	 
     # =========================================================================
     # Basic methods to get metadata and/or data
     # =========================================================================

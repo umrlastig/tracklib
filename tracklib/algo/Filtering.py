@@ -84,7 +84,7 @@ def Kalman(track):
 # --------------------------------------------------------------------------
 def __Markov_S(track, i):
     etats = []
-    N = int(3*sig/res)+1
+    N = int(2*sig/res)+1
     for kx in range(-N,N+1):
         for ky in range(-N,N+1):
             p = track[i].position.copy()

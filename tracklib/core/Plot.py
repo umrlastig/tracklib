@@ -2,10 +2,13 @@
 # Class to plot GPS tracks and its AF
 # ----------------------------------------------------------------
 
+import progressbar
 import matplotlib.pyplot as plt
 import tracklib.algo.Analytics as algo
 import tracklib.core.Operator as Operator
 import tracklib.core.Utils as utils
+
+from PIL import Image
 
 #MODE_REPRESENT_TRACK2D = 1
 #MODE_REPRESENT_SPEED_PROFIL = 2
@@ -44,8 +47,8 @@ class Plot:
         if len(marqueurs.intersection([0, 1])) == 2:
             return True
         else:
-            return False		
-		
+            return False        
+        
     
     def plot(self, type='LINE', af_name = '', cmap=-1):
 
@@ -212,12 +215,18 @@ class Plot:
         
     
         
-    
-    
+def plotOnImage(track, image_path, sym='r.', markersize=1):
+    N = len(track)
+    img = Image.open(image_path)
+    plt.imshow(img)
+    plt.plot(track.getX(), track.getY(), sym, markersize)
+
         
-    
-        
-        
-    
-    
-    
+def videoOnImage(track, image_path, sym='r.', markersize=1):
+    N = len(track)
+    img = Image.open(image_path)
+    plt.imshow(img)
+    for i in progressbar.progressbar(range(len(track))):
+        for j in range(i):
+            plt.plot(track[j].position.getX(), track[j].position.getY(), 'r.', markersize=1)
+        plt.savefig('export'+'{:04d}'.format(i)+'.png')    
