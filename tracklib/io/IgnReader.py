@@ -4,7 +4,9 @@ import json
 import requests
 from xml.dom import minidom
 
-from tracklib.cartetopo.Troncon import Troncon
+from tracklib.core.Network import Network, Edge, Node
+from tracklib.core.Track import Track
+import tracklib.util.Wkt as wkt
 
 class IgnReader:
     
@@ -18,14 +20,26 @@ class IgnReader:
     #URL_SERVER += "BBOX=44.538617443499014,5.808794912294471,45.05505710140573,6.644301708889899"
     #URL_SERVER += "&count=3&startIndex=0"
     
+    #self.id = id
+    #self.coords = coords
+    #self.nature = nature
+    #self.sens = sens
+    #self.fictif = fictif
+    #self.pos = pos
 
     # ===========================
     # tolerance
     # ===========================
     @staticmethod
-    def getNetwork(bbox, proj):
+    def getNetwork(bbox, proj, tolerance = 0.1):
+        '''
+            TODO : posSol
+        '''
         
-        TRONCONS = []
+        network = Network()
+        
+        cptNode = 1
+        base = None
         
         nbRoute = IgnReader.__getNbRouteEmprise(bbox)
         nbiter = int(nbRoute / IgnReader.NB_PER_PAGE) + 1
@@ -44,24 +58,81 @@ class IgnReader:
             data = json.loads(response.text)
             features = data['features']
             for feature in features:
-                idd = feature['id']
-                nature = feature['properties']['nature']
-                sens = feature['properties']['sens_de_circulation']
-                fictif = feature['properties']['fictif']
-                pos = feature['properties']['position_par_rapport_au_sol']
                 
+                idd = feature['id']
+                # nature = feature['properties']['nature']
+                fictif = feature['properties']['fictif']
+                if fictif == 'True':
+                    continue
+                
+                # TODO
+                #pos = feature['properties']['position_par_rapport_au_sol']
+                
+                TAB_OBS = []
                 coords = feature['geometry']['coordinates']
-                geom = ''
                 if (feature['geometry']['type'] == 'LineString'):
                     #print (str(len(coords)))
-                    geom = coords
+                    #geom = coords
+                    TAB_OBS = wkt.tabCoordsLineStringToObs(coords, 'GEOCOORDS')
                 
-                t = Troncon(idd, geom, nature, sens, fictif, pos)
-                TRONCONS.append(t)
+                if len(TAB_OBS) < 2:
+                    continue
+                
+                track = Track(TAB_OBS)
+                if base == None:
+                    track.toENUCoords()
+                    base = track.base
+                else:
+                    track.toENUCoords(base)
+                
+                
+                edge = Edge(idd, track)
+                
+                # Orientation
+                sens = feature['properties']['sens_de_circulation']
+                orientation = 0
+                if sens == 'Double sens' or sens == 'Sans objet':
+                    orientation = 0
+                elif sens == 'Direct' or sens == 'Sens direct':
+                    orientation = 1
+                elif sens == 'Indirect' or sens == 'Sens inverse':
+                    orientation = -1
+                edge.setOrientation(orientation)
+                
+                # Poids
+                poids = track.length()
+                edge.setPoids(poids)
+                
+                # Source node 
+                p1 = track.getFirstObs().position
+                noeudIni = Node(str(cptNode), p1)
+                candidates = network.select(Node('0', p1), tolerance)
+                if len(candidates) > 0:
+                    for cand in candidates:
+                        edge.setNoeudIni(cand)
+                else:
+                    edge.setNoeudIni(noeudIni)
+                    network.addNode(noeudIni)  
+                    cptNode += 1
+                
+                # Target node 
+                p2 = track.getLastObs().position
+                noeudFin = Node(str(cptNode), p2)
+                candidates = network.select(Node('0', p2), tolerance)
+                if len(candidates) > 0:
+                    for cand in candidates:
+                        edge.setNoeudFin(cand)
+                else:
+                    edge.setNoeudFin(noeudFin)
+                    network.addNode(noeudFin)
+                    cptNode += 1
+                
+                # Add edge
+                network.addEdge(edge)
                 
             offset = offset + IgnReader.NB_PER_PAGE
         
-        return TRONCONS
+        return network
 
     
     
@@ -97,14 +168,3 @@ class IgnReader:
         
 
 
-if __name__ == '__main__':
-
-    xmin = 6.06779213241985538
-    xmax = 6.30425230208879839
-    ymin = 44.915438233863199
-    ymax = 44.99425829041950919
-    proj = "EPSG:2154"
-    
-    TRONCONS = IgnReader.getNetwork((xmin, ymin, xmax, ymax), proj)
-    print (len(TRONCONS))
-    
