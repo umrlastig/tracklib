@@ -15,7 +15,6 @@ from tracklib.core.TrackCollection import TrackCollection
 from tracklib.core.Kernel import GaussianKernel
 from tracklib.core.GPSTime import GPSTime
 
-
 import tracklib.core.Utils as utils
 import tracklib.algo.Analytics as Analytics
 import tracklib.algo.Geometrics as Geometrics

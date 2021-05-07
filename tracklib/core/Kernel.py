@@ -2,15 +2,13 @@
 Kernels for filtering        
 """
 
-import math
-import matplotlib.pyplot as plt
-import numpy as np
 import sys
-
-import tracklib.algo.Comparison as Comparison
+import math
+import numpy as np
+import matplotlib.pyplot as plt
 
 # -----------------------------------------------------------------------------
-#  Kernels for filtering        
+# Kernels for filtering, smoothing and stochastics simulations        
 # -----------------------------------------------------------------------------
 class Kernel:    
     
@@ -123,10 +121,33 @@ class SincKernel(Kernel):
     def __str__(self):
         return "Sinc kernel (width=" + str(self.support/3) + ")"
 
-
+# ---------------------------------------------------------
+# Non-parametric estimator of Kernel based on GPS tracks.
+# The experimental covariogram kernel is initialized with 
+# a maximal scope dmax and an optional resolution (both 
+# given in ground units as a distance along curvilinear 
+# abscissa or traks. The comparison between pairs of tracks 
+# is performed with either Nearest Neighbor (NN) or Dynamic 
+# Time Warping (DTM) method. Some tests are still to be 
+# conducted to determine which one is more suitable for a 
+# robust covariance estimation. If no resolution is input, 
+# the covariogram is estimated in 30 points as a default 
+# value. The covariogram is incrementally estimated with 
+# each data input with addSamples(track_collection) or 
+# addTrackPair(track1, track2). Note that track collection 
+# input into addSamples must contain at least two tracks.
+# ---------------------------------------------------------
+# Once an experimental covariogram has been estimated, it 
+# is possible to fit a parametric estimation on a one of 
+# the kernel models provided above (except UniformKernel 
+# which is not a positive-definite function). 
+# The estimation is performed with fit(kernel) function. 
+# The fitted kernel is returned as standard output.
+# ---------------------------------------------------------
 class ExperimentalKernel:
     
     def __init__(self, dmax, method="DTW", r=None):
+        import tracklib.algo.Comparison as Comparison
         self.dmax = dmax
         self.method = method
         self.r = r
