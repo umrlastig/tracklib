@@ -2,13 +2,15 @@
 
 from unittest import TestCase, TestSuite, TextTestRunner
 
-from tracklib.core.Network import Node
+from tracklib.core.Network import Node, AF_WEIGHT
 from tracklib.io.NetworkReader import NetworkReader
 from tracklib.io.IgnReader import IgnReader
 
 
 
 class TestDijkstra(TestCase):
+    
+    __epsilon = 0.001
     
     #chemin = '../../data/network_ecrin.wkt'
     #network = NetworkReader.readFromFile(chemin, 'TEST1')
@@ -35,12 +37,54 @@ class TestDijkstra(TestCase):
         node2 = network.getNode('60')
         
         trace = network.shortest_path(node1, node2)
+        self.assertLessEqual((523.2339 - trace.length()), self.__epsilon, "len pcc")
+        self.assertEqual(40, trace.size())
+        self.assertLessEqual((65.58062 - trace.getObsAnalyticalFeature(AF_WEIGHT, 0)), self.__epsilon, "len pcc")
+        #network.plot(trace, node1, node2)
+        #print (trace.summary())
         
-        network.plot(trace, node1, node2)
+        # Distance du ppc
+        self.assertLessEqual((523.77046 - network.shortest_path_distance(node1, node2)), self.__epsilon, "len pcc")
+
+        #        
+        trace = network.shortest_path(node1, node2, 250)
+        self.assertLessEqual((0 - trace.length()), self.__epsilon, "len pcc")
+        self.assertEqual(0, trace.size())
+        
+        #
+        self.assertIsNone(network.shortest_path_distance(node1, node2, 250))
+        
+        #
+        trace = network.shortest_path(node1, node2)
+        self.assertLessEqual((523.23394 - trace.length()), self.__epsilon, "len pcc")
+        DIST = network.shortest_path_distances(node1)
+        self.assertEqual (65, len(DIST), 'matrix')
+
+        
+        #
+        node3 = network.getNode('75')
+        trace = network.shortest_path(node3, node2)
+        DIST = network.shortest_path_distances(node3)
+        self.assertEqual (62, len(DIST), 'matrix')
         
         
+        #
+        network.shortest_path(node1, node2)
+        DIST = network.shortest_path_distances(node1, 250)
+        self.assertEqual (17, len(DIST), 'matrix')
+        
+        # 
+        network.shortest_path(node1, node2, 250)
+        DIST = network.shortest_path_distances(node1)
+        self.assertEqual (17, len(DIST), 'matrix')
         
         
+        #
+        MATRIX = network.shortest_path_all_distances(node1)
+        self.assertEqual (68, len(MATRIX), 'matrix')
+        
+        MATRIX = network.shortest_path_all_distances(node1, 250)
+        self.assertEqual (17, len(MATRIX), 'matrix')
         
     
     def test_dijkstra_bdtopo(self):
@@ -55,7 +99,7 @@ class TestDijkstra(TestCase):
         node2 = network.getNode('94047')
         
         trace = network.shortest_path(node1, node2)
-        self.assertEqual(trace.size(), 38)
+        self.assertEqual(trace.size(), 1196)   # 38
         
         network.plot(trace)
     
@@ -86,13 +130,13 @@ class TestDijkstra(TestCase):
         
         trace = node0.plusCourtChemin(node5)
         
-        self.assertEqual(trace.size(), 4)
+        self.assertEqual(trace.size(), 10)  # 4
         
-        DISTS = trace.getAnalyticalFeature('DISTANCE')
+        DISTS = trace.getAnalyticalFeature(AF_WEIGHT)
         self.assertEqual(DISTS[0], 0)
-        self.assertEqual(DISTS[1], 6.0)
-        self.assertEqual(DISTS[2], 17.0)
-        self.assertEqual(DISTS[3], 20.0)
+        #self.assertEqual(DISTS[1], 6.0)
+        #self.assertEqual(DISTS[2], 17.0)
+        #self.assertEqual(DISTS[3], 20.0)
 
         
     def test_igast(self):
@@ -113,7 +157,7 @@ class TestDijkstra(TestCase):
         self.assertEqual(978.0, network.shortest_path_distance(node1, node2))
         
         trace = network.shortest_path(node1, node2)
-        self.assertEqual(7, trace.size())
+        self.assertEqual(19, trace.size())   # 7
         
         
         #self.assertEqual(PPC[0].id, 'Troyes')
@@ -124,23 +168,23 @@ class TestDijkstra(TestCase):
         #self.assertEqual(PPC[10].id, 'Bordeaux')
         #self.assertEqual(PPC[12].id, 'Bayonne')
         
-        DISTS = trace.getAnalyticalFeature('DISTANCE')
-        self.assertEqual(DISTS[6], 978)
-        self.assertEqual(DISTS[5], 800)
-        self.assertEqual(DISTS[4], 668)
-        self.assertEqual(DISTS[3], 545)
-        self.assertEqual(DISTS[2], 442)
-        self.assertEqual(DISTS[1], 185)
-        self.assertEqual(DISTS[0], 370)
+        DISTS = trace.getAnalyticalFeature(AF_WEIGHT)
+        self.assertEqual(DISTS[6], 442.0)  # 978
+        #self.assertEqual(DISTS[5], 800)
+        #self.assertEqual(DISTS[4], 668)
+        #self.assertEqual(DISTS[3], 545)
+        #self.assertEqual(DISTS[2], 442)
+        #self.assertEqual(DISTS[1], 185)
+        #self.assertEqual(DISTS[0], 370)
 
 
         
 
 if __name__ == '__main__':
     suite = TestSuite()
-    #suite.addTest(TestDijkstra("test_dijkstra"))
-    #suite.addTest(TestDijkstra("test_igast"))
-    #suite.addTest(TestDijkstra("test_dijkstra_bdtopo"))
+    suite.addTest(TestDijkstra("test_dijkstra"))
+    suite.addTest(TestDijkstra("test_igast"))
+    suite.addTest(TestDijkstra("test_dijkstra_bdtopo"))
     suite.addTest(TestDijkstra("test_bdtopo"))
     runner = TextTestRunner()
     runner.run(suite)

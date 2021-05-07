@@ -8,6 +8,13 @@ from tracklib.core.Track import Track
 from tracklib.core.GPSTime import GPSTime
 from tracklib.core.Obs import Obs
 
+
+# =============================================================================
+#
+#
+AF_WEIGHT = "->WEIGHT"
+
+
 # =============================================================================
 #
 #
@@ -22,6 +29,10 @@ class Node:
         self.sortants = []
         
         # Pour le ppc:
+        self.initializeForSP()
+        
+        
+    def initializeForSP(self):
         self.__noeudPrecedent = None
         self.__distance = -1
         self.__arcPrecedent = None
@@ -41,18 +52,22 @@ class Node:
     def addArcEntrant(self, edge):
         self.entrants.append(edge)
 
-    def plusCourtChemin(self, arrivee):
+    def plusCourtChemin(self, arrivee, lengthmax = 0):
         '''
         Plus court chemin de self vers arrivée, en tenant compte du sens de circulation. 
         Le pcc s'appuie sur l'attribut 'poids' des arcs, qui doit être rempli auparavant.
+        
+        @param lengthmax Pour optimiser: on arrête de chercher et on renvoie une trace vide
+             s'il n'y a pas de pcc de taille inférieure à maxLongueur (inactif
+             si maxLongueur = 0).
         '''
         PPC = []
         
         if self == arrivee:
             trace = Track()
             trace.addObs(Obs(self.coord, GPSTime()))
-            #PPC.add(self)
-            #return PPC
+            # PPC.add(self)
+            # return PPC
             return trace
         
         self.__distance = 0
@@ -87,7 +102,13 @@ class Node:
             if plusProche == arrivee:
                 # Arrivé !!!
                 break
-        
+            
+            if lengthmax > 0:
+                if plusProche.__distance > lengthmax:
+                    # Trop long, on s'arrête et on renvoie une trace vide
+                    trace = Track()
+                    return trace
+                  
             (arcsVoisins, noeudsVoisins, distancesVoisins) = plusProche.__chercheArcsNoeudsVoisins()
             
             for i in range(len(noeudsVoisins)):
@@ -158,7 +179,11 @@ class Node:
             if isinstance(elt, Node):
                 trace.addObs(Obs(elt.coord, GPSTime()))
                 DIST_TAB.append(elt.getDistance())
-        trace.createAnalyticalFeature('DISTANCE', DIST_TAB)
+            elif isinstance(elt, Edge):
+                for o in elt.track.getObsList():
+                    trace.addObs(o)
+                    DIST_TAB.append(-1)
+        trace.createAnalyticalFeature(AF_WEIGHT, DIST_TAB)
         #return PPC
         return trace
             
@@ -290,6 +315,8 @@ class Network:
         '''
         self.EDGES = []
         self.NODES = []
+        
+        self.__cut = 0
 
 
     def addEdge(self, edge):
@@ -332,19 +359,36 @@ class Network:
         return NODES
     
     
-    
-    def shortest_path(self, node1, node2):
-        return node1.plusCourtChemin(node2)
-    
-    
-    def shortest_path_distance(self, node1, node2):
-        trace = node1.plusCourtChemin(node2)
-        DISTS = trace.getAnalyticalFeature('DISTANCE')
-        return DISTS[len(DISTS) - 1]
+    def __initializeForSP(self):
+        for node in self.NODES:
+            node.initializeForSP()
+            
     
     
-    def shortest_path_distances(node1, cut=None):
+    def shortest_path(self, node1, node2, cut = 0):
+        self.__cut = cut
+        self.__initializeForSP()
+        return node1.plusCourtChemin(node2, cut)
+    
+    
+    def shortest_path_distance(self, node1, node2, cut = 0):
+        self.__cut = cut
+        self.__initializeForSP()
+        trace = node1.plusCourtChemin(node2, cut)
+        if trace != None and trace.hasAnalyticalFeature(AF_WEIGHT):
+            DISTS = trace.getAnalyticalFeature(AF_WEIGHT)
+            return DISTS[len(DISTS) - 1]
+        else:
+            return None
+    
+    
+    def shortest_path_distances(self, node1, cut=0):
         '''
+        
+        Il faut avoir lancé un shortest_path avant !
+        
+        retourne un dict  (key = node1 - node, val = distance)
+        
         Une fonction plus efficace pour le calcul global, qui donne les distances 
         des plus courts chemins entre node1 et tous les nœuds du réseau. 
         Lorsque cut est renseigné, on arrête le calcul dès qu’on dépasse 
@@ -356,11 +400,52 @@ class Network:
         la sortie de base de Dijkstra. Il ne faut pas calculer n fois un 
         Dijkstra unidirectionnel.
         '''
-        pass
+        
+        if cut > 0:
+            self.__cut = cut
+        # sinon cut peut avoir été utilisé dans le calcul
+        
+#        for edge in self.EDGES:
+#            X = edge.track.getX()
+#            Y = edge.track.getY()
+#            if edge.orientation == Edge.DOUBLE_SENS:
+#                plt.plot(X, Y, '-', color="blue", linewidth = 0.5)
+#            else:
+#                plt.plot(X, Y, '-', color="gray", linewidth = 0.5)
+#        
+#        for node in self.NODES:
+#            distance = node.getDistance()
+#            if distance < 0:
+#                plt.plot(node.coord.getX(), node.coord.getY(), 'bo')
+#                
+#        if node1 != None:
+#            plt.plot(node1.coord.getX(), node1.coord.getY(), 'rx', markersize=5)
+#                
+#        plt.show()
+        
+        DIST = dict()
+        for node in self.NODES:
+            distance = node.getDistance()
+            if distance >= 0:
+                if self.__cut > 0 and distance <= self.__cut:
+                    DIST[node.id] = distance
+                elif self.__cut == 0:
+                    DIST[node.id] = distance
+        return DIST
     
     
-    def shortest_path_all_distances(node1, cut=None):
-        pass
+    def shortest_path_all_distances(self, node1, cut=0):
+        self.__cut = cut
+        self.__initializeForSP()
+        
+        DIST = dict()
+        for node in self.NODES:
+            d = self.shortest_path_distance(node1, node, cut)
+            if d != None and d >= 0:
+                # print (d, node.id, node1.id)
+                key = (node1.id, node.id)
+                DIST[key] = d
+        return DIST
     
     
     def plot(self, pcc = None, node1 = None, node2 = None):
@@ -381,7 +466,7 @@ class Network:
         if pcc != None:
             X = pcc.getX()
             Y = pcc.getY()
-            plt.plot(X, Y, '-', color="red", dashes=[4, 3], lw=2)
+            plt.plot(X, Y, '-', color="red", linestyle='--', dashes=(5, 10))
             
         if node1 != None:
             plt.plot(node1.coord.getX(), node1.coord.getY(), 'rx', markersize=5)
