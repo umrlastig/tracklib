@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-import tracklib.algo.Geometrics as geom
 
 from tracklib.core import (
   Track, Obs, Coords, GPSTime)
 
+import tracklib.algo.Geometrics as geom
 
 class TestAlgoGeometricsMethods(unittest.TestCase):
     

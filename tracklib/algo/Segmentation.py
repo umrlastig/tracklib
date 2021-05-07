@@ -8,7 +8,6 @@ import numpy as np
 
 from tracklib.core.Obs import Obs
 from tracklib.core.Coords import ENUCoords
-from tracklib.algo.Geometrics import Circle
 
 import tracklib.core.Track as core_track
 import tracklib.core.Track as core_trackCollection
@@ -16,6 +15,8 @@ import tracklib.core.Utils as utils
 import tracklib.algo.Geometrics as Geometrics
 import tracklib.algo.Interpolation as interp
 import tracklib.core.Operator as Operator
+
+from tracklib.algo.Geometrics import Circle
 
 MODE_COMPARAISON_AND = 1
 MODE_COMPARAISON_OR = 2
