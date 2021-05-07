@@ -48,20 +48,33 @@ class TestQuery(TestCase):
         self.assertLessEqual((0.7071 - trace.getObsAnalyticalFeatures('speed', 1)[0]), self.__epsilon, 'erreur de vitesse obs1')
         self.assertLessEqual((0.2070 - trace.getObsAnalyticalFeatures('speed', 8)[0]), self.__epsilon, 'erreur de vitesse obs8')
     
-    def test_selectwhere(self):
+    def test_selectwhere1(self):
         
         self.track.addAnalyticalFeature(Analytics.speed)
         trace = self.track.query("SELECT * WHERE speed < 0.5")
         self.assertEqual(4, trace.size())
         self.assertTrue(trace.hasAnalyticalFeature('speed'))
+        self.assertLessEqual((0.2070 - trace.getObsAnalyticalFeatures('speed', 0)[0]), self.__epsilon, 'erreur de vitesse 0')
         self.assertLessEqual((0.2070 - trace.getObsAnalyticalFeatures('speed', 1)[0]), self.__epsilon, 'erreur de vitesse 1')
         self.assertLessEqual((0.2070 - trace.getObsAnalyticalFeatures('speed', 2)[0]), self.__epsilon, 'erreur de vitesse 2')
         self.assertLessEqual((0.2070 - trace.getObsAnalyticalFeatures('speed', 3)[0]), self.__epsilon, 'erreur de vitesse 3')
+
+    def test_selectwhere2(self):
+        
+        self.track.addAnalyticalFeature(Analytics.speed)
+        trace = self.track.query("SELECT * WHERE speed > 0.5")
+        self.assertEqual(4, trace.size())
+        self.assertTrue(trace.hasAnalyticalFeature('speed'))
+        self.assertLessEqual((0.7071 - trace.getObsAnalyticalFeatures('speed', 0)[0]), self.__epsilon, 'erreur de vitesse 0')
+        self.assertLessEqual((0.7071 - trace.getObsAnalyticalFeatures('speed', 1)[0]), self.__epsilon, 'erreur de vitesse 1')
+        self.assertLessEqual((0.7071 - trace.getObsAnalyticalFeatures('speed', 2)[0]), self.__epsilon, 'erreur de vitesse 2')
+        self.assertLessEqual((0.7071 - trace.getObsAnalyticalFeatures('speed', 3)[0]), self.__epsilon, 'erreur de vitesse 3')
 
 
 if __name__ == '__main__':
     suite = TestSuite()
     suite.addTest(TestQuery("test_selectstar"))
-    suite.addTest(TestQuery("test_selectwhere"))
+    suite.addTest(TestQuery("test_selectwhere1"))
+    suite.addTest(TestQuery("test_selectwhere2"))
     runner = TextTestRunner()
     runner.run(suite)
