@@ -54,6 +54,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from tracklib.core.Track import Track
+from tracklib.core.TrackCollection import TrackCollection
 from tracklib.core.Obs import Obs
 
 import tracklib.core.Utils as utils
@@ -69,6 +70,9 @@ MODE_CROSSES = 0
 MODE_INSIDE = 1
 MODE_GETS_IN = 2
 MODE_GETS_OUT = 3
+
+MODE_CROSSES = 0
+MODE_PARALLEL = 1
 
 TYPE_SELECT = 0
 TYPE_CUT_AND_SELECT = 1
@@ -130,23 +134,59 @@ class TimeConstraint:
 # -------------------------------------------------
 class TrackConstraint:
 
-    def __init__(self, track, time=None, mode=MODE_CROSSES, type=TYPE_SELECT):
+    def __init__(self, track, res=1, buffer=10, prop=0.5, length=0, time=None, mode=MODE_PARALLEL, type=TYPE_SELECT):
         self.track = track
         self.time = time
-        self.mode = mode
         self.type = type
+        self.prop = prop
+        self.mode = mode
+        self.length = length
+        self.segments = []
+        for i in range(1,len(track),1):
+            pt1 = track[i].position.copy()
+            pt2 = pt1.copy()
+            dx = track[i].position.getX()-track[i-1].position.getX()
+            dy = track[i].position.getY()-track[i-1].position.getY()
+            R = (dx*dx+dy*dy)**(0.5)
+            if R == 0:
+                continue
+            pt1.translate(+buffer*dy/R, -buffer*dx/R)
+            pt2.translate(-buffer*dy/R, +buffer*dx/R)
+            self.segments.append(Track([Obs(pt1), Obs(pt2)]))
 
     def __str__(self):
-        output = "Track-based selecting constraint (mode '"+printMode(self)+"')"
-        output += "(mode '"+ str(printMode(self)) +"')"              
-        output += " with " + str(self.time).lower()		
+        output = "Track-based selecting constraint (mode '"+printMode(self)+"')"              
+        output += " with " + str(self.time).lower()        
         return output
+
+    def plot(self, sym='r-'):
+        plt.plot(self.track.getX(), self.track.getY(), sym)
+        for i in range(len(self.segments)):
+            plt.plot(self.segments[i].getX(), self.segments[i].getY(), sym)
         
-    def contains(self, track):  # TO DO (in track)
-        return True 
+    def contains(self, track):  
+        if self.mode == MODE_PARALLEL:
+            counter = 0
+            lgth = 0
+            for i in range(len(self.segments)):
+                if Geometrics.intersects(self.segments[i], track):
+                    counter += 1
+                    lgth += self.track[i].position.distance2DTo(self.track[i+1].position)
+                    if ((counter > self.prop*len(self.segments)) and (lgth > self.length)):
+                        return True
+            return False 
+        else:
+            return Geometrics.intersects(self.track, track)
         
-    def select(self, track): # TO DO (in track collection)
-        return track 
+    def select(self, tracks): 
+        if self.type == TYPE_SELECT:
+            output = TrackCollection()
+            for track in tracks: 
+                if self.contains(track):
+                    output.addTrack(track)
+            return output
+        if self.type == TYPE_CUT_AND_SELECT:
+            return tracks  
         
 # -------------------------------------------------
 # Special case of constraint defined by a segment
@@ -159,9 +199,9 @@ class TollGateConstraint:
         self.type = type
 
     def __str__(self):
-        output = "Toll gate selecting constraint"
-        output += "(mode '"+ str(printMode(self)) +"')"              
-        output += " with " + str(self.time).lower()
+        output = "Toll gate selecting constraint"  
+        if not self.time is None:
+            output += " with " + str(self.time).lower()
         return output
         
     def plot(self, sym='ro-'):
@@ -170,8 +210,15 @@ class TollGateConstraint:
     def contains(self, track):
         return Geometrics.intersects(self.gate, track)
         
-    def select(self, tracks): # TO DO (in track collection)
-        return tracks
+    def select(self, tracks):
+        if self.type == TYPE_SELECT:
+            output = TrackCollection()
+            for track in tracks: 
+                if self.contains(track):
+                    output.addTrack(track)
+            return output
+        if self.type == TYPE_CUT_AND_SELECT:
+            return tracks 
         
 
 class Constraint:
@@ -230,9 +277,13 @@ class Constraint:
                             return True
             return False            
         
-    def select(self, tracks):  # TO DO (in track collection)
+    def select(self, tracks): 
         if self.type == TYPE_SELECT:
-            return tracks
+            output = TrackCollection()
+            for track in tracks: 
+                if self.contains(track):
+                    output.addTrack(track)
+            return output
         if self.type == TYPE_CUT_AND_SELECT:
             return tracks 
             
@@ -324,7 +375,7 @@ class GlobalSelector:
         for i in range(len(self)):
             output += " ("+alphabet[i].upper() +") " + str(self.selectors[i])    
         return output 
-		
+        
     def plot(self):
         for i in range(len(self.selectors)):
             self.selectors[i].plot()
@@ -350,7 +401,7 @@ class GlobalSelector:
         
     def setCombinationMode(self, combination):
         self.combination = combination   
-		
+        
     def contains(self, track):
         inside = self.__initCombination()
         for s in self.selectors:

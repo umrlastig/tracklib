@@ -29,13 +29,13 @@ class FileReader:
     NMEA_GNRMC = "GNRMC"
     
     @staticmethod
-    def readFromFile(path, id_E=-1, id_N=-1, id_U=-1, id_T=-1, separator=",", DateIni=-1, h=0, com="#", no_data_value=-999999, srid="ENUCoords", read_all=False):
+    def readFromFile(path, id_E=-1, id_N=-1, id_U=-1, id_T=-1, separator=",", DateIni=-1, h=0, com="#", no_data_value=-999999, srid="ENUCoords", read_all=False, verbose=False):
         '''
         The method assumes a single track in file. 
         If only path is provided as input parameters: file format is infered from extension according to file track_file_format
         If only path and a string s parameters are provied, the name of file format is set equal to s.
         '''
-        
+ 
         # -------------------------------------------------------
         # Infering file format from extension or name
         # -------------------------------------------------------
@@ -66,7 +66,7 @@ class FileReader:
         
         time_fmt_save = GPSTime.getReadFormat()
         GPSTime.setReadFormat(fmt.time_fmt)
-        
+
         id_special = [fmt.id_E, fmt.id_N]
         if fmt.id_U >= 0:
             id_special.append(fmt.id_U)
@@ -85,7 +85,7 @@ class FileReader:
             line = fp.readline().strip()
             
             while line:
-            
+
                 if line.strip()[0] == fmt.com:
                     name_non_special = line[1:].split(fmt.separator)
                     line = fp.readline().strip()
@@ -93,7 +93,7 @@ class FileReader:
 
                 fields = line.strip().split(fmt.separator)
                 fields = [s for s in fields if s]
-                
+        
                 if fmt.id_T != -1:
                     if isinstance(fmt.DateIni, int):
                         time = GPSTime.readTimestamp(fields[fmt.id_T])
@@ -172,24 +172,30 @@ class FileReader:
         
         GPSTime.setReadFormat(time_fmt_save)
         
-        #print("File " + path + " loaded: \n" + (str)(track.size()) + " point(s) registered")
+        if verbose:
+            print("File " + path + " loaded: \n" + (str)(track.size()) + " point(s) registered")
         
         return track
     
     
     @staticmethod
-    def readFromFiles(pathdir, id_T, id_E, id_N, id_U=-1, separator=",", srid="ENUCoords"):
+    def readFromFiles(pathdir, id_E=-1, id_N=-1, id_U=-1, id_T=-1, separator=",", DateIni=-1, h=0, com="#", no_data_value=-999999, srid="ENUCoords", read_all=False, verbose=False, selector=None):
         
-        TRACES = []
+        TRACES = TrackCollection()
         LISTFILE = os.listdir(pathdir)
         for f in LISTFILE:
-    
             p = pathdir + '/' + f
-            trace = FileReader.readFromFile(p, id_T, id_E, id_N, id_U, separator, srid)
-            TRACES.append(trace)
+            trace = FileReader.readFromFile(p, id_E, id_N, id_U, id_T, separator, DateIni, h, com, no_data_value, srid, read_all, verbose=False)
+            if not selector is None:
+                if not selector.contains(trace):
+                    continue
+            TRACES.addTrack(trace)
+            if verbose:
+                print("File " + p + " loaded: \n" + (str)(trace.size()) + " point(s) registered")
     
         return TRACES
         
+
     @staticmethod
     def readFromWKTFile(path, id_geom, id_user=-1, id_track=-1, separator=";", h=0, srid="ENUCoords", bboxFilter=None):
     
@@ -254,7 +260,7 @@ class FileReader:
                             break
                     if not inside:
                         line = fp.readline()
-                        continue					
+                        continue                    
                 TRACES.addTrack(track)
                 line = fp.readline()
         
