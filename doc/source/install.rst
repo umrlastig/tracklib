@@ -82,7 +82,16 @@ To launch the documentation:
 Spyder IDE
 -------------
 
-7. A python IDE make the development more easy. To use spyder, you have to create a new project with an existing directory. 
+7. A python IDE make the development more easy. 
+
+pip install spyder
+
+pip install spyder-kernels
+
+spyder &
+
+
+To use spyder, you have to create a new project with an existing directory. 
 
 .. container:: centerside
   
