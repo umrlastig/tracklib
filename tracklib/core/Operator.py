@@ -697,7 +697,7 @@ class Operator:
 	THRESHOLDER = Thresholder()				     # y(t) = 1 if x1(t) >= arg, 0 otherwise (arg is a numeric)
 	RANDOM = Random()							 # y(t) = eta(t) with eta ~ arg
 	FILTER = Filter()							 # y(t) = int[x(z)*h(t-z)dz] (arg is an odd-dimension vector or a kernel)
-	FILTER_FFT = Filter_FFT()	
+	FILTER_FFT = Filter_FFT()	                 # y(t) = int[x(z)*h(t-z)dz] (fast version with FFT)
 	
 
 	

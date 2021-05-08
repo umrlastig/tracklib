@@ -20,3 +20,4 @@ RTKLIB    , pos, 2, 1, 3, 0, -1, bb, 1, %, -999999, GEO, 4Y/2M/2D 2h:2m:2s.3z, F
 RTKLIB_ENU, pos, 1, 2, 3, 0, -1, bb, 1, %, -999999, ENU, 4Y/2M/2D 2h:2m:2s.3z, FALSE
 RTKLIB_XYZ, pos, 1, 2, 3, 0, -1, bb, 1, %, -999999, ECEF, 4Y/2M/2D 2h:2m:2s.3z, FALSE
 NAVITIME, gps, 2, 3, -1, 1, -1, c, 1, #, -1, ENU, 4Y-2M-2D 2h:2m:2s, FALSE
+IMU_STEREOPOLIS, imu, 1, 2, 3, 0, 2019-09-08 00:00:00, b, 0 , %, -999999, ENU, 4Y-2M-2D 2h:2m:2s, FALSE

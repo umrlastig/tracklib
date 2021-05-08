@@ -58,21 +58,21 @@ class Track:
         for i in range(self.size()):
             output += (str)(self.__POINTS[i])+'\n'     
         return output
-		
+        
     def getSRID(self):
         return str(type(self.getFirstObs().position)).split(".")[-1][0:-8]
-		
+        
     def duration(self):
         return self.getLastObs().timestamp - self.getFirstObs().timestamp
-		
-    # Average frequency	in Hz (resp. m/pt) for temporal (resp. spatial) mode 	
+        
+    # Average frequency    in Hz (resp. m/pt) for temporal (resp. spatial) mode     
     def frequency(self, mode="temporal"):
         if ((mode == "spatial") or (mode == 1)):
             return self.size()/self.length()
         if ((mode == "temporal") or (mode == 0)):
             return self.size()/self.duration()
-			
-	# Inverse of average frequency in pt/sec (resp. pt/m) for temporal (resp. spatial) mode 	
+            
+    # Inverse of average frequency in pt/sec (resp. pt/m) for temporal (resp. spatial) mode     
     def interval(self, mode="temporal"):
         return 1.0/self.frequency(mode)
     
@@ -116,10 +116,10 @@ class Track:
                 print("Error: former base coordinates should be specified for conversion ENU -> ENU")
                 exit()
             for i in range(self.size()):
-                self.getObs(i).position = self.getObs(i).position.toENUCoords(self.base, base)          				
+                self.getObs(i).position = self.getObs(i).position.toENUCoords(self.base, base)                          
             self.base = base.toGeoCoords()
             return
-			
+            
     def toGeoCoords(self, base=None):
         if (self.getSRID() == "ECEF"):
             for i in range(self.size()):
@@ -132,24 +132,32 @@ class Track:
                 else:
                     base = self.base
             for i in range(self.size()):
-                self.getObs(i).position = self.getObs(i).position.toGeoCoords(base)            	
+                self.getObs(i).position = self.getObs(i).position.toGeoCoords(base)  
+
+    def toProjCoords(self, srid):
+        if not (self.getSRID().upper() == "GEO"):
+            print("Error: track must be in GEO coordinate for projection to SRID = " + str(srid))
+            exit()            
+        for i in range(self.size()):
+            self.getObs(i).position = self.getObs(i).position.toProjCoords(srid)
+        self.base = srid			
           
     # Function to convert 2D coordinates (GEO or ENU) into image local coordinates
     # Input: two points p1, p2 (image coordinates), P1, P2 (track coordinate system)
-    # p1 and p2 are provided as lists. P1 and P2 are GeoCoords or ENUCoords.	
+    # p1 and p2 are provided as lists. P1 and P2 are GeoCoords or ENUCoords.    
     def toImageCoords(self, P1, P2, p1, p2):
-        if not (self.getSRID() in ["Geo", "ENU"]):	
+        if not (self.getSRID() in ["Geo", "ENU"]):    
             print("Error: track coordinate system must be GEO or ENU for image projection")
             exit()
-			
+            
         sx = (p2[0]-p1[0])/(P2.getX() - P1.getX())
         sy = (p2[1]-p1[1])/(P2.getY() - P1.getY())
     
         for i in range(len(self)):
             xi = (self[i].position.getX()-P1.getX())*sx + p1[0]
             yi = (self[i].position.getY()-P1.getY())*sy + p1[1]
-            self[i].position = ENUCoords(xi, yi, self[i].position.getZ())	
-	 
+            self[i].position = ENUCoords(xi, yi, self[i].position.getZ())    
+     
     # =========================================================================
     # Basic methods to get metadata and/or data
     # =========================================================================
@@ -214,14 +222,14 @@ class Track:
         else:
             T = self.__POINTS[i].timestamp
         return T
-		
+        
     def getCentroid(self):
         m = self.getObs(0).position.copy()
         m.setX(self.operate(Operator.Operator.AVERAGER, 'x'))
         m.setY(self.operate(Operator.Operator.AVERAGER, 'y'))
-        m.setZ(self.operate(Operator.Operator.AVERAGER, 'z'))	
-        return m	
-		
+        m.setZ(self.operate(Operator.Operator.AVERAGER, 'z'))    
+        return m    
+        
     def getMinX(self):
         return self.operate(Operator.Operator.MIN, 'x')
 
@@ -238,8 +246,8 @@ class Track:
         return self.operate(Operator.Operator.MAX, 'y')
 
     def getMaxZ(self):
-        return self.operate(Operator.Operator.MAX, 'z')	
-	
+        return self.operate(Operator.Operator.MAX, 'z')    
+    
     def getLowerLeftPoint(self):
         ll = self.getObs(0).position.copy()
         ll.setX(self.getMinX())
@@ -255,7 +263,7 @@ class Track:
         return ur
 
     def getBBox(self):
-        return [self.getLowerLeftPoint(), self.getUpperRightPoint()]		
+        return [self.getLowerLeftPoint(), self.getUpperRightPoint()]        
 
     def shiftTo(self, idx_point, new_coords=ENUCoords(0,0,0)):
         if (self.getSRID() != "ENU"):
@@ -268,7 +276,7 @@ class Track:
     # Internal methods
     def __transmitAF(self, track):
         self.__analyticalFeaturesDico = track.__analyticalFeaturesDico.copy()
-	
+    
     def hasAnalyticalFeature(self, af_name):
         return af_name in self.__analyticalFeaturesDico
 
@@ -277,7 +285,7 @@ class Track:
         output = []
         for af in af_names:
             output.append(self.getAnalyticalFeature(af))
-        return output	
+        return output    
  
     def getAnalyticalFeature(self, af_name):
         AF = []
@@ -313,7 +321,7 @@ class Track:
         output = []
         for af in af_names:
             output.append(self.getObsAnalyticalFeature(af, i))
-        return output	
+        return output    
 
     def getObsAnalyticalFeature(self, af_name, i):
         if af_name == "x":
@@ -542,8 +550,8 @@ class Track:
             if (id == N):
                 break
         return id
-		
-		
+        
+        
     def print(self, af_names="#all_features"):
         '''Console print of track with analytical features'''
         if self.size() == 0:
@@ -565,7 +573,7 @@ class Track:
                 if j < len(af_names)-1:
                     output += ","
             print(output)
-		 
+         
     def summary(self):
         '''
         Print summary (complete wkt below)
@@ -587,7 +595,7 @@ class Track:
             output += "Analytical feature(s):"
             for i in range(len(self.getListAnalyticalFeatures())):
                 output += "\n - "+self.getListAnalyticalFeatures()[i] 
-            output += "\n-------------------------------------\n"		    			
+            output += "\n-------------------------------------\n"                        
         print(output)
         
         
@@ -635,7 +643,7 @@ class Track:
                 output += ","
         output += "))"
         return output
-		
+        
      
     def extract(self, id_ini, id_fin):
         '''
@@ -831,46 +839,45 @@ class Track:
             - a list of timestamps where interpolation 
             should be computed
             - a reference track'''
-			
-		# (Temporaire)
+            
+        # (Temporaire)
         if not (self.getSRID() == "ENU"):
             print("Error: track data must be in ENU coordinates for resampling")
             exit()
-			
+            
         Interpolation.resample(self, delta, algo, mode)
         self.__analyticalFeaturesDico = {}
-   
-    
-    def incrementTime(self, dt=1):  
+	
+    def incrementTime(self, dt=1, offset=0):  
         '''Add 1 sec to each subsequent record. Use incrementTime to 
         get valid timestamps sequence when timestamps are set as default 
         date on 1970/01/01 00:00:00 for example''' 
         for i in range(len(self)):
-            self.getObs(i).timestamp = self.getObs(i).timestamp.addSec(i*dt)
+            self.getObs(i).timestamp = self.getObs(i).timestamp.addSec(i*dt + offset)
         
         
-	# DEPRECATED
+    # DEPRECATED
     def mapOn(self, reference, TP1, TP2=[], init=[], N_ITER_MAX=20, mode="2D", verbose=True):
     
         '''Geometric affine transformation to align two tracks with diferent
-		coordinate systems. For "2D" mode, coordinates must be ENU or Geo. For 
-		"3D" mode, any type of coordinates is valid. In general, it is recommended 
-		to avoid usage of non-metric Geo coordinates for mapping operation, since 
-		it is relying on an isotropic error model. Inputs:
-		   - reference: another track we want to align on or a list of points
-		   - TP1: list of tie points indices (relative to track self)
-		   - TP2: list of tie points indices (relative to track)
-		   - mode: could be "2D" (default) or "3D"
+        coordinate systems. For "2D" mode, coordinates must be ENU or Geo. For 
+        "3D" mode, any type of coordinates is valid. In general, it is recommended 
+        to avoid usage of non-metric Geo coordinates for mapping operation, since 
+        it is relying on an isotropic error model. Inputs:
+           - reference: another track we want to align on or a list of points
+           - TP1: list of tie points indices (relative to track self)
+           - TP2: list of tie points indices (relative to track)
+           - mode: could be "2D" (default) or "3D"
         if TP2 is not specified, it is assumed equal to TP1.
-		TP1 and TP2 must have same size. Adjustment is performed with least squares.
-		The general transformation from point X to point X' is provided below:
-		                         X' = kRX + T
-		with: k a positive real value, R a 2D or 3D rotation matrix and T a 2D or 
-		3D translation vector. Transformation parameters are returned in standard 
-		output in the following format: [theta, k, tx, ty] (theta in radians)
-		Track argument may also be replaced ny a list of points.
-		Note that mapOn does not handle negative determinant (symetries not allowed)
-		'''   
+        TP1 and TP2 must have same size. Adjustment is performed with least squares.
+        The general transformation from point X to point X' is provided below:
+                                 X' = kRX + T
+        with: k a positive real value, R a 2D or 3D rotation matrix and T a 2D or 
+        3D translation vector. Transformation parameters are returned in standard 
+        output in the following format: [theta, k, tx, ty] (theta in radians)
+        Track argument may also be replaced ny a list of points.
+        Note that mapOn does not handle negative determinant (symetries not allowed)
+        '''   
 
         return Mapping.mapOn(self, reference, TP1, TP2, init, N_ITER_MAX, mode, verbose)
 
@@ -904,8 +911,8 @@ class Track:
         plt.plot(self.getX(), self.getY(), frg+sym_bkg, markersize=size)
         plt.plot(self.getX(), self.getY(), bkg+sym_bkg, markersize=int(0.8*size))
         plt.plot(self.getX(), self.getY(), frg+sym_frg, markersize=int(0.8*size))
-	
-	
+    
+    
     def plot(self, type='LINE', af_name = '', cmap = -1):
         '''
         af_name: test si isAFTransition
@@ -976,12 +983,12 @@ class Track:
             return self.estimate_raw_speed()
         else:
             return self.smoothed_speed_calculation(kernel)
-	
-	# DEPRECATED
+    
+    # DEPRECATED
     def estimate_raw_speed(self):
         return Cinematics.estimate_speed(self)
-	
-	# DEPRECATED	
+    
+    # DEPRECATED    
     def smoothed_speed_calculation(self, kernel):
         return Cinematics.smoothed_speed_calculation(self, kernel)
         
@@ -1022,7 +1029,7 @@ class Track:
             sys.exit("Error: 'compute_abscurv' has not been called yet")
 
     
-	# DEPRECATED
+    # DEPRECATED
     def getCurvAbsBetweenTwoPoints(self, id_ini=0, id_fin=None):
         '''
         Computes and return the curvilinear abscissa between two points
@@ -1036,34 +1043,34 @@ class Track:
 
     # ----------------------------------------------------------------------------------------------------
     # Tools to query observations in a track with SQL-like commands. Output depends on the SELECT clause:
-	#     - If "SELECT *" then output is a copied track of the original track (with all its AF hopefully)
-	#     - If "SELECT f1, f2... fp", then output is a (p x n)-dimensional array, with p = number of fields 
-	#       queried and n = number of observations selected by the WHERE conditions.
-	#     - If "SELECT AGG1(f1), AGG2(f2)... AGGp(fp)", with AGG1, AGG2,.. AGGp, a set of p aggregators, 
-	#       then output is a p-dimensional array, with on value for each aggregator
-	#     - If "SELECT AGG(f)", then output is the floating point value returned by the operator.
-	# Note that operators take as input only analytical feature names. Therefore, "SELECT COUNT(*)" syntax 
-	# is not allowed and must be replaced equivalently by "SELECT COUNT(f)" with any AF name f.
+    #     - If "SELECT *" then output is a copied track of the original track (with all its AF hopefully)
+    #     - If "SELECT f1, f2... fp", then output is a (p x n)-dimensional array, with p = number of fields 
+    #       queried and n = number of observations selected by the WHERE conditions.
+    #     - If "SELECT AGG1(f1), AGG2(f2)... AGGp(fp)", with AGG1, AGG2,.. AGGp, a set of p aggregators, 
+    #       then output is a p-dimensional array, with on value for each aggregator
+    #     - If "SELECT AGG(f)", then output is the floating point value returned by the operator.
+    # Note that operators take as input only analytical feature names. Therefore, "SELECT COUNT(*)" syntax 
+    # is not allowed and must be replaced equivalently by "SELECT COUNT(f)" with any AF name f.
     # General rules: 
-	#     - Only SELECT and WHERE keywords (SET and DELETE available soon)
-	#     - All analytical features + x, y, z, t, and timestamp are available as fields
-	#     - Fields are written without quotes. They must not contain blank spaces
-	#     - "t" is time as integer in seconds since 1970/01/01 00:00:00, and "timestamp" is GPSTIme object
-	#     - Blank space must be used between every other words, symbols and operators
-	#     - WHERE clause may contain as many conditions as needed, separated by OR/AND key words
-	#     - Parenthesis are not allowed within WHERE clause. Use boolean algebra rules to reformulate 
-	#       query without parenthesis: e.g. A AND (B OR C) = A AND B OR A AND C. Or use successive queries.
-	#     - Each condition must contain exactly 3 parts (separated by blank spaces) in this exact order:
-	#         (1) the name of an analytical feature to test
-	#         (2) a comparison operator among >, <, >=, <=, ==, != and LIKE (with % in str and timestamps)
-	#         (3) a threshold value which is automatically casted to the type of the AF given in (1). 
-	#             Intended types accepted are: integers, floats, strings, boolean and GPSTime. 
-	#             When GPSTime is used as a threshold value, eventhough it may contain 2 parts 
-	#            (date and time), it must not be enclosed within quotes. For boolean, "1", "T" and "TRUE"
-    #             are considered as logical True, all other values are considered as False.	
-	#     - Important: no computation allowed in WHERE conditions. E.g. "... WHERE z-2 > 10" not allowed
-	#     - Available aggregators: all unary operators as described in Operator.py, except MSE
-	#     - Capital letters must be used for SQL keywords SELECT, WHERE, AND, OR and aggregators 
+    #     - Only SELECT and WHERE keywords (SET and DELETE available soon)
+    #     - All analytical features + x, y, z, t, and timestamp are available as fields
+    #     - Fields are written without quotes. They must not contain blank spaces
+    #     - "t" is time as integer in seconds since 1970/01/01 00:00:00, and "timestamp" is GPSTIme object
+    #     - Blank space must be used between every other words, symbols and operators
+    #     - WHERE clause may contain as many conditions as needed, separated by OR/AND key words
+    #     - Parenthesis are not allowed within WHERE clause. Use boolean algebra rules to reformulate 
+    #       query without parenthesis: e.g. A AND (B OR C) = A AND B OR A AND C. Or use successive queries.
+    #     - Each condition must contain exactly 3 parts (separated by blank spaces) in this exact order:
+    #         (1) the name of an analytical feature to test
+    #         (2) a comparison operator among >, <, >=, <=, ==, != and LIKE (with % in str and timestamps)
+    #         (3) a threshold value which is automatically casted to the type of the AF given in (1). 
+    #             Intended types accepted are: integers, floats, strings, boolean and GPSTime. 
+    #             When GPSTime is used as a threshold value, eventhough it may contain 2 parts 
+    #            (date and time), it must not be enclosed within quotes. For boolean, "1", "T" and "TRUE"
+    #             are considered as logical True, all other values are considered as False.    
+    #     - Important: no computation allowed in WHERE conditions. E.g. "... WHERE z-2 > 10" not allowed
+    #     - Available aggregators: all unary operators as described in Operator.py, except MSE
+    #     - Capital letters must be used for SQL keywords SELECT, WHERE, AND, OR and aggregators 
     # ----------------------------------------------------------------------------------------------------
     def __condition(val1, operator, val2):
 
@@ -1078,7 +1085,7 @@ class Track:
             val2 = GPSTime.readTimestamp(val2)
         if isinstance(val1, bool):
             val2 = (val2.upper == "TRUE") or (val2.upper == "T") or (val2 == "1")
-			
+            
         if operator == "<":
             return val1 < val2
         if operator == ">":
@@ -1090,16 +1097,16 @@ class Track:
         if (operator == "=") or (operator == "=="):
             return val1 == val2
         if operator == "!=":
-            return val1 != val2			
-	
+            return val1 != val2            
+    
     def query(self, cmd):
-	
+    
         cmd = cmd.strip()
-		
+        
         AGG = ["SUM", "AVG", "COUNT", "VAR", "MEDIAN", "ARGMIN", "ARGMAX", "MIN", "MAX", "RMSE", "MAD", "STDDEV", "ZEROS"]
-			
+            
         select_part = cmd.split("SELECT")[1].split("WHERE")[0].strip()
-		
+        
         if not select_part == "*":
             select_part = select_part.split(",")
             aggregator = []
@@ -1120,15 +1127,15 @@ class Track:
                 message += "Use boolean algebra rules to reformulate query or use successive queries"
                 print(message)
                 exit()
-		
+        
         if not select_part == "*":
             LAF = []
             for i in range(len(select_part)):
                 LAF.append([])
-		
+        
         output = Track()
-        BOOL = []		
-		
+        BOOL = []        
+        
         for i in range(self.size()):
             if where_part== -1:
                 select_all = True
@@ -1146,8 +1153,8 @@ class Track:
                         select = select and Track.__condition(self[c4[0]][i], operator, c4[2])
                     select_all = select_all or select
             BOOL.append(select_all)
-			 
-        if select_part == "*":			
+             
+        if select_part == "*":            
             for i in range(len(BOOL)):
                 if BOOL[i]:
                     output.addObs(self[i])
@@ -1158,11 +1165,11 @@ class Track:
                 if BOOL[i]:
                     for j in range(len(select_part)):
                         LAF[j].append(self[select_part[j].strip()][i])
-				
+                
      
             if len(aggregator) == 0:
                 return LAF
-				
+                
             OUTPUT = []
             for af in range(len(LAF)):
                 AF = LAF[af]
@@ -1199,18 +1206,18 @@ class Track:
                         OUTPUT.append(tmp.operate(Operator.Operator.ZEROS, "#tmp"))
                     if AGG[aggregator[af]] == "MAD":
                         OUTPUT.append(tmp.operate(Operator.Operator.MAD, "#tmp"))
-			
+            
             if (len(OUTPUT) == 1):
-                return OUTPUT[0]			
+                return OUTPUT[0]            
 
-            return OUTPUT			
+            return OUTPUT            
    
 
   
     # ------------------------------------------------------------
     # Rotation of 2D track (coordinates should be ENU)
-	# Input: track in ENU coords and theta angle (in radians)
-	# Output: rotated track (in ENU coords)
+    # Input: track in ENU coords and theta angle (in radians)
+    # Output: rotated track (in ENU coords)
     # ------------------------------------------------------------  
     def rotate(self, theta):
         if not (self.getSRID() == "ENU"):
@@ -1221,8 +1228,8 @@ class Track:
 
     # ------------------------------------------------------------
     # Homothetic transformation of 2D track (coordinates in ENU)
-	# Input: track in ENU coords and h homothetic ratio
-	# Output: scaled track (in ENU coords)
+    # Input: track in ENU coords and h homothetic ratio
+    # Output: scaled track (in ENU coords)
     # ------------------------------------------------------------  
     def scale(self, h):
         if not (self.getSRID() == "ENU"):
@@ -1230,25 +1237,25 @@ class Track:
             exit()
         for i in range(self.size()):
             self.getObs(i).position.scale(h)
-			
+            
     # ------------------------------------------------------------
     # Translation of 2D track (coordinates in ENU)
-	# Input: track in ENU coords and tx, ty translation parameters
-	# Output: translated track (in ENU coords)
+    # Input: track in ENU coords and tx, ty translation parameters
+    # Output: translated track (in ENU coords)
     # ------------------------------------------------------------  
-    def translate(self, tx, ty):
+    def translate(self, tx, ty, tz=0):
         if not (self.getSRID() == "ENU"):
             print("Error: track to scale must be in ENU coordinates")
             exit()
         for i in range(self.size()):
-            self.getObs(i).position.translate(tx, ty)
-		
-				
+            self.getObs(i).position.translate(tx, ty, tz)
+        
+                
     # ------------------------------------------------------------
     # Removal of idle points at the begining or end of track
-	# Input: parameter to set and mode in "begin" or "end"
-	# Output: cleared track
-    # ------------------------------------------------------------ 	
+    # Input: parameter to set and mode in "begin" or "end"
+    # Output: cleared track
+    # ------------------------------------------------------------     
     def removeIdleEnds(self, parameter, mode="begin"):
         track = self.copy() 
         n = track.size()
@@ -1261,7 +1268,7 @@ class Track:
                 d = portion.getCentroid().distance2DTo(init_center)
                 sdx = portion.operate(Operator.Operator.STDDEV, "x")
                 sdy = portion.operate(Operator.Operator.STDDEV, "y")
-                sdz = portion.operate(Operator.Operator.STDDEV, "z")						
+                sdz = portion.operate(Operator.Operator.STDDEV, "z")                        
                 if d > parameter + (sdx*sdx+sdy*sdy+sdz*sdz)**0.5:
                     break
             if i == n-5:
@@ -1274,12 +1281,12 @@ class Track:
                 d = portion.getCentroid().distance2DTo(init_center)
                 sdx = portion.operate(Operator.Operator.STDDEV, "x")
                 sdy = portion.operate(Operator.Operator.STDDEV, "y")
-                sdz = portion.operate(Operator.Operator.STDDEV, "z")	
+                sdz = portion.operate(Operator.Operator.STDDEV, "z")    
                 if d > parameter + math.sqrt(sdx*sdx+sdy*sdy+sdz*sdz)**0.5:
                     break
             if i == 5:
                 return track
-            return track.extract(0,i-4)	
+            return track.extract(0,i-4)    
             
 
     # ------------------------------------------------------------
@@ -1298,7 +1305,7 @@ class Track:
             for i in range(len(AF1)):
                 same = same and (AF1[i] == AF2[i])
         if same:
-            track.__transmitAF(self)		
+            track.__transmitAF(self)        
         return track
         
     # ------------------------------------------------------------
@@ -1316,22 +1323,22 @@ class Track:
             SPLITS.addTrack(portion)
         return SPLITS
         
-	# ------------------------------------------------------------	
+    # ------------------------------------------------------------    
     # [>] Removes first n points of track or time comp    
-    # ------------------------------------------------------------	
+    # ------------------------------------------------------------    
     def __gt__(self, arg):
         if isinstance(arg, Track):
             t1i = self.getFirstObs().timestamp
             t2f = arg.getLastObs().timestamp            
-            return (t1i > t2f)			
+            return (t1i > t2f)            
         else:
             output = Track(self.__POINTS[arg:self.size()], self.uid, self.tid, self.base)
             output.__transmitAF(self)
             return output
-		
-	# ------------------------------------------------------------	
+        
+    # ------------------------------------------------------------    
     # [<] Removes last n points of track or time comp  
-    # ------------------------------------------------------------	
+    # ------------------------------------------------------------    
     def __lt__(self, arg):
         if isinstance(arg, Track):
             t1f = self.getLastObs().timestamp
@@ -1341,8 +1348,8 @@ class Track:
             output = Track(self.__POINTS[0:(self.size()-arg)], self.uid, self.tid, self.base)
             output.__transmitAF(self)
             return output
-		
-	# ------------------------------------------------------------	
+        
+    # ------------------------------------------------------------    
     # [>=] Remove idle points at the start of track or time comp   
     # ------------------------------------------------------------
     def __ge__(self, arg):
@@ -1355,7 +1362,7 @@ class Track:
         else:
             return self.removeIdleEnds(arg, "begin")
 
-	# ------------------------------------------------------------	
+    # ------------------------------------------------------------    
     # [<=] Remove idle points at the end of track or time comp    
     # ------------------------------------------------------------
     def __le__(self, arg):
@@ -1367,20 +1374,20 @@ class Track:
             return ((t1f <= t2f) and (t1i <= t2i))
         else:
             return self.removeIdleEnds(arg, "end")
-		
-	# ------------------------------------------------------------	
+        
+    # ------------------------------------------------------------    
     # [!=] Available operator       
     # ------------------------------------------------------------
     def __neq__(self, arg):
         return None
-		
-	# ------------------------------------------------------------	
+        
+    # ------------------------------------------------------------    
     # [Unary -] Available operator      
     # ------------------------------------------------------------
     def __neg__(self, arg):
-        return None	
-		
-	# ------------------------------------------------------------	
+        return None    
+        
+    # ------------------------------------------------------------    
     # [**] Resample according to a number of points  
     # Linear interpolation and temporal resampling
     # ------------------------------------------------------------
@@ -1389,20 +1396,20 @@ class Track:
         dt = output.duration()/(nb_points) * (1-1e-3)
         output.resample(dt) # Linear / temporal
         return output
-	
-	# ------------------------------------------------------------	
+    
+    # ------------------------------------------------------------    
     # [abs] Available operator     
     # ------------------------------------------------------------
     def __abs__(self):
         return None
-		
-	# ------------------------------------------------------------	
+        
+    # ------------------------------------------------------------    
     # [len] Number of points in track    
     # ------------------------------------------------------------
     def __len__(self):
         return self.size()
-	
-	# ------------------------------------------------------------	
+    
+    # ------------------------------------------------------------    
     # [-] Computes difference profile of 2 tracks    
     # ------------------------------------------------------------
     def __sub__(self, arg):
@@ -1447,8 +1454,8 @@ class Track:
         track_resampled = self.copy()
         track_resampled.resample(track, Interpolation.MODE_TEMPORAL)
         return track_resampled    
-	
-	# ------------------------------------------------------------
+    
+    # ------------------------------------------------------------
     # [[n]] Get and set obs number n (or AF vector with name n)
     # ------------------------------------------------------------    
     def __getitem__(self, n):
@@ -1456,4 +1463,4 @@ class Track:
             return self.getAnalyticalFeature(n)
         return self.__POINTS[n]  
     def __setitem__(self, n, obs):
-        self.__POINTS[n] = obs	
+        self.__POINTS[n] = obs    

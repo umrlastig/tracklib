@@ -7,6 +7,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 # -----------------------------------------------------------------------------
 # Kernels for filtering, smoothing and stochastics simulations        
 # -----------------------------------------------------------------------------
@@ -121,6 +122,8 @@ class SincKernel(Kernel):
     def __str__(self):
         return "Sinc kernel (width=" + str(self.support/3) + ")"
 
+
+
 # ---------------------------------------------------------
 # Non-parametric estimator of Kernel based on GPS tracks.
 # The experimental covariogram kernel is initialized with 
@@ -159,7 +162,7 @@ class ExperimentalKernel:
         self.H = [0]*N 
         for i in range(N):
             self.H[i] = i*r
-	
+
     def addSamples(self, trackCollection): 
         N = trackCollection.size()
         for i in range(N-1):
@@ -168,7 +171,7 @@ class ExperimentalKernel:
                 track2 = trackCollection[j]
                 self.addTrackPair(track1, track2)
         return 0
-		
+
     def addTrackPair(self, track1, track2):
         track1.compute_abscurv()
         profile = Comparison.differenceProfile(track1, track2, self.method, False, p=4)
@@ -185,7 +188,7 @@ class ExperimentalKernel:
                     continue
                 self.GAMMA[idx] += (yi-yj)**2
                 self.COUNT[idx] +=  1
-				
+
     def __getGamma(self, scale=1):
         x = self.GAMMA
         for i in range(len(x)):
