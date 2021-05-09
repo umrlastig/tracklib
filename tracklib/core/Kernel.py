@@ -153,9 +153,9 @@ class ExperimentalKernel:
         import tracklib.algo.Comparison as Comparison
         self.dmax = dmax
         self.method = method
-        self.r = r
         if r is None:
             r = int(self.dmax/30.0)+1
+        self.r = r
         N = int(dmax/r)+1
         self.GAMMA = [0]*N
         self.COUNT = [0]*N
@@ -166,27 +166,23 @@ class ExperimentalKernel:
     def addSamples(self, trackCollection): 
         N = trackCollection.size()
         for i in range(N-1):
-            track1 = trackCollection[i]
-            for j in range(i+1,N): 
-                track2 = trackCollection[j]
-                self.addTrackPair(track1, track2)
+            self.addTrackPair(trackCollection[j])
         return 0
 
-    def addTrackPair(self, track1, track2):
-        track1.compute_abscurv()
-        profile = Comparison.differenceProfile(track1, track2, self.method, False, p=4)
+    def addDifferenceProfile(self, profile):
         N = len(profile)
+        m = np.mean(profile["diff"])
         for i in range(N-1):
-            si = track1.getObsAnalyticalFeature("abs_curv", i)
+            si = profile.getObsAnalyticalFeature("abs_curv", i)
             yi = profile.getObsAnalyticalFeature("diff", i) 
             for j in range(i+1,N):
-                sj = track1.getObsAnalyticalFeature("abs_curv", j)
+                sj = profile.getObsAnalyticalFeature("abs_curv", j)
                 yj = profile.getObsAnalyticalFeature("diff", j) 
                 d =  abs(si-sj) 
                 idx = int(d/self.r)
                 if idx >= len(self.GAMMA):
                     continue
-                self.GAMMA[idx] += (yi-yj)**2
+                self.GAMMA[idx] += (yi-m)*(yj-m)
                 self.COUNT[idx] +=  1
 
     def __getGamma(self, scale=1):
@@ -194,9 +190,8 @@ class ExperimentalKernel:
         for i in range(len(x)):
             if self.COUNT[i] != 0:
                 x[i] /= self.COUNT[i]
-        gamma_max = np.max(x)
         for i in range(len(x)):
-             x[i] = (gamma_max-x[i])*scale	
+             x[i] = x[i]*scale    
         return x
 
     def plot(self, sym='k+'):
@@ -214,4 +209,4 @@ class ExperimentalKernel:
 
 
 
-			
+            
