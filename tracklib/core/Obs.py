@@ -82,5 +82,5 @@ class Obs:
     # ------------------------------------------------------------    
 	def __getitem__(self, af_index):
 		return self.features[af_index]
-	def __setitem__(self, af, value):
+	def __setitem__(self, af_index, value):
 		self.features[af_index] = value	
