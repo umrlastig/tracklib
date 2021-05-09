@@ -305,7 +305,12 @@ class Edge:
 
     def __str__(self):
         return self.id
+    
+    def getX(self, i=None):
+        return self.track.getX(i)
 
+    def getY(self, i=None):
+        return self.track.getY(i)
 
 # =============================================================================
 #
@@ -323,6 +328,17 @@ class Network:
         
     def __iter__(self):
         yield from self.EDGES
+        
+    def size(self):
+        return len(self.EDGES)
+    
+    # ------------------------------------------------------------
+    # [[n]] Get and set track number n
+    # ------------------------------------------------------------    
+    def __getitem__(self, n):
+        return self.EDGES[n]  
+    def __setitem__(self, n, edge):
+        self.EDGES[n] = edge  
 
 
     def addEdge(self, edge):

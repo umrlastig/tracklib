@@ -49,7 +49,6 @@ class TrackCollection:
             m += track.frequency(mode)
         return m/self.size()
     
-    
     def __iter__(self):
         yield from self.__TRACES
     
