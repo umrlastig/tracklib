@@ -25,7 +25,7 @@ class TestSpatialIndex(TestCase):
     def test_index_trackcollection(self):
        
         GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
-        collection = FileReader.readFromFiles("../data/CSV_L93_VERCORS/", 3, 4, 5, 6)
+        collection = FileReader.readFromFiles("test/data/CSV_L93_VERCORS/", 3, 4, 5, 6)
         
         collection.addAnalyticalFeature(Analytics.speed)
         
