@@ -225,10 +225,8 @@ class PointwiseEqualer(BinaryVoidOperator):
 class Convolution(BinaryVoidOperator):
     def execute(self, track, af_input1, af_input2, af_output):
         track.createAnalyticalFeature(af_output)
-        track.operate(Operator.DEBIASER, af_input1, "#temp1")
-        track.operate(Operator.DEBIASER, af_input2, "#temp2")
-        H = np.fft.fft(track["#temp1"])
-        G = np.fft.fft(track["#temp2"])
+        H = np.fft.fft(track[af_input1])
+        G = np.fft.fft(track[af_input2])
         temp = np.abs(np.fft.ifft(H*np.conj(G)))
         algoAF.addListToAF(track, af_output, temp)
         return temp

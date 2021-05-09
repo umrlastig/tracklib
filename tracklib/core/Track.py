@@ -106,7 +106,10 @@ class Track:
                 print(message)
             for i in range(self.size()):
                 self.getObs(i).position = self.getObs(i).position.toENUCoords(base)
-            self.base = base.toGeoCoords() 
+            if isinstance(base, int):
+                self.base = base
+            else:
+                self.base = base.toGeoCoords() 
             return
         if (self.getSRID() == "ENU"):
             if (base == None):
@@ -140,7 +143,7 @@ class Track:
             exit()            
         for i in range(self.size()):
             self.getObs(i).position = self.getObs(i).position.toProjCoords(srid)
-        self.base = srid			
+        self.base = srid            
           
     # Function to convert 2D coordinates (GEO or ENU) into image local coordinates
     # Input: two points p1, p2 (image coordinates), P1, P2 (track coordinate system)
@@ -847,7 +850,7 @@ class Track:
             
         Interpolation.resample(self, delta, algo, mode)
         self.__analyticalFeaturesDico = {}
-	
+    
     def incrementTime(self, dt=1, offset=0):  
         '''Add 1 sec to each subsequent record. Use incrementTime to 
         get valid timestamps sequence when timestamps are set as default 

@@ -8,7 +8,7 @@
 import math
 import copy
 
-Re = 6378137.0;                   # Earth equatorial radius 
+Re = 6378137.0;                # Earth equatorial radius 
 Fe = 1.0/298.257223563;        # Earth eccentricity
 
 
@@ -61,6 +61,9 @@ class GeoCoords:
     # Base coordinates need to be provided in ECEF/Geo
     # --------------------------------------------------
     def toENUCoords(self, base):
+	    # Special SRID projection
+        if isinstance(base, int):
+            return self.toProjCoords(base)
         base_ecef = base.toECEFCoords()
         point_ecef = self.toECEFCoords()
         return point_ecef.toENUCoords(base_ecef);
@@ -177,6 +180,9 @@ class ENUCoords:
     # Base coordinates need to be provided in ECEF/Geo 
     # --------------------------------------------------
     def toGeoCoords(self, base):
+        # Special SRID projection
+        if isinstance(base, int):
+            return _unproj(self, base)
         base_ecef = base.toECEFCoords()
         point_ecef = self.toECEFCoords(base_ecef)
         return point_ecef.toGeoCoords();
@@ -453,11 +459,37 @@ class ECEFCoords:
 # --------------------------------------------------   
 def _proj(coords, srid):
     if srid == 2154:
-        return _projLambert93(coords)
+        return _projToLambert93(coords)
+    print("Error: SRID code " + str(srid) + " is not implmented in Tracklib")
+    exit()
+    
+def _unproj(coords, srid):
+    if srid == 2154:
+        return __projFromLambert93(coords)
     print("Error: SRID code " + str(srid) + " is not implmented in Tracklib")
     exit()
 
-def _projLambert93(coords):
+def __projFromLambert93(coords):
+
+    E = 0.08181919106
+    Xp = 700000.000
+    Yp = 12655612.050
+    n = 0.725607765053267
+    C = 11754255.4260960
+    lambda0 = 0.0523598775598299
+    X = coords.getX()
+    Y = coords.getY()
+    lon = math.atan(-(X-Xp)/(Y-Yp))/n + lambda0
+    latiso = -math.log(math.sqrt((X-Xp)**2 + (Y-Yp)**2)/C)/n
+    
+    phi = 2*math.atan(math.exp(latiso))-math.pi/2
+    for i in range(10):    
+        phi  = 2*math.atan(((1+E*math.sin(phi))/(1-E*math.sin(phi)))**(E/2)*math.exp(latiso))
+        phi -= math.pi/2
+ 
+    return GeoCoords(lon*180/math.pi, phi*180/math.pi, coords.getZ())
+
+def _projToLambert93(coords):
     
     E = 0.08181919106
     Xp = 700000.000
@@ -473,8 +505,8 @@ def _projLambert93(coords):
     latiso = math.tan(math.pi/4+phi/2)*latiso
     latiso = math.log(latiso)
 
-    X=Xp + C*math.exp(-n*latiso)*math.sin(n*(lon-lambda0))
-    Y=Yp - C*math.exp(-n*latiso)*math.cos(n*(lon-lambda0))
+    X = Xp + C*math.exp(-n*latiso)*math.sin(n*(lon-lambda0))
+    Y = Yp - C*math.exp(-n*latiso)*math.cos(n*(lon-lambda0))
     
     return ENUCoords(X,Y,coords.getZ())
 
