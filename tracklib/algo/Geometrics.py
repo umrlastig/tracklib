@@ -160,7 +160,7 @@ def inclusion(X, Y, x, y):
         edge.append(X[i+1])
         edge.append(Y[i+1])
         
-        if __intersects(segment, edge):
+        if isSegmentIntersects(segment, edge):
             n += 1
             
     return (n % 2 == 1)
@@ -228,18 +228,18 @@ def __eval(param, x, y):
 # Entrees : segment1 et segment2
 # Sortie : true s'il y a intersection
 # ----------------------------------------
-def __intersects(segment1, segment2):
+def isSegmentIntersects(segment1, segment2):
     
     param_1 = __cartesienne(segment1)
     param_2 = __cartesienne(segment2)
 
-    a1 = param_1[0]
-    b1 = param_1[1]
-    c1 = param_1[2]
+    #a1 = param_1[0]
+    #b1 = param_1[1]
+    #c1 = param_1[2]
     
-    a2 = param_2[0]
-    b2 = param_2[1]
-    c2 = param_2[2]
+    #a2 = param_2[0]
+    #b2 = param_2[1]
+    #c2 = param_2[2]
 
     x11 = segment1[0]
     y11 = segment1[1]
@@ -296,7 +296,7 @@ def intersection(track1, track2, withTime=-1):
             y22 = track2[j+1].position.getY()
             seg2 = [x21,y21,x22,y22]
             
-            if (__intersects(seg1, seg2)):
+            if (isSegmentIntersects(seg1, seg2)):
                 P1 = __cartesienne(seg1)
                 P2 = __cartesienne(seg2)
                 A = np.zeros((2,2))
@@ -360,7 +360,7 @@ def intersects(track1, track2):
             y22 = track2[j+1].position.getY()
             seg2 = [x21,y21,x22,y22]
             
-            if __intersects(seg1, seg2):
+            if isSegmentIntersects(seg1, seg2):
                 return True
                 
     return False
