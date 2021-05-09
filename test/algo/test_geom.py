@@ -2,6 +2,8 @@
 
 import unittest
 
+import matplotlib.pyplot as plt
+
 from tracklib.core import (
   Track, Obs, Coords, GPSTime)
 
@@ -28,7 +30,7 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         self.trace1.addObs(p4)
 
     
-    def test1(self):
+    def testMinCircle(self):
         
         #P = [obs.position for obs in self.trace1]
         #R = []
@@ -42,9 +44,68 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         self.assertLessEqual((0 - C[0].getY()), self.__epsilon, "coord y du centre cercle")
 
 
+    def testIntersectionCelluleSegment(self):
+        
+        x1 = 1.2
+        y1 = 1.3
+        x2 = 4.8
+        y2 = 2.4
 
+        segment2 = [x1,y1,x2,y2]
+        
+        # --------------------------------------------------------------
+        # Intersect
+        segment1 = [2, 1, 2, 2]
+        self.assertTrue(geom.isSegmentIntersects(segment1, segment2))
+        
+        segment1 = [3, 1, 3, 2]
+        self.assertTrue(geom.isSegmentIntersects(segment1, segment2))
+        
+        segment1 = [3, 2, 4, 2]
+        self.assertTrue(geom.isSegmentIntersects(segment1, segment2))
+        
+        segment1 = [4, 2, 4, 3]
+        self.assertTrue(geom.isSegmentIntersects(segment1, segment2))
+        
+        
+        # --------------------------------------------------------------
+        # Non intersect
+        segment1 = [1, 1, 1, 2]
+        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        segment1 = [1, 1, 2, 1]
+        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        segment1 = [1, 2, 2, 2]
+        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        
+        segment1 = [2, 1, 3, 1]
+        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        segment1 = [2, 2, 3, 2]
+        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        
+        segment1 = [3, 2, 3, 3]
+        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        segment1 = [3, 3, 4, 3]
+        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        
+        segment1 = [4, 2, 5, 2]
+        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        segment1 = [5, 2, 5, 3]
+        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        segment1 = [4, 3, 5, 3]
+        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        
+        segment1 = [2, 2, 2, 3]
+        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        segment1 = [2, 3, 3, 3]
+        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        
+        segment1 = [4, 1, 4, 2]
+        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        
+        
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    suite.addTest(TestAlgoGeometricsMethods("test1"))
+    suite.addTest(TestAlgoGeometricsMethods("testMinCircle"))
+    suite.addTest(TestAlgoGeometricsMethods("testIntersectionCelluleSegment"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
