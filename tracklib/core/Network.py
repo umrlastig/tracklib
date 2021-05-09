@@ -7,7 +7,9 @@ import matplotlib.pyplot as plt
 from tracklib.core.Track import Track
 from tracklib.core.GPSTime import GPSTime
 from tracklib.core.Obs import Obs
+from tracklib.core.Operator import Operator
 
+import tracklib.algo.Summarize as Sum
 
 # =============================================================================
 #
@@ -317,6 +319,10 @@ class Network:
         self.NODES = []
         
         self.__cut = 0
+        
+        
+    def __iter__(self):
+        yield from self.EDGES
 
 
     def addEdge(self, edge):
@@ -474,6 +480,36 @@ class Network:
             plt.plot(node2.coord.getX(), node2.coord.getY(), 'rx', markersize=5)
         
         plt.show()
+        
+        
+    def bbox(self):
+        '''
+        BBOx sur edges
+
+        Returns
+        -------
+        (xmin, xmax, ymin, ymax)
+            bounding box on EDGES of network
+
+        '''
+        tarray_xmin = []
+        tarray_xmax = []
+        tarray_ymin = []
+        tarray_ymax = []
+        
+        for edge in self.EDGES:
+            trace = edge.track
+            tarray_xmin.append(trace.operate(Operator.MIN, 'x'))
+            tarray_xmax.append(trace.operate(Operator.MAX, 'x'))
+            tarray_ymin.append(trace.operate(Operator.MIN, 'y'))
+            tarray_ymax.append(trace.operate(Operator.MAX, 'y'))
+        
+        xmin = Sum.co_min(tarray_xmin)
+        xmax = Sum.co_max(tarray_xmax)
+        ymin = Sum.co_min(tarray_ymin)
+        ymax = Sum.co_max(tarray_ymax)
+        
+        return (xmin, xmax, ymin, ymax)
 
 
 #if __name__ == '__main__':

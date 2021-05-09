@@ -50,6 +50,9 @@ class TrackCollection:
         return m/self.size()
     
     
+    def __iter__(self):
+        yield from self.__TRACES
+    
     # =========================================================================
     # Track collection coordinate transformation
     # =========================================================================	
