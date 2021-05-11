@@ -5,7 +5,7 @@ Example detect stop points with two methods.
 from tracklib.core.GPSTime import GPSTime
 import tracklib.algo.Interpolation as interpolation
 from tracklib.io.GpxReader import GpxReader
-import tracklib.algo.AlgoAF as stop
+import tracklib.algo.Analytics as stop
 
 # -----------------------------------------------------------------------------
 #   Comparaison de 2 méthodes pour détecter les points stops
@@ -15,7 +15,7 @@ path = '../data/vincennes.gpx'
 GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
 tracks = GpxReader.readFromGpx(path)
 trace = tracks[0]
-
+trace.toENUCoords()
 trace.summary()
 trace.plot()
 

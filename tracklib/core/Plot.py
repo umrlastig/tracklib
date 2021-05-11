@@ -33,7 +33,7 @@ class Plot:
         self.h = 3
         self.pointsize = 5
         
-    def __isAFTransition(track, af_name):
+    def __isAFTransition(self, track, af_name):
         '''
         Return true if AF is transition marker.
         For example return true if AF values are like: 
@@ -167,7 +167,7 @@ class Plot:
         limit = ymax + 0.5
         for (indice, af_name) in enumerate(afs):
 
-            if __isAFTransition(self.track, af_name):
+            if self.__isAFTransition(self.track, af_name):
                 print ('---')
             
                 tabmarqueurs = self.track.getAnalyticalFeature(af_name)
