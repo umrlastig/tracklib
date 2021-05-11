@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
-#from .core.core_utils import * 
-#from .algo.AlgoAF import *
-
 #from .core.Coords import GeoCoords, ENUCoords, ECEFCoords
 #from .core.GPSTime import GPSTime
 #from .core.Obs import Obs
 #from .core.Track import Track
+
+
+#from .core.core_utils import * 
+#from .algo.AlgoAF import *
+
 
 #from .core.Kernel import DiracKernel, UniformKernel, TriangularKernel
 #from .core.Kernel import GaussianKernel, ExponentialKernel, EpanechnikovKernel

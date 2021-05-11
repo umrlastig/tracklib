@@ -165,9 +165,12 @@ class TestOperateurMethods(unittest.TestCase):
         std_n = track1.operate(Operator.L2, "y", "y2")
         std_u = track1.operate(Operator.L2, "z", "z2")
 
-        print("E std = " + '{:5.3f}'.format(std_e) + " m")
-        print("N std = " + '{:5.3f}'.format(std_n) + " m")
-        print("U std = " + '{:5.3f}'.format(std_u) + " m")
+        #print("E std = " + '{:5.3f}'.format(std_e) + " m")
+        self.assertEqual('{:5.3f}'.format(std_e), '3.246')
+        #print("N std = " + '{:5.3f}'.format(std_n) + " m")
+        self.assertEqual('{:5.3f}'.format(std_n), '4.786')
+        #print("U std = " + '{:5.3f}'.format(std_u) + " m")
+        self.assertEqual('{:5.3f}'.format(std_u), '8.224')
 
 
         
