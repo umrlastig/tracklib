@@ -2,12 +2,8 @@
 # Class to manage filtering of GPS tracks
 # -----------------------------------------------------------------------------
 
-import sys
 import numpy as np
 
-import tracklib.core.Track as Track
-import tracklib.core.Utils as utils
-import tracklib.core.Operator as Operator
 import tracklib.algo.Dynamics as Dynamics
 
 FILTER_LOW_PASS = 0

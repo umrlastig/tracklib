@@ -6,8 +6,6 @@
 import sys
 import math
 import copy
-import random
-import progressbar
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -16,7 +14,6 @@ from tracklib.core.GPSTime import GPSTime
 from tracklib.core.Obs import Obs
 import tracklib.core.Operator as Operator
 import tracklib.core.Kernel as Kernel
-from tracklib.core.Kernel import GaussianKernel
 from tracklib.core.TrackCollection import TrackCollection
 
 import tracklib.core.Utils as utils
