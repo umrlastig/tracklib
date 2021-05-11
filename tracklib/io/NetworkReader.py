@@ -96,4 +96,17 @@ class NetworkReader:
         # Return network loaded
         return network
         
-    
+
+    # @staticmethod
+    # def writeFromFile(path, network):
+        
+    #     output = ""
+        
+    #     for j in range(network.size()):
+    #         edge = network[j]
+    #         output += edge.id + ";" + edge.track.toWKT() + "\n"
+        
+    #     if path:
+    #         f = open(path, "w")
+    #         f.write(output)
+    #         f.close()

@@ -102,15 +102,20 @@ class SpatialIndex:
         '''
         
         segment2 = [coord1[0], coord1[1], coord2[0], coord2[1]]
-        #print ('segment ', segment2)
+        
+        xmin = min (math.floor(coord1[0]), math.floor(coord2[0]))
+        xmax = max (math.floor(coord1[0]), math.floor(coord2[0]))
+        
+        ymin = min (math.floor(coord1[1]), math.floor(coord2[1]))
+        ymax = max (math.floor(coord1[1]), math.floor(coord2[1]))
         
         # On boucle sur les cellules 
-        for i in range(coord1[0], coord2[0]+1):
+        for i in range( xmin,  xmax+1):
              #print (i)
-             for j in range(coord1[1], coord2[1]+1):
+             for j in range(ymin, ymax+1):
                 
                  # On boucle sur les 4 bordures        
-                 segment1 = [i,j,i+1,j]
+                 segment1 = [i+0.0, j, i+1, j]
                  if Geometrics.isSegmentIntersects(segment1, segment2):
                      self.grid[i][j].append(data)
                     
@@ -135,10 +140,10 @@ class SpatialIndex:
         '''
         
         X = float(coord.getX()) - self.xmin
-        idx = math.floor(X / self.dX)
+        idx = X / self.dX
         
         Y = float(coord.getY()) - self.ymin
-        idy = math.floor(Y / self.dY)
+        idy = Y / self.dY
         
         return (idx, idy)
     
