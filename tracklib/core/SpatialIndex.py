@@ -216,7 +216,7 @@ class SpatialIndex:
             c = self.__getCell(ENUCoords(x, y))
             return self.grid[c[0]][c[1]]
         
-        elif isinstance(obj, list):
+        if isinstance(obj, list):
             ''' dans les cellules traversée par le segment coord '''
             [coord1, coord2] = obj
             segment2 = [coord1[0], coord1[1], coord2[0], coord2[1]]
@@ -326,3 +326,17 @@ class SpatialIndex:
                 pos1 = pos2
                 
             return TAB
+        
+        
+    def neighborhood(self, obj, j = -1, unit=1):
+        '''
+        retourne toutes les données (sous forme de liste simple) référencées 
+        dans la cellule (i,j). 
+        Si unit=-1, calcule la valeur minimale à donner à unit, 
+        pour que la liste ne soit pas vide*.  
+        '''
+        if isinstance(obj, int):
+            pass
+        
+        if isinstance(obj, GeoCoords) or isinstance(obj, ENUCoords) or isinstance(obj, ECEFCoords):
+            pass

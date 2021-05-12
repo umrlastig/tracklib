@@ -77,6 +77,8 @@ class TestSpatialIndex(TestCase):
         #track.plot()
         #track.plotAsMarkers()
         
+        
+        
         TRACES = []
         TRACES.append(track)
         collection = TrackCollection(TRACES)
@@ -106,10 +108,30 @@ class TestSpatialIndex(TestCase):
         self.assertEqual(index.request([(2.1, 0.5), (1.1, 1.1)]), [(0,0)])
         self.assertEqual(index.request([(2.5, 2.5), (2.1, 1.1)]), [(0,0),(1,0),(2,0)])
         
-        
         self.assertEqual(index.request(track), [(0,0),(1,0),(2,0),(3,0)])
         
-    
+        # =====================================================================
+        track2 = Track()
+        p6 = Obs(ENUCoords(580, 320), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        track2.addObs(p6)
+        p7 = Obs(ENUCoords(580, 327), GPSTime.readTimestamp('2020-01-01 10:08:00'))
+        track2.addObs(p7)
+        p8 = Obs(ENUCoords(640, 327), GPSTime.readTimestamp('2020-01-01 10:08:00'))
+        track2.addObs(p8)
+        
+        self.assertEqual(index.request(track2), [(0,0),(1,0)])
+        
+        # =====================================================================
+        track3 = Track()
+        p9 = Obs(ENUCoords(640, 327), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        track3.addObs(p9)
+        p10 = Obs(ENUCoords(640, 335), GPSTime.readTimestamp('2020-01-01 10:08:00'))
+        track3.addObs(p10)
+        p11 = Obs(ENUCoords(675, 335), GPSTime.readTimestamp('2020-01-01 10:08:00'))
+        track3.addObs(p11)
+        
+        self.assertEqual(index.request(track3), [(2,0),(3,0)])
+        
     
     def testIndexPoint(self):
         ''' TODO '''
