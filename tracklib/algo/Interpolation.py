@@ -4,7 +4,6 @@
 import sys
 import math
 import numpy as np
-import matplotlib.pyplot as plt
 
 from tracklib.core.Obs import Obs
 from tracklib.core.Coords import ENUCoords

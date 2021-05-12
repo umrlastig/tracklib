@@ -14,10 +14,6 @@ from tracklib.core.GPSTime import GPSTime
 
 import tracklib.core.Track as Track
 import tracklib.core.Utils as Utils
-import tracklib.core.Operator as Operator
-import tracklib.core.TrackCollection as TrackCollection
-
-import tracklib.algo.Interpolation as interp
 
 MODE_ENCLOSING_BBOX = 0
 MODE_ENCLOSING_MBR = 1

@@ -7,13 +7,7 @@ import progressbar
 import numpy as np
 import matplotlib.pyplot as plt
 
-from tracklib.core.Obs import Obs
-from tracklib.core.TrackCollection import TrackCollection
-
-import tracklib.core.Utils as utils
-import tracklib.algo.Geometrics as Geometrics
 import tracklib.algo.Interpolation as Interpolation
-import tracklib.core.Operator as Operator
 
 # ------------------------------------------------------------
 # Difference profile plot

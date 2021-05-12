@@ -2,12 +2,9 @@
 # Class to manage mapping of GPS tracks on geographic features
 # -----------------------------------------------------------------------------
 
-import sys
 import numpy as np
 
 import tracklib.core.Track as Track
-import tracklib.core.Utils as utils
-import tracklib.core.Operator as Operator
 
 
 # --------------------------------------------------------------------------

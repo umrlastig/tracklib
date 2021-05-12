@@ -4,21 +4,16 @@
 
 import sys
 import random
-import progressbar
 import numpy as np
 import matplotlib.pyplot as plt
 
 from tracklib.core.Obs import Obs
-from tracklib.core.TrackCollection import TrackCollection
 
-from tracklib.core.Kernel import GaussianKernel
 from tracklib.core.Kernel import DiracKernel
 
 import tracklib.core.Utils as utils
 import tracklib.algo.Analytics as Analytics
-import tracklib.algo.Geometrics as Geometrics
 import tracklib.algo.Interpolation as Interpolation
-import tracklib.core.Operator as Operator
 import tracklib.core.Kernel as Kernel
 
 DISTRIBUTION_NORMAL = 1

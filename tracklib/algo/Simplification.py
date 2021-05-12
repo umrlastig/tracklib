@@ -3,9 +3,6 @@
 # -----------------------------------------------------------------------------
 
 import sys
-import progressbar
-import numpy as np
-import matplotlib.pyplot as plt
 
 import tracklib.core.Track as Track
 import tracklib.core.Utils as utils
