@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from unittest import TestCase, TestSuite, TextTestRunner
+import os.path
 
 import matplotlib.pyplot as plt
 
@@ -21,11 +22,15 @@ class TestSpatialIndex(TestCase):
     
     __epsilon = 0.001
     
+    resource_path = os.path.join(os.path.split(__file__)[0], "..")
+    
     
     def test_index_trackcollection(self):
        
         GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
-        collection = FileReader.readFromFiles("test/data/CSV_L93_VERCORS/", 3, 4, 5, 6)
+        chemindata = os.path.join(TestSpatialIndex.resource_path, "data/CSV_L93_VERCORS/")
+        print (chemindata)
+        collection = FileReader.readFromFiles(chemindata, 3, 4, 5, 6)
         
         collection.addAnalyticalFeature(Analytics.speed)
         
@@ -33,7 +38,7 @@ class TestSpatialIndex(TestCase):
         #print (collection.bbox())
         #collection.plot()
     
-        index = SpatialIndex(collection)
+        index = SpatialIndex(collection, (30,30))
         index.plot()
         plt.show()
         
@@ -51,7 +56,7 @@ class TestSpatialIndex(TestCase):
          # print (network.bbox())
          # network.plot()
         
-         index = SpatialIndex(network)
+         index = SpatialIndex(network, (20, 20))
          index.plot()
         
         
