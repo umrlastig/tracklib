@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import os.path
 
 class NetworkFormat:
 
-    NETWORK_FILE_FORMAT = "resources/network_file_format"
+    resource_path = os.path.join(os.path.split(__file__)[0], "../..")
+    NETWORK_FILE_FORMAT = os.path.join(resource_path, "resources/network_file_format")
 
     # -------------------------------------------------------------
     # Load file format from network_file_format

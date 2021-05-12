@@ -11,7 +11,6 @@ from tracklib.core.GPSTime import GPSTime
 
 class FileFormat:
 
-    #TRACK_FILE_FORMAT = "resources/track_file_format"
     resource_path = os.path.join(os.path.split(__file__)[0], "../..")
     TRACK_FILE_FORMAT = os.path.join(resource_path, "resources/track_file_format")
     
