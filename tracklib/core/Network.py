@@ -304,7 +304,7 @@ class Edge:
         return False
 
     def __str__(self):
-        return self.id
+        return 'edge' + str(self.id)
     
     def getX(self, i=None):
         return self.track.getX(i)

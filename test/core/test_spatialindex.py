@@ -29,7 +29,6 @@ class TestSpatialIndex(TestCase):
        
         GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemindata = os.path.join(TestSpatialIndex.resource_path, "data/CSV_L93_VERCORS/")
-        print (chemindata)
         collection = FileReader.readFromFiles(chemindata, 3, 4, 5, 6)
         
         collection.addAnalyticalFeature(Analytics.speed)
@@ -86,11 +85,42 @@ class TestSpatialIndex(TestCase):
         index.plot()
         
         
+        self.assertEqual(index.request(0, 0), [(0,0)])
+        self.assertEqual(index.request(1, 0), [(0,0)])
+        self.assertEqual(index.request(0, 1), [])
+        self.assertEqual(index.request(1, 1), [(0,0)])
+        self.assertEqual(index.request(2, 0), [(0,0)])
+        self.assertEqual(index.request(2, 1), [(0,0),(1,0)])
+        self.assertEqual(index.request(2, 2), [(1,0), (2,0)])
+        self.assertEqual(index.request(4, 4), [(3,0)])
+        
+        self.assertEqual(index.request(ENUCoords(550, 320)), [(0,0)])
+        self.assertEqual(index.request(ENUCoords(610, 325)), [(0,0), (1,0)])
+        self.assertEqual(index.request(ENUCoords(610, 330)), [(1,0), (2,0)])
+        self.assertEqual(index.request(ENUCoords(650, 330)), [(2,0), (3,0)])
+        self.assertEqual(index.request(ENUCoords(675, 340)), [(3,0)])
+        
+        
+        self.assertEqual(index.request([(2.1, 0.5), (1.1, 1.1)]), [(0,0)])
+        self.assertEqual(index.request([(2.5, 2.5), (2.1, 1.1)]), [(0,0),(1,0),(2,0)])
+        
+        
+        self.assertEqual(index.request(track), [(0,0),(1,0),(2,0),(3,0)])
+        
+    
+    
+    def testIndexPoint(self):
+        ''' TODO '''
+        pass
+        
+        
     
 if __name__ == '__main__':
     suite = TestSuite()
     suite.addTest(TestSpatialIndex("testCreateIndex"))
     suite.addTest(TestSpatialIndex("test_index_trackcollection"))
     suite.addTest(TestSpatialIndex("test_index_network"))
+    suite.addTest(TestSpatialIndex("testIndexPoint"))
     runner = TextTestRunner()
     runner.run(suite)
+    
