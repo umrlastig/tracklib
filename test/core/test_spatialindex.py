@@ -92,6 +92,8 @@ class TestSpatialIndex(TestCase):
         self.assertEqual(index.request(2, 0), [(0,0)])
         self.assertEqual(index.request(2, 1), [(0,0),(1,0)])
         self.assertEqual(index.request(2, 2), [(1,0), (2,0)])
+        self.assertEqual(index.request(3, 2), [(2,0)])
+        self.assertEqual(index.request(4, 2), [(2,0),(3,0)])
         self.assertEqual(index.request(4, 4), [(3,0)])
         
         self.assertEqual(index.request(ENUCoords(550, 320)), [(0,0)])
