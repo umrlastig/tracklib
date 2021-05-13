@@ -89,7 +89,7 @@ class TestDijkstra(TestCase):
     
     def test_dijkstra_bdtopo(self):
         
-        chemin = 'data/network/network_ecrin_extrait.csv'
+        chemin = '../../data/network/network_ecrin_extrait.csv'
         network = NetworkReader.readFromFile(chemin, 'TEST2')
         
         self.assertEqual(890, len(network.EDGES))
@@ -106,7 +106,7 @@ class TestDijkstra(TestCase):
     
     def test_dijkstra(self):
         
-        chemin = 'data/network/network_test.csv'
+        chemin = '../../data/network/network_test.csv'
         network = NetworkReader.readFromFile(chemin, 'TEST_UNITAIRE')
         
         #self.assertEqual(sumPlot[0][7][0], 1)
@@ -141,7 +141,7 @@ class TestDijkstra(TestCase):
         
     def test_igast(self):
         
-        chemin = 'data/network/network_igast.csv'
+        chemin = '../../data/network/network_igast.csv'
         network = NetworkReader.readFromFile(chemin, 'TEST_UNITAIRE')
         
         self.assertEqual(34, len(network.EDGES))

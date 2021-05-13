@@ -97,7 +97,21 @@ class SpatialIndex:
                traversée par le segment [coord1, coord2] avec
                coord1 : indices de la grille
         '''
+        #
+        CELLS = self.__cellsCrossSegment(coord1, coord2)
         
+        for cell in CELLS:
+            i = cell[0]
+            j = cell[1]
+            if data not in self.grid[i][j]:
+                self.grid[i][j].append(data)
+                
+    
+    def __cellsCrossSegment(self, coord1, coord2):
+        '''
+            liste des cellules passent par ce segment
+        '''
+        CELLS = []
         segment2 = [coord1[0], coord1[1], coord2[0], coord2[1]]
         
         xmin = min (math.floor(coord1[0]), math.floor(coord2[0]))
@@ -106,37 +120,38 @@ class SpatialIndex:
         ymin = min (math.floor(coord1[1]), math.floor(coord2[1]))
         ymax = max (math.floor(coord1[1]), math.floor(coord2[1]))
         
-        # On boucle sur les cellules 
         for i in range( xmin,  xmax+1):
-             #print (i)
-             for j in range(ymin, ymax+1):
+            for j in range(ymin, ymax+1):
                 
-                 # On boucle sur les 4 bordures        
-                 segment1 = [i+0.0, j, i+1, j]
-                 if Geometrics.isSegmentIntersects(segment1, segment2):
-                     if data not in self.grid[i][j]:
-                         self.grid[i][j].append(data)
+                segment1 = [i, j, i+1, j]
+                if Geometrics.isSegmentIntersects(segment1, segment2):
+                    CELLS.append((i,j))
                     
-                 segment1 = [i,j,i,j+1]
-                 if Geometrics.isSegmentIntersects(segment1, segment2):
-                     if data not in self.grid[i][j]:
-                         self.grid[i][j].append(data)
+                segment1 = [i, j, i, j+1]
+                if Geometrics.isSegmentIntersects(segment1, segment2):
+                     if (i,j) not in CELLS:
+                         CELLS.append((i,j))
                     
-                 segment1 = [i,j+1,i+1,j+1]
-                 if Geometrics.isSegmentIntersects(segment1, segment2):
-                     if data not in self.grid[i][j]:
-                         self.grid[i][j].append(data)
+                segment1 = [i,j+1,i+1,j+1]
+                if Geometrics.isSegmentIntersects(segment1, segment2):
+                     if (i,j) not in CELLS:
+                         CELLS.append((i,j))
                     
-                 segment1 = [i+1,j,i+1,j+1]
-                 if Geometrics.isSegmentIntersects(segment1, segment2):
-                     if data not in self.grid[i][j]:
-                         self.grid[i][j].append(data)
-        
-       
+                segment1 = [i+1,j,i+1,j+1]
+                if Geometrics.isSegmentIntersects(segment1, segment2):
+                    if (i,j) not in CELLS:
+                        CELLS.append((i,j))
+                
+        return CELLS
+      
+    
+    def __addPoint (self, coord, data):
+        pass
+    
     
     def __getCoordGrille(self, coord):
         '''
-            Fonction qui convertit des coordonnées Coords en indices (i,j), 
+            Fonction qui convertit des coordonnées Coords en Coordonnées de la grille 
         '''
         X = float(coord.getX()) - self.xmin
         idx = X / self.dX
@@ -146,20 +161,13 @@ class SpatialIndex:
         
         return (idx, idy)
     
-    
     def __getCell(self, coord):
         '''
-            Fonction qui convertit des coordonnées Coords en indices (i,j), 
+            Fonction qui retourne les identifiants de la cellule en indices (i,j)
+            de Coord  
         '''
         (idx, idy) = self.__getCoordGrille(coord)
         return (math.floor(idx), math.floor(idy))
-    
-    
-    
-    def __addPoint (self, coord, data):
-        
-        pass
-    
     
     
     def plot(self):
@@ -195,7 +203,7 @@ class SpatialIndex:
                     ax.add_patch(polygon)
                     polygon.set_facecolor('lightcyan')
 
-                
+
     def request(self, obj, j = -1) : 
         '''
         retourne toutes les données (sous forme de liste simple) 
@@ -209,7 +217,6 @@ class SpatialIndex:
            
         if isinstance(obj, GeoCoords) or isinstance(obj, ENUCoords) or isinstance(obj, ECEFCoords):
             ''' dans la cellule contenant le point coord '''
-            
             coord = obj
             x = coord.getX()
             y = coord.getY()
@@ -219,59 +226,25 @@ class SpatialIndex:
         if isinstance(obj, list):
             ''' dans les cellules traversée par le segment coord '''
             [coord1, coord2] = obj
-            segment2 = [coord1[0], coord1[1], coord2[0], coord2[1]]
             
             # Les cellules traversées par le segment
-            
-            xmin = min (math.floor(coord1[0]), math.floor(coord2[0]))
-            xmax = max (math.floor(coord1[0]), math.floor(coord2[0]))
-        
-            ymin = min (math.floor(coord1[1]), math.floor(coord2[1]))
-            ymax = max (math.floor(coord1[1]), math.floor(coord2[1]))
-        
+            CELLS = self.__cellsCrossSegment(coord1, coord2)
             TAB = []
-            # On boucle sur les cellules 
-            for i in range( xmin,  xmax+1):
-                #print (i)
-                for j in range(ymin, ymax+1):
-                    
-                    val = self.grid[i][j]
-                    
-                    # On boucle sur les 4 bordures         
-                    segment1 = [i+0.0, j, i+1, j]
-                    if Geometrics.isSegmentIntersects(segment1, segment2):
-                        for d in val:
-                            if d not in TAB:
-                                TAB.append(d)
-                    
-                    segment1 = [i,j,i,j+1]
-                    if Geometrics.isSegmentIntersects(segment1, segment2):
-                        for d in val:
-                            if d not in TAB:
-                                TAB.append(d)
-                    
-                    segment1 = [i,j+1,i+1,j+1]
-                    if Geometrics.isSegmentIntersects(segment1, segment2):
-                        for d in val:
-                            if d not in TAB:
-                                TAB.append(d)
-                    
-                    segment1 = [i+1,j,i+1,j+1]
-                    if Geometrics.isSegmentIntersects(segment1, segment2):
-                        for d in val:
-                            if d not in TAB:
-                                TAB.append(d)
-                    
+            for cell in CELLS:
+                i = cell[0]
+                j = cell[1]
+                val = self.grid[i][j]
+                for d in val:
+                    if d not in TAB:
+                        TAB.append(d)
             return TAB
-        
-        elif isinstance(obj, Track):
-            ''' dans les cellules traversée par la track '''
             
-            # récupération des cellules de la track
+        if isinstance(obj, Track):
+            ''' dans les cellules traversée par la track '''
             track = obj
             
+            # récupération des cellules de la track
             TAB = []
-            
             pos1 = None
             for i in range(track.size()):
                 obs = track.getObs(i)
@@ -279,50 +252,15 @@ class SpatialIndex:
                 if pos1 != None:
                     coord1 = self.__getCell(pos1)
                     coord2 = self.__getCell(pos2)
-                    #print (p1, p2)
-                    #self.__addSegment(p1, p2, (i-1,num))
                     
-                    segment2 = [coord1[0], coord1[1], coord2[0], coord2[1]]
-        
-                    xmin = min (math.floor(coord1[0]), math.floor(coord2[0]))
-                    xmax = max (math.floor(coord1[0]), math.floor(coord2[0]))
-        
-                    ymin = min (math.floor(coord1[1]), math.floor(coord2[1]))
-                    ymax = max (math.floor(coord1[1]), math.floor(coord2[1]))
-                    
-                    
-                    # On boucle sur les cellules 
-                    for i in range( xmin,  xmax+1):
-                        #print (i)
-                        for j in range(ymin, ymax+1):
-                            
-                            val = self.grid[i][j]
-                            
-                            segment1 = [i+0.0, j, i+1, j]
-                            if Geometrics.isSegmentIntersects(segment1, segment2):
-                                for d in val:
-                                    if d not in TAB:
-                                        TAB.append(d)
-                                        
-                            segment1 = [i,j,i,j+1]
-                            if Geometrics.isSegmentIntersects(segment1, segment2):
-                                for d in val:
-                                    if d not in TAB:
-                                        TAB.append(d)
-                                        
-                            segment1 = [i,j+1,i+1,j+1]
-                            if Geometrics.isSegmentIntersects(segment1, segment2):
-                                for d in val:
-                                    if d not in TAB:
-                                        TAB.append(d)
-                            
-                            segment1 = [i+1,j,i+1,j+1]
-                            if Geometrics.isSegmentIntersects(segment1, segment2):
-                                for d in val:
-                                    if d not in TAB:
-                                        TAB.append(d)
-                    
-                    
+                    CELLS = self.__cellsCrossSegment(coord1, coord2)
+                    for cell in CELLS:
+                        i = cell[0]
+                        j = cell[1]
+                        val = self.grid[i][j]
+                        for d in val:
+                            if d not in TAB:
+                                TAB.append(d)
                 pos1 = pos2
                 
             return TAB
