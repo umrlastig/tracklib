@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from unittest import TestCase, TestSuite, TextTestRunner
+import os.path
+from unittest import TestSuite, TextTestRunner
 
 from tracklib.core.Network import Node, AF_WEIGHT
 from tracklib.io.NetworkReader import NetworkReader
 from tracklib.io.IgnReader import IgnReader
 
+from test.TestTracklib import TestTracklib
 
-
-class TestDijkstra(TestCase):
+class TestDijkstra(TestTracklib):
     
     __epsilon = 0.001
     
@@ -42,7 +43,6 @@ class TestDijkstra(TestCase):
         self.assertLessEqual((65.58062 - trace.getObsAnalyticalFeature(AF_WEIGHT, 0)), self.__epsilon, "len pcc")
         #network.plot(trace, node1, node2)
         #print (trace.summary())
-        
         # Distance du ppc
         self.assertLessEqual((523.77046 - network.shortest_path_distance(node1, node2)), self.__epsilon, "len pcc")
 
@@ -89,7 +89,7 @@ class TestDijkstra(TestCase):
     
     def test_dijkstra_bdtopo(self):
         
-        chemin = '../../data/network/network_ecrin_extrait.csv'
+        chemin = os.path.join(self.resource_path, 'data/network/network_ecrin_extrait.csv')
         network = NetworkReader.readFromFile(chemin, 'TEST2')
         
         self.assertEqual(890, len(network.EDGES))
@@ -106,7 +106,7 @@ class TestDijkstra(TestCase):
     
     def test_dijkstra(self):
         
-        chemin = '../../data/network/network_test.csv'
+        chemin = os.path.join(self.resource_path, 'data/network/network_test.csv')
         network = NetworkReader.readFromFile(chemin, 'TEST_UNITAIRE')
         
         #self.assertEqual(sumPlot[0][7][0], 1)
@@ -141,7 +141,7 @@ class TestDijkstra(TestCase):
         
     def test_igast(self):
         
-        chemin = '../../data/network/network_igast.csv'
+        chemin = os.path.join(self.resource_path, 'data/network/network_igast.csv')
         network = NetworkReader.readFromFile(chemin, 'TEST_UNITAIRE')
         
         self.assertEqual(34, len(network.EDGES))
