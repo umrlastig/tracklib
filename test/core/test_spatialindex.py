@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from unittest import TestCase, TestSuite, TextTestRunner
+from unittest import TestSuite, TextTestRunner
 import os.path
 
 import matplotlib.pyplot as plt
+
+from test.TestTracklib import TestTracklib
 
 from tracklib.core.GPSTime import GPSTime
 from tracklib.core.Coords import ENUCoords
@@ -18,17 +20,14 @@ from tracklib.io.IgnReader import IgnReader
 from tracklib.algo import (Analytics)
 
 
-class TestSpatialIndex(TestCase):
+class TestSpatialIndex(TestTracklib):
     
     __epsilon = 0.001
-    
-    resource_path = os.path.join(os.path.split(__file__)[0], "..")
-    
     
     def test_index_trackcollection(self):
        
         GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
-        chemindata = os.path.join(TestSpatialIndex.resource_path, "data/CSV_L93_VERCORS/")
+        chemindata = os.path.join(self.resource_path, "test/data/CSV_L93_VERCORS/")
         collection = FileReader.readFromFiles(chemindata, 3, 4, 5, 6)
         
         collection.addAnalyticalFeature(Analytics.speed)
