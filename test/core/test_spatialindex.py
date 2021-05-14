@@ -131,6 +131,23 @@ class TestSpatialIndex(TestTracklib):
         
         self.assertEqual(index.request(track3), [(2,0),(3,0)])
         
+        
+        # =====================================================================
+        self.assertCountEqual(index.neighbouringcells(0, 4, 1), [(0,3), (1,3), (1,4)])
+        self.assertCountEqual(index.neighbouringcells(0, 4, 2), [(0,2), (1,2), (2,2), (2,3), (2,4)])
+        self.assertCountEqual(index.neighbouringcells(0, 4, 3), [(0,1), (1,1), (2,1), (3,1), (3,2), (3,3), (3,4)])   
+    
+        self.assertCountEqual(index.neighbouringcells(3, 0, 1), [(2,0), (2,1), (3,1), (4,1), (4,0)])
+        self.assertCountEqual(index.neighbouringcells(3, 0, 2), [(1,0), (1,1), (1,2), (2,2), (3,2), (4,2)])
+        self.assertCountEqual(index.neighbouringcells(3, 0, 3), [(0,0), (0,1), (0,2), (0,3), (1,3), (2,3), (3,3), (4,3)])
+    
+        self.assertCountEqual(index.neighbouringcells(2, 2, 1), [(1,1), (1,2), (1,3), (2,3), (3,3), (3,2), (3,1), (2,1)])
+        self.assertCountEqual(index.neighbouringcells(2, 2, 2), [(0,0), (0,1), (0,2), (0,3), (0,4), (1,4), (2,4), (3,4), (4,4), (4,3), (4,2), (4,1), (4,0), (3,0), (2,0), (1,0)])
+        self.assertCountEqual(index.neighbouringcells(2, 2, 3), [])
+    
+    
+        # =====================================================================
+    
     
     def testIndexPoint(self):
         ''' TODO '''
@@ -141,9 +158,9 @@ class TestSpatialIndex(TestTracklib):
 if __name__ == '__main__':
     suite = TestSuite()
     suite.addTest(TestSpatialIndex("testCreateIndex"))
-    suite.addTest(TestSpatialIndex("test_index_trackcollection"))
-    suite.addTest(TestSpatialIndex("test_index_network"))
-    suite.addTest(TestSpatialIndex("testIndexPoint"))
+    #suite.addTest(TestSpatialIndex("test_index_trackcollection"))
+    #suite.addTest(TestSpatialIndex("test_index_network"))
+    #suite.addTest(TestSpatialIndex("testIndexPoint"))
     runner = TextTestRunner()
     runner.run(suite)
     

@@ -161,6 +161,7 @@ class SpatialIndex:
         
         return (idx, idy)
     
+    
     def __getCell(self, coord):
         '''
             Fonction qui retourne les identifiants de la cellule en indices (i,j)
@@ -273,8 +274,68 @@ class SpatialIndex:
         Si unit=-1, calcule la valeur minimale à donner à unit, 
         pour que la liste ne soit pas vide*.  
         '''
+        
         if isinstance(obj, int):
-            pass
+            i = obj
+            
+            
+            
+            
+            if unit == 1:
+                return self.request(i,j)
         
         if isinstance(obj, GeoCoords) or isinstance(obj, ENUCoords) or isinstance(obj, ECEFCoords):
             pass
+        
+    
+    def neighbouringcells(self, i, j, u=1):
+        '''
+        Parameters
+        ----------
+        i : TYPE
+            DESCRIPTION.
+        j : TYPE
+            DESCRIPTION.
+        u : TYPE, optional
+            DESCRIPTION. The default is 1.
+
+        Returns
+        -------
+        NC : integer
+            neighbouring cells of (i,j) with u unit
+
+        '''
+        
+        NC = []
+        
+        #  i = +-u et j = +- 0-->u
+        for t in range(-u,u+1):
+            candidat1 = (i + u, j + t)
+            if candidat1 != (i,j) and (i+u) < self.xsize and (i+u) >= 0 and (j+t) < self.ysize and (j+t) >= 0:
+                if candidat1 not in NC:
+                    NC.append(candidat1)
+            candidat2 = (i - u, j + t)
+            if candidat2 != (i,j) and (i-u) < self.xsize and (i-u) >= 0 and (j+t) < self.ysize and (j+t) >= 0:
+                if candidat2 not in NC:
+                    NC.append(candidat2)
+        
+        #  i = +- 0-->u-1 et j = +-u
+        for s in range(-u+1, u):
+            candidat1 = (i + s, j + u)
+            if candidat1 != (i,j) and (i+s) < self.xsize and (i+s) >= 0 and (j+u) < self.ysize and (j+u) >= 0:
+                if candidat1 not in NC:
+                    NC.append(candidat1)
+            candidat2 = (i + s, j - u)
+            if candidat2 != (i,j) and (i+s) < self.xsize and (i+s) >= 0 and (j-u) < self.ysize and (j-u) >= 0:
+                if candidat2 not in NC:
+                    NC.append(candidat2)
+            
+        # return neighbouring cells
+        #print (NC)
+        return NC
+        
+        
+        
+        
+        
+        
