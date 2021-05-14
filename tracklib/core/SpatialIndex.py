@@ -309,24 +309,24 @@ class SpatialIndex:
         NC = []
         
         #  i = +-u et j = +- 0-->u
-        for t in range(-u,u+1):
+        for t in range(-u, u+1):
             candidat1 = (i + u, j + t)
-            if candidat1 != (i,j) and (i+u) < self.xsize and (i+u) >= 0 and (j+t) < self.ysize and (j+t) >= 0:
+            if (i+u) < self.xsize and (i+u) >= 0 and (j+t) < self.ysize and (j+t) >= 0:
                 if candidat1 not in NC:
                     NC.append(candidat1)
             candidat2 = (i - u, j + t)
-            if candidat2 != (i,j) and (i-u) < self.xsize and (i-u) >= 0 and (j+t) < self.ysize and (j+t) >= 0:
+            if (i-u) < self.xsize and (i-u) >= 0 and (j+t) < self.ysize and (j+t) >= 0:
                 if candidat2 not in NC:
                     NC.append(candidat2)
         
         #  i = +- 0-->u-1 et j = +-u
         for s in range(-u+1, u):
             candidat1 = (i + s, j + u)
-            if candidat1 != (i,j) and (i+s) < self.xsize and (i+s) >= 0 and (j+u) < self.ysize and (j+u) >= 0:
+            if (i+s) < self.xsize and (i+s) >= 0 and (j+u) < self.ysize and (j+u) >= 0:
                 if candidat1 not in NC:
                     NC.append(candidat1)
             candidat2 = (i + s, j - u)
-            if candidat2 != (i,j) and (i+s) < self.xsize and (i+s) >= 0 and (j-u) < self.ysize and (j-u) >= 0:
+            if (i+s) < self.xsize and (i+s) >= 0 and (j-u) < self.ysize and (j-u) >= 0:
                 if candidat2 not in NC:
                     NC.append(candidat2)
             
