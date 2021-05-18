@@ -2,6 +2,7 @@
 
 import math
 import matplotlib.pyplot as plt
+import sys
 
 from tracklib.core.Coords import GeoCoords, ENUCoords, ECEFCoords
 from tracklib.core.Network import Edge
@@ -45,16 +46,16 @@ class SpatialIndex:
         
         # Nombre de dalle par cote
         self.resolution = resolution
-        self.xsize = self.resolution[0] + 0
-        self.ysize = self.resolution[1] + 0
+        self.xsize = self.resolution[0]
+        self.ysize = self.resolution[1]
         #print ('nb cellule', self.xsize * self.ysize)
         
         # Tableau de collections de features appartenant a chaque dalle. 
         # Un feature peut appartenir a plusieurs dalles.
         self.grid = []
-        for i in range(self.xsize+1):
+        for i in range(self.xsize + 1):
             self.grid.append([])
-            for j in range(self.ysize+1):
+            for j in range(self.ysize + 1):
                 self.grid[i].append([])
         
         (self.xmin, self.xmax, self.ymin, self.ymax) = collection.bbox()
@@ -97,46 +98,30 @@ class SpatialIndex:
                traversée par le segment [coord1, coord2] avec
                coord1 : indices de la grille
         '''
+        #
+        CELLS = self.__cellsCrossSegment(coord1, coord2)
         
-        segment2 = [coord1[0], coord1[1], coord2[0], coord2[1]]
-        
-        xmin = min (math.floor(coord1[0]), math.floor(coord2[0]))
-        xmax = max (math.floor(coord1[0]), math.floor(coord2[0]))
-        
-        ymin = min (math.floor(coord1[1]), math.floor(coord2[1]))
-        ymax = max (math.floor(coord1[1]), math.floor(coord2[1]))
-        
-        # On boucle sur les cellules 
-        for i in range( xmin,  xmax+1):
-             #print (i)
-             for j in range(ymin, ymax+1):
+        for cell in CELLS:
+            i = cell[0]
+            j = cell[1]
+            if i > self.xsize:
+                print ('error, depassement en x')
+                exit()
+            if j > self.ysize:
+                print ('error, depassement en y')
+                exit()
                 
-                 # On boucle sur les 4 bordures        
-                 segment1 = [i+0.0, j, i+1, j]
-                 if Geometrics.isSegmentIntersects(segment1, segment2):
-                     if data not in self.grid[i][j]:
-                         self.grid[i][j].append(data)
-                    
-                 segment1 = [i,j,i,j+1]
-                 if Geometrics.isSegmentIntersects(segment1, segment2):
-                     if data not in self.grid[i][j]:
-                         self.grid[i][j].append(data)
-                    
-                 segment1 = [i,j+1,i+1,j+1]
-                 if Geometrics.isSegmentIntersects(segment1, segment2):
-                     if data not in self.grid[i][j]:
-                         self.grid[i][j].append(data)
-                    
-                 segment1 = [i+1,j,i+1,j+1]
-                 if Geometrics.isSegmentIntersects(segment1, segment2):
-                     if data not in self.grid[i][j]:
-                         self.grid[i][j].append(data)
-        
-       
+            if data not in self.grid[i][j]:
+                self.grid[i][j].append(data)
+                
+    
+    def __addPoint (self, coord, data):
+        pass
+    
     
     def __getCoordGrille(self, coord):
         '''
-            Fonction qui convertit des coordonnées Coords en indices (i,j), 
+            Fonction qui convertit des coordonnées Coords en Coordonnées de la grille 
         '''
         X = float(coord.getX()) - self.xmin
         idx = X / self.dX
@@ -149,17 +134,17 @@ class SpatialIndex:
     
     def __getCell(self, coord):
         '''
-            Fonction qui convertit des coordonnées Coords en indices (i,j), 
+            Fonction qui retourne les identifiants de la cellule en indices (i,j)
+            de Coord  
         '''
         (idx, idy) = self.__getCoordGrille(coord)
-        return (math.floor(idx), math.floor(idy))
-    
-    
-    
-    def __addPoint (self, coord, data):
         
-        pass
-    
+        if math.floor(idx) < 0 or math.floor(idx) > (self.xsize + 1):
+            sys.exit ('error, depassement en x')
+        if idy < 0 or idy > (self.ysize + 1):
+            sys.exit ('error, depassement en y')
+        
+        return (math.floor(idx), math.floor(idy))
     
     
     def plot(self):
@@ -195,7 +180,7 @@ class SpatialIndex:
                     ax.add_patch(polygon)
                     polygon.set_facecolor('lightcyan')
 
-                
+
     def request(self, obj, j = -1) : 
         '''
         retourne toutes les données (sous forme de liste simple) 
@@ -209,69 +194,28 @@ class SpatialIndex:
            
         if isinstance(obj, GeoCoords) or isinstance(obj, ENUCoords) or isinstance(obj, ECEFCoords):
             ''' dans la cellule contenant le point coord '''
-            
             coord = obj
-            x = coord.getX()
-            y = coord.getY()
-            c = self.__getCell(ENUCoords(x, y))
-            return self.grid[c[0]][c[1]]
+            c = self.__getCell(coord)
+            # print ('--', c)
+            return self.request(c[0], c[1])
         
-        elif isinstance(obj, list):
+        if isinstance(obj, list):
             ''' dans les cellules traversée par le segment coord '''
             [coord1, coord2] = obj
-            segment2 = [coord1[0], coord1[1], coord2[0], coord2[1]]
             
             # Les cellules traversées par le segment
-            
-            xmin = min (math.floor(coord1[0]), math.floor(coord2[0]))
-            xmax = max (math.floor(coord1[0]), math.floor(coord2[0]))
-        
-            ymin = min (math.floor(coord1[1]), math.floor(coord2[1]))
-            ymax = max (math.floor(coord1[1]), math.floor(coord2[1]))
-        
+            CELLS = self.__cellsCrossSegment(coord1, coord2)
             TAB = []
-            # On boucle sur les cellules 
-            for i in range( xmin,  xmax+1):
-                #print (i)
-                for j in range(ymin, ymax+1):
-                    
-                    val = self.grid[i][j]
-                    
-                    # On boucle sur les 4 bordures         
-                    segment1 = [i+0.0, j, i+1, j]
-                    if Geometrics.isSegmentIntersects(segment1, segment2):
-                        for d in val:
-                            if d not in TAB:
-                                TAB.append(d)
-                    
-                    segment1 = [i,j,i,j+1]
-                    if Geometrics.isSegmentIntersects(segment1, segment2):
-                        for d in val:
-                            if d not in TAB:
-                                TAB.append(d)
-                    
-                    segment1 = [i,j+1,i+1,j+1]
-                    if Geometrics.isSegmentIntersects(segment1, segment2):
-                        for d in val:
-                            if d not in TAB:
-                                TAB.append(d)
-                    
-                    segment1 = [i+1,j,i+1,j+1]
-                    if Geometrics.isSegmentIntersects(segment1, segment2):
-                        for d in val:
-                            if d not in TAB:
-                                TAB.append(d)
-                    
+            for cell in CELLS:
+                self.__addCellValuesInTAB(TAB, cell)
             return TAB
-        
-        elif isinstance(obj, Track):
-            ''' dans les cellules traversée par la track '''
             
-            # récupération des cellules de la track
+        if isinstance(obj, Track):
+            ''' dans les cellules traversée par la track '''
             track = obj
             
+            # récupération des cellules de la track
             TAB = []
-            
             pos1 = None
             for i in range(track.size()):
                 obs = track.getObs(i)
@@ -279,50 +223,172 @@ class SpatialIndex:
                 if pos1 != None:
                     coord1 = self.__getCell(pos1)
                     coord2 = self.__getCell(pos2)
-                    #print (p1, p2)
-                    #self.__addSegment(p1, p2, (i-1,num))
                     
-                    segment2 = [coord1[0], coord1[1], coord2[0], coord2[1]]
-        
-                    xmin = min (math.floor(coord1[0]), math.floor(coord2[0]))
-                    xmax = max (math.floor(coord1[0]), math.floor(coord2[0]))
-        
-                    ymin = min (math.floor(coord1[1]), math.floor(coord2[1]))
-                    ymax = max (math.floor(coord1[1]), math.floor(coord2[1]))
-                    
-                    
-                    # On boucle sur les cellules 
-                    for i in range( xmin,  xmax+1):
-                        #print (i)
-                        for j in range(ymin, ymax+1):
-                            
-                            val = self.grid[i][j]
-                            
-                            segment1 = [i+0.0, j, i+1, j]
-                            if Geometrics.isSegmentIntersects(segment1, segment2):
-                                for d in val:
-                                    if d not in TAB:
-                                        TAB.append(d)
-                                        
-                            segment1 = [i,j,i,j+1]
-                            if Geometrics.isSegmentIntersects(segment1, segment2):
-                                for d in val:
-                                    if d not in TAB:
-                                        TAB.append(d)
-                                        
-                            segment1 = [i,j+1,i+1,j+1]
-                            if Geometrics.isSegmentIntersects(segment1, segment2):
-                                for d in val:
-                                    if d not in TAB:
-                                        TAB.append(d)
-                            
-                            segment1 = [i+1,j,i+1,j+1]
-                            if Geometrics.isSegmentIntersects(segment1, segment2):
-                                for d in val:
-                                    if d not in TAB:
-                                        TAB.append(d)
-                    
-                    
+                    CELLS = self.__cellsCrossSegment(coord1, coord2)
+                    for cell in CELLS:
+                        self.__addCellValuesInTAB(TAB, cell)
                 pos1 = pos2
                 
             return TAB
+        
+        
+    def neighborhood(self, obj, j = -1, unit=0):
+        '''
+        retourne toutes les données (sous forme de liste simple) référencées 
+        dans la cellule (i,j). 
+        Si unit=-1, calcule la valeur minimale à donner à unit, 
+        pour que la liste ne soit pas vide*.  
+        '''
+        
+        if isinstance(obj, int):
+            i = obj
+            
+            if unit > -1:
+                NC = self.__neighbouringcells(i, j, unit)
+                TAB = []
+                for cell in NC:
+                    self.__addCellValuesInTAB(TAB, cell)
+                #print (TAB)
+                return TAB
+            
+            # Si unit = -1, tant liste ne soit pas vide
+            # plus une marge de une unité
+            u = 0
+            while (u <= max(self.xsize, self.ysize)):
+                NC = self.__neighbouringcells(i, j, u)
+                TAB = []
+                for cell in NC:
+                    self.__addCellValuesInTAB(TAB, cell)
+                
+                if len(TAB) <= 0:
+                    u += 1
+                    continue
+                
+                # Plus une marge de sécurité
+                NC = self.__neighbouringcells(i, j, u+1)
+                for cell in NC:
+                    self.__addCellValuesInTAB(TAB, cell)
+                #print (TAB)                
+                return TAB
+        
+        
+        if isinstance(obj, GeoCoords) or isinstance(obj, ENUCoords) or isinstance(obj, ECEFCoords):
+            coord = obj
+            x = coord.getX()
+            y = coord.getY()
+            c = self.__getCell(ENUCoords(x, y))
+            # print (c)
+            return self.neighborhood(c[0], c[1], unit)
+            
+            
+        
+        if isinstance(obj, list):
+            ''' cellules voisines traversées par le segment coord '''
+            [coord1, coord2] = obj
+            pass
+        
+        if isinstance(obj, Track):
+            ''' cellules voisines traversée par la track '''
+            track = obj
+            pass
+        
+    
+    def __neighbouringcells(self, i, j, u=1):
+        '''
+        Parameters
+        ----------
+        i : TYPE
+            DESCRIPTION.
+        j : TYPE
+            DESCRIPTION.
+        u : TYPE, optional
+            DESCRIPTION. The default is 1.
+
+        Returns
+        -------
+        NC : integer
+            neighbouring cells of (i,j) with u unit
+
+        '''
+        
+        NC = []
+        
+        #  i = +-u et j = +- 0-->u
+        for t in range(-u, u+1):
+            candidat1 = (i + u, j + t)
+            if (i+u) < self.xsize and (i+u) >= 0 and (j+t) < self.ysize and (j+t) >= 0:
+                if candidat1 not in NC:
+                    NC.append(candidat1)
+            candidat2 = (i - u, j + t)
+            if (i-u) < self.xsize and (i-u) >= 0 and (j+t) < self.ysize and (j+t) >= 0:
+                if candidat2 not in NC:
+                    NC.append(candidat2)
+        
+        #  i = +- 0-->u-1 et j = +-u
+        for s in range(-u+1, u):
+            candidat1 = (i + s, j + u)
+            if (i+s) < self.xsize and (i+s) >= 0 and (j+u) < self.ysize and (j+u) >= 0:
+                if candidat1 not in NC:
+                    NC.append(candidat1)
+            candidat2 = (i + s, j - u)
+            if (i+s) < self.xsize and (i+s) >= 0 and (j-u) < self.ysize and (j-u) >= 0:
+                if candidat2 not in NC:
+                    NC.append(candidat2)
+            
+        # return neighbouring cells
+        #print (NC)
+        return NC
+        
+        
+    
+    def __addCellValuesInTAB(self, TAB, cell):
+        '''
+           Add all values of the cell in TAB array.
+           Check: 
+               if cell is empty 
+               if the values of cell are not already in TAB
+        '''
+        
+        values = self.request(cell[0], cell[1])
+        if len (values) > 0:
+            for d in values:
+                if d not in TAB:
+                    TAB.append(d)
+        
+        
+    def __cellsCrossSegment(self, coord1, coord2):
+        '''
+            liste des cellules passent par ce segment
+        '''
+        CELLS = []
+        segment2 = [coord1[0], coord1[1], coord2[0], coord2[1]]
+        
+        xmin = min (math.floor(coord1[0]), math.floor(coord2[0]))
+        xmax = max (math.floor(coord1[0]), math.floor(coord2[0]))
+        
+        ymin = min (math.floor(coord1[1]), math.floor(coord2[1]))
+        ymax = max (math.floor(coord1[1]), math.floor(coord2[1]))
+        
+        for i in range( xmin,  xmax+1):
+            for j in range(ymin, ymax+1):
+                
+                segment1 = [i, j, i+1, j]
+                if Geometrics.isSegmentIntersects(segment1, segment2):
+                    CELLS.append((i,j))
+                    
+                segment1 = [i, j, i, j+1]
+                if Geometrics.isSegmentIntersects(segment1, segment2):
+                     if (i,j) not in CELLS:
+                         CELLS.append((i,j))
+                    
+                segment1 = [i,j+1,i+1,j+1]
+                if Geometrics.isSegmentIntersects(segment1, segment2):
+                     if (i,j) not in CELLS:
+                         CELLS.append((i,j))
+                    
+                segment1 = [i+1,j,i+1,j+1]
+                if Geometrics.isSegmentIntersects(segment1, segment2):
+                    if (i,j) not in CELLS:
+                        CELLS.append((i,j))
+                
+        return CELLS   
