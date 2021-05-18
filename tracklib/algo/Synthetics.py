@@ -1,7 +1,7 @@
 # --------------------------- Synthetics --------------------------------------
 # Class to manage GPS tracks synthetic generations
 # -----------------------------------------------------------------------------
-
+import math
 import random
 
 from tracklib.core.Coords import ENUCoords

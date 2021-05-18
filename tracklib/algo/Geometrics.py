@@ -35,7 +35,7 @@ class Circle:
             Y[t] = self.radius*math.sin(2*math.pi*t/len(Y)) + self.center.getY()
         X[len(X)-1] = X[0]
         Y[len(Y)-1] = Y[0]
-        plt.plot(X, Y, sym)
+        plt.plot(X, Y, sym,linewidth=.5)
         
     def contains(self, point):
         return (point.getX()-self.center.getX())**2 + (point.getX()-self.center.getY())**2 <= self.radius**2
@@ -601,6 +601,70 @@ def minCircleMatrix(track):
             M[i,j] = minCircle(track.extract(i,j))[1]
     M = M + np.transpose(M)
     return M
+
+
+def fitCircle(track, iter_max=100, epsilon=1e-10):
+
+    X = np.ones((3,1)); 
+    c = track.getCentroid()
+    N = track.size()
+    X[0] = c.getX(); X[1] = c.getY(); 
+    J = np.zeros((N,3)); 
+    B = np.zeros((N,1)); 
+    
+    for k in range(iter_max):
+        for i in range(N):
+            obs = track[i].position; x = obs.getX(); y = obs.getY()
+            R = math.sqrt((x-X[0])**2 + (y-X[1])**2) 
+            J[i,0] = 2*(X[0,0]-x)
+            J[i,1] = 2*(X[1,0]-y);
+            J[i,2] = -2*R
+            B[i,0] = X[2]-R
+        try:
+            dX = np.linalg.solve(np.transpose(J)@J, np.transpose(J)@B)
+            X = X+dX
+        except np.linalg.LinAlgError as err:
+            return Circle(ENUCoords(0, 0), 0)
+        
+        if max(max(abs(dX[0]/X[0]), abs(dX[1]/X[1])), abs(dX[2]/X[2])) < epsilon:
+            break
+    
+    residuals = [0]*len(track)
+    for i in range(len(residuals)):
+        residuals[i] = (track[i].position.getX()-X[0])**2 + (track[i].position.getY()-X[1])**2 - X[2]**2
+        sign = -1*(residuals[i] < 0) + 1*(residuals[i] > 0)
+        residuals[i] = sign*math.sqrt(abs(residuals[i]))
+    track.createAnalyticalFeature("#circle_residual", residuals)
+
+    return Circle(ENUCoords(X[0], X[1]), X[2])
+
+
+'''   
+def fitCircle(track):
+    #Computes optimal circle fit on track
+    #Beta version, with Kalman filter 
+    I = np.identity(3)
+    P = I*1e10
+    H = -1*np.ones((1,3))
+    X = np.zeros((3,1)); 
+    c = track.getCentroid()
+    X[0,0] = c.getX(); X[1,0] = c.getY(); 
+    w = 1e-20
+    
+    L = list(range(len(track)))
+    random.shuffle(L)
+
+    for i in L:
+        obs = track[i].position; x = obs.getX(); y = obs.getY()
+        R = math.sqrt((x-X[0])**2 + (y-X[1])**2)
+        z = np.matrix(X[2]-R)
+        H[0,0] = (X[0]-x)/R;   H[0,1] = (X[1]-y)/R; 
+        K =  P @ np.transpose(H) @ np.linalg.inv(H @ P @ np.transpose(H) + w)
+        X = X + K@z
+        P = (I - K@H) @ P
+            
+    return Circle(ENUCoords(X[0,0], X[1,0]), X[2,0])
+'''
     
 # ------------------------------------------------------------
 # Output :     R = [[x1,y1],[x2,y2],[x3,y3],[x4,y4], area, l, L]    
