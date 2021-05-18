@@ -279,13 +279,19 @@ class SpatialIndex:
             c = self.__getCell(ENUCoords(x, y))
             # print (c)
             return self.neighborhood(c[0], c[1], unit)
-            
-            
+           
         
         if isinstance(obj, list):
             ''' cellules voisines traversées par le segment coord '''
             [coord1, coord2] = obj
-            pass
+            # Tableau à retourner
+            TAB = []
+            # Les cellules traversées par le segment
+            CELLS = self.__cellsCrossSegment(coord1, coord2)
+            for cell in CELLS:
+                self.__addCellValuesInTAB(TAB, cell)
+            
+
         
         if isinstance(obj, Track):
             ''' cellules voisines traversée par la track '''

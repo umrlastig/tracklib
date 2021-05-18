@@ -135,6 +135,7 @@ class TestSpatialIndex(TestTracklib):
         # self.assertCountEqual(index.neighborhood(4, 4, -1), [(3,0)])
         # self.assertCountEqual(index.neighborhood(2, 4, -1), [(0,0), (1,0), (2,0), (3,0)])
         
+        
         # =====================================================================
         # UNIT != -1
         self.assertCountEqual(index.neighborhood(ENUCoords(550, 320)), [(0,0)])
@@ -171,6 +172,10 @@ class TestSpatialIndex(TestTracklib):
         
         
         # =====================================================================
+        # UNIT != -1
+        #self.assertEqual(index.neighborhood([(2.1, 0.5), (1.1, 1.1)], None, 0), [(0,0)])
+        
+        
         
         
     def test_index_trackcollection(self):
@@ -216,9 +221,9 @@ class TestSpatialIndex(TestTracklib):
 if __name__ == '__main__':
     suite = TestSuite()
     suite.addTest(TestSpatialIndex("test_create_index"))
-    #suite.addTest(TestSpatialIndex("test_index_trackcollection"))
-    #suite.addTest(TestSpatialIndex("test_index_network"))
-    #suite.addTest(TestSpatialIndex("testIndexPoint"))
+    suite.addTest(TestSpatialIndex("test_index_trackcollection"))
+    suite.addTest(TestSpatialIndex("test_index_network"))
+    suite.addTest(TestSpatialIndex("testIndexPoint"))
     runner = TextTestRunner()
     runner.run(suite)
     

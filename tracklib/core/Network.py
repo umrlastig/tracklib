@@ -342,7 +342,8 @@ class Network:
     # [[n]] Get and set track number n
     # ------------------------------------------------------------    
     def __getitem__(self, n):
-        return self.EDGES[n]  
+        #return self.EDGES[n]
+        return list(self.EDGES)[n]
     def __setitem__(self, n, edge):
         self.EDGES[n] = edge  
 
