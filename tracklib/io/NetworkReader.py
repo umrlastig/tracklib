@@ -45,7 +45,7 @@ class NetworkReader:
                     continue
                 
                 track = Track(TAB_OBS)
-
+                
                 # Transformation GEO coordinates to ENU
                 #if (fmt.srid.upper() in ["GEOCOORDS", "GEO", "ECEFCOORDS", "ECEF"]):
                 #    track.toENUCoords()
