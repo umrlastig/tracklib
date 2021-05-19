@@ -182,9 +182,9 @@ class TestDijkstra(TestTracklib):
 
 if __name__ == '__main__':
     suite = TestSuite()
-    #suite.addTest(TestDijkstra("test_dijkstra"))
-    #suite.addTest(TestDijkstra("test_igast"))
-    #suite.addTest(TestDijkstra("test_dijkstra_bdtopo"))
+    suite.addTest(TestDijkstra("test_dijkstra"))
+    suite.addTest(TestDijkstra("test_igast"))
+    suite.addTest(TestDijkstra("test_dijkstra_bdtopo"))
     suite.addTest(TestDijkstra("test_bdtopo"))
     runner = TextTestRunner()
     runner.run(suite)

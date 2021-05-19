@@ -579,7 +579,8 @@ class Network:
         tarray_ymin = []
         tarray_ymax = []
         
-        for edge in self.EDGES:
+        for key in self.EDGES:
+            edge = self.EDGES[key]
             trace = edge.track
             tarray_xmin.append(trace.operate(Operator.MIN, 'x'))
             tarray_xmax.append(trace.operate(Operator.MAX, 'x'))
