@@ -310,7 +310,7 @@ class Edge:
         return False
 
     def __str__(self):
-        return 'edge' + str(self.id)
+        return 'edge #' + str(self.id)
     
     def getX(self, i=None):
         return self.track.getX(i)
@@ -326,40 +326,59 @@ class Network:
     def __init__(self):
         '''
         '''
-        self.EDGES = set()
-        self.NODES = set()
+        self.EDGES = dict()
+        self.NODES = dict()
+        
+        self.__idx_nodes = []
+        self.__idx_edges = []
         
         self.__cut = 0
         
         
     def __iter__(self):
-        yield from self.EDGES
+        yield from [l[1] for l in list(self.EDGES.items())]
         
     def size(self):
         return len(self.EDGES)
     
     # ------------------------------------------------------------
-    # [[n]] Get and set track number n
+    # [[n]] Get and set an edge from n
     # ------------------------------------------------------------    
     def __getitem__(self, n):
-        #return self.EDGES[n]
-        return list(self.EDGES)[n]
+        return self.EDGES[self.__idx_edges[n]]
     def __setitem__(self, n, edge):
-        self.EDGES[n] = edge  
-
-
-    def addEdge(self, edge):
-        self.EDGES.add(edge)
+        self.EDGES[self.__idx_edges[id]] = edge  
+        
+    def getNumberOfNodes(self):
+        return len(self.NODES)
+    def getNumberOfEdges(self):
+        return len(self.EDGES)
+        
+    def getNodeId(self, n):
+        return self.__idx_nodes[n]
+    def getEdgeId(self, n):
+        return self.__idx_edges[n]
+    def getNodesId(self):
+        return [l[0] for l in list(self.NODES.items())]
+    def getEdgesId(self):
+        return [l[0] for l in list(self.EDGES.items())]
         
     def addNode(self, node):
-        self.NODES.add(node)
+        self.NODES[node.id] = node
+        self.__idx_nodes.append(node.id)
+    def addEdge(self, edge):
+        self.EDGES[edge.id] = edge  
+        self.__idx_edges.append(edge.id)
+
+    def hasNode(self, id):
+        return id in self.NODES  
+    def hasEdge(self, id):
+        return id in self.EDGES
 
     def getNode(self, id):
-        for node in self.NODES:
-            if node.id == id:
-                return node
-        return None
-    
+        return self.NODES[id]
+    def getEdge(self, id):
+        return self.EDGES[id]    
     
     def select(self, node, distance):
         '''
@@ -389,10 +408,10 @@ class Network:
     
     
     def __initializeForSP(self):
-        for node in self.NODES:
+        for i in range(self.getNumberOfNodes()):
+            node = self.getNode(self.getNodeId(i))
             node.initializeForSP()
             
-    
     
     def shortest_path(self, node1, node2, cut = 0):
         self.__cut = cut
@@ -479,13 +498,15 @@ class Network:
     
     def plot(self, pcc = None, node1 = None, node2 = None):
         
-        for edge in self.EDGES:
+        L = list(self.EDGES.items())
+        for i in range(len(L)):
+            edge = L[i][1]
             if edge.orientation == Edge.DOUBLE_SENS:
                 plt.plot(edge.track.getX(), edge.track.getY(), '-', color="blue", linewidth = 0.5)
             else:
                 plt.plot(edge.track.getX(), edge.track.getY(), '-', color="gray", linewidth = 0.5)
 
-        '''   
+        '''
         for node in self.NODES:
             #print (str(len(node.getArcsEntrants())) + '-' + str(len(node.getArcsSortants()))) 
             plt.plot(node.coord.getX(), node.coord.getY(), 'gx', markersize=2)
@@ -502,6 +523,7 @@ class Network:
         '''
         plt.show()
         
+
     def fastPlot(self, edges='k-', nodes='', indirect='r-', size=0.5):
     
         x1d = []; y1d = []; x1i = []; y1i = []
@@ -509,7 +531,9 @@ class Network:
         exd = []; eyd = []; exi = []; eyi = [];
         nx = [];   ny = [];
         
-        for edge in self.EDGES:
+        L = list(self.EDGES.items())
+        for i in range(len(L)):
+            edge = L[i][1]
             for j in range(edge.track.size()-1):
                 if edge.orientation == Edge.DOUBLE_SENS:
                     x1d.append(edge.track.getX()[j]); x2d.append(edge.track.getX()[j+1])

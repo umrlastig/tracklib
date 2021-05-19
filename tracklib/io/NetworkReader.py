@@ -33,14 +33,18 @@ class NetworkReader:
                 if cpt >= fmt.h:
                     break
     
-            a = 0    
+            counter = 0    
             for row in spamreader:
                 
                 edge_id = str(row[fmt.pos_edge_id])
+                if fmt.pos_edge_id < 0:
+                    edge_id = counter
+                counter = counter + 1
 
                 geom = str(row[fmt.pos_wkt])
                 TAB_OBS = wkt.wktLineStringToObs(geom, fmt.srid.upper())
-                print(len(network.EDGES))
+
+                
                 # Au moins 2 points
                 if len(TAB_OBS) < 2:
                     continue
@@ -52,13 +56,13 @@ class NetworkReader:
                 #    track.toENUCoords()
                 
                 edge = Edge(edge_id, track)
-                
+              
                 # Orientation
                 orientation = int(row[fmt.pos_sens])
                 if (orientation not in [Edge.DOUBLE_SENS, Edge.SENS_DIRECT, Edge.SENS_INVERSE]):
                     orientation = Edge.DOUBLE_SENS
                 edge.setOrientation(orientation)
-                
+                  
                 # Poids
                 if fmt.pos_poids == -1:
                     poids = track.length()
@@ -75,7 +79,7 @@ class NetworkReader:
                 else:
                     n = network.getNode(source)
                     edge.setNoeudIni(n)
-                
+               
                 # target node 
                 target = str(row[fmt.pos_target])
                 noeudFin = Node(target, track.getLastObs().position)
@@ -85,10 +89,11 @@ class NetworkReader:
                 else:
                     n = network.getNode(target)
                     edge.setNoeudFin(n)
-                
+                             
                 # Add edge
                 network.addEdge(edge)
-
+                if (counter % 100 == 0):
+                    print(counter)
                 if len(network.EDGES) > 5000:
                     break
         
