@@ -33,12 +33,17 @@ class NetworkReader:
                 if cpt >= fmt.h:
                     break
     
-                
+            counter = 0    
             for row in spamreader:
                 
                 edge_id = str(row[fmt.pos_edge_id])
+                if fmt.pos_edge_id < 0:
+                    edge_id = counter
+                counter = counter + 1
+
                 geom = str(row[fmt.pos_wkt])
                 TAB_OBS = wkt.wktLineStringToObs(geom, fmt.srid.upper())
+
                 
                 # Au moins 2 points
                 if len(TAB_OBS) < 2:
@@ -51,13 +56,13 @@ class NetworkReader:
                 #    track.toENUCoords()
                 
                 edge = Edge(edge_id, track)
-                
+              
                 # Orientation
                 orientation = int(row[fmt.pos_sens])
                 if (orientation not in [Edge.DOUBLE_SENS, Edge.SENS_DIRECT, Edge.SENS_INVERSE]):
                     orientation = Edge.DOUBLE_SENS
                 edge.setOrientation(orientation)
-                
+                  
                 # Poids
                 if fmt.pos_poids == -1:
                     poids = track.length()
@@ -71,17 +76,22 @@ class NetworkReader:
                 if noeudIni in network.NODES:
                     n = network.getNode(source)
                     edge.setNoeudIni(n)
+<<<<<<< HEAD
                 else:
                     edge.setNoeudIni(noeudIni)
                     network.addNode(noeudIni)
                     
                 
+=======
+               
+>>>>>>> cb604480a021b2bd858b8bf6457b201519d84bbc
                 # target node 
                 target = str(row[fmt.pos_target])
                 noeudFin = Node(target, track.getLastObs().position)
                 if noeudFin in network.NODES:
                     n = network.getNode(target)
                     edge.setNoeudFin(n)
+<<<<<<< HEAD
                 else:
                     edge.setNoeudFin(noeudFin)
                     network.addNode(noeudFin)
@@ -92,6 +102,15 @@ class NetworkReader:
                 
                 #if len(network.EDGES) > 10000:
                 #    break
+=======
+                             
+                # Add edge
+                network.addEdge(edge)
+                if (counter % 100 == 0):
+                    print(counter)
+                if len(network.EDGES) > 5000:
+                    break
+>>>>>>> cb604480a021b2bd858b8bf6457b201519d84bbc
         
         csvfile.close()        
                 
