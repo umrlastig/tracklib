@@ -473,14 +473,12 @@ class Network:
     def plot(self, pcc = None, node1 = None, node2 = None):
         
         for edge in self.EDGES:
-            X = edge.track.getX()
-            Y = edge.track.getY()
             if edge.orientation == Edge.DOUBLE_SENS:
-                plt.plot(X, Y, '-', color="blue", linewidth = 0.5)
+                plt.plot(edge.track.getX(), edge.track.getY(), '-', color="blue", linewidth = 0.5)
             else:
-                plt.plot(X, Y, '-', color="gray", linewidth = 0.5)
-            #edge.track.plot()
-            
+                plt.plot(edge.track.getX(), edge.track.getY(), '-', color="gray", linewidth = 0.5)
+
+        '''   
         for node in self.NODES:
             #print (str(len(node.getArcsEntrants())) + '-' + str(len(node.getArcsSortants()))) 
             plt.plot(node.coord.getX(), node.coord.getY(), 'gx', markersize=2)
@@ -494,10 +492,41 @@ class Network:
             plt.plot(node1.coord.getX(), node1.coord.getY(), 'rx', markersize=5)
         if node2 != None:
             plt.plot(node2.coord.getX(), node2.coord.getY(), 'rx', markersize=5)
-        
+        '''
         plt.show()
         
+    def fastPlot(self, edges='k-', nodes='', indirect='r-', size=0.5):
+    
+        x1d = []; y1d = []; x1i = []; y1i = []
+        x2d = []; y2d = []; x2i = []; y2i = []
+        exd = []; eyd = []; exi = []; eyi = [];
+        nx = [];   ny = [];
         
+        for edge in self.EDGES:
+            for j in range(edge.track.size()-1):
+                if edge.orientation == Edge.DOUBLE_SENS:
+                    x1d.append(edge.track.getX()[j]); x2d.append(edge.track.getX()[j+1])
+                    y1d.append(edge.track.getY()[j]); y2d.append(edge.track.getY()[j+1])
+                else:
+                    x1i.append(edge.track.getX()[j]); x2i.append(edge.track.getX()[j+1])
+                    y1i.append(edge.track.getY()[j]); y2i.append(edge.track.getY()[j+1])
+            nx.append(edge.track.getX()[0]); nx.append(edge.track.getX()[-1])   
+            ny.append(edge.track.getY()[0]); ny.append(edge.track.getY()[-1])
+
+        for s, t, u, v in zip(x1d, y1d, x2d, y2d):
+            exd.append(s); exd.append(u); exd.append(None)
+            eyd.append(t); eyd.append(v); eyd.append(None)
+        for s, t, u, v in zip(x1i, y1i, x2i, y2i):
+            exi.append(s); exi.append(u); exi.append(None)
+            eyi.append(t); eyi.append(v); eyi.append(None)
+            
+        if len(edges) > 0: 
+            plt.plot(exd, eyd, edges, linewidth=size)
+        if len(indirect) > 0: 
+            plt.plot(exi, eyi, indirect, linewidth=size)
+        if (len(nodes) > 0):
+            plt.plot(nx, ny, nodes, markersize=4*size)        
+            
     def bbox(self):
         '''
         BBOx sur edges
