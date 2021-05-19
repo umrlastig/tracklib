@@ -33,13 +33,14 @@ class NetworkReader:
                 if cpt >= fmt.h:
                     break
     
-                
+            a = 0    
             for row in spamreader:
                 
                 edge_id = str(row[fmt.pos_edge_id])
+
                 geom = str(row[fmt.pos_wkt])
                 TAB_OBS = wkt.wktLineStringToObs(geom, fmt.srid.upper())
-                
+                print(len(network.EDGES))
                 # Au moins 2 points
                 if len(TAB_OBS) < 2:
                     continue
@@ -87,9 +88,9 @@ class NetworkReader:
                 
                 # Add edge
                 network.addEdge(edge)
-                
-                #if len(network.EDGES) > 10:
-                #    break
+
+                if len(network.EDGES) > 5000:
+                    break
         
         csvfile.close()        
                 
