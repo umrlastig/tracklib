@@ -33,6 +33,9 @@ class Node:
         # Pour le ppc:
         self.initializeForSP()
         
+    def __hash__(self):
+        return hash(self.id)
+        
         
     def initializeForSP(self):
         self.__noeudPrecedent = None
@@ -251,6 +254,9 @@ class Edge:
         self.orientation = 0
         self.poids = 0
         
+    def __hash__(self):
+        return hash(self.id)
+        
     def getNoeudIni(self):
         return self.noeudIni
     
@@ -320,8 +326,8 @@ class Network:
     def __init__(self):
         '''
         '''
-        self.EDGES = []
-        self.NODES = []
+        self.EDGES = set()
+        self.NODES = set()
         
         self.__cut = 0
         
@@ -336,16 +342,17 @@ class Network:
     # [[n]] Get and set track number n
     # ------------------------------------------------------------    
     def __getitem__(self, n):
-        return self.EDGES[n]  
+        #return self.EDGES[n]
+        return list(self.EDGES)[n]
     def __setitem__(self, n, edge):
         self.EDGES[n] = edge  
 
 
     def addEdge(self, edge):
-        self.EDGES.append(edge)
+        self.EDGES.add(edge)
         
     def addNode(self, node):
-        self.NODES.append(node)
+        self.NODES.add(node)
 
     def getNode(self, id):
         for node in self.NODES:
