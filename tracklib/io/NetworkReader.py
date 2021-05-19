@@ -70,47 +70,35 @@ class NetworkReader:
                     poids = float(row[fmt.pos_poids])
                 edge.setPoids(poids)
                 
-                # source node 
+                 # source node 
                 source = str(row[fmt.pos_source])
                 noeudIni = Node(source, track.getFirstObs().position)
-                if noeudIni in network.NODES:
-                    n = network.getNode(source)
-                    edge.setNoeudIni(n)
-<<<<<<< HEAD
-                else:
+                if noeudIni.id not in network.NODES:
                     edge.setNoeudIni(noeudIni)
                     network.addNode(noeudIni)
+                else:
+                    n = network.getNode(source)
+                    edge.setNoeudIni(n)
                     
-                
-=======
-               
->>>>>>> cb604480a021b2bd858b8bf6457b201519d84bbc
+                    
                 # target node 
                 target = str(row[fmt.pos_target])
                 noeudFin = Node(target, track.getLastObs().position)
-                if noeudFin in network.NODES:
-                    n = network.getNode(target)
-                    edge.setNoeudFin(n)
-<<<<<<< HEAD
-                else:
+                if noeudFin.id not in network.NODES:
                     edge.setNoeudFin(noeudFin)
                     network.addNode(noeudFin)
+                else:
+                    n = network.getNode(target)
+                    edge.setNoeudFin(n)
                     
                 
-                # Add edge
-                #network.addEdge(edge)
-                
-                #if len(network.EDGES) > 10000:
-                #    break
-=======
-                             
-                # Add edge
+               # Add edge
                 network.addEdge(edge)
+
                 if (counter % 100 == 0):
                     print(counter)
                 if len(network.EDGES) > 5000:
                     break
->>>>>>> cb604480a021b2bd858b8bf6457b201519d84bbc
         
         csvfile.close()        
                 

@@ -349,6 +349,9 @@ class Network:
     def __setitem__(self, n, edge):
         self.EDGES[self.__idx_edges[id]] = edge  
         
+    def getIndexNodes(self):
+        return self.__idx_nodes
+        
     def getNumberOfNodes(self):
         return len(self.NODES)
     def getNumberOfEdges(self):
@@ -400,7 +403,8 @@ class Network:
         '''
         NODES = []
         
-        for n in self.NODES:
+        for key in self.NODES:
+            n = self.NODES[key]
             if n.coord.distance2DTo(node.coord) <= distance:
                 NODES.append(n)
         
@@ -472,7 +476,8 @@ class Network:
 #        plt.show()
         
         DIST = dict()
-        for node in self.NODES:
+        for key in self.NODES:
+            node = self.NODES[key]
             distance = node.getDistance()
             if distance >= 0:
                 if self.__cut > 0 and distance <= self.__cut:
@@ -487,7 +492,8 @@ class Network:
         self.__initializeForSP()
         
         DIST = dict()
-        for node in self.NODES:
+        for key in self.NODES:
+            node = self.NODES[key]
             d = self.shortest_path_distance(node1, node, cut)
             if d != None and d >= 0:
                 # print (d, node.id, node1.id)
