@@ -68,27 +68,29 @@ class NetworkReader:
                 # source node 
                 source = str(row[fmt.pos_source])
                 noeudIni = Node(source, track.getFirstObs().position)
-                if noeudIni not in network.NODES:
-                    edge.setNoeudIni(noeudIni)
-                    network.addNode(noeudIni)
-                else:
+                if noeudIni in network.NODES:
                     n = network.getNode(source)
                     edge.setNoeudIni(n)
+                else:
+                    edge.setNoeudIni(noeudIni)
+                    network.addNode(noeudIni)
+                    
                 
                 # target node 
                 target = str(row[fmt.pos_target])
                 noeudFin = Node(target, track.getLastObs().position)
-                if noeudFin not in network.NODES:
-                    edge.setNoeudFin(noeudFin)
-                    network.addNode(noeudFin)
-                else:
+                if noeudFin in network.NODES:
                     n = network.getNode(target)
                     edge.setNoeudFin(n)
+                else:
+                    edge.setNoeudFin(noeudFin)
+                    network.addNode(noeudFin)
+                    
                 
                 # Add edge
-                network.addEdge(edge)
+                #network.addEdge(edge)
                 
-                #if len(network.EDGES) > 10:
+                #if len(network.EDGES) > 10000:
                 #    break
         
         csvfile.close()        
