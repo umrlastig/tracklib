@@ -35,7 +35,9 @@ class Node:
     def __hash__(self):
         return hash(self.id)
         
-        
+    def plot(self, sym='r+'):
+        plt.plot(self.coord.getX(), self.coord.getY(), sym)
+               
     def initializeForSP(self):
         self.__noeudPrecedent = None
         self.__distance = -1
@@ -175,17 +177,20 @@ class Node:
             PPC.append(self)
         noeudsFinaux.insert(0, arrivee)
         # arrivee.addGroupe(plusCourtChemin)
-        
+
         # On construit le PCC en Track
         trace = Track()
         DIST_TAB = []
         for i in range(len(PPC)-1, -1, -1):
             elt = PPC[i]
-            if isinstance(elt, Node):
-                trace.addObs(Obs(elt.coord, GPSTime()))
-                DIST_TAB.append(elt.getDistance())
-            elif isinstance(elt, Edge):
-                for o in elt.track.getObsList():
+            #if isinstance(elt, Node):
+                #trace.addObs(Obs(elt.coord, GPSTime()))
+                #DIST_TAB.append(elt.getDistance())
+            if isinstance(elt, Edge):
+                portion = elt.track.getObsList()
+                if elt.track.getLastObs().position.distance2DTo(PPC[i+1].coord) == 0:
+                    portion = portion[::-1]
+                for o in portion:
                     trace.addObs(o)
                     DIST_TAB.append(-1)
         trace.createAnalyticalFeature(AF_WEIGHT, DIST_TAB)
