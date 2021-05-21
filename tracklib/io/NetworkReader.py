@@ -70,28 +70,31 @@ class NetworkReader:
                     poids = float(row[fmt.pos_poids])
                 edge.setPoids(poids)
                 
-                # source node 
+                 # source node 
                 source = str(row[fmt.pos_source])
                 noeudIni = Node(source, track.getFirstObs().position)
-                if noeudIni not in network.NODES:
+                if noeudIni.id not in network.NODES:
                     edge.setNoeudIni(noeudIni)
                     network.addNode(noeudIni)
                 else:
                     n = network.getNode(source)
                     edge.setNoeudIni(n)
-               
+                    
+                    
                 # target node 
                 target = str(row[fmt.pos_target])
                 noeudFin = Node(target, track.getLastObs().position)
-                if noeudFin not in network.NODES:
+                if noeudFin.id not in network.NODES:
                     edge.setNoeudFin(noeudFin)
                     network.addNode(noeudFin)
                 else:
                     n = network.getNode(target)
                     edge.setNoeudFin(n)
-                             
-                # Add edge
+                    
+                
+               # Add edge
                 network.addEdge(edge)
+
                 if (counter % 100 == 0):
                     print(counter)
                 #if len(network.EDGES) > 5000:
