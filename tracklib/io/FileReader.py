@@ -185,6 +185,9 @@ class FileReader:
         LISTFILE = os.listdir(pathdir)
         for f in LISTFILE:
             p = pathdir + '/' + f
+            if (TRACES.size() > 10):
+                break
+            print(TRACES.size())
             trace = FileReader.readFromFile(p, id_E, id_N, id_U, id_T, separator, DateIni, h, com, no_data_value, srid, read_all, verbose=False)
             if not selector is None:
                 if not selector.contains(trace):

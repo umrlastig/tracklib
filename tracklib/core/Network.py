@@ -1,6 +1,5 @@
 # -------------------------- Network ------------------------------------------
 # Class to manage Network
-# 
 # -----------------------------------------------------------------------------
 import matplotlib.pyplot as plt
 
@@ -155,6 +154,7 @@ class Node:
         noeudsFinaux = []
         
         suivant = arrivee
+
         while (True):
             arcsFinaux.insert(0, suivant.__arcPrecedent)
             #suivant.__arcPrecedent.addGroupe(plusCourtChemin)
@@ -229,7 +229,7 @@ class Node:
         return False
         
     def __str__(self):
-        return self.id
+        return "Node object: " + str(self.id)
         
 
 # =============================================================================
