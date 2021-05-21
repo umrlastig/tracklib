@@ -181,20 +181,17 @@ class Node:
         # On construit le PCC en Track
         trace = Track()
         DIST_TAB = []
-        for i in range(len(PPC)-1, -1, -1):
+        for i in range(len(PPC)-2, -1, -2):
             elt = PPC[i]
-            #if isinstance(elt, Node):
-                #trace.addObs(Obs(elt.coord, GPSTime()))
-                #DIST_TAB.append(elt.getDistance())
-            if isinstance(elt, Edge):
-                portion = elt.track.getObsList()
-                if elt.track.getLastObs().position.distance2DTo(PPC[i+1].coord) == 0:
-                    portion = portion[::-1]
-                for o in portion:
-                    trace.addObs(o)
-                    DIST_TAB.append(-1)
+            node = PPC[i+1]
+            portion = elt.track.getObsList()
+            if elt.track.getLastObs().position.distance2DTo(node.coord) == 0:
+                portion = portion[::-1]
+            for o in portion:
+                trace.addObs(o)
+                DIST_TAB.append(node.getDistance())
         trace.createAnalyticalFeature(AF_WEIGHT, DIST_TAB)
-        #return PPC
+  
         return trace
             
     
