@@ -61,7 +61,7 @@ class GeoCoords:
     # Base coordinates need to be provided in ECEF/Geo
     # --------------------------------------------------
     def toENUCoords(self, base):
-	    # Special SRID projection
+        # Special SRID projection
         if isinstance(base, int):
             return self.toProjCoords(base)
         base_ecef = base.toECEFCoords()
@@ -466,6 +466,10 @@ def _proj(coords, srid):
 def _unproj(coords, srid):
     if srid == 2154:
         return __projFromLambert93(coords)
+    if (srid >= 32600) and (srid <= 32799):
+        zone = ((srid-32600) % 100)
+        north = srid < 32700
+        return _projFromUTM(coords, zone, north)
     print("Error: SRID code " + str(srid) + " is not implmented in Tracklib")
     exit()
 
@@ -509,5 +513,80 @@ def _projToLambert93(coords):
     Y = Yp - C*math.exp(-n*latiso)*math.cos(n*(lon-lambda0))
     
     return ENUCoords(X,Y,coords.getZ())
+
+
+# --------------------------------------------------------------------------
+# Copyright (C) 2012 Tobias Bieniek <Tobias.Bieniek@gmx.de>
+# Permission is hereby granted, free of charge, to any person obtaining a 
+# copy of this software and associated documentation files (the "Software"), 
+#to deal in the Software without restriction, including without limitation 
+# the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+# and/or sell copies of the Software, and to permit persons to whom the 
+# Software is furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in
+#  all copies or substantial portions of the Software.
+# --------------------------------------------------------------------------
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+# DEALINGS IN THE SOFTWARE.
+# --------------------------------------------------------------------------
+def _projFromUTM(coords, zone, northern=True):
+
+    x = coords.getX() - 500000
+    y = coords.getY()
+
+    zone_number_to_central_longitude = (zone - 1) * 6 - 180 + 3
+
+    if not northern:
+        y -= 10000000
+    
+    K0 = 0.9996
+
+    E = 0.00669438; E2 = E*E; E3 = E2*E; E_P2 = E/(1.0-E)
+
+    SQRT_E = math.sqrt(1 - E)
+    _E = (1 - SQRT_E) / (1 + SQRT_E)
+    _E2 = _E * _E; _E3 = _E2 * _E; _E4 = _E3 * _E; _E5 = _E4 * _E
+
+    M1 = (1-E/4-3*E2/64-5*E3/256); M2 = (3*E/8+3*E2/32+45*E3/1024)
+    M3 = (15*E2/256+45*E3/1024); M4 = (35*E3/3072)
+
+    P2 = (3./2*_E-27./32*_E3+269./512*_E5); P3 = (21./16*_E2-55./32*_E4)
+    P4 = (151./96*_E3-417./128*_E5); P5 = (1097./512*_E4)
+    R = 6378137
+
+    m = y/K0; mu = m/(R*M1)
+
+    p_rad = (mu + P2 * math.sin(2*mu) + P3 * math.sin(4*mu) + P4 * math.sin(6*mu) + P5 * math.sin(8* mu))
+
+    p_sin = math.sin(p_rad); p_sin2 = p_sin*p_sin
+    p_cos = math.cos(p_rad)
+
+    p_tan  = p_sin / p_cos; p_tan2 = p_tan*p_tan; p_tan4 = p_tan2*p_tan2
+
+    ep_sin = 1-E*p_sin2; ep_sin_sqrt = math.sqrt(1 - E*p_sin2)
+
+    n = R/ep_sin_sqrt; r = (1-E)/ep_sin
+    c = E_P2*p_cos**2; c2 = c*c
+
+    d = x/(n*K0)
+    d2 = d*d; d3 = d2 * d; d4 = d3*d; d5 = d4*d; d6 = d5*d
+
+    latitude = (p_rad - (p_tan / r) *
+            (d2/2-
+             d4/24*(5+3*p_tan2+10*c-4*c2-9*E_P2))+
+             d6/720*(61+90*p_tan2+298*c+45*p_tan4-252*E_P2-3*c2))
+
+    longitude = (d-
+             d3/6*(1+2*p_tan2+c)+
+             d5/120*(5-2*c+28*p_tan2-3*c2+8*E_P2+24*p_tan4))/p_cos
+
+    longitude = longitude + math.radians(zone_number_to_central_longitude)  # !!!! mod angle
+
+    return GeoCoords(longitude*180/math.pi, latitude*180/math.pi, coords.getZ())
 
 

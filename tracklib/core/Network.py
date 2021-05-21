@@ -1,6 +1,7 @@
 # -------------------------- Network ------------------------------------------
 # Class to manage Network
 # -----------------------------------------------------------------------------
+import random
 import matplotlib.pyplot as plt
 
 from tracklib.core.Track import Track
@@ -13,9 +14,8 @@ import tracklib.algo.Summarize as Sum
 # =============================================================================
 #
 #
-AF_WEIGHT = "->WEIGHT"
-
-
+AF_LINK = "#link"
+AF_WEIGHT = "#weight"
 # =============================================================================
 #
 #
@@ -180,7 +180,10 @@ class Node:
 
         # On construit le PCC en Track
         trace = Track()
+        
+        LINKS = []
         DIST_TAB = []
+
         for i in range(len(PPC)-2, -1, -2):
             elt = PPC[i]
             node = PPC[i+1]
@@ -190,8 +193,11 @@ class Node:
             for o in portion:
                 trace.addObs(o)
                 DIST_TAB.append(node.getDistance())
+                LINKS.append(elt.id)
+        
+        trace.createAnalyticalFeature(AF_LINK, LINKS)
         trace.createAnalyticalFeature(AF_WEIGHT, DIST_TAB)
-  
+        
         return trace
             
     
@@ -367,6 +373,9 @@ class Network:
         return [l[0] for l in list(self.NODES.items())]
     def getEdgesId(self):
         return [l[0] for l in list(self.EDGES.items())]
+        
+    def getRandomNode(self):
+        return self.getNode(self.getNodesId()[random.randint(0, self.getNumberOfNodes())])
         
     def addNode(self, node):
         self.NODES[node.id] = node

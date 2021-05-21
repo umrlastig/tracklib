@@ -97,7 +97,7 @@ class NetworkReader:
 
                 if (counter % 100 == 0):
                     print(counter)
-                #if len(network.EDGES) > 5000:
+                #if len(network.EDGES) > 20000:
                 #    break
         
         csvfile.close()        
