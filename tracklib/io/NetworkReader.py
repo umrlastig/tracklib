@@ -95,8 +95,8 @@ class NetworkReader:
                # Add edge
                 network.addEdge(edge)
 
-                if (counter % 100 == 0):
-                    print(counter)
+                #if (counter % 100 == 0):
+                #    print(counter)
                 #if len(network.EDGES) > 20000:
                 #    break
         

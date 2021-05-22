@@ -159,7 +159,6 @@ class Node:
 
         while (True):
             arcsFinaux.insert(0, suivant.__arcPrecedent)
-            #suivant.__arcPrecedent.addGroupe(plusCourtChemin)
             if suivant.__arcPrecedent not in PPC:
                 PPC.append(suivant.__arcPrecedent)
             suivant = suivant.__noeudPrecedent
@@ -167,33 +166,39 @@ class Node:
                 break
         
             noeudsFinaux.insert(0, suivant)
-            #suivant.addGroupe(plusCourtChemin)
             if suivant not in PPC:
                 PPC.append(suivant)
                 
         noeudsFinaux.insert(0, self)
-        # self.addGroupe(plusCourtChemin)
         if self not in PPC:
             PPC.append(self)
         noeudsFinaux.insert(0, arrivee)
-        # arrivee.addGroupe(plusCourtChemin)
 
         # On construit le PCC en Track
         trace = Track()
         
         LINKS = []
         DIST_TAB = []
-
+        
         for i in range(len(PPC)-2, -1, -2):
             elt = PPC[i]
             node = PPC[i+1]
             portion = elt.track.getObsList()
+            
+            # Si la géometrie est inversée
             if elt.track.getLastObs().position.distance2DTo(node.coord) == 0:
-                portion = portion[::-1]
+                 portion = portion[::-1]
+                 
+        #     #if elt.track.getFirstObs().position.distance2DTo(node.coord) == 0:
+        #     #     portion = portion[1::-1]
             for o in portion:
                 trace.addObs(o)
                 DIST_TAB.append(node.getDistance())
                 LINKS.append(elt.id)
+                
+        # Le dernier point
+        node0 = PPC[0]
+        DIST_TAB[len(DIST_TAB)-1] = node0.getDistance()
         
         trace.createAnalyticalFeature(AF_LINK, LINKS)
         trace.createAnalyticalFeature(AF_WEIGHT, DIST_TAB)
