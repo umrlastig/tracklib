@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import csv
+import progressbar
 
 #from tracklib.core.Coords import ENUCoords, ECEFCoords, GeoCoords
 from tracklib.core.Network import Network, Node, Edge
@@ -12,7 +13,7 @@ import tracklib.util.Wkt as wkt
 class NetworkReader:
     
     @staticmethod
-    def readFromFile(path, formatfile = 'DEFAULT'):
+    def readFromFile(path, formatfile = 'DEFAULT', verbose=True):
         '''
         TODO : posSol
         '''
@@ -21,10 +22,13 @@ class NetworkReader:
         
         network = Network()
         
+        
+        num_lines = sum(1 for line in open(path))
+
+        
         with open(path, encoding='utf-8') as csvfile:
             
             spamreader = csv.reader(csvfile, delimiter=fmt.separator, doublequote= True, )
-        
             
             # Header
             cpt = 0
@@ -34,6 +38,9 @@ class NetworkReader:
                     break
     
             counter = 0    
+            if verbose:
+                spamreader = progressbar.progressbar(spamreader, max_value=num_lines)
+                
             for row in spamreader:
                 
                 edge_id = str(row[fmt.pos_edge_id])
@@ -99,8 +106,8 @@ class NetworkReader:
                 #    print(counter)
                 #if len(network.EDGES) > 20000:
                 #    break
-        
-        csvfile.close()        
+
+        csvfile.close()      
                 
         # Return network loaded
         return network
