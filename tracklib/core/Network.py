@@ -94,15 +94,13 @@ class Node:
         noeudsATraiter += noeudsVoisins
         
         # Phase "avant"
-        counter = 0
         while len(noeudsATraiter) > 0:
             # on choisit le noeud à marquer comme traité parmi les voisins
             plusProche = noeudsATraiter[0]
             for i in range(1, len(noeudsATraiter)):
                 if noeudsATraiter[i].__distance < plusProche.__distance:
                     plusProche = noeudsATraiter[i]
-            counter = counter + 1
-            print(counter)
+
             noeudsTraites.append(plusProche)
             noeudsATraiter.remove(plusProche)
             
