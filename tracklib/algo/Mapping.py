@@ -1,7 +1,7 @@
 # ---------------------------- Mapping ----------------------------------------
 # Class to manage mapping of GPS tracks on geographic features
 # -----------------------------------------------------------------------------
-
+import math
 import numpy as np
 
 import tracklib.core.Track as Track
@@ -56,8 +56,8 @@ def mapOn(track, reference, TP1, TP2=[], init=[], N_ITER_MAX=20, mode="2D", verb
         exit()
 		
     P1 = [track.getObs(i).position.copy() for i in TP1]
-	
-    if isinstance(reference, Track):
+
+    if isinstance(reference, Track.Track):
         P2 = [reference.getObs(i).position.copy() for i in TP2]
     else:
         P2 = reference

@@ -26,6 +26,12 @@ class KmlWriter:
         c2: color for max value (default red) in POINT mode
         '''
         
+        clampToGround = True
+        for obs in track:
+            if obs.position.getZ() != 0:
+                clampToGround = False
+                break
+        
         if not af is None:
             vmin = track.operate(Operator.Operator.MIN, af)
             vmax = track.operate(Operator.Operator.MAX, af)
@@ -34,8 +40,8 @@ class KmlWriter:
 
         if type not in ["LINE", "POINT"]:
             print("Error in KmlWriter: type '"+type+"' unknown")
-            exit()			
-		
+            exit()            
+        
         if type == "LINE":
             output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
             output += "<kml xmlns=\"http://earth.google.com/kml/2.1\">\n"
@@ -52,8 +58,10 @@ class KmlWriter:
             
             for i in range(track.size()):
                 output += '{:15.12f}'.format(track.getObs(i).position.getX()) + "," 
-                output += '{:15.12f}'.format(track.getObs(i).position.getY()) + ","
-                output += '{:15.12f}'.format(track.getObs(i).position.getZ()) + "\n"
+                output += '{:15.12f}'.format(track.getObs(i).position.getY())
+                if not clampToGround:
+                    output += "," + '{:15.12f}'.format(track.getObs(i).position.getZ()) 
+                output += "\n"
                 
             output += "</coordinates>\n"
             output += "</LineString>\n"

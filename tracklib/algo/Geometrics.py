@@ -370,7 +370,10 @@ def __dist_point_droite(param, x, y):
     distance = math.fabs(a*x+b*y+c)
     distance /= math.sqrt(a*a+b*b)
     
-    return distance        
+    return distance   
+
+def dist_point_to_segment(point, segment):
+    return __dist_point_droite(__cartesienne(segment), point.getX(), point.getY())      
         
 def __transform(theta, tx, ty, X, Y):
 

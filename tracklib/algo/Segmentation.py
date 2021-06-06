@@ -310,7 +310,8 @@ def findStopsGlobal(track, diameter=2e-2, duration=10, downsampling=1, verbose=T
     stops.createAnalyticalFeature("duration", TMP_DURATION)
     stops.createAnalyticalFeature("nb_points", TMP_NBPOINTS)
 	
-    stops.operate(Operator.Operator.QUAD_ADDER, "sigma_x", "sigma_y", "rmse") 
+    stops.operate(Operator.Operator.QUAD_ADDER, "sigma_x", "sigma_y", "rmse")
+    stops.base = track.base	
 	
     return stops
 
