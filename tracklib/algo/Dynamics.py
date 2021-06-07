@@ -21,6 +21,283 @@ MODE_VERBOSE_ALL = 1
 MODE_VERBOSE_PROGRESS = 2
 MODE_VERBOSE_PROGRESS_BY_EPOCH = 3
 
+
+# -------------------------------------------------------
+# Unscented Kalman Filter is designed to perform non-
+# linear and non-gaussian estimation on a sequence of
+# unknown states, given a dynamic model F and an 
+# observation model H :
+#    - F is a function taking as input an [n x 1] state 
+#      vector x(t) and returning x(t+1), the prior mean 
+#      of state vector at time t+1. If F is a matrix
+#      transition is handled as standard KF or EKF.
+#    - Q is a the [n x n] state transition covariance 
+#      matrix where Qij = Cov(vi, vj) with:
+#                   xi(t+1) = F(xi(t)) + vi
+#    - H is a function taking as input an [nx1] state 
+#      vector x(t) and returning an [m x 1] vector y(t), 
+#      the observation vetcor at time t. If H is a matrix 
+#      observation is handled as a standard KF or EKF.
+#    - R is a the [m x m] state observation covariance 
+#      matrix where Rij = Cov(wi, wj) with:
+#                   yi(t) = H(xi(t)) + wi
+#    - X0 is a a [n x 1] initial state vector
+#    - P0 is a a [n x n] initial state covariance matrix
+#    - Spreading is a parameter describing the distance 
+#      between central mean and sampled sigma points. As 
+#      a default 2n+1 sigma points are generated. 
+# -------------------------------------------------------
+class Kalman:
+
+    def __init__(self, F=None, Q=None, H=None, R=None, X0=None, P0=None, spreading=None, iter=1):
+        self.F = F
+        self.Q = Q
+        self.H = H
+        self.R = R 
+        self.X0 = X0
+        self.P0 = P0
+        self.iter = iter
+        self.spreading = spreading
+        
+    def setTransition(self, F, Q=None):
+        self.F = F 
+        if not Q is None:
+            self.Q = Q
+    def setObservation(self, H, R=None):
+        self.H = H
+        if not R is None:
+            self.R = R
+    def setInitState(self, X0, P0):
+        self.X0 = X0    
+        if not P0 is None:
+            self.P0 = P0
+    def setSpreading(self, spreading):
+        self.spreading = spreading    
+		
+    def setIterations(self, iter):
+        self.iter = iter   
+        
+    def summary(self):
+        if ("function" in str(type(self.F))) or ("function" in str(type(self.Q))):
+            type_kalman = "unscented (UKF)"
+        else:
+            type_kalman = "standard (KF)"
+        print("==============================================")
+        print("Kalman filter")
+        print("Type:", type_kalman)
+        if type_kalman == "unscented (UKF)":
+            t_dyn = "linear"
+            t_obs = "linear"
+            if "function" in str(type(self.F)):
+                t_dyn = "non-linear"
+            if "function" in str(type(self.H)):
+                t_obs = "non-linear"
+            print("Dyn model:", t_dyn, "/ Obs model:", t_obs)
+        print("Number of states         n =", self.Q.shape[0])
+        print("Number of observations   m =", self.R.shape[0])
+        print("==============================================")
+        print("Dynamic model [n x n]:")
+        print(self.F)
+        print("----------------------------------------------")
+        print("Dynamic model covariance matrix [n x n]:")
+        print(self.Q)
+        print("==============================================")
+        print("Observation model [m x n]:")
+        print(self.H)
+        print("----------------------------------------------")
+        print("Observation model covariance matrix [m x m]:")
+        print(self.R)
+        print("==============================================")
+        print("Initial state vector [n x 1]")
+        print(self.X0)
+        print("----------------------------------------------")
+        print("Initial state covariance matrix [n x n]")
+        print(self.P0)
+        print("==============================================")
+        
+    # ------------------------------------------------------------
+    # Internal function to calculate sigma points.
+    # Inputs:
+    #    - mu : distribution mean vector
+    #    - S: covariance matrix
+    # ------------------------------------------------------------
+    def __sampleSigmaPts(self, mu, S):
+        
+        n = mu.shape[0]
+
+        # Cholesky decomposition
+        L = np.linalg.cholesky((n+self.spreading)*S)        
+        
+        # Sigma points computation
+        X = np.concatenate([mu, mu+np.array([L[:,0]]).transpose()], axis=1)
+    
+        for i in range(1,n):
+            X = np.concatenate([X, mu+np.array([L[:,i]]).transpose()], axis=1)
+        for i in range(n):
+            X = np.concatenate([X, mu-np.array([L[:,i]]).transpose()], axis=1)  
+        return X
+        
+    # ------------------------------------------------------------
+    # Internal function to calculate sigma point weights
+    # ------------------------------------------------------------
+    def __sampleSigmaWeights(self):
+        n = self.X0.shape[0]
+        l = self.spreading
+        W = np.zeros((2*n+1,1))
+        W[0,0] = l/(n+l)
+        for i in range(1, 2*n+1):
+            W[i,0] = 1.0/(2*(n+l))
+        return W
+        
+    # ------------------------------------------------------------
+    # Internal function to calculate mean of sigma points
+    # Inputs: sigma points matrix and weight vector
+    # ------------------------------------------------------------
+    def __mean(self, SIGMA, W):
+        n = SIGMA.shape[0]
+        M = np.zeros((n, 1))
+        for i in range(SIGMA.shape[1]):
+            M = M + W[i,0]*np.array([SIGMA[:,i]]).transpose()
+        return M
+    
+    # ------------------------------------------------------------
+    # Internal function to calculate covariance of sigma points
+    # Inputs: sigma points matrix and weight vector
+    # ------------------------------------------------------------
+    def __cov(self, SIGMA, W, M=None):
+        n = SIGMA.shape[0] 
+        S = np.zeros((n, n))
+        if M is None:
+            M = self.__mean(SIGMA, W)
+        for i in range(SIGMA.shape[1]):
+            v = M-np.array([SIGMA[:,i]]).transpose()
+            S = S + W[i,0]*v@v.transpose()
+        return S
+		
+    # ------------------------------------------------------------
+    # Internal function to calculate cross covariance Cov(X,Z)
+    # Inputs: sigma points matrix and weight vector
+    # ------------------------------------------------------------
+    def __cross_cov(self, X, Z, W, MX=None, MZ=None):
+        n = X.shape[0]
+        m = Z.shape[0]		
+        T = np.zeros((n, m))
+        if MX is None:
+            MX = self.__mean(X, W)
+        if MZ is None:
+            MZ = self.__mean(Z, W)
+        for i in range(X.shape[1]):
+            vx = MX-np.array([X[:,i]]).transpose()
+            vz = MZ-np.array([Z[:,i]]).transpose()
+            T = T + W[i,0]*vx@vz.transpose()
+        return T
+		
+    # ------------------------------------------------------------
+    # Internal function to apply F or H to sigma points
+    # ------------------------------------------------------------
+    def __apply(self, function, SIGMA): 
+        output = function(np.array([SIGMA[:,0]]).transpose())
+        for i in range(1,SIGMA.shape[1]):
+            output = np.concatenate([output, function(np.array([SIGMA[:,i]]).transpose())], axis=1)
+        return output
+
+    # ------------------------------------------------------------
+    # Internal function to get all observations at epoch k in a 
+    # track, from a list of analytical feature names (obs) and a
+    # mode if retrieved values must be converted to positions
+    # ------------------------------------------------------------
+    def __getObs(self, track, obs, k, mode):
+
+        y = track.getObsAnalyticalFeatures(obs,k)
+        
+        if mode in [MODE_OBS_AS_2D_POSITIONS, MODE_OBS_AND_STATES_AS_2D_POSITIONS]:    
+            if len(y) < 2:
+                print("Error: wrong number of observations in HMM to form 2D position")
+                exit()
+            ytemp = [utils.makeCoords(y[0], y[1], 0.0, track.getSRID())]
+            for remain in range(2,len(y)):
+                ytemp.append(y[remain])
+            y = ytemp
+        if mode in [MODE_OBS_AS_3D_POSITIONS, MODE_OBS_AND_STATES_AS_3D_POSITIONS]:     
+            if len(y) < 3:
+                print("Error: wrong number of observations in HMM to form 3D position")
+                exit()
+            ytemp = [utils.makeCoords(y[0], y[1], y[2], track.getSRID())] 
+            for remain in range(3,len(y)):
+                ytemp.append(y[remain])
+            y = ytemp
+
+        return utils.unlistify(y)
+    
+    # ------------------------------------------------------------
+    # Main function of Kalman object, to estimate the states
+    # Inputs:
+    #   - track: the track on which estimation is performed
+    #   - obs: the name of an analytical feature (may also a list 
+    #     of analytical feature names for multi-dimensional input)
+    #     All the analytical features listed must be in the track
+    #   - mode: to specify how observations are used
+    #        - MODE_OBS_AS_SCALAR: list of values (default)
+    #        - MODE_OBS_AS_2D_POSITION: the first two fields 
+    #          of  obs are used to make a Coords object. 
+    #          Z component is set to 0 as default.
+    #        - MODE_OBS_AS_3D_POSITIONS: the first three fields
+    #          of obs are used to make a Coords object
+    #     For MODE_OBS_AS_2D_POSITIONS / MODE_OBS_AS_3D_POSITIONS
+    #     modes, coordinates SRID is the same as track SRID.
+    # ------------------------------------------------------------
+    def estimate(self, track, obs, mode=MODE_OBS_AS_SCALAR, verbose=True):
+
+        # Output states
+        for i in range(self.X0.shape[0]):
+            track.createAnalyticalFeature("kf_"+str(i), [0]*len(track))
+            track.setObsAnalyticalFeature("kf_"+str(i), 0, self.X0[i])
+
+        # Initialization
+        W = self.__sampleSigmaWeights()  
+		
+        X = self.X0
+        P = self.P0
+        I = np.eye(P.shape[0], P.shape[1])
+        OUTPUT = []
+		
+        EPOCHS = range(len(track)-1)
+        if verbose:
+            EPOCHS = progressbar.progressbar(EPOCHS)
+       
+	    # Filter
+        for k in EPOCHS:
+		
+            for step in range(self.iter):
+
+                SIGMA_PTS = self.__sampleSigmaPts(X, P)
+                
+                # Prediction step
+                if step == 0:
+                    SIGMA_PTS = self.__apply(self.F, SIGMA_PTS)
+                    MU = self.__mean(SIGMA_PTS, W)
+                    COV = self.__cov(SIGMA_PTS, W, MU) + self.Q
+                
+                # Update step
+                SIGMA_PTS2 = self.__apply(self.H, SIGMA_PTS)
+                z = self.__getObs(track, obs, k+1, mode)
+                Z = self.__mean(SIGMA_PTS2, W)
+                S =  self.__cov(SIGMA_PTS2, W, Z) + self.R
+                T = self.__cross_cov(SIGMA_PTS, SIGMA_PTS2, W, MU, Z)
+                K = T @ np.linalg.inv(S)
+                
+                X = MU + K@(np.array([z]).transpose()-Z)
+                P = COV - K@S@K.transpose()
+                MU = X
+                COV = P
+			
+			# Output states
+            for i in range(X.shape[0]):
+                track.setObsAnalyticalFeature("kf_"+str(i), k+1, X[i])
+
+
+
+
 # -------------------------------------------------------
 # Hidden Markov Model is designed to estimate discrete 
 # sequential variables on tracks, given a probabilistic 
