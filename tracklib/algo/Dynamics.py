@@ -21,6 +21,59 @@ MODE_VERBOSE_ALL = 1
 MODE_VERBOSE_PROGRESS = 2
 MODE_VERBOSE_PROGRESS_BY_EPOCH = 3
 
+def DYN_MAT_2D_CST_SPEED(dt):
+    return np.array([
+	[1, 0, dt, 0 ],
+	[0, 1, 0 , dt],
+	[0, 0, 1 , 0 ],
+	[0, 0, 0 , 1 ]])
+	
+def DYN_MAT_2D_CST_ACC(dt):
+    dt2 = 0.5*dt**2
+    return np.array([
+	[1.0, 0.0, dt , 0.0, dt2, 0.0],
+	[0.0, 1.0, 0.0, dt , 0.0, dt2],
+	[0.0, 0.0, 1.0, 0.0, dt , 0.0],
+	[0.0, 0.0, 0.0, 1.0, 0.0, dt ],
+	[0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+	[0.0, 0.0, 0.0, 0.0, 0.0, 1.0]])
+
+def DYN_MAT_3D_CST_SPEED(dt):
+    return np.array([
+    [1, 0, 0, dt,  0, 0 ],
+    [1, 0, 0,  0, dt, 0 ],
+    [1, 0, 0,  0,  0, dt],
+    [0, 0, 0,  1,  0, 0 ],
+    [0, 0, 0,  0,  1, 0 ],
+    [0, 0, 0,  0,  0, 1 ]])
+	
+def DYN_MAT_3D_CST_ACC(dt):
+    dt2 = 0.5*dt**2
+    return np.array([
+	[1.0, 0.0, 0.0, dt , 0.0, 0.0, dt2, 0.0, 0.0],
+    [0.0, 1.0, 0.0, 0.0, dt , 0.0, 0.0, dt2, 0.0],
+    [0.0, 0.0, 1.0, 0.0, 0.0, dt , 0.0, 0.0, dt2],
+    [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, dt , 0.0, 0.0],
+    [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, dt , 0.0],
+    [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, dt ],
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+	[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]])
+
+def DYN_MAT_2D_CST_SPEED_COV(dt, std_acc):
+    G = np.array([[0.5*dt**2], [0.5*dt**2], [dt], [dt]])
+    return std_acc**2*G@G.transpose()
+def DYN_MAT_3D_CST_SPEED_COV(dt, std_acc):
+    G = np.array([[0.5*dt**2], [0.5*dt**2], [0.5*dt**2], [dt], [dt], [dt]])
+    return std_acc**2*G@G.transpose()
+def DYN_MAT_2D_CST_ACC_COV(dt, std_jrk):
+    G = np.array([[1.0/6.0*dt**3], [1.0/6.0*dt**3], [0.5*dt**2], [0.5*dt**2], [dt], [dt]])
+    return std_jrk**2*G@G.transpose()
+def DYN_MAT_3D_CST_ACC_COV(dt, std_jrk):
+    G = np.array([[1.0/6.0*dt**3], [1.0/6.0*dt**3], [1.0/6.0*dt**3], 
+                  [0.5*dt**2]    , [0.5*dt**2]    , [0.5*dt**2]    , 
+			      [dt]           , [dt]           , [dt]])
+    return std_jrk**2*G@G.transpose()
 
 # -------------------------------------------------------
 # Unscented Kalman Filter is designed to perform non-
@@ -78,11 +131,12 @@ class Kalman:
         self.iter = iter   
         
     def summary(self):
+ 
         if ("function" in str(type(self.F))) or ("function" in str(type(self.Q))):
             type_kalman = "unscented (UKF)"
         else:
             type_kalman = "standard (KF)"
-        print("==============================================")
+        print("===========================================================")
         print("Kalman filter")
         print("Type:", type_kalman)
         if type_kalman == "unscented (UKF)":
@@ -95,25 +149,31 @@ class Kalman:
             print("Dyn model:", t_dyn, "/ Obs model:", t_obs)
         print("Number of states         n =", self.Q.shape[0])
         print("Number of observations   m =", self.R.shape[0])
-        print("==============================================")
+        print("===========================================================")
         print("Dynamic model [n x n]:")
-        print(self.F)
-        print("----------------------------------------------")
+        print(self.F) 
+        x = np.random.randint(0,10,self.X0.shape)
+        y = self.F(x).transpose()
+        print("E.g. x =", x.transpose(), "=>", "F(x) =", y)
+        print("-----------------------------------------------------------")
         print("Dynamic model covariance matrix [n x n]:")
         print(self.Q)
-        print("==============================================")
+        print("===========================================================")
         print("Observation model [m x n]:")
         print(self.H)
-        print("----------------------------------------------")
+        y = self.H(x).transpose()
+        
+        print("E.g. x =", x.transpose(), "=>", "H(x) =", y)
+        print("-----------------------------------------------------------")
         print("Observation model covariance matrix [m x m]:")
         print(self.R)
-        print("==============================================")
+        print("===========================================================")
         print("Initial state vector [n x 1]")
         print(self.X0)
-        print("----------------------------------------------")
+        print("-----------------------------------------------------------")
         print("Initial state covariance matrix [n x n]")
         print(self.P0)
-        print("==============================================")
+        print("===========================================================")
         
     # ------------------------------------------------------------
     # Internal function to calculate sigma points.
@@ -251,7 +311,9 @@ class Kalman:
         # Output states
         for i in range(self.X0.shape[0]):
             track.createAnalyticalFeature("kf_"+str(i), [0]*len(track))
-            track.setObsAnalyticalFeature("kf_"+str(i), 0, self.X0[i])
+            track.setObsAnalyticalFeature("kf_"+str(i), 0, self.X0[i,0])
+        track.createAnalyticalFeature("kf_gain", [0]*len(track))
+        track.setObsAnalyticalFeature("kf_gain", 0, 0)
 
         # Initialization
         W = self.__sampleSigmaWeights()  
@@ -293,7 +355,8 @@ class Kalman:
 			
 			# Output states
             for i in range(X.shape[0]):
-                track.setObsAnalyticalFeature("kf_"+str(i), k+1, X[i])
+                track.setObsAnalyticalFeature("kf_"+str(i), k+1, X[i,0])
+            track.setObsAnalyticalFeature("kf_gain", k+1, K)
 
 
 

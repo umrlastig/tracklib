@@ -20,6 +20,10 @@ FILTER_XZ = ["x","z"]
 FILTER_YZ = ["y","z"]
 FILTER_XYZ = ["x","y","z"]
 
+KALMAN_FORWARD = 0
+KALMAN_BACKWARD = 1
+KALMAN_COMBINED = 2
+
 # -----------------------------------------
 # Global variables for Markov filtering
 # -----------------------------------------
@@ -52,10 +56,68 @@ def KLFiltering(track):
     return None	
 	
 # --------------------------------------------------------------------------
-# TO DO: Kalman filtering
+# Filtering with Unscented Kalman filter based on speed ragularization
+# Inputs:
+#    - track: a track to filter
+#    - sigma: Positional standard deviation (in ground units)
+#    - speed: standard deviation of speed
+#    - speed_af: AF field containing speeds (optional)
+#    - mode : forward, backward or combined
+# Important: tracks are assumed to be sampled at constant time frequency
 # --------------------------------------------------------------------------
-def Kalman(track):
-    return None
+def Kalman(track, sigma, speed_std, speed_af=None):
+
+    track = track.copy()
+    dt = track.frequency()
+
+    # -----------------------------------------------------
+	# Mode speed recorded in AF field
+	# -----------------------------------------------------
+    if not (speed_af is None):
+
+        F = lambda x: Dynamics.DYN_MAT_2D_CST_SPEED(dt) @ x      
+        H = lambda x: np.array([[x[0,0]], [x[1,0]], [(x[2,0]**2 + x[3,0]**2)**0.5]])           
+        
+        Q = np.eye(4,4); Q[2,2] = 0; Q[3,3] = 0
+        R = sigma**2*np.eye(3,3); R[2,2] = speed_std**2;
+        X0 = np.array([[track[0].position.getX()],[track[0].position.getY()],[0],[0]])
+        P0 = sigma**2*np.eye(4,4)                                           
+        
+        UKF = Dynamics.Kalman(spreading=1)
+        UKF.setTransition(F, Q)                        
+        UKF.setObservation(H, R)                        
+        UKF.setInitState(X0, P0)  
+
+        UKF.estimate(track, ["x", "y", speed_af]) 
+		
+	# -----------------------------------------------------
+	# Mode prior information on speed based on std value
+	# -----------------------------------------------------
+    else:
+
+        F = lambda x: x                                 # Transition model
+        H = lambda x: np.array([[x[0,0]],[x[1,0]]])     # Observation model
+        
+        Q = (dt*speed_std)**2*np.eye(2,2)               # Transition covariance
+        R = sigma**2*np.eye(2,2)                        # Observation covariance
+        
+        p0 = track[0].position                          # First position
+        X0 = np.array([[p0.getX()],[p0.getY()]])        # Initial state
+        P0 = sigma**2*np.eye(2,2)                       # Initial covariance
+        
+        UKF = Dynamics.Kalman(spreading=1)
+        UKF.setTransition(F, Q)                         # Dynamic model
+        UKF.setObservation(H, R)                        # Observation model
+        UKF.setInitState(X0, P0)                        # Initialization
+        
+        UKF.estimate(track, ["x", "y"])                 # Filtering
+    
+    for i in range(len(track)):
+        track[i].position.setX(track.getObsAnalyticalFeature("kf_0", i))
+        track[i].position.setY(track.getObsAnalyticalFeature("kf_1", i))
+  
+    return track	
+
 	
 # --------------------------------------------------------------------------
 # Filtering with Markov process based on speed ragularization
