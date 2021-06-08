@@ -65,10 +65,10 @@ def KLFiltering(track):
 #    - mode : forward, backward or combined
 # Important: tracks are assumed to be sampled at constant time frequency
 # --------------------------------------------------------------------------
-def Kalman(track, sigma, speed_std, speed_af=None):
+def __kalman(track, sigma, speed_std, speed_af=None, verbose=True):
 
     track = track.copy()
-    dt = track.frequency()
+    dt = abs(track.frequency())
 
     # -----------------------------------------------------
 	# Mode speed recorded in AF field
@@ -88,7 +88,7 @@ def Kalman(track, sigma, speed_std, speed_af=None):
         UKF.setObservation(H, R)                        
         UKF.setInitState(X0, P0)  
 
-        UKF.estimate(track, ["x", "y", speed_af]) 
+        UKF.estimate(track, ["x", "y", speed_af], verbose=verbose) 
 		
 	# -----------------------------------------------------
 	# Mode prior information on speed based on std value
@@ -110,7 +110,7 @@ def Kalman(track, sigma, speed_std, speed_af=None):
         UKF.setObservation(H, R)                        # Observation model
         UKF.setInitState(X0, P0)                        # Initialization
         
-        UKF.estimate(track, ["x", "y"])                 # Filtering
+        UKF.estimate(track, ["x", "y"], verbose=verbose)              
     
     for i in range(len(track)):
         track[i].position.setX(track.getObsAnalyticalFeature("kf_0", i))
@@ -118,6 +118,20 @@ def Kalman(track, sigma, speed_std, speed_af=None):
   
     return track	
 
+def Kalman(track, sigma, speed_std, speed_af=None, mode=KALMAN_FORWARD, verbose=True):
+    if mode == KALMAN_FORWARD:
+       return __kalman(track, sigma, speed_std, speed_af, verbose)
+    if mode == KALMAN_BACKWARD:  
+       return __kalman(track.reverse(), sigma, speed_std, speed_af, verbose).reverse()
+    if mode == KALMAN_COMBINED:
+        track_fwd = Kalman(track, sigma, speed_std, speed_af, mode=KALMAN_FORWARD,  verbose=verbose)
+        track_bwd = Kalman(track, sigma, speed_std, speed_af, mode=KALMAN_BACKWARD, verbose=verbose)
+        for k in range(len(track_fwd)):
+            x_fusion = 0.5*track_fwd[k].position.getX() + 0.5*track_bwd[k].position.getX()
+            y_fusion = 0.5*track_fwd[k].position.getY() + 0.5*track_bwd[k].position.getY()
+            track_fwd[k].position.setX(x_fusion)
+            track_fwd[k].position.setY(y_fusion)
+        return track_fwd
 	
 # --------------------------------------------------------------------------
 # Filtering with Markov process based on speed ragularization

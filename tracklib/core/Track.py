@@ -816,7 +816,15 @@ class Track:
             for i in range(len(arg1)):
                 operator.execute(self, arg1[i], arg2, arg3[i])
 
-
+    # =========================================================================
+    # Return a reversed track (based on index)
+	# Important: track may not be valid for some other functions
+	# Used mostly to simplify backward kalman filter formulation
+    # =========================================================================
+    def reverse(self):
+        output = self.copy()
+        output.__POINTS = output.__POINTS[::-1]
+        return output
 
     # =========================================================================
     #  Resampling
