@@ -296,6 +296,7 @@ class Kalman:
     #   - obs: the name of an analytical feature (may also a list 
     #     of analytical feature names for multi-dimensional input)
     #     All the analytical features listed must be in the track
+	#   - out: names of estimated fields as recorded in AF
     #   - mode: to specify how observations are used
     #        - MODE_OBS_AS_SCALAR: list of values (default)
     #        - MODE_OBS_AS_2D_POSITION: the first two fields 
@@ -303,17 +304,36 @@ class Kalman:
     #          Z component is set to 0 as default.
     #        - MODE_OBS_AS_3D_POSITIONS: the first three fields
     #          of obs are used to make a Coords object
+	#        - MODE_OBS_AND_STATES_AS_2D_POSITIONS: the first two 
+	#          fields of  obs are used to make a Coords object 
+	#          and output is read in positions form first two 
+	#          fields of states.
+    #        - MODE_OBS_AND_STATES_AS_3D_POSITIONS: the first 3
+	#          fields of  obs are used to make a Coords object 
+	#          and output is read in positions form first 3 
+	#          fields of states. 
     #     For MODE_OBS_AS_2D_POSITIONS / MODE_OBS_AS_3D_POSITIONS
     #     modes, coordinates SRID is the same as track SRID.
+	# ------------------------------------------------------------
+	# Estimated parameters are registered in AF listed in out 
+	# and ("kf_0", "kf_1",..., "kf_n" otherwise if not provided).
+	# Kalman gain matrix is saved at each epoch in "kf_gain" AF
+    # Posterior covariance matrix Pk|k is saved in "kf_P" AF. It 
+	# may be used as it is to plot 2D error ellipses, provided 
+	# that first two states are x and y coordinates. 
     # ------------------------------------------------------------
-    def estimate(self, track, obs, mode=MODE_OBS_AS_SCALAR, verbose=True):
+    def estimate(self, track, obs, out=[], mode=MODE_OBS_AS_SCALAR, verbose=True):
+        
+        if (len(out) < self.X0.shape[0]):
+            for i in range(len(out), self.X0.shape[0]):
+                out.append("kf_"+str(i))
 
         # Output states
         for i in range(self.X0.shape[0]):
-            track.createAnalyticalFeature("kf_"+str(i), [0]*len(track))
-            track.setObsAnalyticalFeature("kf_"+str(i), 0, self.X0[i,0])
+            track.createAnalyticalFeature(out[i], [0]*len(track))
+            track.setObsAnalyticalFeature(out[i], 0, self.X0[i,0])
         track.createAnalyticalFeature("kf_gain", [0]*len(track))
-        track.setObsAnalyticalFeature("kf_gain", 0, 0)
+        track.createAnalyticalFeature("kf_P", [0]*len(track))
 
         # Initialization
         W = self.__sampleSigmaWeights()  
@@ -323,7 +343,7 @@ class Kalman:
         I = np.eye(P.shape[0], P.shape[1])
         OUTPUT = []
 		
-        EPOCHS = range(len(track)-1)
+        EPOCHS = range(len(track))
         if verbose:
             EPOCHS = progressbar.progressbar(EPOCHS)
        
@@ -342,7 +362,7 @@ class Kalman:
                 
                 # Update step
                 SIGMA_PTS2 = self.__apply(self.H, SIGMA_PTS)
-                z = self.__getObs(track, obs, k+1, mode)
+                z = self.__getObs(track, obs, k, mode)
                 Z = self.__mean(SIGMA_PTS2, W)
                 S =  self.__cov(SIGMA_PTS2, W, Z) + self.R
                 T = self.__cross_cov(SIGMA_PTS, SIGMA_PTS2, W, MU, Z)
@@ -355,10 +375,18 @@ class Kalman:
 			
 			# Output states
             for i in range(X.shape[0]):
-                track.setObsAnalyticalFeature("kf_"+str(i), k+1, X[i,0])
-            track.setObsAnalyticalFeature("kf_gain", k+1, K)
-
-
+                track.setObsAnalyticalFeature(out[i], k, X[i,0])
+            track.setObsAnalyticalFeature("kf_gain", k, K)
+            track.setObsAnalyticalFeature("kf_P", k, P)
+			
+			# MODE_OBS_AND_STATES_AS_POSITIONS
+            if mode == MODE_OBS_AND_STATES_AS_2D_POSITIONS:
+                track.setXFromAnalyticalFeature(out[0])
+                track.setYFromAnalyticalFeature(out[1])
+            if mode == MODE_OBS_AND_STATES_AS_3D_POSITIONS:
+                track.setXFromAnalyticalFeature(out[0])
+                track.setYFromAnalyticalFeature(out[1])
+                track.setZFromAnalyticalFeature(out[1])
 
 
 # -------------------------------------------------------

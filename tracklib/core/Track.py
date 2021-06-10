@@ -714,7 +714,6 @@ class Track:
             except IndexError:
                 value = utils.NAN
             self.getObs(i).features[idAF] = value
-
         return self.getAnalyticalFeature(name)
     
     def createAnalyticalFeature(self, name, val_init=0.0):
@@ -818,8 +817,8 @@ class Track:
 
     # =========================================================================
     # Return a reversed track (based on index)
-	# Important: track may not be valid for some other functions
-	# Used mostly to simplify backward kalman filter formulation
+    # Important: track may not be valid for some other functions
+    # Used mostly to simplify backward kalman filter formulation
     # =========================================================================
     def reverse(self):
         output = self.copy()
@@ -920,14 +919,39 @@ class Track:
         plt.plot(self.getX(), self.getY(), bkg+sym_bkg, markersize=int(0.8*size))
         plt.plot(self.getX(), self.getY(), frg+sym_frg, markersize=int(0.8*size))
     
-    
-    def plot(self, type='LINE', af_name = '', cmap = -1):
+    		
+    # ----------------------------------------------------
+	# Method to plot a track (short cut from Plot)
+	# Append:
+	#  - True : append to the current plot
+	#  - False: create a new plot
+	#  - Ax   : append to the fiven ax object 
+	# ----------------------------------------------------
+	# Output:
+	#  Ax object (may be input into append parameter)
+	# ----------------------------------------------------
+    def plot(self, sym='k-', type='LINE', af_name = '', cmap = -1, append=True):
         '''
         af_name: test si isAFTransition
         '''
         plot = Plot.Plot(self)
-        plot.plot(type, af_name, cmap)
-        
+        plot.sym = sym
+        plot.w = 6
+        plot.h = 5
+        return plot.plot(type, af_name, cmap, append=append)
+		
+    # ----------------------------------------------------
+	# Plot track uncertainty (as error ellipses)
+	# Input track must contain an AF with (at least) a 
+	# 2 x 2 covariance matrix. If this matrix has dim > 2,
+	# first two dimensions are arbitrarily considered
+	# ----------------------------------------------------
+    def plotEllipses(self, sym='r-', factor=3, af=None, append=True):
+        plot = Plot.Plot(self)
+        plot.sym = sym
+        plot.w = 6
+        plot.h = 5
+        return plot.plotEllipses(self, sym, factor, af, append)
         
     def plotProfil(self, template = 'SPATIAL_SPEED_PROFIL', afs = []):
         '''
@@ -1295,7 +1319,7 @@ class Track:
             if i == 5:
                 return track
             return track.extract(0,i-4)    
-            
+    
 
     # ------------------------------------------------------------
     # [+] Concatenation of two tracks

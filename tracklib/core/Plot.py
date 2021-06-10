@@ -2,11 +2,14 @@
 # Class to plot GPS tracks and its AF
 # ----------------------------------------------------------------
 
+import math
+import numpy as np
 import progressbar
 import matplotlib.pyplot as plt
 import tracklib.algo.Analytics as algo
 import tracklib.core.Operator as Operator
 import tracklib.core.Utils as utils
+from matplotlib.patches import Ellipse
 
 from PIL import Image
 
@@ -29,6 +32,7 @@ class Plot:
     def __init__(self, track):
         self.track = track
         self.color = 'forestgreen'
+        self.sym = 'g-'
         self.w = 10
         self.h = 3
         self.pointsize = 5
@@ -49,22 +53,47 @@ class Plot:
         else:
             return False        
         
-    
-    def plot(self, type='LINE', af_name = '', cmap=-1):
+		
+    # ----------------------------------------------------
+	# Append:
+	#  - True : append to the current plot
+	#  - False: create a new plot
+	#  - Ax   : append to the fiven ax object 
+	# ----------------------------------------------------
+	# Output:
+	#  Ax object (may be input into append parameter)
+	# ----------------------------------------------------
+    def plot(self, type='LINE', af_name=None, cmap=-1, margin=0.1, append=False):
 
         '''
         Représentation d'une trace sous forme de ligne ou de point.
         On peut visualiser la valeur d'une AF avec une couleur sur les points.
         '''
-    
-        fig, ax1 = plt.subplots(figsize=(6, 3))
+
+        if isinstance(append, bool): 
+            if append:
+                ax1 = plt.gca()
+            else:
+                fig, ax1 = plt.subplots(figsize=(self.w, self.h))
+        else:
+            ax1 = append
+			
         
         X = self.track.getX()
         Y = self.track.getY()
+        
         xmin = self.track.operate(Operator.Operator.MIN, 'x')
         xmax = self.track.operate(Operator.Operator.MAX, 'x')
-        
-        if af_name != None and af_name != '':
+        ymin = self.track.operate(Operator.Operator.MIN, 'y')
+        ymax = self.track.operate(Operator.Operator.MAX, 'y')
+		
+        dx = xmax-xmin; dy = ymax-ymin 
+        xmin = xmin - dx*margin
+        ymin = ymin - dy*margin
+        xmax = xmax + dx*margin
+        ymax = ymax + dy*margin   
+		
+        if af_name is None:
             
             if cmap == -1:
                 cmap = utils.getColorMap((255, 0, 0), (32, 178, 170))
@@ -79,15 +108,63 @@ class Plot:
             plt.scatter(X, Y, s=self.pointsize, c=self.color)
         
         else:
-            ax1.plot(X, Y, '-', color=self.color)
+            ax1.plot(X, Y, self.sym)
         
         # TODO : tenir compte du type Coord
-        ax1.set(xlabel='E', ylabel='N')
+        if self.track.getSRID() == "Geo":
+            ax1.set(xlabel='lon (deg)', ylabel='lat (deg)')
+        if self.track.getSRID() == "ENU":
+            ax1.set(xlabel='E (m)', ylabel='N (m)')
+        if self.track.getSRID() == "ECEF":    
+            print("Warning: can't plot track in ECEF coordinate system")
+            ax1.set(xlabel='X(m)', ylabel='Y(m)')        
         
         plt.xlim([xmin, xmax])
+        plt.ylim([ymin, ymax])
         plt.title('Track ' + str(self.track.uid))
+		
+        return ax1
         
-    
+    # ----------------------------------------------------
+	# Plot track uncertainty (as error ellipses)
+	# Input track must contain an AF with (at least) a 
+	# 2 x 2 covariance matrix. If this matrix has dim > 2,
+	# first two dimensions are arbitrarily considered
+	# ----------------------------------------------------
+    def plotEllipses(self, track, sym='r-', factor=3, af=None, append=False):
+	
+        if isinstance(append, bool): 
+            if append:
+                ax1 = plt.gca()
+            else:
+                fig, ax1 = plt.subplots(figsize=(self.w, self.h))
+        else:
+            ax1 = append
+	
+        if af is None:
+            if "cov" in track.getListAnalyticalFeatures():
+                af = "cov"
+            if "kf_P" in track.getListAnalyticalFeatures():
+                af = "kf_P"         
+   			
+        for k in range(len(track)):
+
+            P = track.getObsAnalyticalFeature(af, k)[0:2,0:2]
+            [V, D] = np.linalg.eig(P)
+            alpha = math.atan(-D[0][1]/D[0][0])*180/math.pi
+            Xhat = track[k].position.getX()
+            Yhat = track[k].position.getY()	
+            SDXhat = D[0,0]	
+            SDYhat = D[1,1]
+			
+            e = Ellipse((Xhat, Yhat), factor*SDXhat, factor*SDYhat, angle=alpha)	
+            e.set_fill(False)
+            e.set_linewidth(0.5)
+            e.set_edgecolor(sym[0])		
+            ax1.add_artist(e)
+
+        return ax1			
+
     
     def plotAnalyticalFeature(self, af_name, template='BOXPLOT'):
         '''

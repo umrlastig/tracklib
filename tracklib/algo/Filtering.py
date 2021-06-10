@@ -56,7 +56,7 @@ def KLFiltering(track):
     return None	
 	
 # --------------------------------------------------------------------------
-# Filtering with Unscented Kalman filter based on speed ragularization
+# Filtering with Unscented Kalman filter based on speed regularization
 # Inputs:
 #    - track: a track to filter
 #    - sigma: Positional standard deviation (in ground units)
