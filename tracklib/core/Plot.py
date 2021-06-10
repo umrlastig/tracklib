@@ -69,7 +69,6 @@ class Plot:
         Représentation d'une trace sous forme de ligne ou de point.
         On peut visualiser la valeur d'une AF avec une couleur sur les points.
         '''
-
         if isinstance(append, bool): 
             if append:
                 ax1 = plt.gca()
@@ -119,9 +118,10 @@ class Plot:
             print("Warning: can't plot track in ECEF coordinate system")
             ax1.set(xlabel='X(m)', ylabel='Y(m)')        
         
-        plt.xlim([xmin, xmax])
-        plt.ylim([ymin, ymax])
-        plt.title('Track ' + str(self.track.uid))
+        if not append:
+            plt.xlim([xmin, xmax])
+            plt.ylim([ymin, ymax])
+            plt.title('Track ' + str(self.track.uid))
 		
         return ax1
         

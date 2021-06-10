@@ -14,7 +14,8 @@ MODE_OBS_AS_2D_POSITIONS = 1
 MODE_OBS_AS_3D_POSITIONS = 2
 MODE_OBS_AND_STATES_AS_2D_POSITIONS = 3
 MODE_OBS_AND_STATES_AS_3D_POSITIONS = 4
-MODE_STATES_AS_POSITIONS = 5
+MODE_STATES_AS_2D_POSITIONS = 5
+MODE_STATES_AS_3D_POSITIONS = 6
 
 MODE_VERBOSE_NONE = 0
 MODE_VERBOSE_ALL = 1
@@ -23,20 +24,20 @@ MODE_VERBOSE_PROGRESS_BY_EPOCH = 3
 
 def DYN_MAT_2D_CST_SPEED(dt):
     return np.array([
-	[1, 0, dt, 0 ],
-	[0, 1, 0 , dt],
-	[0, 0, 1 , 0 ],
-	[0, 0, 0 , 1 ]])
-	
+    [1, 0, dt, 0 ],
+    [0, 1, 0 , dt],
+    [0, 0, 1 , 0 ],
+    [0, 0, 0 , 1 ]])
+    
 def DYN_MAT_2D_CST_ACC(dt):
     dt2 = 0.5*dt**2
     return np.array([
-	[1.0, 0.0, dt , 0.0, dt2, 0.0],
-	[0.0, 1.0, 0.0, dt , 0.0, dt2],
-	[0.0, 0.0, 1.0, 0.0, dt , 0.0],
-	[0.0, 0.0, 0.0, 1.0, 0.0, dt ],
-	[0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
-	[0.0, 0.0, 0.0, 0.0, 0.0, 1.0]])
+    [1.0, 0.0, dt , 0.0, dt2, 0.0],
+    [0.0, 1.0, 0.0, dt , 0.0, dt2],
+    [0.0, 0.0, 1.0, 0.0, dt , 0.0],
+    [0.0, 0.0, 0.0, 1.0, 0.0, dt ],
+    [0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+    [0.0, 0.0, 0.0, 0.0, 0.0, 1.0]])
 
 def DYN_MAT_3D_CST_SPEED(dt):
     return np.array([
@@ -46,11 +47,11 @@ def DYN_MAT_3D_CST_SPEED(dt):
     [0, 0, 0,  1,  0, 0 ],
     [0, 0, 0,  0,  1, 0 ],
     [0, 0, 0,  0,  0, 1 ]])
-	
+    
 def DYN_MAT_3D_CST_ACC(dt):
     dt2 = 0.5*dt**2
     return np.array([
-	[1.0, 0.0, 0.0, dt , 0.0, 0.0, dt2, 0.0, 0.0],
+    [1.0, 0.0, 0.0, dt , 0.0, 0.0, dt2, 0.0, 0.0],
     [0.0, 1.0, 0.0, 0.0, dt , 0.0, 0.0, dt2, 0.0],
     [0.0, 0.0, 1.0, 0.0, 0.0, dt , 0.0, 0.0, dt2],
     [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, dt , 0.0, 0.0],
@@ -58,7 +59,7 @@ def DYN_MAT_3D_CST_ACC(dt):
     [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, dt ],
     [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
     [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
-	[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]])
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]])
 
 def DYN_MAT_2D_CST_SPEED_COV(dt, std_acc):
     G = np.array([[0.5*dt**2], [0.5*dt**2], [dt], [dt]])
@@ -72,7 +73,7 @@ def DYN_MAT_2D_CST_ACC_COV(dt, std_jrk):
 def DYN_MAT_3D_CST_ACC_COV(dt, std_jrk):
     G = np.array([[1.0/6.0*dt**3], [1.0/6.0*dt**3], [1.0/6.0*dt**3], 
                   [0.5*dt**2]    , [0.5*dt**2]    , [0.5*dt**2]    , 
-			      [dt]           , [dt]           , [dt]])
+                  [dt]           , [dt]           , [dt]])
     return std_jrk**2*G@G.transpose()
 
 # -------------------------------------------------------
@@ -126,34 +127,78 @@ class Kalman:
             self.P0 = P0
     def setSpreading(self, spreading):
         self.spreading = spreading    
-		
+        
     def setIterations(self, iter):
         self.iter = iter   
+
+    def getQ(self, k, track):
+        if not 'function' in str(type(self.Q)):
+            return self.Q
+        else:
+            if self.Q.__code__.co_argcount == 0:
+                return self.Q()
+            if self.Q.__code__.co_argcount == 1:
+                return self.Q(k)
+            if self.Q.__code__.co_argcount == 2:
+                return self.Q(k, track)
+		
+    def getR(self, k, track):
+        if not 'function' in str(type(self.R)):
+            return self.R
+        else:
+            if self.R.__code__.co_argcount == 0:
+                return self.R()
+            if self.R.__code__.co_argcount == 1:
+                return self.R(k)
+            if self.R.__code__.co_argcount == 2:
+                return self.R(k, track)
         
     def summary(self):
  
-        if ("function" in str(type(self.F))) or ("function" in str(type(self.Q))):
+        if ("function" in str(type(self.F))) or ("function" in str(type(self.H))):
             type_kalman = "unscented (UKF)"
         else:
             type_kalman = "standard (KF)"
         print("===========================================================")
         print("Kalman filter")
         print("Type:", type_kalman)
+        t_dyn = "linear"
+        t_obs = "linear"
         if type_kalman == "unscented (UKF)":
-            t_dyn = "linear"
-            t_obs = "linear"
             if "function" in str(type(self.F)):
                 t_dyn = "non-linear"
             if "function" in str(type(self.H)):
                 t_obs = "non-linear"
             print("Dyn model:", t_dyn, "/ Obs model:", t_obs)
-        print("Number of states         n =", self.Q.shape[0])
-        print("Number of observations   m =", self.R.shape[0])
+        stationarity = "Yes"
+        if 'function' in str(type(self.F)):
+            if self.F.__code__.co_argcount > 1:
+                stationarity = "No"	
+        if 'function' in str(type(self.H)):
+            if self.H.__code__.co_argcount > 1:
+                stationarity = "No"
+        if 'function' in str(type(self.Q)):
+            if self.Q.__code__.co_argcount > 0:
+                stationarity = "No"
+        if 'function' in str(type(self.R)):
+            if self.R.__code__.co_argcount > 0:
+                stationarity = "No"
+        print("Stationnarity:", stationarity)
+        n = self.P0.shape[0]
+        if 'function' in str(type(self.R)):
+            m = "?"
+        else:
+            m = self.R.shape[0]
+        print("Number of states         n =", n)
+        print("Number of observations   m =", m)
         print("===========================================================")
         print("Dynamic model [n x n]:")
         print(self.F) 
         x = np.random.randint(0,10,self.X0.shape)
-        y = self.F(x).transpose()
+        if t_dyn == "linear":
+            y = (self.F @ x).transpose()
+        else:
+            y = self.F(x).transpose()
         print("E.g. x =", x.transpose(), "=>", "F(x) =", y)
         print("-----------------------------------------------------------")
         print("Dynamic model covariance matrix [n x n]:")
@@ -161,8 +206,11 @@ class Kalman:
         print("===========================================================")
         print("Observation model [m x n]:")
         print(self.H)
-        y = self.H(x).transpose()
-        
+        if m != "?":
+            if t_obs == "linear":
+                y = (self.H @ x).transpose()
+            else:
+                y = self.H(x).transpose()        
         print("E.g. x =", x.transpose(), "=>", "H(x) =", y)
         print("-----------------------------------------------------------")
         print("Observation model covariance matrix [m x m]:")
@@ -233,14 +281,14 @@ class Kalman:
             v = M-np.array([SIGMA[:,i]]).transpose()
             S = S + W[i,0]*v@v.transpose()
         return S
-		
+        
     # ------------------------------------------------------------
     # Internal function to calculate cross covariance Cov(X,Z)
     # Inputs: sigma points matrix and weight vector
     # ------------------------------------------------------------
     def __cross_cov(self, X, Z, W, MX=None, MZ=None):
         n = X.shape[0]
-        m = Z.shape[0]		
+        m = Z.shape[0]        
         T = np.zeros((n, m))
         if MX is None:
             MX = self.__mean(X, W)
@@ -251,43 +299,38 @@ class Kalman:
             vz = MZ-np.array([Z[:,i]]).transpose()
             T = T + W[i,0]*vx@vz.transpose()
         return T
-		
+        
     # ------------------------------------------------------------
     # Internal function to apply F or H to sigma points
     # ------------------------------------------------------------
-    def __apply(self, function, SIGMA): 
-        output = function(np.array([SIGMA[:,0]]).transpose())
-        for i in range(1,SIGMA.shape[1]):
-            output = np.concatenate([output, function(np.array([SIGMA[:,i]]).transpose())], axis=1)
+    def __apply(self, function, SIGMA, k, track): 
+        if 'function' in str(type(function)):
+           if function.__code__.co_argcount == 1:
+               output = function(np.array([SIGMA[:,0]]).transpose())
+               for i in range(1,SIGMA.shape[1]):
+                   output = np.concatenate([output, function(np.array([SIGMA[:,i]]).transpose())], axis=1)
+           if function.__code__.co_argcount == 2:
+               output = function(np.array([SIGMA[:,0]]).transpose(), k)
+               for i in range(1,SIGMA.shape[1]):
+                   output = np.concatenate([output, function(np.array([SIGMA[:,i]]).transpose(), k)], axis=1)
+           if function.__code__.co_argcount == 3:
+               output = function(np.array([SIGMA[:,0]]).transpose(), k, track)
+               for i in range(1,SIGMA.shape[1]):
+                   output = np.concatenate([output, function(np.array([SIGMA[:,i]]).transpose(), k, track)], axis=1)
+        else:
+            output = function @ np.array([SIGMA[:,0]]).transpose()
+            for i in range(1,SIGMA.shape[1]):
+                output = np.concatenate([output, function @ np.array([SIGMA[:,i]]).transpose()], axis=1)
+   
         return output
 
     # ------------------------------------------------------------
     # Internal function to get all observations at epoch k in a 
-    # track, from a list of analytical feature names (obs) and a
-    # mode if retrieved values must be converted to positions
+    # track, from a list of analytical feature names (obs) 
     # ------------------------------------------------------------
     def __getObs(self, track, obs, k, mode):
+        return utils.unlistify(track.getObsAnalyticalFeatures(obs,k))
 
-        y = track.getObsAnalyticalFeatures(obs,k)
-        
-        if mode in [MODE_OBS_AS_2D_POSITIONS, MODE_OBS_AND_STATES_AS_2D_POSITIONS]:    
-            if len(y) < 2:
-                print("Error: wrong number of observations in HMM to form 2D position")
-                exit()
-            ytemp = [utils.makeCoords(y[0], y[1], 0.0, track.getSRID())]
-            for remain in range(2,len(y)):
-                ytemp.append(y[remain])
-            y = ytemp
-        if mode in [MODE_OBS_AS_3D_POSITIONS, MODE_OBS_AND_STATES_AS_3D_POSITIONS]:     
-            if len(y) < 3:
-                print("Error: wrong number of observations in HMM to form 3D position")
-                exit()
-            ytemp = [utils.makeCoords(y[0], y[1], y[2], track.getSRID())] 
-            for remain in range(3,len(y)):
-                ytemp.append(y[remain])
-            y = ytemp
-
-        return utils.unlistify(y)
     
     # ------------------------------------------------------------
     # Main function of Kalman object, to estimate the states
@@ -296,33 +339,23 @@ class Kalman:
     #   - obs: the name of an analytical feature (may also a list 
     #     of analytical feature names for multi-dimensional input)
     #     All the analytical features listed must be in the track
-	#   - out: names of estimated fields as recorded in AF
-    #   - mode: to specify how observations are used
-    #        - MODE_OBS_AS_SCALAR: list of values (default)
-    #        - MODE_OBS_AS_2D_POSITION: the first two fields 
-    #          of  obs are used to make a Coords object. 
-    #          Z component is set to 0 as default.
-    #        - MODE_OBS_AS_3D_POSITIONS: the first three fields
-    #          of obs are used to make a Coords object
-	#        - MODE_OBS_AND_STATES_AS_2D_POSITIONS: the first two 
-	#          fields of  obs are used to make a Coords object 
-	#          and output is read in positions form first two 
-	#          fields of states.
-    #        - MODE_OBS_AND_STATES_AS_3D_POSITIONS: the first 3
-	#          fields of  obs are used to make a Coords object 
-	#          and output is read in positions form first 3 
-	#          fields of states. 
-    #     For MODE_OBS_AS_2D_POSITIONS / MODE_OBS_AS_3D_POSITIONS
-    #     modes, coordinates SRID is the same as track SRID.
-	# ------------------------------------------------------------
-	# Estimated parameters are registered in AF listed in out 
-	# and ("kf_0", "kf_1",..., "kf_n" otherwise if not provided).
-	# Kalman gain matrix is saved at each epoch in "kf_gain" AF
-    # Posterior covariance matrix Pk|k is saved in "kf_P" AF. It 
-	# may be used as it is to plot 2D error ellipses, provided 
-	# that first two states are x and y coordinates. 
+    #   - out: names of estimated fields as recorded in AF
+    #   - mode: to specify how output states are used
+    #        - MODE_STATES_AS_2D_POSITIONS: the first two 
+    #          fields of  output are used to make a Coords object 
+    #        - MODE_STATES_AS_2D_POSITIONS: the first three 
+    #          fields of  output are used to make a Coords object
+    #     For MODE_STATES_AS_XX_POSITIONS modes, coordinates SRID
+    #      is the same as track SRID.
     # ------------------------------------------------------------
-    def estimate(self, track, obs, out=[], mode=MODE_OBS_AS_SCALAR, verbose=True):
+    # Estimated parameters are registered in AF listed in out 
+    # and ("kf_0", "kf_1",..., "kf_n" otherwise if not provided).
+    # Kalman gain matrix is saved at each epoch in "kf_gain" AF
+    # Posterior covariance matrix Pk|k is saved in "kf_P" AF. It 
+    # may be used as it is to plot 2D error ellipses, provided 
+    # that first two states are x and y coordinates. 
+    # ------------------------------------------------------------
+    def estimate(self, track, obs, out=[], mode=-1, verbose=True):
         
         if (len(out) < self.X0.shape[0]):
             for i in range(len(out), self.X0.shape[0]):
@@ -331,63 +364,79 @@ class Kalman:
         # Output states
         for i in range(self.X0.shape[0]):
             track.createAnalyticalFeature(out[i], [0]*len(track))
-            track.setObsAnalyticalFeature(out[i], 0, self.X0[i,0])
+        # Output states std values
+        for i in range(self.X0.shape[0]):
+            track.createAnalyticalFeature(out[i]+"_std" , [0]*len(track))
+            track.createAnalyticalFeature(out[i]+"_gain", [0]*len(track))
+        # Measurements innovation
+        for i in range(len(obs)):
+            track.createAnalyticalFeature("kf_"+obs[i]+"_inov", [0]*len(track))
+        
+        # Matrices AF (gain and covariance matrix)
         track.createAnalyticalFeature("kf_gain", [0]*len(track))
         track.createAnalyticalFeature("kf_P", [0]*len(track))
 
         # Initialization
         W = self.__sampleSigmaWeights()  
-		
+        
         X = self.X0
         P = self.P0
         I = np.eye(P.shape[0], P.shape[1])
         OUTPUT = []
-		
+        
         EPOCHS = range(len(track))
         if verbose:
             EPOCHS = progressbar.progressbar(EPOCHS)
        
-	    # Filter
+        # Filter
         for k in EPOCHS:
-		
+        
             for step in range(self.iter):
 
                 SIGMA_PTS = self.__sampleSigmaPts(X, P)
                 
                 # Prediction step
                 if step == 0:
-                    SIGMA_PTS = self.__apply(self.F, SIGMA_PTS)
+                    SIGMA_PTS = self.__apply(self.F, SIGMA_PTS, k, track)
                     MU = self.__mean(SIGMA_PTS, W)
-                    COV = self.__cov(SIGMA_PTS, W, MU) + self.Q
+                    COV = self.__cov(SIGMA_PTS, W, MU) + self.getQ(k, track)
                 
                 # Update step
-                SIGMA_PTS2 = self.__apply(self.H, SIGMA_PTS)
+                SIGMA_PTS2 = self.__apply(self.H, SIGMA_PTS, k, track)
                 z = self.__getObs(track, obs, k, mode)
                 Z = self.__mean(SIGMA_PTS2, W)
-                S =  self.__cov(SIGMA_PTS2, W, Z) + self.R
+                I = (np.array([z]).transpose()-Z)
+                S =  self.__cov(SIGMA_PTS2, W, Z) + self.getR(k, track)
                 T = self.__cross_cov(SIGMA_PTS, SIGMA_PTS2, W, MU, Z)
                 K = T @ np.linalg.inv(S)
                 
-                X = MU + K@(np.array([z]).transpose()-Z)
+                X = MU + K@I
                 P = COV - K@S@K.transpose()
                 MU = X
                 COV = P
-			
-			# Output states
+            
+            # Output states
             for i in range(X.shape[0]):
                 track.setObsAnalyticalFeature(out[i], k, X[i,0])
+                track.setObsAnalyticalFeature(out[i]+"_std", k, math.sqrt(P[i,i]))
+                track.setObsAnalyticalFeature(out[i]+"_gain", k, K[i,i])
+
+            # Measurement innovations
+            for i in range(len(obs)):
+                track.setObsAnalyticalFeature("kf_"+obs[i]+"_inov", k, I[i])
+
+            # Matrices AF
             track.setObsAnalyticalFeature("kf_gain", k, K)
             track.setObsAnalyticalFeature("kf_P", k, P)
-			
-			# MODE_OBS_AND_STATES_AS_POSITIONS
-            if mode == MODE_OBS_AND_STATES_AS_2D_POSITIONS:
-                track.setXFromAnalyticalFeature(out[0])
-                track.setYFromAnalyticalFeature(out[1])
-            if mode == MODE_OBS_AND_STATES_AS_3D_POSITIONS:
-                track.setXFromAnalyticalFeature(out[0])
-                track.setYFromAnalyticalFeature(out[1])
-                track.setZFromAnalyticalFeature(out[1])
-
+            
+        # MODE_STATES_AS_XX_POSITIONS
+        if mode == MODE_STATES_AS_2D_POSITIONS:
+            track.setXFromAnalyticalFeature(out[0])
+            track.setYFromAnalyticalFeature(out[1])
+        if mode == MODE_STATES_AS_3D_POSITIONS:
+            track.setXFromAnalyticalFeature(out[0])
+            track.setYFromAnalyticalFeature(out[1])
+            track.setZFromAnalyticalFeature(out[2])
 
 # -------------------------------------------------------
 # Hidden Markov Model is designed to estimate discrete 
