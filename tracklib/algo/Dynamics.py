@@ -22,6 +22,17 @@ MODE_VERBOSE_ALL = 1
 MODE_VERBOSE_PROGRESS = 2
 MODE_VERBOSE_PROGRESS_BY_EPOCH = 3
 
+def DYN_MAT_2D_CST_POS():
+    return np.array([
+    [1, 0],
+    [0, 1]])
+	
+def DYN_MAT_3D_CST_POS():
+    return np.array([
+    [1, 0, 0],
+    [0, 1, 0],
+    [0, 0, 1]])
+
 def DYN_MAT_2D_CST_SPEED(dt):
     return np.array([
     [1, 0, dt, 0 ],
@@ -197,9 +208,11 @@ class Kalman:
         x = np.random.randint(0,10,self.X0.shape)
         if t_dyn == "linear":
             y = (self.F @ x).transpose()
+            print("E.g. x =", x.transpose(), "=>", "F(x) =", y)
         else:
-            y = self.F(x).transpose()
-        print("E.g. x =", x.transpose(), "=>", "F(x) =", y)
+            if self.F.__code__.co_argcount == 1:
+                y = self.F(x).transpose()
+                print("E.g. x =", x.transpose(), "=>", "F(x) =", y)
         print("-----------------------------------------------------------")
         print("Dynamic model covariance matrix [n x n]:")
         print(self.Q)
@@ -209,9 +222,11 @@ class Kalman:
         if m != "?":
             if t_obs == "linear":
                 y = (self.H @ x).transpose()
+                print("E.g. x =", x.transpose(), "=>", "H(x) =", y)
             else:
-                y = self.H(x).transpose()        
-        print("E.g. x =", x.transpose(), "=>", "H(x) =", y)
+                if self.H.__code__.co_argcount == 1:
+                    y = self.H(x).transpose()        
+                    print("E.g. x =", x.transpose(), "=>", "H(x) =", y)
         print("-----------------------------------------------------------")
         print("Observation model covariance matrix [m x m]:")
         print(self.R)
@@ -367,7 +382,6 @@ class Kalman:
         # Output states std values
         for i in range(self.X0.shape[0]):
             track.createAnalyticalFeature(out[i]+"_std" , [0]*len(track))
-            track.createAnalyticalFeature(out[i]+"_gain", [0]*len(track))
         # Measurements innovation
         for i in range(len(obs)):
             track.createAnalyticalFeature("kf_"+obs[i]+"_inov", [0]*len(track))
@@ -419,7 +433,6 @@ class Kalman:
             for i in range(X.shape[0]):
                 track.setObsAnalyticalFeature(out[i], k, X[i,0])
                 track.setObsAnalyticalFeature(out[i]+"_std", k, math.sqrt(P[i,i]))
-                track.setObsAnalyticalFeature(out[i]+"_gain", k, K[i,i])
 
             # Measurement innovations
             for i in range(len(obs)):
