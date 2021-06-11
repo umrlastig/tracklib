@@ -1489,8 +1489,14 @@ class Track:
     
     # ------------------------------------------------------------
     # [[n]] Get and set obs number n (or AF vector with name n)
+	# If n is tuple ["af", index] or [index, "af"]
     # ------------------------------------------------------------    
     def __getitem__(self, n):
+        if isinstance(n, tuple):
+            if isinstance(n[0], str):
+                return self.getObsAnalyticalFeature(n[0], n[1])
+            else: 
+                return self.getObsAnalyticalFeature(n[1], n[0])
         if isinstance(n, str):
             return self.getAnalyticalFeature(n)
         return self.__POINTS[n]  

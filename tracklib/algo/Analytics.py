@@ -10,8 +10,9 @@ import tracklib.core.Utils as utils
 # Liste des AF algo intégrés à disposition
 BIAF_DS = 'ds'
 BIAF_SPEED = 'speed'
+BIAF_HEADING = 'heading'
 BIAF_ABS_CURV = 'abs_curv'
-BUILT_IN_AF = [BIAF_DS, BIAF_SPEED, BIAF_ABS_CURV]
+BUILT_IN_AF = [BIAF_DS, BIAF_SPEED, BIAF_ABS_CURV, BIAF_HEADING]
 
 
 
@@ -34,6 +35,10 @@ def abs_curv(track, i):
         S.append(S[i-1] + ds)
     return S
 
+def heading(track, i):
+    if i == len(track):
+        return heading(track, i-1)
+    return track.getObs(i).position.azimuthTo(track.getObs(i-1).position)	
 
 
 '''
