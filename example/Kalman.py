@@ -385,9 +385,97 @@ KmlWriter.writeToKml(track, path="couplage.kml", type="LINE")
 '''
 
 
+# -----------------------------------------------------------------------
+# Example 4: GNSS computation with 3 satellites
+# -----------------------------------------------------------------------
+# Context: receiver clock error drift is estimated in order to keep 
+# track of position even without required minimal number of satellites
+# -----------------------------------------------------------------------
+
+'''
+start = GeoCoords(2.4320023,  48.84298, 100).toECEFCoords()
+
+
+path = "tracklib/data/psr_all.dat"
+
+track = Track()
+
+Nepochs = 534
+for i in range(Nepochs):
+	track.addObs(Obs(ECEFCoords(0,0,0)))
+track.createAnalyticalFeature("m0",[0]*Nepochs); track.createAnalyticalFeature("sx0",[0]*Nepochs); track.createAnalyticalFeature("sy0",[0]*Nepochs); track.createAnalyticalFeature("sz0",[0]*Nepochs); 
+track.createAnalyticalFeature("m1",[0]*Nepochs); track.createAnalyticalFeature("sx1",[0]*Nepochs); track.createAnalyticalFeature("sy1",[0]*Nepochs); track.createAnalyticalFeature("sz1",[0]*Nepochs); 
+track.createAnalyticalFeature("m2",[0]*Nepochs); track.createAnalyticalFeature("sx2",[0]*Nepochs); track.createAnalyticalFeature("sy2",[0]*Nepochs); track.createAnalyticalFeature("sz2",[0]*Nepochs); 
+track.createAnalyticalFeature("m3",[0]*Nepochs); track.createAnalyticalFeature("sx3",[0]*Nepochs); track.createAnalyticalFeature("sy3",[0]*Nepochs); track.createAnalyticalFeature("sz3",[0]*Nepochs); 
+track.createAnalyticalFeature("m4",[0]*Nepochs); track.createAnalyticalFeature("sx4",[0]*Nepochs); track.createAnalyticalFeature("sy4",[0]*Nepochs); track.createAnalyticalFeature("sz4",[0]*Nepochs); 
+track.createAnalyticalFeature("m5",[0]*Nepochs); track.createAnalyticalFeature("sx5",[0]*Nepochs); track.createAnalyticalFeature("sy5",[0]*Nepochs); track.createAnalyticalFeature("sz5",[0]*Nepochs); 
+
+
+with open(path) as fp:
+	line = True
+	for i in range(Nepochs):
+		for j in range(6):
+			line = fp.readline()
+			vals = line[:-1].split(",")
+			track.setObsAnalyticalFeature("sx"+str(j), i, float(vals[1]))
+			track.setObsAnalyticalFeature("sy"+str(j), i, float(vals[2]))
+			track.setObsAnalyticalFeature("sz"+str(j), i, float(vals[3]))
+			track.setObsAnalyticalFeature("m"+str(j) , i, float(vals[4]))
+		line = fp.readline()
+
+track = track%[False, True]
 
 
 
+def F(x):
+	return np.array([
+	[x[0,0]],
+	[x[1,0]],
+	[x[2,0]],
+	[x[3,0]+x[4,0]],
+	[x[4,0]]])
+
+def H(x, k, track):		
+	return np.array([
+	[((x[0,0]-track["sx0",k])**2 + (x[1,0]-track["sy0",k])**2 + (x[2,0]-track["sz0",k])**2)**0.5 + x[3,0]],
+	[((x[0,0]-track["sx1",k])**2 + (x[1,0]-track["sy1",k])**2 + (x[2,0]-track["sz1",k])**2)**0.5 + x[3,0]],
+	[((x[0,0]-track["sx2",k])**2 + (x[1,0]-track["sy2",k])**2 + (x[2,0]-track["sz2",k])**2)**0.5 + x[3,0]],
+	[((x[0,0]-track["sx3",k])**2 + (x[1,0]-track["sy3",k])**2 + (x[2,0]-track["sz3",k])**2)**0.5 + x[3,0]],
+	[((x[0,0]-track["sx4",k])**2 + (x[1,0]-track["sy4",k])**2 + (x[2,0]-track["sz4",k])**2)**0.5 + x[3,0]],
+	[((x[0,0]-track["sx5",k])**2 + (x[1,0]-track["sy5",k])**2 + (x[2,0]-track["sz5",k])**2)**0.5 + x[3,0]]])
+
+
+Q = 1e0*np.eye(5,5); Q[3,3] = 0; Q[4,4] = 1e0
+def R(k):
+	P = 1e1*np.eye(6,6)
+	if (k>=70) and (k<267):
+		for i in range(3,6):
+			P[i,i] = 1e16
+	return P 
+	
+for k in range(70, 267):
+	for i in range(3,6):
+		track.setObsAnalyticalFeature("m"+str(i),k, 20000000)
+
+X0 = np.array([[start.X], [start.Y], [start.Z], [0], [0]])
+P0 = 1e5*np.eye(5,5); P0[3,3] = 1e8; P0[4,4] = 1e6
+
+UKF = Kalman(spreading=1)
+UKF.setTransition(F, Q)
+UKF.setObservation(H, R)
+UKF.setInitState(X0, P0)
+UKF.summary()
+
+UKF.estimate(track, ["m0","m1","m2","m3","m4","m5"], mode = Dynamics.MODE_STATES_AS_3D_POSITIONS)
+track.toGeoCoords()
+
+
+KmlWriter.writeToKml(track, path="couplage.kml", type="POINT", c1=[0,1,0,1])
+
+
+track.plot('r+')
+plt.show()
+'''
 
 
 

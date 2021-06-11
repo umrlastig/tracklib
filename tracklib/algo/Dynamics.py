@@ -185,9 +185,6 @@ class Kalman:
         if 'function' in str(type(self.F)):
             if self.F.__code__.co_argcount > 1:
                 stationarity = "No"	
-        if 'function' in str(type(self.H)):
-            if self.H.__code__.co_argcount > 1:
-                stationarity = "No"
         if 'function' in str(type(self.Q)):
             if self.Q.__code__.co_argcount > 0:
                 stationarity = "No"
