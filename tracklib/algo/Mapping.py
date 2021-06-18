@@ -2,9 +2,11 @@
 # Class to manage mapping of GPS tracks on geographic features
 # -----------------------------------------------------------------------------
 import math
+import progressbar
 import numpy as np
 
 import tracklib.core.Track as Track
+from tracklib.core.Operator import Operator
 
 
 # --------------------------------------------------------------------------
@@ -20,7 +22,7 @@ def mapOnRaster(track, grid):
     return None
 
 
-def mapOn(track, reference, TP1, TP2=[], init=[], N_ITER_MAX=20, mode="2D", verbose=True):
+def mapOn(track, reference, TP1=[], TP2=[], init=[], apply=True, N_ITER_MAX=20, NPTS=30, mode="2D", verbose=True):
 
     '''Geometric affine transformation to align two tracks with diferent
 	coordinate systems. For "2D" mode, coordinates must be ENU or Geo. For 
@@ -28,10 +30,14 @@ def mapOn(track, reference, TP1, TP2=[], init=[], N_ITER_MAX=20, mode="2D", verb
 	to avoid usage of non-metric Geo coordinates for mapping operation, since 
 	it is relying on an isotropic error model. Inputs:
 	   - reference: another track we want to align on or a list of points
-	   - TP1: list of tie points indices (relative to track self)
-	   - TP2: list of tie points indices (relative to track)
-	   - mode: could be "2D" (default) or "3D"
-    if TP2 is not specified, it is assumed equal to TP1.
+	   - TP1         : list of tie points indices (relative to track self)
+	   - TP2         : list of tie points indices (relative to track)
+       - init        : "initial guess" vector : [scale, tx, ty, rotation angle]
+	   - N_ITER_MAX  : maximal number of iterations (in least squares or ICP)
+       - apply       : boolean value to specify if estimated transfo must be performed
+	   - mode        : could be "2D" (default) or "3D"
+       - NPTS        : integer specifying number of points to consider (for ICP only)
+    If TP2 is not specified, it is assumed equal to TP1.
 	TP1 and TP2 must have same size. Adjustment is performed with least squares.
 	The general transformation from point X to point X' is provided below:
 	                         X' = kRX + T
@@ -39,8 +45,73 @@ def mapOn(track, reference, TP1, TP2=[], init=[], N_ITER_MAX=20, mode="2D", verb
 	3D translation vector. Transformation parameters are returned in standard 
 	output in the following format: [theta, k, tx, ty] (theta in radians)
 	Track argument may also be replaced ny a list of points.
+	If TP1 is an empty list or if it is not specified, adjustment is performed 
+	with iterative closest point (ICP) algorithm, to solve both the transfo and
+	the data association problems in a single framework. This method requires 
+	however that the "initial guess" (i.e. scale difference and rotation between 
+	both datasets) be not too far from reality, in order to reach a good solution.
+	For standard least squares, time complexity of the method is O(n^2) with n 
+	the number of points used for data matching. For ICP, data association step 
+	is O(n^2) and least squares resolution is O(n^2) hence an overall complexity 
+	equal to N_ITER_MAX * O(NPTS^2). In general NPTS = 30 performs fair enough.
 	Note that mapOn does not handle negative determinant (symetries not allowed)
 	'''   
+	
+    if (len(TP1) == 0):   # Recursive solution
+		
+        track_copy = track.copy()
+		
+        # Initial guess (if provided)
+        if (len(init) == 4):
+            track_copy.rotate(init[3,0])
+            track_copy.scale(init[0,0])
+            track_copy.translate(init[1,0],init[2,0])	
+
+        # Match data by rough scale factor
+        track_copy.compute_abscurv(); reference.compute_abscurv()
+        track_copy.operate(Operator.DIFFERENTIATOR, "abs_curv", "ds")
+        reference.operate( Operator.DIFFERENTIATOR, "abs_curv", "ds")
+        f = reference.operate(Operator.AVERAGER, "ds")/track_copy.operate(Operator.AVERAGER, "ds")
+        track_copy.scale(f)
+
+        # Match data by rough translation
+        t = track_copy.getCentroid() - reference.getCentroid();
+        track_copy.translate(t.getX(), t.getY())
+		
+        resolution_steps = range(N_ITER_MAX);
+        if verbose:
+            resolution_steps = progressbar.progressbar(resolution_steps)
+
+		# Iterative closest point
+        for step in resolution_steps:
+
+            # -------------------------------------------------
+            # Data association step
+            # -------------------------------------------------
+            TP1 = []; TP2 = [];
+            for i in range(0, len(track_copy), (int)(len(track_copy)/NPTS)):
+                dmin =  1e300
+                jmin = 0
+                for j in range(len(reference)):
+                    dist = track_copy[i].position.distance2DTo(reference[j].position)
+                    if dist < dmin:
+                        dmin = dist
+                        jmin = j
+                TP1.append(i); TP2.append(jmin)
+        
+            # -------------------------------------------------
+            # Recursive data adjustment step
+            # -------------------------------------------------
+            mapOn(track_copy, reference, TP1, TP2, N_ITER_MAX=1, verbose=False)
+		
+        # Data association application
+        track.createAnalyticalFeature("pair", -1)
+        for k in range(len(TP1)):
+            track.setObsAnalyticalFeature("pair", TP1[k], TP2[k])		
+		
+        # Adjustement application
+        return mapOn(track, reference, TP1, TP2, apply=apply, N_ITER_MAX=20, verbose=verbose)
+		
 
     if (mode == "3D"):
         print("Mode 3D is not implemented yet")
@@ -128,8 +199,9 @@ def mapOn(track, reference, TP1, TP2=[], init=[], N_ITER_MAX=20, mode="2D", verb
         print(message)
         print("-----------------------------------------------------------------")
 	
-    track.rotate(X[3,0])
-    track.scale(X[0,0])
-    track.translate(X[1,0],X[2,0])
+    if apply:
+        track.rotate(X[3,0])
+        track.scale(X[0,0])
+        track.translate(X[1,0],X[2,0])
 
     return [X[3,0], X[0,0], X[1,0], X[2,0]]
