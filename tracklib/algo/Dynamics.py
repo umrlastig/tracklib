@@ -122,6 +122,7 @@ class Kalman:
         self.X0 = X0
         self.P0 = P0
         self.iter = iter
+        self.control = 1e300
         self.spreading = spreading
         
     def setTransition(self, F, Q=None):
@@ -141,6 +142,9 @@ class Kalman:
         
     def setIterations(self, iter):
         self.iter = iter   
+		
+    def setInnovationControl(self, control):
+        self.control = control
 
     def getQ(self, k, track):
         if not 'function' in str(type(self.Q)):
@@ -382,6 +386,7 @@ class Kalman:
         # Measurements innovation
         for i in range(len(obs)):
             track.createAnalyticalFeature("kf_"+obs[i]+"_inov", [0]*len(track))
+            track.createAnalyticalFeature("kf_"+obs[i]+"_inov_std", [0]*len(track))
         
         # Matrices AF (gain and covariance matrix)
         track.createAnalyticalFeature("kf_gain", [0]*len(track))
@@ -418,6 +423,11 @@ class Kalman:
                 Z = self.__mean(SIGMA_PTS2, W)
                 I = (np.array([z]).transpose()-Z)
                 S =  self.__cov(SIGMA_PTS2, W, Z) + self.getR(k, track)
+                
+                # Innovation control
+                if math.sqrt(np.max(np.diagonal(I.transpose()@I/(S+1e-10)))) > self.control:
+                    continue
+				
                 T = self.__cross_cov(SIGMA_PTS, SIGMA_PTS2, W, MU, Z)
                 K = T @ np.linalg.inv(S)
                 
@@ -434,6 +444,7 @@ class Kalman:
             # Measurement innovations
             for i in range(len(obs)):
                 track.setObsAnalyticalFeature("kf_"+obs[i]+"_inov", k, I[i])
+                track.setObsAnalyticalFeature("kf_"+obs[i]+"_inov_std", k, I[i]/S[i,i])
 
             # Matrices AF
             track.setObsAnalyticalFeature("kf_gain", k, K)
