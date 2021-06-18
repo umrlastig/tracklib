@@ -134,7 +134,7 @@ def Kalman(track, sigma, speed_std, speed_af=None, mode=KALMAN_FORWARD, verbose=
         return track_fwd
 	
 # --------------------------------------------------------------------------
-# Filtering with Markov process based on speed ragularization
+# Filtering with Markov process based on speed regularization
 # Inputs:
 #    - track: a track to filter
 #    - sigma: Positional standard deviation (in ground units)

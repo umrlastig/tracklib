@@ -70,9 +70,9 @@ from tracklib.io.NetworkReader import NetworkReader
 #      yi(t) = distance(vehicle, beacon i) + bi(t)
 #      and bi transition rule is : bi(t+1) = bi(t) + w   (w ~ 1e-16)
 #    - Based on the previous study case with biased measurements, an 
-#      interseting experiment is to change the bias of one of the two 
+#      interesting experiment is to change the bias of one of the two 
 #      beacons during the process (for example at time step k=50). We 
-#      the observe how all bias parameters estimation are impacted 
+#      then observe how all bias parameter estimations are impacted 
 #      simultaneously, along with the position parameters. This "jump"
 #      may be detected before being included in the Kalman loop, by 
 #      carefully inspecting the innovation values ("kf_balise1_inov" and 
