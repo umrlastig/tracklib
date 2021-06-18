@@ -32,7 +32,7 @@ def mapOn(track, reference, TP1=[], TP2=[], init=[], apply=True, N_ITER_MAX=20, 
 	   - reference: another track we want to align on or a list of points
 	   - TP1         : list of tie points indices (relative to track self)
 	   - TP2         : list of tie points indices (relative to track)
-       - init        : "initial guess" vector : [scale, tx, ty, rotation angle]
+       - init        : "initial guess" vector : [rotation angle, scale, tx, ty]
 	   - N_ITER_MAX  : maximal number of iterations (in least squares or ICP)
        - apply       : boolean value to specify if estimated transfo must be performed
 	   - mode        : could be "2D" (default) or "3D"
@@ -63,9 +63,9 @@ def mapOn(track, reference, TP1=[], TP2=[], init=[], apply=True, N_ITER_MAX=20, 
 		
         # Initial guess (if provided)
         if (len(init) == 4):
-            track_copy.rotate(init[3,0])
-            track_copy.scale(init[0,0])
-            track_copy.translate(init[1,0],init[2,0])	
+            track_copy.rotate(init[0,0])
+            track_copy.scale(init[1,0])
+            track_copy.translate(init[2,0],init[3,0])	
 
         # Match data by rough scale factor
         track_copy.compute_abscurv(); reference.compute_abscurv()
@@ -151,6 +151,8 @@ def mapOn(track, reference, TP1=[], TP2=[], init=[], apply=True, N_ITER_MAX=20, 
     B = np.zeros((2*n, 1))
     X = np.matrix([init[1],init[0],init[2],init[3]]).transpose()
 	
+    track_copy = track.copy()	
+	
 	# Iterations
     for iter in range(N_ITER_MAX):
     
@@ -170,8 +172,7 @@ def mapOn(track, reference, TP1=[], TP2=[], init=[], apply=True, N_ITER_MAX=20, 
         	
         dX = np.linalg.solve(J.transpose()@J, J.transpose()@B)
         X = X+dX
-		
-        cv_param = max(max(max(dX[0,0]*1e4, dX[1,0]*1e4), dX[2,0]*1e4),  dX[3,0]*1e4)
+        cv_param = max(max(max(abs(dX[0,0])*1e4, abs(dX[1,0])*1e4), abs(dX[2,0])*1e4),  abs(dX[3,0])*1e4)
         if (cv_param < 1):
             break               
         

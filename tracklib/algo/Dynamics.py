@@ -7,7 +7,7 @@ import progressbar
 import numpy as np
 
 import tracklib.core.Utils as utils
-
+import tracklib.algo.Stochastics as Stochastics
 
 MODE_OBS_AS_SCALAR = 0
 MODE_OBS_AS_2D_POSITIONS = 1
@@ -122,7 +122,7 @@ class Kalman:
         self.X0 = X0
         self.P0 = P0
         self.iter = iter
-        self.control = 1e300
+        self.control = 1
         self.spreading = spreading
         
     def setTransition(self, F, Q=None):
@@ -425,7 +425,7 @@ class Kalman:
                 S =  self.__cov(SIGMA_PTS2, W, Z) + self.getR(k, track)
                 
                 # Innovation control
-                if math.sqrt(np.max(np.diagonal(I.transpose()@I/(S+1e-10)))) > self.control:
+                if Stochastics.khi2test(I, S, self.control):
                     continue
 				
                 T = self.__cross_cov(SIGMA_PTS, SIGMA_PTS2, W, MU, Z)
