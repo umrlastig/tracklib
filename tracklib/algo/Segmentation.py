@@ -3,6 +3,7 @@
 # -----------------------------------------------------------------------------
 
 import sys
+import math
 import progressbar
 import numpy as np
 
@@ -23,6 +24,7 @@ MODE_COMPARAISON_OR = 2
 
 MODE_STOPS_LOCAL = 0
 MODE_STOPS_GLOBAL = 1
+MODE_STOPS_RTK = 2
 
 MODE_SPLIT_RETURN_EXHAUSTIVE = 0
 MODE_SPLIT_RETURN_FAST = 1
@@ -133,6 +135,8 @@ def findStops(track, spatial, temporal, mode, verbose=True):
         return findStopsLocal(track, spatial, temporal)
     if mode == MODE_STOPS_GLOBAL:
         return findStopsGlobal(track, spatial, temporal, verbose)
+    if mode == MODE_STOPS_RTK:
+        return findStopsGlobalForRTK(track, spatial, temporal, verbose)
     
 # -------------------------------------------------------------------
 # Function to find stop positions from a track
@@ -140,10 +144,9 @@ def findStops(track, spatial, temporal, mode, verbose=True):
 #     - duration: minimal stop duration (in seconds)
 #     - speed: maximal speed during stop (in ground units / sec)
 # Output: a track with centroids (and first time of stop sequence)
-# Default is set for precise RTK GNSS survey (1 cm / sec for 5 sec)
-# For classical standard GPS track set 1 m/s for 10 sec)
+# For classical standard GPS track set 1 m/s for 10 sec)'''
 # -------------------------------------------------------------------
-def findStopsLocal(track, speed=1e-2, duration=5):        
+def findStopsLocal(track, speed=1, duration=10):        
     
     track = track.copy()
     stops = core_track.Track()
@@ -223,7 +226,7 @@ def removeStops(track, stops=None):
     return output
     
 		
-def findStopsGlobal(track, diameter=2e-2, duration=10, downsampling=1, verbose=True):
+def findStopsGlobal(track, diameter=20, duration=60, downsampling=1, verbose=True):
     '''Find stop points in a track based on two parameters:
         Maximal size of a stop (as the diameter of enclosing circle, 
         in ground units) and minimal time duration (in seconds)
@@ -289,6 +292,115 @@ def findStopsGlobal(track, diameter=2e-2, duration=10, downsampling=1, verbose=T
         TMP_STD_X.append(portion.operate(Operator.Operator.STDDEV, 'x'))
         TMP_STD_Y.append(portion.operate(Operator.Operator.STDDEV, 'y'))
         TMP_STD_Z.append(portion.operate(Operator.Operator.STDDEV, 'z'))
+        TMP_IDSTART.append(segmentation[i]*downsampling)
+        TMP_IDEND.append((segmentation[i+1]-1)*downsampling)
+        TMP_NBPOINTS.append(segmentation[i+1]-segmentation[i])
+        TMP_DURATION.append(portion.duration())
+
+    
+    if stops.size() == 0:
+        return stops
+        
+    stops.createAnalyticalFeature("radius", TMP_RADIUS)
+    stops.createAnalyticalFeature("mean_x", TMP_MEAN_X)
+    stops.createAnalyticalFeature("mean_y", TMP_MEAN_Y)
+    stops.createAnalyticalFeature("mean_z", TMP_MEAN_Z)
+    stops.createAnalyticalFeature("id_ini", TMP_IDSTART)
+    stops.createAnalyticalFeature("id_end", TMP_IDEND)
+    stops.createAnalyticalFeature("sigma_x", TMP_STD_X)
+    stops.createAnalyticalFeature("sigma_y", TMP_STD_Y)
+    stops.createAnalyticalFeature("sigma_z", TMP_STD_Z)
+    stops.createAnalyticalFeature("duration", TMP_DURATION)
+    stops.createAnalyticalFeature("nb_points", TMP_NBPOINTS)
+	
+    stops.operate(Operator.Operator.QUAD_ADDER, "sigma_x", "sigma_y", "rmse")
+    stops.base = track.base	
+	
+    return stops
+	
+def findStopsGlobalForRTK(track, std_max=2e-2, duration=5, downsampling=1, verbose=True):
+    '''Find stop points in a track based on two parameters:
+        Maximal size of a stop (as the standard deviation per axis, 
+        in ground units) and minimal time duration (in seconds)
+        Use downsampling parameter > 1 to speed up the process
+		Default is set for precise RTK GNSS survey (2 cm for 5 sec)'''
+        
+    # If down-sampling is required
+    if (downsampling > 1):
+        track = track.copy()
+        track **= track.size()/downsampling
+    
+    # ---------------------------------------------------------------------------
+    # Computes cost matrix as :
+    #    Cij = 0 if sqrt(0.33*(std_x^2 + std_y^2 + std_Z^2)) > std_max 
+    #    Cij = 0 if time duration between pi and p-1 is < duration
+    #    Cij = (j-i)**2 = square of the number of points of segment otherwise
+    # ---------------------------------------------------------------------------
+    C = np.zeros((track.size(), track.size()))
+    RANGE = range(track.size()-2)
+    if verbose:
+        print("Minimal enclosing circles computation:")
+        RANGE = progressbar.progressbar(RANGE)
+    for i in RANGE:
+        for j in range(i+1, track.size()-1):
+            if (track[i].distanceTo(track[j-1]) > 3*std_max):
+                C[i,j] = 0
+                break
+            if (track[j-1].timestamp - track[i].timestamp <= duration):
+                C[i,j] = 0
+                continue
+            portion = track.extract(i,j-1)
+            varx = portion.operate(Operator.Operator.VARIANCE, "x")
+            vary = portion.operate(Operator.Operator.VARIANCE, "y")
+            varz = portion.operate(Operator.Operator.VARIANCE, "z")
+            C[i,j] = math.sqrt(varx + vary + varz)
+            C[i,j] = (C[i,j] < std_max)*(j-i)**2
+    C = C + np.transpose(C)
+    
+    # ---------------------------------------------------------------------------
+    # Computes optimal partition with dynamic programing
+    # ---------------------------------------------------------------------------
+    segmentation = optimalPartition(C, MODE_SEGMENTATION_MAXIMIZE, verbose)
+    
+    stops = core_track.Track()
+    
+    TMP_RADIUS = []
+    TMP_MEAN_X = []
+    TMP_MEAN_Y = []
+    TMP_MEAN_Z = []
+    TMP_IDSTART = []
+    TMP_IDEND = []
+    TMP_STD_X = []
+    TMP_STD_Y = []
+    TMP_STD_Z = []
+    TMP_DURATION = []
+    TMP_NBPOINTS = []
+    
+    for i in range(len(segmentation)-1):
+        portion = track.extract(segmentation[i], segmentation[i+1]-1)
+
+        radius = C[segmentation[i],segmentation[i+1]]
+        if  radius == 0:
+            continue
+
+        xm = portion.operate(Operator.Operator.AVERAGER, 'x')
+        ym = portion.operate(Operator.Operator.AVERAGER, 'y')
+        zm = portion.operate(Operator.Operator.AVERAGER, 'z')
+		
+        xv = portion.operate(Operator.Operator.VARIANCE, 'x')
+        yv = portion.operate(Operator.Operator.VARIANCE, 'y')
+        zv = portion.operate(Operator.Operator.VARIANCE, 'z')
+ 		
+        pt = portion[0].position.copy(); pt.setX(xm); pt.setY(ym); pt.setZ(zm)
+        stops.addObs(Obs(pt, portion[0].timestamp))
+
+        TMP_RADIUS.append(math.sqrt(xv+yv+zv))
+        TMP_MEAN_X.append(xm)
+        TMP_MEAN_Y.append(ym)
+        TMP_MEAN_Z.append(zm)
+        TMP_STD_X.append(xv**0.5)
+        TMP_STD_Y.append(yv**0.5)
+        TMP_STD_Z.append(zv**0.5)
         TMP_IDSTART.append(segmentation[i]*downsampling)
         TMP_IDEND.append((segmentation[i+1]-1)*downsampling)
         TMP_NBPOINTS.append(segmentation[i+1]-segmentation[i])
