@@ -19,13 +19,20 @@ from heapq import heapify, heappush, heappop
 
 
 # =============================================================================
-#   Gestion des valeurs non renseignées et non calculées
-#   
+#   Gestion des valeurs non renseignées et non calculées  
 # =============================================================================
+
 NAN = float('nan')
 
 def isnan(number):
     return number != number
+
+def isfloat(value):
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
 
 # Make to list if needed
 def listify(input):
@@ -350,12 +357,4 @@ class priority_dict(dict):
         
         while self:
             yield self.pop_smallest()
-
-
-
-
-
-
-
-
-
+			

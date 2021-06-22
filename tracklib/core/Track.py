@@ -16,7 +16,7 @@ import tracklib.core.Operator as Operator
 import tracklib.core.Kernel as Kernel
 from tracklib.core.TrackCollection import TrackCollection
 
-import tracklib.core.Utils as utils
+import tracklib.core.Utils as Utils
 import tracklib.algo.Analytics as algoAF
 import tracklib.algo.Geometrics as Geometrics
 import tracklib.algo.Mapping as Mapping
@@ -27,6 +27,7 @@ import tracklib.algo.Interpolation as Interpolation
 import tracklib.algo.Simplification as Simplification
 
 import tracklib.core.Plot as Plot
+
 
 
 class Track:
@@ -281,7 +282,7 @@ class Track:
         return af_name in self.__analyticalFeaturesDico
 
     def getAnalyticalFeatures(self, af_names): 
-        af_names = utils.listify(af_names) 
+        af_names = Utils.listify(af_names) 
         output = []
         for af in af_names:
             output.append(self.getAnalyticalFeature(af))
@@ -317,7 +318,7 @@ class Track:
         return AF    
   
     def getObsAnalyticalFeatures(self, af_names, i):
-        af_names = utils.listify(af_names)
+        af_names = Utils.listify(af_names)
         output = []
         for af in af_names:
             output.append(self.getObsAnalyticalFeature(af, i))
@@ -712,7 +713,7 @@ class Track:
             try:
                 value = algorithm(self, i)
             except IndexError:
-                value = utils.NAN
+                value = Utils.NAN
             self.getObs(i).features[idAF] = value
         return self.getAnalyticalFeature(name)
     
@@ -1107,7 +1108,7 @@ class Track:
     def __condition(val1, operator, val2):
 
         if operator == "LIKE":
-            return utils.compLike(str(val1), val2)
+            return Utils.compLike(str(val1), val2)
 
         if isinstance(val1, int):
             val2 = int(val2)
@@ -1244,8 +1245,143 @@ class Track:
 
             return OUTPUT            
    
+    # ------------------------------------------------------------ 
+    #   Applying operators through algebraic expressions
+    # ------------------------------------------------------------
+    
+    def __makeRPN(expression):
+        s = expression
+        for operator in ["=", "+-", "*/", "^", "@"]:
+            depth = 0
+            for p in range(len(s) - 1, -1, -1):
+                if s[p] == ')': depth += 1
+                if s[p] == '(': depth -= 1
+                if not depth and s[p] in operator:
+                    return (Track.__makeRPN(s[:p]) + Track.__makeRPN(s[p+1:])) + [s[p]]
+        s = s.strip()
+        if s[0] == '(':
+            return Track.__makeRPN(s[1:-1])
+        return [s]  
 
-  
+    def __applyOperation(self, op1, op2, operator, temp_af_counter):
+	
+        # Handling special case of affectation
+        if operator == "=":
+            if self.hasAnalyticalFeature(op2):
+                if self.hasAnalyticalFeature(op1):
+                    AF = self.getAnalyticalFeature(op2)
+                    self.removeAnalyticalFeature(op1)
+                    self.createAnalyticalFeature(op1, AF)
+                else:
+                    self.createAnalyticalFeature(op1, self.getAnalyticalFeature(op2))
+            else:
+                self.createAnalyticalFeature(op1, float(op2))
+            return
+        
+		# Floating point operation
+        if Utils.isfloat(op1) and Utils.isfloat(op2):
+            op1 = float(op1)
+            op2 = float(op2)
+            if operator == "+":
+                return op1 + op2
+            if operator == "-":
+                return op1 - op2
+            if operator == "*":
+                return op1 * op2
+            if operator == "/":
+                return op1 / op2
+            if operator == "^":
+                return op1 ^ op2
+
+		# Functional operator
+        if operator == "@":
+            out_af = "#"+str(temp_af_counter)
+            if op1 == "I": 
+                self.operate(Operator.Operator.INTEGRATOR, op2, out_af)
+                return out_af
+            if op1 == "D": 
+                self.operate(Operator.Operator.DIFFERENTIATOR, op2, out_af)
+                return out_af
+            if op1 == "D2": 
+                self.operate(Operator.Operator.SECOND_ORDER_FINITE_DIFFERENCE, op2, out_af)
+                return out_af
+            print("Function '"+op1+ "' is unknwon")
+            exit(1)
+
+        op1IsAF = self.hasAnalyticalFeature(op1)
+        op2IsAF = self.hasAnalyticalFeature(op2)
+
+        # [AF operator AF] case
+        if op1IsAF and op2IsAF:
+            out_af = "#"+str(temp_af_counter)
+            if operator == "+":
+                self.operate(Operator.Operator.ADDER, op1, op2, out_af)
+            if operator == "-":
+                self.operate(Operator.Operator.SUBSTRACTER, op1, op2, out_af)
+            if operator == "*":
+                self.operate(Operator.Operator.MULTIPLIER, op1, op2, out_af)
+            if operator == "/":
+                self.operate(Operator.Operator.DIVIDER, op1, op2, out_af)
+            if operator == "^":
+                self.operate(Operator.Operator.POWER, op1, op2, out_af)
+            return out_af 
+
+        # [AF operator float] case
+        if (op1IsAF and not op2IsAF):	
+            out_af = "#"+str(temp_af_counter)
+            if operator == "+":
+                self.operate(Operator.Operator.SCALAR_ADDER, op1, op2, out_af)
+            if operator == "-":
+                self.operate(Operator.Operator.SCALAR_SUBSTRACTER, op1, op2, out_af)
+            if operator == "*":
+                self.operate(Operator.Operator.MULTIPLIER, op1, op2, out_af)
+            if operator == "/":
+                self.operate(Operator.Operator.DIVIDER, op1, op2, out_af)
+            if operator == "^":
+                self.operate(Operator.Operator.POWER, op1, op2, out_af)
+            return out_af   
+
+        # [float operator AF] case
+        if (op2IsAF and not op1IsAF):		
+            out_af = "#"+str(temp_af_counter)
+            if operator == "+":
+                self.operate(Operator.Operator.SCALAR_ADDER, op2, float(op1), out_af)
+            if operator == "-":
+                self.operate(Operator.Operator.SCALAR_SUBSTRACTER, op2, float(op1), out_af)
+                self.operate(Operator.Operator.INVERTER, out_af)
+            if operator == "*":
+                self.operate(Operator.Operator.SCALAR_MULTIPLIER, op2, float(op1), out_af)
+            if operator == "/":
+                self.operate(Operator.Operator.SCALAR_DIVIDER, op2, float(op1), out_af)
+                self.operate(Operator.Operator.INVERSER, out_af)
+            if operator == "^":
+                f = lambda x: float(op1)^x
+                return track.operate(Operator.APPLY, af_input, f, af_output)
+            return out_af 			
+
+        print("Invalid operator "+str(operator)+ " for operands "+str(op1)+ " and "+str(op2))
+        exit(1)		
+		
+    def __evaluateRPN(self, expression, external=[]):
+        stack = []
+        operators = ["=", "+", "-", "*", "/", "^", "@"]
+        temp_af_counter = 0
+        for e in expression:
+            # print("STACK = ", stack)   # DEBUG LINE
+            if e in operators:
+                operand2 = stack.pop()
+                operand1 = stack.pop()
+                stack.append(self.__applyOperation(operand1, operand2, e, temp_af_counter))
+                temp_af_counter += 1
+                continue
+            if e in external:
+                e = external[e]
+            stack.append(e)
+        return expression
+
+    def evaluate(self, expression, external=[]):
+        return self.__evaluateRPN(Track.__makeRPN(expression), external)
+      
     # ------------------------------------------------------------
     # Rotation of 2D track (coordinates should be ENU)
     # Input: track in ENU coords and theta angle (in radians)

@@ -39,8 +39,26 @@ class ScalarVoidOperator():
     @abstractmethod
     def execute(self, track, af_input1, arg, af_output):
         sys.exit("Not yet implemented")    
+ 
     
-    
+# =============================================================================
+#   Applying operators through algebraic expressions
+# =============================================================================
+
+def makeRPN(expression):
+    s = expression
+    for operator in ["+-", "*/", "^", "@"]:
+        depth = 0
+        for p in range(len(s) - 1, -1, -1):
+            if s[p] == ')': depth += 1
+            if s[p] == '(': depth -= 1
+            if not depth and s[p] in operator:
+                return (makeRPN(s[:p]) + makeRPN(s[p+1:])) + [s[p]]
+    s = s.strip()
+    if s[0] == '(':
+        return makeRPN(s[1:-1])
+    return [s]  	
+	
 # -----------------------------------------------------------------------------
 #      UnaryVoidOperator    
 # -----------------------------------------------------------------------------
@@ -68,6 +86,48 @@ class Differentiator(UnaryVoidOperator):
         temp[0] = utils.NAN
         algoAF.addListToAF(track, af_output, temp)    
         return temp
+
+class ForwardFiniteDiff(UnaryVoidOperator):
+    def execute(self, track, af_input, af_output):
+        track.createAnalyticalFeature(af_output)
+        temp = [0]*track.size()
+        for i in range(1, track.size()):
+            temp[i] = track.getObsAnalyticalFeature(af_input, i+1) - track.getObsAnalyticalFeature(af_input, i)
+        temp[0] = utils.NAN
+        algoAF.addListToAF(track, af_output, temp)    
+        return temp
+		
+class BackwardFiniteDiff(UnaryVoidOperator):
+    def execute(self, track, af_input, af_output):
+        track.createAnalyticalFeature(af_output)
+        temp = [0]*track.size()
+        for i in range(1, track.size()):
+            temp[i] = track.getObsAnalyticalFeature(af_input, i+1) - track.getObsAnalyticalFeature(af_input, i)
+        temp[0] = utils.NAN
+        algoAF.addListToAF(track, af_output, temp)    
+        return temp
+		
+class CenteredFiniteDiff(UnaryVoidOperator):
+    def execute(self, track, af_input, af_output):
+        track.createAnalyticalFeature(af_output)
+        temp = [0]*track.size()
+        for i in range(1, track.size()):
+            temp[i] = track.getObsAnalyticalFeature(af_input, i+1) - track.getObsAnalyticalFeature(af_input, i-1)
+        temp[0] = utils.NAN
+        algoAF.addListToAF(track, af_output, temp)    
+        return temp
+		
+class SecondOrderFiniteDiff(UnaryVoidOperator):
+    def execute(self, track, af_input, af_output):
+        track.createAnalyticalFeature(af_output)
+        temp = [0]*track.size()
+        for i in range(1, track.size()):
+            temp[i]  =   track.getObsAnalyticalFeature(af_input, i+1) 
+            temp[i] -= 2*track.getObsAnalyticalFeature(af_input, i)
+            temp[i] +=   track.getObsAnalyticalFeature(af_input, i-1)
+        temp[0] = utils.NAN
+        algoAF.addListToAF(track, af_output, temp)    
+        return temp
             
 class ShiftRight(UnaryVoidOperator):
     def execute(self, track, af_input, af_output):
@@ -80,6 +140,11 @@ class ShiftLeft(UnaryVoidOperator):
 class Inverter(UnaryVoidOperator):
     def execute(self, track, af_input, af_output):
         f = lambda x: -x
+        return track.operate(Operator.APPLY, af_input, f, af_output)
+		
+class Inverser(UnaryVoidOperator):
+    def execute(self, track, af_input, af_output):
+        f = lambda x: 1.0/x
         return track.operate(Operator.APPLY, af_input, f, af_output)
             
 class Rectifier(UnaryVoidOperator):
@@ -487,6 +552,15 @@ class ScalarAdder(ScalarVoidOperator):
             temp[i]  = track.getObsAnalyticalFeature(af_input, i) + number
         algoAF.addListToAF(track, af_output, temp)
         return temp
+		
+class ScalarSubstracter(ScalarVoidOperator):
+    def execute(self, track, af_input, number, af_output):
+        track.createAnalyticalFeature(af_output)
+        temp = [0]*track.size()
+        for i in range(0, track.size()):
+            temp[i]  = track.getObsAnalyticalFeature(af_input, i) - number
+        algoAF.addListToAF(track, af_output, temp)
+        return temp
         
 class ScalarMuliplier(ScalarVoidOperator):
     def execute(self, track, af_input, number, af_output):
@@ -637,72 +711,80 @@ class Random(ScalarVoidOperator):
 class Operator:
     
     # Unary void operator
-    IDENTITY = Identity()                        # y(t) = x(t)
-    RECTIFIER = Rectifier()                      # y(t) = |x(t)|
-    INTEGRATOR = Integrator()                    # y(t) = y(t-1) + y(t) 
-    SHIFT_RIGHT = ShiftRight()                   # y(t) = x(t-1)
-    SHIFT_LEFT = ShiftLeft()                     # y(t) = x(t+1)
-    INVERTER = Inverter()                        # y(t) = -x(t)
-    DEBIASER = Debiaser()                        # y(t) = x(t) - mean(x)
-    SQUARE = Square()                             # y(t) = x(t)*x(t)
-    SQRT = Sqrt()                                 # y(t) = x(t)**(0.5)
-    NORMALIZER = Normalizer()                     # y(t) = (x(t) - mean(x))/sigma(x)
-    DIFFERENTIATOR = Differentiator()            # y(t) = x(t) - x(t-1)
-    DIODE = Diode()                                 # y(t) = 1[x>0] * x(t)
-    SIGN = Sign()                                 # y(t) = x(t)/|x(t)|
-    EXP = Exp()                                     # y(t) = exp(x(t))
-    LOG = Log()                                     # y(t) = log(x(t))
+    IDENTITY = Identity()                                  # y(t) = x(t)
+    RECTIFIER = Rectifier()                                # y(t) = |x(t)|
+    INTEGRATOR = Integrator()                              # y(t) = y(t-1) + y(t) 
+    SHIFT_RIGHT = ShiftRight()                             # y(t) = x(t-1)
+    SHIFT_LEFT = ShiftLeft()                               # y(t) = x(t+1)
+    INVERTER = Inverter()                                  # y(t) = -x(t)
+    INVERSER = Inverser()                                  # y(t) = 1/x(t)
+    DEBIASER = Debiaser()                                  # y(t) = x(t) - mean(x)
+    SQUARE = Square()                                      # y(t) = x(t)*x(t)
+    SQRT = Sqrt()                                          # y(t) = x(t)**(0.5)
+    NORMALIZER = Normalizer()                              # y(t) = (x(t) - mean(x))/sigma(x)
+    DIFFERENTIATOR = Differentiator()                      # y(t) = x(t) - x(t-1)
+    BACKWARD_FINITE_DIFF = BackwardFiniteDiff()            # y(t) = x(t) - x(t-1)
+    FORWARD_FINITE_DIFF = ForwardFiniteDiff()              # y(t) = x(t+1) - x(t)
+    CENTERED_FINITE_DIFF = CenteredFiniteDiff()            # y(t) = x(t+1) - x(t-1)
+    SECOND_ORDER_FINITE_DIFF = SecondOrderFiniteDiff()     # y(t) = x(t+1) - x(t-1)
+    DIFFERENTIATOR = Differentiator()                      # y(t) = x(t) - x(t-1)
+    DIFFERENTIATOR = Differentiator()                      # y(t) = x(t) - x(t-1)
+    DIODE = Diode()                                        # y(t) = 1[x>0] * x(t)
+    SIGN = Sign()                                          # y(t) = x(t)/|x(t)|
+    EXP = Exp()                                            # y(t) = exp(x(t))
+    LOG = Log()                                            # y(t) = log(x(t))
     
     # Binary void operator
-    ADDER = Adder()                              # y(t) = x1(t) + x2(t)
-    SUBSTRACTER = Substracter()                  # y(t) = x1(t) - x2(t)
-    MULTIPLIER = Multiplier()                     # y(t) = x1(t) * x2(t)
-    DIVIDER = Divider()                             # y(t) = x1(t) / x2(t)
-    POWER = Power()                                 # y(t) = x1(t) ** x2(t)
-    QUAD_ADDER = QuadraticAdder()                # y(t) = (x1(t)**2 + x2(t)**2)**0.5
-    RENORMALIZER = Renormalizer()                 # y(t) = (x1(t)-m(x1))* s(x2)/s(x1) + m(x2)
-    DERIVATOR = Derivator()                      # y(t) = (x1(t)-x1(t-1))/(x2(t)-x2(t-1)) = dx1/dx2
-    POINTWISE_EQUALER = PointwiseEqualer()       # y(t) = 1 if x1(t)=x2(t), 0 otherwise
-    CONVOLUTION = Convolution()                     # y(t) = int(x1(h)*x2(t-h)dh)
+    ADDER = Adder()                                        # y(t) = x1(t) + x2(t)
+    SUBSTRACTER = Substracter()                            # y(t) = x1(t) - x2(t)
+    MULTIPLIER = Multiplier()                              # y(t) = x1(t) * x2(t)
+    DIVIDER = Divider()                                    # y(t) = x1(t) / x2(t)
+    POWER = Power()                                        # y(t) = x1(t) ** x2(t)
+    QUAD_ADDER = QuadraticAdder()                          # y(t) = (x1(t)**2 + x2(t)**2)**0.5
+    RENORMALIZER = Renormalizer()                          # y(t) = (x1(t)-m(x1))* s(x2)/s(x1) + m(x2)
+    DERIVATOR = Derivator()                                # y(t) = (x1(t)-x1(t-1))/(x2(t)-x2(t-1)) = dx1/dx2
+    POINTWISE_EQUALER = PointwiseEqualer()                 # y(t) = 1 if x1(t)=x2(t), 0 otherwise
+    CONVOLUTION = Convolution()                            # y(t) = int(x1(h)*x2(t-h)dh)
     
     # Unary operator
-    SUM = Sum()                                     # y = sum(x)
-    AVERAGER = Averager()                         # y = mean(x)
-    VARIANCE = Variance()                         # y = Var(x)
-    STDDEV = StdDev()                             # y = sqrt(Var(x))
-    MSE = Mse()                                     # y = mean(x**2)
-    RMSE = Rmse()                                 # y = sqrt(mean(x**2))
-    MAD = Mad()                                      # y = median(|x|)
-    MIN = Min()                                     # y = min(x)
-    MAX = Max()                                     # y = max(x)
-    MEDIAN = Median()                             # y = median(x)
-    ARGMIN = Argmin()                             # y = min {t | x(t) = min(x)}
-    ARGMAX = Argmax()                             # y = min {t | x(t) = max(x)}
-    ZEROS = Zeros()                                 # y = {t | x(t) = 0}
-    
-    # Binary operator
-    COVARIANCE = Covariance()                     # y = m[x1x2] - m[x1]*m[x2]
-    CORRELATOR = Correlator()                     # y = cov(x1,x2)/(sigma(x1)*sigma(x2))
-    L0 = L0Diff()                                 # y = #{t | x1(t) != x2(t)}
-    L1 = L1Diff()                                 # y = mean(|x1(t)-x2(t)|)
-    L2 = L2Diff()                                 # y = mean(|x1(t)-x2(t)|**2)
-    LINF = LInfDiff()                             # y = max(|x1(t)-x2(t)|)
-    EQUAL = Equal()                              # y = 1 if {x1(t) = x2(t) for all t}
+    SUM = Sum()                                            # y = sum(x)
+    AVERAGER = Averager()                                  # y = mean(x)
+    VARIANCE = Variance()                                  # y = Var(x)
+    STDDEV = StdDev()                                      # y = sqrt(Var(x))
+    MSE = Mse()                                            # y = mean(x**2)
+    RMSE = Rmse()                                          # y = sqrt(mean(x**2))
+    MAD = Mad()                                            # y = median(|x|)
+    MIN = Min()                                            # y = min(x)
+    MAX = Max()                                            # y = max(x)
+    MEDIAN = Median()                                      # y = median(x)
+    ARGMIN = Argmin()                                      # y = min {t | x(t) = min(x)}
+    ARGMAX = Argmax()                                      # y = min {t | x(t) = max(x)}
+    ZEROS = Zeros()                                        # y = {t | x(t) = 0}
+														   
+    # Binary operator                                      
+    COVARIANCE = Covariance()                              # y = m[x1x2] - m[x1]*m[x2]
+    CORRELATOR = Correlator()                              # y = cov(x1,x2)/(sigma(x1)*sigma(x2))
+    L0 = L0Diff()                                          # y = #{t | x1(t) != x2(t)}
+    L1 = L1Diff()                                          # y = mean(|x1(t)-x2(t)|)
+    L2 = L2Diff()                                          # y = mean(|x1(t)-x2(t)|**2)
+    LINF = LInfDiff()                                      # y = max(|x1(t)-x2(t)|)
+    EQUAL = Equal()                                        # y = 1 if {x1(t) = x2(t) for all t}
     
     # Scalar operator
-    AGGREGATE = Aggregate()                         # y(t) = arg({x(t)})   (arg is a list function)
-    
-    # Scalar void operator
-    SHIFT = Shift()                                 # y(t) = x(t-arg)      (arg is a integer)
-    APPLY = Apply()                                 # y(t) = arg(x(t))     (arg is a real function)
-    SCALAR_ADDER = ScalarAdder()                 # y(t) = x(t) + arg    (arg is a numeric)
-    SCALAR_MULTIPLIER = ScalarMuliplier()         # y(t) = arg * x(t)    (arg is a numeric)
-    SCALAR_DIVIDER = ScalarDivider()              # y(t) = arg / x(t)    (arg is a numeric)
-    SCALAR_POWER = ScalarPower()                 # y(t) = arg ** x(t)   (arg is a numeric)
-    THRESHOLDER = Thresholder()                     # y(t) = 1 if x1(t) >= arg, 0 otherwise (arg is a numeric)
-    RANDOM = Random()                             # y(t) = eta(t) with eta ~ arg
-    FILTER = Filter()                             # y(t) = int[x(z)*h(t-z)dz] (arg is an odd-dimension vector or a kernel)
-    FILTER_FFT = Filter_FFT()                     # y(t) = int[x(z)*h(t-z)dz] (fast version with FFT)
+    AGGREGATE = Aggregate()                                # y(t) = arg({x(t)})   (arg is a list function)
+														   
+    # Scalar void operator                                 
+    SHIFT = Shift()                                        # y(t) = x(t-arg)      (arg is a integer)
+    APPLY = Apply()                                        # y(t) = arg(x(t))     (arg is a real function)
+    SCALAR_ADDER = ScalarAdder()                           # y(t) = x(t) + arg    (arg is a numeric)
+    SCALAR_SUBSTRACTER = ScalarSubstracter()               # y(t) = x(t) - arg    (arg is a numeric)
+    SCALAR_MULTIPLIER = ScalarMuliplier()                  # y(t) = arg * x(t)    (arg is a numeric)
+    SCALAR_DIVIDER = ScalarDivider()                       # y(t) = arg / x(t)    (arg is a numeric)
+    SCALAR_POWER = ScalarPower()                           # y(t) = arg ** x(t)   (arg is a numeric)
+    THRESHOLDER = Thresholder()                            # y(t) = 1 if x1(t) >= arg, 0 otherwise (arg is a numeric)
+    RANDOM = Random()                                      # y(t) = eta(t) with eta ~ arg
+    FILTER = Filter()                                      # y(t) = int[x(z)*h(t-z)dz] (arg is an odd-dimension vector or a kernel)
+    FILTER_FFT = Filter_FFT()                              # y(t) = int[x(z)*h(t-z)dz] (fast version with FFT)
     
 
     
