@@ -1406,8 +1406,12 @@ class Track:
         expression = expression.replace("{", "@(").replace("}", ")")
         expression = expression.replace(">>", "&").replace("<<", "$")
         for f_name in Operator.Operator.NAMES_DICT_VOID:
+            if f_name[-1] in ['+', '-', '*', '/', '^']:
+                continue
             expression = expression.replace(f_name+"(", f_name+"@(")
         for f_name in Operator.Operator.NAMES_DICT_NON_VOID:
+            if f_name[-1] in ['+', '-', '*', '/', '^']:
+                continue
             expression = expression.replace(f_name+"(", f_name+"@(")
         void = ("=" in expression)
         if not void:
@@ -1662,6 +1666,8 @@ class Track:
     # ------------------------------------------------------------
     # [[n]] Get and set obs number n (or AF vector with name n)
 	# If n is tuple ["af", index] or [index, "af"]
+	# If argument is a string starting with "$", it's interpreted
+	# as an algebraic operation on analytical features.
     # ------------------------------------------------------------    
     def __getitem__(self, n):
         if isinstance(n, tuple):
@@ -1670,7 +1676,12 @@ class Track:
             else: 
                 return self.getObsAnalyticalFeature(n[1], n[0])
         if isinstance(n, str):
-            return self.getAnalyticalFeature(n)
+            n = n.strip()
+            if n[0] == "$":
+                return self.operate(n[1:])
+            else:
+                return self.getAnalyticalFeature(n)
+		
         return self.__POINTS[n]  
     def __setitem__(self, n, obs):
         self.__POINTS[n] = obs    
