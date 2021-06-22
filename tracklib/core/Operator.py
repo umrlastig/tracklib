@@ -190,6 +190,18 @@ class Exp(UnaryVoidOperator):
 class Log(UnaryVoidOperator):
     def execute(self, track, af_input, af_output):
         return track.operate(Operator.APPLY, af_input, math.log, af_output)
+		
+class Cos(UnaryVoidOperator):
+    def execute(self, track, af_input, af_output):
+        return track.operate(Operator.APPLY, af_input, math.cos, af_output)
+		
+class Sin(UnaryVoidOperator):
+    def execute(self, track, af_input, af_output):
+        return track.operate(Operator.APPLY, af_input, math.sin, af_output)
+		
+class Tan(UnaryVoidOperator):
+    def execute(self, track, af_input, af_output):
+        return track.operate(Operator.APPLY, af_input, math.tan, af_output)
 
 
 # -----------------------------------------------------------------------------
@@ -540,9 +552,13 @@ class Shift(ScalarVoidOperator):
             if (i-number < 0) or (i-number >= track.size()):
                 temp[i] = utils.NAN
                 continue
-            temp[i] = track.getObsAnalyticalFeature(af_input, i-number)
+            temp[i] = track.getObsAnalyticalFeature(af_input, int(i-number))
         algoAF.addListToAF(track, af_output, temp)
         return temp
+		
+class ShiftRev(ScalarVoidOperator):
+    def execute(self, track, af_input, number, af_output):
+        return track.operate(Operator.SHIFT, af_input, -number, af_output)
 
 class ScalarAdder(ScalarVoidOperator):
     def execute(self, track, af_input, number, af_output):
@@ -561,6 +577,15 @@ class ScalarSubstracter(ScalarVoidOperator):
             temp[i]  = track.getObsAnalyticalFeature(af_input, i) - number
         algoAF.addListToAF(track, af_output, temp)
         return temp
+
+class ScalarRevSubstracter(ScalarVoidOperator):
+    def execute(self, track, af_input, number, af_output):
+        track.createAnalyticalFeature(af_output)
+        temp = [0]*track.size()
+        for i in range(0, track.size()):
+            temp[i]  = number - track.getObsAnalyticalFeature(af_input, i)
+        algoAF.addListToAF(track, af_output, temp)
+        return temp
         
 class ScalarMuliplier(ScalarVoidOperator):
     def execute(self, track, af_input, number, af_output):
@@ -574,6 +599,11 @@ class ScalarMuliplier(ScalarVoidOperator):
 class ScalarDivider(ScalarVoidOperator):
     def execute(self, track, af_input, number, af_output):
         return track.operate(Operator.SCALAR_MULTIPLIER, af_input, 1.0/number, af_output)
+		
+class ScalarRevDivider(ScalarVoidOperator):
+    def execute(self, track, af_input, number, af_output):
+        track.operate(Operator.SCALAR_INVERSER, af_input, af_output)
+        return track.operate(Operator.SCALAR_MULTIPLIER, af_output, number, af_output)
         
 class ScalarPower(ScalarVoidOperator):
     def execute(self, track, af_input, number, af_output):
@@ -581,6 +611,15 @@ class ScalarPower(ScalarVoidOperator):
         temp = [0]*track.size()
         for i in range(0, track.size()):
             temp[i]  = track.getObsAnalyticalFeature(af_input, i) ** number
+        algoAF.addListToAF(track, af_output, temp)
+        return temp
+		
+class ScalarRevPower(ScalarVoidOperator):
+    def execute(self, track, af_input, number, af_output):
+        track.createAnalyticalFeature(af_output)
+        temp = [0]*track.size()
+        for i in range(0, track.size()):
+            temp[i]  = number**track.getObsAnalyticalFeature(af_input, i)
         algoAF.addListToAF(track, af_output, temp)
         return temp
         
@@ -727,12 +766,13 @@ class Operator:
     FORWARD_FINITE_DIFF = ForwardFiniteDiff()              # y(t) = x(t+1) - x(t)
     CENTERED_FINITE_DIFF = CenteredFiniteDiff()            # y(t) = x(t+1) - x(t-1)
     SECOND_ORDER_FINITE_DIFF = SecondOrderFiniteDiff()     # y(t) = x(t+1) - x(t-1)
-    DIFFERENTIATOR = Differentiator()                      # y(t) = x(t) - x(t-1)
-    DIFFERENTIATOR = Differentiator()                      # y(t) = x(t) - x(t-1)
     DIODE = Diode()                                        # y(t) = 1[x>0] * x(t)
     SIGN = Sign()                                          # y(t) = x(t)/|x(t)|
     EXP = Exp()                                            # y(t) = exp(x(t))
     LOG = Log()                                            # y(t) = log(x(t))
+    COS = Cos()                                            # y(t) = cos(x(t))
+    SIN = Sin()                                            # y(t) = sin(x(t))
+    TAN = Tan()                                            # y(t) = tan(x(t))
     
     # Binary void operator
     ADDER = Adder()                                        # y(t) = x1(t) + x2(t)
@@ -773,18 +813,76 @@ class Operator:
     # Scalar operator
     AGGREGATE = Aggregate()                                # y(t) = arg({x(t)})   (arg is a list function)
 														   
-    # Scalar void operator                                 
+    # Scalar void operator    
+    APPLY = Apply()                                        # y(t) = arg(x(t))     (arg is a real function)	
     SHIFT = Shift()                                        # y(t) = x(t-arg)      (arg is a integer)
-    APPLY = Apply()                                        # y(t) = arg(x(t))     (arg is a real function)
+    SHIFT_REV = ShiftRev()                                 # y(t) = x(t+arg)      (arg is a integer)
     SCALAR_ADDER = ScalarAdder()                           # y(t) = x(t) + arg    (arg is a numeric)
     SCALAR_SUBSTRACTER = ScalarSubstracter()               # y(t) = x(t) - arg    (arg is a numeric)
     SCALAR_MULTIPLIER = ScalarMuliplier()                  # y(t) = arg * x(t)    (arg is a numeric)
-    SCALAR_DIVIDER = ScalarDivider()                       # y(t) = arg / x(t)    (arg is a numeric)
-    SCALAR_POWER = ScalarPower()                           # y(t) = arg ** x(t)   (arg is a numeric)
+    SCALAR_DIVIDER = ScalarDivider()                       # y(t) = x(t) / arg    (arg is a numeric)
+    SCALAR_POWER = ScalarPower()                           # y(t) = x(t) ** arg   (arg is a numeric)
+    SCALAR_REV_SUBSTRACTER = ScalarRevSubstracter()        # y(t) = arg - x(t)    (arg is a numeric)
+    SCALAR_REV_DIVIDER = ScalarRevDivider()                # y(t) = arg / x(t)    (arg is a numeric)
+    SCALAR_REV_POWER = ScalarRevPower()                    # y(t) = arg ** x(t)   (arg is a numeric)
     THRESHOLDER = Thresholder()                            # y(t) = 1 if x1(t) >= arg, 0 otherwise (arg is a numeric)
     RANDOM = Random()                                      # y(t) = eta(t) with eta ~ arg
     FILTER = Filter()                                      # y(t) = int[x(z)*h(t-z)dz] (arg is an odd-dimension vector or a kernel)
     FILTER_FFT = Filter_FFT()                              # y(t) = int[x(z)*h(t-z)dz] (fast version with FFT)
     
+	# --------------------------------------------
+    # Short-cut names for algebraic expression
+	# --------------------------------------------
+    NAMES_DICT_VOID = {
+	
+		# Unary void operators
+        "I"     : INTEGRATOR, 
+        "D"     : DIFFERENTIATOR,
+        "D2"    : SECOND_ORDER_FINITE_DIFF,
+		"LOG"   : LOG,
+		"ABS"   : RECTIFIER,
+        "SQRT"  : SQRT,
+		"DIODE" : DIODE,
+		"SIGN"  : SIGN,
+		"EXP"   : EXP,
+		"COS"   : COS,
+		"SIN"   : SIN,
+		"TAN"   : TAN,
 
-    
+		
+		# Binary operators	
+		"+"    : ADDER,
+		"-"    : SUBSTRACTER,
+		"*"    : MULTIPLIER,
+		"/"    : DIVIDER,
+		"^"    : POWER,
+		
+	    "s+"    : SCALAR_ADDER,
+		"s-"    : SCALAR_SUBSTRACTER,
+		"s*"    : SCALAR_MULTIPLIER,
+		"s/"    : SCALAR_DIVIDER,
+		"s^"    : SCALAR_POWER,
+	    "s&"    : SHIFT,
+	    "s$"    : SHIFT_REV,
+			
+	    "sr+"    : SCALAR_ADDER,
+		"sr-"    : SCALAR_REV_SUBSTRACTER,
+		"sr*"    : SCALAR_MULTIPLIER,
+		"sr/"    : SCALAR_REV_DIVIDER,
+		"sr^"    : SCALAR_REV_POWER}
+		
+    NAMES_DICT_NON_VOID = {
+	
+		# Unary operators
+        "SUM"    : SUM, 
+        "AVG"    : AVERAGER,
+        "VAR"    : VARIANCE,
+		"STD"    : STDDEV,
+		"MSE"    : MSE,
+        "RMSE"   : RMSE,
+		"MAD"    : MAD,
+        "MIN"    : MIN, 
+        "MAX"    : MAX,
+        "MEDIAN" : MEDIAN,
+		"ARGMIN" : ARGMIN,
+		"ARGMAX" : ARGMAX}
