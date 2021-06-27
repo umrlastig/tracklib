@@ -662,13 +662,18 @@ class Track:
         track.__transmitAF(self)
         return track
         
-    
-    def extractSpanTime(self, tini, tfin):
+
+    def extractSpanTime(self, tini, tfin=None):
         '''
         Extract span time from a track
         tini: Initial time of extraction
         tfin: final time of extraction
         '''
+		
+        # Special case: track passed as input
+        if isinstance(tini, Track) and (tfin is None):
+            return self.extractSpanTime(tini[0].timestamp, tini[-1].timestamp)
+            			
         if (tini > tfin):
             ttemp = tini
             tini = tfin
@@ -1433,6 +1438,25 @@ class Track:
             exit()
         for i in range(self.size()):
             self.getObs(i).position.rotate(theta)
+			
+    # ------------------------------------------------------------
+    # Rotation of 3D track (coordinates should be ENU/ECEF)
+    # Input: 
+	#   - track in ENU/ECEF coords
+	#   - 3x3 rotation matrix
+    # Output: rotated track (in ENU/ECEF coords)
+    # ------------------------------------------------------------  
+    def rotate3D(self, R):
+        if not (self.getSRID() in ["ENU", "ECEF"]):
+            print("Error: track to scale must be in ENU/ECEF coordinates")
+            exit()
+        for i in range(self.size()):
+            x = self.getObs(i).position.getX()
+            y = self.getObs(i).position.getY()
+            z = self.getObs(i).position.getZ()
+            self.getObs(i).position.setX(R[0,0]*x + R[0,1]*y + R[0,2]*z)
+            self.getObs(i).position.setY(R[1,0]*x + R[1,1]*y + R[1,2]*z)
+            self.getObs(i).position.setZ(R[2,0]*x + R[2,1]*y + R[2,2]*z)
 
     # ------------------------------------------------------------
     # Homothetic transformation of 2D track (coordinates in ENU)
@@ -1445,9 +1469,35 @@ class Track:
             exit()
         for i in range(self.size()):
             self.getObs(i).position.scale(h)
+			
+
+    # ------------------------------------------------------------
+    # Homothetic transformation of 3D track (coords in ENU/ECEF)
+    # Input: 
+	#   - track in ENU/ECEF coords
+	#   - h homothetic ratio
+	#   - center in ENU/ECEF coords (default is centroid)
+    # Output: scaled track (in ENU coords)
+    # ------------------------------------------------------------  
+    def scale3D(self, h, center=None):
+        if not (self.getSRID() in ["ENU", "ECEF"]):
+            print("Error: track to scale must be in ENU/ECEF coordinates")
+            exit()
+        if center is None:
+            center = self.getCentroid()
+        cx = center.getX()
+        cy = center.getY()
+        cz = center.getZ()
+        for i in range(self.size()):
+            x = self.getObs(i).position.getX()
+            y = self.getObs(i).position.getY()
+            z = self.getObs(i).position.getZ()
+            self.getObs(i).position.setX(cx + h*(x-cx))
+            self.getObs(i).position.setY(cy + h*(y-cy))
+            self.getObs(i).position.setZ(cz + h*(z-cz))
             
     # ------------------------------------------------------------
-    # Translation of 2D track (coordinates in ENU)
+    # Translation of 3D track (coordinates in ENU)
     # Input: track in ENU coords and tx, ty translation parameters
     # Output: translated track (in ENU coords)
     # ------------------------------------------------------------  
@@ -1457,8 +1507,25 @@ class Track:
             exit()
         for i in range(self.size()):
             self.getObs(i).position.translate(tx, ty, tz)
-        
-                
+
+    # ------------------------------------------------------------
+    # Symmetric transformation of 2D track based on an axis x=c, 
+	# y=c or z=c. Track must be provided in ENU or ECEF coords
+    # Input: dimension (x=0, y=1, z=2) and value c (default 0).
+    # Output: translated track (in ENU r ECEF coords)
+    # ------------------------------------------------------------  
+    def symmetrize(self, dim, val=0):
+        if not (self.getSRID() in ["ENU", "ECEF"]):
+            print("Error: track to scale must be in ENU/ECEF coordinates")
+            exit()
+        for i in range(self.size()):
+            if (dim == 0) or (dim in ["x", "X", "E"]):
+                self.getObs(i).position.setX(val-self.getObs(i).position.getX())        
+            if (dim == 1) or (dim in ["y", "Y", "N"]):
+                self.getObs(i).position.setY(val-self.getObs(i).position.getY())  
+            if (dim == 2) or (dim in ["z", "Z", "U"]):
+                self.getObs(i).position.setZ(val-self.getObs(i).position.getZ())    
+				
     # ------------------------------------------------------------
     # Removal of idle points at the begining or end of track
     # Input: parameter to set and mode in "begin" or "end"
