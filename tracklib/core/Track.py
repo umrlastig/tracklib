@@ -795,12 +795,17 @@ class Track:
     #     track.operate("A=A/factor", {'factor' : var}])
     # -------------------------------------------------------------------------		
     def operate(self, operator, arg1=None, arg2=None, arg3=None):
-	
+
         # Algebraic expression (arg1 = list of externals)
         if isinstance(operator, str):
             if arg1 is None:
                 arg1 = []
-            return self.__evaluate(operator, arg1)		
+            output = self.__evaluate(operator, arg1)	
+            SUPPRESS_AF = self.getListAnalyticalFeatures()
+            for af in SUPPRESS_AF:
+                if (af[0] == "#"):
+                    self.removeAnalyticalFeature(af)     
+            return output			
 		
         # UnaryOperator
         if (isinstance(operator, Operator.UnaryOperator)):
@@ -1355,12 +1360,14 @@ class Track:
 
 		# Functional operator
         if operator == "@":
+            out_af = "#"+str(temp_af_counter)
             if op1 in Operator.Operator.NAMES_DICT_VOID:
-                out_af = "#"+str(temp_af_counter)
                 self.operate(Operator.Operator.NAMES_DICT_VOID[op1], op2, out_af)
                 return out_af
             if op1 in Operator.Operator.NAMES_DICT_NON_VOID:
-                return self.operate(Operator.Operator.NAMES_DICT_NON_VOID[op1], op2)			
+                out = self.operate(Operator.Operator.NAMES_DICT_NON_VOID[op1], op2)
+                self.createAnalyticalFeature(out_af, [out]*self.size())
+                return out_af			
             print("Function '"+op1+ "' is unknown")
             exit(1)                
 
@@ -1744,10 +1751,11 @@ class Track:
                 return self.getObsAnalyticalFeature(n[1], n[0])
         if isinstance(n, str):
             n = n.strip()
-            if n[0] == "$":
-                return self.operate(n[1:])
-            else:
-                return self.getAnalyticalFeature(n)
+            if ("+" in n) or ("-" in n) or ("/" in n) or ("*" in n) or ("^" in n):
+                return self.operate(n)		
+            if (">>" in n) or ("<<" in n) or ("(" in n) or (")" in n):	
+                return self.operate(n)				
+            return self.getAnalyticalFeature(n)
 		
         return self.__POINTS[n]  
     def __setitem__(self, n, obs):

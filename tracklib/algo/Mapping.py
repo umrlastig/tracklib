@@ -240,9 +240,10 @@ def mapOn(track, reference, TP1=[], TP2=[], init=[], apply=True, N_ITER_MAX=20, 
         for i in range(len(D1)): 
             v += (D1[i]*scale - D2[i])**2			
         v = math.sqrt(v/len(D1))
-        print("------------------------------------------------------------------------------")
-        print("SCALE = ", '{:5.3f}'.format(scale), "    (RMSE = ", '{:5.3f}'.format(v), "GROUND UNITS)")		
-        print("------------------------------------------------------------------------------")		
+        if verbose:
+            print("------------------------------------------------------------------------------")
+            print("SCALE = ", '{:5.3f}'.format(scale), "    (RMSE = ", '{:5.3f}'.format(v), "GROUND UNITS)")		
+            print("------------------------------------------------------------------------------")		
 		
 		# Centers of mass estimations
         cm1 = [0,0,0]; cm2 = [0,0,0]
@@ -256,10 +257,11 @@ def mapOn(track, reference, TP1=[], TP2=[], init=[], apply=True, N_ITER_MAX=20, 
 		
         cm1 = ENUCoords(cm1[0], cm1[1], cm1[2])
         cm2 = ENUCoords(cm2[0], cm2[1], cm2[2])
-		
-        print("TRK CENTER OF MASS: ", cm1)
-        print("REF CENTER OF MASS: ", cm2)
-        print("------------------------------------------------------------------------------")		
+
+        if verbose:		
+            print("TRK CENTER OF MASS: ", cm1)
+            print("REF CENTER OF MASS: ", cm2)
+            print("------------------------------------------------------------------------------")		
 	
         # Translation and scale applications
         track.translate(-cm1.getX(), -cm1.getY(), -cm1.getZ())
