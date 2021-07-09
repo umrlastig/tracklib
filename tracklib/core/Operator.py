@@ -258,6 +258,33 @@ class Power(BinaryVoidOperator):
             temp[i] = track.getObsAnalyticalFeature(af_input1, i) ** track.getObsAnalyticalFeature(af_input2, i)
         algoAF.addListToAF(track, af_output, temp)
         return temp
+		
+class Modulo(BinaryVoidOperator):
+    def execute(self, track, af_input1, af_input2, af_output):
+        track.createAnalyticalFeature(af_output)
+        temp = [0]*track.size()
+        for i in range(0, track.size()):
+            temp[i] = track.getObsAnalyticalFeature(af_input1, i) % track.getObsAnalyticalFeature(af_input2, i)
+        algoAF.addListToAF(track, af_output, temp)
+        return temp
+		
+class Above(BinaryVoidOperator):
+    def execute(self, track, af_input1, af_input2, af_output):
+        track.createAnalyticalFeature(af_output)
+        temp = [0]*track.size()
+        for i in range(0, track.size()):
+            temp[i] = 0.0 + (track.getObsAnalyticalFeature(af_input1, i) > track.getObsAnalyticalFeature(af_input2, i))
+        algoAF.addListToAF(track, af_output, temp)
+        return temp
+
+class Below(BinaryVoidOperator):
+    def execute(self, track, af_input1, af_input2, af_output):
+        track.createAnalyticalFeature(af_output)
+        temp = [0]*track.size()
+        for i in range(0, track.size()):
+            temp[i] = 0.0 + (track.getObsAnalyticalFeature(af_input1, i) < track.getObsAnalyticalFeature(af_input2, i))
+        algoAF.addListToAF(track, af_output, temp)
+        return temp
         
 class QuadraticAdder(BinaryVoidOperator):
     def execute(self, track, af_input1, af_input2, af_output):
@@ -614,12 +641,66 @@ class ScalarPower(ScalarVoidOperator):
         algoAF.addListToAF(track, af_output, temp)
         return temp
 		
+class ScalarModulo(ScalarVoidOperator):
+    def execute(self, track, af_input, number, af_output):
+        track.createAnalyticalFeature(af_output)
+        temp = [0]*track.size()
+        for i in range(0, track.size()):
+            temp[i]  = track.getObsAnalyticalFeature(af_input, i) % number
+        algoAF.addListToAF(track, af_output, temp)
+        return temp		
+		
+class ScalarBelow(ScalarVoidOperator):
+    def execute(self, track, af_input, number, af_output):
+        track.createAnalyticalFeature(af_output)
+        temp = [0]*track.size()
+        for i in range(0, track.size()):
+            temp[i]  = 0.0 + track.getObsAnalyticalFeature(af_input, i) < number
+        algoAF.addListToAF(track, af_output, temp)
+        return temp
+		
+class ScalarRevBelow(ScalarVoidOperator):
+    def execute(self, track, af_input, number, af_output):
+        track.createAnalyticalFeature(af_output)
+        temp = [0]*track.size()
+        for i in range(0, track.size()):
+            temp[i]  = 0.0 + number < track.getObsAnalyticalFeature(af_input, i)
+        algoAF.addListToAF(track, af_output, temp)
+        return temp
+		
+class ScalarAbove(ScalarVoidOperator):
+    def execute(self, track, af_input, number, af_output):
+        track.createAnalyticalFeature(af_output)
+        temp = [0]*track.size()
+        for i in range(0, track.size()):
+            temp[i]  = 0.0 + track.getObsAnalyticalFeature(af_input, i) > number
+        algoAF.addListToAF(track, af_output, temp)
+        return temp
+		
+class ScalarRevAbove(ScalarVoidOperator):
+    def execute(self, track, af_input, number, af_output):
+        track.createAnalyticalFeature(af_output)
+        temp = [0]*track.size()
+        for i in range(0, track.size()):
+            temp[i]  = 0.0 + number > track.getObsAnalyticalFeature(af_input, i)
+        algoAF.addListToAF(track, af_output, temp)
+        return temp
+		
 class ScalarRevPower(ScalarVoidOperator):
     def execute(self, track, af_input, number, af_output):
         track.createAnalyticalFeature(af_output)
         temp = [0]*track.size()
         for i in range(0, track.size()):
             temp[i]  = number**track.getObsAnalyticalFeature(af_input, i)
+        algoAF.addListToAF(track, af_output, temp)
+        return temp
+		
+class ScalarRevModulo(ScalarVoidOperator):
+    def execute(self, track, af_input, number, af_output):
+        track.createAnalyticalFeature(af_output)
+        temp = [0]*track.size()
+        for i in range(0, track.size()):
+            temp[i]  = number % track.getObsAnalyticalFeature(af_input, i)
         algoAF.addListToAF(track, af_output, temp)
         return temp
         
@@ -649,6 +730,8 @@ class Filter(ScalarVoidOperator):
             boundary = kernel.filterBoundary()
             kernel = kernel.toSlidingWindow()
         else:
+            if isinstance(kernel, str):
+                kernel = track.getAnalyticalFeature(kernel)
             norm = np.sum(np.array(kernel))
             for i in range(len(kernel)):
                 kernel[i] /= norm
@@ -780,6 +863,9 @@ class Operator:
     MULTIPLIER = Multiplier()                              # y(t) = x1(t) * x2(t)
     DIVIDER = Divider()                                    # y(t) = x1(t) / x2(t)
     POWER = Power()                                        # y(t) = x1(t) ** x2(t)
+    MODULO = Modulo()                                      # y(t) = x1(t) % x2(t)
+    ABOVE = Above()                                        # y(t) = x1(t) > x2(t) (boolean)
+    BELOW = Below()                                        # y(t) = x1(t) < x2(t) (boolean)
     QUAD_ADDER = QuadraticAdder()                          # y(t) = (x1(t)**2 + x2(t)**2)**0.5
     RENORMALIZER = Renormalizer()                          # y(t) = (x1(t)-m(x1))* s(x2)/s(x1) + m(x2)
     DERIVATOR = Derivator()                                # y(t) = (x1(t)-x1(t-1))/(x2(t)-x2(t-1)) = dx1/dx2
@@ -822,9 +908,15 @@ class Operator:
     SCALAR_MULTIPLIER = ScalarMuliplier()                  # y(t) = arg * x(t)    (arg is a numeric)
     SCALAR_DIVIDER = ScalarDivider()                       # y(t) = x(t) / arg    (arg is a numeric)
     SCALAR_POWER = ScalarPower()                           # y(t) = x(t) ** arg   (arg is a numeric)
+    SCALAR_MODULO = ScalarModulo()                         # y(t) = x(t) % arg    (arg is a numeric)
+    SCALAR_ABOVE = ScalarAbove()                           # y(t) = x1(t) > arg   (arg is a numeric)
+    SCALAR_BELOW = ScalarBelow()                           # y(t) = x1(t) < arg   (arg is a numeric)
+    SCALAR_REV_ABOVE = ScalarRevAbove()                    # y(t) = arg < x1(t)   (arg is a numeric)
+    SCALAR_REV_BELOW = ScalarRevBelow()                    # y(t) = arg > x1(t)   (arg is a numeric)
     SCALAR_REV_SUBSTRACTER = ScalarRevSubstracter()        # y(t) = arg - x(t)    (arg is a numeric)
     SCALAR_REV_DIVIDER = ScalarRevDivider()                # y(t) = arg / x(t)    (arg is a numeric)
     SCALAR_REV_POWER = ScalarRevPower()                    # y(t) = arg ** x(t)   (arg is a numeric)
+    SCALAR_REV_MODULO = ScalarRevModulo()                  # y(t) = arg % x(t)    (arg is a numeric)
     THRESHOLDER = Thresholder()                            # y(t) = 1 if x1(t) >= arg, 0 otherwise (arg is a numeric)
     RANDOM = Random()                                      # y(t) = eta(t) with eta ~ arg
     FILTER = Filter()                                      # y(t) = int[x(z)*h(t-z)dz] (arg is an odd-dimension vector or a kernel)
@@ -856,6 +948,10 @@ class Operator:
 		"*"    : MULTIPLIER,
 		"/"    : DIVIDER,
 		"^"    : POWER,
+        ">"    : ABOVE,
+        "<"    : BELOW,
+		"%"    : MODULO,
+		"!"    : FILTER,
 		
 	    "s+"    : SCALAR_ADDER,
 		"s-"    : SCALAR_SUBSTRACTER,
@@ -864,12 +960,18 @@ class Operator:
 		"s^"    : SCALAR_POWER,
 	    "s&"    : SHIFT,
 	    "s$"    : SHIFT_REV,
+	    "s>"    : SCALAR_ABOVE,
+	    "s<"    : SCALAR_BELOW,
+	    "s%"    : SCALAR_MODULO,
 			
 	    "sr+"    : SCALAR_ADDER,
 		"sr-"    : SCALAR_REV_SUBSTRACTER,
 		"sr*"    : SCALAR_MULTIPLIER,
 		"sr/"    : SCALAR_REV_DIVIDER,
-		"sr^"    : SCALAR_REV_POWER}
+		"sr^"    : SCALAR_REV_POWER,
+	    "sr>"    : SCALAR_REV_ABOVE,
+	    "sr%"    : SCALAR_REV_MODULO,
+	    "sr<"    : SCALAR_REV_BELOW}
 		
     NAMES_DICT_NON_VOID = {
 	

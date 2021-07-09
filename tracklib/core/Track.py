@@ -269,7 +269,7 @@ class Track:
         self.__analyticalFeaturesDico = track.__analyticalFeaturesDico.copy()
     
     def hasAnalyticalFeature(self, af_name):
-        return (af_name in self.__analyticalFeaturesDico) or (af_name in ["x","y","z","t","timestamp"])
+        return (af_name in self.__analyticalFeaturesDico) or (af_name in ["x","y","z","t","timestamp","idx"])
 
     def getAnalyticalFeatures(self, af_names): 
         af_names = Utils.listify(af_names) 
@@ -300,6 +300,10 @@ class Track:
             for i in range(self.size()):
                 AF.append(self.__POINTS[i].timestamp)
             return AF
+        if af_name == "idx":
+            for i in range(self.size()):
+                AF.append(i)
+            return AF
         if not self.hasAnalyticalFeature(af_name):
             sys.exit("Error: track does not contain analytical feature '" + af_name +"'")
         index = self.__analyticalFeaturesDico[af_name]
@@ -325,6 +329,8 @@ class Track:
             return self.getObs(i).timestamp.toAbsTime()
         if af_name == "timestamp":
             return self.getObs(i).timestamp
+        if af_name == "idx":
+            return i
         if not af_name in self.__analyticalFeaturesDico:
             sys.exit("Error: track does not contain analytical feature '" + af_name +"'") 
         index = self.__analyticalFeaturesDico[af_name]
@@ -689,7 +695,7 @@ class Track:
     # Analytical algorithms
     # =========================================================================
     def __controlName(name):
-        if (name in ["x", "y", "z", "t", "timestamp"]):
+        if (name in ["x", "y", "z", "t", "timestamp", "idx"]):
             sys.exit("Error: analytical feature name '" + name +"' is not available")
     
     def addAnalyticalFeature(self, algorithm, name=None):
@@ -751,7 +757,8 @@ class Track:
             
 			
     # -------------------------------------------------------------------------
-    # General function to perform computations on analytical features
+    # General function to perform computations on analytical features.
+	# Short-cut "op"
     # -------------------------------------------------------------------------
     # Case 1 : operator and operand listed separately
     #    - operator : to be selected in Operator class
@@ -761,8 +768,8 @@ class Track:
 	#       -> Binary operator :  F(arg1, arg2), arg1, arg2 must be provided
     # Note that arg2 may be an AF name or a scalar value. When output AF name 
 	# is not provided, it is automatically set as the first AF input in the 
-	# formula. AF "x", "y", "z", "t" and "timestamp" are right away available
-	# as "virtual" analytical features.
+	# formula. AF "x", "y", "z", "t", "timestamp" and "idx" are right away 
+	# availables as "virtual" analytical features.
 	# -------------------------------------------------------------------------
 	# Case 2 : operator and operand listed in an algebraic expression
 	# arg1 defines the algebraic expression. If this expression contains '=' 
@@ -784,6 +791,9 @@ class Track:
     #     divide an AF A in a track by a (beforehand unknown) variable var:
     #     track.operate("A=A/factor", {'factor' : var}])
     # -------------------------------------------------------------------------		
+    def op(self, operator, arg1=None, arg2=None, arg3=None):
+        return self.operate(operator, arg1, arg2, arg3)
+
     def operate(self, operator, arg1=None, arg2=None, arg3=None):
 
         # Algebraic expression (arg1 = list of externals)
@@ -860,6 +870,29 @@ class Track:
                 sys.exit("Error in "+type(operator).__name__+": non-concordant number in input and output features")
             for i in range(len(arg1)):
                 operator.execute(self, arg1[i], arg2, arg3[i])
+				
+    # -------------------------------------------------------------------------						
+    # Algebraic operation on 2 tracks. Short-cut "biop"
+    # If expression contains a left hand side AF, it is added to self track.
+    # Self track and second track may have same name AF. Any AF referring to 
+    # to the second track must be terminated witj single quote character.
+    # For example t1.bioperate(t2, "a=b'+c") adds 1st track's AF c with 2nd 
+    # track's AF b and the result a is stored in 1st track AF a.
+    # -------------------------------------------------------------------------		
+    def biop(self, track, expression):
+        return self.bioperate(track, expression)
+
+    def bioperate(self, track, expression):
+        track_tmp = self.copy()
+        expression = expression.strip()
+        tab = Track.__makeRPN(expression)
+        for e in tab:
+            if e[-1] == "'":
+                track_tmp.createAnalyticalFeature(e, track[e[:-1]])
+        track_tmp.op(expression)
+        new_field = expression.split("=")[0]
+        self.createAnalyticalFeature(new_field, track_tmp[new_field])
+        return track_tmp[new_field]
 
     # =========================================================================
     # Return a reversed track (based on index)
@@ -1296,7 +1329,7 @@ class Track:
     
     def __makeRPN(expression):
         s = expression
-        for operator in ["=", "+-", "*/", "^", "@", "&$"]:
+        for operator in ["=", "<>", "+-", "!", "*/", "%", "^", "@", "&$"]:
             depth = 0
             for p in range(len(s) - 1, -1, -1):
                 if s[p] == ')': depth += 1
@@ -1347,6 +1380,10 @@ class Track:
                 return op1 / op2
             if operator == "^":
                 return op1 ^ op2
+            if operator == ">":
+                return op1 > op2
+            if operator == "<":
+                return op1 < op2
 
 		# Functional operator
         if operator == "@":
@@ -1387,7 +1424,7 @@ class Track:
 		
     def __evaluateRPN(self, expression, external=[]):
         stack = []
-        operators = ["=", "+", "-", "*", "/", "^", "@", "&", "$"]
+        operators = ["=", "+", "-", "*", "/", "^", "@", "&", "$", "<", ">", "%", "!"]
         temp_af_counter = 0
 		
 		# Stack computation
@@ -1404,11 +1441,35 @@ class Track:
             stack.append(e)
         return expression
 
-    def __evaluate(self, expression, external=[]):
+    def __convertReflexOperator(expression):
+        OPS = ["+", "-", "*", "/", "^", ">>", "<<", "%", "!"]
+        for op in OPS:
+            if op+"=" in expression:
+                splt = expression.split(op+"=")
+                expression = splt[0] + "=" + splt[0] + op + "(" +splt[1] + ")" 
+        return expression
+		
+    def __unaryOp(expression):
+        if (expression[0] in ["-", "+"]):
+            expression = "0" + expression
+        expression = expression.replace("=-", "=0-").replace("=+", "=0+")  
+        expression = expression.replace("(-", "(0-").replace("(+", "(0+") 		
+        return expression
+
+    def __specialOpChar(expression):  
+        expression = expression.replace("**", "^")        
+        expression = expression.replace(".*", "!")
         expression = expression.replace("{", "@(").replace("}", ")")
-        expression = expression.replace(">>", "&").replace("<<", "$")
+        expression = expression.replace(">>", "&").replace("<<", "$") 
+        return expression
+		
+    def __evaluate(self, expression, external=[]):
+        expression = expression.replace(" ", "")
+        expression = Track.__specialOpChar(expression)
+        expression = Track.__convertReflexOperator(expression)
+        expression = Track.__unaryOp(expression)
         for f_name in Operator.Operator.NAMES_DICT_VOID:
-            if f_name[-1] in ['+', '-', '*', '/', '^']:
+            if f_name[-1] in ['+', '-', '*', '/', '^', '!']:
                 continue
             expression = expression.replace(f_name+"(", f_name+"@(")
         for f_name in Operator.Operator.NAMES_DICT_NON_VOID:
@@ -1743,8 +1804,8 @@ class Track:
             n = n.strip()
             if ("+" in n) or ("-" in n) or ("/" in n) or ("*" in n) or ("^" in n):
                 return self.operate(n)		
-            if (">>" in n) or ("<<" in n) or ("(" in n) or (")" in n):	
-                return self.operate(n)				
+            if (">" in n) or ("<" in n) or ("(" in n) or (")" in n) or ("=" in n):	
+                return self.operate(n)						
             return self.getAnalyticalFeature(n)
 		
         return self.__POINTS[n]  
