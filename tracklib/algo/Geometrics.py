@@ -9,11 +9,16 @@ import random
 import matplotlib.pyplot as plt
 
 from tracklib.core.Obs import Obs
-from tracklib.core.Coords import ENUCoords
-from tracklib.core.GPSTime import GPSTime
-
-import tracklib.core.Track as Track
 import tracklib.core.Utils as Utils
+from tracklib.core.GPSTime import GPSTime
+from tracklib.core.Coords import ENUCoords
+
+# --------------------------------------------------------------------------
+# Circular import (not satisfying solution)
+# --------------------------------------------------------------------------
+from tracklib.core.Track import Track
+
+
 
 MODE_ENCLOSING_BBOX = 0
 MODE_ENCLOSING_MBR = 1
@@ -271,7 +276,7 @@ def intersection(track1, track2, withTime=-1):
         print("Error: tracks must have same SRID to compute intersections")
         exit()
     
-    I = Track.Track()
+    I = Track()
     TMP_I = []
     TMP_J = []
     TMP_TPS2 = []
@@ -723,11 +728,4 @@ def minimumBoundingRectangle(track):
     for i in range(len(track)):
         T.append([track[i].position.getX(), track[i].position.getY()])
     return __mbr(T)
-
-
-
-
-
-
-
 

@@ -5,9 +5,13 @@ import math
 import progressbar
 import numpy as np
 
-import tracklib.core.Track as Track
 from tracklib.core.Coords import ENUCoords
 from tracklib.core.Operator import Operator
+
+# --------------------------------------------------------------------------
+# Circular import (not satisfying solution)
+# --------------------------------------------------------------------------
+from tracklib.core.Track import Track
 
 
 # --------------------------------------------------------------------------
@@ -134,7 +138,7 @@ def mapOn(track, reference, TP1=[], TP2=[], init=[], apply=True, N_ITER_MAX=20, 
         	
         P1 = [track.getObs(i).position.copy() for i in TP1]
         
-        if isinstance(reference, Track.Track):
+        if isinstance(reference, Track):
             P2 = [reference.getObs(i).position.copy() for i in TP2]
         else:
             P2 = reference

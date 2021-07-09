@@ -10,8 +10,6 @@ import tracklib.core.Operator as Operator
 import tracklib.core.Plot as Plot
 
 import tracklib.core.Utils as utils
-import tracklib.algo.Interpolation as Interpolation
-import tracklib.algo.Simplification as Simplification
 import tracklib.algo.Summarize as Sum
 
 
@@ -243,7 +241,7 @@ class TrackCollection:
     #   MODE_SIMPLIFY_DOUGLAS_PEUCKER (1)
     #   MODE_SIMPLIFY_VISVALINGAM (2)
     # =========================================================================    
-    def simplify(self, tolerance, mode = Simplification.MODE_SIMPLIFY_DOUGLAS_PEUCKER):
+    def simplify(self, tolerance, mode = 1):
         output = self.copy()
         for i in range(len(output)):
            output[i] = output[i].simplify(tolerance, mode)

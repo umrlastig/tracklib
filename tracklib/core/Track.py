@@ -9,25 +9,15 @@ import copy
 import numpy as np
 import matplotlib.pyplot as plt
 
+from tracklib.core.Obs import Obs
 from tracklib.core.Coords import ENUCoords
 from tracklib.core.GPSTime import GPSTime
-from tracklib.core.Obs import Obs
-import tracklib.core.Operator as Operator
-import tracklib.core.Kernel as Kernel
 from tracklib.core.TrackCollection import TrackCollection
 
-import tracklib.core.Utils as Utils
-import tracklib.algo.Analytics as algoAF
-import tracklib.algo.Geometrics as Geometrics
-import tracklib.algo.Mapping as Mapping
-import tracklib.algo.Cinematics as Cinematics
-import tracklib.algo.Stochastics as Stochastics
-import tracklib.algo.Comparison as Comparison
-import tracklib.algo.Interpolation as Interpolation
-import tracklib.algo.Simplification as Simplification
-
 import tracklib.core.Plot as Plot
-
+import tracklib.core.Utils as Utils
+import tracklib.core.Kernel as Kernel
+import tracklib.core.Operator as Operator
 
 
 class Track:
@@ -1050,7 +1040,7 @@ class Track:
     #   MODE_SIMPLIFY_VISVALINGAM (2)
     # =========================================================================    
     # DEPRECATED
-    def simplify(self, tolerance, mode = Simplification.MODE_SIMPLIFY_DOUGLAS_PEUCKER):
+    def simplify(self, tolerance, mode = 1):
         return Simplification.simplify(self, tolerance, mode)
         
     
@@ -1076,8 +1066,8 @@ class Track:
         return Cinematics.smoothed_speed_calculation(self, kernel)
         
     def getSpeed(self):
-        if self.hasAnalyticalFeature(algoAF.BIAF_SPEED):
-            return self.getAnalyticalFeature(algoAF.BIAF_SPEED)
+        if self.hasAnalyticalFeature(Analytics.BIAF_SPEED):
+            return self.getAnalyticalFeature(Analytics.BIAF_SPEED)
         else:
             sys.exit("Error: 'estimate_speed' has not been called yet")
 
@@ -1106,8 +1096,8 @@ class Track:
         return Cinematics.computeAbsCurv(self)
         
     def getAbsCurv(self):
-        if self.hasAnalyticalFeature(algoAF.BIAF_ABS_CURV):
-            return self.getAnalyticalFeature(algoAF.BIAF_ABS_CURV)
+        if self.hasAnalyticalFeature(Analytics.BIAF_ABS_CURV):
+            return self.getAnalyticalFeature(Analytics.BIAF_ABS_CURV)
         else:
             sys.exit("Error: 'compute_abscurv' has not been called yet")
 
@@ -1752,3 +1742,17 @@ class Track:
         return self.__POINTS[n]  
     def __setitem__(self, n, obs):
         self.__POINTS[n] = obs    
+		
+
+
+# --------------------------------------------------------------------------
+# Circular import (not satisfying solution)
+# --------------------------------------------------------------------------
+import tracklib.algo.Mapping as Mapping
+import tracklib.algo.Analytics as Analytics
+import tracklib.algo.Geometrics as Geometrics
+import tracklib.algo.Cinematics as Cinematics
+import tracklib.algo.Comparison as Comparison
+import tracklib.algo.Stochastics as Stochastics
+import tracklib.algo.Interpolation as Interpolation
+import tracklib.algo.Simplification as Simplification

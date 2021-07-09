@@ -9,15 +9,20 @@ import numpy as np
 
 from tracklib.core.Obs import Obs
 from tracklib.core.Coords import ENUCoords
+from tracklib.algo.Geometrics import Circle
 
-import tracklib.core.Track as core_track
-import tracklib.core.Track as core_trackCollection
 import tracklib.core.Utils as utils
 import tracklib.algo.Geometrics as Geometrics
 import tracklib.algo.Interpolation as interp
 import tracklib.core.Operator as Operator
 
-from tracklib.algo.Geometrics import Circle
+# --------------------------------------------------------------------------
+# Circular import (not satisfying solution)
+# --------------------------------------------------------------------------
+from tracklib.core.Track import Track
+from tracklib.core.TrackCollection import TrackCollection
+
+
 
 MODE_COMPARAISON_AND = 1
 MODE_COMPARAISON_OR = 2
@@ -83,7 +88,7 @@ def split(track, source):
 	Returns no trrack if no segmentation, otherwise a TrackCollection object
     '''
     
-    NEW_TRACES = core_trackCollection.TrackCollection()
+    NEW_TRACES = TrackCollection()
     
 	# --------------------------------------------
 	# Split from analytical feature name
@@ -149,7 +154,7 @@ def findStops(track, spatial, temporal, mode, verbose=True):
 def findStopsLocal(track, speed=1, duration=10):        
     
     track = track.copy()
-    stops = core_track.Track()
+    stops = Track()
    
     track.segmentation("speed", "#mark", speed)
     track.operate(Operator.Operator.DIFFERENTIATOR, "#mark")
@@ -265,7 +270,7 @@ def findStopsGlobal(track, diameter=20, duration=60, downsampling=1, verbose=Tru
     # ---------------------------------------------------------------------------
     segmentation = optimalPartition(C, MODE_SEGMENTATION_MAXIMIZE, verbose)
     
-    stops = core_track.Track()
+    stops = Track()
     
     TMP_RADIUS = []
     TMP_MEAN_X = []
@@ -362,7 +367,7 @@ def findStopsGlobalForRTK(track, std_max=2e-2, duration=5, downsampling=1, verbo
     # ---------------------------------------------------------------------------
     segmentation = optimalPartition(C, MODE_SEGMENTATION_MAXIMIZE, verbose)
     
-    stops = core_track.Track()
+    stops = Track()
     
     TMP_RADIUS = []
     TMP_MEAN_X = []
@@ -569,6 +574,5 @@ def optimalSegmentation(track, cost, glob_param=None, mode=MODE_SEGMENTATION_MIN
     return optimalPartition(C, mode, verbose)
 
                     
-
 
 

@@ -4,12 +4,16 @@
 
 import sys
 
-import tracklib.core.Track as Track
 import tracklib.core.Utils as utils
 import tracklib.core.Operator as Operator
 
 import tracklib.algo.Geometrics as Geometrics
 import tracklib.algo.Segmentation as Segmentation
+
+# --------------------------------------------------------------------------
+# Circular import (not satisfying solution)
+# --------------------------------------------------------------------------
+from tracklib.core.Track import Track
 
 MODE_SIMPLIFY_DOUGLAS_PEUCKER = 1
 MODE_SIMPLIFY_VISVALINGAM = 2
@@ -95,7 +99,7 @@ def douglas_peucker(track, eps):
     
     n = len(L)
     if (n <= 2):
-        return Track.Track(L)
+        return Track(L)
     
     dmax = 0
     imax = 0
@@ -113,10 +117,10 @@ def douglas_peucker(track, eps):
             imax = i
         
     if (dmax < eps):
-        return Track.Track([L[0], L[n-1]], user_id=track.uid, track_id=track.tid, base=track.base)
+        return Track([L[0], L[n-1]], user_id=track.uid, track_id=track.tid, base=track.base)
     else:
-        XY1 = Track.Track(L[0:imax], user_id=track.uid, track_id=track.tid, base=track.base)
-        XY2 = Track.Track(L[imax:n], user_id=track.uid, track_id=track.tid, base=track.base)
+        XY1 = Track(L[0:imax], user_id=track.uid, track_id=track.tid, base=track.base)
+        XY2 = Track(L[imax:n], user_id=track.uid, track_id=track.tid, base=track.base)
         return douglas_peucker(XY1, eps) + douglas_peucker(XY2, eps)
 
 # --------------------------------------------------------------------------
@@ -132,7 +136,7 @@ def douglas_peucker(track, eps):
 # --------------------------------------------------------------------------
 def optimalSimplification(track, cost, eps, mode=Segmentation.MODE_SEGMENTATION_MINIMIZE):
 
-    simplified = Track.Track(user_id=track.uid, track_id=track.tid, base=track.base)
+    simplified = Track(user_id=track.uid, track_id=track.tid, base=track.base)
     segmentation = Segmentation.optimalSegmentation(track, cost, eps)
  
     for i in range(len(segmentation)):
@@ -178,5 +182,3 @@ def __cost_largest_deviation_strict(track, i, j, offset):
         R = Geometrics.boundingShape(track.extract(i,j), Geometrics.MODE_ENCLOSING_MBR)
         l =  min(R[2],R[3])
         return 1e300*(l > offset) + 1        
-    
-

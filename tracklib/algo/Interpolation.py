@@ -5,13 +5,12 @@ import sys
 import math
 import numpy as np
 
+import tracklib.core.Utils as utils
+
 from tracklib.core.Obs import Obs
+from tracklib.core.Track import Track
 from tracklib.core.Coords import ENUCoords
 from tracklib.core.GPSTime import GPSTime
-
-import tracklib.core.Utils as utils
-import tracklib.core.Track as core_Track
-
 
 MODE_SPATIAL = 1
 MODE_TEMPORAL = 2
@@ -184,7 +183,7 @@ def gaussian_process(track, timestamps, kernel, factor=1.0, sigma=0.0, cp_var=Fa
 	cp_var: compute covariance matrix and store pointwise sigmas
 	returns: interpolated/smoothed track (without AF)'''
 		
-	new_track = core_Track.Track()
+	new_track = Track.Track()
 	
 	tini = track.getFirstObs().timestamp.toAbsTime()
 	tfin = track.getLastObs().timestamp.toAbsTime()
@@ -256,7 +255,7 @@ def prepareTimeSampling(input, tini=None, tfin=None):
 	if isinstance(input, list):
 		for i in range(len(input)):
 			output.append(input[i].toAbsTime())
-	if isinstance(input, core_Track.Track):
+	if isinstance(input, Track.Track):
 		for i in range(input.size()):
 			output.append(input.getObs(i).timestamp.toAbsTime())
 	if isinstance(input, int) or isinstance(input, float):
