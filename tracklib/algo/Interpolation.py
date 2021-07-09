@@ -183,7 +183,7 @@ def gaussian_process(track, timestamps, kernel, factor=1.0, sigma=0.0, cp_var=Fa
 	cp_var: compute covariance matrix and store pointwise sigmas
 	returns: interpolated/smoothed track (without AF)'''
 		
-	new_track = Track.Track()
+	new_track = Track()
 	
 	tini = track.getFirstObs().timestamp.toAbsTime()
 	tfin = track.getLastObs().timestamp.toAbsTime()
@@ -255,7 +255,7 @@ def prepareTimeSampling(input, tini=None, tfin=None):
 	if isinstance(input, list):
 		for i in range(len(input)):
 			output.append(input[i].toAbsTime())
-	if isinstance(input, Track.Track):
+	if isinstance(input, Track):
 		for i in range(input.size()):
 			output.append(input.getObs(i).timestamp.toAbsTime())
 	if isinstance(input, int) or isinstance(input, float):
