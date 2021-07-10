@@ -123,7 +123,7 @@ class Kalman:
         self.P0 = P0
         self.iter = iter
         self.control = 1
-        self.spreading = spreading
+        self.spreading = 1
         
     def setTransition(self, F, Q=None):
         self.F = F 

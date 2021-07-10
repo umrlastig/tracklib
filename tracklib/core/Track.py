@@ -16,7 +16,6 @@ from tracklib.core.TrackCollection import TrackCollection
 
 import tracklib.core.Plot as Plot
 import tracklib.core.Utils as Utils
-import tracklib.core.Kernel as Kernel
 import tracklib.core.Operator as Operator
 
 
@@ -970,7 +969,9 @@ class Track:
     # =========================================================================
     #  Adding noise to tracks
     # =========================================================================   
-    def noise(self, sigma=5, kernel=Kernel.DiracKernel()):
+    def noise(self, sigma=5, kernel=None):
+        if kernel is None:
+            kernel = Kernel.DiracKernel()
         return Stochastics.noise(self, sigma, kernel)
         
 
@@ -1429,7 +1430,7 @@ class Track:
 		
 		# Stack computation
         for e in expression:
-            # print("STACK = ", stack)   # DEBUG LINE
+            #print("STACK = ", stack, "->", e)   # DEBUG LINE
             if e in operators:
                 operand2 = stack.pop()
                 operand1 = stack.pop()
@@ -1453,7 +1454,9 @@ class Track:
         if (expression[0] in ["-", "+"]):
             expression = "0" + expression
         expression = expression.replace("=-", "=0-").replace("=+", "=0+")  
-        expression = expression.replace("(-", "(0-").replace("(+", "(0+") 		
+        expression = expression.replace("(-", "(0-").replace("(+", "(0+") 	
+        expression = expression.replace("--", "+").replace("++", "+")
+        expression = expression.replace("+-", "-").replace("-+", "-")		
         return expression
 
     def __specialOpChar(expression):  
@@ -1817,6 +1820,8 @@ class Track:
 # --------------------------------------------------------------------------
 # Circular import (not satisfying solution)
 # --------------------------------------------------------------------------
+import tracklib.core.Kernel as Kernel
+
 import tracklib.algo.Mapping as Mapping
 import tracklib.algo.Analytics as Analytics
 import tracklib.algo.Geometrics as Geometrics

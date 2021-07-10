@@ -7,6 +7,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
+from tracklib.core.TrackCollection import TrackCollection
 
 # -----------------------------------------------------------------------------
 # Kernels for filtering, smoothing and stochastics simulations        
@@ -127,7 +128,7 @@ class SincKernel(Kernel):
 # ---------------------------------------------------------
 # Non-parametric estimator of Kernel based on GPS tracks.
 # The experimental covariogram kernel is initialized with 
-# a maximal scope dmax and an optional resolution (both 
+# a maximal scope dmax and an optional resolution, both 
 # given in ground units as a distance along curvilinear 
 # abscissa or traks. The comparison between pairs of tracks 
 # is performed with either Nearest Neighbor (NN) or Dynamic 
@@ -141,7 +142,7 @@ class SincKernel(Kernel):
 # input into addSamples must contain at least two tracks.
 # ---------------------------------------------------------
 # Once an experimental covariogram has been estimated, it 
-# is possible to fit a parametric estimation on a one of 
+# is possible to fit a parametric estimation on one of 
 # the kernel models provided above (except UniformKernel 
 # which is not a positive-definite function). 
 # The estimation is performed with fit(kernel) function. 
@@ -163,27 +164,36 @@ class ExperimentalKernel:
         for i in range(N):
             self.H[i] = i*r
 
-    def addSamples(self, trackCollection): 
+    def addTrackPair(self, track1, track2): 
+        self.addTrackCollection(TrackCollection([track1, track2]))
+
+    def addTrackCollection(self, trackCollection, verbose=False): 
+        import tracklib.algo.Comparison as Comparison    # <- Assez moche... A voir comment resoudre
         N = trackCollection.size()
         for i in range(N-1):
-            self.addTrackPair(trackCollection[j])
-        return 0
+            print("Reference set on track ["+str(i+1)+"/"+str(N-1)+"]")
+            t1 = trackCollection[i]
+            for j in range(i+1, N):
+                t2 = trackCollection[j]
+                pf = Comparison.differenceProfile(t1, t2, mode=self.method, ends=True, p=1, verbose=verbose)
+                self.addDifferenceProfile(pf)
 
     def addDifferenceProfile(self, profile):
         N = len(profile)
-        m = np.mean(profile["diff"])
         for i in range(N-1):
             si = profile.getObsAnalyticalFeature("abs_curv", i)
-            yi = profile.getObsAnalyticalFeature("diff", i) 
+            yix = profile.getObsAnalyticalFeature("ex", i) 
+            yiy = profile.getObsAnalyticalFeature("ey", i) 
             for j in range(i+1,N):
                 sj = profile.getObsAnalyticalFeature("abs_curv", j)
-                yj = profile.getObsAnalyticalFeature("diff", j) 
+                yjx = profile.getObsAnalyticalFeature("ex", j)
+                yjy = profile.getObsAnalyticalFeature("ey", j) 				
                 d =  abs(si-sj) 
                 idx = int(d/self.r)
                 if idx >= len(self.GAMMA):
                     continue
-                self.GAMMA[idx] += (yi-m)*(yj-m)
-                self.COUNT[idx] +=  1
+                self.GAMMA[idx] += (yix-yjx)**2 + (yiy-yjy)**2
+                self.COUNT[idx] +=  2
 
     def __getGamma(self, scale=1):
         x = self.GAMMA
@@ -195,10 +205,11 @@ class ExperimentalKernel:
         return x
 
     def plot(self, sym='k+'):
-        gamma = self.__getGamma(0.02)
+        gamma = self.__getGamma()
         N = len(gamma)
         x = [i * (-1) for i in list(reversed(self.H))] + self.H
         y = list(reversed(gamma)) + gamma 
+        y = np.max(y)-y
         plt.plot(x, y, sym)
 
 

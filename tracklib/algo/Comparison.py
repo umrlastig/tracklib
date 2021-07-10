@@ -37,11 +37,13 @@ def plotDifferenceProfile(profile, track2, af_name="pair", sym='g--', NO_DATA_VA
 # value is 1 for summation of distances, 2 for least squares 
 # solution and 10 for an approximation of Frechet solution. 
 # ------------------------------------------------------------		
-def differenceProfile(track1, track2, mode="NN", ends=False, p=1):
+def differenceProfile(track1, track2, mode="NN", ends=False, p=1, verbose=True):
 
     output = track1.copy()
     output.createAnalyticalFeature("diff");
     output.createAnalyticalFeature("pair");
+    output.createAnalyticalFeature("ex");
+    output.createAnalyticalFeature("ey");
  
     # --------------------------------------------------------
     # Nearest Neighbor (NN) algorithm
@@ -57,6 +59,10 @@ def differenceProfile(track1, track2, mode="NN", ends=False, p=1):
                     id_min = j
             output.setObsAnalyticalFeature("diff", i, val_min)
             output.setObsAnalyticalFeature("pair", i, id_min)
+            ex = track1.getObs(i).position.getX() - track2.getObs(id_min).position.getX()
+            ey = track1.getObs(i).position.getY() - track2.getObs(id_min).position.getY()
+            output.setObsAnalyticalFeature("ex", i, ex)
+            output.setObsAnalyticalFeature("ey", i, ey)
 
     # --------------------------------------------------------
     # Dynamic time warping (DTW) algorithm
@@ -81,7 +87,10 @@ def differenceProfile(track1, track2, mode="NN", ends=False, p=1):
         M[0,0] = -1
 		
 		# Forward step
-        for i in progressbar.progressbar(range(1,T.shape[0])):
+        step_to_run = range(1,T.shape[0])
+        if verbose:
+            step_to_run = progressbar.progressbar(step_to_run)
+        for i in step_to_run:
             T[i,0] = T[i-1,0] + D[i,0]
             M[i,0] = 0
             for j in range(1, T.shape[1]):
@@ -113,8 +122,12 @@ def differenceProfile(track1, track2, mode="NN", ends=False, p=1):
             x2 = track2.getObs(S[i]).position.getX()
             y2 = track2.getObs(S[i]).position.getY()
             d = track1.getObs(i).distance2DTo(track2.getObs(S[i]))
+            ex = track1.getObs(i).position.getX() - track2.getObs(S[i]).position.getX()
+            ey = track1.getObs(i).position.getY() - track2.getObs(S[i]).position.getY()
             output.setObsAnalyticalFeature("diff", i, d)
             output.setObsAnalyticalFeature("pair", i, S[i])
+            output.setObsAnalyticalFeature("ex", i, ex)
+            output.setObsAnalyticalFeature("ey", i, ey)
 
     output.compute_abscurv()
     return output

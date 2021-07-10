@@ -46,6 +46,60 @@ from tracklib.core.Network import Edge
 from tracklib.core.Network import Network
 from tracklib.io.NetworkReader import NetworkReader
 
+# -----------------------------------------------------------------------
+# Example 0: a simple example with simulated data
+# -----------------------------------------------------------------------
+# Simple standard (linear) Kalman Filter with 4 states [x, y, vx, vy] 
+# and two measurements [x, y]
+# -----------------------------------------------------------------------
+def example0():
+
+    Stochastics.seed(123)
+    track1 = Synthetics.generate(0.2, dt=10)
+    track2 = track1.noise(1)
+    
+    F = np.array([
+        [1, 0, 1, 0],
+        [0, 1, 0, 1],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1]])
+    H = np.array([
+        [1, 0, 0, 0],
+        [0, 1, 0, 0]])
+    Q = np.array([
+        [1e-8, 0, 0, 0],
+        [0, 1e-8, 0, 0],
+        [0, 0, 2e-4, 0],
+        [0, 0, 0, 2e-4]])
+    R = np.array([
+        [1, 0],
+        [0, 1]])
+    X0 = np.array([
+        [track2[0].position.getX()],
+        [track2[0].position.getY()],
+    	[0],
+    	[0]])
+    P0 = np.array([
+        [3, 0, 0, 0],
+        [0, 3, 0, 0],
+        [0, 0, 1e1, 0],
+        [0, 0, 0, 1e1]])
+    
+    UKF = Kalman()
+    UKF.setTransition(F, Q)
+    UKF.setObservation(H, R)
+    UKF.setInitState(X0, P0)
+    UKF.summary()
+    
+    UKF.estimate(track2, ["x", "y"])
+    	
+    
+    track1.plot('k--')
+    plt.plot(track2['kf_0'], track2['kf_1'], 'b-')
+    track2.plot('r+')
+    
+    plt.show()
+
 
 
 # -----------------------------------------------------------------------
@@ -78,100 +132,87 @@ from tracklib.io.NetworkReader import NetworkReader
 #      carefully inspecting the innovation values ("kf_balise1_inov" and 
 #      "kf_balise2_inov") to detect incorrect measurement. 
 # -----------------------------------------------------------------------
+def example1(withBiases=False, withCycleSlip=False):
 
-'''
-Stochastics.seed(123)
+    Stochastics.seed(123)
+    
+    track_gt = Synthetics.generate(0.15)
+    
+    B1 = [-20,30]
+    B2 = [30,10]
+	
+    b1 = 0 + withBiases*25
+    b2 = 0 + withBiases*32
+    sp = 0 + withCycleSlip*10
+    
+    track_odo = track_gt.copy()
+    track_odo = Stochastics.NoiseProcess(2, GaussianKernel(10)).noise(track_odo)
+    track_odo.op("dx=D(x)")
+    track_odo.op("dy=D(y)")
+    
+    track = track_gt.noise(0.5)
+    track.biop(track_odo, "vx=dx'")
+    track.biop(track_odo, "vy=dy'")
+	
+    externals = {"x1":B1[0], "y1":B1[1], "x2":B2[0], "y2":B2[1], "b1":b1, "b2":b2, "sp":sp}
+    track.op("balise1 = SQRT((x-x1)^2+(y-y1)^2)-b1-sp*(idx>50)", externals)
+    track.op("balise2 = SQRT((x-x2)^2+(y-y2)^2)-b2", externals)
+	
+    track = track > 1
+    
+    track_gt.plot('k--')
+    plt.plot(B1[0], B1[1], 'k^')
+    plt.plot(B2[0], B2[1], 'k^')
+    track.plot('b+')
+    
+    def F(x, k, track):
+    	return np.array([
+    		[x[0,0] + track["vx", k]], 
+    		[x[1,0] + track["vy", k]],
+    		[x[2,0]],
+    		[x[3,0]]])
+    
+    def H(x):
+    	return np.array([
+    	[((x[0,0]-B1[0])**2+(x[1,0]-B1[1])**2)**0.5]-x[2,0],
+    	[((x[0,0]-B2[0])**2+(x[1,0]-B2[1])**2)**0.5]-x[3,0]])
+    
+    Q = 1e-1*np.eye(4,4); Q[2,2] = 1e-10; Q[3,3] = 1e-10
+    R = 0.5**2*np.eye(2,2);
+    
+    X0 = np.array([[-50], [40], [0], [0]])
+    P0 = 1e1*np.eye(4,4); P0[2,2] = 1e2; P0[3,3] = 1e2
+    
+    UKF = Kalman()
+    UKF.setTransition(F, Q)
+    UKF.setObservation(H, R)
+    UKF.setInitState(X0, P0)
+    UKF.summary()
+    
+    UKF.estimate(track, ["balise1", "balise2"], mode = Dynamics.MODE_STATES_AS_2D_POSITIONS)
+    
+    track.plot('r-')
 
-track_gt = Synthetics.generate(0.15)
-
-B1 = [-20,30]
-B2 = [30,10]
-
-
-
-track_odo = track_gt.copy()
-track_odo = Stochastics.NoiseProcess(2, GaussianKernel(10)).noise(track_odo)
-track_odo.operate(Operator.DIFFERENTIATOR, "x", "dx")
-track_odo.operate(Operator.DIFFERENTIATOR, "y", "dy")
-
-def balise1(track, k):
-	return ((track[k].position.getX()-B1[0])**2+(track[k].position.getY()-B1[1])**2)**0.5 - 25 - 10*(k > 50)
-def balise2(track, k):
-	return ((track[k].position.getX()-B2[0])**2+(track[k].position.getY()-B2[1])**2)**0.5 - 32
-
-track = track_gt.noise(0.5)
-track.createAnalyticalFeature("vx", track_odo["dx"])
-track.createAnalyticalFeature("vy", track_odo["dy"])
-track.addAnalyticalFeature(balise1)
-track.addAnalyticalFeature(balise2)
-track = track > 1
-
-track_gt.plot('k--')
-plt.plot(B1[0], B1[1], 'k^')
-plt.plot(B2[0], B2[1], 'k^')
-track.plot('b+')
-
-
-
-def F(x, k, track):
-	vx = track.getObsAnalyticalFeature("vx", k)
-	vy = track.getObsAnalyticalFeature("vy", k)
-	return np.array([
-		[x[0,0] + vx], 
-		[x[1,0] + vy],
-		[x[2,0]],
-		[x[3,0]]])
-
-def H(x):
-	return np.array([
-	[((x[0,0]-B1[0])**2+(x[1,0]-B1[1])**2)**0.5]-x[2,0],
-	[((x[0,0]-B2[0])**2+(x[1,0]-B2[1])**2)**0.5]-x[3,0]])
-
-
-
-Q = 1e-1*np.eye(4,4); Q[2,2] = 1e-10; Q[3,3] = 1e-10
-R = 0.5**2*np.eye(2,2);
-
-
-X0 = np.array([[-50], [40], [0], [0]])
-P0 = 1e1*np.eye(4,4); P0[2,2] = 1e2; P0[3,3] = 1e2
-
-UKF = Kalman(spreading=1)
-UKF.setTransition(F, Q)
-UKF.setObservation(H, R)
-UKF.setInitState(X0, P0)
-UKF.summary()
-
-
-UKF.estimate(track, ["balise1", "balise2"], mode = Dynamics.MODE_STATES_AS_2D_POSITIONS)
-
-
-track.plot('r-')
-
-
-
-# Innovation
-#fig, ax1 = plt.subplots(figsize=(5, 3))
-#ax1.plot(track["kf_balise1_inov"], 'r-')
-#ax1.plot(track["kf_balise2_inov"], 'g-')
-
-#ax1.plot(np.array(track["x"])-np.array(track_gt["x"])[1:], 'b-')
-#ax1.plot(np.array(track["y"])-np.array(track_gt["y"])[1:], 'b-')
-
-# Statistics
-#print("Std gps =", '{:3.2f}'.format(track.operate(Operator.RMSE,"kf_balise1_inov")), "m")
-#print("Std cam =", '{:3.2f}'.format(track.operate(Operator.RMSE,"kf_balise2_inov")), "m")
-
-fig, ax1 = plt.subplots(figsize=(5, 3))
-#ax1.plot(track["kf_2"], 'r.')
-#ax1.plot(track["kf_3"], 'g.')
-
-ax1.plot(track["kf_balise1_inov"], 'r-')
-ax1.plot(track["kf_balise2_inov"], 'g-')
-
-plt.show()
-
-'''
+    # Innovation
+    #fig, ax1 = plt.subplots(figsize=(5, 3))
+    #ax1.plot(track["kf_balise1_inov"], 'r-')
+    #ax1.plot(track["kf_balise2_inov"], 'g-')
+    
+    #ax1.plot(np.array(track["x"])-np.array(track_gt["x"])[1:], 'b-')
+    #ax1.plot(np.array(track["y"])-np.array(track_gt["y"])[1:], 'b-')
+    
+    # Statistics
+    #print("Std gps =", '{:3.2f}'.format(track.operate(Operator.RMSE,"kf_balise1_inov")), "m")
+    #print("Std cam =", '{:3.2f}'.format(track.operate(Operator.RMSE,"kf_balise2_inov")), "m")
+    
+    fig, ax1 = plt.subplots(figsize=(5, 3))
+    #ax1.plot(track["kf_2"], 'r.')
+    #ax1.plot(track["kf_3"], 'g.')
+    
+    ax1.plot(track["kf_balise1_inov"], 'r-')
+    ax1.plot(track["kf_balise2_inov"], 'g-')
+    
+    plt.show()
 
 
 # -----------------------------------------------------------------------
@@ -182,82 +223,82 @@ plt.show()
 # GPS absolute and low-accuracy data, with high-accuracy relative 
 # photogrammetric measurements. 
 # -----------------------------------------------------------------------
+def example2():
 
-'''
-path_cam = "tracklib/data/hybridation_gnss_camera.dat"
-path_gps = "tracklib/data/hybridation_gnss_camera.pos"
+    path_cam = "tracklib/data/hybridation_gnss_camera.dat"
+    path_gps = "tracklib/data/hybridation_gnss_camera.pos"
+    
+    GPSTime.setReadFormat("2D/2M/4Y-2h:2m:2s.3z")
+    
+    track_cam = FileReader.readFromFile(path_cam, 1, 2, 3, 0, " ", srid="ENUCoords")
+    track_gps = FileReader.readFromFile(path_gps, 1, 2, 3, 0, " ", srid="ENUCoords")
+    track_cam.incrementTime(0, 18-3600)
+    
+    
+    
+    ini_time = GPSTime("06/06/2021-16:02:00.000")
+    fin_time = GPSTime("06/06/2021-16:12:12.000")
+    track_cam = track_cam.extractSpanTime(ini_time, fin_time)
+    track_gps = track_gps.extractSpanTime(ini_time, fin_time)
+    track_gps = track_gps // track_cam
+    
+    Mapping.mapOn(track_cam, track_gps, TP1=list(range(0, 50, 10)))
+    
+    def vx(track, i):
+    	if i == len(track)-1:
+    		return track[i].position.getX()-track[i-1].position.getX()
+    	return track[i+1].position.getX()-track[i].position.getX()
+    def vy(track, i):
+    	if i == len(track)-1:
+    		return track[i].position.getY()-track[i-1].position.getY()
+    	return track[i+1].position.getY()-track[i].position.getY()
+    
+    
+    track_cam.addAnalyticalFeature(vx)
+    track_cam.addAnalyticalFeature(vy)
+    track_gps.createAnalyticalFeature("vx", track_cam["vx"])
+    track_gps.createAnalyticalFeature("vy", track_cam["vy"])
+    
+    def F(x, k, track):
+    	vx = track.getObsAnalyticalFeature("vx", k)
+    	vy = track.getObsAnalyticalFeature("vy", k)
+    	return Dynamics.DYN_MAT_2D_CST_POS() @ x + np.array([[vx], [vy]])
+    	
+    H = np.eye(2,2)
+    
+    Q = 1e-1*np.eye(2,2);
+    R = 1.8**2*np.eye(2,2);
+    
+    X0 = np.zeros((2,1)); 
+    P0 = R
+    
+    UKF = Kalman(spreading=1)
+    UKF.setTransition(F, Q)
+    UKF.setObservation(H, R)
+    UKF.setInitState(X0, 1e2*P0)
+    
+    UKF.summary()
+    
+    track_filtered = track_gps.copy()
+    UKF.estimate(track_filtered, ["x","y"], mode = Dynamics.MODE_STATES_AS_2D_POSITIONS)
+    
+    track_filtered.summary()
+    
+    
+    
+    # Track plot
+    track_gps.plot('k+')
+    track_cam.plot('r-')
+    track_filtered.plot('g-')
+    #track_filtered.plotEllipses('g-', factor=10)
+    
+    
+    
+    # Statistics
+    print("Std gps =", '{:3.2f}'.format(track_filtered.operate(Operator.RMSE,"kf_x_inov")), "m")
+    
+    plt.show()
 
-GPSTime.setReadFormat("2D/2M/4Y-2h:2m:2s.3z")
-
-track_cam = FileReader.readFromFile(path_cam, 1, 2, 3, 0, " ", srid="ENUCoords")
-track_gps = FileReader.readFromFile(path_gps, 1, 2, 3, 0, " ", srid="ENUCoords")
-track_cam.incrementTime(0, 18-3600)
-
-
-
-ini_time = GPSTime("06/06/2021-16:02:00.000")
-fin_time = GPSTime("06/06/2021-16:12:12.000")
-track_cam = track_cam.extractSpanTime(ini_time, fin_time)
-track_gps = track_gps.extractSpanTime(ini_time, fin_time)
-track_gps = track_gps // track_cam
-
-Mapping.mapOn(track_cam, track_gps, TP1=list(range(0, 50, 10)))
-
-def vx(track, i):
-	if i == len(track)-1:
-		return track[i].position.getX()-track[i-1].position.getX()
-	return track[i+1].position.getX()-track[i].position.getX()
-def vy(track, i):
-	if i == len(track)-1:
-		return track[i].position.getY()-track[i-1].position.getY()
-	return track[i+1].position.getY()-track[i].position.getY()
-
-
-track_cam.addAnalyticalFeature(vx)
-track_cam.addAnalyticalFeature(vy)
-track_gps.createAnalyticalFeature("vx", track_cam["vx"])
-track_gps.createAnalyticalFeature("vy", track_cam["vy"])
-
-def F(x, k, track):
-	vx = track.getObsAnalyticalFeature("vx", k)
-	vy = track.getObsAnalyticalFeature("vy", k)
-	return Dynamics.DYN_MAT_2D_CST_POS() @ x + np.array([[vx], [vy]])
-	
-H = np.eye(2,2)
-
-Q = 1e-1*np.eye(2,2);
-R = 1.8**2*np.eye(2,2);
-
-X0 = np.zeros((2,1)); 
-P0 = R
-
-UKF = Kalman(spreading=1)
-UKF.setTransition(F, Q)
-UKF.setObservation(H, R)
-UKF.setInitState(X0, 1e2*P0)
-
-UKF.summary()
-
-track_filtered = track_gps.copy()
-UKF.estimate(track_filtered, ["x","y"], mode = Dynamics.MODE_STATES_AS_2D_POSITIONS)
-
-track_filtered.summary()
-
-
-
-# Track plot
-track_gps.plot('k+')
-track_cam.plot('r-')
-track_filtered.plot('g-')
-#track_filtered.plotEllipses('g-', factor=10)
-
-
-
-# Statistics
-print("Std gps =", '{:3.2f}'.format(track_filtered.operate(Operator.RMSE,"kf_x_inov")), "m")
-
-plt.show()
-'''
 
 # -----------------------------------------------------------------------
 # Example 3: GNSS kalman integration
@@ -307,82 +348,81 @@ plt.show()
 #    Clock error :  0      (+/- 1e6 m) 
 #    Clock drift :  0      (+/- 1e3 m/s)
 # -----------------------------------------------------------------------
+def example3():
 
-'''
-start = GeoCoords(2.4320023,  48.84298, 100).toECEFCoords()
-print(start)
-
-path = "tracklib/data/psr.dat"
-
-track = Track()
-
-for i in range(47):
-	track.addObs(Obs(ECEFCoords(0,0,0)))
-track.createAnalyticalFeature("m0",[0]*47); track.createAnalyticalFeature("sx0",[0]*47); track.createAnalyticalFeature("sy0",[0]*47); track.createAnalyticalFeature("sz0",[0]*47); 
-track.createAnalyticalFeature("m1",[0]*47); track.createAnalyticalFeature("sx1",[0]*47); track.createAnalyticalFeature("sy1",[0]*47); track.createAnalyticalFeature("sz1",[0]*47); 
-track.createAnalyticalFeature("m2",[0]*47); track.createAnalyticalFeature("sx2",[0]*47); track.createAnalyticalFeature("sy2",[0]*47); track.createAnalyticalFeature("sz2",[0]*47); 
-track.createAnalyticalFeature("m3",[0]*47); track.createAnalyticalFeature("sx3",[0]*47); track.createAnalyticalFeature("sy3",[0]*47); track.createAnalyticalFeature("sz3",[0]*47); 
-track.createAnalyticalFeature("m4",[0]*47); track.createAnalyticalFeature("sx4",[0]*47); track.createAnalyticalFeature("sy4",[0]*47); track.createAnalyticalFeature("sz4",[0]*47); 
-
-with open(path) as fp:
-	line = True
-	for i in range(47):
-		for j in range(5):
-			line = fp.readline()
-			vals = line[:-2].split(",")
-			track.setObsAnalyticalFeature("sx"+str(j), i, float(vals[1]))
-			track.setObsAnalyticalFeature("sy"+str(j), i, float(vals[2]))
-			track.setObsAnalyticalFeature("sz"+str(j), i, float(vals[3]))
-			track.setObsAnalyticalFeature("m"+str(j) , i, float(vals[4]))
-		line = fp.readline()
-
-
-def F(x):
-	plan = ECEFCoords(x[0,0], x[1,0], x[2,0]).toENUCoords(start)
-	plan.E += x[5,0]*math.sin(x[4,0])
-	plan.N += x[5,0]*math.cos(x[4,0])
-	xyz = plan.toECEFCoords(start)
-	return np.array([
-	[xyz.X],
-	[xyz.Y],
-	[xyz.Z],
-	[x[3,0]+x[6,0]],
-	[x[4,0]],
-	[x[5,0]],
-	[x[6,0]]])
-	
-
-def H(x, k, track):
-	return np.array([
-	[((x[0,0]-track["sx0",k])**2 + (x[1,0]-track["sy0",k])**2 + (x[2,0]-track["sz0",k])**2)**0.5 + x[3,0]],
-	[((x[0,0]-track["sx1",k])**2 + (x[1,0]-track["sy1",k])**2 + (x[2,0]-track["sz1",k])**2)**0.5 + x[3,0]],
-	[((x[0,0]-track["sx2",k])**2 + (x[1,0]-track["sy2",k])**2 + (x[2,0]-track["sz2",k])**2)**0.5 + x[3,0]],
-	[((x[0,0]-track["sx3",k])**2 + (x[1,0]-track["sy3",k])**2 + (x[2,0]-track["sz3",k])**2)**0.5 + x[3,0]],
-	[((x[0,0]-track["sx4",k])**2 + (x[1,0]-track["sy4",k])**2 + (x[2,0]-track["sz4",k])**2)**0.5 + x[3,0]]])
-
-Q = 1e0*np.eye(7,7); Q[3,3] = 0; Q[4,4] = 1e-10; Q[5,5] = 1e-1; Q[6,6] = 1e-1
-R = 1e1*np.eye(5,5);
-
-X0 = np.array([[start.getX()], [start.getY()], [start.getZ()], [0], [0], [0], [0]])
-P0 = 1e5*np.eye(7,7); P0[3,3] = 1e6; P0[4,4] = 1e1; P0[5,5] = 1e1; P0[6,6] = 1e3
-
-UKF = Kalman(spreading=1)
-UKF.setTransition(F, Q)
-UKF.setObservation(H, R)
-UKF.setInitState(X0, P0)
-UKF.summary()
-
-UKF.estimate(track, ["m0","m1","m2","m3","m4"], mode = Dynamics.MODE_STATES_AS_3D_POSITIONS)
-
-track.toGeoCoords()
-
-
-track.plot('r-')
-
-plt.show()
-
-KmlWriter.writeToKml(track, path="couplage.kml", type="LINE")
-'''
+    start = GeoCoords(2.4320023,  48.84298, 100).toECEFCoords()
+    print(start)
+    
+    path = "tracklib/data/psr.dat"
+    
+    track = Track()
+    
+    for i in range(47):
+    	track.addObs(Obs(ECEFCoords(0,0,0)))
+    track.createAnalyticalFeature("m0",[0]*47); track.createAnalyticalFeature("sx0",[0]*47); track.createAnalyticalFeature("sy0",[0]*47); track.createAnalyticalFeature("sz0",[0]*47); 
+    track.createAnalyticalFeature("m1",[0]*47); track.createAnalyticalFeature("sx1",[0]*47); track.createAnalyticalFeature("sy1",[0]*47); track.createAnalyticalFeature("sz1",[0]*47); 
+    track.createAnalyticalFeature("m2",[0]*47); track.createAnalyticalFeature("sx2",[0]*47); track.createAnalyticalFeature("sy2",[0]*47); track.createAnalyticalFeature("sz2",[0]*47); 
+    track.createAnalyticalFeature("m3",[0]*47); track.createAnalyticalFeature("sx3",[0]*47); track.createAnalyticalFeature("sy3",[0]*47); track.createAnalyticalFeature("sz3",[0]*47); 
+    track.createAnalyticalFeature("m4",[0]*47); track.createAnalyticalFeature("sx4",[0]*47); track.createAnalyticalFeature("sy4",[0]*47); track.createAnalyticalFeature("sz4",[0]*47); 
+    
+    with open(path) as fp:
+    	line = True
+    	for i in range(47):
+    		for j in range(5):
+    			line = fp.readline()
+    			vals = line[:-2].split(",")
+    			track.setObsAnalyticalFeature("sx"+str(j), i, float(vals[1]))
+    			track.setObsAnalyticalFeature("sy"+str(j), i, float(vals[2]))
+    			track.setObsAnalyticalFeature("sz"+str(j), i, float(vals[3]))
+    			track.setObsAnalyticalFeature("m"+str(j) , i, float(vals[4]))
+    		line = fp.readline()
+    
+    
+    def F(x):
+    	plan = ECEFCoords(x[0,0], x[1,0], x[2,0]).toENUCoords(start)
+    	plan.E += x[5,0]*math.sin(x[4,0])
+    	plan.N += x[5,0]*math.cos(x[4,0])
+    	xyz = plan.toECEFCoords(start)
+    	return np.array([
+    	[xyz.X],
+    	[xyz.Y],
+    	[xyz.Z],
+    	[x[3,0]+x[6,0]],
+    	[x[4,0]],
+    	[x[5,0]],
+    	[x[6,0]]])
+    	
+    
+    def H(x, k, track):
+    	return np.array([
+    	[((x[0,0]-track["sx0",k])**2 + (x[1,0]-track["sy0",k])**2 + (x[2,0]-track["sz0",k])**2)**0.5 + x[3,0]],
+    	[((x[0,0]-track["sx1",k])**2 + (x[1,0]-track["sy1",k])**2 + (x[2,0]-track["sz1",k])**2)**0.5 + x[3,0]],
+    	[((x[0,0]-track["sx2",k])**2 + (x[1,0]-track["sy2",k])**2 + (x[2,0]-track["sz2",k])**2)**0.5 + x[3,0]],
+    	[((x[0,0]-track["sx3",k])**2 + (x[1,0]-track["sy3",k])**2 + (x[2,0]-track["sz3",k])**2)**0.5 + x[3,0]],
+    	[((x[0,0]-track["sx4",k])**2 + (x[1,0]-track["sy4",k])**2 + (x[2,0]-track["sz4",k])**2)**0.5 + x[3,0]]])
+    
+    Q = 1e0*np.eye(7,7); Q[3,3] = 0; Q[4,4] = 1e-10; Q[5,5] = 1e-1; Q[6,6] = 1e-1
+    R = 1e1*np.eye(5,5);
+    
+    X0 = np.array([[start.getX()], [start.getY()], [start.getZ()], [0], [0], [0], [0]])
+    P0 = 1e5*np.eye(7,7); P0[3,3] = 1e6; P0[4,4] = 1e1; P0[5,5] = 1e1; P0[6,6] = 1e3
+    
+    UKF = Kalman(spreading=1)
+    UKF.setTransition(F, Q)
+    UKF.setObservation(H, R)
+    UKF.setInitState(X0, P0)
+    UKF.summary()
+    
+    UKF.estimate(track, ["m0","m1","m2","m3","m4"], mode = Dynamics.MODE_STATES_AS_3D_POSITIONS)
+    
+    track.toGeoCoords()
+    
+    
+    track.plot('r-')
+    
+    plt.show()
+    
+    KmlWriter.writeToKml(track, path="couplage.kml", type="LINE")
 
 
 # -----------------------------------------------------------------------
@@ -391,94 +431,88 @@ KmlWriter.writeToKml(track, path="couplage.kml", type="LINE")
 # Context: receiver clock error drift is estimated in order to keep 
 # track of position even without required minimal number of satellites
 # -----------------------------------------------------------------------
+def example4():
 
-'''
-start = GeoCoords(2.4320023,  48.84298, 100).toECEFCoords()
-
-
-path = "tracklib/data/psr_all.dat"
-
-track = Track()
-
-Nepochs = 534
-for i in range(Nepochs):
-	track.addObs(Obs(ECEFCoords(0,0,0)))
-track.createAnalyticalFeature("m0",[0]*Nepochs); track.createAnalyticalFeature("sx0",[0]*Nepochs); track.createAnalyticalFeature("sy0",[0]*Nepochs); track.createAnalyticalFeature("sz0",[0]*Nepochs); 
-track.createAnalyticalFeature("m1",[0]*Nepochs); track.createAnalyticalFeature("sx1",[0]*Nepochs); track.createAnalyticalFeature("sy1",[0]*Nepochs); track.createAnalyticalFeature("sz1",[0]*Nepochs); 
-track.createAnalyticalFeature("m2",[0]*Nepochs); track.createAnalyticalFeature("sx2",[0]*Nepochs); track.createAnalyticalFeature("sy2",[0]*Nepochs); track.createAnalyticalFeature("sz2",[0]*Nepochs); 
-track.createAnalyticalFeature("m3",[0]*Nepochs); track.createAnalyticalFeature("sx3",[0]*Nepochs); track.createAnalyticalFeature("sy3",[0]*Nepochs); track.createAnalyticalFeature("sz3",[0]*Nepochs); 
-track.createAnalyticalFeature("m4",[0]*Nepochs); track.createAnalyticalFeature("sx4",[0]*Nepochs); track.createAnalyticalFeature("sy4",[0]*Nepochs); track.createAnalyticalFeature("sz4",[0]*Nepochs); 
-track.createAnalyticalFeature("m5",[0]*Nepochs); track.createAnalyticalFeature("sx5",[0]*Nepochs); track.createAnalyticalFeature("sy5",[0]*Nepochs); track.createAnalyticalFeature("sz5",[0]*Nepochs); 
-
-
-with open(path) as fp:
-	line = True
-	for i in range(Nepochs):
-		for j in range(6):
-			line = fp.readline()
-			vals = line[:-1].split(",")
-			track.setObsAnalyticalFeature("sx"+str(j), i, float(vals[1]))
-			track.setObsAnalyticalFeature("sy"+str(j), i, float(vals[2]))
-			track.setObsAnalyticalFeature("sz"+str(j), i, float(vals[3]))
-			track.setObsAnalyticalFeature("m"+str(j) , i, float(vals[4]))
-		line = fp.readline()
-
-track = track%[False, True]
-
-
-
-def F(x):
-	return np.array([
-	[x[0,0]],
-	[x[1,0]],
-	[x[2,0]],
-	[x[3,0]+x[4,0]],
-	[x[4,0]]])
-
-def H(x, k, track):		
-	return np.array([
-	[((x[0,0]-track["sx0",k])**2 + (x[1,0]-track["sy0",k])**2 + (x[2,0]-track["sz0",k])**2)**0.5 + x[3,0]],
-	[((x[0,0]-track["sx1",k])**2 + (x[1,0]-track["sy1",k])**2 + (x[2,0]-track["sz1",k])**2)**0.5 + x[3,0]],
-	[((x[0,0]-track["sx2",k])**2 + (x[1,0]-track["sy2",k])**2 + (x[2,0]-track["sz2",k])**2)**0.5 + x[3,0]],
-	[((x[0,0]-track["sx3",k])**2 + (x[1,0]-track["sy3",k])**2 + (x[2,0]-track["sz3",k])**2)**0.5 + x[3,0]],
-	[((x[0,0]-track["sx4",k])**2 + (x[1,0]-track["sy4",k])**2 + (x[2,0]-track["sz4",k])**2)**0.5 + x[3,0]],
-	[((x[0,0]-track["sx5",k])**2 + (x[1,0]-track["sy5",k])**2 + (x[2,0]-track["sz5",k])**2)**0.5 + x[3,0]]])
-
-
-Q = 1e0*np.eye(5,5); Q[3,3] = 0; Q[4,4] = 1e0
-def R(k):
-	P = 1e1*np.eye(6,6)
-	if (k>=70) and (k<267):
-		for i in range(3,6):
-			P[i,i] = 1e16
-	return P 
-	
-for k in range(70, 267):
-	for i in range(3,6):
-		track.setObsAnalyticalFeature("m"+str(i),k, 20000000)
-
-X0 = np.array([[start.X], [start.Y], [start.Z], [0], [0]])
-P0 = 1e5*np.eye(5,5); P0[3,3] = 1e8; P0[4,4] = 1e6
-
-UKF = Kalman(spreading=1)
-UKF.setTransition(F, Q)
-UKF.setObservation(H, R)
-UKF.setInitState(X0, P0)
-UKF.summary()
-
-UKF.estimate(track, ["m0","m1","m2","m3","m4","m5"], mode = Dynamics.MODE_STATES_AS_3D_POSITIONS)
-track.toGeoCoords()
-
-
-KmlWriter.writeToKml(track, path="couplage.kml", type="POINT", c1=[0,1,0,1])
-
-
-track.plot('r+')
-plt.show()
-'''
-
-
-
-
-
+    start = GeoCoords(2.4320023,  48.84298, 100).toECEFCoords()
+    
+    
+    path = "tracklib/data/psr_all.dat"
+    
+    track = Track()
+    
+    Nepochs = 534
+    for i in range(Nepochs):
+    	track.addObs(Obs(ECEFCoords(0,0,0)))
+    track.createAnalyticalFeature("m0",[0]*Nepochs); track.createAnalyticalFeature("sx0",[0]*Nepochs); track.createAnalyticalFeature("sy0",[0]*Nepochs); track.createAnalyticalFeature("sz0",[0]*Nepochs); 
+    track.createAnalyticalFeature("m1",[0]*Nepochs); track.createAnalyticalFeature("sx1",[0]*Nepochs); track.createAnalyticalFeature("sy1",[0]*Nepochs); track.createAnalyticalFeature("sz1",[0]*Nepochs); 
+    track.createAnalyticalFeature("m2",[0]*Nepochs); track.createAnalyticalFeature("sx2",[0]*Nepochs); track.createAnalyticalFeature("sy2",[0]*Nepochs); track.createAnalyticalFeature("sz2",[0]*Nepochs); 
+    track.createAnalyticalFeature("m3",[0]*Nepochs); track.createAnalyticalFeature("sx3",[0]*Nepochs); track.createAnalyticalFeature("sy3",[0]*Nepochs); track.createAnalyticalFeature("sz3",[0]*Nepochs); 
+    track.createAnalyticalFeature("m4",[0]*Nepochs); track.createAnalyticalFeature("sx4",[0]*Nepochs); track.createAnalyticalFeature("sy4",[0]*Nepochs); track.createAnalyticalFeature("sz4",[0]*Nepochs); 
+    track.createAnalyticalFeature("m5",[0]*Nepochs); track.createAnalyticalFeature("sx5",[0]*Nepochs); track.createAnalyticalFeature("sy5",[0]*Nepochs); track.createAnalyticalFeature("sz5",[0]*Nepochs); 
+    
+    
+    with open(path) as fp:
+    	line = True
+    	for i in range(Nepochs):
+    		for j in range(6):
+    			line = fp.readline()
+    			vals = line[:-1].split(",")
+    			track.setObsAnalyticalFeature("sx"+str(j), i, float(vals[1]))
+    			track.setObsAnalyticalFeature("sy"+str(j), i, float(vals[2]))
+    			track.setObsAnalyticalFeature("sz"+str(j), i, float(vals[3]))
+    			track.setObsAnalyticalFeature("m"+str(j) , i, float(vals[4]))
+    		line = fp.readline()
+    
+    track = track%[False, True]
+    
+    
+    
+    def F(x):
+    	return np.array([
+    	[x[0,0]],
+    	[x[1,0]],
+    	[x[2,0]],
+    	[x[3,0]+x[4,0]],
+    	[x[4,0]]])
+    
+    def H(x, k, track):		
+    	return np.array([
+    	[((x[0,0]-track["sx0",k])**2 + (x[1,0]-track["sy0",k])**2 + (x[2,0]-track["sz0",k])**2)**0.5 + x[3,0]],
+    	[((x[0,0]-track["sx1",k])**2 + (x[1,0]-track["sy1",k])**2 + (x[2,0]-track["sz1",k])**2)**0.5 + x[3,0]],
+    	[((x[0,0]-track["sx2",k])**2 + (x[1,0]-track["sy2",k])**2 + (x[2,0]-track["sz2",k])**2)**0.5 + x[3,0]],
+    	[((x[0,0]-track["sx3",k])**2 + (x[1,0]-track["sy3",k])**2 + (x[2,0]-track["sz3",k])**2)**0.5 + x[3,0]],
+    	[((x[0,0]-track["sx4",k])**2 + (x[1,0]-track["sy4",k])**2 + (x[2,0]-track["sz4",k])**2)**0.5 + x[3,0]],
+    	[((x[0,0]-track["sx5",k])**2 + (x[1,0]-track["sy5",k])**2 + (x[2,0]-track["sz5",k])**2)**0.5 + x[3,0]]])
+    
+    
+    Q = 1e0*np.eye(5,5); Q[3,3] = 0; Q[4,4] = 1e0
+    def R(k):
+    	P = 1e1*np.eye(6,6)
+    	if (k>=70) and (k<267):
+    		for i in range(3,6):
+    			P[i,i] = 1e16
+    	return P 
+    	
+    for k in range(70, 267):
+    	for i in range(3,6):
+    		track.setObsAnalyticalFeature("m"+str(i),k, 20000000)
+    
+    X0 = np.array([[start.X], [start.Y], [start.Z], [0], [0]])
+    P0 = 1e5*np.eye(5,5); P0[3,3] = 1e8; P0[4,4] = 1e6
+    
+    UKF = Kalman(spreading=1)
+    UKF.setTransition(F, Q)
+    UKF.setObservation(H, R)
+    UKF.setInitState(X0, P0)
+    UKF.summary()
+    
+    UKF.estimate(track, ["m0","m1","m2","m3","m4","m5"], mode = Dynamics.MODE_STATES_AS_3D_POSITIONS)
+    track.toGeoCoords()
+    
+    
+    KmlWriter.writeToKml(track, path="couplage.kml", type="POINT", c1=[0,1,0,1])
+    
+    
+    track.plot('r+')
+    plt.show()
 

@@ -8,13 +8,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from tracklib.core.Obs import Obs
-
 from tracklib.core.Kernel import DiracKernel
+from tracklib.core.TrackCollection import TrackCollection
 
 import tracklib.core.Utils as utils
-import tracklib.algo.Analytics as Analytics
-import tracklib.algo.Interpolation as Interpolation
 import tracklib.core.Kernel as Kernel
+
 
 DISTRIBUTION_NORMAL = 1
 DISTRIBUTION_UNIFORM = 2
@@ -95,8 +94,14 @@ class NoiseProcess:
                 output += "\n + "
         return output
 		
-    def noise(self, track):
-        return noise(track, self.amplitudes, self.kernels, self.distribution) 
+    def noise(self, track, N=1):
+        if N==1:
+            return noise(track, self.amplitudes, self.kernels, self.distribution) 
+        else:
+            collection = TrackCollection()
+            for i in range(N):
+                collection.addTrack(noise(track, self.amplitudes, self.kernels, self.distribution))
+            return collection
 		
     def plot(self):
         dh = self.kernels[0].support/500.0
@@ -216,3 +221,5 @@ def randomizer(input, f, sigma=[7], kernel=[Kernel.GaussianKernel(650)], N=10):
     return noised_output
         
 
+import tracklib.algo.Analytics as Analytics
+import tracklib.algo.Interpolation as Interpolation
