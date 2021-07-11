@@ -17,10 +17,6 @@ from tracklib.core.Utils import priority_dict
 from tracklib.core.TrackCollection import TrackCollection
 
 
-AF_LINK = "#link"
-AF_WEIGHT = "#weight"
-
-
 class Node:
     
     def __init__(self, id, coord):
@@ -30,6 +26,11 @@ class Node:
 		
     def __str__(self):
         return "Node object: " + str(self.id)
+		
+    def distanceTo(self, node):
+        return self.coord.distanceTo(node.coord)
+    def distance2DTo(self, node):
+        return self.coord.distance2DTo(node.coord)
   
     def plot(self, sym='r+'):
         plt.plot(self.coord.getX(), self.coord.getY(), sym)
@@ -59,6 +60,14 @@ class Edge:
 		
 class Network:
 
+    # Routing modes
+    ROUTING_ALGO_DIJKSTRA = 0
+    ROUTING_ALGO_ASTAR = 1 
+	
+    # Analytical features
+    AF_LINK = "#link"
+    AF_WEIGHT = "#weight"
+
     def __init__(self):
         
         self.NODES = dict();
@@ -75,6 +84,9 @@ class Network:
         self.NBGR_NODES = dict()
 		
         self.DISTANCES = None
+        self.routing_mode = Network.ROUTING_ALGO_DIJKSTRA
+
+        self.astar_wgt = 1
 		
     def addNode(self, node):
         if node.id not in self.NODES:
@@ -119,6 +131,20 @@ class Network:
         return len(self.EDGES)
 		
     # ------------------------------------------------------------
+    # Choose routing mode between:
+	#  - ROUTING_ALGO_DIJKSTRA          (0)  [default]
+	#  - ROUTING_ALGO_ASTAR             (1)
+	# ------------------------------------------------------------
+	# A* is an efficient approximate version of Dijkstra. It
+	# returns exact solution under theoretical assumptions on the
+	# metrics used to set weights on graph edges.  
+	# ------------------------------------------------------------
+    def setRoutingMethod(self, method):
+        self.routing_mode = method
+    def setAStarWeight(self, weight):
+        self.astar_wgt = weight
+
+    # ------------------------------------------------------------
     # Topometric methods
     # ------------------------------------------------------------ 
     def toGeoCoords(self, base):
@@ -131,7 +157,16 @@ class Network:
         for id in self.__idx_nodes:
             self.NODES[id].coord = self.NODES[id].coord.toENUCoords(base)
         for id in self.__idx_edges:
-            self.EDGES[id].geom.toENUCoords(base)  
+            self.EDGES[id].geom.toENUCoords(base)
+
+    def getSRID(self): 
+        return self.EDGES[self.__idx_edges[0]].geom.getSRID()
+
+    def totalLength(self):
+        count = 0
+        for id in self.__idx_edges:	
+            count += self.EDGES[id].geom.length()
+        return count
 
     def simplify(self, tolerance, mode=1):	
         for id in self.__idx_edges:
@@ -177,6 +212,11 @@ class Network:
         return len(self.NODES)
     def getNumberOfEdges(self):
         return len(self.EDGES)
+    def getNumberOfVertices(self):
+        count = 0
+        for id in self.__idx_edges:
+            count += self.EDGES[id].geom.size()
+        return count
         
     def getNodeId(self, n):
         return self.__idx_nodes[n]
@@ -188,7 +228,7 @@ class Network:
         return [l[0] for l in list(self.EDGES.items())]
         
     def getRandomNode(self):
-        return self.getNode(self.getNodesId()[random.randint(0, self.getNumberOfNodes())])
+        return self.getNode(self.getNodesId()[random.randint(0, self.getNumberOfNodes()-1)])
      
     def hasNode(self, id):
         return id in self.NODES  
@@ -248,17 +288,73 @@ class Network:
     # ------------------------------------------------------------ 
     
     # ------------------------------------------------------------ 
-	# Dijkstra algorithm to compute shortest_path(s). Routine is 
+	# Routing algorithms to compute shortest_path(s). Routine is 
 	# stopped when either target node is reached or distance to 
 	# source node is greater than 'cut' value. The result of 
 	# run_dijstra may be used as shortest distance between pair of 
 	# node, or as shortest distances between 1 node and all other 
 	# nodes of the graph model. Source and target must be provided
-	# as nodes or node ids.
+	# as nodes or node ids. As a default strategy, all computations 
+	# are done with the popular and efficient Dijkstra's algorithm
+	# If needed, settings enable to use A* heuristics optimization
+	# ------------------------------------------------------------ 
+	# Available functions:
+	#  - run_routing_forward: executes forward pass of dijkstra
+	#  - run_routing_backward: backtracking recursive search for 
+	#    the shortest path joining source and target nodes.
+	#  - sub_network: extracts sub-network from forward search
+	#  - shortest_distance: finds shortest distance between source 
+	#    node and either a target node or a list of target nodes.
+	#  - all_shortest_distances: computes all shortest distances 
+	#    between pairs of nodes in an efficient way.
+	#  - shortest_path: compute shortest path between 2 nodes.
+	#  - prepare: computes all distances between pairs of nodes
+	#  - save_prep: saves the result computed by 'prepare'
+	#  - load_prep: imports the result saved by 'save_prep'
+	#  - prepared_shortest_distance: reads shortest distance from 
+	#    a precomputed dictionnary structure. May be called only 
+	#    after prepare or load_prep functions.
+    # ------------------------------------------------------------
+	# Most of the above search functions may be interrupted before 
+	# end by specifying a target node and/or a cut distance.
+	# Output results may be compiled in an output dictionnary.
+    # ------------------------------------------------------------
+	# Important: to compute the shortest distances between all 
+	# pairs of nodes, 'all_shortest_distances' function is more 
+	# efficient than successive calls of shortest_distance(n1, n2)
+	# for all pairs of nodes n1 and n2, since the former sums up 
+	# to an n x O(n.log(n)) = O(n^2.log(n)) time complexity for 
+	# a typical planar road network, versus n^2 x O(n.log(n)) = 
+	# O(n^3.log(n)) for the latter. For a general network (not 
+	# necessarily planar), 'all_shortest_distances' function takes 
+	# O(n^3.log(n)) against O(n^4.log(n)) for 'shortest_distance'. 
+	# As a consequence, in every situation, all_shortest_distances 
+	# is n times faster than a (bad) strategy based on successive 
+	# calls of pairwise shortest_distance function. 
+    # ------------------------------------------------------------
+    def __correctInputNode(self, node):
+        if isinstance(node, Node):
+            return node.id
+        return node
+	
+    # ------------------------------------------------------------	
+    # sub_network: extracts sub-network from routing forward 
+	# search. An edge is added to the output network if both
+	# its ends have been visited during the search process.
+    # ------------------------------------------------------------
+	# Inputs:
+	#  - source:    a source node (id or node object)
+	#  - cut   :    a maximal distance for search
+	# ------------------------------------------------------------
+	# Output: a network containing only visited nodes reachable 
+	# from source with a cost lower than cut distance.
     # ------------------------------------------------------------
     def sub_network(self, source, cut):
+        self.run_routing_forward(source, cut=cut)
+        return self.sub_network()
+
+    def sub_network(self):
         print("Sub network extraction...")
-        self.run_dijkstra_forward(source, cut=cut)
         sub_net = Network()
         for eid in progressbar.progressbar(self.getEdgesId()):
             e = self.EDGES[eid]
@@ -266,24 +362,44 @@ class Network:
                 continue
             sub_net.addEdge(e, e.source, e.target)
         return sub_net
-		
-    def resetFlags(self):
+	
+    # ------------------------------------------------------------
+	# Internal function to call before dijkstra forward step
+    # ------------------------------------------------------------	
+    def __resetFlags(self):
         for elem in self.NODES.items():  	
             elem[1].poids = -1   
             elem[1].visite = False
             elem[1].antecedent = ""
             elem[1].antecedent_edge = ""
 
-    def run_dijkstra_forward(self, source, target=None, cut=1e300, output_dict=None):
+    # ------------------------------------------------------------
+	# Executes forward pass of routing algorithm to find 
+	# shortest distance between source node and all other nodes in 
+	# graph. Execution may be stopped prematurely by specifying
+	# target node and/or cut distance. For each nodes reached 
+	# (with a distance d < cut) during the search process, an 
+	# entry {key=(source, n), value=d} is added to an output 
+	# dictionnary (if specified as input)
+	# ------------------------------------------------------------
+    # Inputs:
+	#  - source      : a source node (id or node object)
+	#  - target      : a target node (id or node object, optional)
+	#  - cut         : a maximal distance for search (optional)
+	#  - output_dict : output structure for retrieved distances
+	# ------------------------------------------------------------
+	# Output: none (flags modified in node objects)
+	# ------------------------------------------------------------
+    def run_routing_forward(self, source, target=None, cut=1e300, output_dict=None):
 	
         # Input format
-        if isinstance(source, Node):
-            source = source.id
-        if isinstance(target, Node):
-            target = target.id  			
+        source = self.__correctInputNode(source)
+        target = self.__correctInputNode(target)
+	
+        heuristic = 0			
        
 	    # Node initialization
-        self.resetFlags()
+        self.__resetFlags()
         self.NODES[source].poids = 0
 
         pere = self.NODES[source];
@@ -296,15 +412,17 @@ class Network:
 				
             pere = fil.pop_smallest()
 
+            # Stop conditions
             if (pere.poids > cut) or (pere.id == target):
                 break
 
             if not output_dict is None:
-                output_dict[(source, pere)] = pere.poids				
+                output_dict[(source, pere.id)] = pere.poids				
 
             pere.visite = True
             nextEdges = self.getNextEdges(pere.id)
 
+            # Loop on connected edges
             for edge_id in nextEdges:
                 e = self.EDGES[edge_id]
                 fils = e.target
@@ -312,50 +430,198 @@ class Network:
                     fils = e.source
                 if fils.visite:
                     continue
-                if (fils.poids == -1) or (pere.poids + e.weight < fils.poids):       
-                    fils.poids = pere.poids + e.weight
+                if (fils.poids == -1) or (pere.poids + e.weight < fils.poids):  
+                    if (self.routing_mode == 1) and not (target is None):
+                        heuristic = self.astar_wgt*fils.distanceTo(self.NODES[target])				
+                    fils.poids = pere.poids + e.weight + heuristic
                     fils.antecedent = pere
                     fils.antecedent_edge = e.id
                     fil.__setitem__(fils, fils.poids)
 
-    def shortest_distance(self, source, target=None, cut=1e300):
+	# ------------------------------------------------------------
+	# Shortest_distance: finds shortest distance between source 
+	# node and either a target node or a list of target nodes.
+	# In every case, time complexity is O((n+m).log(n)) with 
+	# n the number of node and m the number of edges. That 
+	# amounts roughly to O(n.log(n)) for a typical planar road 
+	# network, and to O(n^2.log(n)) for a general network.
+	# ------------------------------------------------------------
+    # Inputs:
+	#  - source      : a source node (id or node object)
+	#  - target      : a target node (id or node object, optional)
+	#  - cut         : a maximal distance for search (optional)
+	#  - output_dict : output structure for retrieved distances
+	# ------------------------------------------------------------
+	# Output: the (float) distance between source and target nodes
+    # If target node is not specified, returns a list of distances 
+    # between source node and all other nodes in the network (non-
+    # reachable nodes are associated to 1e300 distance).	
+	# ------------------------------------------------------------
+    def shortest_distance(self, source, target=None, cut=1e300, output_dict=None):
 	    # Input format
-        if isinstance(source, Node):
-            source = source.id
-        if isinstance(target, Node):
-            target = target.id  
-        self.run_dijkstra_forward(source, target)
+        source = self.__correctInputNode(source) 
+        target = self.__correctInputNode(target)
+        self.run_routing_forward(source, target, cut=cut, output_dict=output_dict)
         if not target is None:
             return self.NODES[target].poids
         else:
             return [(n[1].poids<0)*1e300 + n[1].poids for n in self.NODES.items()]
 
-    def all_shortest_distances(self, cut=1e300):
+	# ------------------------------------------------------------
+	# Computes all shortest distances between pairs of nodes and 
+	# saves results in a dictionnary {key=(source, n), value=d}.
+	# If output dictionnary structure is provided as input, it is 
+	# directly incremented during the process, otherwise, it is 
+	# created before begining to search for shortest distances.
+	# Time complexity is O(n.(n+m).log(n)) with n the number of 
+	# nodes and m the number of edges. That amounts roughly to 
+	# O(n^2.log(n)) for a typical planar road network, and to 
+	# O(n^3.log(n)) for a general network.
+	# ------------------------------------------------------------
+    # Inputs:
+	#  - cut         : a maximal distance for search (optional)
+	#  - output_dict : output structure for retrieved distances
+	# ------------------------------------------------------------
+	# Output: the (float) distances between all pairs of nodes.
+    # Nodes separated by a distance > cut are not registered in 
+    # the output dictionnary. If dictionnary is provided as input
+	# it is incremented during the process, hence it is possble to 
+	# call 'all_shortest_distances' successively with the same 
+	# output dictionnary structure.
+	# ------------------------------------------------------------
+    def all_shortest_distances(self, cut=1e300, output_dict=None):
         print("Computing all pairs shortest distances...")
-        distances = dict()
+        if output_dict is None:
+            output_dict = dict()
         for id_source in progressbar.progressbar(self.getNodesId()):
-            self.run_dijkstra_forward(id_source, cut=cut, output_dict=distances)
-        return distances				   
-  
-    def run_dijkstra_backward(self, target):
-        node = target
+            self.run_routing_forward(id_source, cut=cut, output_dict=output_dict)
+        return output_dict				   
+
+	# ------------------------------------------------------------
+	# Computes shortest path between the source node used in 
+	# forward step 'run_routing_forward' and any target node. If 
+	# target node has not been reached during forward search, a 
+	# None object is returned by the function.
+	# ------------------------------------------------------------
+    # Inputs:
+	#  - target      : a target node (id or node object)
+	# ------------------------------------------------------------
+	# Output: a track between the source node specified in 
+    # 'run_routing_forward" and a target node. The track contains 
+    # topologic and non-topologic vertices. If the node target has 
+    # not been reached during forward step, None object is output  	
+	# ------------------------------------------------------------
+    def run_routing_backward(self, target):
+        target = self.__correctInputNode(target)
+        node = self.NODES[target]
         track = Track()
         track.addObs(Obs(node.coord))
+        if node.antecedent == "":
+            return None
         while (node.poids != 0) and (node.antecedent != ""):
             e = self.EDGES[node.antecedent_edge]
+            edge_geom = e.geom.copy()
             if e.source != node:
-                e.geom = e.geom.reverse()
-            track = track + e.geom
+                edge_geom = edge_geom.reverse()
+            track = track + (edge_geom > 1)
             node = node.antecedent
-            track.addObs(Obs(node.coord))
         return track
-			
+		
+	# ------------------------------------------------------------
+	# Computes shortest path between source and target nodes
+    # ------------------------------------------------------------
+    # Inputs:
+	#  - source      : a source node (id or node object)
+	#  - target      : a target node (id or node object, optional)
+	#  - cut         : a maximal distance for search (optional)
+	#  - output_dict : output structure for retrieved distances
+	# ------------------------------------------------------------
+	# Output: a track between source and target node. If target is 
+    # not reachable during forward step, None object is output
+	# ------------------------------------------------------------
+    def shortest_path(self, source, target, cut=1e300, output_dict=None):
+        self.run_routing_forward(source, target, cut=cut, output_dict=output_dict)
+        return self.run_routing_backward(target)
+	
+	# ------------------------------------------------------------
+	# Precomputes shortest distances between all pairs of nodes 
+	# and saves the result in DISTANCES attribute.
+	# ------------------------------------------------------------
+    # Inputs:
+	#  - cut         : a maximal distance for search (optional)
+	# ------------------------------------------------------------
+	# Output: none, DISTANCES attribute is built or updated 
+	# ------------------------------------------------------------	
     def prepare(self, cut=1e300):
-        self.DISTANCES = self.all_shortest_distances(cut=cut)
+        if self.DISTANCES is None:
+            self.DISTANCES = dict()
+        self.all_shortest_distances(cut=cut, output_dict=self.DISTANCES)
+		
+	# ------------------------------------------------------------
+	# Tests if a shortest distance has been precomputed
+    # ------------------------------------------------------------
+    # Inputs:
+	#  - source      : a source node (id or node object)
+	#  - target      : a target node (id or node object, optional)
+	# ------------------------------------------------------------
+	# Output: true if a shortest distance between source and 
+	# target has already been computed.
+	# ------------------------------------------------------------
+    def has_prepared_shortest_distance(self, source, target):
+        if self.DISTANCES is None:
+            print("Error: prepare function must be called before attempting to use preparation")	
+        if isinstance(source, Node):
+            source = source.id
+        if isinstance(target, Node):
+            target = target.id  
+        key = (source, target)
+        return key in self.DISTANCES
+
+	# ------------------------------------------------------------
+	# Finds shortest distance from the precomputation. May be 
+	# called only after prepare or load_prep. 
+    # ------------------------------------------------------------
+    # Inputs:
+	#  - source      : a source node (id or node object)
+	#  - target      : a target node (id or node object, optional)
+	# ------------------------------------------------------------
+	# Output: shortest distance between source and targer. Returns 
+	# 1e300 if shortest distance has not been precomputed.
+	# ------------------------------------------------------------
+    def prepared_shortest_distance(self, source, target):
+        if self.DISTANCES is None:
+            print("Error: prepare function must be called before attempting to use preparation")
+        if isinstance(source, Node):
+            source = source.id
+        if isinstance(target, Node):
+            target = target.id  
+        key = (source, target)
+        if key in self.DISTANCES:
+            return self.DISTANCES[key]
+        else:
+            return 1e300
+		
+	# ------------------------------------------------------------
+	# Saves DISTANCES attribute in a npy file for further use
+	# ------------------------------------------------------------	
+    # Inputs:
+	#  - filename      : path to save precomputed structure
+	# ------------------------------------------------------------
     def save_prep(self, filename):
         if self.DISTANCES is None:
             print("Error: prepare function must be called before attempting to save preparation")
             exit(1)
         np.save(filename, self.DISTANCES) 
+		
+	# ------------------------------------------------------------
+	# Imports DISTANCES attribute from an npy file
+	# ------------------------------------------------------------
+	    # Inputs:
+	#  - filename      : path where precomputed structure is saved
+	# ------------------------------------------------------------
     def load_prep(self, filename):
+        if len(filename) < 4:
+            filename = filename + '.npy'
+        if filename[:-4] != '.npy':
+            filename = filename + '.npy'
         self.DISTANCES = read_dictionary = np.load(filename, allow_pickle='TRUE').item()
