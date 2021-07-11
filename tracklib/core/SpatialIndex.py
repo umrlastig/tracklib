@@ -120,25 +120,17 @@ class SpatialIndex:
         pass
     
     
-    def __getCoordGrille(self, coord):
-        '''
-            Fonction qui convertit des coordonnées Coords en Coordonnées de la grille 
-        '''
-        X = float(coord.getX()) - self.xmin
-        idx = X / self.dX
-        
-        Y = float(coord.getY()) - self.ymin
-        idy = Y / self.dY
-        
-        return (idx, idy)
-    
-    
     def __getCell(self, coord):
         '''
             Fonction qui retourne les identifiants de la cellule en indices (i,j)
             de Coord  
         '''
-        (idx, idy) = self.__getCoordGrille(coord)
+        # (idx, idy) = self.__getCoordGrille(coord)
+        X = float(coord.getX()) - self.xmin
+        idx = X / self.dX
+        
+        Y = float(coord.getY()) - self.ymin
+        idy = Y / self.dY
         
         if math.floor(idx) < 0 or math.floor(idx) > (self.csize + 1):
             sys.exit ('error, depassement en x')
@@ -201,7 +193,7 @@ class SpatialIndex:
             return self.request(math.floor(c[0]), math.floor(c[1]))
         
         if isinstance(obj, list):
-            ''' dans les cellules traversée par le segment défini
+            ''' dans les cellules traversées par le segment défini
             par des coordonnées géographiques '''
             [coord1, coord2] = obj
             p1 = self.__getCell(coord1)
@@ -240,13 +232,15 @@ class SpatialIndex:
         '''
         retourne toutes les données (sous forme de liste simple) référencées 
         dans la cellule (i,j). 
+        
         Si unit=-1, calcule la valeur minimale à donner à unit, 
         pour que la liste ne soit pas vide*.  
         '''
         
         if isinstance(obj, int):
+        
             i = obj
-            
+
             if unit > -1:
                 NC = self.__neighbouringcells(i, j, unit)
                 TAB = []
@@ -258,7 +252,7 @@ class SpatialIndex:
             # Si unit = -1, tant liste ne soit pas vide
             # plus une marge de une unité
             u = 0
-            while (u <= max(self.xsize, self.ysize)):
+            while (u <= max(self.csize, self.lsize)):
                 NC = self.__neighbouringcells(i, j, u)
                 TAB = []
                 for cell in NC:
@@ -282,35 +276,53 @@ class SpatialIndex:
             y = coord.getY()
             c = self.__getCell(ENUCoords(x, y))
             # print (c)
-            return self.neighborhood(c[0], c[1], unit)
+            return self.neighborhood(math.floor(c[0]), math.floor(c[1]), unit)
            
         
         if isinstance(obj, list):
             ''' cellules voisines traversées par le segment coord '''
             [coord1, coord2] = obj
-            # Tableau à retourner
-            TAB = []
-            # Les cellules traversées par le segment
-            CELLS = self.__cellsCrossSegment(coord1, coord2)
+            p1 = self.__getCell(coord1)
+            p2 = self.__getCell(coord2)
+            
+            if unit > -1:
+                # Tableau à retourner
+                TAB = []
+            
+                # Les cellules traversées par le segment
+                CELLS = self.__cellsCrossSegment(p1, p2)
+                for cell in CELLS:
+                    NC = self.__neighbouringcells(cell[0], cell[1], unit)
+                    #print (cell, NC)
+                    for cellu in NC:
+                        self.__addCellValuesInTAB(TAB, cellu)
+                
+                return TAB
+            
+            CELLS = self.__cellsCrossSegment(p1, p2)
             for cell in CELLS:
-                self.__addCellValuesInTAB(TAB, cell)
+                NC = self.__neighbouringcells(cell[0], cell[1], unit)
+                #print (cell, NC)
+                for cellu in NC:
+                    self.__addCellValuesInTAB(TAB, cellu)
+                
+            # Plus une marge de sécurité
             
 
-        
-        if isinstance(obj, Track):
-            ''' cellules voisines traversée par la track '''
-            track = obj
-            pass
+#        if isinstance(obj, Track):
+#            ''' cellules voisines traversée par la track '''
+#            track = obj
+#            pass
         
     
     def __neighbouringcells(self, i, j, u=1):
         '''
         Parameters
         ----------
-        i : TYPE
-            DESCRIPTION.
-        j : TYPE
-            DESCRIPTION.
+        i : int
+            indice de la cellule (i,j).
+        j : int
+            indice de la cellule (i,j).
         u : TYPE, optional
             DESCRIPTION. The default is 1.
 
@@ -326,27 +338,27 @@ class SpatialIndex:
         #  i = +-u et j = +- 0-->u
         for t in range(-u, u+1):
             candidat1 = (i + u, j + t)
-            if (i+u) < self.xsize and (i+u) >= 0 and (j+t) < self.ysize and (j+t) >= 0:
+            if (i+u) < self.csize and (i+u) >= 0 and (j+t) < self.lsize and (j+t) >= 0:
                 if candidat1 not in NC:
                     NC.append(candidat1)
             candidat2 = (i - u, j + t)
-            if (i-u) < self.xsize and (i-u) >= 0 and (j+t) < self.ysize and (j+t) >= 0:
+            if (i-u) < self.csize and (i-u) >= 0 and (j+t) < self.lsize and (j+t) >= 0:
                 if candidat2 not in NC:
                     NC.append(candidat2)
         
         #  i = +- 0-->u-1 et j = +-u
         for s in range(-u+1, u):
             candidat1 = (i + s, j + u)
-            if (i+s) < self.xsize and (i+s) >= 0 and (j+u) < self.ysize and (j+u) >= 0:
+            if (i+s) < self.csize and (i+s) >= 0 and (j+u) < self.lsize and (j+u) >= 0:
                 if candidat1 not in NC:
                     NC.append(candidat1)
             candidat2 = (i + s, j - u)
-            if (i+s) < self.xsize and (i+s) >= 0 and (j-u) < self.ysize and (j-u) >= 0:
+            if (i+s) < self.csize and (i+s) >= 0 and (j-u) < self.lsize and (j-u) >= 0:
                 if candidat2 not in NC:
                     NC.append(candidat2)
             
         # return neighbouring cells
-        #print (NC)
+        # print (NC)
         return NC
         
         
