@@ -4,7 +4,7 @@ import math
 import matplotlib.pyplot as plt
 import sys
 
-from tracklib.core.Coords import GeoCoords, ENUCoords, ECEFCoords
+from Coords import GeoCoords, ENUCoords, ECEFCoords
 from tracklib.core.Network import Edge
 from tracklib.core.Track import Track
 
@@ -46,32 +46,33 @@ class SpatialIndex:
         
         # Nombre de dalle par cote
         self.resolution = resolution
-        self.xsize = self.resolution[0]
-        self.ysize = self.resolution[1]
-        #print ('nb cellule', self.xsize * self.ysize)
+        self.csize = self.resolution[0]
+        self.lsize = self.resolution[1]
+        # print ('nb cellule', self.xsize * self.ysize)
         
         # Tableau de collections de features appartenant a chaque dalle. 
         # Un feature peut appartenir a plusieurs dalles.
         self.grid = []
-        for i in range(self.xsize + 1):
+        for i in range(self.csize + 1):
             self.grid.append([])
-            for j in range(self.ysize + 1):
+            for j in range(self.lsize + 1):
                 self.grid[i].append([])
         
         (self.xmin, self.xmax, self.ymin, self.ymax) = collection.bbox()
         
-        self.dX = (self.xmax - self.xmin) / self.xsize
-        self.dY = (self.ymax - self.ymin) / self.ysize
+        self.dX = (self.xmax - self.xmin) / self.csize
+        self.dY = (self.ymax - self.ymin) / self.lsize
         #print (self.dX, self.dY)
         
         # Calcul de la grille
         for num in range(collection.size()):
-            features = collection[num]
+            feature = collection[num]
             # On récupere la trace
-            if isinstance(features, Track):
-                self.__addIntersectCells(features, num)
-            elif isinstance(features, Edge):
-                self.__addIntersectCells(features.track, num)
+            if isinstance(feature, Track):
+                self.__addIntersectCells(feature, num)
+            # On récupère l'arc du reseau qui est une trace
+            elif isinstance(feature, Edge):
+                self.__addIntersectCells(feature.track, num)
                 
 
 
@@ -85,7 +86,6 @@ class SpatialIndex:
             if coord1 != None:
                 p1 = self.__getCell(coord1)
                 p2 = self.__getCell(coord2)
-                #print (p1, p2)
                 self.__addSegment(p1, p2, (i-1,num))
             coord1 = coord2
 
@@ -100,14 +100,15 @@ class SpatialIndex:
         '''
         #
         CELLS = self.__cellsCrossSegment(coord1, coord2)
+        #print (CELLS)
         
         for cell in CELLS:
             i = cell[0]
             j = cell[1]
-            if i > self.xsize:
+            if i > self.csize:
                 print ('error, depassement en x')
                 exit()
-            if j > self.ysize:
+            if j > self.lsize:
                 print ('error, depassement en y')
                 exit()
                 
@@ -139,23 +140,24 @@ class SpatialIndex:
         '''
         (idx, idy) = self.__getCoordGrille(coord)
         
-        if math.floor(idx) < 0 or math.floor(idx) > (self.xsize + 1):
+        if math.floor(idx) < 0 or math.floor(idx) > (self.csize + 1):
             sys.exit ('error, depassement en x')
-        if idy < 0 or idy > (self.ysize + 1):
+        if idy < 0 or idy > (self.lsize + 1):
             sys.exit ('error, depassement en y')
         
-        return (math.floor(idx), math.floor(idy))
+        #return (math.floor(idx), math.floor(idy))
+        return (idx, idy)
     
     
     def plot(self):
         
         fig = plt.figure()
-        ax = fig.add_subplot(111, xlim=(0, self.xsize), ylim=(0, self.ysize))
+        ax = fig.add_subplot(111, xlim=(0, self.csize), ylim=(0, self.lsize))
         
-        for i in range(1,self.xsize):
-            ax.plot([i,i], [0,self.xsize], '-',color='lightgray')
-        for j in range(1,self.ysize):
-            ax.plot([0,self.ysize], [j,j], '-',color='lightgray')
+        for i in range(1,self.csize):
+            ax.plot([i,i], [0, self.csize], '-',color='lightgray')
+        for j in range(1,self.lsize):
+            ax.plot([0, self.lsize], [j,j], '-',color='lightgray')
         
         for j in range(self.collection.size()):
             features = self.collection[j]
@@ -170,8 +172,8 @@ class SpatialIndex:
             ax.plot(X1, Y1, '-', color='forestgreen')
         #ax.plot([x1,x2], [y1,y2], '-')
         
-        for i in range(self.xsize):
-            for j in range(self.ysize):
+        for i in range(self.csize):
+            for j in range(self.lsize):
                 # cellule (i,j)
 
                 if len(self.grid[i][j]) > 0:
@@ -181,12 +183,12 @@ class SpatialIndex:
                     polygon.set_facecolor('lightcyan')
 
 
-    def request(self, obj, j = -1) : 
+    def request(self, obj, j = -1): 
         '''
         retourne toutes les données (sous forme de liste simple) 
         référencées dans ...
         '''
-        
+        # print (type(obj))
         if isinstance(obj, int):
             ''' dans la cellule (i,j)  '''
             i = obj
@@ -196,15 +198,17 @@ class SpatialIndex:
             ''' dans la cellule contenant le point coord '''
             coord = obj
             c = self.__getCell(coord)
-            # print ('--', c)
-            return self.request(c[0], c[1])
+            return self.request(math.floor(c[0]), math.floor(c[1]))
         
         if isinstance(obj, list):
-            ''' dans les cellules traversée par le segment coord '''
+            ''' dans les cellules traversée par le segment défini
+            par des coordonnées géographiques '''
             [coord1, coord2] = obj
+            p1 = self.__getCell(coord1)
+            p2 = self.__getCell(coord2)
             
             # Les cellules traversées par le segment
-            CELLS = self.__cellsCrossSegment(coord1, coord2)
+            CELLS = self.__cellsCrossSegment(p1, p2)
             TAB = []
             for cell in CELLS:
                 self.__addCellValuesInTAB(TAB, cell)
@@ -361,10 +365,12 @@ class SpatialIndex:
                 if d not in TAB:
                     TAB.append(d)
         
+
         
     def __cellsCrossSegment(self, coord1, coord2):
         '''
-            liste des cellules passent par ce segment
+            liste des cellules passent par le segment défini 
+            par [coord1, coord2] en pixel
         '''
         CELLS = []
         segment2 = [coord1[0], coord1[1], coord2[0], coord2[1]]
