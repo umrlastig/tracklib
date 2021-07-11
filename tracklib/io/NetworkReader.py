@@ -11,9 +11,87 @@ import tracklib.util.Wkt as wkt
 
 
 class NetworkReader:
-    
+
     @staticmethod
     def readFromFile(path, formatfile = 'DEFAULT', verbose=True):
+ 
+        network = Network()
+        fmt = NetworkFormat(formatfile)
+        
+        num_lines = sum(1 for line in open(path))
+
+        with open(path, encoding='utf-8') as csvfile:
+            
+            spamreader = csv.reader(csvfile, delimiter=fmt.separator, doublequote= True)
+            
+            # Header
+            cpt = 0
+            for row in spamreader:
+                cpt += 1
+                if cpt >= fmt.h:
+                    break
+    
+            counter = 0    
+            if verbose:
+                spamreader = progressbar.progressbar(spamreader, max_value=num_lines)
+                
+            for row in spamreader:
+                
+                edge_id = str(row[fmt.pos_edge_id])
+                if fmt.pos_edge_id < 0:
+                    edge_id = counter
+                counter = counter + 1
+
+                geom = str(row[fmt.pos_wkt])
+                TAB_OBS = wkt.wktLineStringToObs(geom, fmt.srid.upper())
+
+                
+                # Au moins 2 points
+                if len(TAB_OBS) < 2:
+                    continue
+                
+                track = Track(TAB_OBS)
+             
+                # Transformation GEO coordinates to ENU
+                if (fmt.srid.upper() in ["GEOCOORDS", "GEO", "ECEFCOORDS", "ECEF"]):
+                    track.toENUCoords()
+                
+                edge = Edge(edge_id, track)
+              
+                # Orientation
+                orientation = int(row[fmt.pos_sens])
+                if (orientation not in [Edge.DOUBLE_SENS, Edge.SENS_DIRECT, Edge.SENS_INVERSE]):
+                    orientation = Edge.DOUBLE_SENS
+                edge.orientation = orientation
+                  
+                # Poids
+                if fmt.pos_poids == -1:
+                    poids = track.length()
+                else:
+                    poids = float(row[fmt.pos_poids])
+                edge.weight = poids
+                
+                 # source node 
+                source = str(row[fmt.pos_source])
+                noeudIni = Node(source, track.getFirstObs().position)
+                
+                # target node 
+                target = str(row[fmt.pos_target])
+                noeudFin = Node(target, track.getLastObs().position)
+                
+               # Add edge
+                network.addEdge(edge, noeudIni, noeudFin)
+
+        csvfile.close()      
+                
+        # Return network loaded
+        return network
+
+
+
+    
+    @staticmethod
+    def readFromFile2(path, formatfile = 'DEFAULT', verbose=True):
         '''
         TODO : posSol
         '''
@@ -21,7 +99,6 @@ class NetworkReader:
         fmt = NetworkFormat(formatfile)  # Read from input parameters
         
         network = Network()
-        
         
         num_lines = sum(1 for line in open(path))
 
@@ -101,11 +178,6 @@ class NetworkReader:
                 
                # Add edge
                 network.addEdge(edge)
-
-                #if (counter % 100 == 0):
-                #    print(counter)
-                #if len(network.EDGES) > 20000:
-                #    break
 
         csvfile.close()      
                 
