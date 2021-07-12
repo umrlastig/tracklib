@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import sys
 
 from tracklib.core.Coords import GeoCoords, ENUCoords, ECEFCoords
-#from Coords import GeoCoords, ENUCoords, ECEFCoords
 from tracklib.core.Network import Edge
 from tracklib.core.Track import Track
 

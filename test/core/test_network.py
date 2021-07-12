@@ -7,7 +7,7 @@ from tracklib.core.Network import Node, AF_WEIGHT
 from tracklib.io.NetworkReader import NetworkReader
 from tracklib.io.IgnReader import IgnReader
 
-from test.TestTracklib import TestTracklib
+from test_tracklib import TestTracklib
 
 class TestDijkstra(TestTracklib):
     
