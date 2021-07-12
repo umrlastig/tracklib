@@ -410,20 +410,20 @@ class Kalman:
             for step in range(self.iter):
 
                 SIGMA_PTS = self.__sampleSigmaPts(X, P)
-                
+                 
                 # Prediction step
                 if step == 0:
                     SIGMA_PTS = self.__apply(self.F, SIGMA_PTS, k, track)
                     MU = self.__mean(SIGMA_PTS, W)
                     COV = self.__cov(SIGMA_PTS, W, MU) + self.getQ(k, track)
-                
+
                 # Update step
                 SIGMA_PTS2 = self.__apply(self.H, SIGMA_PTS, k, track)
                 z = self.__getObs(track, obs, k, mode)
-                Z = self.__mean(SIGMA_PTS2, W)
+                Z = self.__mean(SIGMA_PTS2, W)  
                 I = (np.array([z]).transpose()-Z)
                 S =  self.__cov(SIGMA_PTS2, W, Z) + self.getR(k, track)
-                
+            
                 # Innovation control
                 if Stochastics.khi2test(I, S, self.control):
                     continue

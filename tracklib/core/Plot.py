@@ -7,8 +7,8 @@ import numpy as np
 import progressbar
 import matplotlib.pyplot as plt
 import tracklib.algo.Analytics as algo
-import tracklib.core.Operator as Operator
 import tracklib.core.Utils as utils
+
 from matplotlib.patches import Ellipse
 
 from PIL import Image
@@ -69,6 +69,9 @@ class Plot:
         Représentation d'une trace sous forme de ligne ou de point.
         On peut visualiser la valeur d'une AF avec une couleur sur les points.
         '''
+		
+        import tracklib.core.Operator as Operator
+		
         if isinstance(append, bool): 
             if append:
                 ax1 = plt.gca()
@@ -197,7 +200,8 @@ class Plot:
                   
         afs: uniquement si 'isAFTransition'
         '''
-        
+        import tracklib.core.Operator as Operator
+
         tabplot = []
         tablegend = []
         nomaxes = template.split('_')

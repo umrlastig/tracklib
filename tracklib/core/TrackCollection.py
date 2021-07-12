@@ -6,7 +6,6 @@ import random
 
 import matplotlib.pyplot as plt
 
-import tracklib.core.Operator as Operator
 import tracklib.core.Plot as Plot
 
 import tracklib.core.Utils as utils
@@ -142,6 +141,9 @@ class TrackCollection:
     #def summarize(self, ):
         
     def filterOnBBox(self, bbox):
+		
+        import tracklib.core.Operator as Operator  
+
         xmin = bbox[0]
         ymin = bbox[1]
         xmax = bbox[2]
@@ -411,7 +413,4 @@ class TrackCollection:
                 NEW_TRACES.append(track)
         
         self.__TRACES = NEW_TRACES
-
-               
-               
-               
+          

@@ -151,8 +151,8 @@ def example1(withBiases=False, withCycleSlip=False):
     track_odo.op("dy=D(y)")
     
     track = track_gt.noise(0.5)
-    track.biop(track_odo, "vx=dx'")
-    track.biop(track_odo, "vy=dy'")
+    track.biop(track_odo, "vx=dx°2")
+    track.biop(track_odo, "vy=dy°")
 	
     externals = {"x1":B1[0], "y1":B1[1], "x2":B2[0], "y2":B2[1], "b1":b1, "b2":b2, "sp":sp}
     track.op("balise1 = SQRT((x-x1)^2+(y-y1)^2)-b1-sp*(idx>50)", externals)
@@ -225,8 +225,8 @@ def example1(withBiases=False, withCycleSlip=False):
 # -----------------------------------------------------------------------
 def example2():
 
-    path_cam = "tracklib/data/hybridation_gnss_camera.dat"
-    path_gps = "tracklib/data/hybridation_gnss_camera.pos"
+    path_cam = "data/hybridation_gnss_camera.dat"
+    path_gps = "data/hybridation_gnss_camera.pos"
     
     GPSTime.setReadFormat("2D/2M/4Y-2h:2m:2s.3z")
     

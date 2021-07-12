@@ -797,6 +797,7 @@ class Track:
 
         # Algebraic expression (arg1 = list of externals)
         if isinstance(operator, str):
+            print(Track.__makeRPN(operator))
             if arg1 is None:
                 arg1 = []
             output = self.__evaluate(operator, arg1)	
@@ -874,8 +875,8 @@ class Track:
     # Algebraic operation on 2 tracks. Short-cut "biop"
     # If expression contains a left hand side AF, it is added to self track.
     # Self track and second track may have same name AF. Any AF referring to 
-    # to the second track must be terminated witj single quote character.
-    # For example t1.bioperate(t2, "a=b'+c") adds 1st track's AF c with 2nd 
+    # to the second track must be terminated with single ° character.
+    # For example t1.bioperate(t2, "a=b°+c") adds 1st track's AF c with 2nd 
     # track's AF b and the result a is stored in 1st track AF a.
     # -------------------------------------------------------------------------		
     def biop(self, track, expression):
@@ -886,7 +887,7 @@ class Track:
         expression = expression.strip()
         tab = Track.__makeRPN(expression)
         for e in tab:
-            if e[-1] == "'":
+            if e[-1] == "°":
                 track_tmp.createAnalyticalFeature(e, track[e[:-1]])
         track_tmp.op(expression)
         new_field = expression.split("=")[0]
