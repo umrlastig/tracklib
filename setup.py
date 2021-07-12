@@ -7,9 +7,8 @@ current_path = os.path.abspath(os.path.dirname(__file__))
 requirements = (
     'numpy',
     'matplotlib',
-	'psycopg2',
+    'psycopg2',
     'scikit-image',
-	'progressbar',
     'progressbar2'
 )
 
@@ -40,7 +39,7 @@ setup(
         'Intended Audience :: Developers',
         'Programming Language :: Python :: 3.5',
     ],
-    packages=find_packages(),
+    packages=find_packages(include=['test', 'resources']),
     install_requires=requirements,
     test_suite="tests",
     extras_require={
