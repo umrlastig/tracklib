@@ -299,14 +299,31 @@ class SpatialIndex:
                 
                 return TAB
             
-            CELLS = self.__cellsCrossSegment(p1, p2)
-            for cell in CELLS:
-                NC = self.__neighbouringcells(cell[0], cell[1], unit)
-                #print (cell, NC)
-                for cellu in NC:
-                    self.__addCellValuesInTAB(TAB, cellu)
+            
+            u = 0
+            while (u <= max(self.csize, self.lsize)):
+                TAB = []
+                CELLS = self.__cellsCrossSegment(p1, p2)
+                for cell in CELLS:
+                    NC = self.__neighbouringcells(cell[0], cell[1], u)
+                    #print (cell, NC)
+                    for cellu in NC:
+                        self.__addCellValuesInTAB(TAB, cellu)
                 
-            # Plus une marge de sécurité
+                #print (TAB)
+                if len(TAB) <= 0:
+                    u += 1
+                    continue
+                
+                # Plus une marge de sécurité
+                CELLS = self.__cellsCrossSegment(p1, p2)
+                for cell in CELLS:
+                    NC = self.__neighbouringcells(cell[0], cell[1], u+1)
+                    #print (cell, NC)
+                    for cellu in NC:
+                        self.__addCellValuesInTAB(TAB, cellu)
+                #print (TAB)                
+                return TAB
             
 
 #        if isinstance(obj, Track):
