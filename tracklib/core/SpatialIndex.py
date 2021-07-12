@@ -293,7 +293,7 @@ class SpatialIndex:
                 CELLS = self.__cellsCrossSegment(p1, p2)
                 for cell in CELLS:
                     NC = self.__neighbouringcells(cell[0], cell[1], unit)
-                    #print (cell, NC)
+                    #print ('    ', cell, NC)
                     for cellu in NC:
                         self.__addCellValuesInTAB(TAB, cellu)
                 
@@ -326,10 +326,27 @@ class SpatialIndex:
                 return TAB
             
 
-#        if isinstance(obj, Track):
-#            ''' cellules voisines traversée par la track '''
-#            track = obj
-#            pass
+        if isinstance(obj, Track):
+            ''' cellules voisines traversées par Track '''
+            
+            track = obj
+            
+            TAB2 = []
+            pos1 = None
+            for i in range(track.size()):
+                obs = track.getObs(i)
+                pos2 = obs.position
+                if pos1 != None:
+                    CELLS = self.neighborhood([pos1, pos2], None, unit)
+                    #print (CELLS, unit)
+                    for cell in CELLS:
+                        if cell not in TAB2:
+                            TAB2.append(cell)
+                pos1 = pos2
+                
+            return TAB2
+            
+
         
     
     def __neighbouringcells(self, i, j, u=1):
