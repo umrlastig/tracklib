@@ -797,7 +797,6 @@ class Track:
 
         # Algebraic expression (arg1 = list of externals)
         if isinstance(operator, str):
-            print(Track.__makeRPN(operator))
             if arg1 is None:
                 arg1 = []
             output = self.__evaluate(operator, arg1)	
@@ -1467,6 +1466,19 @@ class Track:
         expression = expression.replace(">>", "&").replace("<<", "$") 
         return expression
 		
+    def __prime(rpn):
+        out = []
+        for e in rpn:
+            if e[-1] == "'":
+                out = out + ["D"] + [e[0:-1]] + ["@"]
+                out = out + ["D"] + ["t"] + ["@"] + ["/"]                
+            else:
+                out = out + [e]
+        return out
+		
+    def __double_prime(rpn):
+        return Track.__prime(Track.__prime(rpn))
+		
     def __evaluate(self, expression, external=[]):
         expression = expression.replace(" ", "")
         expression = Track.__specialOpChar(expression)
@@ -1483,7 +1495,7 @@ class Track:
         void = ("=" in expression)
         if not void:
             expression = "#output = "+ expression
-        self.__evaluateRPN(Track.__makeRPN(expression), external)
+        self.__evaluateRPN(Track.__double_prime(Track.__makeRPN(expression)), external)
         if not void:
             output = self.getAnalyticalFeature("#output")
             self.removeAnalyticalFeature("#output")
@@ -1808,7 +1820,7 @@ class Track:
             n = n.strip()
             if ("+" in n) or ("-" in n) or ("/" in n) or ("*" in n) or ("^" in n):
                 return self.operate(n)		
-            if (">" in n) or ("<" in n) or ("(" in n) or (")" in n) or ("=" in n):	
+            if (">" in n) or ("<" in n) or ("(" in n) or (")" in n) or ("=" in n) or ("'"):	
                 return self.operate(n)						
             return self.getAnalyticalFeature(n)
 		

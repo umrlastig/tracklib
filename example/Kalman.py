@@ -151,7 +151,7 @@ def example1(withBiases=False, withCycleSlip=False):
     track_odo.op("dy=D(y)")
     
     track = track_gt.noise(0.5)
-    track.biop(track_odo, "vx=dx°2")
+    track.biop(track_odo, "vx=dx°")
     track.biop(track_odo, "vy=dy°")
 	
     externals = {"x1":B1[0], "y1":B1[1], "x2":B2[0], "y2":B2[1], "b1":b1, "b2":b2, "sp":sp}
@@ -353,7 +353,7 @@ def example3():
     start = GeoCoords(2.4320023,  48.84298, 100).toECEFCoords()
     print(start)
     
-    path = "tracklib/data/psr.dat"
+    path = "data/psr.dat"
     
     track = Track()
     
@@ -436,7 +436,7 @@ def example4():
     start = GeoCoords(2.4320023,  48.84298, 100).toECEFCoords()
     
     
-    path = "tracklib/data/psr_all.dat"
+    path = "data/psr_all.dat"
     
     track = Track()
     
@@ -516,3 +516,124 @@ def example4():
     track.plot('r+')
     plt.show()
 
+
+# -----------------------------------------------------------------------
+# Example 5: GNSS computation with N satellites (from Nisar Hakam)
+# -----------------------------------------------------------------------
+def example5():
+
+
+	# Read the position file of RTKlib
+	positions = "data/raw_gps_ECEF.pos"
+	track = FileReader.readFromFile(positions, "RTKLIB_XYZ")			# Lecture du fichier
+	track.toENUCoords(track[0].position)
+	track.resample(1, 1)
+	track.toECEFCoords()
+
+
+	# Read the data file of the satellites
+	satellites = "data/satellites_no_erros.txt"
+
+	# Model 1:
+	# --------
+	# The state matrix Xk = (Xr, Yr, Zr)
+
+	# Define the evolution model matrix
+	# Stationery model
+	A = np.array([[1,0,0],
+				  [0,1,0],
+				  [0,0,1]])
+
+	# Define the covariance matrix of the states
+	Q = np.array([[1e2,   0,  0],
+				  [   0,1e2,  0],
+				  [   0,   0,1e2]])
+
+	# Define the measurement matrix
+	def H(x, k, track):
+
+		# Declare the number of satellites used
+		NUMBER_OF_SATELLITES = 32
+		NUMBER_OF_STATES = 3
+
+		Hk = np.zeros ((NUMBER_OF_SATELLITES, 1))
+
+		for ind in range (0, NUMBER_OF_SATELLITES):
+			
+			visible = 0 + (track.getObsAnalyticalFeature("Xs"+str(ind+1), k) != 0)
+
+			# Obtenir les positions des satellites rajouter à la trace
+			Xsat = track.getObsAnalyticalFeature("Xs" + str(ind + 1), k)
+			Ysat = track.getObsAnalyticalFeature("Ys" + str(ind + 1), k)
+			Zsat = track.getObsAnalyticalFeature("Zs" + str(ind + 1), k)
+			
+			# Distance radiale
+			r = visible * ((x[0,0] - Xsat) ** 2 + (x[1,0] - Ysat) ** 2 + (x[2,0] - Zsat) ** 2) ** 0.5
+
+			# Obtenir la Jacobienne de la matrice de mesure
+			Hk[ind][0] = r
+
+		return Hk
+
+	# Define the covariance matrix of the observation
+	Rk = np.eye(32,32)
+
+	# Create 32 analytical variables (536 slots => )
+	for cnt in range(0, 32):
+		track.createAnalyticalFeature("Xs" + str(cnt+1), [0]*len(track))
+		track.createAnalyticalFeature("Ys" + str(cnt+1), [0]*len(track))
+		track.createAnalyticalFeature("Zs" + str(cnt+1), [0]*len(track))
+		track.createAnalyticalFeature("m" + str(cnt+1), [0]*len(track))
+
+	# Put the satellites coordinates as new analytics into the track
+	ind = -1
+	with open(satellites) as fp:
+		line = fp.readline()
+		while (line):
+			if line[0:5] == "12/09":
+				ind += 1
+				fp.readline()
+				while True:
+					line = fp.readline()
+					if line[0] == "-":
+						break
+
+					# Handle the headers of each slot
+					tok = line.split()
+					
+					# Set the values of the satellites at each time stamp
+					track.setObsAnalyticalFeature("Xs" + str(tok[0]), ind, float(tok[1]))
+					track.setObsAnalyticalFeature("Ys" + str(tok[0]), ind, float(tok[2]))
+					track.setObsAnalyticalFeature("Zs" + str(tok[0]), ind, float(tok[3]))
+					track.setObsAnalyticalFeature("m" + str(tok[0]), ind, float(tok[4]))
+			
+			line = fp.readline()
+		
+		
+	start = ECEFCoords(4201797.8382,178416.3546,4779221.8874)
+
+	X0 = np.array([[start.getX()], [start.getY()], [start.getZ()]])
+	P0 = 1e1 * np.eye(3,3)
+
+
+	UKF = Kalman(spreading=1)
+	UKF.setTransition(A, Q)
+	UKF.setObservation(H, Rk)
+	UKF.setInitState(X0, P0)
+
+	UKF.summary()
+
+
+	H(X0, 0, track)
+	obs = []
+	for i in range (32):
+		obs.append("m" + str(i+1))
+
+		
+	UKF.estimate(track, obs, mode=Dynamics.MODE_STATES_AS_3D_POSITIONS)
+	track.summary()
+
+	track.toGeoCoords()
+	KmlWriter.writeToKml(track, "test.kml")
+	track.plot('r-')
+	plt.show()

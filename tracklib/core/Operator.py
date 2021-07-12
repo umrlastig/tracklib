@@ -629,7 +629,7 @@ class ScalarDivider(ScalarVoidOperator):
 		
 class ScalarRevDivider(ScalarVoidOperator):
     def execute(self, track, af_input, number, af_output):
-        track.operate(Operator.SCALAR_INVERSER, af_input, af_output)
+        track.operate(Operator.INVERSER, af_input, af_output)
         return track.operate(Operator.SCALAR_MULTIPLIER, af_output, number, af_output)
         
 class ScalarPower(ScalarVoidOperator):
