@@ -6,8 +6,6 @@ import random
 
 import matplotlib.pyplot as plt
 
-import tracklib.core.Plot as Plot
-
 import tracklib.core.Utils as utils
 import tracklib.algo.Summarize as Sum
 
@@ -161,6 +159,9 @@ class TrackCollection:
                     break
     
     def bbox(self):
+        
+        import tracklib.core.Operator as Operator  
+        
         tarray_xmin = []
         tarray_xmax = []
         tarray_ymin = []
