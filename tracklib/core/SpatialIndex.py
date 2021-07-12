@@ -337,6 +337,7 @@ class SpatialIndex:
             for i in range(track.size()):
                 obs = track.getObs(i)
                 pos2 = obs.position
+                
                 if pos1 != None:
                     CELLS = self.neighborhood([pos1, pos2], None, unit)
                     #print (CELLS, unit)
