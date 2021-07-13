@@ -6,13 +6,10 @@ import progressbar
 import numpy as np
 import matplotlib.pyplot as plt
 
-import tracklib.algo.Summarize as Sum
 import tracklib.algo.Simplification as Simplification
 
 from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
-from tracklib.core.GPSTime import GPSTime
-from tracklib.core.Operator import Operator
 from tracklib.core.Utils import priority_dict
 from tracklib.core.TrackCollection import TrackCollection
 
