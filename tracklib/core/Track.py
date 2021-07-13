@@ -1820,8 +1820,8 @@ class Track:
             n = n.strip()
             if ("+" in n) or ("-" in n) or ("/" in n) or ("*" in n) or ("^" in n):
                 return self.operate(n)		
-            if (">" in n) or ("<" in n) or ("(" in n) or (")" in n) or ("=" in n) or ("'"):	
-                return self.operate(n)						
+            if (">" in n) or ("<" in n) or ("(" in n) or (")" in n) or ("=" in n) or ("'" in n):	
+                return self.operate(n)	
             return self.getAnalyticalFeature(n)
 		
         return self.__POINTS[n]  

@@ -77,8 +77,8 @@ def example0():
     X0 = np.array([
         [track2[0].position.getX()],
         [track2[0].position.getY()],
-    	[0],
-    	[0]])
+        [0],
+        [0]])
     P0 = np.array([
         [3, 0, 0, 0],
         [0, 3, 0, 0],
@@ -92,7 +92,7 @@ def example0():
     UKF.summary()
     
     UKF.estimate(track2, ["x", "y"])
-    	
+        
     
     track1.plot('k--')
     plt.plot(track2['kf_0'], track2['kf_1'], 'b-')
@@ -140,7 +140,7 @@ def example1(withBiases=False, withCycleSlip=False):
     
     B1 = [-20,30]
     B2 = [30,10]
-	
+    
     b1 = 0 + withBiases*25
     b2 = 0 + withBiases*32
     sp = 0 + withCycleSlip*10
@@ -153,11 +153,11 @@ def example1(withBiases=False, withCycleSlip=False):
     track = track_gt.noise(0.5)
     track.biop(track_odo, "vx=dx°")
     track.biop(track_odo, "vy=dy°")
-	
+    
     externals = {"x1":B1[0], "y1":B1[1], "x2":B2[0], "y2":B2[1], "b1":b1, "b2":b2, "sp":sp}
     track.op("balise1 = SQRT((x-x1)^2+(y-y1)^2)-b1-sp*(idx>50)", externals)
     track.op("balise2 = SQRT((x-x2)^2+(y-y2)^2)-b2", externals)
-	
+    
     track = track > 1
     
     track_gt.plot('k--')
@@ -166,16 +166,16 @@ def example1(withBiases=False, withCycleSlip=False):
     track.plot('b+')
     
     def F(x, k, track):
-    	return np.array([
-    		[x[0,0] + track["vx", k]], 
-    		[x[1,0] + track["vy", k]],
-    		[x[2,0]],
-    		[x[3,0]]])
+        return np.array([
+            [x[0,0] + track["vx", k]], 
+            [x[1,0] + track["vy", k]],
+            [x[2,0]],
+            [x[3,0]]])
     
     def H(x):
-    	return np.array([
-    	[((x[0,0]-B1[0])**2+(x[1,0]-B1[1])**2)**0.5]-x[2,0],
-    	[((x[0,0]-B2[0])**2+(x[1,0]-B2[1])**2)**0.5]-x[3,0]])
+        return np.array([
+        [((x[0,0]-B1[0])**2+(x[1,0]-B1[1])**2)**0.5]-x[2,0],
+        [((x[0,0]-B2[0])**2+(x[1,0]-B2[1])**2)**0.5]-x[3,0]])
     
     Q = 1e-1*np.eye(4,4); Q[2,2] = 1e-10; Q[3,3] = 1e-10
     R = 0.5**2*np.eye(2,2);
@@ -245,13 +245,13 @@ def example2():
     Mapping.mapOn(track_cam, track_gps, TP1=list(range(0, 50, 10)))
     
     def vx(track, i):
-    	if i == len(track)-1:
-    		return track[i].position.getX()-track[i-1].position.getX()
-    	return track[i+1].position.getX()-track[i].position.getX()
+        if i == len(track)-1:
+            return track[i].position.getX()-track[i-1].position.getX()
+        return track[i+1].position.getX()-track[i].position.getX()
     def vy(track, i):
-    	if i == len(track)-1:
-    		return track[i].position.getY()-track[i-1].position.getY()
-    	return track[i+1].position.getY()-track[i].position.getY()
+        if i == len(track)-1:
+            return track[i].position.getY()-track[i-1].position.getY()
+        return track[i+1].position.getY()-track[i].position.getY()
     
     
     track_cam.addAnalyticalFeature(vx)
@@ -260,10 +260,10 @@ def example2():
     track_gps.createAnalyticalFeature("vy", track_cam["vy"])
     
     def F(x, k, track):
-    	vx = track.getObsAnalyticalFeature("vx", k)
-    	vy = track.getObsAnalyticalFeature("vy", k)
-    	return Dynamics.DYN_MAT_2D_CST_POS() @ x + np.array([[vx], [vy]])
-    	
+        vx = track.getObsAnalyticalFeature("vx", k)
+        vy = track.getObsAnalyticalFeature("vy", k)
+        return Dynamics.DYN_MAT_2D_CST_POS() @ x + np.array([[vx], [vy]])
+        
     H = np.eye(2,2)
     
     Q = 1e-1*np.eye(2,2);
@@ -358,7 +358,7 @@ def example3():
     track = Track()
     
     for i in range(47):
-    	track.addObs(Obs(ECEFCoords(0,0,0)))
+        track.addObs(Obs(ECEFCoords(0,0,0)))
     track.createAnalyticalFeature("m0",[0]*47); track.createAnalyticalFeature("sx0",[0]*47); track.createAnalyticalFeature("sy0",[0]*47); track.createAnalyticalFeature("sz0",[0]*47); 
     track.createAnalyticalFeature("m1",[0]*47); track.createAnalyticalFeature("sx1",[0]*47); track.createAnalyticalFeature("sy1",[0]*47); track.createAnalyticalFeature("sz1",[0]*47); 
     track.createAnalyticalFeature("m2",[0]*47); track.createAnalyticalFeature("sx2",[0]*47); track.createAnalyticalFeature("sy2",[0]*47); track.createAnalyticalFeature("sz2",[0]*47); 
@@ -366,40 +366,40 @@ def example3():
     track.createAnalyticalFeature("m4",[0]*47); track.createAnalyticalFeature("sx4",[0]*47); track.createAnalyticalFeature("sy4",[0]*47); track.createAnalyticalFeature("sz4",[0]*47); 
     
     with open(path) as fp:
-    	line = True
-    	for i in range(47):
-    		for j in range(5):
-    			line = fp.readline()
-    			vals = line[:-2].split(",")
-    			track.setObsAnalyticalFeature("sx"+str(j), i, float(vals[1]))
-    			track.setObsAnalyticalFeature("sy"+str(j), i, float(vals[2]))
-    			track.setObsAnalyticalFeature("sz"+str(j), i, float(vals[3]))
-    			track.setObsAnalyticalFeature("m"+str(j) , i, float(vals[4]))
-    		line = fp.readline()
+        line = True
+        for i in range(47):
+            for j in range(5):
+                line = fp.readline()
+                vals = line[:-2].split(",")
+                track.setObsAnalyticalFeature("sx"+str(j), i, float(vals[1]))
+                track.setObsAnalyticalFeature("sy"+str(j), i, float(vals[2]))
+                track.setObsAnalyticalFeature("sz"+str(j), i, float(vals[3]))
+                track.setObsAnalyticalFeature("m"+str(j) , i, float(vals[4]))
+            line = fp.readline()
     
     
     def F(x):
-    	plan = ECEFCoords(x[0,0], x[1,0], x[2,0]).toENUCoords(start)
-    	plan.E += x[5,0]*math.sin(x[4,0])
-    	plan.N += x[5,0]*math.cos(x[4,0])
-    	xyz = plan.toECEFCoords(start)
-    	return np.array([
-    	[xyz.X],
-    	[xyz.Y],
-    	[xyz.Z],
-    	[x[3,0]+x[6,0]],
-    	[x[4,0]],
-    	[x[5,0]],
-    	[x[6,0]]])
-    	
+        plan = ECEFCoords(x[0,0], x[1,0], x[2,0]).toENUCoords(start)
+        plan.E += x[5,0]*math.sin(x[4,0])
+        plan.N += x[5,0]*math.cos(x[4,0])
+        xyz = plan.toECEFCoords(start)
+        return np.array([
+        [xyz.X],
+        [xyz.Y],
+        [xyz.Z],
+        [x[3,0]+x[6,0]],
+        [x[4,0]],
+        [x[5,0]],
+        [x[6,0]]])
+        
     
     def H(x, k, track):
-    	return np.array([
-    	[((x[0,0]-track["sx0",k])**2 + (x[1,0]-track["sy0",k])**2 + (x[2,0]-track["sz0",k])**2)**0.5 + x[3,0]],
-    	[((x[0,0]-track["sx1",k])**2 + (x[1,0]-track["sy1",k])**2 + (x[2,0]-track["sz1",k])**2)**0.5 + x[3,0]],
-    	[((x[0,0]-track["sx2",k])**2 + (x[1,0]-track["sy2",k])**2 + (x[2,0]-track["sz2",k])**2)**0.5 + x[3,0]],
-    	[((x[0,0]-track["sx3",k])**2 + (x[1,0]-track["sy3",k])**2 + (x[2,0]-track["sz3",k])**2)**0.5 + x[3,0]],
-    	[((x[0,0]-track["sx4",k])**2 + (x[1,0]-track["sy4",k])**2 + (x[2,0]-track["sz4",k])**2)**0.5 + x[3,0]]])
+        return np.array([
+        [((x[0,0]-track["sx0",k])**2 + (x[1,0]-track["sy0",k])**2 + (x[2,0]-track["sz0",k])**2)**0.5 + x[3,0]],
+        [((x[0,0]-track["sx1",k])**2 + (x[1,0]-track["sy1",k])**2 + (x[2,0]-track["sz1",k])**2)**0.5 + x[3,0]],
+        [((x[0,0]-track["sx2",k])**2 + (x[1,0]-track["sy2",k])**2 + (x[2,0]-track["sz2",k])**2)**0.5 + x[3,0]],
+        [((x[0,0]-track["sx3",k])**2 + (x[1,0]-track["sy3",k])**2 + (x[2,0]-track["sz3",k])**2)**0.5 + x[3,0]],
+        [((x[0,0]-track["sx4",k])**2 + (x[1,0]-track["sy4",k])**2 + (x[2,0]-track["sz4",k])**2)**0.5 + x[3,0]]])
     
     Q = 1e0*np.eye(7,7); Q[3,3] = 0; Q[4,4] = 1e-10; Q[5,5] = 1e-1; Q[6,6] = 1e-1
     R = 1e1*np.eye(5,5);
@@ -442,7 +442,7 @@ def example4():
     
     Nepochs = 534
     for i in range(Nepochs):
-    	track.addObs(Obs(ECEFCoords(0,0,0)))
+        track.addObs(Obs(ECEFCoords(0,0,0)))
     track.createAnalyticalFeature("m0",[0]*Nepochs); track.createAnalyticalFeature("sx0",[0]*Nepochs); track.createAnalyticalFeature("sy0",[0]*Nepochs); track.createAnalyticalFeature("sz0",[0]*Nepochs); 
     track.createAnalyticalFeature("m1",[0]*Nepochs); track.createAnalyticalFeature("sx1",[0]*Nepochs); track.createAnalyticalFeature("sy1",[0]*Nepochs); track.createAnalyticalFeature("sz1",[0]*Nepochs); 
     track.createAnalyticalFeature("m2",[0]*Nepochs); track.createAnalyticalFeature("sx2",[0]*Nepochs); track.createAnalyticalFeature("sy2",[0]*Nepochs); track.createAnalyticalFeature("sz2",[0]*Nepochs); 
@@ -452,50 +452,50 @@ def example4():
     
     
     with open(path) as fp:
-    	line = True
-    	for i in range(Nepochs):
-    		for j in range(6):
-    			line = fp.readline()
-    			vals = line[:-1].split(",")
-    			track.setObsAnalyticalFeature("sx"+str(j), i, float(vals[1]))
-    			track.setObsAnalyticalFeature("sy"+str(j), i, float(vals[2]))
-    			track.setObsAnalyticalFeature("sz"+str(j), i, float(vals[3]))
-    			track.setObsAnalyticalFeature("m"+str(j) , i, float(vals[4]))
-    		line = fp.readline()
+        line = True
+        for i in range(Nepochs):
+            for j in range(6):
+                line = fp.readline()
+                vals = line[:-1].split(",")
+                track.setObsAnalyticalFeature("sx"+str(j), i, float(vals[1]))
+                track.setObsAnalyticalFeature("sy"+str(j), i, float(vals[2]))
+                track.setObsAnalyticalFeature("sz"+str(j), i, float(vals[3]))
+                track.setObsAnalyticalFeature("m"+str(j) , i, float(vals[4]))
+            line = fp.readline()
     
     track = track%[False, True]
     
     
     
     def F(x):
-    	return np.array([
-    	[x[0,0]],
-    	[x[1,0]],
-    	[x[2,0]],
-    	[x[3,0]+x[4,0]],
-    	[x[4,0]]])
+        return np.array([
+        [x[0,0]],
+        [x[1,0]],
+        [x[2,0]],
+        [x[3,0]+x[4,0]],
+        [x[4,0]]])
     
-    def H(x, k, track):		
-    	return np.array([
-    	[((x[0,0]-track["sx0",k])**2 + (x[1,0]-track["sy0",k])**2 + (x[2,0]-track["sz0",k])**2)**0.5 + x[3,0]],
-    	[((x[0,0]-track["sx1",k])**2 + (x[1,0]-track["sy1",k])**2 + (x[2,0]-track["sz1",k])**2)**0.5 + x[3,0]],
-    	[((x[0,0]-track["sx2",k])**2 + (x[1,0]-track["sy2",k])**2 + (x[2,0]-track["sz2",k])**2)**0.5 + x[3,0]],
-    	[((x[0,0]-track["sx3",k])**2 + (x[1,0]-track["sy3",k])**2 + (x[2,0]-track["sz3",k])**2)**0.5 + x[3,0]],
-    	[((x[0,0]-track["sx4",k])**2 + (x[1,0]-track["sy4",k])**2 + (x[2,0]-track["sz4",k])**2)**0.5 + x[3,0]],
-    	[((x[0,0]-track["sx5",k])**2 + (x[1,0]-track["sy5",k])**2 + (x[2,0]-track["sz5",k])**2)**0.5 + x[3,0]]])
+    def H(x, k, track):        
+        return np.array([
+        [((x[0,0]-track["sx0",k])**2 + (x[1,0]-track["sy0",k])**2 + (x[2,0]-track["sz0",k])**2)**0.5 + x[3,0]],
+        [((x[0,0]-track["sx1",k])**2 + (x[1,0]-track["sy1",k])**2 + (x[2,0]-track["sz1",k])**2)**0.5 + x[3,0]],
+        [((x[0,0]-track["sx2",k])**2 + (x[1,0]-track["sy2",k])**2 + (x[2,0]-track["sz2",k])**2)**0.5 + x[3,0]],
+        [((x[0,0]-track["sx3",k])**2 + (x[1,0]-track["sy3",k])**2 + (x[2,0]-track["sz3",k])**2)**0.5 + x[3,0]],
+        [((x[0,0]-track["sx4",k])**2 + (x[1,0]-track["sy4",k])**2 + (x[2,0]-track["sz4",k])**2)**0.5 + x[3,0]],
+        [((x[0,0]-track["sx5",k])**2 + (x[1,0]-track["sy5",k])**2 + (x[2,0]-track["sz5",k])**2)**0.5 + x[3,0]]])
     
     
     Q = 1e0*np.eye(5,5); Q[3,3] = 0; Q[4,4] = 1e0
     def R(k):
-    	P = 1e1*np.eye(6,6)
-    	if (k>=70) and (k<267):
-    		for i in range(3,6):
-    			P[i,i] = 1e16
-    	return P 
-    	
+        P = 1e1*np.eye(6,6)
+        if (k>=70) and (k<267):
+            for i in range(3,6):
+                P[i,i] = 1e16
+        return P 
+        
     for k in range(70, 267):
-    	for i in range(3,6):
-    		track.setObsAnalyticalFeature("m"+str(i),k, 20000000)
+        for i in range(3,6):
+            track.setObsAnalyticalFeature("m"+str(i),k, 20000000)
     
     X0 = np.array([[start.X], [start.Y], [start.Z], [0], [0]])
     P0 = 1e5*np.eye(5,5); P0[3,3] = 1e8; P0[4,4] = 1e6
@@ -523,117 +523,118 @@ def example4():
 def example5():
 
 
-	# Read the position file of RTKlib
-	positions = "data/raw_gps_ECEF.pos"
-	track = FileReader.readFromFile(positions, "RTKLIB_XYZ")			# Lecture du fichier
-	track.toENUCoords(track[0].position)
-	track.resample(1, 1)
-	track.toECEFCoords()
+    # -------------------------------------------------------
+    # Trajectoire de reference IMU
+    # -------------------------------------------------------
+    path = "data/imu_opk_Vincennes1909121306.txt"     
+    ref = FileReader.readFromFile(path, "IMU_STEREOPOLIS")   
+    ref = ref < 520                                             
+    ref.incrementTime(0, 18)                                 
+    ref.translate(0, 0, 46.49)                                 
+    ref.toGeoCoords(2154)
+	
+    track = ref.copy(); track.toECEFCoords()
+
+    # Read the data file of the satellites
+    satellites = "data/satellites_no_erros.txt"
+
+    # Model 1:
+    # --------
+    # The state matrix Xk = (Xr, Yr, Zr)
+
+    # Define the evolution model matrix
+    # Stationery model
+    A = np.array([[1,0,0],
+                  [0,1,0],
+                  [0,0,1]])
+
+    # Define the covariance matrix of the states
+    Q = np.array([[1e2,   0,  0],
+                  [   0,1e2,  0],
+                  [   0,   0,1e2]])
+
+    # Define the measurement matrix
+    def H(x, k, track):
+
+        # Declare the number of satellites used
+        NUMBER_OF_SATELLITES = 32
+        NUMBER_OF_STATES = 3
+
+        Hk = np.zeros ((NUMBER_OF_SATELLITES, 1))
+
+        for ind in range (0, NUMBER_OF_SATELLITES):
+            
+            visible = 0 + (track.getObsAnalyticalFeature("Xs"+str(ind+1), k) != 0)
+
+            # Obtenir les positions des satellites rajouter à la trace
+            Xsat = track.getObsAnalyticalFeature("Xs" + str(ind + 1), k)
+            Ysat = track.getObsAnalyticalFeature("Ys" + str(ind + 1), k)
+            Zsat = track.getObsAnalyticalFeature("Zs" + str(ind + 1), k)
+            
+            # Distance radiale
+            Hk[ind][0] = visible * ((x[0,0] - Xsat) ** 2 + (x[1,0] - Ysat) ** 2 + (x[2,0] - Zsat) ** 2) ** 0.5
+
+        return Hk
+
+    # Define the covariance matrix of the observation
+    Rk = np.eye(32,32)
+
+    # Create 32 analytical variables (536 slots => )
+    for cnt in range(0, 32):
+        track.createAnalyticalFeature("Xs" + str(cnt+1), [0]*len(track))
+        track.createAnalyticalFeature("Ys" + str(cnt+1), [0]*len(track))
+        track.createAnalyticalFeature("Zs" + str(cnt+1), [0]*len(track))
+        track.createAnalyticalFeature("m" + str(cnt+1), [0]*len(track))
+
+    # Put the satellites coordinates as new analytics into the track
+    ind = -1
+    with open(satellites) as fp:
+        line = fp.readline()
+        while (line):
+            if line[0:5] == "12/09":
+                ind += 1
+                fp.readline()
+                while True:
+                    line = fp.readline()
+                    if line[0] == "-":
+                        break
+
+                    # Handle the headers of each slot
+                    tok = line.split()
+                    
+                    # Set the values of the satellites at each time stamp
+                    track.setObsAnalyticalFeature("Xs" + str(tok[0]), ind, float(tok[1]))
+                    track.setObsAnalyticalFeature("Ys" + str(tok[0]), ind, float(tok[2]))
+                    track.setObsAnalyticalFeature("Zs" + str(tok[0]), ind, float(tok[3]))
+                    track.setObsAnalyticalFeature("m" + str(tok[0]), ind, float(tok[4]))
+            
+            line = fp.readline()
+        
+        
+    start = ECEFCoords(4201797.8382,178416.3546,4779221.8874)
+
+    X0 = np.array([[start.getX()], [start.getY()], [start.getZ()]])
+    P0 = 1e1 * np.eye(3,3)
 
 
-	# Read the data file of the satellites
-	satellites = "data/satellites_no_erros.txt"
-
-	# Model 1:
-	# --------
-	# The state matrix Xk = (Xr, Yr, Zr)
-
-	# Define the evolution model matrix
-	# Stationery model
-	A = np.array([[1,0,0],
-				  [0,1,0],
-				  [0,0,1]])
-
-	# Define the covariance matrix of the states
-	Q = np.array([[1e2,   0,  0],
-				  [   0,1e2,  0],
-				  [   0,   0,1e2]])
-
-	# Define the measurement matrix
-	def H(x, k, track):
-
-		# Declare the number of satellites used
-		NUMBER_OF_SATELLITES = 32
-		NUMBER_OF_STATES = 3
-
-		Hk = np.zeros ((NUMBER_OF_SATELLITES, 1))
-
-		for ind in range (0, NUMBER_OF_SATELLITES):
-			
-			visible = 0 + (track.getObsAnalyticalFeature("Xs"+str(ind+1), k) != 0)
-
-			# Obtenir les positions des satellites rajouter à la trace
-			Xsat = track.getObsAnalyticalFeature("Xs" + str(ind + 1), k)
-			Ysat = track.getObsAnalyticalFeature("Ys" + str(ind + 1), k)
-			Zsat = track.getObsAnalyticalFeature("Zs" + str(ind + 1), k)
-			
-			# Distance radiale
-			r = visible * ((x[0,0] - Xsat) ** 2 + (x[1,0] - Ysat) ** 2 + (x[2,0] - Zsat) ** 2) ** 0.5
-
-			# Obtenir la Jacobienne de la matrice de mesure
-			Hk[ind][0] = r
-
-		return Hk
-
-	# Define the covariance matrix of the observation
-	Rk = np.eye(32,32)
-
-	# Create 32 analytical variables (536 slots => )
-	for cnt in range(0, 32):
-		track.createAnalyticalFeature("Xs" + str(cnt+1), [0]*len(track))
-		track.createAnalyticalFeature("Ys" + str(cnt+1), [0]*len(track))
-		track.createAnalyticalFeature("Zs" + str(cnt+1), [0]*len(track))
-		track.createAnalyticalFeature("m" + str(cnt+1), [0]*len(track))
-
-	# Put the satellites coordinates as new analytics into the track
-	ind = -1
-	with open(satellites) as fp:
-		line = fp.readline()
-		while (line):
-			if line[0:5] == "12/09":
-				ind += 1
-				fp.readline()
-				while True:
-					line = fp.readline()
-					if line[0] == "-":
-						break
-
-					# Handle the headers of each slot
-					tok = line.split()
-					
-					# Set the values of the satellites at each time stamp
-					track.setObsAnalyticalFeature("Xs" + str(tok[0]), ind, float(tok[1]))
-					track.setObsAnalyticalFeature("Ys" + str(tok[0]), ind, float(tok[2]))
-					track.setObsAnalyticalFeature("Zs" + str(tok[0]), ind, float(tok[3]))
-					track.setObsAnalyticalFeature("m" + str(tok[0]), ind, float(tok[4]))
-			
-			line = fp.readline()
-		
-		
-	start = ECEFCoords(4201797.8382,178416.3546,4779221.8874)
-
-	X0 = np.array([[start.getX()], [start.getY()], [start.getZ()]])
-	P0 = 1e1 * np.eye(3,3)
+    UKF = Kalman(spreading=1)
+    UKF.setTransition(A, Q)
+    UKF.setObservation(H, Rk)
+    UKF.setInitState(X0, P0)
+    UKF.summary()
 
 
-	UKF = Kalman(spreading=1)
-	UKF.setTransition(A, Q)
-	UKF.setObservation(H, Rk)
-	UKF.setInitState(X0, P0)
+    H(X0, 0, track)
+    obs = []
+    for i in range (32):
+        obs.append("m" + str(i+1))
 
-	UKF.summary()
+        
+    UKF.estimate(track, obs, mode = Dynamics.MODE_STATES_AS_3D_POSITIONS)
 
 
-	H(X0, 0, track)
-	obs = []
-	for i in range (32):
-		obs.append("m" + str(i+1))
-
-		
-	UKF.estimate(track, obs, mode=Dynamics.MODE_STATES_AS_3D_POSITIONS)
-	track.summary()
-
-	track.toGeoCoords()
-	KmlWriter.writeToKml(track, "test.kml")
-	track.plot('r-')
-	plt.show()
+    track.toGeoCoords()
+    KmlWriter.writeToKml(TrackCollection([ref, track]), "test.kml")
+    ref.plot('g-')
+    track.plot('r.')
+    plt.show()
