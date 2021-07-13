@@ -721,7 +721,7 @@ class Apply(ScalarVoidOperator):
 class Filter(ScalarVoidOperator):
 
     def execute(self, track, af_input, kernel, af_output):
-        
+		        
         # --------------------------------------------------------------        
         # Preparing kernel
         # --------------------------------------------------------------

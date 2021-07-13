@@ -262,6 +262,13 @@ class Track:
         delta = self.getObs(idx_point).position - new_coords
         for i in range(self.size()):
             self.getObs(i).position = delta + self.getObs(i).position
+			
+    def makeOdd(self):
+        if self.size() % 2 == 0:
+            self.__POINTS.pop()
+    def makeEven(self):
+        if self.size() % 2 == 1:
+            self.__POINTS.pop()
                   
     # Internal methods
     def __transmitAF(self, track):
