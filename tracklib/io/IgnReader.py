@@ -97,11 +97,13 @@ class IgnReader:
                     orientation = 1
                 elif sens == 'Indirect' or sens == 'Sens inverse':
                     orientation = -1
-                edge.setOrientation(orientation)
+                #edge.setOrientation(orientation)
+                edge.orientation = orientation
                 
                 # Poids
                 poids = track.length()
-                edge.setPoids(poids)
+                #edge.setPoids(poids)
+                edge.poids= poids
                 
                 # Source node 
                 p1 = track.getFirstObs().position
