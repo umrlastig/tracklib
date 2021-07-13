@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 
 import os.path
-from unittest import TestSuite, TextTestRunner
+from unittest import TestCase, TestSuite, TextTestRunner
 
 from tracklib.core.Network import Node, Network
 from tracklib.io.NetworkReader import NetworkReader
 from tracklib.io.IgnReader import IgnReader
 
-from test_tracklib import TestTracklib
 
-class TestDijkstra(TestTracklib):
+class TestDijkstra(TestCase):
     
     __epsilon = 0.001
+    
+    def setUp (self):
+        self.resource_path = os.path.join(os.path.split(__file__)[0], "../..")
     
     #chemin = '../../data/network_ecrin.wkt'
     #network = NetworkReader.readFromFile(chemin, 'TEST1')

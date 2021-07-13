@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from unittest import TestSuite, TextTestRunner
+from unittest import TestCase, TestSuite, TextTestRunner
 import os.path
-
-from test_tracklib import TestTracklib
 
 import matplotlib.pyplot as plt
 
@@ -20,9 +18,12 @@ from tracklib.io.IgnReader import IgnReader
 from tracklib.algo import (Analytics)
 
 
-class TestSpatialIndex(TestTracklib):
+class TestSpatialIndex(TestCase):
     
     __epsilon = 0.001
+    
+    def setUp (self):
+        self.resource_path = os.path.join(os.path.split(__file__)[0], "../..")
     
     
     def test_create_index_collection1(self):
