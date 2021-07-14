@@ -360,49 +360,49 @@ class TestSpatialIndex(TestCase):
         
         
         
-    def test_index_trackcollection(self):
+    # def test_index_trackcollection(self):
        
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
-        chemindata = os.path.join(self.resource_path, "test/data/CSV_L93_VERCORS/")
-        collection = FileReader.readFromFiles(chemindata, 3, 4, 5, 6)
+    #     GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+    #     chemindata = os.path.join(self.resource_path, "test/data/CSV_L93_VERCORS/")
+    #     collection = FileReader.readFromFiles(chemindata, 3, 4, 5, 6)
         
-        collection.addAnalyticalFeature(Analytics.speed)
+    #     collection.addAnalyticalFeature(Analytics.speed)
         
-        #print (collection.size())
-        #print (collection.bbox())
-        #collection.plot()
+    #     #print (collection.size())
+    #     #print (collection.bbox())
+    #     #collection.plot()
     
-        index = SpatialIndex(collection, (30,30))
-        index.plot()
-        plt.show()
+    #     index = SpatialIndex(collection, (30,30))
+    #     index.plot()
+    #     plt.show()
         
     
-    def test_index_network(self):
+    # def test_index_network(self):
         
-         xmin = 2.34850
-         xmax = 2.35463
-         ymin = 48.83896
-         ymax = 48.84299
-         network = IgnReader.getNetwork((xmin, ymin, xmax, ymax), "EPSG:2154")
+    #      xmin = 2.34850
+    #      xmax = 2.35463
+    #      ymin = 48.83896
+    #      ymax = 48.84299
+    #      network = IgnReader.getNetwork((xmin, ymin, xmax, ymax), "EPSG:2154")
          
-         #NetworkReader.writeFromFile("ici.csv", network)
+    #      #NetworkReader.writeFromFile("ici.csv", network)
         
-         # print (network.bbox())
-         # network.plot()
+    #      # print (network.bbox())
+    #      # network.plot()
         
-         index = SpatialIndex(network, (20, 20))
-         index.plot()
+    #      index = SpatialIndex(network, (20, 20))
+    #      index.plot()
          
     
-    def testIndexPoint(self):
-        ''' TODO '''
-        pass
+    # def testIndexPoint(self):
+    #     ''' TODO '''
+    #     pass
         
         
     
 if __name__ == '__main__':
     suite = TestSuite()
-    #suite.addTest(TestSpatialIndex("test_create_index"))
+    suite.addTest(TestSpatialIndex("test_create_index"))
     suite.addTest(TestSpatialIndex("test_create_index_collection1"))
     #suite.addTest(TestSpatialIndex("test_index_trackcollection"))
     #suite.addTest(TestSpatialIndex("test_index_network"))
