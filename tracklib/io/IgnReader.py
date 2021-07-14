@@ -108,29 +108,32 @@ class IgnReader:
                 # Source node 
                 p1 = track.getFirstObs().position
                 noeudIni = Node(str(cptNode), p1)
-                candidates = network.select(Node('0', p1), tolerance)
+                candidates = selectNodes(network, Node('0', p1), tolerance)
                 if len(candidates) > 0:
                     for cand in candidates:
-                        edge.setNoeudIni(cand)
+                        #edge.setNoeudIni(cand)
+                        noeudIni = cand
                 else:
-                    edge.setNoeudIni(noeudIni)
+                    #edge.setNoeudIni(noeudIni)
                     network.addNode(noeudIni)  
                     cptNode += 1
                 
                 # Target node 
                 p2 = track.getLastObs().position
                 noeudFin = Node(str(cptNode), p2)
-                candidates = network.select(Node('0', p2), tolerance)
+                candidates = selectNodes(network, Node('0', p2), tolerance)
                 if len(candidates) > 0:
                     for cand in candidates:
-                        edge.setNoeudFin(cand)
+                        #edge.setNoeudFin(cand)
+                        noeudFin = cand
                 else:
-                    edge.setNoeudFin(noeudFin)
+                    #edge.setNoeudFin(noeudFin)
                     network.addNode(noeudFin)
                     cptNode += 1
                 
                 # Add edge
-                network.addEdge(edge)
+                #network.addEdge(edge)
+                network.addEdge(edge, noeudIni, noeudFin)
                 
             offset = offset + IgnReader.NB_PER_PAGE
         
@@ -170,3 +173,26 @@ class IgnReader:
         
 
 
+def selectNodes(network, node, distance):
+        '''
+        Selection des autres noeuds dans le cercle dont node.coord est le centre, 
+        de rayon distance
+        Parameters
+        ----------
+        node : Node
+            le centre du cercle de recherche.
+        tolerance : double
+            le rayon du cercle de recherche.
+        Returns
+        -------
+        NODES : tableau de NODES
+            liste des noeuds dans le cercle
+        '''
+        NODES = []
+        
+        for key in network.NODES:
+            n = network.NODES[key]
+            if n.coord.distance2DTo(node.coord) <= distance:
+                NODES.append(n)
+        
+        return NODES
