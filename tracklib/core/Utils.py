@@ -325,15 +325,14 @@ class priority_dict(dict):
     def __setitem__(self, key, val):
         # We are not going to remove the previous value from the heap,
         # since this would have a cost O(n).
-        
         super(priority_dict, self).__setitem__(key, val)
-        
         if len(self._heap) < 2 * len(self):
             heappush(self._heap, (val, key))
         else:
             # When the heap grows larger than 2 * len(self), we rebuild it
             # from scratch to avoid wasting too much memory.
             self._rebuild_heap()
+
 
     def setdefault(self, key, val):
         if key not in self:

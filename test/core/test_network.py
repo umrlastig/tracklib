@@ -3,7 +3,8 @@
 import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
 
-from tracklib.core.Network import Node, Network
+from tracklib.core.Track import Track
+from tracklib.core.Network import Node
 from tracklib.io.NetworkReader import NetworkReader
 from tracklib.io.IgnReader import IgnReader
 
@@ -36,11 +37,15 @@ class TestDijkstra(TestCase):
         self.assertEqual(107, len(network.EDGES))
         self.assertEqual(78, len(network.NODES))
         
-        node1 = network.getNode('12')
-        node2 = network.getNode('60')
+        node1 = network.getNode('5')
+        node2 = network.getNode('7')
+        print ('\n', node1.coord)
+        print (node2.coord, '\n')
+        network.plot('k-', 'ob')
         
-        #trace = network.shortest_path(node1, node2)
-        # self.assertLessEqual((523.2339 - trace.length()), self.__epsilon, "len pcc")
+        trace = network.shortest_path(node1, node2)
+        print (trace)
+        #self.assertLessEqual((523.2339 - trace.length()), self.__epsilon, "len pcc")
         # #self.assertEqual(40, trace.size())
         # self.assertLessEqual((65.58062 - trace.getObsAnalyticalFeature(Network.AF_WEIGHT, 0)), self.__epsilon, "len pcc")
         # #network.plot(trace, node1, node2)
@@ -111,7 +116,7 @@ class TestDijkstra(TestCase):
         
         self.assertEqual(8, len(network.EDGES))
         self.assertEqual(6, len(network.NODES))
-
+        
         node0 = network.getNode('0')
         self.assertIsInstance(node0, Node)
         self.assertEqual(0, len(network.PREV_EDGES[node0.id]))
@@ -127,8 +132,9 @@ class TestDijkstra(TestCase):
         self.assertEqual(1, len(network.PREV_EDGES[node5.id]))
         self.assertEqual(2, len(network.NEXT_EDGES[node5.id]))
         
-        #trace = network.shortest_path(node0, node5)
-        #self.assertEqual(trace.size(), 10)  # 4
+        trace = network.shortest_path(node0, node3)
+        self.assertIsInstance(trace, Track)
+        self.assertEqual(trace.size(), 3)  # 4
         
         #DISTS = trace.getAnalyticalFeature(Network.AF_WEIGHT)
         #self.assertEqual(DISTS[0], 0)

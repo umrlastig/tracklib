@@ -23,6 +23,19 @@ class Node:
         
     def __str__(self):
         return "Node object: " + str(self.id)
+    
+    def __lt__(self, other):
+        if isinstance(other, Node):
+            return self.id < other.id
+        return False
+    
+    def __eq__(self, other):
+        if isinstance(other, Node):
+            return self.id == other.id
+        return False
+    
+    def __hash__(self):
+        return hash(self.id)
         
     def distanceTo(self, node):
         return self.coord.distanceTo(node.coord)
@@ -247,7 +260,7 @@ class Network:
     # Graphics
     # ------------------------------------------------------------           
     def plot(self, edges='k-', nodes='', indirect='r-', size=0.5):
-    
+
         x1d = []; y1d = []; x1i = []; y1i = []
         x2d = []; y2d = []; x2i = []; y2i = []
         exd = []; eyd = []; exi = []; eyi = [];
