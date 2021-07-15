@@ -98,6 +98,8 @@ class Network:
 
         self.astar_wgt = 1
         
+        self.spatial_index = None 
+        
     def addNode(self, node):
         if node.id not in self.NODES:
             self.NODES[node.id] = node
@@ -181,6 +183,22 @@ class Network:
     def simplify(self, tolerance, mode=1):    
         for id in self.__idx_edges:
             self.EDGES[id].geom = Simplification.simplify(self.EDGES[id].geom, tolerance, mode)
+
+    # ------------------------------------------------------------
+    # Spatial index creation, export and import functions
+    # ------------------------------------------------------------ 		
+		
+    def createSpatialIndex(self, resolution=(100, 100), verbose=True):
+        from tracklib.core.SpatialIndex import SpatialIndex
+        self.spatial_index = SpatialIndex(self, resolution, verbose)
+
+    def exportSpatialIndex(self, filename):
+        from tracklib.core.SpatialIndex import SpatialIndex
+        self.spatial_index.save(filename)
+
+    def importSpatialIndex(self, filename):
+        from tracklib.core.SpatialIndex import SpatialIndex
+        self.spatial_index = SpatialIndex.load(filename)
             
     # ------------------------------------------------------------
     # Topologic methods
@@ -262,7 +280,7 @@ class Network:
     # ------------------------------------------------------------
     # Graphics
     # ------------------------------------------------------------           
-    def plot(self, edges='k-', nodes='', indirect='r-', size=0.5, append=None):
+    def plot(self, edges='k-', nodes='', indirect='r-', size=0.5, append=plt):
 
         x1d = []; y1d = []; x1i = []; y1i = []
         x2d = []; y2d = []; x2i = []; y2i = []

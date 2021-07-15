@@ -18,6 +18,7 @@ class TrackCollection:
         TRACES: list of Track
         '''
         self.__TRACES = TRACES.copy()
+        self.spatial_index = None
 		
     def addTrack(self, track):
         self.__TRACES.append(track)
@@ -46,6 +47,22 @@ class TrackCollection:
     
     def __iter__(self):
         yield from self.__TRACES
+		
+    # =========================================================================
+    # Spatial index creation, export and import functions
+    # =========================================================================		
+		
+    def createSpatialIndex(self, resolution=(100, 100), verbose=True):
+        from tracklib.core.SpatialIndex import SpatialIndex
+        self.spatial_index = SpatialIndex(self, resolution, verbose)
+
+    def exportSpatialIndex(self, filename):
+        from tracklib.core.SpatialIndex import SpatialIndex
+        self.spatial_index.save(filename)
+
+    def importSpatialIndex(self, filename):
+        from tracklib.core.SpatialIndex import SpatialIndex
+        self.spatial_index = SpatialIndex.load(filename)
     
     # =========================================================================
     # Track collection coordinate transformation

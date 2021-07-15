@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
 import math
+import pickle
 import progressbar
 import matplotlib.pyplot as plt
 
@@ -13,7 +14,7 @@ import tracklib.algo.Geometrics as Geometrics
 
 class SpatialIndex:
     
-    def __init__(self, collection, resolution=(100, 100), verbose=True):
+    def __init__(self, :
         '''
         Parameters
         ----------
@@ -41,10 +42,9 @@ class SpatialIndex:
         None.
 
         '''
-		
         if isinstance(resolution, int):
             resolution = (resolution, resolution)
-        
+   
         self.collection = collection
         
         # Nombre de dalle par cote
@@ -107,7 +107,7 @@ class SpatialIndex:
         '''
         #
         CELLS = self.__cellsCrossSegment(coord1, coord2)
-        print (CELLS, coord1, coord2)
+        #print (CELLS, coord1, coord2)
         
         for cell in CELLS:
             i = cell[0]
@@ -458,4 +458,15 @@ class SpatialIndex:
                         CELLS.append((i,j))
                     continue
                 
-        return CELLS   
+        return CELLS
+
+
+    def save(self, filename):
+        outfile = open(filename,'wb')
+        pickle.dump(self, outfile)
+        outfile.close()
+    def load(filename):
+        infile = open(filename,'rb')
+        index = pickle.load(infile)
+        infile.close()
+        return index
