@@ -41,7 +41,7 @@ class TestDijkstra(TestCase):
         node2 = network.getNode('7')
         print ('\n', node1.coord)
         print (node2.coord, '\n')
-        network.plot('k-', 'ob')
+        #network.plot('k-', 'ob')
         
         trace = network.shortest_path(node1, node2)
         print (trace)
