@@ -206,6 +206,57 @@ class TestSpatialIndex(TestCase):
         self.assertEqual(index.neighborhood(track3, None, -1), [(2,0),(3,0)])
         
     
+    def test_create_index_collection2(self):
+        
+        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+                
+        track = Track()
+        p1 = Obs(ENUCoords(0, 0), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        track.addObs(p1)
+        p2 = Obs(ENUCoords(3.1, 3), GPSTime.readTimestamp('2020-01-01 10:08:00'))
+        track.addObs(p2)
+        p3 = Obs(ENUCoords(3.1, 4.5), GPSTime.readTimestamp('2020-01-01 10:17:00'))
+        track.addObs(p3)
+        
+        p4 = Obs(ENUCoords(4.5, 4.5), GPSTime.readTimestamp('2020-01-01 10:21:00'))
+        track.addObs(p4)
+        p5 = Obs(ENUCoords(6, 5.5), GPSTime.readTimestamp('2020-01-01 10:21:00'))
+        track.addObs(p5)
+        
+        p6 = Obs(ENUCoords(7, 4.5), GPSTime.readTimestamp('2020-01-01 10:21:00'))
+        track.addObs(p6)
+        p7 = Obs(ENUCoords(11, 5.5), GPSTime.readTimestamp('2020-01-01 10:21:00'))
+        track.addObs(p7)
+        p8 = Obs(ENUCoords(13, 10), GPSTime.readTimestamp('2020-01-01 10:25:00'))
+        track.addObs(p8)
+                #track.plot()
+                #track.plotAsMarkers()
+                
+        TRACES = []
+        TRACES.append(track)
+        collection = TrackCollection(TRACES)
+                
+        index = SpatialIndex(collection, (5, 5))
+        index.plot()
+        
+        # =====================================================================
+        # =====================================================================
+        self.assertEqual(index.request(0, 0), [(0,0)])
+        self.assertEqual(index.request(1, 0), [])
+        self.assertEqual(index.request(0, 1), [(0,0)])
+        self.assertEqual(index.request(1, 1), [(0,0), (1,0)])
+        self.assertEqual(index.request(2, 0), [])
+        self.assertEqual(index.request(2, 1), [])
+        self.assertEqual(index.request(1, 2), [(1,0),(2,0),(3,0)])
+        self.assertEqual(index.request(2, 2), [(3,0),(4,0),(5,0)])
+        self.assertEqual(index.request(3, 2), [(5,0)])
+        self.assertEqual(index.request(3, 3), [])
+        self.assertEqual(index.request(4, 2), [(5,0),(6,0)])
+        self.assertEqual(index.request(4, 3), [(6,0)])
+        self.assertEqual(index.request(4, 4), [(6,0)])
+        self.assertEqual(index.request(5, 5), [(6,0)])
+        self.assertEqual(index.request(5, 4), [(6,0)])
+        
         
     def test_create_index(self):
         
@@ -404,6 +455,7 @@ if __name__ == '__main__':
     suite = TestSuite()
     suite.addTest(TestSpatialIndex("test_create_index"))
     suite.addTest(TestSpatialIndex("test_create_index_collection1"))
+    suite.addTest(TestSpatialIndex("test_create_index_collection2"))
     #suite.addTest(TestSpatialIndex("test_index_trackcollection"))
     #suite.addTest(TestSpatialIndex("test_index_network"))
     #suite.addTest(TestSpatialIndex("testIndexPoint"))

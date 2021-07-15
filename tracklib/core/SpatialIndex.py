@@ -107,7 +107,7 @@ class SpatialIndex:
         '''
         #
         CELLS = self.__cellsCrossSegment(coord1, coord2)
-        #print (CELLS)
+        print (CELLS, coord1, coord2)
         
         for cell in CELLS:
             i = cell[0]
@@ -427,23 +427,35 @@ class SpatialIndex:
         for i in range( xmin,  xmax+1):
             for j in range(ymin, ymax+1):
                 
+                # complètement inclus
+                if i < coord1[0] and coord1[0] < i+1 and i < coord2[0] and coord2[0] < i+1 and j < coord1[1] and coord1[1] < j+1 and j < coord2[1] and coord2[1] < j+1:
+                    if (i,j) not in CELLS:
+                        CELLS.append((i,j))
+                    continue
+                
+                # traverse
                 segment1 = [i, j, i+1, j]
                 if Geometrics.isSegmentIntersects(segment1, segment2):
-                    CELLS.append((i,j))
+                    if (i,j) not in CELLS:
+                        CELLS.append((i,j))
+                    continue
                     
                 segment1 = [i, j, i, j+1]
                 if Geometrics.isSegmentIntersects(segment1, segment2):
                      if (i,j) not in CELLS:
                          CELLS.append((i,j))
+                     continue
                     
                 segment1 = [i,j+1,i+1,j+1]
                 if Geometrics.isSegmentIntersects(segment1, segment2):
                      if (i,j) not in CELLS:
                          CELLS.append((i,j))
+                     continue
                     
                 segment1 = [i+1,j,i+1,j+1]
                 if Geometrics.isSegmentIntersects(segment1, segment2):
                     if (i,j) not in CELLS:
                         CELLS.append((i,j))
+                    continue
                 
         return CELLS   
