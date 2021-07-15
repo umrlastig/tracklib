@@ -60,6 +60,8 @@ class SpatialIndex:
             self.grid.append([])
             for j in range(self.lsize + 1):
                 self.grid[i].append([])
+                
+        #self.inventaire = set()
         
         (self.xmin, self.xmax, self.ymin, self.ymax) = collection.bbox()
         
@@ -81,6 +83,7 @@ class SpatialIndex:
             elif isinstance(feature, Edge):
                 self.__addIntersectCells(feature.geom, num)
                 
+        #print (self.inventaire)
 
 
     def __addIntersectCells(self, track, num):
@@ -105,9 +108,9 @@ class SpatialIndex:
                traversée par le segment [coord1, coord2] avec
                coord1 : indices de la grille
         '''
-        #
         CELLS = self.__cellsCrossSegment(coord1, coord2)
         #print (CELLS, coord1, coord2)
+
         
         for cell in CELLS:
             i = cell[0]
@@ -120,7 +123,9 @@ class SpatialIndex:
                 exit()
                 
             if data not in self.grid[i][j]:
+            #if (i,j,data[1]) not in self.inventaire:
                 self.grid[i][j].append(data)
+                #self.inventaire.add((i,j,data[1]))
                 
     
     def __addPoint (self, coord, data):
