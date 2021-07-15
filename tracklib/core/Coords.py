@@ -7,6 +7,7 @@
 
 import math
 import copy
+import matplotlib.pyplot as plt
 
 Re = 6378137.0;                # Earth equatorial radius 
 Fe = 1.0/298.257223563;        # Earth eccentricity
@@ -123,7 +124,10 @@ class GeoCoords:
     def setY(self, Y):
         self.lat = Y
     def setZ(self, Z):
-        self.hgt = Z    
+        self.hgt = Z   
+
+    def plot(self, sym='ro'):
+        plt.plot(self.lon, self.lat, sym)	
     
     
 class ENUCoords:
@@ -296,7 +300,8 @@ class ENUCoords:
     def setZ(self, Z):
         self.U = Z
         
-        
+    def plot(self, sym='ro'):
+        plt.plot(self.E, self.N, sym)        
     
 class ECEFCoords:
 

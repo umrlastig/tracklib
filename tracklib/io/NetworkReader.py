@@ -19,6 +19,8 @@ class NetworkReader:
         fmt = NetworkFormat(formatfile)
         
         num_lines = sum(1 for line in open(path))
+		
+        print("Loading network...")
 
         with open(path, encoding='utf-8') as csvfile:
             

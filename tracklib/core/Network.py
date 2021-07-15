@@ -255,11 +255,14 @@ class Network:
         for id in self.__idx_edges:
             tracks.addTrack(self.EDGES[id].geom)
         return tracks    
+		
+    def bbox(self):
+        return self.getAllEdgeGeoms().bbox()
 
     # ------------------------------------------------------------
     # Graphics
     # ------------------------------------------------------------           
-    def plot(self, edges='k-', nodes='', indirect='r-', size=0.5):
+    def plot(self, edges='k-', nodes='', indirect='r-', size=0.5, append=None):
 
         x1d = []; y1d = []; x1i = []; y1i = []
         x2d = []; y2d = []; x2i = []; y2i = []
@@ -287,11 +290,11 @@ class Network:
             eyi.append(t); eyi.append(v); eyi.append(None)
             
         if len(edges) > 0: 
-            plt.plot(exd, eyd, edges, linewidth=size)
+            append.plot(exd, eyd, edges, linewidth=size)
         if len(indirect) > 0: 
-            plt.plot(exi, eyi, indirect, linewidth=size)
+            append.plot(exi, eyi, indirect, linewidth=size)
         if (len(nodes) > 0):
-            plt.plot(nx, ny, nodes, markersize=4*size)  
+            append.plot(nx, ny, nodes, markersize=4*size)  
             
     # ------------------------------------------------------------
     # Routing methods

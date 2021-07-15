@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
-
-import math
-import matplotlib.pyplot as plt
 import sys
+import math
+import progressbar
+import matplotlib.pyplot as plt
 
-from tracklib.core.Coords import GeoCoords, ENUCoords, ECEFCoords
-from tracklib.core.Network import Edge
 from tracklib.core.Track import Track
+from tracklib.core.Network import Edge
+from tracklib.core.Coords import GeoCoords, ENUCoords, ECEFCoords
 
 import tracklib.algo.Geometrics as Geometrics
 
 
 class SpatialIndex:
     
-    def __init__(self, collection, resolution=(100, 100)):
+    def __init__(self, collection, resolution=(100, 100), verbose=True):
         '''
         Parameters
         ----------
@@ -41,6 +41,9 @@ class SpatialIndex:
         None.
 
         '''
+		
+        if isinstance(resolution, int):
+            resolution = (resolution, resolution)
         
         self.collection = collection
         
@@ -65,14 +68,18 @@ class SpatialIndex:
         #print (self.dX, self.dY)
         
         # Calcul de la grille
-        for num in range(collection.size()):
+        boucle = range(collection.size())
+        if verbose:
+            print("Building spatial index...")
+            boucle = progressbar.progressbar(boucle)
+        for num in boucle:
             feature = collection[num]
             # On récupere la trace
             if isinstance(feature, Track):
                 self.__addIntersectCells(feature, num)
             # On récupère l'arc du reseau qui est une trace
             elif isinstance(feature, Edge):
-                self.__addIntersectCells(feature.track, num)
+                self.__addIntersectCells(feature.geom, num)
                 
 
 
@@ -142,40 +149,29 @@ class SpatialIndex:
     
     
     def plot(self):
-        
+
         fig = plt.figure()
-        ax = fig.add_subplot(111, xlim=(0, self.csize), ylim=(0, self.lsize))
+        ax = fig.add_subplot(111, xlim=(self.xmin, self.xmax), ylim=(self.ymin, self.ymax))
         
         for i in range(1,self.csize):
-            ax.plot([i,i], [0, self.csize], '-',color='lightgray')
+            xi = i*self.dX + self.xmin
+            ax.plot([xi,xi], [self.ymin, self.ymax], '-',color='lightgray')
         for j in range(1,self.lsize):
-            ax.plot([0, self.lsize], [j,j], '-',color='lightgray')
-        
-        for j in range(self.collection.size()):
-            features = self.collection[j]
-            X = features.getX()
-            Y = features.getY()
-            X1 = []
-            Y1 = []
-            for i in range(len(X)):
-                X1.append((X[i] - self.xmin ) / self.dX)
-                Y1.append((Y[i] - self.ymin ) / self.dY)
-            #print (Y1)
-            ax.plot(X1, Y1, '-', color='forestgreen')
-        #ax.plot([x1,x2], [y1,y2], '-')
-        
-        for i in range(self.csize):
-            for j in range(self.lsize):
-                # cellule (i,j)
+            yj = j*self.dY + self.ymin
+            ax.plot([self.xmin, self.xmax], [yj,yj], '-',color='lightgray')
+        self.collection.plot(append=ax)        
 
+        for i in range(self.csize):
+            xi1 = i*self.dX + self.xmin; xi2 = xi1 + self.dX
+            for j in range(self.lsize):
+                yj1 = j*self.dY + self.ymin; yj2 = yj1 + self.dY
                 if len(self.grid[i][j]) > 0:
                     polygon = plt.Polygon(
-                        [[i, j], [i+1, j], [i+1, j+1], [i, j+1], [i, j]])
+                        [[xi1, yj1], [xi2, yj1], [xi2, yj2], [xi1, yj2], [xi1, yj1]])
                     ax.add_patch(polygon)
                     polygon.set_facecolor('lightcyan')
-
-
-    def request(self, obj, j = -1): 
+          
+    def request(self, obj, j=None): 
         '''
         retourne toutes les données (sous forme de liste simple) 
         référencées dans ...
