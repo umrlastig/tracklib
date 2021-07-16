@@ -14,7 +14,7 @@ import tracklib.algo.Geometrics as Geometrics
 
 class SpatialIndex:
     
-    def __init__(self, :
+    def __init__(self, collection, resolution=(100,100), verbose=True):
         '''
         Parameters
         ----------
@@ -46,7 +46,10 @@ class SpatialIndex:
             resolution = (resolution, resolution)
    
         self.collection = collection
-        
+
+		# Keeps track of registered features
+        self.inventaire = set()
+
         # Nombre de dalle par cote
         self.resolution = resolution
         self.csize = self.resolution[0]
@@ -60,8 +63,6 @@ class SpatialIndex:
             self.grid.append([])
             for j in range(self.lsize + 1):
                 self.grid[i].append([])
-                
-        #self.inventaire = set()
         
         (self.xmin, self.xmax, self.ymin, self.ymax) = collection.bbox()
         
@@ -123,9 +124,9 @@ class SpatialIndex:
                 exit()
                 
             if data not in self.grid[i][j]:
-            #if (i,j,data[1]) not in self.inventaire:
-                self.grid[i][j].append(data)
-                #self.inventaire.add((i,j,data[1]))
+                if (i,j,data) not in self.inventaire:
+                    self.grid[i][j].append(data)
+                    self.inventaire.add((i,j,data))
                 
     
     def __addPoint (self, coord, data):
@@ -134,8 +135,7 @@ class SpatialIndex:
     
     def __getCell(self, coord):
         '''
-            Fonction qui retourne les identifiants de la cellule en indices (i,j)
-            de Coord  
+            Fonction qui retourne les coordonnees normalisees de coord  
         '''
         # (idx, idy) = self.__getCoordGrille(coord)
         X = float(coord.getX()) - self.xmin
@@ -145,9 +145,9 @@ class SpatialIndex:
         idy = Y / self.dY
         
         if math.floor(idx) < 0 or math.floor(idx) > (self.csize + 1):
-            sys.exit ('error, depassement en x')
+            sys.exit ('Error: x overflow')
         if idy < 0 or idy > (self.lsize + 1):
-            sys.exit ('error, depassement en y')
+            sys.exit ('Error: y overflow')
         
         #return (math.floor(idx), math.floor(idy))
         return (idx, idy)
@@ -229,7 +229,7 @@ class SpatialIndex:
             return TAB
         
         
-    def neighborhood(self, obj, j = -1, unit=0):
+    def neighborhood(self, obj, j=None, unit=0):
         '''
         retourne toutes les données (sous forme de liste simple) référencées 
         dans la cellule (i,j). 
@@ -447,15 +447,15 @@ class SpatialIndex:
                     
                 segment1 = [i, j, i, j+1]
                 if Geometrics.isSegmentIntersects(segment1, segment2):
-                     if (i,j) not in CELLS:
-                         CELLS.append((i,j))
-                     continue
+                    if (i,j) not in CELLS:
+                        CELLS.append((i,j))
+                    continue
                     
                 segment1 = [i,j+1,i+1,j+1]
                 if Geometrics.isSegmentIntersects(segment1, segment2):
-                     if (i,j) not in CELLS:
-                         CELLS.append((i,j))
-                     continue
+                    if (i,j) not in CELLS:
+                        CELLS.append((i,j))
+                    continue
                     
                 segment1 = [i+1,j,i+1,j+1]
                 if Geometrics.isSegmentIntersects(segment1, segment2):

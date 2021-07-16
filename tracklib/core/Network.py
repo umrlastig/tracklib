@@ -371,25 +371,57 @@ class Network:
     # ------------------------------------------------------------    
     # sub_network: extracts sub-network from routing forward 
     # search. An edge is added to the output network if both
-    # its ends have been visited during the search process.
+    # its ends have been visited during the search process 
+	# (TOPOGRAPHIC mode) or if one of its ends are located in 
+	# a circle centered on source with radius = cut
     # ------------------------------------------------------------
     # Inputs:
-    #  - source:    a source node (id or node object)
+    #  - source:    a source node (id or node object) or a coord
     #  - cut   :    a maximal distance for search
+    #  - mode  :    "TOPOLOGIC" (default) or "GEOMETRIC"
     # ------------------------------------------------------------
     # Output: a network containing only visited nodes reachable 
     # from source with a cost lower than cut distance.
     # ------------------------------------------------------------
-    def sub_network(self, source, cut):
-        self.run_routing_forward(source, cut=cut)
-        return self.sub_network()
+    def sub_network(self, source, cut, mode="TOPOLOGIC", verbose=True):
+        if mode == "TOPOLOGIC":
+            self.run_routing_forward(source, cut=cut)
+            return self.__sub_network_routing(verbose)
+        if mode == "GEOMETRIC":
+            return self.__sub_network_geometric(source, cut, verbose)
+        print("Error: unknown network extraction mode: ",  mode)
+        exit(1)
 
-    def sub_network(self):
-        print("Sub network extraction...")
+    def __sub_network_routing(self, verbose):
+        if verbose:
+            print("Sub network extraction...")
         sub_net = Network()
-        for eid in progressbar.progressbar(self.getEdgesId()):
+        to_run = self.getEdgesId()
+        if verbose:
+            to_run = progressbar.progressbar(to_run)
+        for eid in to_run:
             e = self.EDGES[eid]
             if (not e.source.visite) or (not e.target.visite):
+                continue
+            sub_net.addEdge(e, e.source, e.target)
+        return sub_net
+
+
+    def __sub_network_geometric(self, source, cut, verbose):
+        if verbose:
+            print("Sub network extraction...") 
+        if isinstance(source, Node) or isinstance(source, str):
+            source = self.__correctInputNode(source).coord
+        sub_net = Network()
+        if self.spatial_index is None:
+            to_run = self.getEdgesId()
+        else:
+            to_run = [e[1] for e in self.spatial_index.neighborhood(source, unit=3)]
+        if verbose:
+            to_run = progressbar.progressbar(to_run)
+        for eid in to_run:
+            e = self.EDGES[eid]
+            if min(source.distance2DTo(e.source.coord), source.distance2DTo(e.target.coord)) > cut:
                 continue
             sub_net.addEdge(e, e.source, e.target)
         return sub_net
