@@ -156,3 +156,28 @@ def compare(track1, track2):
         rmse += trackA.getObs(i).distanceTo(trackB.getObs(i))**2
     
     return math.sqrt(rmse/trackA.size())
+	
+	
+# ------------------------------------------------------------
+# Computes central track of a track collection
+# Inputs:
+#     - tracks:  TrackCollection or list of tracks
+#     - mode  :  "NN" or "DTW" for track pair matching   
+# ------------------------------------------------------------	
+def centralTrack(tracks, mode="NN", verbose=True):
+    if isinstance(tracks, list):
+        tracks = TrackCollection(tracks)
+    central = tracks[0].copy()
+    for i in range(1,len(tracks)):
+        diff = differenceProfile(tracks[0], tracks[i], mode=mode, verbose=verbose)
+        for j in range(len(central)):
+            dx = tracks[i][diff["pair", j]].position.getX()
+            dy = tracks[i][diff["pair", j]].position.getY()
+            dz = tracks[i][diff["pair", j]].position.getZ()
+            central[j].position.translate(dx, dy, dz)
+    for j in range(len(central)):
+        central[j].position.scale(1.0/len(tracks))
+    return central
+
+
+

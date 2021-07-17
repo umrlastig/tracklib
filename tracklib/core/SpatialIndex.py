@@ -14,7 +14,7 @@ import tracklib.algo.Geometrics as Geometrics
 
 class SpatialIndex:
     
-    def __init__(self, collection, resolution=(100,100), verbose=True):
+    def __init__(self, collection, resolution=None, margin=0.05, verbose=True):
         '''
         Parameters
         ----------
@@ -42,8 +42,16 @@ class SpatialIndex:
         None.
 
         '''
-        if isinstance(resolution, int):
-            resolution = (resolution, resolution)
+        bb = collection.bbox()
+        (self.xmin, self.xmax, self.ymin, self.ymax) = SpatialIndex._addMargin(bb, margin)
+        ax = self.xmax-self.xmin
+        ay = self.ymax-self.ymin
+
+        if resolution is None:
+            am = max(ax, ay)
+            r = am/100; resolution = (int(ax/r), int(ay/r))
+        else:
+            r = resolution; resolution = (int(ax/r), int(ay/r))
    
         self.collection = collection
 
@@ -59,21 +67,18 @@ class SpatialIndex:
         # Tableau de collections de features appartenant a chaque dalle. 
         # Un feature peut appartenir a plusieurs dalles.
         self.grid = []
-        for i in range(self.csize + 1):
+        for i in range(self.csize):
             self.grid.append([])
-            for j in range(self.lsize + 1):
+            for j in range(self.lsize):
                 self.grid[i].append([])
         
-        (self.xmin, self.xmax, self.ymin, self.ymax) = collection.bbox()
-        
-        self.dX = (self.xmax - self.xmin) / self.csize
-        self.dY = (self.ymax - self.ymin) / self.lsize
-        #print (self.dX, self.dY)
+        self.dX = ax / self.csize
+        self.dY = ay / self.lsize
         
         # Calcul de la grille
         boucle = range(collection.size())
         if verbose:
-            print("Building spatial index...")
+            print("Building ["+str(self.csize)+" x "+str(self.lsize)+"] spatial index...")
             boucle = progressbar.progressbar(boucle)
         for num in boucle:
             feature = collection[num]
@@ -83,9 +88,16 @@ class SpatialIndex:
             # On récupère l'arc du reseau qui est une trace
             elif isinstance(feature, Edge):
                 self.__addIntersectCells(feature.geom, num)
-                
-        #print (self.inventaire)
 
+    def _addMargin(bbox, margin):
+        (xmin, xmax, ymin, ymax) = bbox
+        ax = xmax-xmin
+        ay = ymax-ymin
+        xmin -= margin*ax
+        xmax += margin*ax
+        ymin -= margin*ay
+        ymax += margin*ay
+        return (xmin, xmax, ymin, ymax)
 
     def __addIntersectCells(self, track, num):
         '''
@@ -133,27 +145,30 @@ class SpatialIndex:
         pass
     
     
+    # ------------------------------------------------------------
+    # Normalized coordinates of coord: (x,) -> (i,j) with:
+	#   i = (x-xmin)/(xmax-xmin)*nb_cols
+	#   j = (y-ymin)/(ymax-ymin)*nb_rows
+    # ------------------------------------------------------------
     def __getCell(self, coord):
-        '''
-            Fonction qui retourne les coordonnees normalisees de coord  
-        '''
-        # (idx, idy) = self.__getCoordGrille(coord)
-        X = float(coord.getX()) - self.xmin
-        idx = X / self.dX
-        
-        Y = float(coord.getY()) - self.ymin
-        idy = Y / self.dY
-        
-        if math.floor(idx) < 0 or math.floor(idx) > (self.csize + 1):
+	
+        if (coord.getX() < self.xmin) or (coord.getX() > self.xmax):
             sys.exit ('Error: x overflow')
-        if idy < 0 or idy > (self.lsize + 1):
+        if (coord.getY() < self.ymin) or (coord.getY() > self.ymax):
             sys.exit ('Error: y overflow')
-        
-        #return (math.floor(idx), math.floor(idy))
+
+        idx = (float(coord.getX()) - self.xmin) / self.dX
+        idy = (float(coord.getY()) - self.ymin) / self.dY
+                
         return (idx, idy)
     
     
-    def plot(self):
+    # ------------------------------------------------------------
+    # Plot spatial index and collection structure together in the 
+	# same reference frame (geographic reference frame)
+	#   - base: plot support network or track collection if True
+    # ------------------------------------------------------------
+    def plot(self, base=True):
 
         fig = plt.figure()
         ax = fig.add_subplot(111, xlim=(self.xmin, self.xmax), ylim=(self.ymin, self.ymax))
@@ -164,7 +179,9 @@ class SpatialIndex:
         for j in range(1,self.lsize):
             yj = j*self.dY + self.ymin
             ax.plot([self.xmin, self.xmax], [yj,yj], '-',color='lightgray')
-        self.collection.plot(append=ax)        
+        
+        if base:
+            self.collection.plot(append=ax)        
 
         for i in range(self.csize):
             xi1 = i*self.dX + self.xmin; xi2 = xi1 + self.dX
@@ -175,7 +192,30 @@ class SpatialIndex:
                         [[xi1, yj1], [xi2, yj1], [xi2, yj2], [xi1, yj2], [xi1, yj1]])
                     ax.add_patch(polygon)
                     polygon.set_facecolor('lightcyan')
-          
+					
+    # ------------------------------------------------------------
+    # Plot a specific cell (i,j)
+    # ------------------------------------------------------------
+    def highlight(self, i, j, sym='r-', size=0.5):
+        x0 = self.xmin+i*self.dX; x1 = x0+self.dX
+        y0 = self.ymin+j*self.dY; y1 = y0+self.dY
+        X = [x0, x1, x1, x0, x0]
+        Y = [y0, y0, y1, y1, y0] 
+        plt.plot(X, Y, sym, linewidth=size)		
+
+    # ------------------------------------------------------------
+    # Request function to get data registered in spatial index
+    # Inputs:
+	# 	- request(i,j) returns data registered in cell (i,j) 
+	#   	- i: row index i of spatial index grid
+	#		- j: col index j of spatial index grid
+	#   - request(coord) returns data registered in the cell 
+	#     containing GeoCoords or ENUCoors object coord
+	#   - request(list) returns data registered in all cells 
+	#     crossed by a segment list=[coord1, coord2].
+	#	- request(track) returns data registered in all cells 
+	#     crossed by a track.
+    # ------------------------------------------------------------
     def request(self, obj, j=None): 
         '''
         retourne toutes les données (sous forme de liste simple) 
@@ -187,7 +227,7 @@ class SpatialIndex:
             i = obj
             return self.grid[i][j]
            
-        if isinstance(obj, GeoCoords) or isinstance(obj, ENUCoords) or isinstance(obj, ECEFCoords):
+        if isinstance(obj, GeoCoords) or isinstance(obj, ENUCoords):
             ''' dans la cellule contenant le point coord '''
             coord = obj
             c = self.__getCell(coord)
@@ -228,7 +268,33 @@ class SpatialIndex:
                 
             return TAB
         
-        
+    # ------------------------------------------------------------
+	# Neighborhood function to get all data registered in spatial 
+	# index and located in the vicinity of a given location.
+	# ------------------------------------------------------------
+	# - neighborhood(i,j,unit) returns all data (as a plain list) 
+	#   registered in a cell located at less than 'unit' distance 
+	#   from (i,j) cell. 
+	# - neighborhood(coord, unit) returns data (as a plain list) 
+	#   registered in a cells located at less than 'unit' distance 
+	#   from cell containing coord. 
+	# - neighborhood([c1, c2], unit) returns data (as a plain 
+	#   list) registered in a cells located at less than 'unit' 
+	#   distance from cells containing segment [c1, c2]
+	# - neighborhood(track, unit) returns data (as a plain list) 
+	#   registered in a cells located at less than 'unit' distance 
+	#   from cells containing track
+	# ------------------------------------------------------------
+	# As default value, unit=0, meaning that only data located in 
+	# (i,j) cell are selected. If unit=-1, the minimal value is 
+	# selected in order to get at least 1 data in function output. 
+	# ------------------------------------------------------------
+	# The number of cells inspected is given by:
+	#    - (1+2*unit)^2 if unit >= 0
+	#    - (1+2*(unit'+1))^2 if unit < 0, with unit' is the min 
+	#      value of unit such that output is not empty
+	# ------------------------------------------------------------
+
     def neighborhood(self, obj, j=None, unit=0):
         '''
         retourne toutes les données (sous forme de liste simple) référencées 
@@ -238,48 +304,49 @@ class SpatialIndex:
         pour que la liste ne soit pas vide*.  
         '''
         
+	    # --------------------------------------------------------	
+        # neighborhood(i,j,unit)
+	    # --------------------------------------------------------	
         if isinstance(obj, int):
         
             i = obj
 
-            if unit > -1:
-                NC = self.__neighbouringcells(i, j, unit)
-                TAB = []
+            if unit != -1:
+                TAB = set()
+                NC = self.__neighboringcells(i, j, unit, False)
                 for cell in NC:
-                    self.__addCellValuesInTAB(TAB, cell)
-                #print (TAB)
-                return TAB
-            
-            # Si unit = -1, tant liste ne soit pas vide
-            # plus une marge de une unité
-            u = 0
+                    TAB.update(self.request(cell[0], cell[1]))
+                return list(TAB)
+				
+            # -----------------------------------------
+            # Case: unit < 0 -> search for unit value
+			# -----------------------------------------
+            u = 0; TAB = set(); found = False
             while (u <= max(self.csize, self.lsize)):
-                NC = self.__neighbouringcells(i, j, u)
-                TAB = []
+                NC = self.__neighboringcells(i, j, u, True)
                 for cell in NC:
-                    self.__addCellValuesInTAB(TAB, cell)
-                
-                if len(TAB) <= 0:
-                    u += 1
-                    continue
-                
-                # Plus une marge de sécurité
-                NC = self.__neighbouringcells(i, j, u+1)
-                for cell in NC:
-                    self.__addCellValuesInTAB(TAB, cell)
-                #print (TAB)                
-                return TAB
+                    TAB.update(self.request(cell[0], cell[1]))
+                if found:
+                    break
+					
+                found = (len(TAB) > 0); u += 1
+                 
+            return list(TAB)
         
-        
-        if isinstance(obj, GeoCoords) or isinstance(obj, ENUCoords) or isinstance(obj, ECEFCoords):
+        # --------------------------------------------------------	
+        # neighborhood(coord, unit)
+	    # --------------------------------------------------------	
+        if isinstance(obj, GeoCoords) or isinstance(obj, ENUCoords):
             coord = obj
             x = coord.getX()
             y = coord.getY()
             c = self.__getCell(ENUCoords(x, y))
-            # print (c)
             return self.neighborhood(math.floor(c[0]), math.floor(c[1]), unit)
            
         
+		# --------------------------------------------------------	
+        # neighborhood([c1, c2], unit)
+	    # --------------------------------------------------------	
         if isinstance(obj, list):
             ''' cellules voisines traversées par le segment coord '''
             [coord1, coord2] = obj
@@ -293,7 +360,7 @@ class SpatialIndex:
                 # Les cellules traversées par le segment
                 CELLS = self.__cellsCrossSegment(p1, p2)
                 for cell in CELLS:
-                    NC = self.__neighbouringcells(cell[0], cell[1], unit)
+                    NC = self.__neighboringcells(cell[0], cell[1], unit)
                     #print ('    ', cell, NC)
                     for cellu in NC:
                         self.__addCellValuesInTAB(TAB, cellu)
@@ -306,7 +373,7 @@ class SpatialIndex:
                 TAB = []
                 CELLS = self.__cellsCrossSegment(p1, p2)
                 for cell in CELLS:
-                    NC = self.__neighbouringcells(cell[0], cell[1], u)
+                    NC = self.__neighboringcells(cell[0], cell[1], u)
                     #print (cell, NC)
                     for cellu in NC:
                         self.__addCellValuesInTAB(TAB, cellu)
@@ -319,14 +386,16 @@ class SpatialIndex:
                 # Plus une marge de sécurité
                 CELLS = self.__cellsCrossSegment(p1, p2)
                 for cell in CELLS:
-                    NC = self.__neighbouringcells(cell[0], cell[1], u+1)
+                    NC = self.__neighboringcells(cell[0], cell[1], u+1)
                     #print (cell, NC)
                     for cellu in NC:
                         self.__addCellValuesInTAB(TAB, cellu)
                 #print (TAB)                
                 return TAB
             
-
+		# --------------------------------------------------------	
+        # neighborhood(track, unit)
+	    # --------------------------------------------------------	
         if isinstance(obj, Track):
             ''' cellules voisines traversées par Track '''
             
@@ -347,79 +416,49 @@ class SpatialIndex:
                 pos1 = pos2
                 
             return TAB2
-            
-
+    # ------------------------------------------------------------
+	# Function to convert ground distance (metric system is 
+	# assumed to be orthonormal) into unit number
+	# ------------------------------------------------------------        
+    def groundDistanceToUnits(self, distance):
+        return math.floor(distance/max(self.dX, self.dY)+1)
         
-    
-    def __neighbouringcells(self, i, j, u=1):
-        '''
-        Parameters
-        ----------
-        i : int
-            indice de la cellule (i,j).
-        j : int
-            indice de la cellule (i,j).
-        u : TYPE, optional
-            DESCRIPTION. The default is 1.
-
-        Returns
-        -------
-        NC : integer
-            neighbouring cells of (i,j) with u unit
-
-        '''
-        
+    # ------------------------------------------------------------
+	# Returns all cells (i',j') in a vicinity unit of (i,j) 
+	# ------------------------------------------------------------
+	# - incremental = True: gets all cells where distance is to 
+	#   central cell is exactly u units (Manhattan L1 discretized 
+	#   distance). Used for incremental search of neighbors.
+	# - incremental = False: gets all cells where distance is less 
+	#   or equal than u units (Manhattan L1 discretized distance)
+	# ------------------------------------------------------------
+    def __neighboringcells(self, i, j, u=0, incremental=False):   
         NC = []
-        
-        #  i = +-u et j = +- 0-->u
-        for t in range(-u, u+1):
-            candidat1 = (i + u, j + t)
-            if (i+u) < self.csize and (i+u) >= 0 and (j+t) < self.lsize and (j+t) >= 0:
-                if candidat1 not in NC:
-                    NC.append(candidat1)
-            candidat2 = (i - u, j + t)
-            if (i-u) < self.csize and (i-u) >= 0 and (j+t) < self.lsize and (j+t) >= 0:
-                if candidat2 not in NC:
-                    NC.append(candidat2)
-        
-        #  i = +- 0-->u-1 et j = +-u
-        for s in range(-u+1, u):
-            candidat1 = (i + s, j + u)
-            if (i+s) < self.csize and (i+s) >= 0 and (j+u) < self.lsize and (j+u) >= 0:
-                if candidat1 not in NC:
-                    NC.append(candidat1)
-            candidat2 = (i + s, j - u)
-            if (i+s) < self.csize and (i+s) >= 0 and (j-u) < self.lsize and (j-u) >= 0:
-                if candidat2 not in NC:
-                    NC.append(candidat2)
-            
-        # return neighbouring cells
-        # print (NC)
-        return NC
-        
-        
+        imin = max(i-u, 0); imax = min(i+u+1, self.csize) 
+        jmin = max(j-u, 0); jmax = min(j+u+1, self.lsize)
+        for ii in range(imin, imax):
+            for jj in range(jmin, jmax):	
+                if incremental:
+                    if (ii != imin) and (ii != imax-1):
+                        if (jj != jmin) and (jj != jmax-1):
+                            continue
+                NC.append((ii,jj))	
+        return NC				
     
-    def __addCellValuesInTAB(self, TAB, cell):
-        '''
-           Add all values of the cell in TAB array.
-           Check: 
-               if cell is empty 
-               if the values of cell are not already in TAB
-        '''
-        
+	# ------------------------------------------------------------
+	# Add data registered in cell within TAB structure 
+	# ------------------------------------------------------------
+    def __addCellValuesInTAB(self, TAB, cell):     
         values = self.request(cell[0], cell[1])
-        if len (values) > 0:
-            for d in values:
-                if d not in TAB:
-                    TAB.append(d)
+        for d in values:
+            if d not in TAB:
+                TAB.append(d)
         
-
-        
+	# ------------------------------------------------------------
+	# List of cells crossing segment [coord1, coord2] (in px)
+	# ------------------------------------------------------------        
     def __cellsCrossSegment(self, coord1, coord2):
-        '''
-            liste des cellules passent par le segment défini 
-            par [coord1, coord2] en pixel
-        '''
+
         CELLS = []
         segment2 = [coord1[0], coord1[1], coord2[0], coord2[1]]
         

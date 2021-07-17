@@ -188,9 +188,9 @@ class Network:
     # Spatial index creation, export and import functions
     # ------------------------------------------------------------ 		
 		
-    def createSpatialIndex(self, resolution=(100, 100), verbose=True):
+    def createSpatialIndex(self, resolution=None, margin=0.05, verbose=True):
         from tracklib.core.SpatialIndex import SpatialIndex
-        self.spatial_index = SpatialIndex(self, resolution, verbose)
+        self.spatial_index = SpatialIndex(self, resolution, margin, verbose)
 
     def exportSpatialIndex(self, filename):
         from tracklib.core.SpatialIndex import SpatialIndex
@@ -416,7 +416,8 @@ class Network:
         if self.spatial_index is None:
             to_run = self.getEdgesId()
         else:
-            to_run = [e[1] for e in self.spatial_index.neighborhood(source, unit=3)]
+            unit = self.spatial_index.groundDistanceToUnits(cut)
+            to_run = [e[1] for e in self.spatial_index.neighborhood(source, unit=unit)]
         if verbose:
             to_run = progressbar.progressbar(to_run)
         for eid in to_run:
