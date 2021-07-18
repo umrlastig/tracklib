@@ -62,6 +62,7 @@ def compLike(s1, s2):
         s = s[id+len(tok):len(s)]
     return True    
 
+
 # =============================================================================
 ''' Pour calculer l'aire des triangles dans Visvalingam '''
 def aire_visval(track, i):
@@ -266,6 +267,179 @@ def getOffsetColorMap(cmin, cmax, part):
     cmap = mcolors.LinearSegmentedColormap('CustomMap', cdict)
 
     return cmap
+
+# ----------------------------------------
+# Fonction equation cartesienne
+# Entree : segment
+# Sortie : liste de parametres (a,b,c)
+# ----------------------------------------
+def cartesienne(segment):
+    
+    parametres = list();
+    
+    x1 = segment[0]
+    y1 = segment[1]
+    x2 = segment[2]
+    y2 = segment[3]
+    
+    u1 = x2-x1
+    u2 = y2-y1
+    
+    b = -u1
+    a = u2
+    
+    c = -(a*x1+b*y1)
+    
+    parametres.append(a)
+    parametres.append(b)
+    parametres.append(c)
+    
+    return parametres
+    
+# ----------------------------------------
+# Fonction distance point-droite
+# Entree : paramètres a,b,c d'une droite, 
+# coordonnées x et y du point
+# Sortie : distance du point à la droite
+# ----------------------------------------
+def dist_point_droite(param, x, y):
+    
+    a = param[0]
+    b = param[1]
+    c = param[2]
+
+    distance = math.fabs(a*x+b*y+c)
+    distance /= math.sqrt(a*a+b*b)
+    
+    return distance
+    
+
+# ----------------------------------------
+# Fonction projection orthogonal sur une 
+# droite, coordonnées x et y
+# Entree : paramètres a,b,c d'une droite
+# Sortie : coordonnée xproj et yproj du 
+# point projeté
+# ----------------------------------------
+def projection_droite(param, x, y):
+    
+    a = param[0]
+    b = param[1]
+    c = param[2]
+    
+    xv = -b 
+    yv = a
+    
+    norm = math.sqrt(xv*xv+yv*yv)
+    
+    xb = 0
+    yb = -c/b
+    
+    BH = ((x-xb)*xv+(y-yb)*yv)/norm
+    
+    xproj = xb + BH*xv/norm
+    yproj = yb + BH*yv/norm   
+    
+    return xproj, yproj
+    
+# ----------------------------------------
+# Fonction complète de projection
+# Entree : segment, coordonnées x et y du 
+# point
+# Sortie : distance du point au segment et 
+# coordonnées du projeté
+# ----------------------------------------
+def proj_segment(segment, x, y):
+    
+    param = cartesienne(segment)    
+    
+    a = param[0]
+    b = param[1]
+    c = param[2]
+
+    distance = math.fabs(a*x+b*y+c)
+    distance /= math.sqrt(a*a+b*b)
+    
+    # Récupération des coordonnées du projeté
+    xproj, yproj =  projection_droite(param, x, y)
+    
+    # Test d'inclusion dans le segment
+
+    x1 = segment[0]
+    y1 = segment[1]
+    x2 = segment[2]
+    y2 = segment[3]    
+    
+    boolx1 = (xproj >= x1) and (xproj <= x2)    
+    boolx2 = (xproj <= x1) and (xproj >= x2)
+    boolx = boolx1 or boolx2
+    
+    booly1 = (yproj >= y1)&(yproj <= y2)    
+    booly2 = (yproj <= y1)&(yproj >= y2)
+    booly = booly1 or booly2
+    
+    bool_include = (boolx and booly)
+    
+     # Si le projeté est dans le segment
+    if (bool_include):
+
+        a = param[0]
+        b = param[1]
+        c = param[2]
+    
+        xv = -b 
+        yv = a
+        
+        norm = math.sqrt(xv*xv+yv*yv)
+    
+        xb = 0
+        yb = -c/b
+    
+        BH = ((x-xb)*xv+(y-yb)*yv)/norm
+    
+        xproj = xb + BH*xv/norm
+        yproj = yb + BH*yv/norm   
+            
+        
+        return distance, xproj, yproj
+    
+    else:
+        distance1 = math.sqrt((x-x1)*(x-x1)+(y-y1)*(y-y1))
+        distance2 = math.sqrt((x-x2)*(x-x2)+(y-y2)*(y-y2))
+        
+        if (distance1 <= distance2):
+            return distance1, x1, y1
+        else:
+            return distance2, x2, y2
+            
+# ----------------------------------------
+# Fonction complète de projection entre un
+# point et une polyligne
+# Entree : polyligne, coordonnées x et y du 
+# point
+# Sortie : distance du point ) la polyligne
+# et coordonnées du projeté
+# ----------------------------------------
+def proj_polyligne(Xp, Yp, x, y):     
+    
+    distmin = 1e300
+    
+    for i in range(len(Xp)-1):
+    
+        x1 = Xp[i]
+        y1 = Yp[i]
+        x2 = Xp[i+1]
+        y2 = Yp[i+1]
+
+        dist, xp, yp = proj_segment([x1, y1, x2, y2], x, y)
+        
+        if dist < distmin:
+            distmin = dist
+            xproj = xp
+            yproj = yp
+            iproj = i
+            
+    return distmin, xproj, yproj, iproj
 
 # --------------------------------------------------------------------------
 # Priority heap

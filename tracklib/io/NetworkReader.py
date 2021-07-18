@@ -4,10 +4,13 @@ import csv
 import progressbar
 
 #from tracklib.core.Coords import ENUCoords, ECEFCoords, GeoCoords
-from tracklib.core.Network import Network, Node, Edge
+
 from tracklib.core.Track import Track
+from tracklib.core.Network import Network, Node, Edge
 from tracklib.io.NetworkFormat import NetworkFormat
+
 import tracklib.util.Wkt as wkt
+import tracklib.algo.Cinematics as Cinematics
 
 
 class NetworkReader:
@@ -53,6 +56,7 @@ class NetworkReader:
                     continue
                 
                 track = Track(TAB_OBS)
+                Cinematics.computeAbsCurv(track)
              
                 # Transformation GEO coordinates to ENU
                 if (fmt.srid.upper() in ["GEOCOORDS", "GEO", "ECEFCOORDS", "ECEF"]):

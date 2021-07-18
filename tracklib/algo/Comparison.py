@@ -3,10 +3,15 @@
 # -----------------------------------------------------------------------------
 
 import sys
+import math
 import progressbar
 import numpy as np
 import matplotlib.pyplot as plt
 
+from tracklib.core.TrackCollection import TrackCollection
+
+import tracklib.core.Utils as Utils
+import tracklib.algo.Dynamics as Dynamics
 import tracklib.algo.Interpolation as Interpolation
 
 # ------------------------------------------------------------
@@ -27,6 +32,20 @@ def plotDifferenceProfile(profile, track2, af_name="pair", sym='g--', NO_DATA_VA
 # Two possible modes: 
 # - NN (Nearest Neighbour): O(n^2) time and O(n) space
 # - DTW (Dynamic Time Warping): O(n^3) time and O(n^2) space
+# - FDTW (Fast Dynamic Time Warping): same as DTW with reduced
+#   search space. In this particular case, 'ends' parameter is 
+#   an integer giving the number of points to search for a 
+#   match ahead and behind the current point. E.g. for ends=0,
+#   there is a strict matching track1[i] <-> track2[i] for 
+#   each epoch i. For ends=10 for example, each point track[i]
+#   can be matched with any point chronologically between the 
+#   bounds track2[i-10] and track2[i+10]. Default is equal to 
+#   3, meaning that track1 may be at most 3 times faster or 
+#   slower than track2 on ant given sub-interval. Note that 
+#   this method is designed for pairs of tracks having about 
+#   same number of points. Otherwise, it is strongly advised 
+#   to perform a spatial resampling before applying FDTW.
+# ------------------------------------------------------------
 # Output is a track objet, with an analytical feature diff
 # containing shortest distance of each point of track t1, to 
 # the points of track t2. We may get profile as a list with 
@@ -49,7 +68,10 @@ def differenceProfile(track1, track2, mode="NN", ends=False, p=1, verbose=True):
     # Nearest Neighbor (NN) algorithm
     # --------------------------------------------------------
     if mode == "NN":
-        for i in range(output.size()):
+        to_run = range(output.size())
+        if verbose:
+            to_run = progressbar.progressbar(to_run)
+        for i in to_run:
             val_min = sys.float_info.max
             id_min = 0
             for j in range(track2.size()):
@@ -116,21 +138,43 @@ def differenceProfile(track1, track2, mode="NN", ends=False, p=1, verbose=True):
         #plt.plot(S, 'r-')			
         #plt.imshow(M)
 
-        for i in range(track1.size()):
-            x1 = track1.getObs(i).position.getX()
-            y1 = track1.getObs(i).position.getY()
-            x2 = track2.getObs(S[i]).position.getX()
-            y2 = track2.getObs(S[i]).position.getY()
-            d = track1.getObs(i).distance2DTo(track2.getObs(S[i]))
-            ex = track1.getObs(i).position.getX() - track2.getObs(S[i]).position.getX()
-            ey = track1.getObs(i).position.getY() - track2.getObs(S[i]).position.getY()
-            output.setObsAnalyticalFeature("diff", i, d)
-            output.setObsAnalyticalFeature("pair", i, S[i])
-            output.setObsAnalyticalFeature("ex", i, ex)
-            output.setObsAnalyticalFeature("ey", i, ey)
+        __fillAFProfile(track1, track2, output, S)
+			
+    # --------------------------------------------------------
+    # Fast Dynamic time warping (FDTW) algorithm
+    # --------------------------------------------------------
+    if mode == "FDTW":
+	
+        if isinstance(ends, bool):
+            if not ends:
+                ends = 3
+	
+        S = lambda track, k: [p for p in range(max(0,k-ends),  min(len(track2)-1, k+ends))]
+        Q = lambda i,j,k,t: (j<i+30)*(j>=i)*1
+        P = lambda s,y,k,t: math.exp(-track2[s].position.distance2DTo(y))
+
+        Dynamics.HMM(S, Q, P).estimate(output, ["x","y"], mode=Dynamics.MODE_OBS_AS_2D_POSITIONS, verbose=2*verbose)
+
+        __fillAFProfile(track1, track2, output, output['hmm_inference'])
 
     output.compute_abscurv()
     return output
+
+def __fillAFProfile(track1, track2, output, S):
+    for i in range(track1.size()):
+        x1 = track1.getObs(i).position.getX()
+        y1 = track1.getObs(i).position.getY()
+        x2 = track2.getObs(S[i]).position.getX()
+        y2 = track2.getObs(S[i]).position.getY()
+        d = track1.getObs(i).distance2DTo(track2.getObs(S[i]))
+        ex = track1.getObs(i).position.getX() - track2.getObs(S[i]).position.getX()
+        ey = track1.getObs(i).position.getY() - track2.getObs(S[i]).position.getY()
+        output.setObsAnalyticalFeature("diff", i, d)
+        output.setObsAnalyticalFeature("pair", i, S[i])
+        output.setObsAnalyticalFeature("ex", i, ex)
+        output.setObsAnalyticalFeature("ey", i, ey)
+				
+	
 
 def synchronize(self, track):
         
@@ -162,7 +206,7 @@ def compare(track1, track2):
 # Computes central track of a track collection
 # Inputs:
 #     - tracks:  TrackCollection or list of tracks
-#     - mode  :  "NN" or "DTW" for track pair matching   
+#     - mode  :  "NN", "DTW" or "FDTW" for track pair matching   
 # ------------------------------------------------------------	
 def centralTrack(tracks, mode="NN", verbose=True):
     if isinstance(tracks, list):

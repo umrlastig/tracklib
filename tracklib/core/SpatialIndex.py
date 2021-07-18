@@ -109,7 +109,7 @@ class SpatialIndex:
             if coord1 != None:
                 p1 = self.__getCell(coord1)
                 p2 = self.__getCell(coord2)
-                self.__addSegment(p1, p2, (i-1,num))
+                self.__addSegment(p1, p2, num)
             coord1 = coord2
 
     
@@ -308,9 +308,7 @@ class SpatialIndex:
         # neighborhood(i,j,unit)
 	    # --------------------------------------------------------	
         if isinstance(obj, int):
-        
             i = obj
-
             if unit != -1:
                 TAB = set()
                 NC = self.__neighboringcells(i, j, unit, False)
