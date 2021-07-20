@@ -112,7 +112,16 @@ class TrackCollection:
                 print("Error: base coordinates should be specified for conversion ENU -> Geo")
                 exit()
             for track in self.__TRACES:
-                track.toGeoCoords(base)            	
+                track.toGeoCoords(base) 
+				
+    # Function to convert track to ENUCoords if it is in GeoCoords. Returns None
+    # if no transformation operated, and returns used reference point otherwise
+    def toENUCoordsIfNeeded(self):
+        base = None
+        if self.getTrack(0).getSRID() in ["GEO", "Geo"]:
+            base = self.getTrack(0).getObs(0).position.copy()
+            self.toENUCoords(base)
+        return base
           
     
     def summary(self):
@@ -135,10 +144,13 @@ class TrackCollection:
             trace.addAnalyticalFeature(algorithm, name)
             
             
-    def plot(self, symbols=['r-'], markersize=[4], margin=0.05, append=False):
+    def plot(self, symbols=None, markersize=[4], margin=0.05, append=False):
+        if symbols is None:
+            symbols = ['r-','g-','b-','c-','m-','y-','k-']
         if len(self) == 0:
             return
         symbols = utils.listify(symbols)
+        markersize = utils.listify(markersize)
         if not append:
             (xmin, xmax, ymin, ymax) = self.bbox()
             dx = margin*(xmax-xmin)

@@ -1,4 +1,5 @@
 # --------------------------- Comparison --------------------------------------
+# --------------------------- Comparison --------------------------------------
 # Class to manage comparisons of GPS tracks
 # -----------------------------------------------------------------------------
 
@@ -147,7 +148,7 @@ def differenceProfile(track1, track2, mode="NN", ends=False, p=1, verbose=True):
 	
         if isinstance(ends, bool):
             if not ends:
-                ends = 3
+                ends = 12
 	
         S = lambda track, k: [p for p in range(max(0,k-ends),  min(len(track2)-1, k+ends))]
         Q = lambda i,j,k,t: (j<i+30)*(j>=i)*1
@@ -209,8 +210,10 @@ def compare(track1, track2):
 #     - mode  :  "NN", "DTW" or "FDTW" for track pair matching   
 # ------------------------------------------------------------	
 def centralTrack(tracks, mode="NN", verbose=True):
+    tracks = tracks.copy()
     if isinstance(tracks, list):
         tracks = TrackCollection(tracks)
+    base = tracks.toENUCoordsIfNeeded()
     central = tracks[0].copy()
     for i in range(1,len(tracks)):
         diff = differenceProfile(tracks[0], tracks[i], mode=mode, verbose=verbose)
@@ -221,6 +224,8 @@ def centralTrack(tracks, mode="NN", verbose=True):
             central[j].position.translate(dx, dy, dz)
     for j in range(len(central)):
         central[j].position.scale(1.0/len(tracks))
+    if not base is None:
+        central.toGeoCoords(base)
     return central
 
 

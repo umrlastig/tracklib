@@ -147,6 +147,15 @@ class Track:
             xi = (self[i].position.getX()-P1.getX())*sx + p1[0]
             yi = (self[i].position.getY()-P1.getY())*sy + p1[1]
             self[i].position = ENUCoords(xi, yi, self[i].position.getZ())    
+			
+    # Function to convert track to ENUCoords if it is in GeoCoords. Returns None
+    # if no transformation operated, and returns used reference point otherwise
+    def toENUCoordsIfNeeded(self):
+        base = None
+        if self.getSRID() in ["GEO", "Geo"]:
+            base = self.getObs(0).position.copy()
+            tracks.toENUCoords(base)
+        return base
      
     # =========================================================================
     # Basic methods to get metadata and/or data
