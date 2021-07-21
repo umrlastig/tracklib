@@ -121,6 +121,7 @@ class Kalman:
         self.R = R 
         self.X0 = X0
         self.P0 = P0
+        self.restart = None
         self.iter = iter
         self.control = 1
         self.spreading = 1
@@ -138,7 +139,10 @@ class Kalman:
         if not P0 is None:
             self.P0 = P0
     def setSpreading(self, spreading):
-        self.spreading = spreading    
+        self.spreading = spreading
+
+    def setRestart(self, restart):
+        self.restart = restart
         
     def setIterations(self, iter):
         self.iter = iter   
@@ -371,8 +375,9 @@ class Kalman:
     # may be used as it is to plot 2D error ellipses, provided 
     # that first two states are x and y coordinates. 
     # ------------------------------------------------------------
-    def estimate(self, track, obs, out=[], mode=-1, verbose=True):
-        
+    def estimate(self, track, obs, reinit=[], out=[], mode=-1, verbose=True):
+
+
         if (len(out) < self.X0.shape[0]):
             for i in range(len(out), self.X0.shape[0]):
                 out.append("kf_"+str(i))
@@ -406,7 +411,10 @@ class Kalman:
        
         # Filter
         for k in EPOCHS:
-        
+
+            if not self.restart is None:
+                self.restart(X, P, track, k)
+
             for step in range(self.iter):
 
                 SIGMA_PTS = self.__sampleSigmaPts(X, P)
@@ -458,6 +466,7 @@ class Kalman:
             track.setXFromAnalyticalFeature(out[0])
             track.setYFromAnalyticalFeature(out[1])
             track.setZFromAnalyticalFeature(out[2])
+        
 
 # -------------------------------------------------------
 # Hidden Markov Model is designed to estimate discrete 
