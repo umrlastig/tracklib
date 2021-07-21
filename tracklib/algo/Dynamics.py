@@ -375,7 +375,7 @@ class Kalman:
     # may be used as it is to plot 2D error ellipses, provided 
     # that first two states are x and y coordinates. 
     # ------------------------------------------------------------
-    def estimate(self, track, obs, reinit=[], out=[], mode=-1, verbose=True):
+    def estimate(self, track, obs, out=[], mode=-1, verbose=True):
 
 
         if (len(out) < self.X0.shape[0]):
