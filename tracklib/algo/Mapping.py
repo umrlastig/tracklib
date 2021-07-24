@@ -2,12 +2,14 @@
 # Class to manage mapping of GPS tracks on geographic features
 # -----------------------------------------------------------------------------
 import math
+import random
 import progressbar
 import numpy as np
 import matplotlib.pyplot as plt
 
 import tracklib.core.Utils as Utils
 
+from tracklib.core.Obs import Obs
 from tracklib.core.Coords import ENUCoords
 from tracklib.core.Operator import Operator
 from tracklib.core.TrackCollection import TrackCollection
@@ -40,7 +42,8 @@ def __distToNode(track, coord, i, end=0):
 def __states(track, k):
     return STATES[k]
 def __obs_log(s, y, k, track):
-    return -(s[0].distance2DTo(y)/gps_noise)**2
+    return s[0].distance2DTo(y)
+    #return -(s[0].distance2DTo(y)/gps_noise)**2
 def __transition_log(s1, s2, k, track):
     return __distBetweenStates(s1,s2)
 def __distBetweenStates(s1, s2):
@@ -48,19 +51,41 @@ def __distBetweenStates(s1, s2):
     e2 = net.EDGES[net.getEdgeId(s2[1])]
     if e1 == e2:
         return abs(s1[2]-s2[2])
-    d1 = s1[0].distance2DTo(e2.source.coord) + net.prepared_shortest_distance(e1.source.id, e2.source.id) + e2.source.coord.distance2DTo(s2[0])
-    d2 = s1[0].distance2DTo(e2.source.coord) + net.prepared_shortest_distance(e1.source.id, e2.target.id) + e2.target.coord.distance2DTo(s2[0])
-    d3 = s1[0].distance2DTo(e2.target.coord) + net.prepared_shortest_distance(e1.target.id, e2.source.id) + e2.source.coord.distance2DTo(s2[0])
-    d4 = s1[0].distance2DTo(e2.target.coord) + net.prepared_shortest_distance(e1.target.id, e2.target.id) + e2.target.coord.distance2DTo(s2[0])
-    #print(s1[1], s2[1], d1, d2, d3, d4)
-    return min(min(d1,d2), min(d3,d4))
+    d1s = s1[2]
+    ds2 = s2[2]
+    d1t = e1.geom.length()-s1[2] 
+    dt2 = e2.geom.length()-s2[2]   	
+    dss = net.prepared_shortest_distance(e1.source.id, e2.source.id)
+    dtt = net.prepared_shortest_distance(e1.target.id, e2.target.id)
+    dst = net.prepared_shortest_distance(e1.source.id, e2.target.id)
+    dts = net.prepared_shortest_distance(e1.target.id, e2.source.id)
+	
+    d1 = d1s + dss + ds2
+    d2 = d1t + dtt + dt2
+    d3 = d1s + dst + dt2
+    d4 = d1t + dts + ds2
+	
+    dopt = min(min(d1,d2), min(d3,d4))
+    '''
+    if abs(dopt - 47.754) < 0.001:
+        print(s1[1], s2[1], d1, d2, d3, d4, dopt)
+        print(d1s, d1t, ds2, dt2)
+        print(dss, dtt, dst, dts)  
+    '''
+    return dopt
 
-def __mapOnNetwork(track, network, gps_noise=5, transition_cost=10, search_radius=50):
+def __mapOnNetwork(track, network, gps_noise=5, transition_cost=10, search_radius=50, debug=False):
+
+    if debug:
+        f1 = open("observation.dat", "a")
+        f2 = open("transition.dat", "a")
+
     global STATES; STATES = []
     global net; net = network
-    for i in range(2):
+    print("Map-matching preparation...")
+    for i in progressbar.progressbar(range(len(track))):
         STATES.append([])
-        track[i].position.plot('b.')
+        #track[i].position.plot('b.')
         E = network.spatial_index.neighborhood(track[i].position, unit=1)
         for elem in E:
             edge_geom = network.EDGES[network.getEdgeId(elem)].geom
@@ -70,22 +95,32 @@ def __mapOnNetwork(track, network, gps_noise=5, transition_cost=10, search_radiu
                 dist_source = __distToNode(edge_geom, proj, vertex, end=0)
                 dist_target = __distToNode(edge_geom, proj, vertex, end=1)
                 STATES[-1].append((proj, elem, dist_source, dist_target))
+                wkt = Track([Obs(track[i].position), Obs(proj)]).toWKT()
+                if debug:
+                    f1.write(str(i) + " \""+wkt+"\" " + str(dist) + "\n")
+
     for k in range(len(STATES)-1):
         S1 = __states(track, k)
         S2 = __states(track, k+1)
-        s1 = S1[0]
-        for s2 in S2:
-            plt.plot([s1[0].getX(), s2[0].getX()], [s1[0].getY(), s2[0].getY()], 'g-')
-            print(s1[1], s2[1], s2[0], __transition_log(s1, s2, k, track))
-	
+        for s1 in S1:
+            for s2 in S2:
+                #plt.plot([s1[0].getX(), s2[0].getX()], [s1[0].getY(), s2[0].getY()], 'g-')
+                transition = __transition_log(s1, s2, k, track)
+                observation = __obs_log(s1, track[k].position, k, track)
+                wkt = Track([Obs(s1[0]), Obs(s2[0])]).toWKT()
+                if debug:
+                    f2.write(str(k) + " \""+wkt+"\" " + str(transition) + "\n")
+    f1.close()
+    f2.close()
+
 # --------------------------------------------------------------------------
 # Map-matching on a network
 # --------------------------------------------------------------------------
-def mapOnNetwork(tracks, network, gps_noise=5, transition_cost=10, search_radius=50):
+def mapOnNetwork(tracks, network, gps_noise=5, transition_cost=10, search_radius=50, debug=False):
     if isinstance(tracks, Track):
         tracks = TrackCollection([tracks])
     for track in tracks:
-        __mapOnNetwork(track, network, search_radius)  
+        __mapOnNetwork(track, network, gps_noise, transition_cost, search_radius, debug)  
 
 # --------------------------------------------------------------------------
 # TO DO: map-matching on raster
