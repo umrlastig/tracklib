@@ -51,7 +51,8 @@ class SpatialIndex:
             am = max(ax, ay)
             r = am/100; resolution = (int(ax/r), int(ay/r))
         else:
-            r = resolution; resolution = (int(ax/r), int(ay/r))
+            r = resolution
+            resolution = (int(ax/r[0]), int(ay/r[1]))
    
         self.collection = collection
 

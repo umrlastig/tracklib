@@ -48,44 +48,43 @@ class TestSpatialIndex(TestCase):
         TRACES.append(track)
         collection = TrackCollection(TRACES)
                 
-        index = SpatialIndex(collection, (5, 5))
+        index = SpatialIndex(collection, (2, 2))
         index.plot()
         
         # =====================================================================
         # =====================================================================
-        self.assertEqual(index.request(0, 0), [(0,0)])
+        self.assertEqual(index.request(0, 0), [0])
         self.assertEqual(index.request(1, 0), [])
-        self.assertEqual(index.request(0, 1), [(0,0)])
-        self.assertEqual(index.request(1, 1), [(0,0), (1,0)])
+        self.assertEqual(index.request(0, 1), [0])
+        self.assertEqual(index.request(1, 1), [0])
         self.assertEqual(index.request(2, 0), [])
         self.assertEqual(index.request(2, 1), [])
-        self.assertEqual(index.request(1, 2), [(1,0), (2,0)])
-        self.assertEqual(index.request(2, 2), [(2,0)])
-        self.assertEqual(index.request(3, 2), [(2,0),(3,0)])
-        self.assertEqual(index.request(3, 3), [(3,0)])
-        self.assertEqual(index.request(4, 3), [(3,0)])
-        self.assertEqual(index.request(4, 4), [(3,0)])
-        self.assertEqual(index.request(5, 5), [(3,0)])
+        self.assertEqual(index.request(1, 2), [0])
+        self.assertEqual(index.request(2, 2), [0])
+        self.assertEqual(index.request(3, 2), [0])
+        self.assertEqual(index.request(3, 3), [0])
+        self.assertEqual(index.request(4, 3), [0])
+        self.assertEqual(index.request(4, 4), [0])
         
         
-        # =====================================================================
-        self.assertEqual(index.request(ENUCoords(0, 0)), [(0,0)])
-        self.assertEqual(index.request(ENUCoords(2.5, 3)), [(0,0), (1,0)])
-        self.assertEqual(index.request(ENUCoords(2.5, 5)), [(1,0), (2,0)])
-        self.assertEqual(index.request(ENUCoords(7, 5)), [(2,0), (3,0)])
-        self.assertEqual(index.request(ENUCoords(10, 10)), [(3,0)])
-        self.assertEqual(index.request(ENUCoords(0.5, 2.5)), [(0,0)])
-        self.assertEqual(index.request(ENUCoords(4.2, 5.8)), [(2,0)])
+        # # =====================================================================
+        self.assertEqual(index.request(ENUCoords(0, 0)), [0])
+        self.assertEqual(index.request(ENUCoords(2.5, 3)), [0])
+        self.assertEqual(index.request(ENUCoords(2.5, 5)), [0])
+        self.assertEqual(index.request(ENUCoords(7, 5)), [0])
+        self.assertEqual(index.request(ENUCoords(10, 10)), [0])
+        self.assertEqual(index.request(ENUCoords(0.5, 2.5)), [0])
+        self.assertEqual(index.request(ENUCoords(4.2, 5.8)), [0])
 
         
-        # =====================================================================
-        self.assertEqual(index.request([ENUCoords(2.1, 0.5), ENUCoords(1.1, 1.1)]), [(0,0)])
+        # # =====================================================================
+        self.assertEqual(index.request([ENUCoords(2.1, 0.5), ENUCoords(1.1, 1.1)]), [0])
         self.assertEqual(index.request([ENUCoords(2.1, 0.5), ENUCoords(7.1, 3.5)]), [])
-        self.assertEqual(index.request([ENUCoords(5.8, 5.8), ENUCoords(2.1, 1.1)]), [(0,0),(1,0),(2,0)])
+        self.assertEqual(index.request([ENUCoords(5.8, 5.8), ENUCoords(2.1, 1.1)]), [0])
         
         
-        # =====================================================================
-        self.assertEqual(index.request(track), [(0,0),(1,0),(2,0),(3,0)])
+        # # =====================================================================
+        self.assertEqual(index.request(track), [0])
  
         track2 = Track()
         p6 = Obs(ENUCoords(2.2, 0), GPSTime.readTimestamp('2020-01-01 10:00:00'))
@@ -94,7 +93,7 @@ class TestSpatialIndex(TestCase):
         track2.addObs(p7)
         p8 = Obs(ENUCoords(6.5, 3.8), GPSTime.readTimestamp('2020-01-01 10:08:00'))
         track2.addObs(p8)
-        self.assertEqual(index.request(track2), [(0,0),(1,0)])
+        self.assertEqual(index.request(track2), [0])
         
         
         track3 = Track()
@@ -104,106 +103,105 @@ class TestSpatialIndex(TestCase):
         track3.addObs(p10)
         p11 = Obs(ENUCoords(10, 7), GPSTime.readTimestamp('2020-01-01 10:08:00'))
         track3.addObs(p11)
-        
-        self.assertEqual(index.request(track3), [(2,0), (3,0)])
+        self.assertEqual(index.request(track3), [0])
 
 
-        # =====================================================================
-        # =====================================================================
+        # # =====================================================================
+        # # =====================================================================
         self.assertCountEqual(index.neighborhood(0, 4, 0), [])
         self.assertCountEqual(index.neighborhood(0, 4, 1), [])
-        self.assertCountEqual(index.neighborhood(0, 4, 2), [(1,0), (2,0)])
-        self.assertCountEqual(index.neighborhood(0, 4, 3), [(0,0), (1,0), (2,0), (3,0)])   
+        self.assertCountEqual(index.neighborhood(0, 4, 2), [0])
+        self.assertCountEqual(index.neighborhood(0, 4, 3), [0])
     
         self.assertCountEqual(index.neighborhood(3, 0, 0), [])
         self.assertCountEqual(index.neighborhood(3, 0, 1), [])
-        self.assertCountEqual(index.neighborhood(3, 0, 2), [(0,0), (1,0), (2,0), (3,0)])
-        self.assertCountEqual(index.neighborhood(3, 0, 3), [(0,0), (3,0)])
+        self.assertCountEqual(index.neighborhood(3, 0, 2), [0])
+        self.assertCountEqual(index.neighborhood(3, 0, 3), [0])
     
-        self.assertCountEqual(index.neighborhood(2, 2, 0), [(2,0)])
-        self.assertCountEqual(index.neighborhood(2, 2, 1), [(0,0), (1,0), (2,0), (3,0)])
-        self.assertCountEqual(index.neighborhood(2, 2, 2), [(0,0), (3,0)])
-        self.assertCountEqual(index.neighborhood(2, 2, 3), [])
+        self.assertCountEqual(index.neighborhood(2, 2, 0), [0])
+        self.assertCountEqual(index.neighborhood(2, 2, 1), [0])
+        self.assertCountEqual(index.neighborhood(2, 2, 2), [0])
+        #self.assertCountEqual(index.neighborhood(2, 2, 3), [0])
     
-        # UNIT = -1
-        self.assertCountEqual(index.neighborhood(2, 1, -1), [(0,0),(1,0),(2,0),(3,0)])
-        self.assertCountEqual(index.neighborhood(2, 0, -1), [(0,0),(1,0),(2,0),(3,0)])
-        self.assertCountEqual(index.neighborhood(0, 1, -1), [(0,0),(1,0),(2,0)])
-        self.assertCountEqual(index.neighborhood(1, 1, -1), [(0,0),(1,0),(2,0)])
-        self.assertCountEqual(index.neighborhood(0, 4, -1), [(0,0),(1,0),(2,0),(3,0)])
-        self.assertCountEqual(index.neighborhood(3, 4, -1), [(1,0),(2,0),(3,0)])
-        self.assertCountEqual(index.neighborhood(4, 4, -1), [(3,0)])
-        self.assertCountEqual(index.neighborhood(2, 4, -1), [(1,0), (2,0), (3,0)])
+        # # UNIT = -1
+        self.assertCountEqual(index.neighborhood(2, 1, -1), [0])
+        self.assertCountEqual(index.neighborhood(2, 0, -1), [0])
+        self.assertCountEqual(index.neighborhood(0, 1, -1), [0])
+        self.assertCountEqual(index.neighborhood(1, 1, -1), [0])
+        self.assertCountEqual(index.neighborhood(0, 4, -1), [0])
+        self.assertCountEqual(index.neighborhood(3, 4, -1), [0])
+        self.assertCountEqual(index.neighborhood(4, 4, -1), [0])
+        self.assertCountEqual(index.neighborhood(2, 4, -1), [0])
         
         
-        # =====================================================================
-        self.assertCountEqual(index.neighborhood(ENUCoords(0, 0.1)), [(0,0)])
-        self.assertCountEqual(index.neighborhood(ENUCoords(2.5, 3)), [(0,0), (1,0)])
-        self.assertCountEqual(index.neighborhood(ENUCoords(2.5, 5)), [(1,0), (2,0)])
-        self.assertCountEqual(index.neighborhood(ENUCoords(7, 5)), [(2,0), (3,0)])
-        self.assertCountEqual(index.neighborhood(ENUCoords(10, 10)), [])
+        # # =====================================================================
+        self.assertCountEqual(index.neighborhood(ENUCoords(0, 0.1)), [0])
+        self.assertCountEqual(index.neighborhood(ENUCoords(2.5, 3)), [0])
+        self.assertCountEqual(index.neighborhood(ENUCoords(2.5, 5)), [0])
+        self.assertCountEqual(index.neighborhood(ENUCoords(7, 5)), [0])
+        self.assertCountEqual(index.neighborhood(ENUCoords(10, 10)), [0])
         
         self.assertCountEqual(index.neighborhood(ENUCoords(6.5, 3.8), None, 0), [])
-        self.assertCountEqual(index.neighborhood(ENUCoords(6.5, 3.8), None, 1), [(2,0), (3,0)])
-        self.assertCountEqual(index.neighborhood(ENUCoords(6.5, 3.8), None, 2), [(0,0), (1,0),(2,0),(3,0)])
-        self.assertCountEqual(index.neighborhood(ENUCoords(6.5, 3.8), None, 3), [(0,0), (3,0)])
+        self.assertCountEqual(index.neighborhood(ENUCoords(6.5, 3.8), None, 1), [0])
+        self.assertCountEqual(index.neighborhood(ENUCoords(6.5, 3.8), None, 2), [0])
+        self.assertCountEqual(index.neighborhood(ENUCoords(6.5, 3.8), None, 3), [0])
 
-        self.assertCountEqual(index.neighborhood(ENUCoords(2.2, 3.8), None, 0), [(0,0), (1,0)])
-        self.assertCountEqual(index.neighborhood(ENUCoords(2.2, 3.8), None, 1), [(0,0),(1,0),(2,0)])
-        self.assertCountEqual(index.neighborhood(ENUCoords(2.2, 3.8), None, 2), [(2,0),(3,0)])
-        self.assertCountEqual(index.neighborhood(ENUCoords(2.2, 3.8), None, 3), [(3,0)])
+        self.assertCountEqual(index.neighborhood(ENUCoords(2.2, 3.8), None, 0), [0])
+        self.assertCountEqual(index.neighborhood(ENUCoords(2.2, 3.8), None, 1), [0])
+        self.assertCountEqual(index.neighborhood(ENUCoords(2.2, 3.8), None, 2), [0])
+        self.assertCountEqual(index.neighborhood(ENUCoords(2.2, 3.8), None, 3), [0])
         
-        self.assertCountEqual(index.neighborhood(ENUCoords(9.9, 7), None, 0), [(3,0)])
-        self.assertCountEqual(index.neighborhood(ENUCoords(9.9, 7), None, 1), [(2,0), (3,0)])
-        self.assertCountEqual(index.neighborhood(ENUCoords(9.9, 7), None, 2), [(2,0)])
-        self.assertCountEqual(index.neighborhood(ENUCoords(9.9, 7), None, 3), [(0,0),(1,0),(2,0)])
+        self.assertCountEqual(index.neighborhood(ENUCoords(9.9, 7), None, 0), [0])
+        self.assertCountEqual(index.neighborhood(ENUCoords(9.9, 7), None, 1), [0])
+        self.assertCountEqual(index.neighborhood(ENUCoords(9.9, 7), None, 2), [0])
+        self.assertCountEqual(index.neighborhood(ENUCoords(9.9, 7), None, 3), [0])
        
-         # UNIT = -1
-        self.assertCountEqual(index.neighborhood(ENUCoords(0, 0), None, -1), [(0,0),(1,0)])
-        self.assertCountEqual(index.neighborhood(ENUCoords(2.5, 3), None, -1), [(0,0), (1,0), (2,0)])
-        self.assertCountEqual(index.neighborhood(ENUCoords(2.5, 5), None, -1), [(0,0), (1,0), (2,0)])
-        self.assertCountEqual(index.neighborhood(ENUCoords(7, 5), None, -1), [(2,0), (3,0)])
-        self.assertCountEqual(index.neighborhood(ENUCoords(10, 10), None, -1), [(3,0)])
+        #  # UNIT = -1
+        self.assertCountEqual(index.neighborhood(ENUCoords(0, 0), None, -1), [0])
+        self.assertCountEqual(index.neighborhood(ENUCoords(2.5, 3), None, -1), [0])
+        self.assertCountEqual(index.neighborhood(ENUCoords(2.5, 5), None, -1), [0])
+        self.assertCountEqual(index.neighborhood(ENUCoords(7, 5), None, -1), [0])
+        self.assertCountEqual(index.neighborhood(ENUCoords(10, 10), None, -1), [0])
         
-        self.assertCountEqual(index.neighborhood(ENUCoords(6.5, 3.8), None, -1), [(0,0),(1,0),(2,0),(3,0)])
-        self.assertCountEqual(index.neighborhood(ENUCoords(2.2, 3.8), None, -1), [(0,0), (1,0), (2,0)])
-        self.assertCountEqual(index.neighborhood(ENUCoords(9.9, 7), None, -1), [(2,0), (3,0)])
+        self.assertCountEqual(index.neighborhood(ENUCoords(6.5, 3.8), None, -1), [0])
+        self.assertCountEqual(index.neighborhood(ENUCoords(2.2, 3.8), None, -1), [0])
+        self.assertCountEqual(index.neighborhood(ENUCoords(9.9, 7), None, -1), [0])
   
     
-        # =====================================================================
-        self.assertEqual(index.neighborhood([ENUCoords(2.1, 0.5), ENUCoords(0.1, 2.1)], None, 0), [(0,0)])
-        self.assertEqual(index.neighborhood([ENUCoords(2.1, 0.5), ENUCoords(0.1, 2.1)], None, 1), [(0,0),(1,0),(2,0)])
-        self.assertEqual(index.neighborhood([ENUCoords(2.1, 0.5), ENUCoords(0.1, 2.1)], None, 2), [(2,0),(1,0),(3,0)])
-        self.assertEqual(index.neighborhood([ENUCoords(2.1, 0.5), ENUCoords(0.1, 2.1)], None, -1), [(0,0),(1,0),(2,0)])
+        # # =====================================================================
+        self.assertEqual(index.neighborhood([ENUCoords(2.1, 0.5), ENUCoords(0.1, 2.1)], None, 0), [0])
+        self.assertEqual(index.neighborhood([ENUCoords(2.1, 0.5), ENUCoords(0.1, 2.1)], None, 1), [0])
+        self.assertEqual(index.neighborhood([ENUCoords(2.1, 0.5), ENUCoords(0.1, 2.1)], None, 2), [0])
+        self.assertEqual(index.neighborhood([ENUCoords(2.1, 0.5), ENUCoords(0.1, 2.1)], None, -1), [0])
 
         self.assertEqual(index.neighborhood([ENUCoords(2.1, 0.5), ENUCoords(7.1, 3.5)]), [])
-        self.assertEqual(index.neighborhood([ENUCoords(2.1, 0.5), ENUCoords(7.1, 3.5)], None, 2), [(2,0),(3,0),(1,0),(0,0)])
-        self.assertEqual(index.neighborhood([ENUCoords(2.1, 0.5), ENUCoords(7.1, 3.5)], None, -1), [(0,0),(1,0),(2,0),(3,0)])
+        self.assertEqual(index.neighborhood([ENUCoords(2.1, 0.5), ENUCoords(7.1, 3.5)], None, 2), [0])
+        self.assertEqual(index.neighborhood([ENUCoords(2.1, 0.5), ENUCoords(7.1, 3.5)], None, -1), [0])
         
-        self.assertEqual(index.neighborhood([ENUCoords(5.8, 5.8), ENUCoords(2.1, 1.1)]), [(0,0),(1,0),(2,0)])
-        self.assertEqual(index.neighborhood([ENUCoords(5.8, 5.8), ENUCoords(2.1, 1.1)], None, 1), [(0,0),(1,0),(2,0),(3,0)])
-        self.assertEqual(index.neighborhood([ENUCoords(5.8, 5.8), ENUCoords(2.1, 1.1)], None, 2), [(2,0),(3,0),(1,0),(0,0)])
-        self.assertEqual(index.neighborhood([ENUCoords(5.8, 5.8), ENUCoords(2.1, 1.1)], None, -1), [(0,0),(1,0),(2,0),(3,0)])
+        self.assertEqual(index.neighborhood([ENUCoords(5.8, 5.8), ENUCoords(2.1, 1.1)]), [0])
+        self.assertEqual(index.neighborhood([ENUCoords(5.8, 5.8), ENUCoords(2.1, 1.1)], None, 1), [0])
+        self.assertEqual(index.neighborhood([ENUCoords(5.8, 5.8), ENUCoords(2.1, 1.1)], None, 2), [0])
+        self.assertEqual(index.neighborhood([ENUCoords(5.8, 5.8), ENUCoords(2.1, 1.1)], None, -1), [0])
         
         
-        # =====================================================================
-        self.assertEqual(index.neighborhood(track), [(0,0),(1,0),(2,0),(3,0)])
-        self.assertEqual(index.neighborhood(track, None, 1), [(0,0),(1,0),(2,0),(3,0)])
-        self.assertEqual(index.neighborhood(track, None, 3), [(2,0),(3,0),(0,0),(1,0)])
-        self.assertEqual(index.neighborhood(track, None, -1), [(0,0),(1,0),(2,0),(3,0)])
+        # # =====================================================================
+        self.assertEqual(index.neighborhood(track), [0])
+        self.assertEqual(index.neighborhood(track, None, 1), [0])
+        self.assertEqual(index.neighborhood(track, None, 3), [0])
+        self.assertEqual(index.neighborhood(track, None, -1), [0])
  
-        self.assertEqual(index.neighborhood(track2), [(0,0),(1,0)])
-        self.assertEqual(index.neighborhood(track2, None, 0), [(0,0),(1,0)])
-        self.assertEqual(index.neighborhood(track2, None, 1), [(0,0),(1,0),(2,0),(3,0)])
-        self.assertEqual(index.neighborhood(track2, None, 3), [(3,0),(0,0)])
-        self.assertEqual(index.neighborhood(track2, None, -1), [(0,0),(1,0),(2,0),(3,0)])
+        self.assertEqual(index.neighborhood(track2), [0])
+        self.assertEqual(index.neighborhood(track2, None, 0), [0])
+        self.assertEqual(index.neighborhood(track2, None, 1), [0])
+        self.assertEqual(index.neighborhood(track2, None, 3), [0])
+        self.assertEqual(index.neighborhood(track2, None, -1), [0])
         
-        self.assertEqual(index.neighborhood(track3), [(2,0), (3,0)])
-        self.assertEqual(index.neighborhood(track3, None, 0), [(2,0), (3,0)])
-        self.assertEqual(index.neighborhood(track3, None, 1), [(2,0), (3,0)])
-        self.assertEqual(index.neighborhood(track3, None, 2), [(0,0),(1,0),(2,0),(3,0)])
-        self.assertEqual(index.neighborhood(track3, None, 3), [(0,0),(3,0),(1,0),(2,0)])
-        self.assertEqual(index.neighborhood(track3, None, -1), [(2,0),(3,0)])
+        self.assertEqual(index.neighborhood(track3), [0])
+        self.assertEqual(index.neighborhood(track3, None, 0), [0])
+        self.assertEqual(index.neighborhood(track3, None, 1), [0])
+        self.assertEqual(index.neighborhood(track3, None, 2), [0])
+        self.assertEqual(index.neighborhood(track3, None, 3), [0])
+        self.assertEqual(index.neighborhood(track3, None, -1), [0])
         
     
     def test_create_index_collection2(self):
@@ -236,26 +234,27 @@ class TestSpatialIndex(TestCase):
         TRACES.append(track)
         collection = TrackCollection(TRACES)
                 
-        index = SpatialIndex(collection, (5, 5))
+        index = SpatialIndex(collection, (2, 2))
         index.plot()
         
         # =====================================================================
         # =====================================================================
-        self.assertEqual(index.request(0, 0), [(0,0)])
-        self.assertEqual(index.request(1, 0), [])
-        self.assertEqual(index.request(0, 1), [(0,0)])
-        self.assertEqual(index.request(1, 1), [(0,0), (1,0)])
+        self.assertEqual(index.request(0, 0), [0])
+        self.assertEqual(index.request(1, 0), [0])
+        self.assertEqual(index.request(0, 1), [])
+        self.assertEqual(index.request(1, 1), [0])
         self.assertEqual(index.request(2, 0), [])
         self.assertEqual(index.request(2, 1), [])
-        self.assertEqual(index.request(1, 2), [(1,0),(2,0),(3,0)])
-        self.assertEqual(index.request(2, 2), [(3,0),(4,0),(5,0)])
-        self.assertEqual(index.request(3, 2), [(5,0)])
+        self.assertEqual(index.request(1, 2), [0])
+        self.assertEqual(index.request(2, 2), [0])
+        self.assertEqual(index.request(3, 2), [0])
         self.assertEqual(index.request(3, 3), [])
-        self.assertEqual(index.request(4, 2), [(5,0),(6,0)])
-        self.assertEqual(index.request(4, 3), [(6,0)])
-        self.assertEqual(index.request(4, 4), [(6,0)])
-        self.assertEqual(index.request(5, 5), [(6,0)])
-        self.assertEqual(index.request(5, 4), [(6,0)])
+        self.assertEqual(index.request(4, 2), [0])
+        self.assertEqual(index.request(4, 3), [])
+        self.assertEqual(index.request(4, 4), [])
+        self.assertEqual(index.request(5, 2), [0])
+        self.assertEqual(index.request(5, 3), [0])
+        self.assertEqual(index.request(5, 4), [])
         
         
     def test_create_index(self):
@@ -280,17 +279,18 @@ class TestSpatialIndex(TestCase):
         TRACES.append(track)
         collection = TrackCollection(TRACES)
         
-        index = SpatialIndex(collection, (5, 5))
+        res = (25, 4)
+        index = SpatialIndex(collection, res, 0.05, True)
         index.plot()
         
         
         # =====================================================================
-        self.assertEqual(index.request(0, 0), [(0,0)])
-#        self.assertEqual(index.request(1, 0), [(0,0)])
-#        self.assertEqual(index.request(0, 1), [])
-#        self.assertEqual(index.request(1, 1), [(0,0)])
-#        self.assertEqual(index.request(2, 0), [(0,0)])
-#        self.assertEqual(index.request(2, 1), [(0,0),(1,0)])
+        self.assertEqual(index.request(0, 0), [0])
+        self.assertEqual(index.request(1, 0), [0])
+        self.assertEqual(index.request(0, 1), [])
+        self.assertEqual(index.request(1, 1), [0])
+        self.assertEqual(index.request(2, 0), [])
+        self.assertEqual(index.request(2, 1), [0])
 #        self.assertEqual(index.request(2, 2), [(1,0), (2,0)])
 #        self.assertEqual(index.request(3, 2), [(2,0)])
 #        self.assertEqual(index.request(4, 2), [(2,0),(3,0)])
