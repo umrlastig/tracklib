@@ -606,7 +606,37 @@ class Network:
     def shortest_path(self, source, target, cut=1e300, output_dict=None):
         self.run_routing_forward(source, target, cut=cut, output_dict=output_dict)
         return self.run_routing_backward(target)
-    
+		
+    # ------------------------------------------------------------
+    # Distance between 2 points, each points being described by:
+	#    - edge id number
+	#    - curvilinear abscissa on edge geometry from source
+    # ------------------------------------------------------------ 	
+    def distanceBtwPts(self, edge1, abs_curv_1, edge2, abs_curv_2):	
+
+        e1 = self.EDGES[self.getEdgeId(edge1)]
+        e2 = self.EDGES[self.getEdgeId(edge2)]
+
+        if e1 == e2:
+            return abs(abs_curv_1-abs_curv_2)
+
+        d1s = abs_curv_1
+        ds2 = abs_curv_2
+        d1t = e1.geom.length()-abs_curv_1 
+        dt2 = e2.geom.length()-abs_curv_2   	
+
+        dss = self.prepared_shortest_distance(e1.source.id, e2.source.id)
+        dtt = self.prepared_shortest_distance(e1.target.id, e2.target.id)
+        dst = self.prepared_shortest_distance(e1.source.id, e2.target.id)
+        dts = self.prepared_shortest_distance(e1.target.id, e2.source.id)
+	
+        d1 = d1s + dss + ds2
+        d2 = d1t + dtt + dt2
+        d3 = d1s + dst + dt2
+        d4 = d1t + dts + ds2
+	
+        return min(min(d1,d2), min(d3,d4))
+	
     # ------------------------------------------------------------
     # Precomputes shortest distances between all pairs of nodes 
     # and saves the result in DISTANCES attribute.

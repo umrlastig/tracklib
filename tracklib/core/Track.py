@@ -647,16 +647,15 @@ class Track:
         return Cinematics.computeDescDeniv(self, id_ini, id_fin)
         
    
-   # DEPRECATED
     def toWKT(self):
         '''Transforms track into WKT string'''
-        output = "LINESTRING(("
+        output = "LINESTRING("
         for i in range(self.size()):
             output += (str)(self.__POINTS[i].position.E) + " " 
             output += (str)(self.__POINTS[i].position.N)
             if (i != self.size()-1):
                 output += ","
-        output += "))"
+        output += ")"
         return output
         
      
@@ -770,6 +769,39 @@ class Track:
             if self.__analyticalFeaturesDico[k] > idAF:
                 self.__analyticalFeaturesDico[k] -= 1
             
+		
+    # -------------------------------------------------------------------------
+    # Remove duplicate observations in a track. When two observations are 
+	# identical, keeps only the first one.
+	# Code must contain one or many of the following characters
+	#   - X   : obs with same X are considered identical
+	#   - Y   : obs with same Y are considered identical
+	#   - Z   : obs with same Z are considered identical
+	#   - T   : obs with same timestamp are considered identical
+	#   - AF  : obs with same AF fields are considered identical 
+	# E.g. "XYT" : obs with same (X,Y,T) are considered identical
+    # -------------------------------------------------------------------------	
+    def __compare(self, k1, k2, code):
+        same = True
+        if "X" in code:
+            same = same and (self[k1].position.getX() == self[k2].position.getX())
+        if "Y" in code:			
+            same = same and (self[k1].position.getX() == self[k2].position.getX())
+        if "Z" in code:
+            same = same and (self[k1].position.getX() == self[k2].position.getX()) 
+        if "T" in code:
+            same = same and (self[k1].timestamp-self[k2].timestamp == 0) 
+        if "AF" in code:
+            for af in self.getListAnalyticalFeatures():
+                same = same and (self[k1,af] == self[k2,af])
+        return same
+
+    def cleanDuplicates(self, code="XYZ"):
+        TO_DEL = [False]*len(self)
+        for i in range(1, len(self)):
+            TO_DEL[i] = self.__compare(i-1, i, code)
+            #print(self.__compare(i-1, i, code))
+        self.__POINTS = [self.__POINTS[i] for i in range(len(self)) if not TO_DEL[i]]
 			
     # -------------------------------------------------------------------------
     # General function to perform computations on analytical features.
