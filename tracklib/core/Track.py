@@ -981,6 +981,17 @@ class Track:
         Interpolation.resample(self, delta, algo, mode)
         self.__analyticalFeaturesDico = {}
     
+    # =========================================================================
+    #  Thin plates smoothing
+    # =========================================================================	
+    def smooth(self, constraint=1e3):
+        times = self.copy()
+        val = Interpolation.SPLINE_PENALIZATION
+        Interpolation.SPLINE_PENALIZATION = constraint
+        self.resample(self.frequency(), Interpolation.ALGO_THIN_SPLINES, mode=Interpolation.MODE_TEMPORAL)
+        Interpolation.SPLINE_PENALIZATION = val
+        self = self // times
+	
     def incrementTime(self, dt=1, offset=0):  
         '''Add 1 sec to each subsequent record. Use incrementTime to 
         get valid timestamps sequence when timestamps are set as default 

@@ -574,5 +574,38 @@ def optimalSegmentation(track, cost, glob_param=None, mode=MODE_SEGMENTATION_MIN
     return optimalPartition(C, mode, verbose)
 
                     
+# -------------------------------------------------------------------------
+#  Method to split a track between two mark points
+# -------------------------------------------------------------------------
+# Inputs: 
+#    - track      : a track to segment 
+#    - pt1        : first point 'departure'
+#    - pt2        : second point 'return'
+#    - radius     : threshold distance (in ground units) around pt1 and pt2
+#    - nb_min_pts : minima number of points to form a track
+# If pt2 is not provided, it is set automatically equal to pt1
+# Output: 
+#    - a track collection containing segmented tracks
+# -------------------------------------------------------------------------
+def splitAR(track, pt1, pt2=None, radius=5, nb_min_pts=5, verbose=True):
 
+    if pt2 is None:
+        pt2 = pt1
 
+    tracks = TrackCollection()
+    subtrack = Track()
+    k = -1
+    while k < len(track)-1:
+        k = k+1
+        if min(track[k].position.distance2DTo(pt1), track[k].position.distance2DTo(pt2)) < radius:
+            if len(subtrack) > nb_min_pts:
+                tracks.addTrack(subtrack)
+                if verbose:
+                    print("Add sub-track: ", subtrack[0].timestamp, subtrack[-1].timestamp, "["+str(len(tracks))+"]")
+            subtrack = Track()
+        subtrack.addObs(track[k].copy())
+    if len(subtrack) > nb_min_pts:
+        tracks.addTrack(subtrack)
+        if verbose:
+            print("Add sub-track: ", subtrack[0].timestamp, subtrack[-1].timestamp, "["+str(len(tracks))+"]")
+    return tracks
