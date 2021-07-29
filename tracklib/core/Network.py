@@ -280,11 +280,11 @@ class Network:
     # ------------------------------------------------------------
     # Graphics
     # ------------------------------------------------------------           
-    def plot(self, edges='k-', nodes='', indirect='r-', size=0.5, append=plt):
+    def plot(self, edges='k-', nodes='', direct='g-', indirect='r-', size=0.5, append=plt):
 
-        x1d = []; y1d = []; x1i = []; y1i = []
-        x2d = []; y2d = []; x2i = []; y2i = []
-        exd = []; eyd = []; exi = []; eyi = [];
+        x1b = []; y1b = []; x1i = []; y1i = []; x1d = []; y1d = []
+        x2b = []; y2b = []; x2i = []; y2i = []; x2d = []; y2d = []
+        exb = []; eyb = []; exi = []; eyi = []; exd = []; eyd = [];
         nx = [];   ny = [];
         
         L = list(self.EDGES.items())
@@ -292,23 +292,32 @@ class Network:
             edge = L[i][1]
             for j in range(edge.geom.size()-1):
                 if edge.orientation == Edge.DOUBLE_SENS:
-                    x1d.append(edge.geom.getX()[j]); x2d.append(edge.geom.getX()[j+1])
-                    y1d.append(edge.geom.getY()[j]); y2d.append(edge.geom.getY()[j+1])
+                    x1b.append(edge.geom.getX()[j]); x2b.append(edge.geom.getX()[j+1])
+                    y1b.append(edge.geom.getY()[j]); y2b.append(edge.geom.getY()[j+1])
                 else:
-                    x1i.append(edge.geom.getX()[j]); x2i.append(edge.geom.getX()[j+1])
-                    y1i.append(edge.geom.getY()[j]); y2i.append(edge.geom.getY()[j+1])
+                    if edge.orientation == Edge.SENS_DIRECT:
+                        x1d.append(edge.geom.getX()[j]); x2d.append(edge.geom.getX()[j+1])
+                        y1d.append(edge.geom.getY()[j]); y2d.append(edge.geom.getY()[j+1])
+                    else:
+                        x1i.append(edge.geom.getX()[j]); x2i.append(edge.geom.getX()[j+1])
+                        y1i.append(edge.geom.getY()[j]); y2i.append(edge.geom.getY()[j+1])
             nx.append(edge.geom.getX()[0]); nx.append(edge.geom.getX()[-1])   
             ny.append(edge.geom.getY()[0]); ny.append(edge.geom.getY()[-1])
 
+        for s, t, u, v in zip(x1b, y1b, x2b, y2b):
+            exb.append(s); exb.append(u); exb.append(None)
+            eyb.append(t); eyb.append(v); eyb.append(None)
         for s, t, u, v in zip(x1d, y1d, x2d, y2d):
             exd.append(s); exd.append(u); exd.append(None)
             eyd.append(t); eyd.append(v); eyd.append(None)
         for s, t, u, v in zip(x1i, y1i, x2i, y2i):
             exi.append(s); exi.append(u); exi.append(None)
             eyi.append(t); eyi.append(v); eyi.append(None)
-            
+
         if len(edges) > 0: 
-            append.plot(exd, eyd, edges, linewidth=size)
+            append.plot(exb, eyb, edges, linewidth=size)
+        if len(direct) > 0: 
+            append.plot(exd, eyd, direct, linewidth=size)
         if len(indirect) > 0: 
             append.plot(exi, eyi, indirect, linewidth=size)
         if (len(nodes) > 0):
