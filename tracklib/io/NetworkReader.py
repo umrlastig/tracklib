@@ -23,7 +23,8 @@ class NetworkReader:
         
         num_lines = sum(1 for line in open(path))
 		
-        print("Loading network...")
+        if verbose:
+            print("Loading network...")
 
         with open(path, encoding='utf-8') as csvfile:
             
