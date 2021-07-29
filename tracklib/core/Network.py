@@ -17,7 +17,6 @@ from tracklib.core.TrackCollection import TrackCollection
 class Node:
     
     def __init__(self, id, coord):
-        
         self.id = id
         self.coord = coord
         
@@ -45,6 +44,7 @@ class Node:
     def plot(self, sym='r+'):
         plt.plot(self.coord.getX(), self.coord.getY(), sym)
         
+
 class Edge:
     
     DOUBLE_SENS  = 0
@@ -52,7 +52,6 @@ class Edge:
     SENS_INVERSE = -1
     
     def __init__(self, id, track):
-        
         self.id = id
         self.geom = track
         
@@ -79,7 +78,6 @@ class Network:
     AF_WEIGHT = "#weight"
 
     def __init__(self):
-        
         self.NODES = dict();
         self.EDGES = dict(); 
         self.__idx_nodes = []
@@ -109,7 +107,7 @@ class Network:
             self.NBGR_EDGES[node.id] = []
             self.NEXT_NODES[node.id] = []
             self.PREV_NODES[node.id] = []
-            self.NBGR_NODES[node.id] = []            
+            self.NBGR_NODES[node.id] = []
             
     def addEdge(self, edge, source, target):
         self.addNode(source)
@@ -117,10 +115,12 @@ class Network:
         if target.id not in self.NODES:
             self.NODES[target.id] = target 
             self.__idx_nodes.append(target.id)
+        
         edge.source = self.NODES[source.id]
         edge.target = self.NODES[target.id]
         self.EDGES[edge.id] = edge
         self.__idx_edges.append(edge.id)
+        
         if edge.orientation >= 0:
             self.NEXT_EDGES[source.id].append(edge.id)
             self.PREV_EDGES[target.id].append(edge.id)            
@@ -281,6 +281,26 @@ class Network:
     # Graphics
     # ------------------------------------------------------------           
     def plot(self, edges='k-', nodes='', indirect='r-', size=0.5, append=plt):
+        '''
+
+        Parameters
+        ----------
+        edges : TYPE, optional
+            DESCRIPTION. The default is 'k-'.
+        nodes : TYPE, optional
+            DESCRIPTION. The default is ''.
+        indirect : TYPE, optional
+            DESCRIPTION. The default is 'r-'.
+        size : TYPE, optional
+            DESCRIPTION. The default is 0.5.
+        append : TYPE, optional
+            DESCRIPTION. The default is plt.
+
+        Returns
+        -------
+        None.
+
+        '''
 
         x1d = []; y1d = []; x1i = []; y1i = []
         x2d = []; y2d = []; x2i = []; y2i = []
@@ -303,6 +323,7 @@ class Network:
         for s, t, u, v in zip(x1d, y1d, x2d, y2d):
             exd.append(s); exd.append(u); exd.append(None)
             eyd.append(t); eyd.append(v); eyd.append(None)
+        
         for s, t, u, v in zip(x1i, y1i, x2i, y2i):
             exi.append(s); exi.append(u); exi.append(None)
             eyi.append(t); eyi.append(v); eyi.append(None)
@@ -494,13 +515,14 @@ class Network:
                     fils = e.source
                 if fils.visite:
                     continue
-                if (fils.poids == -1) or (pere.poids + e.weight < fils.poids):  
+                if (fils.poids == -1) or (pere.poids + e.weight < fils.poids):
                     if (self.routing_mode == 1) and not (target is None):
                         heuristic = self.astar_wgt*fils.distanceTo(self.NODES[target])                
                     fils.poids = pere.poids + e.weight + heuristic
                     fils.antecedent = pere
                     fils.antecedent_edge = e.id
                     fil.__setitem__(fils, fils.poids)
+
 
     # ------------------------------------------------------------
     # Shortest_distance: finds shortest distance between source 

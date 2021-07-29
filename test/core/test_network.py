@@ -4,10 +4,11 @@ import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
 
 from tracklib.core.Track import Track
-from tracklib.core.Network import Node
+from tracklib.core.Network import Node, Edge
 from tracklib.io.NetworkReader import NetworkReader
 from tracklib.io.IgnReader import IgnReader
 
+import matplotlib.pyplot as plt
 
 class TestDijkstra(TestCase):
     
@@ -32,72 +33,48 @@ class TestDijkstra(TestCase):
         ymax = 48.84299
         
         proj = "EPSG:2154"
-    
+        
         network = IgnReader.getNetwork((xmin, ymin, xmax, ymax), proj)
         self.assertEqual(107, len(network.EDGES))
         self.assertEqual(78, len(network.NODES))
         
-        node1 = network.getNode('5')
-        node2 = network.getNode('7')
-        print ('\n', node1.coord)
-        print (node2.coord, '\n')
-        #network.plot('k-', 'ob')
+        network.plot('k-', '', 'r-', 0.5, plt)
+        
+        node1 = network.getNode('12')
+        plt.scatter(node1.coord.E, node1.coord.N, color="blue")
+        self.assertIsInstance(node1, Node)
+        self.assertEqual(2, len(network.PREV_EDGES[node1.id]))
+        self.assertEqual(2, len(network.NEXT_EDGES[node1.id]))
+        
+        node2 = network.getNode('14')
+        plt.scatter(node2.coord.E, node2.coord.N, color="red")
+        self.assertEqual(3, len(network.PREV_EDGES[node2.id]))
+        self.assertEqual(3, len(network.NEXT_EDGES[node2.id]))
+        self.assertIsInstance(node2, Node)
         
         trace = network.shortest_path(node1, node2)
-        print (trace)
-        #self.assertLessEqual((523.2339 - trace.length()), self.__epsilon, "len pcc")
-        # #self.assertEqual(40, trace.size())
-        # self.assertLessEqual((65.58062 - trace.getObsAnalyticalFeature(Network.AF_WEIGHT, 0)), self.__epsilon, "len pcc")
-        # #network.plot(trace, node1, node2)
-        # #print (trace.summary())
-        # # Distance du ppc
-        # self.assertLessEqual((523.77046 - network.shortest_path_distance(node1, node2)), self.__epsilon, "len pcc")
+        plt.plot(trace.getX(), trace.getY(), 'b-')
 
-        # #        
-        # trace = network.shortest_path(node1, node2, 250)
-        # self.assertLessEqual((0 - trace.length()), self.__epsilon, "len pcc")
-        # self.assertEqual(0, trace.size())
-        
-        # #
-        # self.assertIsNone(network.shortest_path_distance(node1, node2, 250))
-        
-        # #
-        # trace = network.shortest_path(node1, node2)
-        # self.assertLessEqual((523.23394 - trace.length()), self.__epsilon, "len pcc")
-        # DIST = network.shortest_path_distances(node1)
-        # self.assertEqual (65, len(DIST), 'matrix')
+        self.assertLessEqual((272.5967 - trace.length()), self.__epsilon, "len pcc")
+        self.assertEqual(12, trace.size())
 
+        #        
+        trace = network.shortest_path(node1, node2, 50)
+        self.assertIsNone(trace, 'Pas de trace inférieure à 50')
         
-        # #
-        # node3 = network.getNode('75')
-        # trace = network.shortest_path(node3, node2)
-        # DIST = network.shortest_path_distances(node3)
-        # self.assertEqual (62, len(DIST), 'matrix')
-        
-        
-        # #
-        # network.shortest_path(node1, node2)
-        # DIST = network.shortest_path_distances(node1, 250)
-        # self.assertEqual (17, len(DIST), 'matrix')
-        
-        # # 
-        # network.shortest_path(node1, node2, 250)
-        # DIST = network.shortest_path_distances(node1)
-        # self.assertEqual (17, len(DIST), 'matrix')
+        #
+        DIST = network.shortest_distance(node1)
+        self.assertLessEqual((272.5967 - DIST[13]), self.__epsilon, "len pcc")
+        self.assertLessEqual((0.0 - DIST[11]), self.__epsilon, "len pcc")
+        self.assertEqual (len(network.NODES), len(DIST), 'matrix')
         
         
-        # #
-        # MATRIX = network.shortest_path_all_distances(node1)
-        # self.assertEqual (68, len(MATRIX), 'matrix')
-        
-        # MATRIX = network.shortest_path_all_distances(node1, 250)
-        # self.assertEqual (17, len(MATRIX), 'matrix')
         
     
     def test_dijkstra_bdtopo(self):
         
         chemin = os.path.join(self.resource_path, 'data/network/network_ecrin_extrait.csv')
-        network = NetworkReader.readFromFile(chemin, 'TEST2')
+        network = NetworkReader.readFromFile(chemin, 'TEST2', False)
         
         self.assertEqual(890, len(network.EDGES))
         self.assertEqual(738, len(network.NODES))
@@ -112,10 +89,14 @@ class TestDijkstra(TestCase):
     def test_dijkstra(self):
         
         chemin = os.path.join(self.resource_path, 'data/network/network_test.csv')
-        network = NetworkReader.readFromFile(chemin, 'TEST_UNITAIRE')
+        network = NetworkReader.readFromFile(chemin, 'TEST_UNITAIRE', False)
+        # Il y a des poids !!!
         
         self.assertEqual(8, len(network.EDGES))
         self.assertEqual(6, len(network.NODES))
+        
+        edge3 = network.getEdge('3')
+        self.assertIsInstance(edge3, Edge)
         
         node0 = network.getNode('0')
         self.assertIsInstance(node0, Node)
@@ -123,6 +104,7 @@ class TestDijkstra(TestCase):
         self.assertEqual(3, len(network.NEXT_EDGES[node0.id]))
         
         node3 = network.getNode('3')
+        self.assertEqual('3', node3.id)
         self.assertIsInstance(node3, Node)
         self.assertEqual(3, len(network.PREV_EDGES[node3.id]))
         self.assertEqual(0, len(network.NEXT_EDGES[node3.id]))
@@ -134,19 +116,27 @@ class TestDijkstra(TestCase):
         
         trace = network.shortest_path(node0, node3)
         self.assertIsInstance(trace, Track)
-        self.assertEqual(trace.size(), 3)  # 4
+        self.assertEqual(trace.size(), 3)
         
-        #DISTS = trace.getAnalyticalFeature(Network.AF_WEIGHT)
-        #self.assertEqual(DISTS[0], 0)
-        #self.assertEqual(DISTS[1], 6.0)
-        #self.assertEqual(DISTS[2], 17.0)
-        #self.assertEqual(DISTS[3], 20.0)
-
+        trace = network.shortest_path(node5, node3)
+        self.assertIsInstance(trace, Track)
+        self.assertEqual(trace.size(), 2)
+        
+        trace = network.shortest_path(node0, node5)
+        self.assertIsInstance(trace, Track)
+        self.assertEqual(trace.size(), 4)
+        
+        node4 = network.getNode('4')
+        trace = network.shortest_path(node0, node4)
+        self.assertIsInstance(trace, Track)
+        self.assertEqual(trace.size(), 3)
+        
         
     def test_igast(self):
         
         chemin = os.path.join(self.resource_path, 'data/network/network_igast.csv')
-        network = NetworkReader.readFromFile(chemin, 'TEST_UNITAIRE')
+        network = NetworkReader.readFromFile(chemin, 'TEST_UNITAIRE', False)
+        network.plot()
         
         self.assertEqual(34, len(network.EDGES))
         self.assertEqual(21, len(network.NODES))
@@ -172,14 +162,6 @@ class TestDijkstra(TestCase):
         #self.assertEqual(PPC[10].id, 'Bordeaux')
         #self.assertEqual(PPC[12].id, 'Bayonne')
         
-#        DISTS = trace.getAnalyticalFeature(Network.AF_WEIGHT)
-        #self.assertEqual(DISTS[6], 442.0)  # 978
-        #self.assertEqual(DISTS[5], 800)
-        #self.assertEqual(DISTS[4], 668)
-        #self.assertEqual(DISTS[3], 545)
-        #self.assertEqual(DISTS[2], 442)
-        #self.assertEqual(DISTS[1], 185)
-        #self.assertEqual(DISTS[0], 370)
 
 
         
