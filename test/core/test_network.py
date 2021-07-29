@@ -32,9 +32,7 @@ class TestDijkstra(TestCase):
         ymin = 48.83896
         ymax = 48.84299
         
-        proj = "EPSG:2154"
-        
-        network = IgnReader.getNetwork((xmin, ymin, xmax, ymax), proj)
+        network = IgnReader.getNetwork((xmin, ymin, xmax, ymax), None)
         self.assertEqual(107, len(network.EDGES))
         self.assertEqual(78, len(network.NODES))
         
@@ -90,6 +88,7 @@ class TestDijkstra(TestCase):
         
         chemin = os.path.join(self.resource_path, 'data/network/network_test.csv')
         network = NetworkReader.readFromFile(chemin, 'TEST_UNITAIRE', False)
+        network.plot()
         # Il y a des poids !!!
         
         self.assertEqual(8, len(network.EDGES))
