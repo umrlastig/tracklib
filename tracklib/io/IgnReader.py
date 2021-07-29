@@ -104,7 +104,7 @@ class IgnReader:
                 # Poids
                 poids = track.length()
                 #edge.setPoids(poids)
-                edge.poids= poids
+                edge.weight = poids
                 
                 # Source node 
                 p1 = track.getFirstObs().position
