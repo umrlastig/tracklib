@@ -97,9 +97,9 @@ Examples
    loading
    coreconcept
    operator
+   mapmatching
    simplify
    summarize
-
 ..   interpolation
 
 
