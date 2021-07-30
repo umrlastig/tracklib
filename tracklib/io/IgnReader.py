@@ -116,16 +116,20 @@ class IgnReader:
                 
                 # Orientation
                 sens = feature['properties']['sens_de_circulation']
-                orientation = 0
-                if sens == 'Double sens' or sens == 'Sans objet':
-                    orientation = 0
+                orientation = Edge.DOUBLE_SENS
+                if sens == None or sens == '':
+                    orientation = Edge.DOUBLE_SENS
+                elif sens == 'Double sens' or sens == 'Sans objet':
+                    orientation = Edge.DOUBLE_SENS
                 elif sens == 'Direct' or sens == 'Sens direct':
-                    orientation = 1
+                    orientation = Edge.SENS_DIRECT
                 elif sens == 'Indirect' or sens == 'Sens inverse':
-                    orientation = -1
+                    orientation = Edge.SENS_INVERSE
+                else:
+                    print (sens)
                 #edge.setOrientation(orientation)
                 # edge.orientation = orientation
-                edge.orientation = 0
+                edge.orientation = orientation
                 
                 # Poids
                 poids = track.length()

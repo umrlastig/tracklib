@@ -36,7 +36,7 @@ class TestDijkstra(TestCase):
         self.assertEqual(107, len(network.EDGES))
         self.assertEqual(78, len(network.NODES))
         
-        network.plot('k-', '', 'r-', 0.5, plt)
+        network.plot('k-', '', 'g-', 'r-', 0.5, plt)
         
         node1 = network.getNode('12')
         plt.scatter(node1.coord.E, node1.coord.N, color="blue")
