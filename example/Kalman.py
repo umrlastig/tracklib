@@ -5,6 +5,9 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 
+import sys
+sys.path.append('D:\\Stage_IGN\\tracklib-main\\tracklib-main')
+
 from tracklib.core.Operator import Operator
 from tracklib.io.FileReader import FileReader
 from tracklib.io.FileWriter import FileWriter
@@ -522,21 +525,21 @@ def example4():
 # -----------------------------------------------------------------------
 def example5():
 
-
     # -------------------------------------------------------
     # Trajectoire de reference IMU
     # -------------------------------------------------------
-    path = "data/imu_opk_Vincennes1909121306.txt"     
+    path = "data/imu_opk_Vincennes1909121306.txt"
     ref = FileReader.readFromFile(path, "IMU_STEREOPOLIS")   
-    ref = ref < 520                                             
+    ref = ref < 435
     ref.incrementTime(0, 18)                                 
-    ref.translate(0, 0, 46.49)                                 
-    ref.toGeoCoords(2154)
-	
-    track = ref.copy(); track.toECEFCoords()
+    ref.translate(0, 0, 43.79)
+
+    track = ref.copy(); track2 = ref.copy(); track2 = track2 // track
+
+    track.toGeoCoords(2154); track.toECEFCoords()
 
     # Read the data file of the satellites
-    satellites = "data/satellites_no_erros.txt"
+    satellites = "data/satellites_no_errors.txt"
 
     # Model 1:
     # --------
@@ -558,41 +561,43 @@ def example5():
 
         # Declare the number of satellites used
         NUMBER_OF_SATELLITES = 32
-        NUMBER_OF_STATES = 3
+        NUMBER_OF_STATES = 1
 
         Hk = np.zeros ((NUMBER_OF_SATELLITES, 1))
 
         for ind in range (0, NUMBER_OF_SATELLITES):
             
-            visible = 0 + (track.getObsAnalyticalFeature("Xs"+str(ind+1), k) != 0)
+            recue = 0 + (track.getObsAnalyticalFeature("Xs"+str(ind+1), k) != 0)
 
             # Obtenir les positions des satellites rajouter à la trace
-            Xsat = track.getObsAnalyticalFeature("Xs" + str(ind + 1), k)
-            Ysat = track.getObsAnalyticalFeature("Ys" + str(ind + 1), k)
-            Zsat = track.getObsAnalyticalFeature("Zs" + str(ind + 1), k)
+            Xsat = track.getObsAnalyticalFeature("Xs" + str(ind+1), k)
+            Ysat = track.getObsAnalyticalFeature("Ys" + str(ind+1), k)
+            Zsat = track.getObsAnalyticalFeature("Zs" + str(ind+1), k)
             
             # Distance radiale
-            Hk[ind][0] = visible * ((x[0,0] - Xsat) ** 2 + (x[1,0] - Ysat) ** 2 + (x[2,0] - Zsat) ** 2) ** 0.5
+            Hk[ind][0] = recue * ((x[0,0] - Xsat) ** 2 + (x[1,0] - Ysat) ** 2 + (x[2,0] - Zsat) ** 2) ** 0.5
 
         return Hk
 
     # Define the covariance matrix of the observation
     Rk = np.eye(32,32)
 
-    # Create 32 analytical variables (536 slots => )
+    # Create 32 analytical variables
     for cnt in range(0, 32):
         track.createAnalyticalFeature("Xs" + str(cnt+1), [0]*len(track))
         track.createAnalyticalFeature("Ys" + str(cnt+1), [0]*len(track))
         track.createAnalyticalFeature("Zs" + str(cnt+1), [0]*len(track))
-        track.createAnalyticalFeature("m" + str(cnt+1), [0]*len(track))
+        track.createAnalyticalFeature("pd" + str(cnt+1), [0]*len(track))
 
     # Put the satellites coordinates as new analytics into the track
     ind = -1
+    counter = 0
     with open(satellites) as fp:
         line = fp.readline()
         while (line):
             if line[0:5] == "12/09":
                 ind += 1
+                counter = counter + 1
                 fp.readline()
                 while True:
                     line = fp.readline()
@@ -601,21 +606,19 @@ def example5():
 
                     # Handle the headers of each slot
                     tok = line.split()
-                    
+
                     # Set the values of the satellites at each time stamp
                     track.setObsAnalyticalFeature("Xs" + str(tok[0]), ind, float(tok[1]))
                     track.setObsAnalyticalFeature("Ys" + str(tok[0]), ind, float(tok[2]))
                     track.setObsAnalyticalFeature("Zs" + str(tok[0]), ind, float(tok[3]))
-                    track.setObsAnalyticalFeature("m" + str(tok[0]), ind, float(tok[4]))
+                    track.setObsAnalyticalFeature("pd" + str(tok[0]), ind, float(tok[4]))
             
             line = fp.readline()
-        
-        
+
     start = ECEFCoords(4201797.8382,178416.3546,4779221.8874)
 
     X0 = np.array([[start.getX()], [start.getY()], [start.getZ()]])
     P0 = 1e1 * np.eye(3,3)
-
 
     UKF = Kalman(spreading=1)
     UKF.setTransition(A, Q)
@@ -623,18 +626,294 @@ def example5():
     UKF.setInitState(X0, P0)
     UKF.summary()
 
-
     H(X0, 0, track)
     obs = []
     for i in range (32):
-        obs.append("m" + str(i+1))
+        obs.append("pd" + str(i+1))
 
-        
     UKF.estimate(track, obs, mode = Dynamics.MODE_STATES_AS_3D_POSITIONS)
 
-
+    
     track.toGeoCoords()
-    KmlWriter.writeToKml(TrackCollection([ref, track]), "test.kml")
-    ref.plot('g-')
+    KmlWriter.writeToKml(TrackCollection([ref, track]), "test_no_multipath.kml")
+    
+    # ref.plot('g-')
     track.plot('r.')
     plt.show()
+    
+    time_stamps = track.getTimestamps()
+    """
+    # Get the error of the predictions
+    for t in range(len(time_stamps)):
+        for sat in range (32):
+            pos_sat = ECEFCoords(track["Xs"+str(sat+1),t], track["Ys"+str(sat+1),t], track["Zs"+str(sat+1),t])
+
+            # Create analytic error and compute it
+            track.createAnalyticalFeature("error_"+str(sat+1), [0]*len(track))
+
+            # An error of -999 represents an NLOS Satellite
+            if track["pd"+str(sat+1), t] != 0:
+                error = track["pd"+str(sat+1), t] - track[t].position.distanceTo(pos_sat)
+            else:
+                error = 0
+
+            track.setObsAnalyticalFeature("error_"+str(sat+1), t, error)
+
+    from PIL import Image
+    
+    for cnt in range(32):
+        plt.plot(track["error_"+str(cnt+1)])
+        plt.xlabel('Position')
+        plt.ylabel('Error (m)')
+        plt.title("Error of Pseudo-distance on satellite " + str(cnt+1))
+        plt.savefig("Result\Error_IMU_Satellite_" + str(cnt+1))
+        plt.clf()
+    """
+
+    KmlWriter.writeToKml(track, "test1.kml", type="POINT")
+
+    track.toProjCoords(2154)
+
+    # ----------------------------------------------
+    # Calcul RMSE dans chaque direction
+    # ----------------------------------------------
+    track.createAnalyticalFeature("x2", track2.getX())
+    track.createAnalyticalFeature("y2", track2.getY())
+    track.createAnalyticalFeature("z2", track2.getZ())
+
+    std_x = track["RMSE(x-x2)"][0]
+    std_y = track["RMSE(y-y2)"][0]
+    std_z = track["RMSE(z-z2)"][0]
+
+    print("X std = " + '{:5.3f}'.format(std_x) + " m")
+    print("Y std = " + '{:5.3f}'.format(std_y) + " m")
+    print("Z std = " + '{:5.3f}'.format(std_z) + " m")
+
+def example6():
+
+    # -------------------------------------------------------
+    # Trajectoire de reference IMU
+    # -------------------------------------------------------
+    path = "data/imu_opk_Vincennes1909121306.txt"
+    ref = FileReader.readFromFile(path, "IMU_STEREOPOLIS")
+    ref = ref < 435
+    ref.incrementTime(0, 18)
+    ref.translate(0, 0, 43.79)
+
+    track = ref.copy()
+
+    track.toGeoCoords(2154); track.toECEFCoords()
+
+    # Read the data file of the satellites
+    satellites = "data/satellites_no_errors.txt"
+
+    SATS = {1:0, 3:1, 8:2, 11:3, 14:4, 17:5, 18:6, 19:7, 22:8, 23:9, 28:10, 31:11, 32:12}
+
+    # Model 2 :
+    # ---------
+    # Stationery model with Multipath constants
+    A = np.eye(16, 16)
+
+    # Define the covariance of the model
+    Q = 15 * 1e1 * np.eye(16, 16); Q[0, 0] = 1e2; Q[1, 1] = 1e2; Q[2, 2] = 1e2
+
+    def restart(X, P, track, k):
+        # Reinitialize the initial constants on new avenue
+        if k in [1, 10, 20, 29, 67, 84, 176, 274, 309, 384, 420, 498, 533, 608, 627]:
+            # Clear the multipaths
+            for i in range(0, 13):
+                X[i+3, 0] = 0
+                P[i + 3, i + 3] = 1e2
+
+                P[0, i + 3] = 0
+                P[1, i + 3] = 0
+                P[2, i + 3] = 0
+
+                P[i + 3, 0] = 0
+                P[i + 3, 1] = 0
+                P[i + 3, 2] = 0
+
+    # Define the measurement matrix
+    def H(x, k, track):
+
+        # Declare the number of observations
+        NUMBER_OF_OBSERVATIONS = 13
+
+        # Declare the observation matrix and initialize it to zero
+        Hk = np.zeros((NUMBER_OF_OBSERVATIONS, 1))
+
+        for ind in range(0, NUMBER_OF_OBSERVATIONS):
+            # Création d'un flag pour voir si le satellites est recue
+            recue = 0 + track.getObsAnalyticalFeature("CP" + str(ind+1), k)
+
+            # Création d'une flag pour voir si le satellite est NLOS
+            nlos = 0 + (track.getObsAnalyticalFeature("NL" + str(ind+1), k) != 0)
+
+            # Obtenir les positions des satellites rajouter à la trace
+            Xsat = track.getObsAnalyticalFeature("Xs" + str(ind+1), k)
+            Ysat = track.getObsAnalyticalFeature("Ys" + str(ind+1), k)
+            Zsat = track.getObsAnalyticalFeature("Zs" + str(ind+1), k)
+
+            # Distance radiale
+            Hk[ind][0] = recue * ((x[0, 0] - Xsat) ** 2 + (x[1, 0] - Ysat) ** 2 + (x[2, 0] - Zsat) ** 2) ** 0.5 \
+                         + nlos * x[ind + 3, 0]
+        return Hk
+
+    # Define the covariance matrix for the observations
+    Rk = np.eye(13, 13)
+
+    # Create 32 analytical variables
+    for cnt in range(0, 13):
+        track.createAnalyticalFeature("Xs" + str(cnt+1), [0] * len(track))
+        track.createAnalyticalFeature("Ys" + str(cnt+1), [0] * len(track))
+        track.createAnalyticalFeature("Zs" + str(cnt+1), [0] * len(track))
+        track.createAnalyticalFeature("Pd" + str(cnt+1), [0] * len(track))
+        track.createAnalyticalFeature("CP" + str(cnt+1), [0] * len(track))
+        track.createAnalyticalFeature("NL" + str(cnt+1), [1] * len(track))
+
+    # Put the satellites coordinates as new analytics into the track
+    ind = -1
+    counter = 0
+
+    cntNLOS = 0
+    cnt1 = 0
+    outliers = []
+
+    with open(satellites) as fp:
+        line = fp.readline()
+
+        while (line):
+
+            if line[0:5] == "12/09":
+                ind += 1
+                counter = counter + 1
+
+                fp.readline()
+                while True:
+                    line = fp.readline()
+                    if line[0] == "-":
+                        break
+
+                    # Handle the headers of each slot
+                    tok = line.split()
+
+                    # Set the values of the satellites at each time stamp
+                    pos = SATS[int(float(tok[0]))]+1
+                    track.setObsAnalyticalFeature("Xs" + str(pos), ind, float(tok[1]))
+                    track.setObsAnalyticalFeature("Ys" + str(pos), ind, float(tok[2]))
+                    track.setObsAnalyticalFeature("Zs" + str(pos), ind, float(tok[3]))
+                    track.setObsAnalyticalFeature("Pd" + str(pos), ind, float(tok[4]))
+                    track.setObsAnalyticalFeature("CP" + str(pos), ind, float(1))
+                    track.setObsAnalyticalFeature("NL" + str(pos), ind, float(tok[5]))
+
+                    if tok[5] == float(1):
+                        cntNLOS = cntNLOS + 1
+
+                    cnt1 = cnt1 + 1
+
+            # if  cnt1 <= 5:
+            #     cnt1 = 0; cntNLOS = 0; outliers.append(ind)
+
+            line = fp.readline()
+
+    # start = ECEFCoords(0,0,0)
+    # start = ECEFCoords(4201797.8382, 178416.3546, 4779221.8874)
+    start = ECEFCoords(4201799.5451,178414.8042,4779231.2271)
+
+    X0 = np.zeros([16, 1])
+    X0[0, 0] = start.getX(); X0[1, 0] = start.getY(); X0[2, 0] = start.getZ()
+
+    pt = [1, 10, 20, 29, 67, 84, 176, 274, 309, 384, 420, 498, 533, 608, 627]
+
+    P0 = 1e2 * np.eye(16, 16)
+    P0[0, 0] = 1e-1; P0[1, 1] = 1e-1; P0[2, 2] = 1e-1
+
+    UKF = Kalman(spreading=1)
+    UKF.setTransition(A, Q)
+    UKF.setObservation(H, Rk)
+    UKF.setInitState(X0, P0)
+    UKF.setRestart(restart)
+    UKF.summary()
+
+    # H(X0, 0, track)
+    obs = []
+    for i in range(13):
+        obs.append("Pd" + str(i+1))
+
+    UKF.estimate(track, obs, mode=Dynamics.MODE_STATES_AS_3D_POSITIONS)
+    FileWriter.writeToFile(track, "traceKalmanECEF.txt")
+    track.toGeoCoords()
+    FileWriter.writeToFile(track, "traceKalman.txt")
+
+    """track.plot('r.')
+    plt.show()"""
+    KmlWriter.writeToKml(track, "test3_all2.kml", type="POINT")
+
+    path = "data/raw_gps.pos"
+    gps = FileReader.readFromFile(path, "RTKLIB")  # Lecture du fichier
+
+    track.toProjCoords(2154)
+    ref = ref // gps
+    track = track // ref
+
+    # ----------------------------------------------
+    # Calcul RMSE dans chaque direction
+    # ----------------------------------------------
+    track.createAnalyticalFeature("x2", ref.getX())
+    track.createAnalyticalFeature("y2", ref.getY())
+    track.createAnalyticalFeature("z2", ref.getZ())
+
+    plt.plot(track["x"], 'r-'); plt.plot(ref["x"], 'b-'); plt.title('X variations')
+    plt.figure()
+    plt.plot(track["y"], 'r-'); plt.plot(ref["y"], 'b-'); plt.title('Y variations')
+
+    """plt.plot(track["y"], 'b-'); plt.plot(ref["y"], 'b.')
+    plt.plot(track["z"], 'g-'), plt.plot(ref["z"], 'g.')"""
+
+    print(str(track.getTimestamps()[0])); print(str(track.getTimestamps()[len(track)-1]))
+    print(ref.getTimestamps()[0]); print(ref.getTimestamps()[len(ref) - 1])
+
+    sx = track["RMSE(x-x2)"]
+    sy = track["RMSE(y-y2)"]
+    sz = track["RMSE(z-z2)"]
+
+    FileWriter.writeToFile(track, "traceKalmanL93.txt")
+
+
+example6()
+
+import sys
+sys.path.append('D:\\Stage_IGN\\tracklib-main\\tracklib-main\\tracklib')
+
+# ----------------------------------------------
+# Trajectoire calculee par GPS (mode standard)
+# ----------------------------------------------
+path = "data/raw_gps.pos"
+track1 = FileReader.readFromFile(path, "RTKLIB")            # Lecture du fichier
+track1.toProjCoords(2154)                                   # Projection Lambert 93
+
+# ----------------------------------------------
+# Trajectoire de reference IMU
+# ----------------------------------------------
+path = "data/imu_opk_Vincennes1909121306.txt"
+track2 = FileReader.readFromFile(path, "IMU_STEREOPOLIS")   # Lecture du fichier
+track2 = track2 < 435
+
+track2.incrementTime(0, 18)                                 # Ajout 18 secondes UTC -> GPS Time
+track2.translate(0, 0, 43.79)                               # Conversion altitude -> hauteur
+track2 = track2 // track1                                   # Synchronisation sur track1
+
+# ----------------------------------------------
+# Calcul RMSE dans chaque direction
+# ----------------------------------------------
+track1.createAnalyticalFeature("x2", track2.getX())
+track1.createAnalyticalFeature("y2", track2.getY())
+track1.createAnalyticalFeature("z2", track2.getZ())
+
+sx = track1["RMSE(x-x2)"]
+sy = track1["RMSE(y-y2)"]
+sz = track1["RMSE(z-z2)"]
+
+print(sx[0]); print(sy[1]); print(sz[2])
+
+plt.show()
