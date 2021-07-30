@@ -37,27 +37,28 @@ class TestDijkstra(TestCase):
         self.assertEqual(78, len(network.NODES))
         
         network.plot('k-', '', 'g-', 'r-', 0.5, plt)
+        #plt.legend()
         
-        node1 = network.getNode('12')
+        node1 = network.getNode('8')
         plt.scatter(node1.coord.E, node1.coord.N, color="blue")
         self.assertIsInstance(node1, Node)
-        self.assertEqual(2, len(network.PREV_EDGES[node1.id]))
+        self.assertEqual(1, len(network.PREV_EDGES[node1.id]))
         self.assertEqual(2, len(network.NEXT_EDGES[node1.id]))
         
-        node2 = network.getNode('14')
+        node2 = network.getNode('12')
         plt.scatter(node2.coord.E, node2.coord.N, color="red")
-        self.assertEqual(3, len(network.PREV_EDGES[node2.id]))
-        self.assertEqual(3, len(network.NEXT_EDGES[node2.id]))
+        self.assertEqual(1, len(network.PREV_EDGES[node2.id]))
+        self.assertEqual(2, len(network.NEXT_EDGES[node2.id]))
         self.assertIsInstance(node2, Node)
         
         trace = network.shortest_path(node1, node2)
         plt.plot(trace.getX(), trace.getY(), 'b-')
 
-        self.assertLessEqual((272.5967 - trace.length()), self.__epsilon, "len pcc")
-        self.assertEqual(12, trace.size())
+        self.assertLessEqual((73.0961 - trace.length()), self.__epsilon, "len pcc")
+        self.assertEqual(3, trace.size())
 
         #        
-        trace = network.shortest_path(node1, node2, 50)
+        trace = network.shortest_path(node1, node2, 25)
         self.assertIsNone(trace, 'Pas de trace inférieure à 50')
         
         #
