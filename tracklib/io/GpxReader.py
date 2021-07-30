@@ -16,7 +16,6 @@ from tracklib.core.TrackCollection import TrackCollection
 class GpxReader:
 
     @staticmethod
-
     def readFromGpx(path, srid="GEO"):
         '''
         Reads (multiple) tracks in .gpx file

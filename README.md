@@ -6,6 +6,8 @@
 [![build status](https://travis-ci.com/umrlastig/tracklib.svg?branch=main)](https://travis-ci.com/umrlastig/tracklib)
 [![codecov](https://codecov.io/gh/umrlastig/tracklib/branch/main/graph/badge.svg?token=pHLaV21j2O)](https://codecov.io/gh/umrlastig/tracklib)
 [![Documentation Status](https://readthedocs.org/projects/tracklib/badge/?version=latest)](https://tracklib.readthedocs.io/en/latest/?badge=latest)
+[![Software License](https://img.shields.io/badge/Licence-Cecill--C-orange.svg?style=flat)](https://github.com/umrlastig/tracklib/blob/main/LICENCE)
+
 
 
 ## README Contents
@@ -143,6 +145,7 @@ Segmentation per speed change:
 ### Authors
 - Yann Méneroux
 - Marie-Dominique Van Damme
+- Nisar Hakam
 
 ### Institute
 - LASTIG, Univ Gustave Eiffel, ENSG, IGN

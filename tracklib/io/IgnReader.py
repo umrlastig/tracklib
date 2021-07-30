@@ -31,8 +31,18 @@ class IgnReader:
     # tolerance
     # ===========================
     @staticmethod
-    def getNetwork(bbox, proj, tolerance = 0.1):
+    def getNetwork(bbox, proj = None, tolerance = 0.1):
         '''
+
+        Parameters
+        ----------
+        bbox : 4-tuples , mandatory
+            DESCRIPTION. The bounding box of the selected area. 
+            The bounding box must be expressed in WGS84
+        proj : projection of results, optional.
+            For example: 'EPSG:2154' or 'EPSG:4326'
+            
+        -------
             TODO : posSol
         '''
         
@@ -52,7 +62,13 @@ class IgnReader:
             URL_FEAT += "&count=" + str(IgnReader.NB_PER_PAGE) 
             URL_FEAT += "&startIndex=" + str(offset)
             URL_FEAT += "&RESULTTYPE=results"
-            # print (URL_FEAT)
+            
+            if proj != None:
+                if proj == 'EPSG:2154':
+                    URL_FEAT += "&srsname=EPSG:2154"
+                if proj == 'EPSG:4326':
+                    URL_FEAT += "&srsname=EPSG:4326"
+            #print (URL_FEAT)
 
             response = requests.get(URL_FEAT)
             data = json.loads(response.text)
@@ -73,38 +89,52 @@ class IgnReader:
                 if (feature['geometry']['type'] == 'LineString'):
                     #print (str(len(coords)))
                     #geom = coords
-                    TAB_OBS = wkt.tabCoordsLineStringToObs(coords, 'GEOCOORDS')
+                    #print (coords)
+                    
+                    typeCoord = 'GEOCOORDS'
+                    if proj != None:
+                        if proj == 'EPSG:2154':
+                            typeCoord = 'ENUCoords'
+                        if proj == 'EPSG:4326':
+                            typeCoord = 'GEOCOORDS'
+                    TAB_OBS = wkt.tabCoordsLineStringToObs(coords, typeCoord)
+                    
                 
                 if len(TAB_OBS) < 2:
                     continue
                 
                 track = Track(TAB_OBS)
-                if base == None:
-                    track.toENUCoords()
-                    base = track.base
-                else:
-                    track.toENUCoords(base)
+                if proj == None:
+                    if base == None:
+                        track.toENUCoords()
+                        base = track.base
+                    else:
+                        track.toENUCoords(base)
                 
                 
                 edge = Edge(idd, track)
                 
                 # Orientation
                 sens = feature['properties']['sens_de_circulation']
-                orientation = 0
-                if sens == 'Double sens' or sens == 'Sans objet':
-                    orientation = 0
+                orientation = Edge.DOUBLE_SENS
+                if sens == None or sens == '':
+                    orientation = Edge.DOUBLE_SENS
+                elif sens == 'Double sens' or sens == 'Sans objet':
+                    orientation = Edge.DOUBLE_SENS
                 elif sens == 'Direct' or sens == 'Sens direct':
-                    orientation = 1
+                    orientation = Edge.SENS_DIRECT
                 elif sens == 'Indirect' or sens == 'Sens inverse':
-                    orientation = -1
+                    orientation = Edge.SENS_INVERSE
+                else:
+                    print (sens)
                 #edge.setOrientation(orientation)
                 # edge.orientation = orientation
-                edge.orientation = 0
+                edge.orientation = orientation
                 
                 # Poids
                 poids = track.length()
                 #edge.setPoids(poids)
-                edge.poids= poids
+                edge.weight = poids
                 
                 # Source node 
                 p1 = track.getFirstObs().position

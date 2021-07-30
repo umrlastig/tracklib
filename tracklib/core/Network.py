@@ -17,7 +17,6 @@ from tracklib.core.TrackCollection import TrackCollection
 class Node:
     
     def __init__(self, id, coord):
-        
         self.id = id
         self.coord = coord
         
@@ -45,6 +44,7 @@ class Node:
     def plot(self, sym='r+'):
         plt.plot(self.coord.getX(), self.coord.getY(), sym)
         
+
 class Edge:
     
     DOUBLE_SENS  = 0
@@ -52,7 +52,6 @@ class Edge:
     SENS_INVERSE = -1
     
     def __init__(self, id, track):
-        
         self.id = id
         self.geom = track
         
@@ -79,7 +78,6 @@ class Network:
     AF_WEIGHT = "#weight"
 
     def __init__(self):
-        
         self.NODES = dict();
         self.EDGES = dict(); 
         self.__idx_nodes = []
@@ -109,7 +107,7 @@ class Network:
             self.NBGR_EDGES[node.id] = []
             self.NEXT_NODES[node.id] = []
             self.PREV_NODES[node.id] = []
-            self.NBGR_NODES[node.id] = []            
+            self.NBGR_NODES[node.id] = []
             
     def addEdge(self, edge, source, target):
         self.addNode(source)
@@ -117,10 +115,12 @@ class Network:
         if target.id not in self.NODES:
             self.NODES[target.id] = target 
             self.__idx_nodes.append(target.id)
+        
         edge.source = self.NODES[source.id]
         edge.target = self.NODES[target.id]
         self.EDGES[edge.id] = edge
         self.__idx_edges.append(edge.id)
+        
         if edge.orientation >= 0:
             self.NEXT_EDGES[source.id].append(edge.id)
             self.PREV_EDGES[target.id].append(edge.id)            
@@ -280,11 +280,34 @@ class Network:
     # ------------------------------------------------------------
     # Graphics
     # ------------------------------------------------------------           
-    def plot(self, edges='k-', nodes='', indirect='r-', size=0.5, append=plt):
+    def plot(self, edges='k-', nodes='', direct='g-', indirect='r-', size=0.5, append=plt):
 
-        x1d = []; y1d = []; x1i = []; y1i = []
-        x2d = []; y2d = []; x2i = []; y2i = []
-        exd = []; eyd = []; exi = []; eyi = [];
+        '''
+
+        Parameters
+        ----------
+        edges : TYPE, optional
+            DESCRIPTION. The default is 'k-'.
+        nodes : TYPE, optional
+            DESCRIPTION. The default is ''.
+        direct : TYPE, optional
+            DESCRIPTION. The default is 'g-'.
+        indirect : TYPE, optional
+            DESCRIPTION. The default is 'r-'.
+        size : TYPE, optional
+            DESCRIPTION. The default is 0.5.
+        append : TYPE, optional
+            DESCRIPTION. The default is plt.
+
+        Returns
+        -------
+        None.
+
+        '''
+
+        x1b = []; y1b = []; x1i = []; y1i = []; x1d = []; y1d = []
+        x2b = []; y2b = []; x2i = []; y2i = []; x2d = []; y2d = []
+        exb = []; eyb = []; exi = []; eyi = []; exd = []; eyd = [];
         nx = [];   ny = [];
         
         L = list(self.EDGES.items())
@@ -292,25 +315,35 @@ class Network:
             edge = L[i][1]
             for j in range(edge.geom.size()-1):
                 if edge.orientation == Edge.DOUBLE_SENS:
-                    x1d.append(edge.geom.getX()[j]); x2d.append(edge.geom.getX()[j+1])
-                    y1d.append(edge.geom.getY()[j]); y2d.append(edge.geom.getY()[j+1])
+                    x1b.append(edge.geom.getX()[j]); x2b.append(edge.geom.getX()[j+1])
+                    y1b.append(edge.geom.getY()[j]); y2b.append(edge.geom.getY()[j+1])
                 else:
-                    x1i.append(edge.geom.getX()[j]); x2i.append(edge.geom.getX()[j+1])
-                    y1i.append(edge.geom.getY()[j]); y2i.append(edge.geom.getY()[j+1])
+                    if edge.orientation == Edge.SENS_DIRECT:
+                        x1d.append(edge.geom.getX()[j]); x2d.append(edge.geom.getX()[j+1])
+                        y1d.append(edge.geom.getY()[j]); y2d.append(edge.geom.getY()[j+1])
+                    else:
+                        x1i.append(edge.geom.getX()[j]); x2i.append(edge.geom.getX()[j+1])
+                        y1i.append(edge.geom.getY()[j]); y2i.append(edge.geom.getY()[j+1])
             nx.append(edge.geom.getX()[0]); nx.append(edge.geom.getX()[-1])   
             ny.append(edge.geom.getY()[0]); ny.append(edge.geom.getY()[-1])
 
+        for s, t, u, v in zip(x1b, y1b, x2b, y2b):
+            exb.append(s); exb.append(u); exb.append(None)
+            eyb.append(t); eyb.append(v); eyb.append(None)
         for s, t, u, v in zip(x1d, y1d, x2d, y2d):
             exd.append(s); exd.append(u); exd.append(None)
             eyd.append(t); eyd.append(v); eyd.append(None)
+        
         for s, t, u, v in zip(x1i, y1i, x2i, y2i):
             exi.append(s); exi.append(u); exi.append(None)
             eyi.append(t); eyi.append(v); eyi.append(None)
-            
+
         if len(edges) > 0: 
-            append.plot(exd, eyd, edges, linewidth=size)
+            append.plot(exb, eyb, edges, linewidth=size, label='double sens')
+        if len(direct) > 0: 
+            append.plot(exd, eyd, direct, linewidth=size, label='direct')
         if len(indirect) > 0: 
-            append.plot(exi, eyi, indirect, linewidth=size)
+            append.plot(exi, eyi, indirect, linewidth=size, label='indirect')
         if (len(nodes) > 0):
             append.plot(nx, ny, nodes, markersize=4*size)  
             
@@ -494,13 +527,14 @@ class Network:
                     fils = e.source
                 if fils.visite:
                     continue
-                if (fils.poids == -1) or (pere.poids + e.weight < fils.poids):  
+                if (fils.poids == -1) or (pere.poids + e.weight < fils.poids):
                     if (self.routing_mode == 1) and not (target is None):
                         heuristic = self.astar_wgt*fils.distanceTo(self.NODES[target])                
                     fils.poids = pere.poids + e.weight + heuristic
                     fils.antecedent = pere
                     fils.antecedent_edge = e.id
                     fil.__setitem__(fils, fils.poids)
+
 
     # ------------------------------------------------------------
     # Shortest_distance: finds shortest distance between source 
@@ -606,7 +640,37 @@ class Network:
     def shortest_path(self, source, target, cut=1e300, output_dict=None):
         self.run_routing_forward(source, target, cut=cut, output_dict=output_dict)
         return self.run_routing_backward(target)
-    
+		
+    # ------------------------------------------------------------
+    # Distance between 2 points, each points being described by:
+	#    - edge id number
+	#    - curvilinear abscissa on edge geometry from source
+    # ------------------------------------------------------------ 	
+    def distanceBtwPts(self, edge1, abs_curv_1, edge2, abs_curv_2):	
+
+        e1 = self.EDGES[self.getEdgeId(edge1)]
+        e2 = self.EDGES[self.getEdgeId(edge2)]
+
+        if e1 == e2:
+            return abs(abs_curv_1-abs_curv_2)
+
+        d1s = abs_curv_1
+        ds2 = abs_curv_2
+        d1t = e1.geom.length()-abs_curv_1 
+        dt2 = e2.geom.length()-abs_curv_2   	
+
+        dss = self.prepared_shortest_distance(e1.source.id, e2.source.id)
+        dtt = self.prepared_shortest_distance(e1.target.id, e2.target.id)
+        dst = self.prepared_shortest_distance(e1.source.id, e2.target.id)
+        dts = self.prepared_shortest_distance(e1.target.id, e2.source.id)
+	
+        d1 = d1s + dss + ds2
+        d2 = d1t + dtt + dt2
+        d3 = d1s + dst + dt2
+        d4 = d1t + dts + ds2
+	
+        return min(min(d1,d2), min(d3,d4))
+	
     # ------------------------------------------------------------
     # Precomputes shortest distances between all pairs of nodes 
     # and saves the result in DISTANCES attribute.
