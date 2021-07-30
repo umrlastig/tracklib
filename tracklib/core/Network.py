@@ -339,11 +339,11 @@ class Network:
             eyi.append(t); eyi.append(v); eyi.append(None)
 
         if len(edges) > 0: 
-            append.plot(exb, eyb, edges, linewidth=size)
+            append.plot(exb, eyb, edges, linewidth=size, label='double sens')
         if len(direct) > 0: 
-            append.plot(exd, eyd, direct, linewidth=size)
+            append.plot(exd, eyd, direct, linewidth=size, label='direct')
         if len(indirect) > 0: 
-            append.plot(exi, eyi, indirect, linewidth=size)
+            append.plot(exi, eyi, indirect, linewidth=size, label='indirect')
         if (len(nodes) > 0):
             append.plot(nx, ny, nodes, markersize=4*size)  
             
