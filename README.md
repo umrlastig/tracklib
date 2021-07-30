@@ -145,6 +145,7 @@ Segmentation per speed change:
 ### Authors
 - Yann Méneroux
 - Marie-Dominique Van Damme
+- Nisar Hakam
 
 ### Institute
 - LASTIG, Univ Gustave Eiffel, ENSG, IGN
