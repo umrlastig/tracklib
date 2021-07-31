@@ -141,6 +141,9 @@ class Network:
         
     def size(self):
         return len(self.EDGES)
+    
+    def getIndexNodes(self):
+        return self.__idx_nodes
         
     # ------------------------------------------------------------
     # Choose routing mode between:
