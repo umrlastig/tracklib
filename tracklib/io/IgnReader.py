@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import json
+import progressbar
 import requests
 from xml.dom import minidom
 
@@ -53,9 +54,11 @@ class IgnReader:
         
         nbRoute = IgnReader.__getNbRouteEmprise(bbox)
         nbiter = int(nbRoute / IgnReader.NB_PER_PAGE) + 1
+        #print (nbiter)
         
         offset = 0
-        for j in range(nbiter):
+        #for j in range(nbiter):
+        for j in progressbar.progressbar(range(nbiter)):
             URL_FEAT = IgnReader.URL_SERVER
             URL_FEAT += "BBOX=" + str(bbox[1]) + "," + str(bbox[0])  
             URL_FEAT += "," + str(bbox[3]) + "," + str(bbox[2])
