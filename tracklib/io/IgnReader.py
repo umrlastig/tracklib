@@ -224,7 +224,7 @@ def selectNodes(network, node, distance):
         '''
         NODES = []
         
-        for key in network.NODES:
+        for key in network.getIndexNodes():
             n = network.NODES[key]
             if n.coord.distance2DTo(node.coord) <= distance:
                 NODES.append(n)
