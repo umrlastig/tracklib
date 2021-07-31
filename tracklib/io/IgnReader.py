@@ -170,7 +170,7 @@ class IgnReader:
                 network.addEdge(edge, noeudIni, noeudFin)
                 
             offset = offset + IgnReader.NB_PER_PAGE
-        
+
         return network
 
     
