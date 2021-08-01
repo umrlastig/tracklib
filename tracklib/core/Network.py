@@ -135,6 +135,8 @@ class Network:
         self.NBGR_EDGES[target.id].append(edge.id)
         self.NBGR_NODES[source.id].append(target.id)
         self.NBGR_NODES[target.id].append(source.id)
+        if not self.spatial_index is None:
+            self.spatial_index.addFeature(edge.geom, self.getNumberOfEdges()-1)
         
     def __iter__(self):
         yield from [l[1] for l in list(self.EDGES.items())]
@@ -283,7 +285,7 @@ class Network:
     # ------------------------------------------------------------
     # Graphics
     # ------------------------------------------------------------           
-    def plot(self, edges='k-', nodes='', direct='g-', indirect='r-', size=0.5, append=plt):
+    def plot(self, edges='k-', nodes='', direct='k--', indirect='k--', size=0.5, append=plt):
 
         '''
 
@@ -294,9 +296,9 @@ class Network:
         nodes : TYPE, optional
             DESCRIPTION. The default is ''.
         direct : TYPE, optional
-            DESCRIPTION. The default is 'g-'.
+            DESCRIPTION. The default is 'k--'.
         indirect : TYPE, optional
-            DESCRIPTION. The default is 'r-'.
+            DESCRIPTION. The default is 'k--'.
         size : TYPE, optional
             DESCRIPTION. The default is 0.5.
         append : TYPE, optional
