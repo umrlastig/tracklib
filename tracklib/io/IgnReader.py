@@ -66,7 +66,7 @@ class IgnReader:
 
         cptNode = 0
 		
-        if proj != None:
+        if proj == None:
             proj = 'EPSG:4326'
         
         nbRoute = IgnReader.__getNbRouteEmprise(bbox)
