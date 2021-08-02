@@ -32,7 +32,7 @@ class TestDijkstra(TestCase):
         ymin = 48.83896
         ymax = 48.84299
         
-        network = IgnReader.getNetwork((xmin, xmax, ymin, ymax), None)
+        network = IgnReader.getNetwork((xmin, xmax, ymin, ymax), None, 0.0, 0.1, False)
         self.assertEqual(107, len(network.EDGES))
         self.assertEqual(78, len(network.NODES))
         
