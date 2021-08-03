@@ -587,7 +587,7 @@ def optimalSegmentation(track, cost, glob_param=None, mode=MODE_SEGMENTATION_MIN
 # Output: 
 #    - a track collection containing segmented tracks
 # -------------------------------------------------------------------------
-def splitAR(track, pt1, pt2=None, radius=5, nb_min_pts=5, verbose=True):
+def splitAR(track, pt1, pt2=None, radius=10, nb_min_pts=10, verbose=True):
 
     if pt2 is None:
         pt2 = pt1

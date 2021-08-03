@@ -208,44 +208,6 @@ class TrackCollection:
         ymax = Sum.co_max(tarray_ymax)
         
         return (xmin, xmax, ymin, ymax)
-        
-    def toKML(self, color=None):
-        '''
-        Transforms track into KML string
-        '''
-        output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-        output += "<kml xmlns=\"http://earth.google.com/kml/2.1\">\n"
-        output += "<Document>\n"
-		
-        col = color
-        
-        for i in range(len(self.__TRACES)):
-            track = self.__TRACES[i]
-            output += "<Placemark>\n"
-            output += "<name>Track " + str(i) + " [" + str(track.tid) + "/" + str(track.uid) + "]</name>\n"
-            output += "<Style>\n"
-            output += "<LineStyle>\n"
-            if color == None:
-                col = "{:06x}".format(random.randint(0, 0xFFFFFF))
-            output += "<color>ff" + utils.rgbToHex(col)[2:] + "</color>\n"
-            output += "</LineStyle>\n"
-            output += "</Style>\n"
-            output += "<LineString>\n"
-            output += "<coordinates>\n"
-            
-            for i in range(track.size()):
-                output += '{:15.12f}'.format(track.getObs(i).position.getX()) + "," 
-                output += '{:15.12f}'.format(track.getObs(i).position.getY()) + ","
-                output += '{:15.12f}'.format(track.getObs(i).position.getZ()) + "\n"
-            
-            output += "</coordinates>\n"
-            output += "</LineString>\n"
-            output += "</Placemark>\n"
-			
-        output += "</Document>\n"
-        output += "</kml>\n"
-        		
-        return output
 		
     def resample(self, delta, algo=1, mode=2):
         '''Resampling tracks with linear interpolation
@@ -265,7 +227,13 @@ class TrackCollection:
             should be computed
             - a reference track'''
         for track in self:
-           track.resample(delta, algo, mode)
+            track.resample(delta, algo, mode)
+			
+    def __collectionnify(tracks):
+        if isinstance(tracks, list):
+            return TrackCollection(tracks)
+        else:
+            return tracks
 		   
     # =========================================================================
     # Tracks simplification (returns a new track)
@@ -279,10 +247,10 @@ class TrackCollection:
            output[i] = output[i].simplify(tolerance, mode)
 		    
     # ------------------------------------------------------------
-    # [+] Concatenation of two tracks
+    # [+] Concatenation of two track collections
     # ------------------------------------------------------------
     def __add__(self, collection):
-        return Track(self.__TRACES + collection.__TRACES, self.uid, self.tid)
+        return TrackCollection(self.__TRACES + collection.__TRACES)
         
     # ------------------------------------------------------------
     # [/] Even split track collection (returns n+1 collections)
@@ -399,7 +367,7 @@ class TrackCollection:
     # [[n]] Get and set track number n
     # ------------------------------------------------------------    
     def __getitem__(self, n):
-        return self.__TRACES[n]  
+        return TrackCollection.__collectionnify(self.__TRACES[n])  
     def __setitem__(self, n, track):
         self.__TRACES[n] = track  	
         

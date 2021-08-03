@@ -33,7 +33,7 @@ class GPSTime:
     # ------------------------------------------------------------    
     # Default value : 01/01/1970 00:00:00.000
     # ------------------------------------------------------------    
-    def __init__(self, year=1970, month=1, day=1, hour=0, min=0, sec=0, ms=0):
+    def __init__(self, year=1970, month=1, day=1, hour=0, min=0, sec=0, ms=0, zone=0):
     
         if isinstance(year, str):
         
@@ -45,6 +45,7 @@ class GPSTime:
             self.min   = time.min
             self.sec   = time.sec
             self.ms    = time.ms
+            self.zone  = zone
             
         else:
         
@@ -55,6 +56,7 @@ class GPSTime:
             self.min   = min
             self.sec   = sec
             self.ms    = ms
+            self.zone  = zone
             
     def copy(self):
         return copy.deepcopy(self)
@@ -163,7 +165,19 @@ class GPSTime:
         t0 = GPSTime(2050,1,1,0,0,0,0)
         s0 = t0.toAbsTime()
         return GPSTime.readUnixTime(random.random()*s0)
-        
+	
+    # ------------------------------------------------------------
+    # Print zone code (Z if greenwhich) ISO 8601
+    # ------------------------------------------------------------    
+    def printZone(self):
+        if self.zone == 0:
+            return "Z"
+        else:
+            if self.zone > 0:
+                return "+"+'{:02d}'.format(self.zone)+":00"
+            else:
+                return "-"+'{:02d}'.format(abs(self.zone))+":00"
+
     # ------------------------------------------------------------
     # Computing current day of week
     # ------------------------------------------------------------    
