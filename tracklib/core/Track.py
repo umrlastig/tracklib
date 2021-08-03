@@ -48,6 +48,17 @@ class Track:
         
     def getSRID(self):
         return str(type(self.getFirstObs().position)).split(".")[-1][0:-8]
+	
+    def getTimeZone(self):
+        return self.getFirstObs().timestamp.zone
+	
+    def setTimeZone(self, zone):
+        for i in range(len(self)):
+            self[i].timestamp.zone = zone
+
+    def convertToTimeZone(self, zone):
+        for i in range(len(self)):
+            self[i].timestamp = self[i].timestamp.convertToZone(zone)
         
     def duration(self):
         return self.getLastObs().timestamp - self.getFirstObs().timestamp

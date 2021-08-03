@@ -37,6 +37,14 @@ class TrackCollection:
         for i in range(self.size()):
             TRACKS.addTrack(self.getTrack(i).copy())
         return TRACKS
+
+    def setTimeZone(self, zone):
+        for i in range(len(self)):
+            self[i].setTimeZone(zone)
+
+    def convertToTimeZone(self, zone):
+        for i in range(len(self)):
+            self[i].convertToZone(zone)
 		
     # Average frequency	of tracks	
     def frequency(self, mode="temporal"):

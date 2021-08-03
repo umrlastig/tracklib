@@ -179,12 +179,30 @@ class GPSTime:
                 return "-"+'{:02d}'.format(abs(self.zone))+":00"
 
     # ------------------------------------------------------------
+    # Print as Gpx time
+    # ------------------------------------------------------------  			
+    def timeWithZone(self):
+        fmt_save = GPSTime.getPrintFormat() 
+        GPSTime.setPrintFormat("4Y-2M-2DT2h:2m:2s")
+        output = str(self) + self.printZone()
+        GPSTime.setPrintFormat(fmt_save)
+        return output
+	
+    # ------------------------------------------------------------
+    # Zone conversion
+    # ------------------------------------------------------------    
+    def convertToZone(self, zone): 
+        shift = (zone-self.zone)
+        new_time = GPSTime.readUnixTime(self.toAbsTime()+3600*shift)
+        new_time.zone = zone
+        return new_time
+
+    # ------------------------------------------------------------
     # Computing current day of week
     # ------------------------------------------------------------    
     def getDayOfWeek(self):
         seconds = self.toAbsTime()
-        return GPSTime.__day_names[((int)(seconds/86400) + GPSTime.__day_of_base_date) % 7]
-        
+        return GPSTime.__day_names[((int)(seconds/86400) + GPSTime.__day_of_base_date) % 7]        
 
     # ------------------------------------------------------------
     # Adding value in a field according to code 
