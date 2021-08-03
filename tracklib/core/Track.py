@@ -629,21 +629,21 @@ class Track:
         Computes net denivellation (in meters)
         '''
         if id_fin is None:
-            id_fin = track.size()-1
+            id_fin = self.size()-1
         return Cinematics.computeNetDeniv(self, id_ini, id_fin)
 
     # DEPRECATED
     def computeAscDeniv(self, id_ini=0, id_fin=None):
         '''Computes positive denivellation (in meters)'''        
         if id_fin is None:
-            id_fin = track.size()-1
-        return  computeAscDeniv(self, id_ini, id_fin)
+            id_fin = self.size()-1
+        return  Cinematics.computeAscDeniv(self, id_ini, id_fin)
     
      # DEPRECATED   
     def computeDescDeniv(self, id_ini=0, id_fin=None):
         '''Computes negative denivellation (in meters)'''
         if id_fin is None:
-            id_fin = track.size()-1 
+            id_fin = self.size()-1 
         return Cinematics.computeDescDeniv(self, id_ini, id_fin)
         
    
@@ -651,8 +651,12 @@ class Track:
         '''Transforms track into WKT string'''
         output = "LINESTRING("
         for i in range(self.size()):
-            output += (str)(self.__POINTS[i].position.E) + " " 
-            output += (str)(self.__POINTS[i].position.N)
+            if self.getSRID() == "Geo":
+                output += (str)(self.__POINTS[i].position.lon) + " " 
+                output += (str)(self.__POINTS[i].position.lat)
+            elif self.getSRID() == "ENU":
+                output += (str)(self.__POINTS[i].position.E) + " " 
+                output += (str)(self.__POINTS[i].position.N)
             if (i != self.size()-1):
                 output += ","
         output += ")"

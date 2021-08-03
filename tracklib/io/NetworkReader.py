@@ -58,11 +58,7 @@ class NetworkReader:
                 
                 track = Track(TAB_OBS)
                 Cinematics.computeAbsCurv(track)
-             
-                # Transformation GEO coordinates to ENU
-                if (fmt.srid.upper() in ["GEOCOORDS", "GEO", "ECEFCOORDS", "ECEF"]):
-                    track.toENUCoords()
-                
+
                 edge = Edge(edge_id, track)
               
                 # Orientation

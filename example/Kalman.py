@@ -875,5 +875,3 @@ def example6():
     sz = track["RMSE(z-z2)"]
 
     FileWriter.writeToFile(track, "traceKalmanL93.txt")
-
-

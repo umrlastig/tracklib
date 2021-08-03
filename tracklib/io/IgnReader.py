@@ -1,11 +1,18 @@
 # -*- coding: utf-8 -*-
 
+import math
 import json
+import progressbar
 import requests
 from xml.dom import minidom
 
-from tracklib.core.Network import Network, Edge, Node
+from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
+from tracklib.core.Coords import GeoCoords
+from tracklib.core.SpatialIndex import SpatialIndex
+from tracklib.core.Network import Network, Edge, Node
+from tracklib.core.TrackCollection import TrackCollection
+
 import tracklib.util.Wkt as wkt
 
 class IgnReader:
@@ -31,7 +38,7 @@ class IgnReader:
     # tolerance
     # ===========================
     @staticmethod
-    def getNetwork(bbox, proj = None, tolerance = 0.1):
+    def getNetwork(bbox, proj=None, margin=0.0, tolerance=0.1, spatialIndex=True):
         '''
 
         Parameters
@@ -45,35 +52,44 @@ class IgnReader:
         -------
             TODO : posSol
         '''
+		
+        # Adding margin
+        xmin, xmax, ymin, ymax = bbox
+        dx = (xmax-xmin)/2
+        dy = (ymax-ymin)/2
+        bbox = (xmin-margin*dx, xmax+margin*dx, ymin-margin*dy, ymax+margin*dy)
         
         network = Network()
-        
-        cptNode = 1
-        base = None
+        if spatialIndex:
+            network.spatial_index = SpatialIndex(bbox, resolution=(dx/1e3, dy/1e3), margin=0.4)
+            network.spatial_index.collection = network
+
+        cptNode = 0
+		
+        if proj == None:
+            proj = 'EPSG:4326'
         
         nbRoute = IgnReader.__getNbRouteEmprise(bbox)
         nbiter = int(nbRoute / IgnReader.NB_PER_PAGE) + 1
         
         offset = 0
         for j in range(nbiter):
+            print("PAGE "+str(j+1)+"/"+str(nbiter))
             URL_FEAT = IgnReader.URL_SERVER
-            URL_FEAT += "BBOX=" + str(bbox[1]) + "," + str(bbox[0])  
-            URL_FEAT += "," + str(bbox[3]) + "," + str(bbox[2])
+            URL_FEAT += "BBOX=" + str(bbox[2]) + "," + str(bbox[0])  
+            URL_FEAT += "," + str(bbox[3]) + "," + str(bbox[1])
             URL_FEAT += "&count=" + str(IgnReader.NB_PER_PAGE) 
             URL_FEAT += "&startIndex=" + str(offset)
             URL_FEAT += "&RESULTTYPE=results"
-            
-            if proj != None:
-                if proj == 'EPSG:2154':
-                    URL_FEAT += "&srsname=EPSG:2154"
-                if proj == 'EPSG:4326':
-                    URL_FEAT += "&srsname=EPSG:4326"
+            URL_FEAT += "&srsname="+proj
+
             #print (URL_FEAT)
 
             response = requests.get(URL_FEAT)
             data = json.loads(response.text)
             features = data['features']
-            for feature in features:
+
+            for feature in progressbar.progressbar(features):
                 
                 idd = feature['id']
                 # nature = feature['properties']['nature']
@@ -92,49 +108,32 @@ class IgnReader:
                     #print (coords)
                     
                     typeCoord = 'GEOCOORDS'
-                    if proj != None:
-                        if proj == 'EPSG:2154':
-                            typeCoord = 'ENUCoords'
-                        if proj == 'EPSG:4326':
-                            typeCoord = 'GEOCOORDS'
+                    if proj == 'EPSG:2154':
+                        typeCoord = 'ENUCoords'
                     TAB_OBS = wkt.tabCoordsLineStringToObs(coords, typeCoord)
                     
                 
                 if len(TAB_OBS) < 2:
                     continue
                 
-                track = Track(TAB_OBS)
-                if proj == None:
-                    if base == None:
-                        track.toENUCoords()
-                        base = track.base
-                    else:
-                        track.toENUCoords(base)
-                
-                
+                track = Track(TAB_OBS)                
                 edge = Edge(idd, track)
                 
                 # Orientation
                 sens = feature['properties']['sens_de_circulation']
-                orientation = Edge.DOUBLE_SENS
+                edge.orientation = Edge.DOUBLE_SENS
                 if sens == None or sens == '':
-                    orientation = Edge.DOUBLE_SENS
+                    edge.orientation = Edge.DOUBLE_SENS
                 elif sens == 'Double sens' or sens == 'Sans objet':
-                    orientation = Edge.DOUBLE_SENS
+                    edge.orientation = Edge.DOUBLE_SENS
                 elif sens == 'Direct' or sens == 'Sens direct':
-                    orientation = Edge.SENS_DIRECT
+                    edge.orientation = Edge.SENS_DIRECT
                 elif sens == 'Indirect' or sens == 'Sens inverse':
-                    orientation = Edge.SENS_INVERSE
+                    edge.orientation = Edge.SENS_INVERSE
                 else:
                     print (sens)
-                #edge.setOrientation(orientation)
-                # edge.orientation = orientation
-                edge.orientation = orientation
-                
-                # Poids
-                poids = track.length()
-                #edge.setPoids(poids)
-                edge.weight = poids
+            
+                edge.weight = track.length()
                 
                 # Source node 
                 p1 = track.getFirstObs().position
@@ -162,12 +161,11 @@ class IgnReader:
                     network.addNode(noeudFin)
                     cptNode += 1
                 
-                # Add edge
-                #network.addEdge(edge)
                 network.addEdge(edge, noeudIni, noeudFin)
                 
+            # 
             offset = offset + IgnReader.NB_PER_PAGE
-        
+
         return network
 
     
@@ -189,8 +187,8 @@ class IgnReader:
         nb = 0
         
         URL_HITS = IgnReader.URL_SERVER 
-        URL_HITS += "BBOX=" + str(bbox[1]) + "," + str(bbox[0])  
-        URL_HITS += "," + str(bbox[3]) + "," + str(bbox[2])
+        URL_HITS += "BBOX=" + str(bbox[2]) + "," + str(bbox[0])  
+        URL_HITS += "," + str(bbox[3]) + "," + str(bbox[1])
         URL_HITS += "&resulttype=hits"
         
         res = requests.get(URL_HITS)
@@ -221,9 +219,19 @@ def selectNodes(network, node, distance):
         '''
         NODES = []
         
-        for key in network.NODES:
-            n = network.NODES[key]
-            if n.coord.distance2DTo(node.coord) <= distance:
-                NODES.append(n)
-        
+        if network.spatial_index is None:
+            for key in network.getIndexNodes():
+                n = network.NODES[key]
+                if n.coord.distance2DTo(node.coord) <= distance:
+                    NODES.append(n)
+        else:
+            vicinity_edges = network.spatial_index.neighborhood(node.coord, unit=1)
+            for e in vicinity_edges:
+                source = network.EDGES[network.getEdgeId(e)].source
+                target = network.EDGES[network.getEdgeId(e)].target
+                if source.coord.distance2DTo(node.coord) <= distance:
+                    NODES.append(source)
+                if target.coord.distance2DTo(node.coord) <= distance:
+                    NODES.append(target)
+
         return NODES

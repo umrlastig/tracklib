@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 
 from tracklib.core.Track import Track
 from tracklib.core.Network import Edge
+from tracklib.core.TrackCollection import TrackCollection
 from tracklib.core.Coords import GeoCoords, ENUCoords, ECEFCoords
 
 import tracklib.algo.Geometrics as Geometrics
@@ -42,8 +43,14 @@ class SpatialIndex:
         None.
 
         '''
-        bb = collection.bbox()
+        # Bbox only or collection
+        if isinstance(collection, tuple):
+            bb = collection
+        else:
+            bb = collection.bbox()
+
         (self.xmin, self.xmax, self.ymin, self.ymax) = SpatialIndex._addMargin(bb, margin)
+
         ax = self.xmax-self.xmin
         ay = self.ymax-self.ymin
 
@@ -53,13 +60,13 @@ class SpatialIndex:
         else:
             r = resolution
             resolution = (int(ax/r[0]), int(ay/r[1]))
-   
+
         self.collection = collection
 
 		# Keeps track of registered features
         self.inventaire = set()
 
-        # Nombre de dalle par cote
+        # Nombre de dalles par cote
         self.resolution = resolution
         self.csize = self.resolution[0]
         self.lsize = self.resolution[1]
@@ -77,6 +84,10 @@ class SpatialIndex:
         self.dY = ay / self.lsize
         
         # Calcul de la grille
+        if isinstance(collection, tuple):
+            self.collection = TrackCollection()
+            return
+
         boucle = range(collection.size())
         if verbose:
             print("Building ["+str(self.csize)+" x "+str(self.lsize)+"] spatial index...")
@@ -85,10 +96,16 @@ class SpatialIndex:
             feature = collection[num]
             # On récupere la trace
             if isinstance(feature, Track):
-                self.__addIntersectCells(feature, num)
+                self.addFeature(feature, num)
             # On récupère l'arc du reseau qui est une trace
             elif isinstance(feature, Edge):
-                self.__addIntersectCells(feature.geom, num)
+                self.addFeature(feature.geom, num)
+
+    def __str__(self):
+        c = [(self.xmin+self.xmax)/2.0, (self.ymin+self.ymax)/2.0]
+        output  = "["+str(self.csize)+" x "+str(self.lsize)+"] " 
+        output += "spatial index centered on ["+str(c[0])+"; "+str(c[1])+"]"
+        return output
 
     def _addMargin(bbox, margin):
         (xmin, xmax, ymin, ymax) = bbox
@@ -100,7 +117,7 @@ class SpatialIndex:
         ymax += margin*ay
         return (xmin, xmax, ymin, ymax)
 
-    def __addIntersectCells(self, track, num):
+    def addFeature(self, track, num):
         '''
         '''
         coord1 = None
@@ -110,6 +127,8 @@ class SpatialIndex:
             if coord1 != None:
                 p1 = self.__getCell(coord1)
                 p2 = self.__getCell(coord2)
+                if p1 is None or p2 is None:
+                    continue
                 self.__addSegment(p1, p2, num)
             coord1 = coord2
 
@@ -123,6 +142,8 @@ class SpatialIndex:
                coord1 : indices de la grille
         '''
         CELLS = self.__cellsCrossSegment(coord1, coord2)
+        if CELLS is None:
+            return  # out of grid
         #print (CELLS, coord1, coord2)
 
         
@@ -150,13 +171,18 @@ class SpatialIndex:
     # Normalized coordinates of coord: (x,) -> (i,j) with:
 	#   i = (x-xmin)/(xmax-xmin)*nb_cols
 	#   j = (y-ymin)/(ymax-ymin)*nb_rows
+    # Returns None if out of grid
     # ------------------------------------------------------------
     def __getCell(self, coord):
 	
         if (coord.getX() < self.xmin) or (coord.getX() > self.xmax):
-            sys.exit ('Error: x overflow')
+            overflow = '{:5.5f}'.format(max(self.xmin-coord.getX(), coord.getX()-self.xmax))
+            print('Warning: x overflow '+str(coord)+"  OVERFLOW = "+str(overflow))
+            return None
         if (coord.getY() < self.ymin) or (coord.getY() > self.ymax):
-            sys.exit ('Error: y overflow')
+            overflow = '{:5.5f}'.format(max(self.ymin-coord.getY(), coord.getY()-self.ymax))
+            print('Warning: y overflow '+str(coord)+"  OVERFLOW = "+str(overflow))
+            return None
 
         idx = (float(coord.getX()) - self.xmin) / self.dX
         idy = (float(coord.getY()) - self.ymin) / self.dY
