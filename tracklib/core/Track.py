@@ -119,7 +119,7 @@ class Track:
             for i in range(self.size()):
                 self.getObs(i).position = self.getObs(i).position.toENUCoords(self.base, base)                          
             self.base = base.toGeoCoords()
-            return
+            return base
             
     def toGeoCoords(self, base=None):
         if (self.getSRID() == "ECEF"):
@@ -627,10 +627,10 @@ class Track:
         
     def length(self):
         '''
-        Total length of curvilinear abscissa
+        Total length of track
         '''
         s = 0
-        for i in range(1,self.size()):
+        for i in range(1, self.size()):
             s += self.getObs(i-1).distanceTo(self.getObs(i))
         return s
         

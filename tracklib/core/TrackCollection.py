@@ -25,7 +25,19 @@ class TrackCollection:
         
     def size(self):
         return len(self.__TRACES)
-    
+
+    def length(self):
+        length = 0
+        for track in self:
+            length += track.length()
+        return length
+
+    def duration(self):
+        duration = 0
+        for track in self:
+            duration += track.duration()
+        return duration
+		
     def getTracks(self):
         return self.__TRACES
 		
@@ -71,6 +83,7 @@ class TrackCollection:
     def importSpatialIndex(self, filename):
         from tracklib.core.SpatialIndex import SpatialIndex
         self.spatial_index = SpatialIndex.load(filename)
+		
     
     # =========================================================================
     # Track collection coordinate transformation
@@ -109,7 +122,7 @@ class TrackCollection:
                     exit()
                 track.toENUCoords(track.base, base)          				
             track.base = base.toGeoCoords()
-            return
+            return base
 			
     def toGeoCoords(self, base=None):
         if (self.__TRACES[0].getSRID() == "ECEF"):
@@ -130,6 +143,13 @@ class TrackCollection:
             base = self.getTrack(0).getObs(0).position.copy()
             self.toENUCoords(base)
         return base
+
+    # =========================================================================
+    #  Thin plates smoothing
+    # =========================================================================	
+    def smooth(self, constraint=1e3):
+        for track in self:
+            track.smooth(constraint)
           
     
     def summary(self):
