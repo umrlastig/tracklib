@@ -3,13 +3,12 @@
 import csv
 import progressbar
 
-#from tracklib.core.Coords import ENUCoords, ECEFCoords, GeoCoords
-
+from tracklib.core.GPSTime import GPSTime
+from tracklib.core.Coords import ENUCoords, ECEFCoords, GeoCoords
+from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
 from tracklib.core.Network import Network, Node, Edge
 from tracklib.io.NetworkFormat import NetworkFormat
-
-import tracklib.util.Wkt as wkt
 import tracklib.algo.Cinematics as Cinematics
 
 
@@ -49,7 +48,7 @@ class NetworkReader:
                 counter = counter + 1
 
                 geom = str(row[fmt.pos_wkt])
-                TAB_OBS = wkt.wktLineStringToObs(geom, fmt.srid.upper())
+                TAB_OBS = wktLineStringToObs(geom, fmt.srid.upper())
 
                 
                 # Au moins 2 points
@@ -129,7 +128,7 @@ class NetworkReader:
                 counter = counter + 1
 
                 geom = str(row[fmt.pos_wkt])
-                TAB_OBS = wkt.wktLineStringToObs(geom, fmt.srid.upper())
+                TAB_OBS = wktLineStringToObs(geom, fmt.srid.upper())
 
                 
                 # Au moins 2 points
@@ -201,3 +200,44 @@ class NetworkReader:
     #         f = open(path, "w")
     #         f.write(output)
     #         f.close()
+    
+    
+def wktLineStringToObs(wkt, srid):
+    '''
+    Une polyligne de n points est modélisée par une Track (timestamp = 1970/01/01 00 :00 :00)
+        Cas LINESTRING()
+    '''
+    
+    # Creation d'une liste vide
+    TAB_OBS = list()
+    
+    # Separation de la chaine
+    coords_string = wkt.split("(")
+    coords_string = coords_string[1]
+    coords_string = coords_string.split(")")[0]
+
+    coords = coords_string.split(",")
+    
+    for i in range(0, len(coords)):
+        sl = coords[i].strip().split(" ")
+        x = float(sl[0])
+        y = float(sl[1])
+        if (len(sl) == 3):
+            z = float(sl[2])
+        else:
+            z = 0.0
+
+        if not srid.upper() in ["ENUCOORDS", "ENU", "GEOCOORDS", "GEO", "ECEFCOORDS", "ECEF"]:
+            print("Error: unknown coordinate type ["+str(srid)+"]")
+            exit()
+                    
+        if (srid.upper() in ["ENUCOORDS", "ENU"]):
+            point = ENUCoords(x,y,z)
+        if (srid.upper() in ["GEOCOORDS", "GEO"]):
+            point = GeoCoords(x,y,z)
+        if (srid.upper() in ["ECEFCOORDS", "ECEF"]):
+            point = ECEFCoords(x,y,z)  
+
+        TAB_OBS.append(Obs(point, GPSTime()))                  
+
+    return TAB_OBS

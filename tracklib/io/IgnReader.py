@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
 
-import math
 import json
 import progressbar
 import requests
 from xml.dom import minidom
 
+from tracklib.core.GPSTime import GPSTime
 from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
-from tracklib.core.Coords import GeoCoords
+from tracklib.core.Coords import ENUCoords, ECEFCoords, GeoCoords
 from tracklib.core.SpatialIndex import SpatialIndex
 from tracklib.core.Network import Network, Edge, Node
-from tracklib.core.TrackCollection import TrackCollection
 
-import tracklib.util.Wkt as wkt
 
 class IgnReader:
     
@@ -110,7 +108,7 @@ class IgnReader:
                     typeCoord = 'GEOCOORDS'
                     if proj == 'EPSG:2154':
                         typeCoord = 'ENUCoords'
-                    TAB_OBS = wkt.tabCoordsLineStringToObs(coords, typeCoord)
+                    TAB_OBS = tabCoordsLineStringToObs(coords, typeCoord)
                     
                 
                 if len(TAB_OBS) < 2:
@@ -235,3 +233,33 @@ def selectNodes(network, node, distance):
                     NODES.append(target)
 
         return NODES
+    
+
+def tabCoordsLineStringToObs(coords, srid):
+    
+    # Creation d'une liste vide
+    TAB_OBS = list()
+    
+    for i in range(0, len(coords)):
+        sl = coords[i]
+        x = float(sl[0])
+        y = float(sl[1])
+        if (len(sl) == 3):
+            z = float(sl[2])
+        else:
+            z = 0.0
+
+        if not srid.upper() in ["ENUCOORDS", "ENU", "GEOCOORDS", "GEO", "ECEFCOORDS", "ECEF"]:
+            print("Error: unknown coordinate type ["+str(srid)+"]")
+            exit()
+                    
+        if (srid.upper() in ["ENUCOORDS", "ENU"]):
+            point = ENUCoords(x,y,z)
+        if (srid.upper() in ["GEOCOORDS", "GEO"]):
+            point = GeoCoords(x,y,z)
+        if (srid.upper() in ["ECEFCOORDS", "ECEF"]):
+            point = ECEFCoords(x,y,z)  
+
+        TAB_OBS.append(Obs(point, GPSTime()))                  
+
+    return TAB_OBS
