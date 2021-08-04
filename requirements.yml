@@ -1,6 +1,5 @@
 numpy
 matplotlib
-psycopg2
 scikit-image
 progressbar2
 pytest
