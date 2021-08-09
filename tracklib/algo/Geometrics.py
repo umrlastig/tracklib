@@ -61,7 +61,7 @@ class Rectangle:
         XR = [self.pmin.getX(), self.pmax.getX(), self.pmax.getX(), self.pmin.getX(), self.pmin.getX()]
         YR = [self.pmin.getY(), self.pmin.getY(), self.pmax.getY(), self.pmax.getY(), self.pmin.getY()]
         plt.plot(XR, YR, sym)
-        
+    
     def contains(self, point):
         inside_x = (self.pmin.getX() < point.getX()) and (point.getX() < self.pmax.getX())
         inside_y = (self.pmin.getY() < point.getY()) and (point.getY() < self.pmax.getY())
@@ -81,15 +81,15 @@ class Rectangle:
     # Rotation (2D) of shape (theta in radians)
     # --------------------------------------------------
     def rotate(self, theta):
-        self.pmin = self.pmin.rotate(theta)
-        self.pmax = self.pmax.rotate(theta)
+        self.pmin.rotate(theta)
+        self.pmax.rotate(theta)
     
     # --------------------------------------------------
-    # Homotehtic transformation (2D) of shape
+    # Homothetic transformation (2D) of shape
     # --------------------------------------------------
     def scale(self, h):
-        self.pmin = self.pmin.scale(h)
-        self.pmax = self.pmax.scale(h)
+        self.pmin.scale(h)
+        self.pmax.scale(h)
 
 class Polygon:
 

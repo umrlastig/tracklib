@@ -180,7 +180,7 @@ class TrackCollection:
         symbols = utils.listify(symbols)
         markersize = utils.listify(markersize)
         if not append:
-            (xmin, xmax, ymin, ymax) = self.bbox()
+            (xmin, xmax, ymin, ymax) = self.bbox().asTuple()
             dx = margin*(xmax-xmin)
             dy = margin*(ymax-ymin)
             plt.xlim([xmin-dx, xmax+dx])
@@ -193,16 +193,9 @@ class TrackCollection:
             Y = trace.getY()
             plt.plot(X, Y, symbols[i%Ns], markersize=markersize[i%Ms])
     
-    #def summarize(self, ):
         
-    def filterOnBBox(self, bbox):
-		
-        import tracklib.core.Operator as Operator  
-
-        xmin = bbox[0]
-        ymin = bbox[1]
-        xmax = bbox[2]
-        ymax = bbox[3]
+    def filterOnBBox(self, bbox): 
+        xmin, xmax, ymin, ymax = bbox.asTuple()
         for i in range(len(self)-1,-1,-1):
             track = self[i]
             for j in range(len(track)):
@@ -216,26 +209,10 @@ class TrackCollection:
                     break
     
     def bbox(self):
-        
-        import tracklib.core.Operator as Operator  
-        
-        tarray_xmin = []
-        tarray_xmax = []
-        tarray_ymin = []
-        tarray_ymax = []
-        
-        for trace in self.__TRACES:
-            tarray_xmin.append(trace.operate(Operator.Operator.MIN, 'x'))
-            tarray_xmax.append(trace.operate(Operator.Operator.MAX, 'x'))
-            tarray_ymin.append(trace.operate(Operator.Operator.MIN, 'y'))
-            tarray_ymax.append(trace.operate(Operator.Operator.MAX, 'y'))
-            
-        xmin = Sum.co_min(tarray_xmin)
-        xmax = Sum.co_max(tarray_xmax)
-        ymin = Sum.co_min(tarray_ymin)
-        ymax = Sum.co_max(tarray_ymax)
-        
-        return (xmin, xmax, ymin, ymax)
+        bbox = self.getTrack(0).bbox()
+        for i in range(1, len(self)):
+            bbox = bbox + self.getTrack(i).bbox()
+        return bbox
 		
     def resample(self, delta, algo=1, mode=2):
         '''Resampling tracks with linear interpolation

@@ -5,6 +5,7 @@ import pickle
 import progressbar
 import matplotlib.pyplot as plt
 
+from tracklib.core.Bbox import Bbox
 from tracklib.core.Track import Track
 from tracklib.core.Network import Edge
 from tracklib.core.TrackCollection import TrackCollection
@@ -44,15 +45,15 @@ class SpatialIndex:
 
         '''
         # Bbox only or collection
-        if isinstance(collection, tuple):
+        if isinstance(collection, Bbox):
             bb = collection
         else:
             bb = collection.bbox()
 
-        (self.xmin, self.xmax, self.ymin, self.ymax) = SpatialIndex._addMargin(bb, margin)
+        bb = bb.copy(); bb.addMargin(margin)
+        (self.xmin, self.xmax, self.ymin, self.ymax) = bb.asTuple()
 
-        ax = self.xmax-self.xmin
-        ay = self.ymax-self.ymin
+        ax, ay = bb.getDimensions()
 
         if resolution is None:
             am = max(ax, ay)
@@ -106,16 +107,6 @@ class SpatialIndex:
         output  = "["+str(self.csize)+" x "+str(self.lsize)+"] " 
         output += "spatial index centered on ["+str(c[0])+"; "+str(c[1])+"]"
         return output
-
-    def _addMargin(bbox, margin):
-        (xmin, xmax, ymin, ymax) = bbox
-        ax = xmax-xmin
-        ay = ymax-ymin
-        xmin -= margin*ax
-        xmax += margin*ax
-        ymin -= margin*ay
-        ymax += margin*ay
-        return (xmin, xmax, ymin, ymax)
 
     def addFeature(self, track, num):
         '''

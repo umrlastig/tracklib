@@ -272,8 +272,8 @@ class Track:
         ur.setZ(self.getMaxZ())
         return ur
 
-    def getBBox(self):
-        return [self.getLowerLeftPoint(), self.getUpperRightPoint()]        
+    def bbox(self):
+        return Bbox(self.getLowerLeftPoint(), self.getUpperRightPoint())	
 
     def shiftTo(self, idx_point, new_coords=ENUCoords(0,0,0)):
         if (self.getSRID() != "ENU"):
@@ -1907,8 +1907,9 @@ class Track:
 # --------------------------------------------------------------------------
 # Circular import (not satisfying solution)
 # --------------------------------------------------------------------------
-import tracklib.core.Kernel as Kernel
+from tracklib.core.Bbox import Bbox
 
+import tracklib.core.Kernel as Kernel
 import tracklib.algo.Mapping as Mapping
 import tracklib.algo.Analytics as Analytics
 import tracklib.algo.Geometrics as Geometrics

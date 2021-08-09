@@ -22,8 +22,8 @@
 #      is the standard type of constraint. Different modes are:
 #         - MODE_CROSSES: tracks crossing shape interior/boundary are selected
 #         - MODE_INSIDE : tracks remaining fully inside the shape are selected
-#         - MODE_GETS_IN: tracks geting in (at least once) shape are selected
-#         - MODE_INSIDE : tracks geting out (at least once) shape are selected
+#         - MODE_GETS_IN: tracks getting in (at least once) shape are selected
+#         - MODE_INSIDE : tracks getting out (at least once) shape are selected
 #    - a track t as a reference. Available modes are:
 #         - MODE_CROSSES : tracks  intersecting t (at least once) are selected
 #         - MODE_PARALLEL: tracks  following t are selected
