@@ -123,7 +123,20 @@ class Bbox:
     def geom(self):
         X = [self.getXmin(), self.getXmax(), self.getXmax(), self.getXmin(), self.getXmin()]
         Y = [self.getYmin(), self.getYmin(), self.getYmax(), self.getYmax(), self.getYmin()]
-        return Polygon(X, Y)		
+        return Polygon(X, Y)
+
+    # --------------------------------------------------
+    # Coordinate transformation
+    # --------------------------------------------------
+    def toECEFCoords(self, base=None):
+        self.ll.toECEFCoords(base)
+        self.ur.toECEFCoords(base)	
+    def toGeoCoords(self, base=None):
+        self.ll.toGeoCoords(base)
+        self.ur.toGeoCoords(base)
+    def toENUCoords(self, base=None):	
+        self.ll.toENUCoords(base)
+        self.ur.toENUCoords(base)		
     
     # ------------------------------------------------------------
     # Adding margin (relative float) to bounding box 
