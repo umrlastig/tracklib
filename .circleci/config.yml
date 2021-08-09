@@ -1,0 +1,18 @@
+# Tracklib configuration file on CircleCI
+#
+# Check https://circleci.com/docs/2.0/language-python/ for more details
+#
+version: 2.1
+
+jobs:
+  build:  # required for runs that don't use workflows
+    working_directory: ~/tracklib/
+
+general:
+  branches:
+    only:
+      - main
+
+
+
+
