@@ -6,7 +6,7 @@ import random
 
 import matplotlib.pyplot as plt
 
-import tracklib.core.Utils as utils
+import tracklib.core.Utils as Utils
 
 
 class TrackCollection:
@@ -176,8 +176,8 @@ class TrackCollection:
             symbols = ['r-','g-','b-','c-','m-','y-','k-']
         if len(self) == 0:
             return
-        symbols = utils.listify(symbols)
-        markersize = utils.listify(markersize)
+        symbols = Utils.listify(symbols)
+        markersize = Utils.listify(markersize)
         if not append:
             (xmin, xmax, ymin, ymax) = self.bbox().asTuple()
             dx = margin*(xmax-xmin)
@@ -369,8 +369,15 @@ class TrackCollection:
 	
 	# ------------------------------------------------------------
     # [[n]] Get and set track number n
+	# May be tuple with uid, tid
     # ------------------------------------------------------------    
     def __getitem__(self, n):
+        if isinstance(n, tuple):
+            tracks = TrackCollection()
+            for track in self:
+                if (Utils.compLike(track.uid, n[0])) and (Utils.compLike(track.tid, n[1])):
+                    tracks.addTrack(track)
+            return tracks
         return TrackCollection.__collectionnify(self.__TRACES[n])  
     def __setitem__(self, n, track):
         self.__TRACES[n] = track  	
