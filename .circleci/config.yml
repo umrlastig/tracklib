@@ -38,12 +38,18 @@ jobs:
           pkg-manager: pip
           # app-dir: ~/tracklib/.circleci # If you're requirements.txt isn't in the root directory.
           # pip-dependency-file: test-requirements.txt  # if you have a different name for your requirements file, maybe one that combines your runtime and test requirements.
-      - run:
-          name: Run tests
-          # This assumes pytest is installed via the install-package step above
-          command: pytest test/  
+      - run: mkdir test-reports
+      - run: pytest test/  
       - store_test_results:
           path: ~/tracklib/test-results
+      - run:
+          name: Run Tests
+          command: |
+            coverage run -m pytest
+            coverage report
+            coverage html  # open htmlcov/index.html in a browser
+      - store_artifacts:
+          path: htmlcov
 
 
 

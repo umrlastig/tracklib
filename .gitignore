@@ -5,6 +5,7 @@
 tracklib/util/__pycache__/
 test/algo/__pycache__/
 test/core/__pycache__/
+test/io/__pycache__/
 /tests/__pycache__/
 test/__pycache__/
 example/__pycache__/
