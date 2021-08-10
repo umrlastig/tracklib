@@ -43,7 +43,7 @@ jobs:
           # This assumes pytest is installed via the install-package step above
           command: pytest test/  
       - store_test_results:
-          path: test-results
+          path: ~/tracklib/test-results
 
 
 

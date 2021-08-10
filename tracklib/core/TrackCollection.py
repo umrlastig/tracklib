@@ -7,7 +7,6 @@ import random
 import matplotlib.pyplot as plt
 
 import tracklib.core.Utils as utils
-import tracklib.algo.Summarize as Sum
 
 
 class TrackCollection:
