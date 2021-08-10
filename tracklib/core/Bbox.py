@@ -175,4 +175,4 @@ class Bbox:
         if (index == 3) or (index == "ymax"):
             self.setYmax(value)
     def asTuple(self):
-        return (self.getXmin(), self.getXmax(), self.getYmin(), self.getXmax())	
+        return (self.getXmin(), self.getXmax(), self.getYmin(), self.getYmax())	
