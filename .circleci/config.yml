@@ -40,9 +40,16 @@ jobs:
           # pip-dependency-file: test-requirements.txt  # if you have a different name for your requirements file, maybe one that combines your runtime and test requirements.
       - run: mkdir test-reports
       - run: pytest test/  
-      - run: coverage run -m unittest discover
       - store_test_results:
           path: ~/tracklib/test-results
+      - run:
+          name: Run Tests
+          command: |
+            $HOME/.local/bin/coverage run -m pytest
+            $HOME/.local/bin/coverage report
+            $HOME/.local/bin/coverage html  # open htmlcov/index.html in a browser
+      - store_artifacts:
+          path: htmlcov
 
 
 
