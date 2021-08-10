@@ -202,8 +202,8 @@ class FileReader:
     @staticmethod
     def readFromWKTFile(path, id_geom, id_user=-1, id_track=-1, separator=";", h=0, srid="ENUCoords", bboxFilter=None, doublequote= False):
     
-        if ((separator == ",") or (separator == " ")):
-            print("Error: separator must not be space or comma for reading WKT file")
+        if (separator == " "):
+            print("Error: separator must not be space for reading WKT file")
             exit()
         
         TRACES = TrackCollection()
