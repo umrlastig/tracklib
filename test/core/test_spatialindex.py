@@ -453,9 +453,11 @@ class TestSpatialIndex(TestCase):
     
 if __name__ == '__main__':
     suite = TestSuite()
+    
     suite.addTest(TestSpatialIndex("test_create_index"))
     suite.addTest(TestSpatialIndex("test_create_index_collection1"))
     suite.addTest(TestSpatialIndex("test_create_index_collection2"))
+    
     #suite.addTest(TestSpatialIndex("test_index_trackcollection"))
     #suite.addTest(TestSpatialIndex("test_index_network"))
     #suite.addTest(TestSpatialIndex("testIndexPoint"))
