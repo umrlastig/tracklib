@@ -144,10 +144,10 @@ class Bbox:
     # ------------------------------------------------------------   
     def addMargin(self, margin=0.05):
         dx, dy = self.getDimensions()    
-        self.setXmin(self.getXmin - margin*dx)
-        self.setXmax(self.getXmax + margin*dx)
-        self.setYmin(self.getYmin - margin*dy)
-        self.setYmax(self.getYmax + margin*dy)
+        self.setXmin(self.getXmin() - margin*dx)
+        self.setXmax(self.getXmax() + margin*dx)
+        self.setYmin(self.getYmin() - margin*dy)
+        self.setYmax(self.getYmax() + margin*dy)
 
     # ------------------------------------------------------------
     # [[n]] Get and set: (for retrocompatibilty)
