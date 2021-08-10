@@ -4,7 +4,7 @@ Read GPS track from CSV file(s).
 
 
 '''
-
+import csv
 import os
 
 from tracklib.core.GPSTime import GPSTime
@@ -200,7 +200,7 @@ class FileReader:
         
 
     @staticmethod
-    def readFromWKTFile(path, id_geom, id_user=-1, id_track=-1, separator=";", h=0, srid="ENUCoords", bboxFilter=None):
+    def readFromWKTFile(path, id_geom, id_user=-1, id_track=-1, separator=";", h=0, srid="ENUCoords", bboxFilter=None, doublequote= False):
     
         if ((separator == ",") or (separator == " ")):
             print("Error: separator must not be space or comma for reading WKT file")
@@ -208,26 +208,40 @@ class FileReader:
         
         TRACES = TrackCollection()
         
-        with open(path) as fp:
+        with open(path, newline='') as csvfile:
+            spamreader = csv.reader(csvfile, delimiter=separator, doublequote= doublequote)
         
             # Header
             for i in range(h):
-                fp.readline()
+                next(spamreader)
         
-            line = fp.readline()
-            
-            while line:
-                fields = line.split(separator)
+            for fields in spamreader:
+                
+                if len(fields) <= 0:
+                    continue
+                
                 track = Track()
                 if id_user >= 0:
                     track.uid = fields[id_user]
                 if id_track >= 0:
                     track.tid = fields[id_track]
-                wkt = fields[id_geom].split("((")[1].split("))")[0]
-                if (wkt[0] == "("):
-                    wkt = wkt[1:]
-                wkt = wkt.split("),(")[0]   # Multipolygon not handled yet
-                wkt = wkt.split(",")
+                
+                wkt = fields[id_geom]
+                if wkt[0:4] == 'POLY':
+                    wkt = fields[id_geom].split("((")[1].split("))")[0]
+                    wkt = wkt.split(",")
+                elif wkt[0:4] == 'LINE':
+                    wkt = fields[id_geom].split("(")[1].split(")")[0]
+                    wkt = wkt.split(",")
+                elif wkt[0:7] == 'MULTIPO':
+                    wkt = fields[id_geom].split("((")[1].split("))")[0]
+                    wkt = wkt.split(",")
+                    if (wkt[0] == "("):
+                        wkt = wkt[1:]
+                    wkt = wkt.split("),(")[0]   # Multipolygon not handled yet
+                else:
+                    print ('this type of wkt is not yet implemented')
+                
                 for s in wkt:
                     sl = s.split(" ")
                     x = float(sl[0])
@@ -262,10 +276,9 @@ class FileReader:
                         if not inside:
                             break
                     if not inside:
-                        line = fp.readline()
                         continue                    
+                
                 TRACES.addTrack(track)
-                line = fp.readline()
         
         return TRACES
         
