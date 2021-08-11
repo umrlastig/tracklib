@@ -10,6 +10,7 @@ orbs:
   # so you dont have to copy and paste it everywhere.
   # See the orb documentation here: https://circleci.com/developer/orbs/orb/circleci/python
   python: circleci/python@1.2
+  sonarcloud: sonarsource/sonarcloud@1.0.0
   
 workflows:
   test_et_couverture:  # This is the name of the workflow, feel free to change it to better match your workflow.
@@ -50,6 +51,7 @@ jobs:
             coverage html  # open htmlcov/index.html in a browser
       - store_artifacts:
           path: htmlcov
+      - run: sonarcloud/scan
 
 
 
