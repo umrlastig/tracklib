@@ -1897,7 +1897,9 @@ class Track:
             if (">" in n) or ("<" in n) or ("(" in n) or (")" in n) or ("=" in n) or ("'" in n):	
                 return self.operate(n)	
             return self.getAnalyticalFeature(n)
-		
+        output = self.__POINTS[n] 
+        if not isinstance(output, Obs):
+            return Track(self.__POINTS[n])
         return self.__POINTS[n]  
     def __setitem__(self, n, obs):
         self.__POINTS[n] = obs    
