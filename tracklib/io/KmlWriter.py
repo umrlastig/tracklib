@@ -5,13 +5,11 @@ Write GPS track in KML file(s).
 
 '''
 
-import os
 import progressbar
 
 import tracklib.core.Utils as utils
 import tracklib.core.Operator as Operator
 
-from tracklib.core.Track import Track
 from tracklib.core.Network import Network
 from tracklib.core.Track import TrackCollection
 
