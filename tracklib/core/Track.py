@@ -1308,7 +1308,7 @@ class Track:
             where_part = -1
         else:
             where_part = temp[1]
-            if ("(" in where_part) or ("(" in where_part):
+            if ("(" in where_part) or (")" in where_part):
                 message = "Error: parenthesis not allowed in conditions."
                 message += "Use boolean algebra rules to reformulate query or use successive queries"
                 print(message)
