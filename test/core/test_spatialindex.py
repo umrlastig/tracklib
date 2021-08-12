@@ -3,19 +3,12 @@
 from unittest import TestCase, TestSuite, TextTestRunner
 import os.path
 
-import matplotlib.pyplot as plt
-
 from tracklib.core.GPSTime import GPSTime
 from tracklib.core.Coords import ENUCoords
 from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
 from tracklib.core.TrackCollection import TrackCollection
 from tracklib.core.SpatialIndex import SpatialIndex
-
-from tracklib.io.FileReader import FileReader
-from tracklib.io.IgnReader import IgnReader
-
-from tracklib.algo import (Analytics)
 
 
 class TestSpatialIndex(TestCase):
