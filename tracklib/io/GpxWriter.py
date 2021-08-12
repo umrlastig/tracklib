@@ -5,10 +5,6 @@ Write GPS track in Gpx file(s).
 
 '''
 
-import os
-import tracklib.core.Utils as utils
-import tracklib.core.Operator as Operator
-
 from tracklib.core.Track import Track
 from tracklib.core.GPSTime import GPSTime
 from tracklib.core.TrackCollection import TrackCollection
