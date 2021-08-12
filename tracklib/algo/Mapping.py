@@ -7,7 +7,7 @@ import progressbar
 import numpy as np
 import matplotlib.pyplot as plt
 
-import tracklib.core.Utils as Utils
+import tracklib.util.Geometry as Geometry
 import tracklib.algo.Dynamics as Dynamics
 
 from tracklib.core.Obs import Obs
@@ -24,7 +24,7 @@ from tracklib.core.Track import Track
 # Utils function for map-matching
 # --------------------------------------------------------------------------
 def __projOnTrack(point, track):
-    proj = Utils.proj_polyligne(track.getX(), track.getY(), point.getX() , point.getY())
+    proj = Geometry.proj_polyligne(track.getX(), track.getY(), point.getX() , point.getY())
     return ENUCoords(proj[1], proj[2], 0), proj[0], proj[3]
 	
 def __distToNode(track, coord, i, end=0):
