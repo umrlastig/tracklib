@@ -32,13 +32,13 @@ res = 0
 # -----------------------------------------
 
 # --------------------------------------------------------------------------
-# TO DO: Gaussian process filtering
+# TODO: Gaussian process filtering
 # --------------------------------------------------------------------------
 def gaussianProcess(track):
     return None
 	
 # --------------------------------------------------------------------------
-# TO DO: Wavelet filtering (Donoho and Johnstone)
+# TODO: Wavelet filtering (Donoho and Johnstone)
 # --------------------------------------------------------------------------
 def waveletTransform(track):
     return None
@@ -46,7 +46,7 @@ def waveletFiltering(track):
     return None
 	
 # --------------------------------------------------------------------------
-# TO DO: Karhunen-Loeve filtering
+# TODO: Karhunen-Loeve filtering
 # --------------------------------------------------------------------------
 def KLBasis(TrackCollection):
     return None
