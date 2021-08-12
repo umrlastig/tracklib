@@ -49,8 +49,6 @@
 # selector = GlobalSelector([s1, s2, ...], options)
 # -----------------------------------------------------------------------------
 
-import sys
-import numpy as np
 import matplotlib.pyplot as plt
 
 from tracklib.core.Track import Track
@@ -58,8 +56,6 @@ from tracklib.core.TrackCollection import TrackCollection
 from tracklib.core.Obs import Obs
 
 import tracklib.core.Utils as utils
-import tracklib.core.Operator as Operator
-import tracklib.algo.Dynamics as Dynamics
 import tracklib.algo.Geometrics as Geometrics
 
 from tracklib.core.GPSTime import GPSTime

@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 
 from tracklib.core.TrackCollection import TrackCollection
 
-import tracklib.core.Utils as Utils
 import tracklib.algo.Dynamics as Dynamics
 import tracklib.algo.Interpolation as Interpolation
 
