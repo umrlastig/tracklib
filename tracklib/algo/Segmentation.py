@@ -56,7 +56,7 @@ def segmentation(track, afs_input, af_output, thresholds_max, mode_comparaison =
     for i in range(track.size()):
         
         # On cumule les comparaisons pour chaque af_input
-        comp = (1 == 1)
+        comp = True
             
         for index, af_input in enumerate(afs_input):
             current_value = track.getObsAnalyticalFeature(af_input, i)
