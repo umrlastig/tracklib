@@ -5,7 +5,7 @@ from unittest import TestCase, TestSuite, TextTestRunner
 from tracklib.core import (
   Track, Obs, Coords, GPSTime, Grid)
 from tracklib.algo import (Analytics)
-from tracklib.algo import (Summarization) 
+from tracklib.algo import (Summarising) 
 from tracklib.core.TrackCollection import TrackCollection
 
 
@@ -54,14 +54,14 @@ class TestGrille(TestCase):
 
         # 
         af_algos = ['speed'] #, utils.stop_point]
-        cell_operators = [Summarization.co_avg] #, utils.sum]
+        cell_operators = [Summarising.co_avg] #, utils.sum]
         self.grille.addAnalyticalFunctionForSummarize(collection, af_algos, cell_operators)
         
         #
-        self.grille.plot(Analytics.speed, Summarization.co_avg)
+        self.grille.plot(Analytics.speed, Summarising.co_avg)
         #print ('')
         
-        sumPlot = self.grille.buildArray(Analytics.speed, Summarization.co_avg)
+        sumPlot = self.grille.buildArray(Analytics.speed, Summarising.co_avg)
         
         self.assertEqual(sumPlot[0][0][0], 0)
         self.assertEqual(sumPlot[1][0][0], 0)
@@ -86,13 +86,13 @@ class TestGrille(TestCase):
 
         # 
         af_algos = [Analytics.speed] #, utils.stop_point]
-        cell_operators = [Summarization.co_avg] #, utils.sum]
+        cell_operators = [Summarising.co_avg] #, utils.sum]
         self.grille.addAnalyticalFunctionForSummarize(TrackCollection(self.TRACES), af_algos, cell_operators)
         
-        self.grille.plot(Analytics.speed, Summarization.co_avg)
+        self.grille.plot(Analytics.speed, Summarising.co_avg)
         #print ('')
         
-        sumPlot = self.grille.buildArray(Analytics.speed, Summarization.co_avg)
+        sumPlot = self.grille.buildArray(Analytics.speed, Summarising.co_avg)
         
         self.assertEqual(sumPlot[0][0][0], 0)
         self.assertEqual(sumPlot[1][0][0], 0)
@@ -117,14 +117,14 @@ class TestGrille(TestCase):
     def test_sum_trace(self):
         
         af_algos = ['uid'] #, utils.stop_point]
-        cell_operators = [Summarization.co_count] #, utils.sum]
+        cell_operators = [Summarising.co_count] #, utils.sum]
         
         self.grille.addAnalyticalFunctionForSummarize(TrackCollection(self.TRACES), af_algos, cell_operators)
         
-        self.grille.plot('uid', Summarization.co_count)
+        self.grille.plot('uid', Summarising.co_count)
         #print ('')
         
-        sumPlot = self.grille.buildArray('uid', Summarization.co_count)
+        sumPlot = self.grille.buildArray('uid', Summarising.co_count)
         
         self.assertEqual(sumPlot[0][0][0], 0)
         self.assertEqual(sumPlot[1][0][0], 0)
@@ -151,14 +151,14 @@ class TestGrille(TestCase):
         collection.addAnalyticalFeature(Analytics.speed)
         
         af_algos = ['uid', 'speed', Analytics.speed]
-        cell_operators = [Summarization.co_count, Summarization.co_avg, Summarization.co_avg] 
+        cell_operators = [Summarising.co_count, Summarising.co_avg, Summarising.co_avg] 
         
         self.grille.addAnalyticalFunctionForSummarize(collection, af_algos, cell_operators)
         
-        self.grille.plot('uid', Summarization.co_count)
+        self.grille.plot('uid', Summarising.co_count)
         #print ('')
         
-        sumPlot = self.grille.buildArray('uid', Summarization.co_count)
+        sumPlot = self.grille.buildArray('uid', Summarising.co_count)
         
         self.assertEqual(sumPlot[0][0][0], 0)
         self.assertEqual(sumPlot[1][0][0], 0)
