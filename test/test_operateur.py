@@ -67,11 +67,11 @@ class TestOperateurMethods(unittest.TestCase):
             plt.show()
         
     
-    def x(t):
+    def x(self, t):
         return 10 * math.cos(4 * math.pi * t)*(1 + math.cos(3.5 * math.pi * t))
-    def y(t):
+    def y(self, t):
         return t
-    def prob():
+    def prob(self):
         return random.random()-0.5
         
     def test_random(self):
