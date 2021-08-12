@@ -553,7 +553,7 @@ class Equal(BinaryOperator):
             val2 = track.getObsAnalyticalFeature(af_input2, i)
             if (utils.isnan(val1)) and (utils.isnan(val2)):
                 continue
-            if val1 != val1:
+            if val1 != val2:
                 return False              
         return True
 
