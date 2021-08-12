@@ -56,7 +56,7 @@ from tracklib.core.TrackCollection import TrackCollection
 from tracklib.core.Obs import Obs
 
 import tracklib.core.Utils as utils
-import tracklib.algo.Geometrics as Geometrics
+import tracklib.util.Geometry as Geometry
 
 from tracklib.core.GPSTime import GPSTime
 from tracklib.algo.Geometrics import Rectangle
@@ -165,14 +165,14 @@ class TrackConstraint:
             counter = 0
             lgth = 0
             for i in range(len(self.segments)):
-                if Geometrics.intersects(self.segments[i], track):
+                if Geometry.intersects(self.segments[i], track):
                     counter += 1
                     lgth += self.track[i].position.distance2DTo(self.track[i+1].position)
                     if ((counter > self.prop*len(self.segments)) and (lgth > self.length)):
                         return True
             return False 
         else:
-            return Geometrics.intersects(self.track, track)
+            return Geometry.intersects(self.track, track)
         
     def select(self, tracks): 
         if self.type == TYPE_SELECT:
@@ -204,7 +204,7 @@ class TollGateConstraint:
         plt.plot(self.gate.getX(), self.gate.getY(), sym)
         
     def contains(self, track):
-        return Geometrics.intersects(self.gate, track)
+        return Geometry.intersects(self.gate, track)
         
     def select(self, tracks):
         if self.type == TYPE_SELECT:

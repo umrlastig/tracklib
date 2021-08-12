@@ -9,10 +9,9 @@ import numpy as np
 
 from tracklib.core.Obs import Obs
 from tracklib.core.Coords import ENUCoords
-from tracklib.algo.Geometrics import Circle
+from tracklib.algo.Geometrics import Circle, minCircle
 
 import tracklib.core.Utils as utils
-import tracklib.algo.Geometrics as Geometrics
 import tracklib.algo.Interpolation as interp
 import tracklib.core.Operator as Operator
 
@@ -261,7 +260,7 @@ def findStopsGlobal(track, diameter=20, duration=60, downsampling=1, verbose=Tru
             if (track[j-1].timestamp - track[i].timestamp <= duration):
                 C[i,j] = 0
                 continue
-            C[i,j] = 2*Geometrics.minCircle(track.extract(i,j-1))[1]
+            C[i,j] = 2*minCircle(track.extract(i,j-1))[1]
             C[i,j] = (C[i,j] < diameter)*(j-i)**2
     C = C + np.transpose(C)
     
@@ -286,7 +285,7 @@ def findStopsGlobal(track, diameter=20, duration=60, downsampling=1, verbose=Tru
     
     for i in range(len(segmentation)-1):
         portion = track.extract(segmentation[i], segmentation[i+1]-1)
-        C = Geometrics.minCircle(portion)
+        C = minCircle(portion)
         if ((C[1] > diameter/2) or (portion.duration() < duration)):
             continue
         stops.addObs(Obs(C[0], portion.getFirstObs().timestamp))

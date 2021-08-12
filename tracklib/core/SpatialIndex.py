@@ -11,7 +11,7 @@ from tracklib.core.Network import Edge
 from tracklib.core.TrackCollection import TrackCollection
 from tracklib.core.Coords import GeoCoords, ENUCoords, ECEFCoords
 
-import tracklib.algo.Geometrics as Geometrics
+import tracklib.util.Geometry as Geometry
 
 
 class SpatialIndex:
@@ -495,25 +495,25 @@ class SpatialIndex:
                 
                 # traverse
                 segment1 = [i, j, i+1, j]
-                if Geometrics.isSegmentIntersects(segment1, segment2):
+                if Geometry.isSegmentIntersects(segment1, segment2):
                     if (i,j) not in CELLS:
                         CELLS.append((i,j))
                     continue
                     
                 segment1 = [i, j, i, j+1]
-                if Geometrics.isSegmentIntersects(segment1, segment2):
+                if Geometry.isSegmentIntersects(segment1, segment2):
                     if (i,j) not in CELLS:
                         CELLS.append((i,j))
                     continue
                     
                 segment1 = [i,j+1,i+1,j+1]
-                if Geometrics.isSegmentIntersects(segment1, segment2):
+                if Geometry.isSegmentIntersects(segment1, segment2):
                     if (i,j) not in CELLS:
                         CELLS.append((i,j))
                     continue
                     
                 segment1 = [i+1,j,i+1,j+1]
-                if Geometrics.isSegmentIntersects(segment1, segment2):
+                if Geometry.isSegmentIntersects(segment1, segment2):
                     if (i,j) not in CELLS:
                         CELLS.append((i,j))
                     continue
