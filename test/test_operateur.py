@@ -5,6 +5,7 @@
 """
 import math
 import matplotlib.pyplot as plt
+import os
 import random
 import unittest
 
@@ -14,11 +15,21 @@ from tracklib.core.Operator import Operator
 from tracklib.core.Kernel import GaussianKernel
 import tracklib.algo.Interpolation as interpolation
 from tracklib.io.FileReader import FileReader
-import tracklib.core.Track as core_Track
 import tracklib.algo.Segmentation as seg
 import tracklib.algo.Synthetics as synth
 
+
+def x(t):
+    return 10 * math.cos(4 * math.pi * t)*(1 + math.cos(3.5 * math.pi * t))
+def y(t):
+    return t
+def prob():
+    return random.random()-0.5
+
 class TestOperateurMethods(unittest.TestCase):
+    
+    def setUp (self):
+        self.resource_path = os.path.join(os.path.split(__file__)[0], "..")
     
     def mafonct(self, track, af_name):
         
@@ -31,7 +42,7 @@ class TestOperateurMethods(unittest.TestCase):
 
     def test_abs_curv1(self):
         GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
-        chemin = 'data/trace1.dat'
+        chemin = os.path.join(self.resource_path, 'data/trace1.dat')
         
         track = FileReader.readFromFile(chemin, 2, 3, -1, 4, separator=",", DateIni=-1, h=0, com="#", no_data_value=-999999, srid="ENUCoords")
         
@@ -56,7 +67,11 @@ class TestOperateurMethods(unittest.TestCase):
             trace.estimate_speed()
             Speed = trace.getAnalyticalFeature('speed')
             #print (Speed)
-            print (trace.getListAnalyticalFeatures())
+            #print (trace.getListAnalyticalFeatures())
+            tabAF = trace.getListAnalyticalFeatures()
+            self.assertEqual(2, len(tabAF))
+            self.assertEqual('abs_curv', tabAF[0])
+            self.assertEqual('speed', tabAF[1])
             
             # =============================================================================
             # ============================================================================
@@ -67,21 +82,16 @@ class TestOperateurMethods(unittest.TestCase):
             plt.show()
         
     
-    def x(self, t):
-        return 10 * math.cos(4 * math.pi * t)*(1 + math.cos(3.5 * math.pi * t))
-    def y(self, t):
-        return t
-    def prob(self):
-        return random.random()-0.5
+    
         
     def test_random(self):
         GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         #track = core_Track.Track.generate(TestOperateurMethods.x, TestOperateurMethods.y)
-        track = synth.generate(TestOperateurMethods.x, TestOperateurMethods.y)
+        track = synth.generate(x, y)
 
         track.createAnalyticalFeature("a")
 
-        track.operate(Operator.RANDOM, ("a","a"), TestOperateurMethods.prob, ("x_noised","y_noised"))
+        track.operate(Operator.RANDOM, ("a","a"), prob, ("x_noised","y_noised"))
         track.operate(Operator.INTEGRATOR, ("x_noised","y_noised"))
         track.operate(Operator.SCALAR_MULTIPLIER, ("x_noised","y_noised"), 0.02)
         track.operate(Operator.ADDER, ("x_noised","y_noised"), ("x","y"))
@@ -108,8 +118,8 @@ class TestOperateurMethods(unittest.TestCase):
         track = synth.generate(TestOperateurMethods.x2, TestOperateurMethods.y2)
         
         track.createAnalyticalFeature("a")
-        track.operate(Operator.RANDOM, "a", TestOperateurMethods.prob, "randx")
-        track.operate(Operator.RANDOM, "a", TestOperateurMethods.prob, "randy")
+        track.operate(Operator.RANDOM, "a", prob, "randx")
+        track.operate(Operator.RANDOM, "a", prob, "randy")
 
         track.operate(Operator.INTEGRATOR, "randx", "randx")
         track.operate(Operator.INTEGRATOR, "randy", "randy")
@@ -138,7 +148,7 @@ class TestOperateurMethods(unittest.TestCase):
         # ----------------------------------------------
         # Trajectoire calculee par GPS (mode standard)
         # ----------------------------------------------
-        path = "data/rawGps1Data.pos"
+        path = os.path.join(self.resource_path, 'data/rawGps1Data.pos')
         track1 = FileReader.readFromFile(path, "RTKLIB")            # Lecture du fichier
         track1.toProjCoords(2154)                                   # Projection Lambert 93
         track1 = track1 > 400                                       # Suppression 400 derniers points
@@ -146,7 +156,7 @@ class TestOperateurMethods(unittest.TestCase):
         # ----------------------------------------------
         # Trajectoire de reference IMU
         # ----------------------------------------------
-        path = "data/imu_opk_Vincennes1909121306.txt"     
+        path = os.path.join(self.resource_path, "data/imu_opk_Vincennes1909121306.txt")
         track3 = FileReader.readFromFile(path, "IMU_STEREOPOLIS")   # Lecture du fichier
         track3 = track3 < 400                                       # Suppression 400 derniers points
         track3.incrementTime(0, 18)                                 # Ajout 18 secondes UTC -> GPS Time
