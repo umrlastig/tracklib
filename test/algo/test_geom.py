@@ -2,12 +2,11 @@
 
 import unittest
 
-import matplotlib.pyplot as plt
-
 from tracklib.core import (
   Track, Obs, Coords, GPSTime)
 
 import tracklib.algo.Geometrics as geom
+import tracklib.util.Geometry as Geometry
 
 class TestAlgoGeometricsMethods(unittest.TestCase):
     
@@ -56,51 +55,51 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         # --------------------------------------------------------------
         # Intersect
         segment1 = [2, 1, 2, 2]
-        self.assertTrue(geom.isSegmentIntersects(segment1, segment2))
+        self.assertTrue(Geometry.isSegmentIntersects(segment1, segment2))
         
         segment1 = [3, 1, 3, 2]
-        self.assertTrue(geom.isSegmentIntersects(segment1, segment2))
+        self.assertTrue(Geometry.isSegmentIntersects(segment1, segment2))
         
         segment1 = [3, 2, 4, 2]
-        self.assertTrue(geom.isSegmentIntersects(segment1, segment2))
+        self.assertTrue(Geometry.isSegmentIntersects(segment1, segment2))
         
         segment1 = [4, 2, 4, 3]
-        self.assertTrue(geom.isSegmentIntersects(segment1, segment2))
+        self.assertTrue(Geometry.isSegmentIntersects(segment1, segment2))
         
         
         # --------------------------------------------------------------
         # Non intersect
         segment1 = [1, 1, 1, 2]
-        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        self.assertFalse(Geometry.isSegmentIntersects(segment1, segment2))
         segment1 = [1, 1, 2, 1]
-        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        self.assertFalse(Geometry.isSegmentIntersects(segment1, segment2))
         segment1 = [1, 2, 2, 2]
-        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        self.assertFalse(Geometry.isSegmentIntersects(segment1, segment2))
         
         segment1 = [2, 1, 3, 1]
-        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        self.assertFalse(Geometry.isSegmentIntersects(segment1, segment2))
         segment1 = [2, 2, 3, 2]
-        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        self.assertFalse(Geometry.isSegmentIntersects(segment1, segment2))
         
         segment1 = [3, 2, 3, 3]
-        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        self.assertFalse(Geometry.isSegmentIntersects(segment1, segment2))
         segment1 = [3, 3, 4, 3]
-        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        self.assertFalse(Geometry.isSegmentIntersects(segment1, segment2))
         
         segment1 = [4, 2, 5, 2]
-        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        self.assertFalse(Geometry.isSegmentIntersects(segment1, segment2))
         segment1 = [5, 2, 5, 3]
-        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        self.assertFalse(Geometry.isSegmentIntersects(segment1, segment2))
         segment1 = [4, 3, 5, 3]
-        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        self.assertFalse(Geometry.isSegmentIntersects(segment1, segment2))
         
         segment1 = [2, 2, 2, 3]
-        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        self.assertFalse(Geometry.isSegmentIntersects(segment1, segment2))
         segment1 = [2, 3, 3, 3]
-        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        self.assertFalse(Geometry.isSegmentIntersects(segment1, segment2))
         
         segment1 = [4, 1, 4, 2]
-        self.assertFalse(geom.isSegmentIntersects(segment1, segment2))
+        self.assertFalse(Geometry.isSegmentIntersects(segment1, segment2))
         
         
 if __name__ == '__main__':
