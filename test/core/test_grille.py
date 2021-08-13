@@ -111,101 +111,101 @@ class TestGrille(TestCase):
         self.assertEqual(rasterBand[2][5], speedTrace2[2])
         
     
-    def test_summarize_aa(self):
+    # def test_summarize_aa(self):
 
-        # 
-        af_algos = [Analytics.speed] #, utils.stop_point]
-        cell_operators = [Summarising.co_avg] #, utils.sum]
-        self.grille.addAnalyticalFunctionForSummarize(TrackCollection(self.TRACES), af_algos, cell_operators)
+    #     # 
+    #     af_algos = [Analytics.speed] #, utils.stop_point]
+    #     cell_operators = [Summarising.co_avg] #, utils.sum]
+    #     self.grille.addAnalyticalFunctionForSummarize(TrackCollection(self.TRACES), af_algos, cell_operators)
         
-        self.grille.plot(Analytics.speed, Summarising.co_avg)
-        #print ('')
+    #     self.grille.plot(Analytics.speed, Summarising.co_avg)
+    #     #print ('')
         
-        sumPlot = self.grille.buildArray(Analytics.speed, Summarising.co_avg)
+    #     sumPlot = self.grille.buildArray(Analytics.speed, Summarising.co_avg)
         
-        self.assertEqual(sumPlot[0][0][0], 0)
-        self.assertEqual(sumPlot[1][0][0], 0)
-        self.assertEqual(sumPlot[2][0][0], 8)
-        self.assertEqual(sumPlot[3][0][0], 0)
-        self.assertEqual(sumPlot[4][0][0], 8)
+    #     self.assertEqual(sumPlot[0][0][0], 0)
+    #     self.assertEqual(sumPlot[1][0][0], 0)
+    #     self.assertEqual(sumPlot[2][0][0], 8)
+    #     self.assertEqual(sumPlot[3][0][0], 0)
+    #     self.assertEqual(sumPlot[4][0][0], 8)
         
-        self.assertEqual(sumPlot[0][6][0], 0)
-        self.assertEqual(sumPlot[1][6][0], 0)
-        self.assertEqual(sumPlot[2][6][0], 3)
-        self.assertEqual(sumPlot[3][6][0], 0)
-        self.assertEqual(sumPlot[4][6][0], 0)
+    #     self.assertEqual(sumPlot[0][6][0], 0)
+    #     self.assertEqual(sumPlot[1][6][0], 0)
+    #     self.assertEqual(sumPlot[2][6][0], 3)
+    #     self.assertEqual(sumPlot[3][6][0], 0)
+    #     self.assertEqual(sumPlot[4][6][0], 0)
         
-        self.assertEqual(sumPlot[0][7][0], 1)
-        self.assertEqual(sumPlot[1][7][0], 0)
-        self.assertEqual(sumPlot[2][7][0], 0)
-        self.assertEqual(sumPlot[3][7][0], 0)
-        self.assertEqual(sumPlot[4][7][0], 0)
+    #     self.assertEqual(sumPlot[0][7][0], 1)
+    #     self.assertEqual(sumPlot[1][7][0], 0)
+    #     self.assertEqual(sumPlot[2][7][0], 0)
+    #     self.assertEqual(sumPlot[3][7][0], 0)
+    #     self.assertEqual(sumPlot[4][7][0], 0)
         
 
 
-    def test_sum_trace(self):
+    # def test_sum_trace(self):
         
-        af_algos = ['uid'] #, utils.stop_point]
-        cell_operators = [Summarising.co_count] #, utils.sum]
+    #     af_algos = ['uid'] #, utils.stop_point]
+    #     cell_operators = [Summarising.co_count] #, utils.sum]
         
-        self.grille.addAnalyticalFunctionForSummarize(TrackCollection(self.TRACES), af_algos, cell_operators)
+    #     self.grille.addAnalyticalFunctionForSummarize(TrackCollection(self.TRACES), af_algos, cell_operators)
         
-        self.grille.plot('uid', Summarising.co_count)
-        #print ('')
+    #     self.grille.plot('uid', Summarising.co_count)
+    #     #print ('')
         
-        sumPlot = self.grille.buildArray('uid', Summarising.co_count)
+    #     sumPlot = self.grille.buildArray('uid', Summarising.co_count)
         
-        self.assertEqual(sumPlot[0][0][0], 0)
-        self.assertEqual(sumPlot[1][0][0], 0)
-        self.assertEqual(sumPlot[2][0][0], 2)
-        self.assertEqual(sumPlot[3][0][0], 0)
-        self.assertEqual(sumPlot[4][0][0], 2)
+    #     self.assertEqual(sumPlot[0][0][0], 0)
+    #     self.assertEqual(sumPlot[1][0][0], 0)
+    #     self.assertEqual(sumPlot[2][0][0], 2)
+    #     self.assertEqual(sumPlot[3][0][0], 0)
+    #     self.assertEqual(sumPlot[4][0][0], 2)
         
-        self.assertEqual(sumPlot[0][6][0], 0)
-        self.assertEqual(sumPlot[1][6][0], 0)
-        self.assertEqual(sumPlot[2][6][0], 1)
-        self.assertEqual(sumPlot[3][6][0], 0)
-        self.assertEqual(sumPlot[4][6][0], 0)
+    #     self.assertEqual(sumPlot[0][6][0], 0)
+    #     self.assertEqual(sumPlot[1][6][0], 0)
+    #     self.assertEqual(sumPlot[2][6][0], 1)
+    #     self.assertEqual(sumPlot[3][6][0], 0)
+    #     self.assertEqual(sumPlot[4][6][0], 0)
         
-        self.assertEqual(sumPlot[0][7][0], 1)
-        self.assertEqual(sumPlot[1][7][0], 0)
-        self.assertEqual(sumPlot[2][7][0], 0)
-        self.assertEqual(sumPlot[3][7][0], 0)
-        self.assertEqual(sumPlot[4][7][0], 0)
+    #     self.assertEqual(sumPlot[0][7][0], 1)
+    #     self.assertEqual(sumPlot[1][7][0], 0)
+    #     self.assertEqual(sumPlot[2][7][0], 0)
+    #     self.assertEqual(sumPlot[3][7][0], 0)
+    #     self.assertEqual(sumPlot[4][7][0], 0)
         
         
-    def test_mixte_aa_af_uid(self):
+    # def test_mixte_aa_af_uid(self):
         
-        collection = TrackCollection(self.TRACES)
-        collection.addAnalyticalFeature(Analytics.speed)
+    #     collection = TrackCollection(self.TRACES)
+    #     collection.addAnalyticalFeature(Analytics.speed)
         
-        af_algos = ['uid', 'speed', Analytics.speed]
-        cell_operators = [Summarising.co_count, Summarising.co_avg, Summarising.co_avg] 
+    #     af_algos = ['uid', 'speed', Analytics.speed]
+    #     cell_operators = [Summarising.co_count, Summarising.co_avg, Summarising.co_avg] 
         
-        self.grille.addAnalyticalFunctionForSummarize(collection, af_algos, cell_operators)
+    #     self.grille.addAnalyticalFunctionForSummarize(collection, af_algos, cell_operators)
         
-        self.grille.plot('uid', Summarising.co_count)
-        #print ('')
+    #     self.grille.plot('uid', Summarising.co_count)
+    #     #print ('')
         
-        sumPlot = self.grille.buildArray('uid', Summarising.co_count)
+    #     sumPlot = self.grille.buildArray('uid', Summarising.co_count)
         
-        self.assertEqual(sumPlot[0][0][0], 0)
-        self.assertEqual(sumPlot[1][0][0], 0)
-        self.assertEqual(sumPlot[2][0][0], 2)
-        self.assertEqual(sumPlot[3][0][0], 0)
-        self.assertEqual(sumPlot[4][0][0], 2)
+    #     self.assertEqual(sumPlot[0][0][0], 0)
+    #     self.assertEqual(sumPlot[1][0][0], 0)
+    #     self.assertEqual(sumPlot[2][0][0], 2)
+    #     self.assertEqual(sumPlot[3][0][0], 0)
+    #     self.assertEqual(sumPlot[4][0][0], 2)
         
-        self.assertEqual(sumPlot[0][6][0], 0)
-        self.assertEqual(sumPlot[1][6][0], 0)
-        self.assertEqual(sumPlot[2][6][0], 1)
-        self.assertEqual(sumPlot[3][6][0], 0)
-        self.assertEqual(sumPlot[4][6][0], 0)
+    #     self.assertEqual(sumPlot[0][6][0], 0)
+    #     self.assertEqual(sumPlot[1][6][0], 0)
+    #     self.assertEqual(sumPlot[2][6][0], 1)
+    #     self.assertEqual(sumPlot[3][6][0], 0)
+    #     self.assertEqual(sumPlot[4][6][0], 0)
         
-        self.assertEqual(sumPlot[0][7][0], 1)
-        self.assertEqual(sumPlot[1][7][0], 0)
-        self.assertEqual(sumPlot[2][7][0], 0)
-        self.assertEqual(sumPlot[3][7][0], 0)
-        self.assertEqual(sumPlot[4][7][0], 0)
+    #     self.assertEqual(sumPlot[0][7][0], 1)
+    #     self.assertEqual(sumPlot[1][7][0], 0)
+    #     self.assertEqual(sumPlot[2][7][0], 0)
+    #     self.assertEqual(sumPlot[3][7][0], 0)
+    #     self.assertEqual(sumPlot[4][7][0], 0)
 
 
 if __name__ == '__main__':
