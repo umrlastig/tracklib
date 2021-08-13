@@ -15,10 +15,11 @@ from tracklib.core.Operator import Operator
 
 import tracklib.algo.Analytics as algo
 import tracklib.algo.Interpolation as interp
+import tracklib.algo.Segmentation as segmentation
 
-import tracklib.core.Grid as g
+import tracklib.core.Grid as grid
 import tracklib.core.TrackCollection as trackCollection
-import tracklib.algo.Summarize as summ
+import tracklib.algo.Summarising as summ
 
 # ---------------------------------------------------
 # Lecture des donnees
@@ -40,18 +41,19 @@ trace.estimate_speed()
 
 trace.plotAnalyticalFeature('speed', 'BOXPLOT')
 trace.plotProfil('SPATIAL_SPEED_PROFIL')
-trace.plot('POINT', 'speed')
-
+trace.plot(type='POINT', af_name='speed', append = False)
+plt.show()
 
 # =====================================================
 collection = trackCollection.TrackCollection([trace])
-(Xmin, Xmax, Ymin, Ymax) = collection.bbox()
-grille = g.Grid(Xmin-10, Ymin-10, Xmax - Xmin + 20, Ymax - Ymin + 20, 3)
+grille = grid.Grid(collection, (2,2))
 
 af_algos = [algo.speed]
 cell_operators = [summ.co_avg]
-grille.addAnalyticalFunctionForSummarize(collection, af_algos, cell_operators)
-grille.plot(algo.speed, summ.co_avg)
+
+raster = summ.summarize(grille, af_algos, cell_operators)
+raster.setColor((255, 255, 255), (255, 0, 0))
+raster.plot(algo.speed, summ.co_avg)
 
 
 # ================================================
@@ -61,9 +63,9 @@ trace.plotProfil("SPATIAL_absdv_PROFIL")
 plt.show()
 
 
-# ================================================
-trace.segmentation(["absdv"], "speed_decoup", [1.5])
-seg = trace.split_segmentation("speed_decoup")
+# # ================================================
+segmentation.segmentation(trace, ["absdv"], "speed_decoup", [1.5])
+seg = segmentation.split(trace, "speed_decoup")
 
 COLORS = ['k-','r-','g-','b-','y-','m-','c-']
 
@@ -84,7 +86,7 @@ for i in range(len(seg)):
     print("Rep", count, ":  vmoy = ", v, "km/h   vmax = ", vm, " km/h   vc = ", vc, "km/h")
     plt.plot(trace.getX(), trace.getY(), COLORS[i%7])
 
-
 plt.show()
+
 
 

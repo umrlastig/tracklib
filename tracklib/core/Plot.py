@@ -69,9 +69,9 @@ class Plot:
         Représentation d'une trace sous forme de ligne ou de point.
         On peut visualiser la valeur d'une AF avec une couleur sur les points.
         '''
-		
+
         import tracklib.core.Operator as Operator
-		
+
         if isinstance(append, bool): 
             if append:
                 ax1 = plt.gca()
@@ -79,7 +79,6 @@ class Plot:
                 fig, ax1 = plt.subplots(figsize=(self.w, self.h))
         else:
             ax1 = append
-			
         
         X = self.track.getX()
         Y = self.track.getY()
@@ -88,29 +87,25 @@ class Plot:
         xmax = self.track.operate(Operator.Operator.MAX, 'x')
         ymin = self.track.operate(Operator.Operator.MIN, 'y')
         ymax = self.track.operate(Operator.Operator.MAX, 'y')
-		
+
         dx = xmax-xmin; dy = ymax-ymin 
         xmin = xmin - dx*margin
         ymin = ymin - dy*margin
         xmax = xmax + dx*margin
         ymax = ymax + dy*margin   
-		
-        if af_name is None:
-            
+
+        if af_name != None and af_name != '':
             if cmap == -1:
                 cmap = utils.getColorMap((255, 0, 0), (32, 178, 170))
-            
             values = self.track.getAnalyticalFeature(af_name)
             
-            plt.scatter(X, Y, c = values, cmap = cmap, s=self.pointsize)
-            plt.colorbar()
-        
+            scatter = ax1.scatter(X, Y, c = values, cmap = cmap, s=self.pointsize)
+            #plt.scatter(X, Y, s=self.pointsize, c=self.color)
+            fig.colorbar(scatter, ax=ax1)
         elif type == 'POINT':
-            #ax1.plot(X, Y, 'o', color=self.color, s=5)
-            plt.scatter(X, Y, s=self.pointsize, c=self.color)
-        
+            ax1.scatter(X, Y, s=self.pointsize, c=self.color)
         else:
-            ax1.plot(X, Y, self.sym)
+            ax1.plot(X, Y, '-', color=self.color)
         
         # TODO : tenir compte du type Coord
         if self.track.getSRID() == "Geo":
