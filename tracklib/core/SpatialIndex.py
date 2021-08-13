@@ -68,8 +68,8 @@ class SpatialIndex:
         self.inventaire = set()
 
         # Nombre de dalles par cote
-        self.csize = self.resolution[0]
-        self.lsize = self.resolution[1]
+        self.csize = resolution[0]
+        self.lsize = resolution[1]
         # print ('nb cellule', self.xsize * self.ysize)
         
         # Tableau de collections de features appartenant a chaque dalle. 
