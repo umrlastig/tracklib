@@ -68,7 +68,6 @@ class SpatialIndex:
         self.inventaire = set()
 
         # Nombre de dalles par cote
-        self.resolution = resolution
         self.csize = self.resolution[0]
         self.lsize = self.resolution[1]
         # print ('nb cellule', self.xsize * self.ysize)
