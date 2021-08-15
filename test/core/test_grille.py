@@ -58,8 +58,8 @@ class TestGrille(TestCase):
         #self.grille = Grid.Grid(Xmin, Ymin, Xmax, Ymax, PixelSize)
         marge = 0.05
         self.grille = Grid.Grid(self.collection, (60,60), marge)
-        self.grille.plot()
-        plt.show()
+        #self.grille.plot()
+        #plt.show()
         
         self.assertEqual(self.grille.xmin, 10.0 - marge*(360-10))
         self.assertEqual(self.grille.xmax, 360.0 + marge*(360-10))
