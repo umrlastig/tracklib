@@ -97,10 +97,12 @@ Examples
    loading
    coreconcept
    operator
+   interpolation
+   smoothing
    mapmatching
    simplify
    summarize
-..   interpolation
+   
 
 
 .. toctree::
