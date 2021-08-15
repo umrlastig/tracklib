@@ -103,6 +103,13 @@ Examples
 ..   interpolation
 
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Use Cases
+   
+   ./usecase/speedprofil.rst
+   
+
 
 
 
