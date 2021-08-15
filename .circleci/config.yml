@@ -45,7 +45,7 @@ jobs:
       - run:
           name: Run Tests
           command: |
-			coverage run -m pytest test/
+            coverage run -m pytest test/
             coverage report
             coverage html  # open htmlcov/index.html in a browser
       - store_artifacts:
