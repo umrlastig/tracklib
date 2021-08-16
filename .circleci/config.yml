@@ -10,7 +10,7 @@ orbs:
   # so you dont have to copy and paste it everywhere.
   # See the orb documentation here: https://circleci.com/developer/orbs/orb/circleci/python
   python: circleci/python@1.2
-  coveralls: coveralls/coveralls@x.y.z
+  coveralls: coveralls/coveralls@1.0.6
   
 workflows:
   test_et_couverture:  # This is the name of the workflow, feel free to change it to better match your workflow.
