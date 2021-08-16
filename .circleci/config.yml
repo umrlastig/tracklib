@@ -48,6 +48,7 @@ jobs:
             coverage run -m pytest test/
             coverage report
             coverage html  # open htmlcov/index.html in a browser
+            coveralls
       - store_artifacts:
           path: htmlcov
 
