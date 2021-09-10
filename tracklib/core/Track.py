@@ -237,7 +237,8 @@ class Track:
         m = self.getObs(0).position.copy()
         m.setX(self.operate(Operator.Operator.AVERAGER, 'x'))
         m.setY(self.operate(Operator.Operator.AVERAGER, 'y'))
-        m.setZ(self.operate(Operator.Operator.AVERAGER, 'z'))    
+        if not Utils.isnan(m.getZ()):
+            m.setZ(self.operate(Operator.Operator.AVERAGER, 'z'))
         return m    
         
     def getMinX(self):
