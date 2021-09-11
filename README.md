@@ -1,12 +1,12 @@
+# Tracklib
+
 <p align="center">
 	<table style="border:none;border:0;width:60%"><tr>
-  		<td align="center" style="width:30%"><img width="150px" src="https://raw.githubusercontent.com/umrlastig/tracklib/main/doc/source/TracklibLogo.png" /></td>
+  		<td align="center" style="width:30%"><img width="200px" src="https://raw.githubusercontent.com/umrlastig/tracklib/main/doc/source/TracklibLogo.png" /></td>
 		<td style="padding:16px;"><label>Tracklib</label> a library provide a variety of tools, operators and functions to manipulate GPS trajectories</td>
 	</tr></table>
 </p>
 
-
-# Tracklib
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![CircleCI](https://img.shields.io/circleci/project/github/umrlastig/tracklib/main.svg?style=flat-square&label=CircleCI)](https://circleci.com/gh/umrlastig/tracklib)
