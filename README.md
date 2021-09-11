@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="40%" src="https://raw.githubusercontent.com/umrlastig/tracklib/main/doc/source/TracklibLogo.png" />
+  <img width="20%" src="https://raw.githubusercontent.com/umrlastig/tracklib/main/doc/source/TracklibLogo.png" />
 </p>
 
 
