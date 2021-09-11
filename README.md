@@ -1,7 +1,7 @@
 <p align="center">
 	<table style="border:none;border:0;"><tr>
   		<td align="center" style="width:30%"><img width="100px" src="https://raw.githubusercontent.com/umrlastig/tracklib/main/doc/source/TracklibLogo.png" /></td>
-		<td style="padding:16px"><label>Tracklib</label> a library provide a variety of tools, operators and functions to manipulate GPS trajectories</td>
+		<td style="padding:16px; width:30%"><label>Tracklib</label> a library provide a variety of tools, operators and functions to manipulate GPS trajectories</td>
 		</tr></table>
 </p>
 
