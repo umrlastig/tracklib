@@ -1,5 +1,6 @@
 <p align="center">
   <img width="20%" src="https://raw.githubusercontent.com/umrlastig/tracklib/main/doc/source/TracklibLogo.png" />
+	<label>Tracklib</label> a library provide a variety of tools, operators and functions to manipulate GPS trajectories
 </p>
 
 
