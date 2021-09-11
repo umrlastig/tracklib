@@ -4,6 +4,7 @@
 #
 version: 2.1
 
+
 orbs:
   # The python orb contains a set of prepackaged CircleCI configuration you can use repeatedly in your configuration files
   # Orb commands and jobs help you with common scripting around a language/tool
@@ -12,12 +13,14 @@ orbs:
   python: circleci/python@1.2
   codecov: codecov/codecov@3.0.0
   
+  
 workflows:
   test_et_couverture:  # This is the name of the workflow, feel free to change it to better match your workflow.
     # Inside the workflow, you define the jobs you want to run. 
     # For more details on extending your workflow, see the configuration docs: https://circleci.com/docs/2.0/configuration-reference/#workflows 
     jobs:
       - build-and-test
+
 
 jobs:
   build-and-test:  # This is the name of the job, feel free to change it to better match what you're trying to do!
