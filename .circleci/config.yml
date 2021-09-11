@@ -45,7 +45,11 @@ jobs:
           name: Run tests
           command: |
             pytest test/
-            
+            coverage run -m --source=tracklib/ pytest test/
+            coverage xml
+          
+      - codecov/upload:
+          file: coverage.xml
       
 
 
