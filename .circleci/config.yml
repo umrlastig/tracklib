@@ -10,7 +10,7 @@ orbs:
   # so you dont have to copy and paste it everywhere.
   # See the orb documentation here: https://circleci.com/developer/orbs/orb/circleci/python
   python: circleci/python@1.2
-  coveralls: coveralls/coveralls@1.0.6
+  codecov: codecov/codecov@3.0.0
   
 workflows:
   test_et_couverture:  # This is the name of the workflow, feel free to change it to better match your workflow.
@@ -38,20 +38,16 @@ jobs:
       - python/install-packages:
           pkg-manager: pip
           # app-dir: ~/tracklib/.circleci # If you're requirements.txt isn't in the root directory.
-          # pip-dependency-file: test-requirements.txt  # if you have a different name for your requirements file, maybe one that combines your runtime and test requirements.
-      - run: mkdir test-results
-      - run: pytest test/  
-      - store_test_results:
-          path: ~/tracklib/test-results
-      - run:
-          name: Run Tests
+      - run: 
+          name: Run tests
           command: |
-            coverage run -m pytest test/
-            coverage report
-            coverage html  # open htmlcov/index.html in a browser
-      - coveralls/upload
-      - store_artifacts:
-          path: htmlcov
+            pytest test/
+            coverage run -m --source=tracklib/ pytest test/
+            coverage xml
+          
+      - codecov/upload:
+          file: coverage.xml
+      
 
 
 
