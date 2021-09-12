@@ -1,4 +1,4 @@
-# --------------------------- Analytics ---------------------------------------
+# --------------------------- Geometrics  -------------------------------------
 # Class to manage general operations on a track
 # -----------------------------------------------------------------------------
 import sys
@@ -26,7 +26,16 @@ class Circle:
         self.center = center
         self.radius = radius
         
-    def plot(self, sym='r-'):
+    def plot(self, sym='r-', append=plt):
+        
+        if isinstance(append, bool): 
+            if append:
+                ax1 = plt.gca()
+            else:
+                fig, ax1 = plt.subplots(figsize=(self.w, self.h))
+        else:
+            ax1 = append
+        
         X = [0]*100
         Y = [0]*100
         for t in range(len(X)-1):
@@ -34,7 +43,9 @@ class Circle:
             Y[t] = self.radius*math.sin(2*math.pi*t/len(Y)) + self.center.getY()
         X[len(X)-1] = X[0]
         Y[len(Y)-1] = Y[0]
-        plt.plot(X, Y, sym,linewidth=.5)
+        ax1.plot(X, Y, sym,linewidth=.5)
+        
+        return ax1
         
     def contains(self, point):
         return (point.getX()-self.center.getX())**2 + (point.getX()-self.center.getY())**2 <= self.radius**2
@@ -44,6 +55,7 @@ class Circle:
         
     def translate(self, dx, dy):
        self.center.translate(dx, dy)    
+       
        
 class Rectangle:
 
