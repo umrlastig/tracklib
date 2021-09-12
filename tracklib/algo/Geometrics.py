@@ -9,9 +9,7 @@ import random
 import matplotlib.pyplot as plt
 
 from tracklib.core.Coords import ENUCoords
-import tracklib.util.Geometry as Geometry
-
-
+from tracklib.util.Geometry import right, azimut, inclusion, collinear, direction
 
 
 MODE_ENCLOSING_BBOX = 0
@@ -55,8 +53,8 @@ class Circle:
         
     def translate(self, dx, dy):
        self.center.translate(dx, dy)    
-       
-       
+
+
 class Rectangle:
 
     def __init__(self, pmin, pmax):
@@ -97,6 +95,7 @@ class Rectangle:
         self.pmin.scale(h)
         self.pmax.scale(h)
 
+
 class Polygon:
 
     def __init__(self, X, Y):
@@ -110,7 +109,7 @@ class Polygon:
         plt.plot(self.X, self.Y, sym)
         
     def contains(self, point):
-        return Geometry.inclusion(self.X, self.Y, point.getX(), point.getY())
+        return inclusion(self.X, self.Y, point.getX(), point.getY())
         
     def copy(self):
         return copy.deepcopy(self) 
@@ -177,7 +176,7 @@ def __convexHull(T):
     while((len(H) < 3) or (H[-1] != H[0])):
         H.append(0)
         for i in range(len(T)):
-            if not (Geometry.right(T[H[-2]], T[H[-1]], T[i])):
+            if not (right(T[H[-2]], T[H[-1]], T[i])):
                 H[-1] = i
    
     return (H)
@@ -194,19 +193,13 @@ def convexHull(track):
     T = []
     for i in range(len(track)):
         T.append([track[i].position.getX(), track[i].position.getY()])
-        
-    X = [p[0] for p in T]
-    H = [X.index(min(X))]
 
-    while((len(H) < 3) or (H[-1] != H[0])):
-        H.append(0)
-        for i in range(len(T)):
-            if not (Geometry.right(T[H[-2]], T[H[-1]], T[i])):
-                H[-1] = i
+    CH = __convexHull(T)
+    
     T2 = []
-    for i in range(len(H)):
-        T2.append(T[H[i]][0])
-        T2.append(T[H[i]][1])
+    for i in range(len(CH)):
+        T2.append(T[CH[i]][0])
+        T2.append(T[CH[i]][1])
     return T2
 
 
@@ -214,7 +207,7 @@ def diameter(track):
     '''
     Finds longest distance between points on track 
     The two selected points are returned in a vector
-    along with the minimal distance : [min_dist, p1, p2].
+    along with the minimal distance : [min_dist, idx_p1, idx_p2].
     Exhaustive search in O(n^2) time complexity'''
     
     dmax = 0
@@ -227,20 +220,28 @@ def diameter(track):
                 dmax = d
                 idmax = [i,j]
     return [dmax, idmax[0], idmax[1]]
-    
-    
+
+
+
+
+
 def __circle(p1, p2=None, p3=None):
     ''' Finds circle through 1, 2 or 3 points
-    Returns [C, R]'''
+    Returns Circle(C, R)
+    '''
+    
     if not isinstance(p1, ENUCoords):
         print("Error: ENU coordinates are required for min circle computation")
         exit()
     if p2 is None:
-        return [p1, 0.0]
+        return Circle(p1, 0.0)
     if p3 is None:
         centre = p1+p2
         centre.scale(0.5)
-        return [centre, p1.distance2DTo(p2)/2]
+        return Circle(centre, p1.distance2DTo(p2)/2)
+    if collinear([p1.getX(), p1.getY()], [p2.getX(), p2.getY()], [p3.getX(), p3.getY()]):
+        print (str(p1) + "," + str(p2) + "," + str(p3) + " are collinear")
+        return None
         
     if (p1.distance2DTo(p2) == 0):
         p2.setX(p2.getX()+random.random()*1e-10)
@@ -259,48 +260,49 @@ def __circle(p1, p2=None, p3=None):
     C13 = __circle(p1, p3)
     CANDIDATS = []
     
-    if (C12[0].distance2DTo(p3) < C12[1]):
+    if (C12.center.distance2DTo(p3) < C12.radius):
         CANDIDATS.append(C12)
-    if (C23[0].distance2DTo(p1) < C23[1]):
+    if (C23.center.distance2DTo(p1) < C23.radius):
         CANDIDATS.append(C23)
-    if (C13[0].distance2DTo(p2) < C13[1]):
+    if (C13.center.distance2DTo(p2) < C13.radius):
         CANDIDATS.append(C13)
 
     if len(CANDIDATS) > 0:
-        min = CANDIDATS[0][1]
+        min = CANDIDATS[0].radius
         argmin = 0
         for i in range(len(CANDIDATS)):
-            if CANDIDATS[i][1] < min:
-                min = CANDIDATS[i][1]
+            if CANDIDATS[i].radius < min:
+                min = CANDIDATS[i].radius
                 argmin = i
         return CANDIDATS[argmin]
-        
 
     x = np.complex(p1.getX(), p1.getY())
     y = np.complex(p2.getX(), p2.getY())
     z = np.complex(p3.getX(), p3.getY())
 
-    w = z-x; w /= y-x; c = (x-y)*(w-abs(w)**2)/2j/np.imag(w)-x
+    w = z-x;w /= y-x;c = (x-y)*(w-abs(w)**2)/2j/np.imag(w)-x
     centre = p1.copy(); 
     centre.setX(-np.real(c)); 
-    centre.setY(-np.imag(c));    
-    return [centre, np.abs(c+x)]
+    centre.setY(-np.imag(c));
     
-def __welzl(P, R):
+    return Circle(centre, np.abs(c+x))
+
+
+def __welzl(C):
     '''Finds minimal bounding circle with Welzl's algorithm'''
     
-    P = P.copy()
-    R = R.copy()
+    P = C.center;P = P.copy()
+    R = C.radius;R = R.copy()
     
     if ((len(P) == 0) or (len(R) == 3)):
         if len(R) == 0:
-            return [ENUCoords(0,0,0), 0]
+            return Circle(ENUCoords(0,0,0), 0)
         if len(R) == 1:
             return __circle(R[0])
         if len(R) == 2:
             return __circle(R[0], R[1])
         return __circle(R[0], R[1], R[2])
-    id = random.randint(0,len(P)-1)
+    id = random.randint(0, len(P)-1)
     
     p = P[id]
     P2 = []
@@ -309,15 +311,17 @@ def __welzl(P, R):
             continue
         P2.append(P[i])
     P = P2
-    D = __welzl(P, R)
-    if (p.distance2DTo(D[0]) < D[1]):
+    D = __welzl(Circle(P, R))
+    
+    if D is None:
+        return None
+    elif (p.distance2DTo(D.center) < D.radius):
         return D
     else:
         R.append(p)
-        return __welzl(P, R)
-    
-    
-    
+        return __welzl(Circle(P, R))
+
+
 def plotPolygon(P, color=[1,0,0,1]):
     '''Function to plot a polygon  from a vector:
     R = [x1,y1,x2,y2,x3,y3,...x1,y1]
@@ -325,7 +329,7 @@ def plotPolygon(P, color=[1,0,0,1]):
     XR = P[::2]
     YR = P[1::2]
     plt.plot(XR, YR, color=color)
-    
+
 
 def minCircle(track):
     '''
@@ -344,13 +348,17 @@ def minCircle(track):
         print(message)
         exit()
     
-    centre = track.getFirstObs().position.copy()
+    #centre = track.getFirstObs().position.copy()
     
     P = [obs.position for obs in track]
+    if track.getFirstObs() == track.getLastObs():
+        # Si la ligne est fermée ?
+        P = P[:-1]
     R = []
         
-    return __welzl(P,R)
-    
+    return __welzl(Circle(P,R))
+
+
 def minCircleMatrix(track):
     '''Computes matrix of all min circles in a track.
         M[i,j] gives the radius of the min circle enclosing 
@@ -358,9 +366,9 @@ def minCircleMatrix(track):
     
     M = np.zeros((track.size(), track.size()))
     for i in range(track.size()):
-        print(i, "/", track.size())
+        # print(i, "/", track.size())
         for j in range(i, track.size()-1):
-            M[i,j] = minCircle(track.extract(i,j))[1]
+            M[i,j] = minCircle(track.extract(i,j)).radius
     M = M + np.transpose(M)
     return M
 
@@ -386,9 +394,22 @@ def fitCircle(track, iter_max=100, epsilon=1e-10):
             dX = np.linalg.solve(np.transpose(J)@J, np.transpose(J)@B)
             X = X+dX
         except np.linalg.LinAlgError as err:
+            print (err)
             return Circle(ENUCoords(0, 0), 0)
         
-        if max(max(abs(dX[0]/X[0]), abs(dX[1]/X[1])), abs(dX[2]/X[2])) < epsilon:
+        if X[0] != 0:
+            NX0 = abs(dX[0]/X[0])
+        else:
+            NX0 = 0
+        if X[1] != 0:
+            NX1 = abs(dX[1]/X[1])
+        else:
+            NX1 = 0
+        if X[2] != 0:
+            NX2 = abs(dX[2]/X[2])
+        else:
+            NX2 = 0
+        if max(max(NX0, NX1), NX2) < epsilon:
             break
     
     residuals = [0]*len(track)

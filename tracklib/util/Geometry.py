@@ -83,6 +83,13 @@ def __eval(param, x, y):
 def right(a,b,c):
     return ((a == c) or (b[0]-a[0])*(c[1]-a[1])-(c[0]-a[0])*(b[1]-a[1]) < 0)
 
+def direction(a, b, c):
+    return (c[0]-a[0]) * (b[1]-a[1]) - (b[0]-a[0]) * (c[1]-a[1])
+
+
+
+ 
+
 # ----------------------------------------
 # Fonction distance point-droite
 # Entree : paramètres a,b,c d'une droite, 
@@ -502,4 +509,58 @@ def transform_inverse(theta, tx, ty, X, Y):
         YR[j] = st*X[j]+ct*Y[j]+ty
         
     return XR, YR
-                
+
+
+# Fonction de calcul de l'azimut (en °)
+# Entrées : coordonnées de P1 et P2
+# Sortie : azimut (en °) de P1 vers P2
+def azimut(x1, y1, x2, y2):
+
+    dx = x2 - x1
+    dy = y2 - y1
+    
+    
+    if (dx == 0) and (dy == 0):
+        print("Erreur : les points p1 et p2 doivent être distincts")
+        return 0
+    
+    q = math.sqrt(dx*dx+dy*dy)+dy
+    if q == 0:
+        azimut = 0
+    else:
+        azimut = 2 * math.atan(dx/q) * 180/math.pi
+    
+    if azimut < 0:
+        azimut += 360
+    
+    return azimut
+
+
+def collinear(p1, p2, p3):
+    '''
+    Parameters
+    ----------
+    p1, p2, p3 : [x, y]
+
+    Returns
+    -------
+    bool
+        DESCRIPTION.
+
+    '''
+    x1 = p1[0]; y1 = p1[1]
+    x2 = p2[0]; y2 = p2[1]
+    x3 = p3[0]; y3 = p3[1]
+
+    xVectP1P2 = x2 - x1
+    yVectP1P2 = y2 - y1
+    xVectP1P3 = x3 - x1
+    yVectP1P3 = y3 - y1
+
+    if xVectP1P2 * yVectP1P3 - xVectP1P3 * yVectP1P2 == 0:
+        # points are collinear 
+        return True
+    else:
+        # Not collinear
+        return False
+
