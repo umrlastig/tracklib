@@ -9,7 +9,8 @@ import random
 import matplotlib.pyplot as plt
 
 from tracklib.core.Coords import ENUCoords
-from tracklib.util.Geometry import right, azimut, inclusion, collinear, direction
+from tracklib.util.Geometry import right, inclusion, collinear, cartesienne
+from tracklib.util.Geometry import transform, transform_inverse
 
 
 MODE_ENCLOSING_BBOX = 0
@@ -466,11 +467,11 @@ def __mbr(COORDS):
     
     for i in range(len(HULL)-1):
     
-        param = Geometry.cartesienne([XH[i], YH[i], XH[i+1], YH[i+1]])    
+        #param = cartesienne([XH[i], YH[i], XH[i+1], YH[i+1]])    
         theta = math.atan((YH[i+1]-YH[i])/(XH[i+1]-XH[i]))
     
         # 3 parameters transformation
-        XHR, YHR = __transform(theta, XH[i], YH[i], XH, YH)
+        XHR, YHR = transform(theta, XH[i], YH[i], XH, YH)
             
         mx = min(XHR)
         my = min(YHR)
@@ -478,12 +479,11 @@ def __mbr(COORDS):
             my = max(YHR)
         Mx = max(XHR)
 
-        
         XRR = [mx, Mx, Mx, mx, mx]
         YRR = [0, 0, my, my, 0]
     
         # 3 parameters inverse transformation
-        XR, YR = __transform_inverse(theta,  XH[i], YH[i], XRR, YRR)
+        XR, YR = transform_inverse(theta,  XH[i], YH[i], XRR, YRR)
             
         new_area = (Mx-mx)*abs(my)
         if (new_area < RECTANGLE_AREA):
@@ -498,9 +498,11 @@ def __mbr(COORDS):
     return [BEST_RECTANGLE, RECTANGLE_AREA, BEST_l, BEST_L]
     
 
-def minimumBoundingRectangle(track):    
+def minimumBoundingRectangle(track):
+    
     T = []
     for i in range(len(track)):
         T.append([track[i].position.getX(), track[i].position.getY()])
+    
     return __mbr(T)
 

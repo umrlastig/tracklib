@@ -11,6 +11,7 @@ from tracklib.core.Track import Track
 import tracklib.algo.Geometrics as Geometrics
 
 
+
 class TestAlgoGeometricsMethods(unittest.TestCase):
     
     __epsilon = 0.001
@@ -170,12 +171,31 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         T = Geometrics.convexHull(self.trace2)
         Geometrics.plotPolygon(T)
         plt.show()
+        
+        
+    def testminimumBoundingRectangle(self):
+        
+        self.trace3.plot()
+        R = Geometrics.minimumBoundingRectangle(self.trace3)
+        T = []
+        for coord in R[0]:
+            T.append(coord[0])
+            T.append(coord[1])
+        Geometrics.plotPolygon(T)
+        
+        self.assertEqual(R[1], 16.5)
+        self.assertLessEqual(abs(3.104 - R[2]), self.__epsilon, "l")
+        self.assertLessEqual(abs(5.315 - R[3]), self.__epsilon, "L")
+
+
+
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    suite.addTest(TestAlgoGeometricsMethods("testCircleTrigo"))
-    suite.addTest(TestAlgoGeometricsMethods("testCircles"))
-    suite.addTest(TestAlgoGeometricsMethods("testDiameter"))
-    suite.addTest(TestAlgoGeometricsMethods("testConvexHull"))
+    #suite.addTest(TestAlgoGeometricsMethods("testCircleTrigo"))
+    #suite.addTest(TestAlgoGeometricsMethods("testCircles"))
+    #suite.addTest(TestAlgoGeometricsMethods("testDiameter"))
+    #suite.addTest(TestAlgoGeometricsMethods("testConvexHull"))
+    suite.addTest(TestAlgoGeometricsMethods("testminimumBoundingRectangle"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
