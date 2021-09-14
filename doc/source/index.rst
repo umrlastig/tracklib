@@ -3,6 +3,12 @@
 :License: --
 :Date: 07/03/2021
 
+.. raw:: html
+   
+   <img src="https://raw.githubusercontent.com/umrlastig/tracklib/main/doc/source/TracklibLogo.png" style="width: 40%; display: block; margin-left: auto; margin-right: auto;"/>
+   <p/>
+  
+
 
 Welcome to TrackLib’s documentation!
 =======================================
@@ -11,17 +17,21 @@ Welcome to TrackLib’s documentation!
 
 :Source Code: https://github.com/umrlastig/tracklib
 
-|travis| |codecov| |rtd| 
+|CircleCI| |codecov| |rtd| |licence|
 
-.. |travis| image:: https://travis-ci.org/umrlastig/tracklib.svg?branch=main
-                  :alt: Travis build status
-                  :target: https://travis-ci.org/github/umrlastig/tracklib
-.. |codecov| image:: https://codecov.io/gh/umrlastig/tracklib/branch/main/graph/badge.svg
+.. |CircleCI| image:: https://img.shields.io/circleci/project/github/umrlastig/tracklib/main.svg?style=flat-square&label=CircleCI
+                  :alt: CircleCi build status
+                  :target: https://circleci.com/gh/umrlastig/tracklib
+.. |codecov| image:: https://codecov.io/gh/umrlastig/tracklib/branch/main/graph/badge.svg?token=pHLaV21j2O
                    :alt: Code coverage
-                   :target: https://app.codecov.io/gh/umrlastig/tracklib
+                   :target: https://codecov.io/gh/umrlastig/tracklib
 .. |rtd| image:: https://readthedocs.org/projects/tracklib/badge/?version=latest
                :alt: Documentation status
                :target: https://tracklib.readthedocs.io/en/latest/?badge=latest
+.. |licence| image:: https://img.shields.io/badge/Licence-Cecill--C-blue.svg?style=flat
+                   :alt Software License
+				   :target https://github.com/umrlastig/tracklib/blob/main/LICENCE
+
 
 
 

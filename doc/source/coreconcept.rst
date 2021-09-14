@@ -71,3 +71,72 @@ De nouvelles surcharges d'opérateurs pour Track et TrackCollection:
 * len( )   nombre d'observations / traces
 * le moins "unaire", abs, "!=", ">=" et "<=" restent disponibles si tu as des idées
 
+
+Tools to query observations in a track with SQL-like commands
+---------------------------------------------------------------
+
+Output depends on the SELECT clause:
+
+If "SELECT *" then output is a copied track of the original track (with all its AF hopefully)
+
+.. code-block:: python
+
+    trace = self.track.query("SELECT *")
+	
+	
+	
+	
+	
+    
+
+
+
+
+
+.. 
+    trace = self.track.query("SELECT * WHERE speed < 0.5")
+	
+
+	If "SELECT f1, f2... fp", then output is a (p x n)-dimensional array, with p = number of fields 
+	queried and n = number of observations selected by the WHERE conditions.
+	* If "SELECT AGG1(f1), AGG2(f2)... AGGp(fp)", with AGG1, AGG2,.. AGGp, a set of p aggregators, 
+	then output is a p-dimensional array, with on value for each aggregator
+	* If "SELECT AGG(f)", then output is the floating point value returned by the operator.
+
+
+	Note that operators take as input only analytical feature names. Therefore, "SELECT COUNT(*)" syntax 
+	is not allowed and must be replaced equivalently by "SELECT COUNT(f)" with any AF name f.
+
+	General rules: 
+		#     - Only SELECT and WHERE keywords (SET and DELETE available soon)
+		#     - All analytical features + x, y, z, t, and timestamp are available as fields
+		#     - Fields are written without quotes. They must not contain blank spaces
+		#     - "t" is time as integer in seconds since 1970/01/01 00:00:00, and "timestamp" is GPSTIme object
+		#     - Blank space must be used between every other words, symbols and operators
+		#     - WHERE clause may contain as many conditions as needed, separated by OR/AND key words
+		#     - Parenthesis are not allowed within WHERE clause. Use boolean algebra rules to reformulate 
+		#       query without parenthesis: e.g. A AND (B OR C) = A AND B OR A AND C. Or use successive queries.
+		#     - Each condition must contain exactly 3 parts (separated by blank spaces) in this exact order:
+		#         (1) the name of an analytical feature to test
+		#         (2) a comparison operator among >, <, >=, <=, ==, != and LIKE (with % in str and timestamps)
+		#         (3) a threshold value which is automatically casted to the type of the AF given in (1). 
+		#             Intended types accepted are: integers, floats, strings, boolean and GPSTime. 
+		#             When GPSTime is used as a threshold value, eventhough it may contain 2 parts 
+		#            (date and time), it must not be enclosed within quotes. For boolean, "1", "T" and "TRUE"
+		#             are considered as logical True, all other values are considered as False.    
+		#     - Important: no computation allowed in WHERE conditions. E.g. "... WHERE z-2 > 10" not allowed
+		#     - Available aggregators: all unary operators as described in Operator.py, except MSE
+		#     - Capital letters must be used for SQL keywords SELECT, WHERE, AND, OR and aggregators 
+
+
+
+
+
+
+Track collection
+*******************
+
+
+.. raw:: html
+   
+   <p><br/><br/></p>

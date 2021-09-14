@@ -47,6 +47,11 @@ Tracklib developer mode
    pip install -e .
    python setup.py install
  
+ 
+5. Quit
+
+deactivate
+ 
 
 Running test
 --------------
