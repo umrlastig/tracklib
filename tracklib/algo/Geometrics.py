@@ -47,6 +47,11 @@ class Circle:
         return ax1
         
     def contains(self, point):
+        d = (point.getX()-self.center.getX())**2 + (point.getX()-self.center.getY())**2
+        print (d**0.5, self.radius)
+        t = (d <= self.radius**2)
+        if t:
+            print (point.getX())
         return (point.getX()-self.center.getX())**2 + (point.getX()-self.center.getY())**2 <= self.radius**2
         
     def copy(self):
