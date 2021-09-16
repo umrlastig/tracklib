@@ -51,6 +51,7 @@
 
 import matplotlib.pyplot as plt
 
+from tracklib.core.Coords import ENUCoords, GeoCoords
 from tracklib.core.Track import Track
 from tracklib.core.TrackCollection import TrackCollection
 from tracklib.core.Obs import Obs
@@ -224,7 +225,7 @@ class Constraint:
             if srid.upper in ["GEO", "GeoCoords"]:
                 shape = Rectangle(GeoCoords(-180,-90), GeoCoords(180,90))
             else:
-                shape = Rectangle(ENUCoords(-1e300,-1e300), GeoCoords(1e300,1e300))
+                shape = Rectangle(ENUCoords(-1e300,-1e300), ENUCoords(1e300,1e300))
         self.shape = shape
         self.mode = mode
         self.type = type
@@ -313,7 +314,7 @@ class Selector:
         self.combination = combination    
         
     def addConstraint(self, constraint):    
-        self.constraints.append(constraints)  
+        self.constraints.append(constraint)  
 
     def plot(self, sym=['r-', 'g-', 'b-']):
         sym = utils.listify(sym)
