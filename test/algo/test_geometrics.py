@@ -192,10 +192,10 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    #suite.addTest(TestAlgoGeometricsMethods("testCircleTrigo"))
-    #suite.addTest(TestAlgoGeometricsMethods("testCircles"))
-    #suite.addTest(TestAlgoGeometricsMethods("testDiameter"))
-    #suite.addTest(TestAlgoGeometricsMethods("testConvexHull"))
+    suite.addTest(TestAlgoGeometricsMethods("testCircleTrigo"))
+    suite.addTest(TestAlgoGeometricsMethods("testCircles"))
+    suite.addTest(TestAlgoGeometricsMethods("testDiameter"))
+    suite.addTest(TestAlgoGeometricsMethods("testConvexHull"))
     suite.addTest(TestAlgoGeometricsMethods("testminimumBoundingRectangle"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
