@@ -42,15 +42,22 @@ TODO
 	Overall picture of selection process
 	**************************************
 
-	selection is performed by a selector object, containing an arbitrary number of constraints, combined by OR, AND or XOR operator. 
+	selection is performed by a selector object, containing an arbitrary number of constraints, 
+	combined by OR, AND or XOR operator. 
 
-	Since only a single operator is allowed in the selector, a "global selector" is provided to the users to combine the output of several individual selectors. Again, the output may be combined with OR, AND or XOR.
+	Since only a single operator is allowed in the selector, a "global selector" is provided to the users 
+	to combine the output of several individual selectors. Again, the output may be combined with OR, AND or XOR.
 
-	For example, given two circles C1 and C2, and two rectangles R1 and R2, to select tracks crossing either C1 or C2, and either R1 or R2, we would like to write the following combination of constraints : F = (C1 + C2).(R1 + R2), where + and . operators denote OR and AND respectively. 
+	For example, given two circles C1 and C2, and two rectangles R1 and R2, to select tracks crossing 
+	either C1 or C2, and either R1 or R2, we would like to write the following 
+	combination of constraints : F = (C1 + C2).(R1 + R2), where + and . operators denote OR and AND respectively. 
 
-	Such a constraint requires two different combination rules, and therefore cannot be expressed with a single selector. A solution is to create two disjonctive (OR) type selectors S1 and S2 with S1 = C1 + C2 and S2 = R1 + R2. Then S1 and S2 are combined in a conjunctive (AND) type global selector. 
+	Such a constraint requires two different combination rules, and therefore cannot be expressed 
+	with a single selector. A solution is to create two disjonctive (OR) type selectors 
+	S1 and S2 with S1 = C1 + C2 and S2 = R1 + R2. Then S1 and S2 are combined in a conjunctive (AND) type global selector. 
 
-	Note that boolean algebraic rules show that it is possible as well to combine 4 conjunctive- type selectors (C1.R1, C1.R2, C2.R1 and C2.R2) in a disjunctive-type global selector. 
+	Note that boolean algebraic rules show that it is possible as well to combine 4 conjunctive- 
+	type selectors (C1.R1, C1.R2, C2.R1 and C2.R2) in a disjunctive-type global selector. 
 
 	Constraints may be based on:
 	- a geometrical shape (Rectangle, circle or polygon in Geometrics). This 
@@ -58,7 +65,7 @@ TODO
 	#         - MODE_CROSSES: tracks crossing shape interior/boundary are selected
 	#         - MODE_INSIDE : tracks remaining fully inside the shape are selected
 	#         - MODE_GETS_IN: tracks getting in (at least once) shape are selected
-	#         - MODE_INSIDE : tracks getting out (at least once) shape are selected
+	#         - MODE_GETS_OUT : tracks getting out (at least once) shape are selected
 	- a track t as a reference. Available modes are:
 	#         - MODE_CROSSES : tracks  intersecting t (at least once) are selected
 	#         - MODE_PARALLEL: tracks  following t are selected

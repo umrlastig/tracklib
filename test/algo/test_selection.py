@@ -223,11 +223,76 @@ class TestSelection(TestCase):
         isSelection = selector.contains(trace)
         self.assertFalse(isSelection)
         
+
+    def test_selection_one_shape_time_constraint(self):
+        
+        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        chemin = os.path.join(self.resource_path, './data/trace1.dat')
+        trace = FileReader.readFromFile(chemin, 2, 3, -1, 4, separator=",")
+        trace.plot()
+        
+        t1 = TimeConstraint(begin=GPSTime('2018-07-31 14:00:00'))
+        t2 = TimeConstraint(begin=GPSTime('2019-07-31 14:00:00'))
+        t3 = TimeConstraint(begin=GPSTime('2018-07-25 14:00:00'))
+        
+        center = trace.getObs(int(trace.size()/2)).position
+        radius = 91000
+        circle1 = Geometrics.Circle(center, radius)
+        #circle1.plot()
+        #plt.show()
+        
+        pt = trace.getObs(int(trace.size()/2)).position
+        center = ENUCoords(pt.getX() + 10000, pt.getY() + 30000)
+        radius = 10000
+        circle4 = Geometrics.Circle(center, radius)
+        
+        # =====================================================================
+        c1 = Constraint(shape = circle1, time=t1, mode = MODE_CROSSES)
+        s = Selector([c1])
+        selector = GlobalSelector([s])
+        isSelection = selector.contains(trace)
+        self.assertTrue(isSelection)
+        
+        # =====================================================================
+        c1 = Constraint(shape = circle1, time=t2, mode = MODE_CROSSES)
+        s = Selector([c1])
+        selector = GlobalSelector([s])
+        isSelection = selector.contains(trace)
+        self.assertFalse(isSelection)
+        
+        # =====================================================================
+        c1 = Constraint(shape = circle1, time=t3, mode = MODE_CROSSES)
+        s = Selector([c1])
+        selector = GlobalSelector([s])
+        isSelection = selector.contains(trace)
+        self.assertTrue(isSelection)
+        
+        # =====================================================================
+        c1 = Constraint(shape = circle4, time=t1, mode = MODE_CROSSES)
+        s = Selector([c1])
+        selector = GlobalSelector([s])
+        isSelection = selector.contains(trace)
+        self.assertFalse(isSelection)
+        
+        
+    def test_selection_combinaison_constraint(self):
+        
+        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        chemin = os.path.join(self.resource_path, './data/trace1.dat')
+        trace = FileReader.readFromFile(chemin, 2, 3, -1, 4, separator=",")
+        trace.plot()
+        
         
         
 if __name__ == '__main__':
+    
     suite = TestSuite()
+    
     #suite.addTest(TestSelection("test_selection_one_timestamp_constraint"))
-    suite.addTest(TestSelection("test_selection_one_shape_constraint"))
+    #suite.addTest(TestSelection("test_selection_one_shape_constraint"))
+    #suite.addTest(TestSelection("test_selection_one_shape_time_constraint"))
+    
+    suite.addTest(TestSelection("test_selection_combinaison_constraint"))
+    
     runner = TextTestRunner()
     runner.run(suite)
