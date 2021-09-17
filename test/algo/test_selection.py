@@ -4,8 +4,9 @@ import matplotlib.pyplot as plt
 import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
 
+from tracklib.core.Coords import ENUCoords
 from tracklib.algo.Selection import Constraint, TimeConstraint, Selector, GlobalSelector
-from tracklib.algo.Selection import MODE_INSIDE, MODE_CROSSES, MODE_GETS_IN
+from tracklib.algo.Selection import MODE_INSIDE, MODE_CROSSES, MODE_GETS_IN, MODE_GETS_OUT
 import tracklib.algo.Geometrics as Geometrics
 from tracklib.core.GPSTime import GPSTime
 from tracklib.io.FileReader import FileReader
@@ -89,37 +90,141 @@ class TestSelection(TestCase):
 
 
     def test_selection_one_shape_constraint(self):
+        
         GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, './data/trace1.dat')
         trace = FileReader.readFromFile(chemin, 2, 3, -1, 4, separator=",")
         trace.plot()
 
-        t = TimeConstraint(begin=GPSTime('2018-07-31 14:00:00'))
-        circle = Geometrics.Circle(trace.getObs(int(trace.size()/2)).position, 91000)
-        # print (circle.center.getX(), circle.center.getY(), circle.radius)
-        circle.plot()
-        plt.show()
+        center = trace.getObs(int(trace.size()/2)).position
+        radius = 91000
+        circle1 = Geometrics.Circle(center, radius)
+        #circle.plot()
+        #plt.show()
         
-        c1 = Constraint(shape = circle, time = t, mode = MODE_INSIDE)
+        c1 = Constraint(shape = circle1, mode = MODE_CROSSES)
         s = Selector([c1])
         selector = GlobalSelector([s])
         isSelection = selector.contains(trace)
-        self.assertFalse(isSelection)
+        self.assertTrue(isSelection)
         
-        c2 = Constraint(shape = circle, time = t, mode = MODE_CROSSES)
+        c2 = Constraint(shape = circle1, mode = MODE_INSIDE)
         s = Selector([c2])
         selector = GlobalSelector([s])
         isSelection = selector.contains(trace)
-        self.assertFalse(isSelection)
+        self.assertTrue(isSelection)
         
-        c3 = Constraint(shape = circle, time = t, mode = MODE_GETS_IN)
+        c3 = Constraint(shape = circle1, mode = MODE_GETS_IN)
         s = Selector([c3])
         selector = GlobalSelector([s])
         isSelection = selector.contains(trace)
         self.assertFalse(isSelection)
         
+        c4 = Constraint(shape = circle1, mode = MODE_GETS_OUT)
+        s = Selector([c4])
+        selector = GlobalSelector([s])
+        isSelection = selector.contains(trace)
+        self.assertFalse(isSelection)
         
-    
+        # -------------------------------------------------------
+        
+        center = trace.getObs(int(trace.size()/2)).position
+        radius = 45000
+        circle2 = Geometrics.Circle(center, radius)
+        #circle2.plot()
+        #plt.show()
+        
+        c1 = Constraint(shape = circle2, mode = MODE_CROSSES)
+        s = Selector([c1])
+        selector = GlobalSelector([s])
+        isSelection = selector.contains(trace)
+        self.assertTrue(isSelection)
+        
+        c2 = Constraint(shape = circle2, mode = MODE_INSIDE)
+        s = Selector([c2])
+        selector = GlobalSelector([s])
+        isSelection = selector.contains(trace)
+        self.assertFalse(isSelection)
+        
+        c3 = Constraint(shape = circle2, mode = MODE_GETS_IN)
+        s = Selector([c3])
+        selector = GlobalSelector([s])
+        isSelection = selector.contains(trace)
+        self.assertTrue(isSelection)
+        
+        c4 = Constraint(shape = circle2, mode = MODE_GETS_OUT)
+        s = Selector([c4])
+        selector = GlobalSelector([s])
+        isSelection = selector.contains(trace)
+        self.assertFalse(isSelection)
+        
+        # -------------------------------------------------------
+        
+        center = trace.getObs(0).position
+        radius = 10000
+        circle3 = Geometrics.Circle(center, radius)
+        # circle3.plot()
+        # plt.show()
+        
+        c1 = Constraint(shape = circle3, mode = MODE_CROSSES)
+        s = Selector([c1])
+        selector = GlobalSelector([s])
+        isSelection = selector.contains(trace)
+        self.assertTrue(isSelection)
+        
+        c2 = Constraint(shape = circle3, mode = MODE_INSIDE)
+        s = Selector([c2])
+        selector = GlobalSelector([s])
+        isSelection = selector.contains(trace)
+        self.assertFalse(isSelection)
+        
+        c3 = Constraint(shape = circle3, mode = MODE_GETS_IN)
+        s = Selector([c3])
+        selector = GlobalSelector([s])
+        isSelection = selector.contains(trace)
+        self.assertFalse(isSelection)
+        
+        c4 = Constraint(shape = circle3, mode = MODE_GETS_OUT)
+        s = Selector([c4])
+        selector = GlobalSelector([s])
+        isSelection = selector.contains(trace)
+        self.assertTrue(isSelection)
+        
+        # -------------------------------------------------------
+        
+        pt = trace.getObs(int(trace.size()/2)).position
+        center = ENUCoords(pt.getX() + 10000, pt.getY() + 30000)
+        radius = 10000
+        circle4 = Geometrics.Circle(center, radius)
+        circle4.plot()
+        plt.show()
+        
+        c1 = Constraint(shape = circle4, mode = MODE_CROSSES)
+        s = Selector([c1])
+        selector = GlobalSelector([s])
+        isSelection = selector.contains(trace)
+        self.assertFalse(isSelection)
+        
+        c2 = Constraint(shape = circle4, mode = MODE_INSIDE)
+        s = Selector([c2])
+        selector = GlobalSelector([s])
+        isSelection = selector.contains(trace)
+        self.assertFalse(isSelection)
+        
+        c3 = Constraint(shape = circle4, mode = MODE_GETS_IN)
+        s = Selector([c3])
+        selector = GlobalSelector([s])
+        isSelection = selector.contains(trace)
+        self.assertFalse(isSelection)
+        
+        c4 = Constraint(shape = circle4, mode = MODE_GETS_OUT)
+        s = Selector([c4])
+        selector = GlobalSelector([s])
+        isSelection = selector.contains(trace)
+        self.assertFalse(isSelection)
+        
+        
+        
 if __name__ == '__main__':
     suite = TestSuite()
     #suite.addTest(TestSelection("test_selection_one_timestamp_constraint"))
