@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 from tracklib.core.Obs import Obs
 from tracklib.core.Coords import ENUCoords
 from tracklib.core.GPSTime import GPSTime
+from tracklib.algo.Geometrics import Polygon
 from tracklib.core.TrackCollection import TrackCollection
 
 import tracklib.core.Plot as Plot
@@ -240,7 +241,10 @@ class Track:
         if not Utils.isnan(m.getZ()):
             m.setZ(self.operate(Operator.Operator.AVERAGER, 'z'))
         return m    
-        
+    
+    def getEnclosedPolygon(self):
+        return Polygon(self.getX(), self.getY())	
+		
     def getMinX(self):
         return self.operate(Operator.Operator.MIN, 'x')
 
@@ -1091,6 +1095,7 @@ class Track:
         '''
         plot = Plot.Plot(self)
         plot.sym = sym
+        plot.color = sym[0]
         plot.w = 6
         plot.h = 5
         return plot.plot(type, af_name, cmap, append=append)

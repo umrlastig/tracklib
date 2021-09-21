@@ -9,7 +9,7 @@ import random
 import matplotlib.pyplot as plt
 
 from tracklib.core.Coords import ENUCoords
-from tracklib.util.Geometry import right, inclusion, collinear, cartesienne
+from tracklib.util.Geometry import right, inclusion, collinear, cartesienne, isSegmentIntersects
 from tracklib.util.Geometry import transform, transform_inverse
 
 
@@ -143,9 +143,85 @@ class Polygon:
             self.X[i] *= h
             self.Y[i] *= h
         
+    # --------------------------------------------------
+    # Polygon area
+    # --------------------------------------------------
+    def area(self):
+        aire = 0
+        for i in range(len(self.X)-1):
+            aire += self.X[i]*self.Y[i+1] - self.X[i+1]*self.Y[i]
+        return abs(aire/2)
+        
+    # --------------------------------------------------
+    # Polygon centroid
+    # --------------------------------------------------
+    def centroid(self): 
+        aire = 0
+        center = [0,0]
+        dx = self.X[0]
+        dy = self.Y[0]
+        self.translate(-dx, -dy)
+        for i in range(len(self.X)-1):
+            factor = (self.X[i]*self.Y[i+1] - self.X[i+1]*self.Y[i])
+            aire += factor
+            center[0] += (self.X[i]+self.X[i+1])*factor
+            center[1] += (self.Y[i]+self.Y[i+1])*factor
+        center[0] /= 3*aire
+        center[1] /= 3*aire
+        center[0] += dx
+        center[1] += dy
+        self.translate(dx, dy)
+        return center
 
-
-    
+    # --------------------------------------------------
+    # Test if a polygon is star-shaped
+    # --------------------------------------------------    
+    def isStarShaped(self):
+        eps = 1e-6
+        c = self.centroid()
+        #self.plot('k-')
+        #plt.plot(c[0], c[1], 'ro')
+        for i in range(len(self.X)-1):
+            visee = [self.X[i]-eps*(self.X[i]-c[0]), self.Y[i]-eps*(self.Y[i]-c[1])]
+            S1 = [c[0], c[1], visee[0], visee[1]]
+            intersection = False
+            for j in range(len(self.X)-1):
+                S2 = [self.X[j], self.Y[j], self.X[j+1], self.Y[j+1]]
+                if isSegmentIntersects(S1, S2):
+                    intersection = True
+                    break
+            if intersection:
+                #plt.plot([c[0],visee[0]], [c[1],visee[1]], 'r--')
+                return False                
+            #else:
+                #plt.plot([c[0],visee[0]], [c[1],visee[1]], 'k--')                                
+        return True
+        
+    # --------------------------------------------------
+    # Computes angular ratio of polygon star-shaped
+    # --------------------------------------------------    
+    def starShapedRatio(self, resolution=1, inf=1e3):
+        eps = inf
+        c = self.centroid()
+        #self.plot('k-')
+        N = 0.0; D = 0.0
+        for theta in range(0,360,math.floor(resolution)):
+            visee = [c[0] + eps*math.cos(theta*math.pi/180), c[1] + eps*math.sin(theta*math.pi/180)]
+            S1 = [c[0], c[1], visee[0], visee[1]]
+            count = 0; D += 1
+            for j in range(len(self.X)-1):
+                S2 = [self.X[j], self.Y[j], self.X[j+1], self.Y[j+1]]
+                if isSegmentIntersects(S1, S2):
+                    count += 1
+                if count == 2:
+                    N += 1    
+                    #plt.plot([c[0],visee[0]], [c[1],visee[1]], 'r--')
+                    break
+            if count == 0:
+                N += 1    
+                #plt.plot([c[0],visee[0]], [c[1],visee[1]], 'r--')        
+        return 1.0-N/D
+  
 # ----------------------------------------
 # Function to get enclosing shape
 # ----------------------------------------
