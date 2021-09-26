@@ -18,6 +18,8 @@ import tracklib.core.Plot as Plot
 import tracklib.core.Utils as Utils
 import tracklib.core.Operator as Operator
 
+from tracklib.algo.Geometrics import Polygon
+
 
 class Track:
 
@@ -239,7 +241,10 @@ class Track:
         m.setY(self.operate(Operator.Operator.AVERAGER, 'y'))
         if not Utils.isnan(m.getZ()):
             m.setZ(self.operate(Operator.Operator.AVERAGER, 'z'))
-        return m    
+        return m  
+
+    def getEnclosedPolygon(self):
+        return Polygon(self.getX(), self.getY())			
         
     def getMinX(self):
         return self.operate(Operator.Operator.MIN, 'x')
@@ -1915,6 +1920,7 @@ from tracklib.core.Bbox import Bbox
 import tracklib.core.Kernel as Kernel
 import tracklib.algo.Mapping as Mapping
 import tracklib.algo.Analytics as Analytics
+
 import tracklib.algo.Geometrics as Geometrics
 import tracklib.algo.Cinematics as Cinematics
 import tracklib.algo.Comparison as Comparison
