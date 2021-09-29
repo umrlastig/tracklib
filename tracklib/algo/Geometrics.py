@@ -12,7 +12,6 @@ from tracklib.core.Coords import ENUCoords
 from tracklib.util.Geometry import right, inclusion, collinear, cartesienne, isSegmentIntersects
 from tracklib.util.Geometry import transform, transform_inverse
 
-
 MODE_ENCLOSING_BBOX = 0
 MODE_ENCLOSING_MBR = 1
 MODE_ENCLOSING_CIRCLE = 2
@@ -220,8 +219,24 @@ class Polygon:
             if count == 0:
                 N += 1    
                 #plt.plot([c[0],visee[0]], [c[1],visee[1]], 'r--')        
-        return 1.0-N/D
-  
+
+        return 1.0-N/D    
+
+    # --------------------------------------------------
+    # Radial signature of a polygon
+    # --------------------------------------------------
+    def signature(self):
+        C = self.centroid();
+        S = [0]; R = [math.sqrt((C[0]-self.X[0])**2+(C[1]-self.Y[0])**2)]; N = R[0]
+        for i in range(1,len(self.X)):
+            S.append(math.sqrt((self.X[i-1]-self.X[i])**2+(self.Y[i-1]-self.Y[i])**2)+S[i-1])
+            R.append(math.sqrt((C[0]       -self.X[i])**2+(C[1]       -self.Y[i])**2))
+            N = max(N, R[-1])
+        for i in range(len(S)):
+            S[i] /= S[-1]
+            R[i] /= N
+        return [S, R]
+    
 # ----------------------------------------
 # Function to get enclosing shape
 # ----------------------------------------
