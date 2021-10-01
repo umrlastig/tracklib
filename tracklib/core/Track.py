@@ -167,7 +167,7 @@ class Track:
         base = None
         if self.getSRID() in ["GEO", "Geo"]:
             base = self.getObs(0).position.copy()
-            tracks.toENUCoords(base)
+            self.toENUCoords(base)
         return base
      
     # =========================================================================
