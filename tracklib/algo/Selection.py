@@ -1,5 +1,5 @@
 # --------------------------- Selection ---------------------------------------
-# Class to manage selection of of GPS tracks
+# Class to manage selection of GPS tracks
 # -----------------------------------------------------------------------------
 # Overall picture of selection process : selection is performed by a selector 
 # object, containing an arbitrary number of constraints, combined by OR, AND or 
@@ -139,7 +139,7 @@ class TrackConstraint:
         self.mode = mode
         self.length = length
         self.segments = []
-        for i in range(1,len(track),1):
+        for i in range(1,len(track), 1):
             pt1 = track[i].position.copy()
             pt2 = pt1.copy()
             dx = track[i].position.getX()-track[i-1].position.getX()
