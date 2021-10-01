@@ -286,6 +286,7 @@ class TestSelection(TestCase):
         trace = FileReader.readFromFile(chemin, 2, 3, -1, 4, separator=",")
         trace.plot()
         
+        # =====================================================================
         trace1 = Track()
         c1 = trace.getObs(1350).position
         c0 = ENUCoords(c1.getX() + 5000, c1.getY())
@@ -304,6 +305,32 @@ class TestSelection(TestCase):
         selector = GlobalSelector([s])
         isSelection = selector.contains(trace)
         self.assertFalse(isSelection)
+        
+        c4 = TrackConstraint(trace1, mode=MODE_CROSSES)
+        s = Selector([c4])
+        selector = GlobalSelector([s])
+        isSelection = selector.contains(trace)
+        self.assertTrue(isSelection)
+        
+        # =====================================================================
+        trace1 = Track()
+        c0 = ENUCoords(trace.getObs(1349).position.getX(), trace.getObs(1349).position.getY())
+        c1 = ENUCoords(trace.getObs(1350).position.getX(), trace.getObs(1350).position.getY())
+        c2 = ENUCoords(trace.getObs(1351).position.getX(), trace.getObs(1351).position.getY())
+        p1 = Obs(c0, GPSTime.readTimestamp("2018-07-31 14:00:00"))
+        p2 = Obs(c1, GPSTime.readTimestamp("2018-07-31 14:01:00"))
+        p3 = Obs(c2, GPSTime.readTimestamp("2018-07-31 14:02:00"))
+        trace1.addObs(p1)
+        trace1.addObs(p2)
+        trace1.addObs(p3)
+        plt.plot(trace1.getX(), trace1.getY(), 'r-')
+        plt.show()
+        
+        c3 = TrackConstraint(trace1, mode=MODE_PARALLEL)
+        s = Selector([c3])
+        selector = GlobalSelector([s])
+        isSelection = selector.contains(trace)
+        self.assertTrue(isSelection)
         
         c4 = TrackConstraint(trace1, mode=MODE_CROSSES)
         s = Selector([c4])
