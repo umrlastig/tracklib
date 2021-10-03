@@ -1223,12 +1223,13 @@ class Track:
     #         id_fin = self.size()-1
     #     return Cinematics.computeAvgAscSpeed(self, id_ini, id_fin)
     
-    # # DEPRECATED    
-    # def compute_abscurv(self):
-    #     '''
-    #     Compute and return curvilinear abscissa for each points
-    #     '''
-    #     return Cinematics.computeAbsCurv(self)
+    # DEPRECATED    
+    def compute_abscurv(self):
+        '''
+        Compute and return curvilinear abscissa for each points
+        '''
+        from tracklib.algo.Cinematics import computeAbsCurv
+        return computeAbsCurv(self)
         
     def getAbsCurv(self):
         if self.hasAnalyticalFeature(BIAF_ABS_CURV):
