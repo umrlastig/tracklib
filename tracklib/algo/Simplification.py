@@ -8,7 +8,8 @@ import tracklib.util.Geometry as Geometry
 import tracklib.core.Operator as Operator
 
 import tracklib.algo.Geometrics as Geometrics
-import tracklib.algo.Segmentation as Segmentation
+from tracklib.algo.Segmentation import MODE_SEGMENTATION_MINIMIZE, MODE_SEGMENTATION_MAXIMIZE
+from tracklib.algo.Segmentation import optimalSegmentation
 
 # --------------------------------------------------------------------------
 # Circular import (not satisfying solution)
@@ -21,6 +22,7 @@ MODE_SIMPLIFY_MINIMIZE_LARGEST_DEVIATION = 3
 MODE_SIMPLIFY_MINIMIZE_ELONGATION_RATIO = 4
 MODE_SIMPLIFY_PRECLUDE_LARGE_DEVIATION = 5
 MODE_SIMPLIFY_FREE = 6
+MODE_SIMPLIFY_FREE_MAXIMIZE = 7
 
 # --------------------------------------------------------------------------
 # Generic method to simplify a track
@@ -54,7 +56,7 @@ def simplify(track, tolerance, mode = MODE_SIMPLIFY_DOUGLAS_PEUCKER, verbose=Tru
         if mode == MODE_SIMPLIFY_FREE:
             return optimalSimplification(track, tolerance, None, verbose)
         if mode == MODE_SIMPLIFY_FREE_MAXIMIZE:
-            max = Segmentation.MODE_SEGMENTATION_MAXIMIZE
+            max = MODE_SEGMENTATION_MAXIMIZE
             return optimalSimplification(track, tolerance, None, max, verbose)
         sys.exit("Error: track simplification mode " + (str)(mode) + " not implemented yet")
 
@@ -134,10 +136,10 @@ def douglas_peucker(track, eps):
 # --------------------------------------------------------------------------
 # Output : simplified 
 # --------------------------------------------------------------------------
-def optimalSimplification(track, cost, eps, mode=Segmentation.MODE_SEGMENTATION_MINIMIZE):
+def optimalSimplification(track, cost, eps, mode=MODE_SEGMENTATION_MINIMIZE):
 
     simplified = Track(user_id=track.uid, track_id=track.tid, base=track.base)
-    segmentation = Segmentation.optimalSegmentation(track, cost, eps)
+    segmentation = optimalSegmentation(track, cost, eps)
  
     for i in range(len(segmentation)):
         simplified.addObs(track.getObs(segmentation[i]).copy())

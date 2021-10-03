@@ -15,7 +15,6 @@ BIAF_ABS_CURV = 'abs_curv'
 BUILT_IN_AF = [BIAF_DS, BIAF_SPEED, BIAF_ABS_CURV, BIAF_HEADING]
 
 
-
 def addListToAF(track, af_name, array):
     if af_name == None:
         return

@@ -14,7 +14,6 @@ from tracklib.core.Bbox import Bbox
 class Grid:
     """ 
         Pour IndexSpatial et Summarizng
-        
         grid[icol][jrow] = list or dict
     """
     
@@ -23,7 +22,7 @@ class Grid:
         Grid constructor. 
         
         Margin : relative float. Default value is +5%
-        
+
         '''
         # Bbox only or collection
         if isinstance(collection, Bbox):

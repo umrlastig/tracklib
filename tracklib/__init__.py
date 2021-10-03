@@ -1,7 +1,17 @@
 # -*- coding: utf-8 -*-
 
+__version__ = '1.0.0'
+
+
 #from .core.Coords import GeoCoords, ENUCoords, ECEFCoords
 #from .core.GPSTime import GPSTime
+
+
+#from tracklib.algo.Interpolation import ALGO_LINEAR, MODE_SPATIAL
+
+
+
+
 #from .core.Obs import Obs
 #from .core.Track import Track
 
@@ -33,7 +43,7 @@
 #from .core_Operator import Operator
 #from .core_Operator import Kernel, DiracKernel, UniformKernel, TriangularKernel, GaussianKernel, ExponentialKernel, EpanechnikovKernel, SincKernel
 
-__version__ = '1.0.0'
+
 #__all__ = ['GeoCoords', 'ENUCoords', 'ECEFCoords',
 #		   'GPSTime', 'Obs', 'Track',
 #          'resample', 'gaussian_process', 'prepareTimeSampling', 'synchronize',
