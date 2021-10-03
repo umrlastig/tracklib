@@ -1198,7 +1198,7 @@ class Track:
     # DEPRECATED    
     def smoothed_speed_calculation(self, kernel):
         from tracklib.algo.Cinematics import smoothed_speed_calculation
-         return smoothed_speed_calculation(self, kernel)
+        return smoothed_speed_calculation(self, kernel)
         
     def getSpeed(self):
         if self.hasAnalyticalFeature(BIAF_SPEED):
