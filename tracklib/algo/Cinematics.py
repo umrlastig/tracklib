@@ -2,7 +2,10 @@
 # Class to manage cinematic computations on GPS tracks
 # -----------------------------------------------------------------------------
 
-import tracklib.algo.Analytics as Analytics
+from tracklib.algo.Analytics import BIAF_SPEED, speed
+from tracklib.algo.Analytics import BIAF_HEADING, heading
+from tracklib.algo.Analytics import BIAF_DS, ds
+from tracklib.algo.Analytics import BIAF_ABS_CURV
 import tracklib.core.Operator as Operator
 
 
@@ -12,10 +15,10 @@ def estimate_speed(track):
     Compute and return speed for each point
     Difference finie arriere-avant
     '''
-    if track.hasAnalyticalFeature(Analytics.BIAF_SPEED):
-        return track.getAnalyticalFeature(Analytics.BIAF_SPEED)
+    if track.hasAnalyticalFeature(BIAF_SPEED):
+        return track.getAnalyticalFeature(BIAF_SPEED)
     else:
-        return track.addAnalyticalFeature(Analytics.speed)
+        return track.addAnalyticalFeature(speed)
 		
 
 # --------------------------------------------------
@@ -48,10 +51,10 @@ def estimate_heading(track):
     Compute and return speed for each point
     Difference finie arriere-avant
     '''
-    if track.hasAnalyticalFeature(Analytics.BIAF_HEADING):
-        return track.getAnalyticalFeature(Analytics.BIAF_HEADING)
+    if track.hasAnalyticalFeature(BIAF_HEADING):
+        return track.getAnalyticalFeature(BIAF_HEADING)
     else:
-        return track.addAnalyticalFeature(Analytics.heading)
+        return track.addAnalyticalFeature(heading)
 		
 
 # --------------------------------------------------
@@ -103,13 +106,13 @@ def computeAvgAscSpeed(track, id_ini=0, id_fin=None):
 def computeAbsCurv(track):
     '''Compute and return curvilinear abscissa for each points'''
     
-    if not track.hasAnalyticalFeature(Analytics.BIAF_DS):
-        track.addAnalyticalFeature(Analytics.ds, Analytics.BIAF_DS)
-    if not track.hasAnalyticalFeature(Analytics.BIAF_ABS_CURV):
-        track.operate(Operator.Operator.INTEGRATOR, Analytics.BIAF_DS, Analytics.BIAF_ABS_CURV)
-    track.removeAnalyticalFeature(Analytics.BIAF_DS)
+    if not track.hasAnalyticalFeature(BIAF_DS):
+        track.addAnalyticalFeature(ds, BIAF_DS)
+    if not track.hasAnalyticalFeature(BIAF_ABS_CURV):
+        track.operate(Operator.Operator.INTEGRATOR, BIAF_DS, BIAF_ABS_CURV)
+    track.removeAnalyticalFeature(BIAF_DS)
    
-    return track.getAnalyticalFeature(Analytics.BIAF_ABS_CURV)
+    return track.getAnalyticalFeature(BIAF_ABS_CURV)
 	
     
 def computeCurvAbsBetweenTwoPoints(track, id_ini=0, id_fin=None):

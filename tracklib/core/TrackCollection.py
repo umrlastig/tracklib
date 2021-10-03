@@ -1,8 +1,7 @@
 # -------------------------- Track Collection ---------------------------------
 # Class to manage collection of tracks
 # -----------------------------------------------------------------------------
-import copy
-import random
+#import copy
 
 import matplotlib.pyplot as plt
 
@@ -76,7 +75,7 @@ class TrackCollection:
         self.spatial_index = SpatialIndex(self, resolution, verbose)
 
     def exportSpatialIndex(self, filename):
-        from tracklib.core.SpatialIndex import SpatialIndex
+        #from tracklib.core.SpatialIndex import SpatialIndex
         self.spatial_index.save(filename)
 
     def importSpatialIndex(self, filename):
@@ -261,7 +260,7 @@ class TrackCollection:
     # ------------------------------------------------------------
     def __truediv__(self, number):
         N = (int)(self.size()/number)
-        R = self.size()-N*number
+        #R = self.size()-N*number
         SPLITS = []
         for i in range(number+1):
             id_ini = i*N

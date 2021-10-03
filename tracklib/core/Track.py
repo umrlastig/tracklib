@@ -19,6 +19,13 @@ import tracklib.core.Utils as Utils
 import tracklib.core.Operator as Operator
 
 from tracklib.algo.Geometrics import Polygon
+from tracklib.util.Geometry import intersection
+
+from tracklib.core.Bbox import Bbox
+from tracklib.core.Kernel import DiracKernel
+
+from tracklib.algo.Analytics import BIAF_SPEED, BIAF_ABS_CURV
+
 
 
 class Track:
@@ -640,28 +647,28 @@ class Track:
             s += self.getObs(i-1).distanceTo(self.getObs(i))
         return s
         
-    # DEPRECATED
-    def computeNetDeniv(self, id_ini=0, id_fin=None):
-        '''
-        Computes net denivellation (in meters)
-        '''
-        if id_fin is None:
-            id_fin = self.size()-1
-        return Cinematics.computeNetDeniv(self, id_ini, id_fin)
+    # # DEPRECATED
+    # def computeNetDeniv(self, id_ini=0, id_fin=None):
+    #     '''
+    #     Computes net denivellation (in meters)
+    #     '''
+    #     if id_fin is None:
+    #         id_fin = self.size()-1
+    #     return Cinematics.computeNetDeniv(self, id_ini, id_fin)
 
-    # DEPRECATED
-    def computeAscDeniv(self, id_ini=0, id_fin=None):
-        '''Computes positive denivellation (in meters)'''        
-        if id_fin is None:
-            id_fin = self.size()-1
-        return  Cinematics.computeAscDeniv(self, id_ini, id_fin)
+    # # DEPRECATED
+    # def computeAscDeniv(self, id_ini=0, id_fin=None):
+    #     '''Computes positive denivellation (in meters)'''        
+    #     if id_fin is None:
+    #         id_fin = self.size()-1
+    #     return  Cinematics.computeAscDeniv(self, id_ini, id_fin)
     
-     # DEPRECATED   
-    def computeDescDeniv(self, id_ini=0, id_fin=None):
-        '''Computes negative denivellation (in meters)'''
-        if id_fin is None:
-            id_fin = self.size()-1 
-        return Cinematics.computeDescDeniv(self, id_ini, id_fin)
+    #  # DEPRECATED   
+    # def computeDescDeniv(self, id_ini=0, id_fin=None):
+    #     '''Computes negative denivellation (in meters)'''
+    #     if id_fin is None:
+    #         id_fin = self.size()-1 
+    #     return Cinematics.computeDescDeniv(self, id_ini, id_fin)
         
    
     def toWKT(self):
@@ -993,24 +1000,29 @@ class Track:
             - a list of timestamps where interpolation 
             should be computed
             - a reference track'''
-            
+        
+        from tracklib.algo.Interpolation import resample as interpolation_resample
+        
         # (Temporaire)
         if not (self.getSRID() == "ENU"):
             print("Error: track data must be in ENU coordinates for resampling")
             exit()
             
-        Interpolation.resample(self, delta, algo, mode)
+        interpolation_resample(self, delta, algo, mode)
         self.__analyticalFeaturesDico = {}
     
     # =========================================================================
     #  Thin plates smoothing
     # =========================================================================	
     def smooth(self, constraint=1e3):
+        from tracklib.algo.Interpolation import SPLINE_PENALIZATION
+        from tracklib.algo.Interpolation import ALGO_THIN_SPLINES
+        from tracklib.algo.Interpolation import MODE_TEMPORAL
         times = self.copy()
-        val = Interpolation.SPLINE_PENALIZATION
-        Interpolation.SPLINE_PENALIZATION = constraint
-        self.resample(self.frequency(), Interpolation.ALGO_THIN_SPLINES, mode=Interpolation.MODE_TEMPORAL)
-        Interpolation.SPLINE_PENALIZATION = val
+        val = SPLINE_PENALIZATION
+        SPLINE_PENALIZATION = constraint
+        self.resample(self.frequency(), ALGO_THIN_SPLINES, mode=MODE_TEMPORAL)
+        SPLINE_PENALIZATION = val
         self = self // times
 	
     def incrementTime(self, dt=1, offset=0):  
@@ -1043,16 +1055,17 @@ class Track:
         Track argument may also be replaced ny a list of points.
         Note that mapOn does not handle negative determinant (symetries not allowed)
         '''   
-
-        return Mapping.mapOn(self, reference, TP1, TP2, init, N_ITER_MAX, mode, verbose)
+        from tracklib.algo.Mapping import mapOn as mapping_mapOn
+        return mapping_mapOn(self, reference, TP1, TP2, init, N_ITER_MAX, mode, verbose)
 
     # =========================================================================
     #  Adding noise to tracks
     # =========================================================================   
     def noise(self, sigma=5, kernel=None):
+        from tracklib.algo.Stochastics import noise as stochastics_noise
         if kernel is None:
-            kernel = Kernel.DiracKernel()
-        return Stochastics.noise(self, sigma, kernel)
+            kernel = DiracKernel()
+        return stochastics_noise(self, sigma, kernel)
         
 
     # =========================================================================
@@ -1160,7 +1173,8 @@ class Track:
     # =========================================================================    
     # DEPRECATED
     def simplify(self, tolerance, mode = 1):
-        return Simplification.simplify(self, tolerance, mode)
+        from tracklib.algo.Simplification import simplify as simplification_simplify
+        return simplification_simplify(self, tolerance, mode)
         
     
     # =========================================================================
@@ -1176,60 +1190,60 @@ class Track:
         else:
             return self.smoothed_speed_calculation(kernel)
     
-    # DEPRECATED
-    def estimate_raw_speed(self):
-        return Cinematics.estimate_speed(self)
+    # # DEPRECATED
+    # def estimate_raw_speed(self):
+    #     return Cinematics.estimate_speed(self)
     
-    # DEPRECATED    
-    def smoothed_speed_calculation(self, kernel):
-        return Cinematics.smoothed_speed_calculation(self, kernel)
+    # # DEPRECATED    
+    # def smoothed_speed_calculation(self, kernel):
+    #     return Cinematics.smoothed_speed_calculation(self, kernel)
         
     def getSpeed(self):
-        if self.hasAnalyticalFeature(Analytics.BIAF_SPEED):
-            return self.getAnalyticalFeature(Analytics.BIAF_SPEED)
+        if self.hasAnalyticalFeature(BIAF_SPEED):
+            return self.getAnalyticalFeature(BIAF_SPEED)
         else:
             sys.exit("Error: 'estimate_speed' has not been called yet")
 
-    # DEPRECATED
-    def computeAvgSpeed(self, id_ini=0, id_fin=None):
-        '''Computes mean speed (m/s) between two points'''
-        if id_fin is None:
-            id_fin = self.size()-1
-        return Cinematics.computeAvgSpeed(self, id_ini, id_fin)
+    # # DEPRECATED
+    # def computeAvgSpeed(self, id_ini=0, id_fin=None):
+    #     '''Computes mean speed (m/s) between two points'''
+    #     if id_fin is None:
+    #         id_fin = self.size()-1
+    #     return Cinematics.computeAvgSpeed(self, id_ini, id_fin)
     
-    # DEPRECATED
-    def computeAvgAscSpeed(self, id_ini=0, id_fin=None):
-        '''
-        Computes average ascending speed (m/s)
-        TODO : à adapter
-        '''
-        if id_fin is None:
-            id_fin = self.size()-1
-        return Cinematics.computeAvgAscSpeed(self, id_ini, id_fin)
+    # # DEPRECATED
+    # def computeAvgAscSpeed(self, id_ini=0, id_fin=None):
+    #     '''
+    #     Computes average ascending speed (m/s)
+    #     TODO : à adapter
+    #     '''
+    #     if id_fin is None:
+    #         id_fin = self.size()-1
+    #     return Cinematics.computeAvgAscSpeed(self, id_ini, id_fin)
     
-    # DEPRECATED    
-    def compute_abscurv(self):
-        '''
-        Compute and return curvilinear abscissa for each points
-        '''
-        return Cinematics.computeAbsCurv(self)
+    # # DEPRECATED    
+    # def compute_abscurv(self):
+    #     '''
+    #     Compute and return curvilinear abscissa for each points
+    #     '''
+    #     return Cinematics.computeAbsCurv(self)
         
     def getAbsCurv(self):
-        if self.hasAnalyticalFeature(Analytics.BIAF_ABS_CURV):
-            return self.getAnalyticalFeature(Analytics.BIAF_ABS_CURV)
+        if self.hasAnalyticalFeature(BIAF_ABS_CURV):
+            return self.getAnalyticalFeature(BIAF_ABS_CURV)
         else:
             sys.exit("Error: 'compute_abscurv' has not been called yet")
 
     
-    # DEPRECATED
-    def getCurvAbsBetweenTwoPoints(self, id_ini=0, id_fin=None):
-        '''
-        Computes and return the curvilinear abscissa between two points
-        TODO : adapter avec le filtre
-        '''
-        if id_fin is None:
-            id_fin = self.size()-1
-        return Cinematics.computeCurvAbsBetweenTwoPoints(self, id_ini, id_fin)
+    # # DEPRECATED
+    # def getCurvAbsBetweenTwoPoints(self, id_ini=0, id_fin=None):
+    #     '''
+    #     Computes and return the curvilinear abscissa between two points
+    #     TODO : adapter avec le filtre
+    #     '''
+    #     if id_fin is None:
+    #         id_fin = self.size()-1
+    #     return Cinematics.computeCurvAbsBetweenTwoPoints(self, id_ini, id_fin)
 
 
 
@@ -1842,18 +1856,19 @@ class Track:
     # [-] Computes difference profile of 2 tracks    
     # ------------------------------------------------------------
     def __sub__(self, arg):
+        from tracklib.algo.Comparison import differenceProfile as comp_differenceProfile
         if isinstance(arg, int): 
             print("Available operator not implemented yet")
             return None
         else:
-            return Comparison.differenceProfile(self, arg)
+            return comp_differenceProfile(self, arg)
         
     # ------------------------------------------------------------
     # [*] Temporal resampling of track or track intersections
     # ------------------------------------------------------------
     def __mul__(self, arg):
         if isinstance(arg, Track):
-            return Geometrics.intersection(self, arg)
+            return intersection(self, arg)
         else:
             track = self.copy()
             dt = (track.frequency("temporal")/arg)*(1-1e-3)
@@ -1880,8 +1895,9 @@ class Track:
     # [//] Time resample of a track according to another track
     # ------------------------------------------------------------    
     def __floordiv__(self, track):
+        from tracklib.algo.Interpolation import MODE_TEMPORAL
         track_resampled = self.copy()
-        track_resampled.resample(track, Interpolation.MODE_TEMPORAL)
+        track_resampled.resample(track, MODE_TEMPORAL)
         return track_resampled    
     
     # ------------------------------------------------------------
@@ -1912,18 +1928,3 @@ class Track:
 		
 
 
-# --------------------------------------------------------------------------
-# Circular import (not satisfying solution)
-# --------------------------------------------------------------------------
-from tracklib.core.Bbox import Bbox
-
-import tracklib.core.Kernel as Kernel
-import tracklib.algo.Mapping as Mapping
-import tracklib.algo.Analytics as Analytics
-
-import tracklib.algo.Geometrics as Geometrics
-import tracklib.algo.Cinematics as Cinematics
-import tracklib.algo.Comparison as Comparison
-import tracklib.algo.Stochastics as Stochastics
-import tracklib.algo.Interpolation as Interpolation
-import tracklib.algo.Simplification as Simplification

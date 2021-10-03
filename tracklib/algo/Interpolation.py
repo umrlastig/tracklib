@@ -77,6 +77,7 @@ def resample(track, delta, algo=1, mode=2):
 		
 	track.__analyticalFeaturesDico = {}
 
+
 def __resampleSpatial(track, ds):
 
 	'''Resampling of a track with linear interpolation
@@ -305,8 +306,8 @@ def synchronize(track1, track2):
 			del sorted[i+1]
 			
 	# Interpolation
-	track1.resample(sorted, MODE_INTERP_TEMPORAL)
-	track2.resample(sorted, MODE_INTERP_TEMPORAL)
+	track1.resample(sorted, MODE_TEMPORAL)
+	track2.resample(sorted, MODE_TEMPORAL)
 	
 	
 

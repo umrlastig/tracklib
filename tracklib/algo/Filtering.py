@@ -4,7 +4,9 @@
 
 import numpy as np
 
-import tracklib.algo.Dynamics as Dynamics
+from tracklib.algo.Dynamics import MODE_OBS_AND_STATES_AS_3D_POSITIONS
+from tracklib.algo.Dynamics import DYN_MAT_2D_CST_SPEED
+from tracklib.algo.Dynamics import HMM as dynamics_hmm
 
 FILTER_LOW_PASS = 0
 FILTER_HIGH_PASS = 1
@@ -75,7 +77,7 @@ def __kalman(track, sigma, speed_std, speed_af=None, verbose=True):
 	# -----------------------------------------------------
     if not (speed_af is None):
 
-        F = lambda x: Dynamics.DYN_MAT_2D_CST_SPEED(dt) @ x      
+        F = lambda x: DYN_MAT_2D_CST_SPEED(dt) @ x      
         H = lambda x: np.array([[x[0,0]], [x[1,0]], [(x[2,0]**2 + x[3,0]**2)**0.5]])           
         
         Q = np.eye(4,4); Q[2,2] = 0; Q[3,3] = 0
@@ -83,7 +85,8 @@ def __kalman(track, sigma, speed_std, speed_af=None, verbose=True):
         X0 = np.array([[track[0].position.getX()],[track[0].position.getY()],[0],[0]])
         P0 = sigma**2*np.eye(4,4)                                           
         
-        UKF = Dynamics.Kalman(spreading=1)
+        from tracklib.algo.Dynamics import kalman as dynamics_kalman
+        UKF = dynamics_kalman(spreading=1)
         UKF.setTransition(F, Q)                        
         UKF.setObservation(H, R)                        
         UKF.setInitState(X0, P0)  
@@ -105,7 +108,7 @@ def __kalman(track, sigma, speed_std, speed_af=None, verbose=True):
         X0 = np.array([[p0.getX()],[p0.getY()]])        # Initial state
         P0 = sigma**2*np.eye(2,2)                       # Initial covariance
         
-        UKF = Dynamics.Kalman(spreading=1)
+        UKF = dynamics_kalman(spreading=1)
         UKF.setTransition(F, Q)                         # Dynamic model
         UKF.setObservation(H, R)                        # Observation model
         UKF.setInitState(X0, P0)                        # Initialization
@@ -171,12 +174,12 @@ def MarkovRegularization(track, sigma, speed, resolution):
     global res, sig
     sig = sigma
     res = resolution
-    model = Dynamics.HMM()
+    model = dynamics_hmm()
     model.setStates(__Markov_S)
     model.setTransitionModel(speed)
     model.setObservationModel(__Markov_Plog)
     model.setLog(True)
-    model.estimate(track, obs=["x","y","z"], mode=Dynamics.MODE_OBS_AND_STATES_AS_3D_POSITIONS)
+    model.estimate(track, obs=["x","y","z"], mode=MODE_OBS_AND_STATES_AS_3D_POSITIONS)
 
 # --------------------------------------------------------------------------
 # Generic method to filter a track with Fast Fourier Transforms

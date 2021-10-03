@@ -14,6 +14,9 @@ from tracklib.core.TrackCollection import TrackCollection
 import tracklib.core.Utils as utils
 import tracklib.core.Kernel as Kernel
 
+from tracklib.algo.Analytics import BIAF_ABS_CURV
+from tracklib.algo.Interpolation import gaussian_process as interpolation_gaussian_process
+
 
 DISTRIBUTION_NORMAL = 1
 DISTRIBUTION_UNIFORM = 2
@@ -131,7 +134,7 @@ def gaussian_process(self, timestamps, kernel, factor=1.0, sigma=0.0, cp_var=Fal
     cp_var: compute covariance matrix and store pointwise sigmas
     returns: interpolated/smoothed track (without AF)'''
     
-    return Interpolation.gaussian_process(self, timestamps, kernel, factor, sigma, cp_var)
+    return interpolation_gaussian_process(self, timestamps, kernel, factor, sigma, cp_var)
 	
 def randomColor():
     return [random.random(),random.random(),random.random()]
@@ -159,7 +162,7 @@ def noise(track, sigma=[1], kernel=[Kernel.DiracKernel()], distribution=DISTRIBU
     
     for n in range(len(sigma)):
 
-        S = track.getAnalyticalFeature(Analytics.BIAF_ABS_CURV)
+        S = track.getAnalyticalFeature(BIAF_ABS_CURV)
         SIGMA_S = utils.makeCovarianceMatrixFromKernel(kernel[n], S, S)
         SIGMA_S += np.identity(N)*1e-12
         SIGMA_S *= sigma[n]**2/SIGMA_S[0,0]
@@ -221,5 +224,3 @@ def randomizer(input, f, sigma=[7], kernel=[Kernel.GaussianKernel(650)], N=10):
     return noised_output
         
 
-import tracklib.algo.Analytics as Analytics
-import tracklib.algo.Interpolation as Interpolation

@@ -14,6 +14,8 @@ BIAF_HEADING = 'heading'
 BIAF_ABS_CURV = 'abs_curv'
 BUILT_IN_AF = [BIAF_DS, BIAF_SPEED, BIAF_ABS_CURV, BIAF_HEADING]
 
+# __all__ = ["BIAF_DS", "BIAF_SPEED", "BIAF_HEADING", "BIAF_ABS_CURV", "BUILT_IN_AF"]
+
 
 def addListToAF(track, af_name, array):
     if af_name == None:
