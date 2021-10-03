@@ -12,7 +12,7 @@ from tracklib.core.Coords import ENUCoords
 from tracklib.algo.Geometrics import Circle, minCircle
 
 import tracklib.core.Utils as utils
-import tracklib.algo.Interpolation as interp
+from tracklib.algo.Interpolation import ALGO_LINEAR, MODE_SPATIAL
 import tracklib.core.Operator as Operator
 
 # --------------------------------------------------------------------------
@@ -471,7 +471,7 @@ def splitReturnTripFast(track, side_effect=0.1, sampling=1):
     track = track.copy()
     track.toENUCoords(track.getFirstObs().position)
     track_test = track.copy()
-    track_test.resample((track_test.length()/track_test.size())/sampling, interp.ALGO_LINEAR, interp.MODE_SPATIAL) 
+    track_test.resample((track_test.length()/track_test.size())/sampling, ALGO_LINEAR, MODE_SPATIAL) 
 
     H = np.fft.fft(track_test.getY())
     G = np.fft.fft(track_test.getY()[::-1])
