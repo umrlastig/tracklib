@@ -8,7 +8,6 @@ import numpy as np
 import tracklib.core.Utils as utils
 
 from tracklib.core.Obs import Obs
-from tracklib.core.Track import Track
 from tracklib.core.Coords import ENUCoords
 from tracklib.core.GPSTime import GPSTime
 
@@ -25,7 +24,13 @@ B_SPLINE_DEGREE = 3
 B_SPLINE_RESOL = None	
 GP_KERNEL = None
 GP_SMOOTHING = 0
-	
+
+# --------------------------------------------------------------------------
+# Circular import (not satisfying solution)
+# --------------------------------------------------------------------------
+from tracklib.core.Track import Track
+
+
 def resample(track, delta, algo=1, mode=2):
 	'''
 	Resampling of a track with linear interpolation

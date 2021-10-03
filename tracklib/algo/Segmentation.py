@@ -141,21 +141,22 @@ def findStops(track, spatial, temporal, mode, verbose=True):
         return findStopsGlobal(track, spatial, temporal, verbose)
     if mode == MODE_STOPS_RTK:
         return findStopsGlobalForRTK(track, spatial, temporal, verbose)
-    
-# -------------------------------------------------------------------
+
+
+# -----------------------------------------------------------------------------
 # Function to find stop positions from a track
 # Inputs:
 #     - duration: minimal stop duration (in seconds)
 #     - speed: maximal speed during stop (in ground units / sec)
 # Output: a track with centroids (and first time of stop sequence)
 # For classical standard GPS track set 1 m/s for 10 sec)'''
-# -------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 def findStopsLocal(track, speed=1, duration=10):        
     
     track = track.copy()
     stops = Track()
    
-    track.segmentation("speed", "#mark", speed)
+    #track.segmentation("speed", "#mark", speed)
     track.operate(Operator.Operator.DIFFERENTIATOR, "#mark")
     track.operate(Operator.Operator.RECTIFIER, "#mark")
 
@@ -168,7 +169,11 @@ def findStopsLocal(track, speed=1, duration=10):
     TMP_STD_Y = []
     TMP_STD_Z = []
     TMP_DURATION = []
-    TMP_NBPOINTS = []	
+    TMP_NBPOINTS = []
+    
+    TMP_SIGMA_X = []
+    TMP_SIGMA_Y = []
+    TMP_SIGMA_Z = []
     
     for i in range(0,len(TRACES),2):
         if (TRACES[i].duration() < duration):
@@ -187,7 +192,7 @@ def findStopsLocal(track, speed=1, duration=10):
     if stops.size() == 0:
         return stops
         
-    stops.createAnalyticalFeature("radius", TMP_RADIUS)
+    #stops.createAnalyticalFeature("radius", TMP_RADIUS)
     stops.createAnalyticalFeature("mean_x", TMP_MEAN_X)
     stops.createAnalyticalFeature("mean_y", TMP_MEAN_Y)
     stops.createAnalyticalFeature("mean_z", TMP_MEAN_Z)
