@@ -7,8 +7,15 @@ from algo.test_geometrics import TestAlgoGeometricsMethods
 from algo.test_selection import TestSelection
 from core.test_grille import TestGrille
 
+class TestAll(unittest.TestCase):
+    
+    def setUp (self):
+        pass
+    
+    
 
 if __name__ == '__main__':
+    
     # =========================================================================
     suite = unittest.TestSuite()
     
