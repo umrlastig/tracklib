@@ -6,7 +6,7 @@ import math
 import numpy as np
 import progressbar
 import matplotlib.pyplot as plt
-import tracklib.algo.Analytics as algo
+from tracklib.algo.Analytics import BIAF_ABS_CURV
 import tracklib.core.Utils as utils
 
 from matplotlib.patches import Ellipse
@@ -168,7 +168,7 @@ class Plot:
         '''
         Plot AF values by abcisse curvilign.
         '''
-        if (not self.track.hasAnalyticalFeature(algo.BIAF_ABS_CURV)):
+        if (not self.track.hasAnalyticalFeature(BIAF_ABS_CURV)):
             self.track.compute_abscurv()
         
         #if template == 'BOXPLOT':
