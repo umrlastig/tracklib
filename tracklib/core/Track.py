@@ -1190,13 +1190,15 @@ class Track:
         else:
             return self.smoothed_speed_calculation(kernel)
     
-    # # DEPRECATED
-    # def estimate_raw_speed(self):
-    #     return Cinematics.estimate_speed(self)
+    # DEPRECATED
+    def estimate_raw_speed(self):
+        from tracklib.algo.Cinematics import estimate_speed
+        return estimate_speed(self)
     
-    # # DEPRECATED    
-    # def smoothed_speed_calculation(self, kernel):
-    #     return Cinematics.smoothed_speed_calculation(self, kernel)
+    # DEPRECATED    
+    def smoothed_speed_calculation(self, kernel):
+        from tracklib.algo.Cinematics import smoothed_speed_calculation
+         return smoothed_speed_calculation(self, kernel)
         
     def getSpeed(self):
         if self.hasAnalyticalFeature(BIAF_SPEED):
