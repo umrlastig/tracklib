@@ -12,7 +12,7 @@ class TestNetworkReader(TestCase):
     
     def setUp (self):
         self.resource_path = os.path.join(os.path.split(__file__)[0], "../..")
-        self.nomproxy = 'ENSG'
+        self.nomproxy = None #'ENSG'
         
 
     def test_read_default(self):
