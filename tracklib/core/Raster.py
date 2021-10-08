@@ -1,4 +1,7 @@
-# -*- coding: utf-8 -*-
+"""Module core.Raster
+
+This module contains the class to manipulate rasters
+"""
 
 import math
 import matplotlib.pyplot as plt

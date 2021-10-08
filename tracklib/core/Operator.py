@@ -1,6 +1,9 @@
-# ------------------------- Operator ------------------------------------------
-# Class to manage operators
-# -----------------------------------------------------------------------------
+"""Module core.Operator
+
+This modules contains the classes to manage the operators
+"""
+
+
 import sys
 import math
 import numpy as np

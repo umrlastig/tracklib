@@ -1,4 +1,5 @@
-"""
+"""Module core.Kernel
+
 Kernels for filtering        
 """
 
