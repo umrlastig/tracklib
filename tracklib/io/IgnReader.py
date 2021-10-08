@@ -140,7 +140,6 @@ class IgnReader:
                         typeCoord = 'ENUCoords'
                     TAB_OBS = tabCoordsLineStringToObs(coords, typeCoord)
                     
-                
                 if len(TAB_OBS) < 2:
                     continue
                 
@@ -171,7 +170,8 @@ class IgnReader:
                 p1 = track.getFirstObs().position
                 candidates = selectNodes(network, Node('0', p1), tolerance)
                 if len(candidates) > 0:
-                    idNoeudIni = candidates[0]
+                    c = candidates[0]
+                    idNoeudIni = c.id
                 else:
                     cptNode += 1
                 
@@ -180,7 +180,8 @@ class IgnReader:
                 p2 = track.getLastObs().position
                 candidates = selectNodes(network, Node('0', p2), tolerance)
                 if len(candidates) > 0:
-                    idNoeudFin = candidates[0]
+                    c = candidates[0]
+                    idNoeudFin = c.id
                 else:
                     cptNode += 1
                 
@@ -189,8 +190,7 @@ class IgnReader:
                 
                 (edge, noeudIni, noeudFin) = reader(row, fmt)
                 network.addEdge(edge, noeudIni, noeudFin)
-                #network.addEdge(edge, noeudIni, noeudFin)
-                
+
             # 
             offset = offset + IgnReader.NB_PER_PAGE
 
