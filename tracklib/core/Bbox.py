@@ -223,4 +223,9 @@ class Bbox:
             self.setYmax(value)
 
     def asTuple(self):
+        """asTuple Transform the Bbox object in a tuple of coordinates
+
+        :return: Tuple of coordinates with this structure (x min, x max, y min, y max)
+        :rtype: (float, float, float, float)
+        """
         return (self.getXmin(), self.getXmax(), self.getYmin(), self.getYmax())
