@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import json
+import os.path
 import progressbar
 import requests
 from xml.dom import minidom
@@ -11,6 +12,9 @@ from tracklib.core.Track import Track
 from tracklib.core.Coords import ENUCoords, ECEFCoords, GeoCoords
 from tracklib.core.SpatialIndex import SpatialIndex
 from tracklib.core.Network import Network, Edge, Node
+from tracklib.io.NetworkReader import readLineAndAddToNetwork as reader
+from tracklib.io.NetworkFormat import NetworkFormat
+
 
 
 class IgnReader:
@@ -25,6 +29,10 @@ class IgnReader:
     #URL_SERVER += "BBOX=44.538617443499014,5.808794912294471,45.05505710140573,6.644301708889899"
     #URL_SERVER += "&count=3&startIndex=0"
     
+    resource_path = os.path.join(os.path.split(__file__)[0], "../..")
+    PROXY_FILE_FORMAT = os.path.join(resource_path, "resources/proxy")
+    
+    
     #self.id = id
     #self.coords = coords
     #self.nature = nature
@@ -36,9 +44,8 @@ class IgnReader:
     # tolerance
     # ===========================
     @staticmethod
-    def getNetwork(bbox, proj=None, margin=0.0, tolerance=0.1, spatialIndex=True):
+    def getNetwork(bbox, proj=None, margin=0.0, tolerance=0.1, spatialIndex=True, nomproxy=None):
         '''
-
         Parameters
         ----------
         bbox : 4-tuples , mandatory
@@ -46,11 +53,11 @@ class IgnReader:
             The bounding box must be expressed in WGS84
         proj : projection of results, optional.
             For example: 'EPSG:2154' or 'EPSG:4326'
-            
+        nomproxy
         -------
             TODO : posSol
         '''
-		
+        
         # Adding margin
         xmin, xmax, ymin, ymax = bbox
         dx = (xmax-xmin)/2
@@ -66,13 +73,34 @@ class IgnReader:
 		
         if proj == None:
             proj = 'EPSG:4326'
+            
+        fmt = NetworkFormat()
+        fmt.createFromDict({'name': 'WFS', 'pos_edge_id': 0, 'pos_source': 5, 
+                        'pos_target': 6, 'pos_wkt': 1, 'pos_poids': 3, 'pos_sens': 4,
+                        'srid': 'GEO'})
         
-        nbRoute = IgnReader.__getNbRouteEmprise(bbox)
+        # PROXY
+        proxyDict = {}
+        if nomproxy != None:
+            with open(IgnReader.PROXY_FILE_FORMAT) as ffmt:
+                line = ffmt.readline().strip()
+                while(line):
+                    if (line[0] == "#"):
+                        line = ffmt.readline().strip()
+                        continue
+                    tab = line.split(",")
+                    if tab[0].strip() == nomproxy:
+                        FIELDS = tab
+                        proxyDict[FIELDS[1].lower()] = FIELDS[2]
+                    line = ffmt.readline().strip()
+            ffmt.close()
+
+        nbRoute = IgnReader.__getNbRouteEmprise(bbox, proxyDict)
         nbiter = int(nbRoute / IgnReader.NB_PER_PAGE) + 1
         
         offset = 0
         for j in range(nbiter):
-            print("PAGE "+str(j+1)+"/"+str(nbiter))
+            print("PAGE " + str(j+1) + "/" + str(nbiter))
             URL_FEAT = IgnReader.URL_SERVER
             URL_FEAT += "BBOX=" + str(bbox[2]) + "," + str(bbox[0])  
             URL_FEAT += "," + str(bbox[3]) + "," + str(bbox[1])
@@ -80,20 +108,22 @@ class IgnReader:
             URL_FEAT += "&startIndex=" + str(offset)
             URL_FEAT += "&RESULTTYPE=results"
             URL_FEAT += "&srsname="+proj
-
             #print (URL_FEAT)
 
-            response = requests.get(URL_FEAT)
+            response = requests.get(URL_FEAT, proxies=proxyDict)
             data = json.loads(response.text)
             features = data['features']
 
             for feature in progressbar.progressbar(features):
+                
+                row = []
                 
                 idd = feature['id']
                 # nature = feature['properties']['nature']
                 fictif = feature['properties']['fictif']
                 if fictif == 'True':
                     continue
+                row.append(idd)
                 
                 # TODO
                 #pos = feature['properties']['position_par_rapport_au_sol']
@@ -116,6 +146,11 @@ class IgnReader:
                 
                 track = Track(TAB_OBS)                
                 edge = Edge(idd, track)
+                row.append(edge.geom.toWKT())
+                row.append('ENU')
+                
+                edge.weight = track.length()
+                row.append(track.length())
                 
                 # Orientation
                 sens = feature['properties']['sens_de_circulation']
@@ -130,8 +165,8 @@ class IgnReader:
                     edge.orientation = Edge.SENS_INVERSE
                 else:
                     print (sens)
-            
-                edge.weight = track.length()
+                row.append(edge.orientation)
+                
                 
                 # Source node 
                 p1 = track.getFirstObs().position
@@ -159,7 +194,13 @@ class IgnReader:
                     network.addNode(noeudFin)
                     cptNode += 1
                 
+                row.append(noeudIni)
+                row.append(noeudFin)
+                
+                
+                (edge, noeudIni, noeudFin) = reader(row, fmt)
                 network.addEdge(edge, noeudIni, noeudFin)
+                #network.addEdge(edge, noeudIni, noeudFin)
                 
             # 
             offset = offset + IgnReader.NB_PER_PAGE
@@ -180,7 +221,7 @@ class IgnReader:
     # Output : number 
     # --------------------------------------------------------------------------
     @staticmethod
-    def __getNbRouteEmprise(bbox):
+    def __getNbRouteEmprise(bbox, proxyDict):
         
         nb = 0
         
@@ -188,10 +229,12 @@ class IgnReader:
         URL_HITS += "BBOX=" + str(bbox[2]) + "," + str(bbox[0])  
         URL_HITS += "," + str(bbox[3]) + "," + str(bbox[1])
         URL_HITS += "&resulttype=hits"
+        #print (URL_HITS)
         
-        res = requests.get(URL_HITS)
+        res = requests.get(URL_HITS, proxies=proxyDict)
         # x = requests.get(url, proxies = { "https" : "https://1.1.0.1:80"})
         dom = minidom.parseString(res.text)
+
         result = dom.getElementsByTagName('wfs:FeatureCollection')
         
         nb = int(result[0].attributes['numberMatched'].value)
