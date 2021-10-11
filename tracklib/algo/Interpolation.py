@@ -32,23 +32,30 @@ from tracklib.core.Track import Track
 
 
 def resample(track, delta, algo=1, mode=2):
-    """
-    Resampling of a track with linear interpolation
-      delta: interpolation interval (time in sec if
-      temporal mode is selected, space in meters if
-      spatial). Available modes are:
-            - MODE_SPATIAL        (1)
-            - MODE_TEMPORAL       (2)
+    """Resampling of a track with linear interpolation delta
+
+    Interpolation interval (time in sec if temporal mode is selected,
+    space in meters if spatial).
+
+      Available modes are:
+
+        - MODE_SPATIAL (*mode=1*)
+        - MODE_TEMPORAL (*mode=2*)
+
       algorithm:
-            - ALGO_LINEAR            (1)
-            - ALGO_THIN_SPLINES      (2)
-            - ALGO_B_SPLINES         (3)
-            - ALGO_GAUSSIAN_PROCESS  (4)
+
+        - ALGO_LINEAR (*algo=1*)
+        - ALGO_THIN_SPLINES (*algo=2*)
+        - ALGO_B_SPLINES (*algo=3*)
+        - ALGO_GAUSSIAN_PROCESS (*algo=4*)
+
       In temporal mode, argument may be:
-            - an integer or float: interval in seconds
-            - a list of timestamps where interpolation
-            should be computed
-            - a reference track"""
+
+        - an integer or float: interval in seconds
+        - a list of timestamps where interpolation should be computed
+        - a reference track
+
+    """
 
     if mode == MODE_SPATIAL:
         if algo == ALGO_LINEAR:
@@ -176,18 +183,23 @@ def __resampleTemporal(track, reference):
 
 def gaussian_process(track, timestamps, kernel, factor=1.0, sigma=0.0, cp_var=False):
     """Track interpolation and smoothing with Gaussian Process (GP)
-    self: a track to smooth (not modified by this function)
-    timestamps: points where interpolation must be computed. May be
-    a list of timestamps, a track or a number of seconds
-    kernel: a symetric function k(xi-xj) describing the statistical
-    similarity between the coordinates X,Y,Z taken in two points :
-                                    k(t2-t1) = Cov(X(t1), X(t2))
-                                    k(t2-t1) = Cov(Y(t1), Y(t2))
-                                    k(t2-t1) = Cov(Z(t1), Z(t2))
-    factor: unit factor of variance if the kernel must be scaled
-    sigma: observation noise standard deviation (in coords units)
-    cp_var: compute covariance matrix and store pointwise sigmas
-    returns: interpolated/smoothed track (without AF)"""
+
+    :param timestamps: points where interpolation must be computed.
+        May be a list of timestamps, a track or a number of seconds
+    :param kernel: a symetric function k(xi-xj) describing the statistical similarity
+        between the coordinates X,Y,Z taken in two points :
+
+        :math:`k(t2-t1) = Cov(X(t1), X(t2))`
+
+        :math:`k(t2-t1) = Cov(Y(t1), Y(t2))`
+
+        :math:`k(t2-t1) = Cov(Z(t1), Z(t2))`
+
+    :param factor: unit factor of variance if the kernel must be scaled
+        :param sigma: observation noise standard deviation (in coords units)
+    :param cp_var: compute covariance matrix and store pointwise sigmas
+        :return: interpolated/smoothed track (without AF)
+    """
 
     new_track = Track()
 
@@ -695,14 +707,17 @@ def __bsplines_spatial(track, ds, degree=3, knots_nb=None):
 
 
 def smooth_cv(track, smooth_function, params=[], verbose=True):
+    """Cross validation for determining optimal parameters of smoothing/interpolating/simplifying functions
+
+    Note that if params contains a single element, smooth_cv function is a simple
+    statistical control. If no parameters are provided in input, a default set of 1000
+    positive parameters sampled according to a logarithmic scale between 1e-9 and 1e9
+    is considered.
+
+    :param track: a (timestamped) track on which cross validation is performed
+    :param smooth_function: any function with track as input and output
+    :param params: a list of parameters to test in smooth_function
     """
-       Cross validation for determining optimal parameters of smoothing/interpolating/simplifying functions
-        - track: a (timestamped) track on which cross validation is performed
-    - smooth_function: any function with track as input and output
-        - params: a list of parameters to test in smooth_function
-        Note that if params contains a single element, smooth_cv function is a simple statistical control.
-        If no parameters are provided in input, a default set of 1000 positive parameters sampled according
-        to a logarithmic scale between 1e-9 and 1e9 is considered."""
 
     if verbose:
         print("-----------------------------------------------------")
