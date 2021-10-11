@@ -3,7 +3,19 @@ This Module contains the classes to manage point coordinates:
 
     - :class:`GeoCoords` : For representation og geographic coordinates (lon, lat, alti)
     - :class:`ENUCoords` : For local projection (East, North, Up)
-    - :class:`ECEFCoords` : For a Earth-Centered-Earth-Fixed coordinates (X, Y, Z)
+    - :class:`ECEFCoords` : For Earth-Centered-Earth-Fixed coordinates (X, Y, Z)
+
+The current constants are used in this module : 
+
+.. py:data:: Re
+    :type: float
+    :value: 6378137.0 
+Earth equatorial radius
+
+.. py:data:: Fe
+    :type: float
+    :value: 1.0 / 298.257223563
+Earth eccentricity
 """
 
 # For type annotation
@@ -15,20 +27,15 @@ import copy
 import matplotlib.pyplot as plt
 
 
-Re = 6378137.0
-# Earth equatorial radius
-Fe = 1.0 / 298.257223563
-# Earth eccentricity
+Re = 6378137.0  # Earth equatorial radius
+Fe = 1.0 / 298.257223563  # Earth eccentricity
 
 
 class GeoCoords:
-    """GeoCoords class
-
-    Class to represent geographics coordinates
-    """
+    """Class to represent geographics coordinates"""
 
     def __init__(self, lon: float, lat: float, hgt: float = 0.0):
-        """__init__ Constructor of GeoCoords class
+        """__init__ Constructor of class:`GeoCoords` class
 
         :param lon: longitude in decimal degrees
         :param lat: latitude in decimal degrees
@@ -154,21 +161,21 @@ class GeoCoords:
 
     def setX(self, X: float):
         """setX Set the X coordinate
-        
+
         :param X: X coordinate
         """
         self.lon = X
 
     def setY(self, Y: float):
         """setY Set the Y coordinate
-        
+
         :param Y: Y coordinate
         """
         self.lat = Y
 
     def setZ(self, Z: float):
         """setZ Set the Z coordinate
-        
+
         :param Z: Z coordinate
         """
         self.hgt = Z
@@ -181,7 +188,7 @@ class ENUCoords:
     """Class for representation of local projection (East, North, Up)"""
 
     def __init__(self, E: float, N: float, U: float = 0):
-        """__init__ Constructor of ENUCoords class
+        """__init__ Constructor of class:`ENUCoords`  class
 
         :param E: East coordinate (in meters)
         :param N: North coordinate (in meters)
@@ -388,21 +395,21 @@ class ENUCoords:
 
     def setX(self, X: float):
         """setX Set the X coordinate
-        
+
         :param X: X coordinate
         """
         self.E = X
 
     def setY(self, Y: float):
         """setY Set the Y coordinate
-        
+
         :param Y: Y coordinate
         """
         self.N = Y
 
     def setZ(self, Z: float):
         """setZ Set the Z coordinate
-        
+
         :param Z: Z coordinate
         """
         self.U = Z
@@ -412,29 +419,44 @@ class ENUCoords:
 
 
 class ECEFCoords:
+    """Class to represent Earth-Centered-Earth-Fixed coordinates"""
 
     # --------------------------------------------------
     # X, Y, Z in meters
     # --------------------------------------------------
-    def __init__(self, X, Y, Z):
+    def __init__(self, X: float, Y: float, Z: float):
+        """__init__ Constructor of :class:`ECEFCoords` class
+
+        :param X: X corrdinate (meters)
+        :param Y: Y corrdinate (meters)
+        :param Z: Z corrdinate (meters)
+        """
         self.X = X
         self.Y = Y
         self.Z = Z
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """__str__ Transform the object in string
+
+        :return: String representation of coordinates
+        """
         output = "[X=" + "{:12.3f}".format(self.X) + ", "
         output += "Y=" + "{:12.3f}".format(self.Y) + ", "
         output += "Z=" + "{:12.3f}".format(self.Z) + "]"
         return output
 
-    def copy(self):
+    def copy(self) -> ECEFCoords:
+        """copy Copy the current object
+
+        :return: A copy of current object
+        """
         return copy.deepcopy(self)
 
-    # --------------------------------------------------
-    # Convert absolute geocentric coords to geodetic
-    # longitude, latitude and height
-    # --------------------------------------------------
-    def toGeoCoords(self):
+    def toGeoCoords(self) -> GeoCoords:
+        """toGeoCoords Convert absolute geocentric coords to geodetic longitude, latitude and height
+
+        :return: GeoCoords representation of current coordinates
+        """
 
         geo = GeoCoords(0.0, 0.0, 0.0)
 
@@ -461,11 +483,12 @@ class ECEFCoords:
 
         return geo
 
-    # --------------------------------------------------
-    # Convert local coordinates to absolute geocentric
-    # Base coordinates need to be provided in ECEF/Geo
-    # --------------------------------------------------
-    def toENUCoords(self, base):
+    def toENUCoords(self, base: Union[ECEFCoords, GeoCoords]) -> ENUCoords:
+        """toENUCoords Convert local coordinates to absolute geocentric
+
+        :param base: Base coordinates
+        :return: Transformed coordinates
+        """
 
         base = base.toECEFCoords()
 
@@ -491,83 +514,106 @@ class ECEFCoords:
 
         return enu
 
-    # --------------------------------------------------
-    # Artificial function to ensure point is ECEFCoords
-    # --------------------------------------------------
-    def toECEFCoords(self):
+    def toECEFCoords(self) -> ECEFCoords:
+        """toECEFCoords Artificial function to ensure point is ECEFCoords
+
+        :return: ECEFCoords
+        """
         return self.copy()
 
-    # --------------------------------------------------
-    # Elevation (in rad) between two ECEF coordinates
-    # --------------------------------------------------
-    def elevationTo(self, point):
+    def elevationTo(self, point: ECEFCoords) -> float:
+        """elevationTo Elevation between two ECEF coordinates
+
+        :param point: Coordinate 2
+        :return: Elevation (rad)
+        """
         objectif = point.toENUCoords(self)
         return math.atan2(objectif.U, objectif.norm2D())
 
-    # --------------------------------------------------
-    # Azimut (in rad) between two ECEF coordinates
-    # --------------------------------------------------
-    def azimuthTo(self, point):
+    def azimuthTo(self, point: ECEFCoords) -> float:
+        """azimuthTo Azimut between two ECEF coordinates
+
+        :param point: Coordinate 2
+        :return: Azimuth (rad)
+        """
         objectif = point.toENUCoords(self)
         return math.atan2(objectif.E, objectif.N)
 
-    # --------------------------------------------------
-    # Dot product between two vectors
-    # --------------------------------------------------
     def dot(self, point):
+        """dot Dot product between two vectors"""
         return self.X * point.X + self.Y * point.Y + self.Z * point.Z
 
-    # --------------------------------------------------
-    # R^3 space euclidian norm of point
-    # --------------------------------------------------
-    def norm(self):
+    def norm(self) -> float:
+        """norm R^3 space euclidian norm of point
+
+        :return: R^3 space euclidian norm
+        """
         return math.sqrt(self.dot(self))
 
-    # --------------------------------------------------
-    # Scalar multiplication of a vector
-    # --------------------------------------------------
-    def scalar(self, factor):
+    def scalar(self, factor: float):
+        """scalar Scalar multiplication of a vector
+
+        :param factor: Multiplication factor
+        """
         self.X *= factor
         self.Y *= factor
         self.Z *= factor
 
-    # --------------------------------------------------
-    # Vector difference between two ECEF coordinates
-    # --------------------------------------------------
-    def __sub__(self, p):
+    def __sub__(self, p: ECEFCoords) -> ECEFCoords:
+        """__sub__ Vector difference between two ECEF coordinates
+
+        :param p: Corrdinate 2
+        :return: Result of substration
+        """
         return ECEFCoords(p.X - self.X, p.Y - self.Y, p.Z - self.Z)
 
-    # --------------------------------------------------
-    # Vector sum of two ECEF coordinates
-    # --------------------------------------------------
-    def __add__(self, p):
+    def __add__(self, p: ECEFCoords) -> ECEFCoords:
+        """__sub__ Vector sum between two ECEF coordinates
+
+        :param p: Corrdinate 2
+        :return: Result of sum
+        """
         return ECEFCoords(p.X + self.X, p.Y + self.Y, p.Z + self.Z)
 
-    # --------------------------------------------------
-    # Distance (in m) between two ECEF coordinates
-    # --------------------------------------------------
-    def distanceTo(self, point):
+    def distanceTo(self, point: ECEFCoords) -> float:
+        """distanceTo Distance between two ECEF coordinates
+
+        :param point: Corrdinate 2
+        :return: Distance (meters)
+        """
         return (point - self).norm()
 
-    # --------------------------------------------------
-    # Coords Alias X, Y, Z
-    # --------------------------------------------------
-    def getX(self):
+    def getX(self) -> float:
+        """getX Return the X coordinate"""
         return self.X
 
-    def getY(self):
+    def getY(self) -> float:
+        """getY Return the X coordinate"""
         return self.Y
 
-    def getZ(self):
+    def getZ(self) -> float:
+        """getZ Return the X coordinate"""
         return self.Z
 
-    def setX(self, X):
+    def setX(self, X: float):
+        """SetX Set the X coordinate
+
+        :param X: X coordinate
+        """
         self.X = X
 
-    def setY(self, Y):
+    def setY(self, Y: float):
+        """SetY Set the Y coordinate
+
+        :param Y: Y coordinate
+        """
         self.Y = Y
 
-    def setZ(self, Z):
+    def setZ(self, Z: float):
+        """SetZ Set the Z coordinate
+
+        :param Z: Z coordinate
+        """
         self.Z = Z
 
 
