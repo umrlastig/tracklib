@@ -1,6 +1,4 @@
-"""
-This module contain a class to manage the collections of tracks
-"""
+"""This module contain a class to manage the collections of tracks"""
 
 import matplotlib.pyplot as plt
 
@@ -216,21 +214,32 @@ class TrackCollection:
 
     def resample(self, delta, algo=1, mode=2):
         """Resampling tracks with linear interpolation
-        delta: interpolation interval (time in sec if
-        temporal mode is selected, space in meters if
-        spatial). Available modes are:
-            - MODE_SPATIAL        (1)
-            - MODE_TEMPORAL       (2)
-        algorithm:
-            - ALGO_LINEAR            (1)
-            - ALGO_THIN_SPLINES      (2)
-            - ALGO_B_SPLINES         (3)
-            - ALGO_GAUSSIAN_PROCESS  (4)
-        In temporal mode, argument may be:
+
+
+        :parm delta: interpolation interval (time in sec if temporal mode is selected,
+        space in meters if spatial).
+
+        :param mode: Mode of interpolation.
+            Available modes are:
+
+            - MODE_SPATIAL (*mode=1*)
+            - MODE_TEMPORAL (*mode=2*)
+
+        :params algorithm: of interpolation.
+            Available algorithm are :
+
+            - ALGO_LINEAR (*algo=1*)
+            - ALGO_THIN_SPLINES (*algo=2*)
+            - ALGO_B_SPLINES (*algo=3*)
+            - ALGO_GAUSSIAN_PROCESS (*algo=4*)
+
+        **NB**: In temporal mode, argument may be:
+
             - an integer or float: interval in seconds
-            - a list of timestamps where interpolation
-            should be computed
-            - a reference track"""
+            - a list of timestamps where interpolation should be computed
+            - a reference track
+
+        """
         for track in self:
             track.resample(delta, algo, mode)
 
