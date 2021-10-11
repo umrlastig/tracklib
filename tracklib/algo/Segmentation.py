@@ -79,11 +79,13 @@ def segmentation(
             track.setObsAnalyticalFeature(af_output, i, 0)
 
 
-def split(track, source):
-    """Splits track according to:
-        - af name (considered as a marker) if source is a string
-    - list of index if source is a list
-     Returns no trrack if no segmentation, otherwise a TrackCollection object
+def split(track, source) -> TrackCollection:
+    """Splits track according to :
+
+        - af name (considered as a marker) if `source` is a string
+        - list of index if `source` is a list
+
+    :return: No track if no segmentation, otherwise a TrackCollection object
     """
 
     NEW_TRACES = TrackCollection()
@@ -335,11 +337,18 @@ def findStopsGlobal(track, diameter=20, duration=60, downsampling=1, verbose=Tru
 def findStopsGlobalForRTK(
     track, std_max=2e-2, duration=5, downsampling=1, verbose=True
 ):
-    """Find stop points in a track based on two parameters:
-    Maximal size of a stop (as the standard deviation per axis,
-    in ground units) and minimal time duration (in seconds)
-    Use downsampling parameter > 1 to speed up the process
-            Default is set for precise RTK GNSS survey (2 cm for 5 sec)"""
+    """Find stop points in a track based on maximal size of a stop and minimal
+    time duration
+
+    Two parameters:
+
+        - Maximal size of a stop (as the standard deviation per axis, in ground units)
+        - Minimal time duration (in seconds)
+
+    Use downsampling parameter > 1 to speed up the process.
+
+    Default is set for precise RTK GNSS survey (2 cm for 5 sec)
+    """
 
     # If down-sampling is required
     if downsampling > 1:
