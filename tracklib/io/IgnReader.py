@@ -140,68 +140,57 @@ class IgnReader:
                         typeCoord = 'ENUCoords'
                     TAB_OBS = tabCoordsLineStringToObs(coords, typeCoord)
                     
-                
                 if len(TAB_OBS) < 2:
                     continue
                 
-                track = Track(TAB_OBS)                
-                edge = Edge(idd, track)
-                row.append(edge.geom.toWKT())
+                track = Track(TAB_OBS)
+                row.append(track.toWKT())
                 row.append('ENU')
                 
-                edge.weight = track.length()
                 row.append(track.length())
                 
                 # Orientation
                 sens = feature['properties']['sens_de_circulation']
-                edge.orientation = Edge.DOUBLE_SENS
+                orientation = Edge.DOUBLE_SENS
                 if sens == None or sens == '':
-                    edge.orientation = Edge.DOUBLE_SENS
+                    orientation = Edge.DOUBLE_SENS
                 elif sens == 'Double sens' or sens == 'Sans objet':
-                    edge.orientation = Edge.DOUBLE_SENS
+                    orientation = Edge.DOUBLE_SENS
                 elif sens == 'Direct' or sens == 'Sens direct':
-                    edge.orientation = Edge.SENS_DIRECT
+                    orientation = Edge.SENS_DIRECT
                 elif sens == 'Indirect' or sens == 'Sens inverse':
-                    edge.orientation = Edge.SENS_INVERSE
+                    orientation = Edge.SENS_INVERSE
                 else:
                     print (sens)
-                row.append(edge.orientation)
+                row.append(orientation)
                 
-                
+
                 # Source node 
+                idNoeudIni = str(cptNode)
                 p1 = track.getFirstObs().position
-                noeudIni = Node(str(cptNode), p1)
                 candidates = selectNodes(network, Node('0', p1), tolerance)
                 if len(candidates) > 0:
-                    for cand in candidates:
-                        #edge.setNoeudIni(cand)
-                        noeudIni = cand
+                    c = candidates[0]
+                    idNoeudIni = c.id
                 else:
-                    #edge.setNoeudIni(noeudIni)
-                    network.addNode(noeudIni)  
                     cptNode += 1
                 
                 # Target node 
+                idNoeudFin = str(cptNode)
                 p2 = track.getLastObs().position
-                noeudFin = Node(str(cptNode), p2)
                 candidates = selectNodes(network, Node('0', p2), tolerance)
                 if len(candidates) > 0:
-                    for cand in candidates:
-                        #edge.setNoeudFin(cand)
-                        noeudFin = cand
+                    c = candidates[0]
+                    idNoeudFin = c.id
                 else:
-                    #edge.setNoeudFin(noeudFin)
-                    network.addNode(noeudFin)
                     cptNode += 1
                 
-                row.append(noeudIni)
-                row.append(noeudFin)
-                
+                row.append(idNoeudIni)
+                row.append(idNoeudFin)
                 
                 (edge, noeudIni, noeudFin) = reader(row, fmt)
                 network.addEdge(edge, noeudIni, noeudFin)
-                #network.addEdge(edge, noeudIni, noeudFin)
-                
+
             # 
             offset = offset + IgnReader.NB_PER_PAGE
 
