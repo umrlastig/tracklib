@@ -240,12 +240,14 @@ VAL_AF_TIME_WINDOW_NONE = -1
 
 
 def stop_point_with_time_window_criteria(trace, i):
-    """
-    This  algorithm of stop detection is based on geographical moving distance
-    in  time  windows. The AF has value:
-        1 : stop
-        0 : not sto
-       -1 : not yet examined
+    """This algorithm of stop detection is based on geographical moving distance in time windows.
+
+    The AF has value:
+
+        - stop (*1*)
+        - not stop (*0*)
+        - not yet examined (*-1*)
+
     """
 
     name_af = "stop_point_with_time_window_criteria"
