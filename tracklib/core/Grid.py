@@ -33,6 +33,7 @@ class Grid:
         :param resolution: Grid resolution
         :param margin : relative float. Default value is +5%
         :param verbose: Verbose creation
+        
         """
         # Bbox only or collection
         if isinstance(collection, Bbox):
