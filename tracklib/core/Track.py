@@ -1085,20 +1085,20 @@ class Track:
     ):
         """Geometric affine transformation to align two tracks with different coordinate systems.
 
-        For "2D" mode, coordinates must be :class:`core.Coords.ENUCoords` or 
-        :class:`core.Coords.GeoCoords`. For "3D" mode, any type of coordinates is valid. 
-        In general, it is recommended to avoid usage of non-metric 
-        :class:`core.Coords.GeoCoords` coordinates for mapping operation, since it is 
-        relying on an isotropic error model. 
-        
+        For "2D" mode, coordinates must be :class:`core.Coords.ENUCoords` or
+        :class:`core.Coords.GeoCoords`. For "3D" mode, any type of coordinates is valid.
+        In general, it is recommended to avoid usage of non-metric
+        :class:`core.Coords.GeoCoords` coordinates for mapping operation, since it is
+        relying on an isotropic error model.
+
         Inputs:
 
            - reference: another track we want to align on or a list of points
            - TP1: list of tie points indices (relative to track self)
            - TP2: list of tie points indices (relative to track)
-           - mode: could be "2D" (default) or "3D" if TP2 is not specified, 
+           - mode: could be "2D" (default) or "3D" if TP2 is not specified,
                 it is assumed equal to TP1.
-        
+
         TP1 and TP2 must have same size. Adjustment is performed with least squares.
         The general transformation from point X to point X' is provided below:
 
@@ -1106,9 +1106,9 @@ class Track:
 
             X' = kRX + T
 
-        with: :math:`k` a positive real value, :math:`R` a 2D or 3D rotation matrix and 
-        :math:`T` a 2D or 3D translation vector. 
-        
+        with: :math:`k` a positive real value, :math:`R` a 2D or 3D rotation matrix and
+        :math:`T` a 2D or 3D translation vector.
+
         Transformation parameters are returned in standard
         output in the following format: [theta, k, tx, ty] (theta in radians)
         Track argument may also be replaced ny a list of points.
