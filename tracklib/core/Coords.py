@@ -1,12 +1,14 @@
 """
 This Module contains the classes to manage point coordinates:
-    - GeoCoords: geographic coordinates (lon, lat, alti)
-    - ENUCoords: local projection (Eeast, North, Up)
-    - ECEFCoords: Earth-Centered-Earth-Fixed (X, Y, Z)
+
+    - :class:`GeoCoords` : For representation og geographic coordinates (lon, lat, alti)
+    - :class:`ENUCoords` : For local projection (East, North, Up)
+    - :class:`ECEFCoords` : For a Earth-Centered-Earth-Fixed coordinates (X, Y, Z)
 """
 
-from __future__ import annotations  # For type annotation
-
+# For type annotation
+from __future__ import annotations
+from typing import Union
 
 import math
 import copy
@@ -25,39 +27,34 @@ class GeoCoords:
     Class to represent geographics coordinates
     """
 
-    def __init__(self, lon, lat, hgt=0):
+    def __init__(self, lon: float, lat: float, hgt: float = 0.0):
         """__init__ Constructor of GeoCoords class
 
         :param lon: longitude in decimal degrees
-        :type lon: float
         :param lat: latitude in decimal degrees
-        :type lat: float
         :param hgt: height in meters above geoid or ellipsoid, defaults to 0
-        :type hgt: float, optional
         """
         self.lon = lon
         self.lat = lat
         self.hgt = hgt
 
-    def __str__(self):
+    def __str__(self) -> str:
         """__str__ Transform the object in string
 
         :return: String representation of coordinates
-        :rtype: String
         """
         output = "[lon=" + "{:12.9f}".format(self.lon) + ", "
         output += "lat=" + "{:11.9f}".format(self.lat) + ", "
         output += "hgt=" + "{:7.3f}".format(self.hgt) + "]"
         return output
 
-    def copy(self):
+    def copy(self) -> GeoCoords:
         return copy.deepcopy(self)
 
     def toECEFCoords(self) -> ECEFCoords:
         """toECEFCoords Convert geodetic coordinates to absolute ECEF
 
         :return: absolute ECEF coordinates
-        :rtype: ECEFCoords
         """
 
         xyz = ECEFCoords(0.0, 0.0, 0.0)
@@ -76,13 +73,11 @@ class GeoCoords:
 
         return xyz
 
-    def toENUCoords(self, base) -> ENUCoords:
+    def toENUCoords(self, base: Union[ECEFCoords, GeoCoords]) -> ENUCoords:
         """toENUCoords Convert geodetic coordinates to local ENU coords
 
-        :param base: Base coordinates for conversion (need to be provided in ECEF/Geo)
-        :type base: ECEFCoords or GeoCoords
+        :param base: Base coordinates for conversion
         :return: Converted coordinates
-        :rtype: ENUCoords
         """
         # Special SRID projection
         if isinstance(base, int):
@@ -91,11 +86,10 @@ class GeoCoords:
         point_ecef = self.toECEFCoords()
         return point_ecef.toENUCoords(base_ecef)
 
-    def toGeoCoords(self):
+    def toGeoCoords(self) -> GeoCoords:
         """toGeoCoords Artificial function to ensure point is GeoCoords
 
         :return: Copy of current object
-        :rtype: GeoCoords
         """
         return self.copy()
 
@@ -103,9 +97,7 @@ class GeoCoords:
         """distanceTo Distance between two geodetic coordinates
 
         :param point: Geographic coordinate
-        :type point: GeoCoords
         :return: Distance
-        :rtype: float
         """
         return self.toECEFCoords().distanceTo(point.toECEFCoords())
 
@@ -113,9 +105,7 @@ class GeoCoords:
         """distance2DTo 2D Distance between two geodetic coordinates
 
         :param point: Geographic coordinate
-        :type point: GeoCoords
         :return: 2D Distance
-        :rtype: float
         """
         return self.toENUCoords(point).norm2D()
 
@@ -123,9 +113,7 @@ class GeoCoords:
         """elevationTo Elevation between two geodetic coordinates
 
         :param point: Geographic coordinate
-        :type point: GeoCoords
         :return: Elevation (in rad)
-        :rtype: float
         """
         objectif = point.toENUCoords(self)
         return math.atan2(objectif.U, objectif.norm2D())
@@ -133,10 +121,8 @@ class GeoCoords:
     def azimuthTo(self, point: GeoCoords) -> float:
         """azimuthTo Azimut between two geodetic coordinates
 
-        :param point: Geographic coordiante
-        :type point: GeoCoords
+        :param point: Geographic coordinate
         :return: Azimut (in rad)
-        :rtype: float
         """
         objectif = point.toENUCoords(self)
         return math.atan2(objectif.E, objectif.N)
@@ -144,35 +130,47 @@ class GeoCoords:
     def toProjCoords(self, srid_number: int) -> ENUCoords:
         """toProjCoords Special function to convert to specific ENU srid
 
-        [extended_summary]
 
         :param srid_number: A SRID number describing projection coords
         (e.g. 2154 for Lambert 93)
-        :type srid_number: int
         :return: an ENUCoords object
-        :rtype: ENUCoords
         """
         return _proj(self, srid_number)
 
     # --------------------------------------------------
     # Coords Alias X, Y, Z
     # --------------------------------------------------
-    def getX(self):
+    def getX(self) -> float:
+        """getX Return the X coordinate"""
         return self.lon
 
-    def getY(self):
+    def getY(self) -> float:
+        """getY Return the Y coordinate"""
         return self.lat
 
-    def getZ(self):
+    def getZ(self) -> float:
+        """getZ Return the Z coordinate"""
         return self.hgt
 
-    def setX(self, X):
+    def setX(self, X: float):
+        """setX Set the X coordinate
+        
+        :param X: X coordinate
+        """
         self.lon = X
 
-    def setY(self, Y):
+    def setY(self, Y: float):
+        """setY Set the Y coordinate
+        
+        :param Y: Y coordinate
+        """
         self.lat = Y
 
-    def setZ(self, Z):
+    def setZ(self, Z: float):
+        """setZ Set the Z coordinate
+        
+        :param Z: Z coordinate
+        """
         self.hgt = Z
 
     def plot(self, sym="ro"):
@@ -180,36 +178,41 @@ class GeoCoords:
 
 
 class ENUCoords:
+    """Class for representation of local projection (East, North, Up)"""
+
     def __init__(self, E: float, N: float, U: float = 0):
         """__init__ Constructor of ENUCoords class
 
         :param E: East coordinate (in meters)
-        :type E: float
         :param N: North coordinate (in meters)
-        :type N: float
         :param U: Elevation (in meter), defaults to 0
-        :type U: float, optional
         """
         self.E = E
         self.N = N
         self.U = U
 
     def __str__(self):
+        """__str__ Transform the object in string
+
+        :return: String representation of coordinates
+        """
         output = "[E=" + "{:12.3f}".format(self.E) + ", "
         output += "N=" + "{:12.3f}".format(self.N) + ", "
         output += "U=" + "{:12.3f}".format(self.U) + "]"
         return output
 
-    def copy(self):
+    def copy(self) -> ENUCoords:
+        """copy Copy the current object
+
+        :return: A copy of current object
+        """
         return copy.deepcopy(self)
 
-    def toECEFCoords(self, base) -> ECEFCoords:
+    def toECEFCoords(self, base: Union[ECEFCoords, GeoCoords]) -> ECEFCoords:
         """toECEFCoords Convert local planimetric to absolute geocentric
 
         :param base: Base coordinates
-        :type base: ECEFCoords or GeoCoords
-        :return: Transformet coordiantes
-        :rtype: ECEFCoords
+        :return: Transformet coordinates
         """
 
         base = base.toECEFCoords()
@@ -236,14 +239,11 @@ class ENUCoords:
 
         return xyz
 
-    def toGeoCoords(self, base) -> GeoCoords:
+    def toGeoCoords(self, base: Union[ECEFCoords, GeoCoords]) -> GeoCoords:
         """toGeoCoords Convert local ENU coordinates to geo coords
-        [extended_summary]
 
         :param base: Base coordinates
-        :type base: ECEFCoords or GeoCoords
         :return: Transformed coordinates
-        :rtype: GeoCoords
         """
         # Special SRID projection
         if isinstance(base, int):
@@ -252,16 +252,15 @@ class ENUCoords:
         point_ecef = self.toECEFCoords(base_ecef)
         return point_ecef.toGeoCoords()
 
-    def toENUCoords(self, base1, base2) -> ENUCoords:
+    def toENUCoords(
+        self, base1: Union[ECEFCoords, GeoCoords], base2: Union[ECEFCoords, GeoCoords]
+    ) -> ENUCoords:
         """toENUCoords Convert local ENU coordinates relative to base1 to
         local ENU coordinates relative to base2.
 
         :param base1: Base 1 coordinates
-        :type base1: ECEFCoords or GeoCoords
         :param base2: Base 2 coordinates
-        :type base2: ECEFCoords or GeoCoords
         :return: Transformed coordinates
-        :rtype: ENUCoords
         """
         base_ecef1 = base1.toECEFCoords()
         base_ecef2 = base2.toECEFCoords()
@@ -272,7 +271,6 @@ class ENUCoords:
         """norm2D Planimetric euclidian norm of point
 
         :return: Euclidian norm
-        :rtype: float
         """
         return math.sqrt(self.E ** 2 + self.N ** 2)
 
@@ -280,19 +278,15 @@ class ENUCoords:
         """norm R^3 space euclidian norm of point
 
         :return: R^3 space euclidian norm of point
-        :rtype: float
         """
         return math.sqrt(self.E ** 2 + self.N ** 2 + self.U ** 2)
 
     def dot(self, point):
         """dot Dot product between two vectors
 
-        [extended_summary]
 
         :param point: [description]
-        :type point: [type]
         :return: [description]
-        :rtype: [type]
         """
         return self.E * point.E + self.N * point.N + self.U * point.U
 
@@ -300,9 +294,7 @@ class ENUCoords:
         """elevationTo Elevation between two ENU coordinates
 
         :param point: A ENUCoordinate
-        :type point: ENUCoords
         :return: Elevation (in rad)
-        :rtype: float
         """
         visee = point - self
         return math.atan2(visee.U, visee.norm2D())
@@ -311,32 +303,32 @@ class ENUCoords:
         """azimuthTo Azimut between two ENU coordinates
 
         :param point: A ENUCoordinate
-        :type point: ENUCoords
         :return: Azimut (in rad)
-        :rtype: float
         """
         visee = point - self
         return math.atan2(visee.E, visee.N)
 
-    # --------------------------------------------------
-    # Vector difference between two ENU coordinates
-    # --------------------------------------------------
     def __sub__(self, p: ENUCoords) -> ENUCoords:
+        """__sub__ Vector difference between two ENU coordinates
+
+        :param p: An ENU coordinate
+        :return: An ENU coordinate
+        """
         return ENUCoords(p.E - self.E, p.N - self.N, p.U - self.U)
 
-    # --------------------------------------------------
-    # Vector difference between two ENU coordinates
-    # --------------------------------------------------
     def __add__(self, p: ENUCoords) -> ENUCoords:
+        """__add__ Vector addition between two ENU coordinates
+
+        :param p: An ENU coordinate
+        :return: An ENU coordinate
+        """
         return ENUCoords(p.E + self.E, p.N + self.N, p.U + self.U)
 
     def distance2DTo(self, point: ENUCoords) -> float:
         """distance2DTo Distance 2D between two ENU coordinates
 
         :param point: A ENU coordinate
-        :type point: ENUCoords
         :return: 2D distance
-        :rtype: float
         """
         return (point - self).norm2D()
 
@@ -344,9 +336,7 @@ class ENUCoords:
         """distanceTo Distance 3D between two ENU coordinates
 
         :param point: A ENU coordinate
-        :type point: ENUCoords
         :return: 2D distance
-        :rtype: float
         """
         return (point - self).norm()
 
@@ -354,7 +344,6 @@ class ENUCoords:
         """rotate Rotation (2D) of point
 
         :param theta: Angle of rotation (in rad)
-        :type theta: float
         """
         cr = math.cos(theta)
         sr = math.sin(theta)
@@ -367,7 +356,6 @@ class ENUCoords:
         """scale Homotehtic transformation (2D) of point
 
         :param h: factor
-        :type h: float
         """
         self.E *= h
         self.N *= h
@@ -376,11 +364,8 @@ class ENUCoords:
         """translate Translation (3D) of point
 
         :param tx: X translation
-        :type tx: float
         :param ty: Y translation
-        :type ty: float
         :param tz: Z translation, defaults to 0
-        :type tz: float, optional
         """
         self.E += tx
         self.N += ty
@@ -389,22 +374,37 @@ class ENUCoords:
     # --------------------------------------------------
     # Coords Alias X, Y, Z
     # --------------------------------------------------
-    def getX(self):
+    def getX(self) -> float:
+        """getX Return the X coordinate"""
         return self.E
 
-    def getY(self):
+    def getY(self) -> float:
+        """getX Return the Y coordinate"""
         return self.N
 
-    def getZ(self):
+    def getZ(self) -> float:
+        """getX Return the Z coordinate"""
         return self.U
 
-    def setX(self, X):
+    def setX(self, X: float):
+        """setX Set the X coordinate
+        
+        :param X: X coordinate
+        """
         self.E = X
 
-    def setY(self, Y):
+    def setY(self, Y: float):
+        """setY Set the Y coordinate
+        
+        :param Y: Y coordinate
+        """
         self.N = Y
 
-    def setZ(self, Z):
+    def setZ(self, Z: float):
+        """setZ Set the Z coordinate
+        
+        :param Z: Z coordinate
+        """
         self.U = Z
 
     def plot(self, sym="ro"):
