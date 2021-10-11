@@ -620,14 +620,14 @@ class ECEFCoords:
 # --------------------------------------------------
 # Static projection methods
 # --------------------------------------------------
-def _proj(coords, srid):
+def _proj(coords, srid: int):
     if srid == 2154:
         return _projToLambert93(coords)
     print("Error: SRID code " + str(srid) + " is not implmented in Tracklib")
     exit()
 
 
-def _unproj(coords, srid):
+def _unproj(coords, srid: int):
     if srid == 2154:
         return __projFromLambert93(coords)
     if (srid >= 32600) and (srid <= 32799):
@@ -638,7 +638,7 @@ def _unproj(coords, srid):
     exit()
 
 
-def __projFromLambert93(coords):
+def __projFromLambert93(coords) -> GeoCoords:
 
     E = 0.08181919106
     Xp = 700000.000
@@ -662,7 +662,7 @@ def __projFromLambert93(coords):
     return GeoCoords(lon * 180 / math.pi, phi * 180 / math.pi, coords.getZ())
 
 
-def _projToLambert93(coords):
+def _projToLambert93(coords) -> ENUCoords:
 
     E = 0.08181919106
     Xp = 700000.000
