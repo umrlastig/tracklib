@@ -148,16 +148,18 @@ class Network:
     def getIndexNodes(self):
         return self.__idx_nodes
 
-    # ------------------------------------------------------------
-    # Choose routing mode between:
-    #  - ROUTING_ALGO_DIJKSTRA          (0)  [default]
-    #  - ROUTING_ALGO_ASTAR             (1)
-    # ------------------------------------------------------------
-    # A* is an efficient approximate version of Dijkstra. It
-    # returns exact solution under theoretical assumptions on the
-    # metrics used to set weights on graph edges.
-    # ------------------------------------------------------------
-    def setRoutingMethod(self, method):
+    def setRoutingMethod(self, method: int):
+        """Define the routing algorithm
+
+        :param method: Algorithm of routing. Two values are possible :
+
+            - ROUTING_ALGO_DIJKSTRA (*mode=0*) [default]
+            - ROUTING_ALGO_ASTAR (*mode=1*). 
+            **NB:** A* is an efficient approximate version of Dijkstra. It returns 
+            exact solution under theoretical assumptions on the metrics used to set 
+            weights on graph edges.
+
+        """
         self.routing_mode = method
 
     def setAStarWeight(self, weight):
