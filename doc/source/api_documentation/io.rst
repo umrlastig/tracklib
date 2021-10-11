@@ -1,61 +1,61 @@
 Module io
 =============
 
-.. automodule:: io
+.. automodule:: tracklib.io
     :members: 
 
 io.AsciiWriter
 ----------------
-.. automodule:: io.AsciiWriter
+.. automodule:: tracklib.io.AsciiWriter
     :members:
 
 io.FileFormat
 ---------------
-.. automodule:: io.FileFormat
+.. automodule:: tracklib.io.FileFormat
     :members:
 
 io.FileReader
 ---------------
-.. automodule:: io.FileReader
+.. automodule:: tracklib.io.FileReader
     :members:
 
 io.FileWriter
 ---------------
-.. automodule:: io.FileWriter
+.. automodule:: tracklib.io.FileWriter
     :members:
 
 io.GpxReader
 --------------
-.. automodule:: io.GpxReader
+.. automodule:: tracklib.io.GpxReader
     :members:
 
 io.GpxWriter
 --------------
-.. automodule:: io.GpxWriter
+.. automodule:: tracklib.io.GpxWriter
     :members:
 
 io.IgnReader
 --------------
-.. automodule:: io.IgnReader
+.. automodule:: tracklib.io.IgnReader
     :members:
 
 io.KmlWriter
 --------------
-.. automodule:: io.KmlWriter
+.. automodule:: tracklib.io.KmlWriter
     :members:
 
 io.NetworkFormat
 ------------------
-.. automodule:: io.NetworkFormat
+.. automodule:: tracklib.io.NetworkFormat
     :members:
 
 io.NetworkReader
 ------------------
-.. automodule:: io.NetworkReader
+.. automodule:: tracklib.io.NetworkReader
     :members:
 
 io.NetworkWriter
 ------------------
-.. automodule:: io.NetworkWriter
+.. automodule:: tracklib.io.NetworkWriter
     :members:
 
