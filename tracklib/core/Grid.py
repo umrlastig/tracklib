@@ -2,9 +2,15 @@
 This module contains the class to generate a grid
 """
 
+# For type annotation
+from __future__ import annotations
+from typing import Union
+
 import matplotlib.pyplot as plt
 
 from tracklib.core.Bbox import Bbox
+from tracklib.core.Coords import ECEFCoords, ENUCoords, GeoCoords
+from tracklib.core.TrackCollection import TrackCollection
 
 
 class Grid:
@@ -13,12 +19,20 @@ class Grid:
     grid[icol][jrow] = list or dict
     """
 
-    def __init__(self, collection, resolution=None, margin=0.05, verbose=True):
+    def __init__(
+        self,
+        collection: Union[Bbox, TrackCollection],
+        resolution=None,
+        margin: float = 0.05,
+        verbose: bool = True,
+    ):
         """
         Grid constructor.
 
-        Margin : relative float. Default value is +5%
-
+        :param collection: Collection of tracks or bbox
+        :param resolution: Grid resolution
+        :param margin : relative float. Default value is +5%
+        :param verbose: Verbose creation
         """
         # Bbox only or collection
         if isinstance(collection, Bbox):
@@ -57,13 +71,19 @@ class Grid:
         self.XPixelSize = ax / self.ncol
         self.YPixelSize = ay / self.nrow
 
-    # ------------------------------------------------------------
-    # Normalized coordinates of coord: (x,) -> (i,j) with:
-    #   i = (x-xmin)/(xmax-xmin)*nb_cols
-    #   j = (y-ymin)/(ymax-ymin)*nb_rows
-    # Returns None if out of grid
-    # ------------------------------------------------------------
-    def getCell(self, coord):
+    def getCell(
+        self, coord: Union[ENUCoords, ECEFCoords, GeoCoords]
+    ) -> Union[tuple[float, float], None]:
+        """Normalized coordinates of coord
+
+        (x,) -> (i,j) with:
+
+            - i = (x-xmin)/(xmax-xmin)*nb_cols
+            - j = (y-ymin)/(ymax-ymin)*nb_rows
+
+        :param coord: Coordinates
+        :return: Cell for give coordinates (or None if out of grid)
+        """
 
         if (coord.getX() < self.xmin) or (coord.getX() > self.xmax):
             overflow = "{:5.5f}".format(
@@ -84,6 +104,7 @@ class Grid:
         return (idx, idy)
 
     def plot(self, base=True, af_algo=None, aggregate=None):
+        """Plot grid"""
 
         fig = plt.figure()
         ax = fig.add_subplot(
