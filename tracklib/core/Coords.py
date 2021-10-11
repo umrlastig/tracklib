@@ -10,11 +10,13 @@ The current constants are used in this module :
 .. py:data:: Re
     :type: float
     :value: 6378137.0 
+
 Earth equatorial radius
 
 .. py:data:: Fe
     :type: float
     :value: 1.0 / 298.257223563
+
 Earth eccentricity
 """
 
@@ -137,9 +139,8 @@ class GeoCoords:
     def toProjCoords(self, srid_number: int) -> ENUCoords:
         """toProjCoords Special function to convert to specific ENU srid
 
-
         :param srid_number: A SRID number describing projection coords
-        (e.g. 2154 for Lambert 93)
+            (e.g. 2154 for Lambert 93)
         :return: an ENUCoords object
         """
         return _proj(self, srid_number)
