@@ -1,6 +1,6 @@
-"""
-This module contains the class to manipulate a spatial Index
-"""
+"""This module contains the class to manipulate a spatial Index"""
+from typing import Any
+
 
 import sys
 import math
@@ -18,8 +18,12 @@ import tracklib.util.Geometry as Geometry
 
 
 class SpatialIndex:
+    """Definition of a spatial index"""
     def __init__(self, collection, resolution=None, margin=0.05, verbose=True):
-        """
+        """Constructor of :class:`SaptialIndex` class
+
+        TODO: update documentation
+
         Parameters
         ----------
         features : bbox() + iterable
@@ -247,10 +251,11 @@ class SpatialIndex:
     # 	- request(track) returns data registered in all cells
     #     crossed by a track.
     # ------------------------------------------------------------
-    def request(self, obj, j=None):
-        """
-        retourne toutes les données (sous forme de liste simple)
-        référencées dans ...
+    def request(self, obj, j=None) -> list[Any]:
+        """Request function to get data registered in spatial index
+
+        TODO
+
         """
         # print (type(obj))
         if isinstance(obj, int):
