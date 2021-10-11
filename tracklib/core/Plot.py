@@ -1,5 +1,4 @@
-"""Module core.Plot
-
+"""
 This module contains the class to plot GPS tracks and its AF
 """
 

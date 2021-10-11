@@ -1,5 +1,4 @@
-"""Module core.Grid
-
+"""
 This module contains the class to generate a grid
 """
 

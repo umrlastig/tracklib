@@ -1,5 +1,4 @@
-"""Module core.Network
-
+"""
 This module contaions the class to manage Network
 """
 

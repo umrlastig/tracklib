@@ -1,5 +1,4 @@
-"""Module core.Operator
-
+"""
 This modules contains the classes to manage the operators
 """
 

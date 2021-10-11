@@ -1,5 +1,4 @@
-"""Module core.SpatialIndex
-
+"""
 This module contains the class to manipulate a spatial Index
 """
 

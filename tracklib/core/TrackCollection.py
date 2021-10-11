@@ -1,5 +1,4 @@
-"""Module core.TrackCollection
-
+"""
 This module contain a class to manage the collections of tracks
 """
 

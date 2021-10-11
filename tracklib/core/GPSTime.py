@@ -1,5 +1,4 @@
-"""Module core.GPSTime
-
+"""
 This module contains the class to manage timestamps
 """
 

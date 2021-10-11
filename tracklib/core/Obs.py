@@ -1,5 +1,4 @@
-"""Module core.Obs
-
+"""
 This module contains the class to manage observation in a GPS track
 Points are referenced in geodetic coordinates
 """

@@ -1,5 +1,4 @@
-"""Module core.Raster
-
+"""
 This module contains the class to manipulate rasters
 """
 

@@ -1,5 +1,4 @@
-"""Module core.coords
-
+"""
 This Module contains the classes to manage point coordinates:
     - GeoCoords: geographic coordinates (lon, lat, alti)
     - ENUCoords: local projection (Eeast, North, Up)

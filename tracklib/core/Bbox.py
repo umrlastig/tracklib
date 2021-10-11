@@ -1,5 +1,4 @@
-"""Module core.Bbox
-
+"""
 This module contains the class to manage bounding box and to manage bounding box
 """
 
