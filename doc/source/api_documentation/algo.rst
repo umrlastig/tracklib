@@ -20,7 +20,7 @@ algo.Comparison
     :members:
 
 algo.Dynamics
-------------
+-------------
 .. automodule:: algo.Dynamics
     :members:
 
