@@ -2,7 +2,6 @@
 This module contains the class to manage GPS tracks. Points are referenced in geodetic coordinates
 """
 
-
 import sys
 import math
 import copy
@@ -28,10 +27,10 @@ from tracklib.algo.Analytics import BIAF_SPEED, BIAF_ABS_CURV
 
 
 class Track:
+    """Representation of a GPS track"""
+
     def __init__(self, list_of_obs=None, user_id=0, track_id=0, base=None):
-        """
-        Takes a (possibly empty) list of points as input
-        """
+        """Takes a (possibly empty) list of points as input"""
         if not list_of_obs:
             self.__POINTS = []
         else:
@@ -1023,24 +1022,30 @@ class Track:
     # =========================================================================
     #  Resampling
     # =========================================================================
-
     def resample(self, delta, algo=1, mode=2):
         """Resampling a track with linear interpolation
-        delta: interpolation interval (time in sec if
-        temporal mode is selected, space in meters if
-        spatial). Available modes are:
-            - MODE_SPATIAL        (1)
-            - MODE_TEMPORAL       (2)
-        algorithm:
-            - ALGO_LINEAR            (1)
-            - ALGO_THIN_SPLINES      (2)
-            - ALGO_B_SPLINES         (3)
-            - ALGO_GAUSSIAN_PROCESS  (4)
+
+        Resampling a track with linear interpolation delta: interpolation
+        interval (time in sec if temporal mode is selected, space in meters if spatial).
+
+        Available modes are:
+
+            - MODE_SPATIAL (*mode=1*)
+            - MODE_TEMPORAL (*mode=2*)
+
+        Algorithm:
+
+            - ALGO_LINEAR (*algo=1*)
+            - ALGO_THIN_SPLINE (*algo=2*)
+            - ALGO_B_SPLINES (*lgo=3*)
+            - ALGO_GAUSSIAN_PROCESS (*algo=4*)
+
         In temporal mode, argument may be:
+
             - an integer or float: interval in seconds
-            - a list of timestamps where interpolation
-            should be computed
-            - a reference track"""
+            - a list of timestamps where interpolation should be computed
+            - a reference track
+        """
 
         from tracklib.algo.Interpolation import resample as interpolation_resample
 
@@ -1078,22 +1083,33 @@ class Track:
     def mapOn(
         self, reference, TP1, TP2=[], init=[], N_ITER_MAX=20, mode="2D", verbose=True
     ):
+        """Geometric affine transformation to align two tracks with different coordinate systems.
 
-        """Geometric affine transformation to align two tracks with diferent
-        coordinate systems. For "2D" mode, coordinates must be ENU or Geo. For
-        "3D" mode, any type of coordinates is valid. In general, it is recommended
-        to avoid usage of non-metric Geo coordinates for mapping operation, since
-        it is relying on an isotropic error model. Inputs:
+        For "2D" mode, coordinates must be :class:`core.Coords.ENUCoords` or 
+        :class:`core.Coords.GeoCoords`. For "3D" mode, any type of coordinates is valid. 
+        In general, it is recommended to avoid usage of non-metric 
+        :class:`core.Coords.GeoCoords` coordinates for mapping operation, since it is 
+        relying on an isotropic error model. 
+        
+        Inputs:
+
            - reference: another track we want to align on or a list of points
            - TP1: list of tie points indices (relative to track self)
            - TP2: list of tie points indices (relative to track)
-           - mode: could be "2D" (default) or "3D"
-        if TP2 is not specified, it is assumed equal to TP1.
+           - mode: could be "2D" (default) or "3D" if TP2 is not specified, 
+                it is assumed equal to TP1.
+        
         TP1 and TP2 must have same size. Adjustment is performed with least squares.
         The general transformation from point X to point X' is provided below:
-                                 X' = kRX + T
-        with: k a positive real value, R a 2D or 3D rotation matrix and T a 2D or
-        3D translation vector. Transformation parameters are returned in standard
+
+        .. math::
+
+            X' = kRX + T
+
+        with: :math:`k` a positive real value, :math:`R` a 2D or 3D rotation matrix and 
+        :math:`T` a 2D or 3D translation vector. 
+        
+        Transformation parameters are returned in standard
         output in the following format: [theta, k, tx, ty] (theta in radians)
         Track argument may also be replaced ny a list of points.
         Note that mapOn does not handle negative determinant (symetries not allowed)
@@ -1193,13 +1209,12 @@ class Track:
         return plot.plotEllipses(self, sym, factor, af, append)
 
     def plotProfil(self, template="SPATIAL_SPEED_PROFIL", afs=[]):
-        """
-        Représentation du profil de la trace suivant une AF.
+        """Représentation du profil de la trace suivant une AF.
 
-        Le nom du template doit respecter:  XXX_YYYY_PROFILE
-        avec:
-            XXX: SPATIAL ou TEMPORAL
-            YYY: ALTI, SPEED ou AF_NAME
+        Le nom du template doit respecter: XXX_YYYY_PROFILE avec:
+
+            - XXX: SPATIAL ou TEMPORAL
+            - YYY: ALTI, SPEED ou AF_NAME
 
         Le tableau de nom afs: teste si isAFTransition
         """
