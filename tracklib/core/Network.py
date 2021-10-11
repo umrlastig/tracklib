@@ -1,13 +1,16 @@
-"""
-This module contaions the class to manage Network
-"""
+"""This module contains the class to manage Network"""
+
+# For type annotation
+from __future__ import annotations
 
 import random
+from typing import Union
 import progressbar
 import numpy as np
 import matplotlib.pyplot as plt
 
 import tracklib.algo.Simplification as Simplification
+from tracklib.core.Coords import ECEFCoords, ENUCoords, GeoCoords
 
 from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
@@ -16,43 +19,66 @@ from tracklib.core.TrackCollection import TrackCollection
 
 
 class Node:
-    def __init__(self, id, coord):
+    """Node / vertice of a network"""
+
+    def __init__(self, id: int, coord):
+        """:class:`Node` constructor
+
+        :param id: unique id of Node
+        """
         self.id = id
         self.coord = coord
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """Node to string"""
         return "Node object: " + str(self.id)
 
-    def __lt__(self, other):
+    def __lt__(self, other: Node) -> bool:
         if isinstance(other, Node):
             return self.id < other.id
         return False
 
-    def __eq__(self, other):
+    def __eq__(self, other: Node) -> bool:
         if isinstance(other, Node):
             return self.id == other.id
         return False
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.id)
 
-    def distanceTo(self, node):
+    def distanceTo(self, node: Node) -> float:
+        """Distance to an other node
+
+        :param node: Node to compute the distance
+        :return: 3d distance
+        """
         return self.coord.distanceTo(node.coord)
 
-    def distance2DTo(self, node):
+    def distance2DTo(self, node: Node) -> float:
+        """2d distance to an other node
+
+        :param node: Node to compute the distance
+        :return: 2d distance
+        """
         return self.coord.distance2DTo(node.coord)
 
     def plot(self, sym="r+"):
+        """Plot the node"""
         plt.plot(self.coord.getX(), self.coord.getY(), sym)
 
 
 class Edge:
+    """Class to define an edge / arc"""
 
     DOUBLE_SENS = 0
     SENS_DIRECT = 1
     SENS_INVERSE = -1
 
-    def __init__(self, id, track):
+    def __init__(self, id: int, track):
+        """:class:`Edge` constructor
+
+        :param id: unique id of Edge
+        """
         self.id = id
         self.geom = track
 
@@ -62,13 +88,16 @@ class Edge:
         self.weight = 0
 
     def plot(self, sym="k-"):
+        "Plot the edge"
         self.geom.plot(sym)
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """Print the edge"""
         return "Edge #" + str(self.id)
 
 
 class Network:
+    """Define a network"""
 
     # Routing modes
     ROUTING_ALGO_DIJKSTRA = 0
@@ -79,6 +108,8 @@ class Network:
     AF_WEIGHT = "#weight"
 
     def __init__(self):
+        """:class:`Network` constructor"""
+
         self.NODES = dict()
         self.EDGES = dict()
         self.__idx_nodes = []
@@ -99,7 +130,11 @@ class Network:
 
         self.spatial_index = None
 
-    def addNode(self, node):
+    def addNode(self, node: Node):
+        """Add a :class:`Node` to the current :class:`Network`
+
+        :param Node: Node to add
+        """
         if node.id not in self.NODES:
             self.NODES[node.id] = node
             self.__idx_nodes.append(node.id)
@@ -110,7 +145,13 @@ class Network:
             self.PREV_NODES[node.id] = []
             self.NBGR_NODES[node.id] = []
 
-    def addEdge(self, edge, source, target):
+    def addEdge(self, edge: Edge, source: Node, target: Node):
+        """Add a :class:`Edge` to the current :class:`Network`
+
+        :param edge: Edge to add
+        :param source: Source Node
+        :param target: Target Node
+        """
         self.addNode(source)
         self.addNode(target)
         if target.id not in self.NODES:
@@ -142,10 +183,15 @@ class Network:
     def __iter__(self):
         yield from [l[1] for l in list(self.EDGES.items())]
 
-    def size(self):
+    def size(self) -> int:
+        """Return the number of edges"""
         return len(self.EDGES)
 
-    def getIndexNodes(self):
+    def getIndexNodes(self) -> list[int]:
+        """Return the list of nodes index
+
+        :return: list of node id
+        """
         return self.__idx_nodes
 
     def setRoutingMethod(self, method: int):
@@ -154,33 +200,37 @@ class Network:
         :param method: Algorithm of routing. Two values are possible :
 
             - ROUTING_ALGO_DIJKSTRA (*mode=0*) [default]
-            - ROUTING_ALGO_ASTAR (*mode=1*). 
-            **NB:** A* is an efficient approximate version of Dijkstra. It returns 
-            exact solution under theoretical assumptions on the metrics used to set 
+            - ROUTING_ALGO_ASTAR (*mode=1*).
+            **NB:** A* is an efficient approximate version of Dijkstra. It returns
+            exact solution under theoretical assumptions on the metrics used to set
             weights on graph edges.
 
         """
         self.routing_mode = method
 
-    def setAStarWeight(self, weight):
+    def setAStarWeight(self, weight: float):
+        """Define the A* weight"""
         self.astar_wgt = weight
 
     # ------------------------------------------------------------
     # Topometric methods
     # ------------------------------------------------------------
-    def toGeoCoords(self, base):
+    def toGeoCoords(self, base: Union[ECEFCoords, ENUCoords]):
+        """Convert network to :class:`core.Coords.GeoCoords`"""
         for id in self.__idx_nodes:
             self.NODES[id].coord = self.NODES[id].coord.toGeoCoords(base)
         for id in self.__idx_edges:
             self.EDGES[id].geom.toGeoCoords(base)
 
-    def toENUCoords(self, base):
+    def toENUCoords(self, base: Union[GeoCoords, ECEFCoords]):
+        """Convert network to :class:`core.Coords.ENUCoords`"""
         for id in self.__idx_nodes:
             self.NODES[id].coord = self.NODES[id].coord.toENUCoords(base)
         for id in self.__idx_edges:
             self.EDGES[id].geom.toENUCoords(base)
 
-    def getSRID(self):
+    def getSRID(self) -> int:
+        """Return the SRID of network"""
         return self.EDGES[self.__idx_edges[0]].geom.getSRID()
 
     def totalLength(self):
@@ -199,17 +249,22 @@ class Network:
     # Spatial index creation, export and import functions
     # ------------------------------------------------------------
 
-    def createSpatialIndex(self, resolution=None, margin=0.05, verbose=True):
+    def createSpatialIndex(
+        self, resolution=None, margin: float = 0.05, verbose: bool = True
+    ):
+        """Create a spatial index"""
         from tracklib.core.SpatialIndex import SpatialIndex
 
         self.spatial_index = SpatialIndex(self, resolution, margin, verbose)
 
     def exportSpatialIndex(self, filename):
+        """Export the spatial index"""
         from tracklib.core.SpatialIndex import SpatialIndex
 
         self.spatial_index.save(filename)
 
-    def importSpatialIndex(self, filename):
+    def importSpatialIndex(self, filename: str):
+        """Import a spatial index"""
         from tracklib.core.SpatialIndex import SpatialIndex
 
         self.spatial_index = SpatialIndex.load(filename)
@@ -217,31 +272,70 @@ class Network:
     # ------------------------------------------------------------
     # Topologic methods
     # ------------------------------------------------------------
-    def getNextNodes(self, node_id):
+    def getNextNodes(self, node_id: int):
+        """Give the XXX of a node
+
+        :param node_id: id of a node
+        """
         return self.NEXT_NODES[node_id]
 
-    def getNextEdges(self, node_id):
+    def getNextEdges(self, node_id: int):
+        """Give the XXX of a node
+
+        :param node_id: id of a node
+        """
         return self.NEXT_EDGES[node_id]
 
-    def getPrevNodes(self, node_id):
+    def getPrevNodes(self, node_id: int):
+        """Give the XXX of a node
+
+        :param node_id: id of a node
+        """
         return self.PREV_NODES[node_id]
 
-    def getPrevEdges(self, node_id):
+    def getPrevEdges(self, node_id: int):
+        """Give the XXX of a node
+
+        :param node_id: id of a node
+        """
         return self.PREV_EDGES[node_id]
 
-    def getAdjacentNodes(self, node_id):
+    def getAdjacentNodes(self, node_id: int):
+        """Give the XXX of a node
+
+        :param node_id: id of a node
+        """
         return self.NBGR_NODES[node_id]
 
-    def getIncidentEdges(self, node_id):
+    def getIncidentEdges(self, node_id: int):
+        """Give the XXX of a node
+
+        :param node_id: id of a node
+        """
         return self.NBGR_EDGES[node_id]
 
-    def degree(self, node_id):
+    def degree(self, node_id: int) -> int:
+        """Compute the degree of a node
+
+        :param node_id: id of a node
+        :return: in degree
+        """
         return self.getAdjacentNodes(node_id).size()
 
-    def degreeIn(self, node_id):
+    def degreeIn(self, node_id: int) -> int:
+        """Compute the in degree of a node
+
+        :param node_id: id of a node
+        :return: in degree
+        """
         return self.getPrevNodes(node_id).size()
 
-    def degreeOut(self, node_id):
+    def degreeOut(self, node_id: int) -> int:
+        """Compute the out degree of a node
+
+        :param node_id: id of a node
+        :return: out degree
+        """
         return self.getNextNodes(node_id).size()
 
     # ------------------------------------------------------------
@@ -256,22 +350,34 @@ class Network:
     def getIndexNodes(self):
         return self.__idx_nodes
 
-    def getNumberOfNodes(self):
+    def getNumberOfNodes(self) -> int:
+        """Number of nodes in the network
+
+        :return: Number of nodes
+        """
         return len(self.NODES)
 
-    def getNumberOfEdges(self):
+    def getNumberOfEdges(self) -> int:
+        """Number of edges in the network
+
+        :return: Number of edges
+        """
         return len(self.EDGES)
 
-    def getNumberOfVertices(self):
+    def getNumberOfVertices(self) -> int:
+        """Number of vertices in the network
+
+        :return: Number of vertices
+        """
         count = 0
         for id in self.__idx_edges:
             count += self.EDGES[id].geom.size()
         return count
 
-    def getNodeId(self, n):
+    def getNodeId(self, n: int):
         return self.__idx_nodes[n]
 
-    def getEdgeId(self, n):
+    def getEdgeId(self, n: int):
         return self.__idx_edges[n]
 
     def getNodesId(self):
@@ -280,30 +386,55 @@ class Network:
     def getEdgesId(self):
         return [l[0] for l in list(self.EDGES.items())]
 
-    def getRandomNode(self):
+    def getRandomNode(self) -> Node:
+        """Return a random node of network
+
+        :return: A node randomly choosed
+        """
         return self.getNode(
             self.getNodesId()[random.randint(0, self.getNumberOfNodes() - 1)]
         )
 
-    def hasNode(self, id):
+    def hasNode(self, id: int) -> bool:
+        """Check if a node with a given id exist
+
+        :param id: node id to test
+        """
         return id in self.NODES
 
-    def hasEdge(self, id):
+    def hasEdge(self, id: int) -> bool:
+        """Check if a node with a given id exist
+
+        :param id: edge id to test
+        """
         return id in self.EDGES
 
-    def getNode(self, id):
+    def getNode(self, id: int) -> Node:
+        """Return the node with a give id
+
+        :param id: node id to get
+        """
         return self.NODES[id]
 
-    def getEdge(self, id):
+    def getEdge(self, id: int) -> Edge:
+        """Return the edge with a give id
+
+        :param id: edge id to get
+        """
         return self.EDGES[id]
 
-    def getAllEdgeGeoms(self):
+    def getAllEdgeGeoms(self) -> TrackCollection:
+        """Return a TrackCollection of all edges
+
+        :return: All edges of :class:`Network`
+        """
         tracks = TrackCollection()
         for id in self.__idx_edges:
             tracks.addTrack(self.EDGES[id].geom)
         return tracks
 
-    def bbox(self):
+    def bbox(self) -> bbox:
+        """Return the :class:`Bbox` of network"""
         return self.getAllEdgeGeoms().bbox()
 
     # ------------------------------------------------------------
@@ -468,22 +599,29 @@ class Network:
             return node.id
         return node
 
-    # ------------------------------------------------------------
-    # sub_network: extracts sub-network from routing forward
-    # search. An edge is added to the output network if both
-    # its ends have been visited during the search process
-    # (TOPOGRAPHIC mode) or if one of its ends are located in
-    # a circle centered on source with radius = cut
-    # ------------------------------------------------------------
-    # Inputs:
-    #  - source:    a source node (id or node object) or a coord
-    #  - cut   :    a maximal distance for search
-    #  - mode  :    "TOPOLOGIC" (default) or "GEOMETRIC"
-    # ------------------------------------------------------------
-    # Output: a network containing only visited nodes reachable
-    # from source with a cost lower than cut distance.
-    # ------------------------------------------------------------
-    def sub_network(self, source, cut, mode="TOPOLOGIC", verbose=True):
+    def sub_network(
+        self,
+        source: Union[int, Node, Union[GeoCoords, ENUCoords, ECEFCoords]],
+        cut: float,
+        mode: str = "TOPOLOGIC",
+        verbose: str = True,
+    ) -> Network:
+        """Extracts sub-network from routing forward search
+
+        An edge is added to the output network if bot its ends have been visited during
+        the search process (TOPOGRAPHIC mode) or if one of its ends are located in a
+        circle centered on source with radius = cut
+
+
+        :param source: a source node (id or node object) or a coord
+        :param cut: a maximal distance for search
+        :param mode: "TOPOLOGIC" (default) or "GEOMETRIC"
+        :param verbose: Verbose creation
+
+        :result: a network containing only visited nodes reachable
+            from source with a cost lower than cut distance.
+
+        """
         if mode == "TOPOLOGIC":
             self.run_routing_forward(source, cut=cut)
             return self.__sub_network_routing(verbose)
