@@ -4,7 +4,7 @@ Kernels for filtering, smoothing and stochastics simulations
 
 # For type annotation
 from __future__ import annotations
-from typing import Union
+from typing import Any, Union
 from collections.abc import Callable
 
 import sys
@@ -343,7 +343,11 @@ class ExperimentalKernel:
                 )
                 self.addDifferenceProfile(pf)
 
-    def addDifferenceProfile(self, profile):
+    def addDifferenceProfile(self, profile: Any):
+        """add a Difference Profile
+
+        :param profile: TODO
+        """
         N = len(profile)
         for i in range(N - 1):
             si = profile.getObsAnalyticalFeature("abs_curv", i)
@@ -360,7 +364,12 @@ class ExperimentalKernel:
                 self.GAMMA[idx] += (yix - yjx) ** 2 + (yiy - yjy) ** 2
                 self.COUNT[idx] += 2
 
-    def __getGamma(self, scale=1):
+    def __getGamma(self, scale: int = 1) -> float:
+        """Return gamma value
+
+        :param scale: Scale value
+        :return: Gamma value
+        """
         x = self.GAMMA
         for i in range(len(x)):
             if self.COUNT[i] != 0:
