@@ -14,9 +14,9 @@ from tracklib.core.TrackCollection import TrackCollection
 
 
 class Grid:
-    """
-    Pour IndexSpatial et Summarizng
-    grid[icol][jrow] = list or dict
+    """Class for defining a spatial grid
+
+    Mainly used by :class:`core.SpatialIndex.SpatialIndex` and for Summarizing
     """
 
     def __init__(
@@ -31,9 +31,8 @@ class Grid:
 
         :param collection: Collection of tracks or bbox
         :param resolution: Grid resolution
-        :param margin : relative float. Default value is +5%
+        :param margin: relative float. Default value is +5%
         :param verbose: Verbose creation
-        
         """
         # Bbox only or collection
         if isinstance(collection, Bbox):
@@ -104,8 +103,13 @@ class Grid:
 
         return (idx, idy)
 
-    def plot(self, base=True, af_algo=None, aggregate=None):
-        """Plot grid"""
+    def plot(self, base: bool = True, af_algo=None, aggregate=None):
+        """Plot grid
+        
+        :param base: TODO
+        :param af_algo: TODO
+        :param aggregate: TODO
+        """
 
         fig = plt.figure()
         ax = fig.add_subplot(
