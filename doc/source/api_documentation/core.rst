@@ -10,7 +10,7 @@ core.Bbox
     :members:
 
 core.Coords
-----------
+-----------
 .. automodule:: core.Coords
     :members:
 
@@ -41,7 +41,11 @@ core.Obs
 
 core.Operator
 -------------
+.. autoclass:: core.Operator.Operator
+    :class-doc-from: class
+
 .. automodule:: core.Operator
+    :exclude-members: Operator
     :members:
 
 core.Plot
