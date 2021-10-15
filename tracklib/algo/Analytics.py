@@ -43,12 +43,10 @@ def heading(track, i):
     return track.getObs(i).position.azimuthTo(track.getObs(i - 1).position)
 
 
-"""
- Méthode calculant le paramètre 'speed' pour chaque point de la trace
-"""
-
-
 def speed(track, i):
+    """
+    Méthode calculant le paramètre 'speed' pour chaque point de la trace
+    """
 
     # On attribut au point d'indice [0] la vitesse du point d'indice [1]
     if i == 0:
