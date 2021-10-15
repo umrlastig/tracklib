@@ -2,6 +2,7 @@
 
 # For type annotation
 from __future__ import annotations
+from typing import Union
 
 import random
 from typing import Union
@@ -10,6 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import tracklib.algo.Simplification as Simplification
+from tracklib.core.Bbox import Bbox
 from tracklib.core.Coords import ECEFCoords, ENUCoords, GeoCoords
 
 from tracklib.core.Obs import Obs
@@ -21,10 +23,11 @@ from tracklib.core.TrackCollection import TrackCollection
 class Node:
     """Node / vertice of a network"""
 
-    def __init__(self, id: int, coord):
+    def __init__(self, id: int, coord: Union[ECEFCoords, ENUCoords, GeoCoords]):
         """:class:`Node` constructor
 
         :param id: unique id of Node
+        :param coord: A coordinate object
         """
         self.id = id
         self.coord = coord
@@ -34,16 +37,27 @@ class Node:
         return "Node object: " + str(self.id)
 
     def __lt__(self, other: Node) -> bool:
+        """Check if a node is bigger than the current node
+
+        :param other: Node to test
+        :return: Result of the test
+        """
         if isinstance(other, Node):
             return self.id < other.id
         return False
 
     def __eq__(self, other: Node) -> bool:
+        """Check if a node is equal with the current node
+
+        :param other: Node to test
+        :return: Result of the test
+        """
         if isinstance(other, Node):
             return self.id == other.id
         return False
 
     def __hash__(self) -> int:
+        """Return the hash of current node"""
         return hash(self.id)
 
     def distanceTo(self, node: Node) -> float:
@@ -74,10 +88,11 @@ class Edge:
     SENS_DIRECT = 1
     SENS_INVERSE = -1
 
-    def __init__(self, id: int, track):
+    def __init__(self, id: int, track: Track):
         """:class:`Edge` constructor
 
         :param id: unique id of Edge
+        :param track: A track
         """
         self.id = id
         self.geom = track
@@ -87,8 +102,11 @@ class Edge:
         self.orientation = 0
         self.weight = 0
 
-    def plot(self, sym="k-"):
-        "Plot the edge"
+    def plot(self, sym: str = "k-"):
+        """Plot the edge
+
+        :param sym: TODO
+        """
         self.geom.plot(sym)
 
     def __str__(self) -> str:
@@ -181,10 +199,14 @@ class Network:
             self.spatial_index.addFeature(edge.geom, self.getNumberOfEdges() - 1)
 
     def __iter__(self):
+        """Define an iterator on Network"""
         yield from [l[1] for l in list(self.EDGES.items())]
 
     def size(self) -> int:
-        """Return the number of edges"""
+        """Return the number of edges
+
+        :return: Number of edges
+        """
         return len(self.EDGES)
 
     def getIndexNodes(self) -> list[int]:
@@ -199,12 +221,12 @@ class Network:
 
         :param method: Algorithm of routing. Two values are possible :
 
-            - ROUTING_ALGO_DIJKSTRA (*mode=0*) [default]
-            - ROUTING_ALGO_ASTAR (*mode=1*).
-            **NB:** A* is an efficient approximate version of Dijkstra. It returns
-            exact solution under theoretical assumptions on the metrics used to set
-            weights on graph edges.
+            1. ROUTING_ALGO_DIJKSTRA [default].
+            2. ROUTING_ALGO_ASTAR.
 
+        **NB:** A* is an efficient approximate version of Dijkstra. It returns
+        exact solution under theoretical assumptions on the metrics used to set
+        weights on graph edges.
         """
         self.routing_mode = method
 
@@ -216,30 +238,59 @@ class Network:
     # Topometric methods
     # ------------------------------------------------------------
     def toGeoCoords(self, base: Union[ECEFCoords, ENUCoords]):
-        """Convert network to :class:`core.Coords.GeoCoords`"""
+        """Convert network to :class:`core.Coords.GeoCoords`
+
+        :param base: Base coordinate for conversion
+        """
         for id in self.__idx_nodes:
             self.NODES[id].coord = self.NODES[id].coord.toGeoCoords(base)
         for id in self.__idx_edges:
             self.EDGES[id].geom.toGeoCoords(base)
 
     def toENUCoords(self, base: Union[GeoCoords, ECEFCoords]):
-        """Convert network to :class:`core.Coords.ENUCoords`"""
+        """Convert network to :class:`core.Coords.ENUCoords`
+
+        :param base: Base coordinate for conversion
+        """
         for id in self.__idx_nodes:
             self.NODES[id].coord = self.NODES[id].coord.toENUCoords(base)
         for id in self.__idx_edges:
             self.EDGES[id].geom.toENUCoords(base)
 
     def getSRID(self) -> int:
-        """Return the SRID of network"""
+        """Return the SRID of network
+
+        :return: SRID of current network
+        """
         return self.EDGES[self.__idx_edges[0]].geom.getSRID()
 
-    def totalLength(self):
+    def totalLength(self) -> int:
+        """Count the edges of current network
+
+        :return: Number of edges
+        """
         count = 0
         for id in self.__idx_edges:
             count += self.EDGES[id].geom.length()
         return count
 
-    def simplify(self, tolerance, mode=1):
+    def simplify(self, tolerance, mode: int = 1):
+        """Simplification of current network
+
+        :param tolerance: TODO
+        :param mode: Mode of simplification. The possibles values are:
+        
+            1. DOUGLAS_PEUCKER
+            2. VISVALINGAM
+            3. MINIMIZE_LARGEST_DEVIATION
+            4. MINIMIZE_ELONGATION_RATIO
+            5. PRECLUDE_LARGE_DEVIATION
+            6. FREE
+            7. FREE_MAXIMIZE
+
+            See :func:`algo.Simplification.simplify` documentation for more infos
+
+        """
         for id in self.__idx_edges:
             self.EDGES[id].geom = Simplification.simplify(
                 self.EDGES[id].geom, tolerance, mode
@@ -248,23 +299,33 @@ class Network:
     # ------------------------------------------------------------
     # Spatial index creation, export and import functions
     # ------------------------------------------------------------
-
     def createSpatialIndex(
         self, resolution=None, margin: float = 0.05, verbose: bool = True
     ):
-        """Create a spatial index"""
+        """Create a spatial index
+
+        :param resolution: TODO
+        :param margin: TODO
+        :param verbose: Verbose creation
+        """
         from tracklib.core.SpatialIndex import SpatialIndex
 
         self.spatial_index = SpatialIndex(self, resolution, margin, verbose)
 
-    def exportSpatialIndex(self, filename):
-        """Export the spatial index"""
+    def exportSpatialIndex(self, filename: str):
+        """Export the spatial index to a file
+
+        :param filename: File to export
+        """
         from tracklib.core.SpatialIndex import SpatialIndex
 
         self.spatial_index.save(filename)
 
     def importSpatialIndex(self, filename: str):
-        """Import a spatial index"""
+        """Import a spatial index from a file
+
+        :parma filename: File to import
+        """
         from tracklib.core.SpatialIndex import SpatialIndex
 
         self.spatial_index = SpatialIndex.load(filename)
@@ -341,13 +402,27 @@ class Network:
     # ------------------------------------------------------------
     # Acces to data
     # ------------------------------------------------------------
-    def __getitem__(self, n):
+    def __getitem__(self, n: int) -> Edge:
+        """Return an edge item from its id
+
+        :param n: Edge id
+        :return: An edge
+        """
         return self.EDGES[self.__idx_edges[n]]
 
-    def __setitem__(self, n, edge):
+    def __setitem__(self, n: int, edge: Edge):
+        """Set an Edge for a give id value
+
+        :param id: The id
+        :param edge: The edge to set
+        """
         self.EDGES[self.__idx_edges[id]] = edge
 
-    def getIndexNodes(self):
+    def getIndexNodes(self) -> list[int]:
+        """Return the list of seted nodes
+
+        :return: A list of nodes id
+        """
         return self.__idx_nodes
 
     def getNumberOfNodes(self) -> int:
@@ -374,16 +449,34 @@ class Network:
             count += self.EDGES[id].geom.size()
         return count
 
-    def getNodeId(self, n: int):
+    def getNodeId(self, n: int) -> int:
+        """The return the id of the n-est Node
+
+        :param n: Position of the node
+        :return: Id of the node
+        """
         return self.__idx_nodes[n]
 
-    def getEdgeId(self, n: int):
+    def getEdgeId(self, n: int) -> int:
+        """The return the id of the n-est Edge
+
+        :param n: Position of the Edge
+        :return: Id of the Edge
+        """
         return self.__idx_edges[n]
 
-    def getNodesId(self):
+    def getNodesId(self) -> list[int]:
+        """Return a list of all nodes Id
+
+        :return: A list of id
+        """
         return [l[0] for l in list(self.NODES.items())]
 
-    def getEdgesId(self):
+    def getEdgesId(self) -> list[int]:
+        """Return a list of all edges Id
+
+        :return: A list of id
+        """
         return [l[0] for l in list(self.EDGES.items())]
 
     def getRandomNode(self) -> Node:
@@ -433,7 +526,7 @@ class Network:
             tracks.addTrack(self.EDGES[id].geom)
         return tracks
 
-    def bbox(self) -> bbox:
+    def bbox(self) -> Bbox:
         """Return the :class:`Bbox` of network"""
         return self.getAllEdgeGeoms().bbox()
 
@@ -441,30 +534,23 @@ class Network:
     # Graphics
     # ------------------------------------------------------------
     def plot(
-        self, edges="k-", nodes="", direct="k--", indirect="k--", size=0.5, append=plt
+        self,
+        edges: str = "k-",
+        nodes: str = "",
+        direct: str = "k--",
+        indirect: str = "k--",
+        size: float = 0.5,
+        append=plt,
     ):
 
-        """
+        """Plot the network
 
-        Parameters
-        ----------
-        edges : TYPE, optional
-            DESCRIPTION. The default is 'k-'.
-        nodes : TYPE, optional
-            DESCRIPTION. The default is ''.
-        direct : TYPE, optional
-            DESCRIPTION. The default is 'k--'.
-        indirect : TYPE, optional
-            DESCRIPTION. The default is 'k--'.
-        size : TYPE, optional
-            DESCRIPTION. The default is 0.5.
-        append : TYPE, optional
-            DESCRIPTION. The default is plt.
-
-        Returns
-        -------
-        None.
-
+        :param edges: TODO
+        :param nodes: TODO
+        :param direct: TODO
+        :param indirect: TODO
+        :param size: TODO
+        :param append: TODO
         """
 
         x1b = []
@@ -630,7 +716,12 @@ class Network:
         print("Error: unknown network extraction mode: ", mode)
         exit(1)
 
-    def __sub_network_routing(self, verbose):
+    def __sub_network_routing(self, verbose: bool) -> Network:
+        """Sub network generation
+
+        :param verbose: Verbose creation
+        :return: A sub part of the current network
+        """
         if verbose:
             print("Sub network extraction...")
         sub_net = Network()
@@ -644,7 +735,16 @@ class Network:
             sub_net.addEdge(e, e.source, e.target)
         return sub_net
 
-    def __sub_network_geometric(self, source, cut, verbose):
+    def __sub_network_geometric(
+        self, source: Union[Node, str], cut: float, verbose: bool
+    ) -> Network:
+        """Sub network generation, based on geometry
+
+        :param source: Source for the sub-network
+        :param cut: TODO
+        :param verbose: Verbose generation
+        :return: A sub part of the current network
+        """
         if verbose:
             print("Sub network extraction...")
         if isinstance(source, Node) or isinstance(source, str):
@@ -670,34 +770,34 @@ class Network:
             sub_net.addEdge(e, e.source, e.target)
         return sub_net
 
-    # ------------------------------------------------------------
-    # Internal function to call before dijkstra forward step
-    # ------------------------------------------------------------
     def __resetFlags(self):
+        """Internal function to call before dijkstra forward step"""
         for elem in self.NODES.items():
             elem[1].poids = -1
             elem[1].visite = False
             elem[1].antecedent = ""
             elem[1].antecedent_edge = ""
 
-    # ------------------------------------------------------------
-    # Executes forward pass of routing algorithm to find
-    # shortest distance between source node and all other nodes in
-    # graph. Execution may be stopped prematurely by specifying
-    # target node and/or cut distance. For each nodes reached
-    # (with a distance d < cut) during the search process, an
-    # entry {key=(source, n), value=d} is added to an output
-    # dictionnary (if specified as input)
-    # ------------------------------------------------------------
-    # Inputs:
-    #  - source      : a source node (id or node object)
-    #  - target      : a target node (id or node object, optional)
-    #  - cut         : a maximal distance for search (optional)
-    #  - output_dict : output structure for retrieved distances
-    # ------------------------------------------------------------
-    # Output: none (flags modified in node objects)
-    # ------------------------------------------------------------
-    def run_routing_forward(self, source, target=None, cut=1e300, output_dict=None):
+    def run_routing_forward(
+        self,
+        source: Union[Node, int],
+        target: Union[Node, int] = None,
+        cut: float = 1e300,
+        output_dict: dict = None,
+    ):
+        """Executes forward pass of routing algorithm to find shortest distance between
+        source node and all other nodes in graph.
+
+        Execution may be stopped prematurely by specifying target node and/or cut
+        distance. For each nodes reached (with a distance d < cut) during the search
+        process, an entry {key=(source, n), value=d} is added to an output dictionnary
+        (if specified as input)
+
+        :param source: a source node
+        :param target: a target node
+        :param cut: a maximal distance for search
+        :param output_dict: output structure for retrieved distance
+        """
 
         # Input format
         source = self.__correctInputNode(source)
@@ -745,26 +845,30 @@ class Network:
                     fils.antecedent_edge = e.id
                     fil.__setitem__(fils, fils.poids)
 
-    # ------------------------------------------------------------
-    # Shortest_distance: finds shortest distance between source
-    # node and either a target node or a list of target nodes.
-    # In every case, time complexity is O((n+m).log(n)) with
-    # n the number of node and m the number of edges. That
-    # amounts roughly to O(n.log(n)) for a typical planar road
-    # network, and to O(n^2.log(n)) for a general network.
-    # ------------------------------------------------------------
-    # Inputs:
-    #  - source      : a source node (id or node object)
-    #  - target      : a target node (id or node object, optional)
-    #  - cut         : a maximal distance for search (optional)
-    #  - output_dict : output structure for retrieved distances
-    # ------------------------------------------------------------
-    # Output: the (float) distance between source and target nodes
-    # If target node is not specified, returns a list of distances
-    # between source node and all other nodes in the network (non-
-    # reachable nodes are associated to 1e300 distance).
-    # ------------------------------------------------------------
-    def shortest_distance(self, source, target=None, cut=1e300, output_dict=None):
+    def shortest_distance(
+        self,
+        source: Union[int, Node],
+        target: Union[int, Node] = None,
+        cut: float = 1e300,
+        output_dict: dict = None,
+    ) -> Union[float, list[float]]:
+        """Finds shortest distance between source node and either a target node or a
+        list of target nodes.
+
+        In every case, time complexity is :math:`O((n+m) \cdot \log(n))` with :math:`n`
+        the number of node and :math:`m` the number of edges. That amounts roughly to
+        :math:`O(n \cdot \log(n))` for a typical planar road network, and to
+        :math:`O(n^2 \cdot \log(n))` for a general network
+
+        :param source: A source node (id or node object)
+        :param target: A target node (id or node object, optional)
+        :param cut: A maximal distance for search (optional)
+        :param output_dict: output structure for retrieved distance
+
+        :return: The distance between source and target nodes If target node is not
+            specified, returns a list of distances between source node and all other nodes
+            in the network (non-reachable nodes are associated to 1e300 distance).
+        """
         # Input format
         source = self.__correctInputNode(source)
         target = self.__correctInputNode(target)
@@ -774,29 +878,31 @@ class Network:
         else:
             return [(n[1].poids < 0) * 1e300 + n[1].poids for n in self.NODES.items()]
 
-    # ------------------------------------------------------------
-    # Computes all shortest distances between pairs of nodes and
-    # saves results in a dictionnary {key=(source, n), value=d}.
-    # If output dictionnary structure is provided as input, it is
-    # directly incremented during the process, otherwise, it is
-    # created before begining to search for shortest distances.
-    # Time complexity is O(n.(n+m).log(n)) with n the number of
-    # nodes and m the number of edges. That amounts roughly to
-    # O(n^2.log(n)) for a typical planar road network, and to
-    # O(n^3.log(n)) for a general network.
-    # ------------------------------------------------------------
-    # Inputs:
-    #  - cut         : a maximal distance for search (optional)
-    #  - output_dict : output structure for retrieved distances
-    # ------------------------------------------------------------
-    # Output: the (float) distances between all pairs of nodes.
-    # Nodes separated by a distance > cut are not registered in
-    # the output dictionnary. If dictionnary is provided as input
-    # it is incremented during the process, hence it is possble to
-    # call 'all_shortest_distances' successively with the same
-    # output dictionnary structure.
-    # ------------------------------------------------------------
-    def all_shortest_distances(self, cut=1e300, output_dict=None):
+    def all_shortest_distances(
+        self, cut: float = 1e300, output_dict: dict = None
+    ) -> Union[dict, None]:
+        """Computes all shortest distances between pairs of nodes
+
+        The results are saved in a dictionnary {key=(source, n), value=d}.
+
+        If output dictionnary structure is provided as input, it is directly incremented
+        during the process, otherwise, it is created before begining to search for
+        shortest distances.
+
+        Time complexity is :math:`O(n \cdot (n+m) \cdot \log(n))` with :math:`n` the
+        number of nodes and :math:`n`  the number of edges. That amounts roughly to
+        :math:`O(n^2.log(n))` for a typical planar road  network, and to
+        :math:`O(n^3.log(n))` for a general network.
+
+        :param cut: a maximal distance for search (optional)
+        :param output_dict: output structure for retrieved distances
+
+        :return: The distances between all pairs of nodes. Nodes separated by a
+            distance > `cut` are not registered in the output dictionnary. If
+            dictionnary is provided as input it is incremented during the process, hence
+            it is possble tocall 'all_shortest_distances' successively with the same
+            output dictionnary structure.
+        """
         print("Computing all pairs shortest distances...")
         if output_dict is None:
             output_dict = dict()
@@ -804,21 +910,19 @@ class Network:
             self.run_routing_forward(id_source, cut=cut, output_dict=output_dict)
         return output_dict
 
-    # ------------------------------------------------------------
-    # Computes shortest path between the source node used in
-    # forward step 'run_routing_forward' and any target node. If
-    # target node has not been reached during forward search, a
-    # None object is returned by the function.
-    # ------------------------------------------------------------
-    # Inputs:
-    #  - target      : a target node (id or node object)
-    # ------------------------------------------------------------
-    # Output: a track between the source node specified in
-    # 'run_routing_forward" and a target node. The track contains
-    # topologic and non-topologic vertices. If the node target has
-    # not been reached during forward step, None object is output
-    # ------------------------------------------------------------
-    def run_routing_backward(self, target):
+    def run_routing_backward(self, target: Union[int, Node]) -> Union[Track, None]:
+        """Computes shortest path between the source node used in forward step
+        :func:`run_routing_forward` and any target node.
+
+        If target node has not been reached during forward search, a None object is
+        returned by the function.
+
+        :param target: A target node
+        :return: A track between the source node specified in
+            :func:`run_routing_forward` and a target node. The track contains topologic
+            and non-topologic vertices. If the node target has not been reached during
+            forward step, None object is output
+        """
         target = self.__correctInputNode(target)
         node = self.NODES[target]
         track = Track()
@@ -834,28 +938,43 @@ class Network:
             node = node.antecedent
         return track
 
-    # ------------------------------------------------------------
-    # Computes shortest path between source and target nodes
-    # ------------------------------------------------------------
-    # Inputs:
-    #  - source      : a source node (id or node object)
-    #  - target      : a target node (id or node object, optional)
-    #  - cut         : a maximal distance for search (optional)
-    #  - output_dict : output structure for retrieved distances
-    # ------------------------------------------------------------
-    # Output: a track between source and target node. If target is
-    # not reachable during forward step, None object is output
-    # ------------------------------------------------------------
-    def shortest_path(self, source, target, cut=1e300, output_dict=None):
+    def shortest_path(
+        self,
+        source: Union[int, Node],
+        target: Union[int, Node],
+        cut: float = 1e300,
+        output_dict: dict = None,
+    ) -> Union[Track, None]:
+        """Computes shortest path between source and target nodes
+
+        :param source: A source node
+        :param target: a target node
+        :param cut: a maximal distance for search
+        :param output_dict: output structure for retrieved distances
+
+        :return: A track between source and target node. If target is not reachable 
+            during forward step, None object is output
+        """
         self.run_routing_forward(source, target, cut=cut, output_dict=output_dict)
         return self.run_routing_backward(target)
 
-    # ------------------------------------------------------------
-    # Distance between 2 points, each points being described by:
-    #    - edge id number
-    #    - curvilinear abscissa on edge geometry from source
-    # ------------------------------------------------------------
-    def distanceBtwPts(self, edge1, abs_curv_1, edge2, abs_curv_2):
+    def distanceBtwPts(
+        self, edge1: int, abs_curv_1: float, edge2: int, abs_curv_2: float
+    ) -> float:
+        """Distance between 2 points
+
+        Each points being described by:
+
+            - Edge id number
+            - Curvilinear abscissa on edge geometry from source
+
+        :param edge1: edge 1 id number
+        :param abs_curv_1: curvilinear abscissa on edge 1 geometry from source
+        :param edge2: edge 2 id number
+        :param abs_curv_2: curvilinear abscissa on edge 2 geometry from source
+
+        :return: Distance between points
+        """
 
         e1 = self.EDGES[self.getEdgeId(edge1)]
         e2 = self.EDGES[self.getEdgeId(edge2)]
@@ -880,31 +999,26 @@ class Network:
 
         return min(min(d1, d2), min(d3, d4))
 
-    # ------------------------------------------------------------
-    # Precomputes shortest distances between all pairs of nodes
-    # and saves the result in DISTANCES attribute.
-    # ------------------------------------------------------------
-    # Inputs:
-    #  - cut         : a maximal distance for search (optional)
-    # ------------------------------------------------------------
-    # Output: none, DISTANCES attribute is built or updated
-    # ------------------------------------------------------------
-    def prepare(self, cut=1e300):
+    def prepare(self, cut: Union[float, None] = 1e300):
+        """Precomputes shortest distances between all pairs of nodes and saves the
+        result in DISTANCES attribute.
+
+        :param cut: A maximal distance for search
+        """
         if self.DISTANCES is None:
             self.DISTANCES = dict()
         self.all_shortest_distances(cut=cut, output_dict=self.DISTANCES)
 
-    # ------------------------------------------------------------
-    # Tests if a shortest distance has been precomputed
-    # ------------------------------------------------------------
-    # Inputs:
-    #  - source      : a source node (id or node object)
-    #  - target      : a target node (id or node object, optional)
-    # ------------------------------------------------------------
-    # Output: true if a shortest distance between source and
-    # target has already been computed.
-    # ------------------------------------------------------------
-    def has_prepared_shortest_distance(self, source, target):
+    def has_prepared_shortest_distance(
+        self, source: Union[int, Node], target: Union[int, Node]
+    ) -> bool:
+        """Tests if a shortest distance has been precomputed
+
+        :param source: A source node
+        :param target: A target node
+        :return: True if a shortest distance between `source` and `target` has already
+            been computed.
+        """
         if self.DISTANCES is None:
             print(
                 "Error: prepare function must be called before attempting to use preparation"
@@ -916,18 +1030,18 @@ class Network:
         key = (source, target)
         return key in self.DISTANCES
 
-    # ------------------------------------------------------------
-    # Finds shortest distance from the precomputation. May be
-    # called only after prepare or load_prep.
-    # ------------------------------------------------------------
-    # Inputs:
-    #  - source      : a source node (id or node object)
-    #  - target      : a target node (id or node object, optional)
-    # ------------------------------------------------------------
-    # Output: shortest distance between source and targer. Returns
-    # 1e300 if shortest distance has not been precomputed.
-    # ------------------------------------------------------------
-    def prepared_shortest_distance(self, source, target):
+    def prepared_shortest_distance(
+        self, source: Union[int, Node], target: Union[int, Node]
+    ) -> float:
+        """Finds shortest distance from the precomputation. May be called only after
+        :func:`prepare` or :func:`load_prep.`
+
+        :param source: A source node
+        :param target: A target node
+        :return: Shortest distance between source and targer. Returns 1e300 if shortest
+            distance has not been precomputed.
+
+        """
         if self.DISTANCES is None:
             print(
                 "Error: prepare function must be called before attempting to use preparation"
@@ -942,13 +1056,11 @@ class Network:
         else:
             return 1e300
 
-    # ------------------------------------------------------------
-    # Saves DISTANCES attribute in a npy file for further use
-    # ------------------------------------------------------------
-    # Inputs:
-    #  - filename      : path to save precomputed structure
-    # ------------------------------------------------------------
-    def save_prep(self, filename):
+    def save_prep(self, filename: str):
+        """Saves DISTANCES attribute in a npy file for further use
+
+        :param filename: Path to save precomputed structure
+        """
         if self.DISTANCES is None:
             print(
                 "Error: prepare function must be called before attempting to save preparation"
@@ -956,13 +1068,11 @@ class Network:
             exit(1)
         np.save(filename, self.DISTANCES)
 
-    # ------------------------------------------------------------
-    # Imports DISTANCES attribute from an npy file
-    # ------------------------------------------------------------
-    # Inputs:
-    #  - filename      : path where precomputed structure is saved
-    # ------------------------------------------------------------
-    def load_prep(self, filename):
+    def load_prep(self, filename: str):
+        """Imports DISTANCES attribute from an npy file
+
+        :param filename: Path where precomputed structure is saved
+        """
         if len(filename) < 4:
             filename = filename + ".npy"
         if filename[:-4] != ".npy":
