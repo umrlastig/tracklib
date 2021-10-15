@@ -12,38 +12,87 @@ from tracklib.core.Kernel import Kernel
 
 
 class UnaryOperator:
+    """Abstract Class to define a Unary Operator"""
+
     @abstractmethod
     def execute(self, track, af_input):
+        """Execution of the operator
+        
+        :param track: TODO
+        :param af_input: TODO
+        """
         sys.exit("Not yet implemented")
 
 
 class BinaryOperator:
+    """Abstract Class to define a Binary Operator"""
+
     @abstractmethod
     def execute(self, track, af_input1, af_input2):
+        """Execution of the operator
+        
+        :param track: TODO
+        :param af_input1: TODO
+        :param af_input2: TODO
+        """
         sys.exit("Not yet implemented")
 
 
 class UnaryVoidOperator:
+    """Abstract Class to define a Unary Void Operator"""
+
     @abstractmethod
     def execute(self, track, af_input, af_output):
+        """Execution of the operator
+        
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        """
         sys.exit("Not yet implemented")
 
 
 class BinaryVoidOperator:
+    """Abstract Class to define a Binary Void Operator"""
+
     @abstractmethod
     def execute(self, track, af_input1, af_input2, af_output):
+        """Execution of the operator
+        
+        :param track: TODO
+        :param af_input1: TODO
+        :param af_input2: TODO
+        :param af_output: TODO
+        """
         sys.exit("Not yet implemented")
 
 
 class ScalarOperator:
+    """Abstract Class to define a Scalar Operator"""
+
     @abstractmethod
     def execute(self, track, af_input1, arg):
+        """Execution of the operator
+        
+        :param track: TODO
+        :param af_input1: TODO
+        :param arg: TODO
+        """
         sys.exit("Not yet implemented")
 
 
 class ScalarVoidOperator:
+    """Abstract Class to define a Scalar Void Operator"""
+
     @abstractmethod
     def execute(self, track, af_input1, arg, af_output):
+        """Execution of the operator
+        
+        :param track: TODO
+        :param af_input1: TODO
+        :param arg: TODO
+        :param af_output:
+        """
         sys.exit("Not yet implemented")
 
 
@@ -52,7 +101,12 @@ class ScalarVoidOperator:
 # =============================================================================
 
 
-def makeRPN(expression):
+def makeRPN(expression: str) -> str:
+    """TODO
+
+    :param expression: An RPN expression
+    :return: TODO
+    """
     s = expression
     for operator in ["+-", "*/", "^", "@"]:
         depth = 0
@@ -75,13 +129,31 @@ def makeRPN(expression):
 
 
 class Identity(UnaryVoidOperator):
+    """Identity operator"""
+
     def execute(self, track, af_input, af_output):
+        """Execute the identity operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         f = lambda x: x
         return track.operate(Operator.APPLY, af_input, f, af_output)
 
 
 class Integrator(UnaryVoidOperator):
+    """Integrator operator"""
+
     def execute(self, track, af_input, af_output):
+        """Execute the integrator operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(1, track.size()):
@@ -91,7 +163,16 @@ class Integrator(UnaryVoidOperator):
 
 
 class Differentiator(UnaryVoidOperator):
+    """Differentiator Operator"""
+
     def execute(self, track, af_input, af_output):
+        """Execute the Differentiator operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(1, track.size()):
@@ -104,7 +185,16 @@ class Differentiator(UnaryVoidOperator):
 
 
 class ForwardFiniteDiff(UnaryVoidOperator):
+    """ForwardFiniteDiff Operator"""
+
     def execute(self, track, af_input, af_output):
+        """Execute the ForwardFiniteDiff operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(1, track.size()):
@@ -117,7 +207,16 @@ class ForwardFiniteDiff(UnaryVoidOperator):
 
 
 class BackwardFiniteDiff(UnaryVoidOperator):
+    """BackwardFiniteDiff Operator"""
+
     def execute(self, track, af_input, af_output):
+        """Execute the BackwardFiniteDiff operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(1, track.size()):
@@ -130,7 +229,16 @@ class BackwardFiniteDiff(UnaryVoidOperator):
 
 
 class CenteredFiniteDiff(UnaryVoidOperator):
+    """CenteredFiniteDiff Operator"""
+
     def execute(self, track, af_input, af_output):
+        """Execute the CenteredFiniteDiff operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(1, track.size()):
@@ -143,7 +251,16 @@ class CenteredFiniteDiff(UnaryVoidOperator):
 
 
 class SecondOrderFiniteDiff(UnaryVoidOperator):
+    """SecondOrderFiniteDiff Operator"""
+
     def execute(self, track, af_input, af_output):
+        """Execute the SecondOrderFiniteDiff operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(1, track.size()):
@@ -156,41 +273,104 @@ class SecondOrderFiniteDiff(UnaryVoidOperator):
 
 
 class ShiftRight(UnaryVoidOperator):
+    """ShiftRight Operator"""
+
     def execute(self, track, af_input, af_output):
+        """Execute the ShiftRight operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         return track.operate(Operator.SHIFT, af_input, +1, af_output)
 
 
 class ShiftLeft(UnaryVoidOperator):
+    """ShiftLeft Operator"""
+
     def execute(self, track, af_input, af_output):
+        """Execute the ShiftLeft operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         return track.operate(Operator.SHIFT, af_input, -1, af_output)
 
 
 class Inverter(UnaryVoidOperator):
+    """Inverter Operator"""
+
     def execute(self, track, af_input, af_output):
+        """Execute the Inverter operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         f = lambda x: -x
         return track.operate(Operator.APPLY, af_input, f, af_output)
 
 
 class Inverser(UnaryVoidOperator):
+    """Inverser Operator"""
+
     def execute(self, track, af_input, af_output):
+        """Execute the Inverser operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         f = lambda x: 1.0 / x
         return track.operate(Operator.APPLY, af_input, f, af_output)
 
 
 class Rectifier(UnaryVoidOperator):
+    """Rectifier Operator"""
+
     def execute(self, track, af_input, af_output):
+        """Execute the Rectifier operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         f = lambda x: -x * (x < 0) + x * (x > 0)
         return track.operate(Operator.APPLY, af_input, f, af_output)
 
 
 class Debiaser(UnaryVoidOperator):
+    """Debiaser Operator"""
+
     def execute(self, track, af_input, af_output):
+        """Execute the Debiaser operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         mean = track.operate(Operator.AVERAGER, af_input)
         return track.operate(Operator.SCALAR_ADDER, af_input, -mean, af_output)
 
 
 class Normalizer(UnaryVoidOperator):
+    """Normalizer Operator"""
+
     def execute(self, track, af_input, af_output):
+        """Execute the Normaliser operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         mean = track.operate(Operator.AVERAGER, af_input)
         sigma = track.operate(Operator.STDDEV, af_input)
         f = lambda x: (x - mean) / sigma
@@ -198,50 +378,131 @@ class Normalizer(UnaryVoidOperator):
 
 
 class Square(UnaryVoidOperator):
+    """Square Operator"""
+
     def execute(self, track, af_input, af_output):
+        """Execute the Square operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         f = lambda x: x * x
         return track.operate(Operator.APPLY, af_input, f, af_output)
 
 
 class Sqrt(UnaryVoidOperator):
+    """Sqrt Operator"""
+
     def execute(self, track, af_input, af_output):
+        """Execute the Sqrt operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         return track.operate(Operator.APPLY, af_input, math.sqrt, af_output)
 
 
 class Diode(UnaryVoidOperator):
+    """Diode Operator"""
+
     def execute(self, track, af_input, af_output):
+        """Execute the Diode operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         f = lambda x: x * (x > 0)
         return track.operate(Operator.APPLY, af_input, f, af_output)
 
 
 class Sign(UnaryVoidOperator):
+    """Sign Operator"""
+
     def execute(self, track, af_input, af_output):
+        """Execute the Sign operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         f = lambda x: 1 * (x >= 0) - 1 * (x < 0)
         return track.operate(Operator.APPLY, af_input, f, af_output)
 
 
 class Exp(UnaryVoidOperator):
+    """Exp Operator"""
+
     def execute(self, track, af_input, af_output):
+        """Execute the Exp operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         return track.operate(Operator.APPLY, af_input, math.exp, af_output)
 
 
 class Log(UnaryVoidOperator):
+    """Log Operator"""
+
     def execute(self, track, af_input, af_output):
+        """Execute the Log operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         return track.operate(Operator.APPLY, af_input, math.log, af_output)
 
 
 class Cos(UnaryVoidOperator):
+    """Cos Operator"""
+
     def execute(self, track, af_input, af_output):
+        """Execute the Cos operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         return track.operate(Operator.APPLY, af_input, math.cos, af_output)
 
 
 class Sin(UnaryVoidOperator):
+    """Sin operator"""
+
     def execute(self, track, af_input, af_output):
+        """Execute the Sin operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         return track.operate(Operator.APPLY, af_input, math.sin, af_output)
 
 
 class Tan(UnaryVoidOperator):
+    """Tan Operator"""
+
     def execute(self, track, af_input, af_output):
+        """Execute the Tan operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         return track.operate(Operator.APPLY, af_input, math.tan, af_output)
 
 
@@ -251,7 +512,17 @@ class Tan(UnaryVoidOperator):
 
 
 class Adder(BinaryVoidOperator):
+    """Adder Operator"""
+
     def execute(self, track, af_input1, af_input2, af_output):
+        """Execute the Normaliser operator
+
+        :param track: TODO
+        :param af_input1: TODO
+        :param af_input2: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(0, track.size()):
@@ -263,7 +534,17 @@ class Adder(BinaryVoidOperator):
 
 
 class Substracter(BinaryVoidOperator):
+    """Substracter Operator"""
+
     def execute(self, track, af_input1, af_input2, af_output):
+        """Execute the Substracter operator
+
+        :param track: TODO
+        :param af_input1: TODO
+        :param af_input2: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(0, track.size()):
@@ -275,7 +556,17 @@ class Substracter(BinaryVoidOperator):
 
 
 class Multiplier(BinaryVoidOperator):
+    """Multiplier Operator"""
+
     def execute(self, track, af_input1, af_input2, af_output):
+        """Execute the Multiplier operator
+
+        :param track: TODO
+        :param af_input1: TODO
+        :param af_input2: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(0, track.size()):
@@ -286,7 +577,17 @@ class Multiplier(BinaryVoidOperator):
 
 
 class Divider(BinaryVoidOperator):
+    """Divider Operator"""
+
     def execute(self, track, af_input1, af_input2, af_output):
+        """Execute the Divier operator
+
+        :param track: TODO
+        :param af_input1: TODO
+        :param af_input2: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(0, track.size()):
@@ -301,7 +602,17 @@ class Divider(BinaryVoidOperator):
 
 
 class Power(BinaryVoidOperator):
+    """Power operator"""
+
     def execute(self, track, af_input1, af_input2, af_output):
+        """Execute the Power operator
+
+        :param track: TODO
+        :param af_input1: TODO
+        :param af_input2: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(0, track.size()):
@@ -313,7 +624,17 @@ class Power(BinaryVoidOperator):
 
 
 class Modulo(BinaryVoidOperator):
+    """Modulo Operator"""
+
     def execute(self, track, af_input1, af_input2, af_output):
+        """Execute the Modulo operator
+
+        :param track: TODO
+        :param af_input1: TODO
+        :param af_input2: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(0, track.size()):
@@ -325,7 +646,17 @@ class Modulo(BinaryVoidOperator):
 
 
 class Above(BinaryVoidOperator):
+    """Above Operator"""
+
     def execute(self, track, af_input1, af_input2, af_output):
+        """Execute the Above operator
+
+        :param track: TODO
+        :param af_input1: TODO
+        :param af_input2: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(0, track.size()):
@@ -338,7 +669,17 @@ class Above(BinaryVoidOperator):
 
 
 class Below(BinaryVoidOperator):
+    """Below Operator"""
+
     def execute(self, track, af_input1, af_input2, af_output):
+        """Execute the Below operator
+
+        :param track: TODO
+        :param af_input1: TODO
+        :param af_input2: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(0, track.size()):
@@ -351,7 +692,17 @@ class Below(BinaryVoidOperator):
 
 
 class QuadraticAdder(BinaryVoidOperator):
+    """Quadratic Adder Operator"""
+
     def execute(self, track, af_input1, af_input2, af_output):
+        """Execute the Quadratic Adder operator
+
+        :param track: TODO
+        :param af_input1: TODO
+        :param af_input2: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(0, track.size()):
@@ -363,7 +714,17 @@ class QuadraticAdder(BinaryVoidOperator):
 
 
 class Derivator(BinaryVoidOperator):
+    """Derivator Operator"""
+
     def execute(self, track, af_input1, af_input2, af_output):
+        """Execute the Derivator operator
+
+        :param track: TODO
+        :param af_input1: TODO
+        :param af_input2: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(1, track.size()):
@@ -379,7 +740,17 @@ class Derivator(BinaryVoidOperator):
 
 
 class Renormalizer(BinaryVoidOperator):
+    """Renormalizer Operator"""
+
     def execute(self, track, af_input1, af_input2, af_output):
+        """Execute the Renormalizer operator
+
+        :param track: TODO
+        :param af_input1: TODO
+        :param af_input2: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         m1 = track.operate(Operator.AVERAGER, af_input1)
         m2 = track.operate(Operator.AVERAGER, af_input2)
         s1 = track.operate(Operator.STDDEV, af_input1)
@@ -389,7 +760,17 @@ class Renormalizer(BinaryVoidOperator):
 
 
 class PointwiseEqualer(BinaryVoidOperator):
+    """Pointwiser Equaler Operator"""
+
     def execute(self, track, af_input1, af_input2, af_output):
+        """Execute the Pointwiser Equaler operator
+
+        :param track: TODO
+        :param af_input1: TODO
+        :param af_input2: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(0, track.size()):
@@ -402,7 +783,17 @@ class PointwiseEqualer(BinaryVoidOperator):
 
 
 class Convolution(BinaryVoidOperator):
+    """Convolution Operator"""
+
     def execute(self, track, af_input1, af_input2, af_output):
+        """Execute the Convolution operator
+
+        :param track: TODO
+        :param af_input1: TODO
+        :param af_input2: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
         track.createAnalyticalFeature(af_output)
         H = np.fft.fft(track[af_input1])
         G = np.fft.fft(track[af_input2])
@@ -417,6 +808,7 @@ class Convolution(BinaryVoidOperator):
 
 
 class Min(UnaryOperator):
+    """Min Operator"""
     def execute(self, track, af_input):
         minimum = +1e300
         for i in range(track.size()):
@@ -541,7 +933,9 @@ class Mse(UnaryOperator):
 
 
 class Rmse(UnaryOperator):
+    """Rmse Operator"""
     def execute(self, track, af_input):
+        """Execution of Rmse operator"""
         return math.sqrt(track.operate(Operator.MSE, af_input))
 
 
@@ -961,6 +1355,106 @@ class Random(ScalarVoidOperator):
 #  Operators
 # -----------------------------------------------------------------------------
 class Operator:
+    """Class defining the usable operators
+
+    The following operators are defined :
+
+        1. Unary void operators:
+
+            - `IDENTITY`: :math:`y(t) = x(t)`
+            - `RECTIFIER`: :math:`y(t) = \|x(t)\|`
+            - `INTEGRATOR`: :math:`y(t) = y(t-1) + y(t)`
+            - `SHIFT_RIGHT`: :math:`y(t) = x(t-1)`
+            - `SHIFT_LEFT`: :math:`y(t) = x(t+1)`
+            - `INVERTER`: :math:`y(t) = -x(t)`
+            - `INVERSER`: :math:`y(t) = 1/x(t)`
+            - `DEBIASER`: :math:`y(t) = x(t) - \\bar{x}`
+            - `SQUARE`: :math:`y(t) = x(t \cdot x(t)`
+            - `SQRT`: :math:`y(t) = x(t)^{1/2}`
+            - `NORMALIZER`: :math:`y(t) = \\frac{(x(t) - \\bar{x})}{\sigma(x)}`
+            - `DIFFERENTIATOR`: :math:`y(t) = x(t) - x(t-1)`
+            - `BACKWARD_FINITE_DIFF`: :math:`y(t) = x(t) - x(t-1)`
+            - `FORWARD_FINITE_DIFF`: :math:`y(t) = x(t+1) - x(t)`
+            - `CENTERED_FINITE_DIFF`: :math:`y(t) = x(t+1) - x(t-1)`
+            - `SECOND_ORDER_FINITE_DIFF`: :math:`y(t) = x(t+1) - x(t-1)`
+            - `DIODE`: :math:`y(t) = 1[x>0] \cdot x(t)`
+            - `SIGN`: :math:`y(t) = \\frac{x(t)}{\|x(t)\|}`
+            - `EXP`:  :math:`y(t) = \exp(x(t))`
+            - `LOG`:  :math:`y(t) = \log(x(t))`
+            - `COS`:  :math:`y(t) = \cos(x(t))`
+            - `SIN`:  :math:`y(t) = \sin(x(t))`
+            - `TAN`:  :math:`y(t) = \\tan(x(t))`
+
+        2. Binary void operators:
+
+            - `ADDER`: :math:`y(t) = x1(t) + x2(t)`
+            - `SUBSTRACTER`: :math:`y(t) = x1(t) - x2(t)`
+            - `MULTIPLIER`: :math:`y(t) = x1(t) \cdot x2(t)`
+            - `DIVIDER`: :math:`y(t) = x1(t) / x2(t)`
+            - `POWER`: :math:`y(t) = x1(t) ^ {x2(t)}`
+            - `MODULO`: :math:`y(t) = x1(t) % x2(t)`
+            - `ABOVE`: :math:`y(t) = x1(t) > x2(t)`
+            - `BELOW`: :math:`y(t) = x1(t) < x2(t)`
+            - `QUAD_ADDER`: :math:`y(t) = (x1(t)^2 + x2(t)^2)^0.5`
+            - `RENORMALIZER`: :math:`y(t) = (x1(t)-m(x1)) \cdot \\frac{s(x2)}{s(x1)} + m(x2)`
+            - `DERIVATOR`: :math:`y(t) = \\frac{(x1(t)-x1(t-1))}{(x2(t)-x2(t-1))} = \\frac{dx1}{dx2}`
+            - `POINTWISE_EQUALER`: :math:`y(t) = 1\ \\text{if}\ x1(t)=x2(t),\ 0\ \\text{otherwise}`
+            - `CONVOLUTION`: :math:`y(t) = int(x1(h) \cdot x2(t-h)dh)`
+
+        3. Unary operator
+
+            - `SUM`: :math:`y = \Sigma x`
+            - `AVERAGER`: :math:`y = \\bar{x}`
+            - `VARIANCE`: :math:`y = \\var(x)`
+            - `STDDEV`: :math:`y = \sqrt{\\var(x)}`
+            - `MSE`: :math:`y = \\bar{x^2}`
+            - `RMSE`: :math:`y = \sqrt{\\bar{x^2}}`
+            - `MAD`: :math:`y = \\text{median}(|x|)`
+            - `MIN`: :math:`y = \min(x)`
+            - `MAX`: :math:`y = \max(x)`
+            - `MEDIAN`: :math:`y = \\text{median}(x)`
+            - `ARGMIN`: :math:`y = \min {t | x(t) = \min(x)}`
+            - `ARGMAX`: :math:`y = \min {t | x(t) = \max(x)}`
+            - `ZEROS`: :math:`y = {t | x(t) = 0}`
+
+        4. Binary operator
+
+            - `COVARIANCE`:  :math:`y = m[x1x2] - m[x1] \cdot m[x2]`
+            - `CORRELATOR`:  :math:`y = \\frac{\cov(x1,x2)}{\sigma(x1) \cdot sigma(x2)}`
+            - `L0`:  :math:`y = {t | x1(t) \\neq x2(t)}`
+            - `L1`:  :math:`y = \\bar{|x1(t)-x2(t)|}`
+            - `L2`:  :math:`y = \\bar{|x1(t)-x2(t)|^2}`
+            - `LINF`:  :math:`y = \max(|x1(t)-x2(t)|)`
+            - `EQUAL`:  :math:`y = 1\ \\text{if} {x1(t) = x2(t)\ \\text{for all t}}`
+
+        5. Scalar operator
+
+            - `AGGREGATE`: :math:`y(t) = arg({x(t)})`   (arg is a list function)
+
+        6. Scalar void operator
+
+            -  `APPLY`:  :math:`y(t) = arg(x(t))` (arg is a real function)
+            -  `SHIFT`:  :math:`y(t) = x(t-arg)` (arg is a integer)
+            -  `SHIFT_REV`:  :math:`y(t) = x(t+arg)` (arg is a integer)
+            -  `SCALAR_ADDER`:  :math:`y(t) = x(t) + arg` (arg is a numeric)
+            -  `SCALAR_SUBSTRACTER`: :math:`:(t) = x(t) - arg` (arg is a numeric)
+            -  `SCALAR_MULTIPLIER`:  :math:`y(t) = arg * x(t)` (arg is a numeric)
+            -  `SCALAR_DIVIDER`:  :math:`y(t) = x(t) / arg` (arg is a numeric)
+            -  `SCALAR_POWER`:  :math:`y(t) = x(t) ** arg` (arg is a numeric)
+            -  `SCALAR_MODULO`:  :math:`y(t) = x(t) % arg` (arg is a numeric)
+            -  `SCALAR_ABOVE`:  :math:`y(t) = x1(t) > arg` (arg is a numeric)
+            -  `SCALAR_BELOW`:  :math:`y(t) = x1(t) < arg` (arg is a numeric)
+            -  `SCALAR_REV_ABOVE`:  :math:`y(t) = arg < x1(t)` (arg is a numeric)
+            -  `SCALAR_REV_BELOW`:  :math:`y(t) = arg > x1(t)` (arg is a numeric)
+            -  `SCALAR_REV_SUBSTRACTER`:  :math:`y(t) = arg - x(t)` (arg is a numeric)
+            -  `SCALAR_REV_DIVIDER`:  :math:`y(t) = arg / x(t)` (arg is a numeric)
+            -  `SCALAR_REV_POWER`:  :math:`y(t) = arg ** x(t)` (arg is a numeric)
+            -  `SCALAR_REV_MODULO`:  :math:`y(t) = arg % x(t)` (arg is a numeric)
+            -  `THRESHOLDER`:  :math:`= y(t) = 1 if x1(t) >= arg, 0 otherwise` (arg is a numeric)
+            -  `RANDOM`:  :math:`y(t) = eta(t) with eta ~ arg`
+            -  `FILTER`:  :math:`= y(t) = int[x(z)*h(t-z)dz]` (arg is an odd-dimension vector or a kernel)
+            -  `FILTER_FFT`:  :math:`y(t) = int[x(z)*h(t-z)dz]` (fast version with FFT)
+    """
 
     # Unary void operator
     IDENTITY = Identity()  # y(t) = x(t)
