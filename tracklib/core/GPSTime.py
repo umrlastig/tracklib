@@ -123,7 +123,7 @@ class GPSTime:
     def setPrintFormat(format: str):
         """Set the format for printing a GPSTime object
 
-        The print format is use by the :method:`__str__` method
+        The print format is use by the :func:`GPSTime.__str__` method
 
         :param format: Format for printing GPSTime
         """
