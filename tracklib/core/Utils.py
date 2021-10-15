@@ -2,6 +2,9 @@
 This module contains an algorithm of Analytical Features calculation and 
 some utility functions.
 """
+# For type annotation
+from __future__ import annotations
+from typing import Any, Iterable, Optional, Union
 
 import numpy as np
 
@@ -21,11 +24,13 @@ from heapq import heapify, heappush, heappop
 NAN = float("nan")
 
 
-def isnan(number):
+def isnan(number: Union[int, float]) -> bool:
+    """Check if two numbers are different"""
     return number != number
 
 
-def isfloat(value):
+def isfloat(value: Any) -> bool:
+    """Check is a value is a float"""
     try:
         float(value)
         return True
@@ -33,22 +38,32 @@ def isfloat(value):
         return False
 
 
-# Make to list if needed
-def listify(input):
+def listify(input) -> list[Any]:
+    """Make to list if needed"""
     if not isinstance(input, list):
         input = [input]
     return input
 
 
-# Remove list if needed
 def unlistify(input):
+    """Remove list if needed
+
+    :param input: TODO
+    :return: TODO
+    """
     if len(input) == 1:
         input = input[0]
     return input
 
 
 # LIKE comparisons
-def compLike(s1, s2):
+def compLike(s1, s2) -> bool:
+    """TODO
+
+    :param s1: TODO
+    :param s2: TODO
+    :return: TODO
+    """
     tokens = s2.split("%")
     if len(tokens) == 1:
         return s1 in s2  # 'in' or 'equal' yet to be decided
@@ -64,18 +79,18 @@ def compLike(s1, s2):
     return True
 
 
-# --------------------------------------------------------------------------
-# Function to form coords object from (x,y,z) data
-# --------------------------------------------------------------------------
-# Input :
-#   - x       ::     1st coordinate (X, lon or E)
-#   - y       ::     2nd coordinate (Y, lat or N)
-#    - z       ::     3rd coordinate (Z, hgt or U)
-#   - srid    ::     Id of coord system (ECEF, GEO or ENU)
-# --------------------------------------------------------------------------
-# Output : Coords object in the proper srid
-# --------------------------------------------------------------------------
-def makeCoords(x, y, z, srid):
+def makeCoords(
+    x: float, y: float, z: float, srid: int
+) -> Union[ENUCoords, ECEFCoords, GeoCoords]:
+    """Function to form coords object from (x,y,z) data
+
+    :param x: 1st coordinate (X, lon or E)
+    :param y: 2nd coordinate (Y, lat or N)
+    :param z: 3rd coordinate (Z, hgt or U)
+    :param srid: Id of coord system (ECEF, GEO or ENU)
+
+    :return: Coords object in the proper srid
+    """
     if srid.upper() in ["ENUCOORDS", "ENU"]:
         return ENUCoords(x, y, z)
     if srid.upper() in ["GEOCOORDS", "GEO"]:
@@ -84,17 +99,15 @@ def makeCoords(x, y, z, srid):
         return ECEFCoords(x, y, z)
 
 
-# --------------------------------------------------------------------------
-# Function to form distance matrix
-# --------------------------------------------------------------------------
-# Input :
-#   - T1     :: a list of points
-#   - T2     :: a list of points
-# --------------------------------------------------------------------------
-# Output : numpy distance matrix between T1 and T2
-# --------------------------------------------------------------------------
-def makeDistanceMatrix(T1, T2):
+def makeDistanceMatrix(
+    T1: list[tuple[float, float]], T2: list[tuple[float, float]]
+) -> np.float32:
+    """Function to form distance matrix
 
+    :param T1: A list of points
+    :param T2: A list of points
+    :return: numpy distance matrix between T1 and T2
+    """
     T1 = np.array(T1)
     T2 = np.array(T2)
 
@@ -110,18 +123,19 @@ def makeDistanceMatrix(T1, T2):
     )
 
 
-# --------------------------------------------------------------------------
-# Function to form covariance matrix from kernel
-# --------------------------------------------------------------------------
-# Input :
-#   - kernel :: a function describing statistical similarity between points
-#   - T1     :: a list of points
-#   - T2     :: a list of points
-#   - factor :: unit factor of std dev (default 1.0)
-# --------------------------------------------------------------------------
-# Output : numpy covariance matrix between T1 and T2
-# --------------------------------------------------------------------------
-def makeCovarianceMatrixFromKernel(kernel, T1, T2, factor=1.0):
+def makeCovarianceMatrixFromKernel(
+    kernel,
+    T1: list[tuple[float, float]],
+    T2: list[tuple[float, float]],
+    factor: float = 1.0,
+):
+    """Function to form covariance matrix from kernel
+
+    :param kernel: A function describing statistical similarity between points
+    :param T1: A list of points
+    :param T2: A list of points
+    :param factor: Unit factor of std dev (default 1.0)
+    """
 
     D = makeDistanceMatrix(T1, T2)
     kfunc = np.vectorize(kernel.getFunction())
@@ -129,16 +143,13 @@ def makeCovarianceMatrixFromKernel(kernel, T1, T2, factor=1.0):
     return factor ** 2 * kfunc(D)
 
 
-# --------------------------------------------------------------------------
-# Function to convert RGBA color to hexadecimal
-# --------------------------------------------------------------------------
-# Input :
-#   - color :: a 3 or 4-element array R, G, B [,alpha]
-# Each color and transparency channel is in [0,1]
-# --------------------------------------------------------------------------
-# Output : a string containing color in hexadecimal
-# --------------------------------------------------------------------------
-def rgbToHex(color):
+def rgbToHex(color: list[float, float, float, Optional[float]]) -> str:
+    """Function to convert RGBA color to hexadecimal
+
+    :param color: A 3 or 4-element array R, G, B [,alpha]. Each color and transparency
+        channel is in [0,1]
+    :return: A string containing color in hexadecimal
+    """
     if len(color) == 3:
         color.append(1)
     R = hex((int)(color[0] * 255))[2:]
@@ -156,19 +167,24 @@ def rgbToHex(color):
     return "0x" + A + B + G + R
 
 
-# --------------------------------------------------------------------------
-# Function to interpolate RGBA (or RGB) color between two values
-# --------------------------------------------------------------------------
-# Input :
-#   - v: a float value
-#   - vmin: minimal value of v (color cmin)
-#   - vmax: maximal value of v (color cmax)
-#   - cmin : a 3 or 4-element array R, G, B [,alpha]
-#   - cmax : a 3 or 4-element array R, G, B [,alpha]
-# --------------------------------------------------------------------------
-# Output : a 4-element array
-# --------------------------------------------------------------------------
-def interpColors(v, vmin, vmax, cmin, cmax):
+def interpColors(
+    v: float,
+    vmin: float,
+    vmax: float,
+    cmin: list[float, float, float, Optional[float]],
+    cmax: list[float, float, float, Optional[float]],
+) -> list[float, float, float, float]:
+    """
+    Function to interpolate RGBA (or RGB) color between two values
+
+    :param v: a float value
+    :param vmin: minimal value of v (color cmin)
+    :param vmax: maximal value of v (color cmin)
+    :param cmin: a 3 or 4-element array R, G, B [,alpha]
+    :param cmax: a 3 or 4-element array R, G, B [,alpha]
+
+    :return: A 4-element array
+    """
     # norm = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax)
     O = []
     O.append(((vmax - v) * cmin[0] + (v - vmin) * cmax[0]) / (vmax - vmin))
@@ -180,6 +196,12 @@ def interpColors(v, vmin, vmax, cmin, cmax):
 
 
 def getColorMap(cmin, cmax):
+    """TODO
+
+    :param cmin: TODO
+    :param cmax: TODO
+    :return: TODO
+    """
 
     # On définit la map color
     cdict = {"red": [], "green": [], "blue": []}
@@ -196,6 +218,13 @@ def getColorMap(cmin, cmax):
 
 
 def getOffsetColorMap(cmin, cmax, part):
+    """TODO
+
+    :param cmin: TODO
+    :param cmax: TODO
+    :param part: TODO
+    :return: TODO
+    """
 
     # On définit la map color
     cdict = {"red": [], "green": [], "blue": []}
