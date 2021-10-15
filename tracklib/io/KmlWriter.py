@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Write GPS track in KML file(s)."""
 
 import progressbar

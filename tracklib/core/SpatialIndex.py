@@ -1,4 +1,6 @@
 """This module contains the class to manipulate a spatial Index"""
+
+
 from typing import Any
 
 

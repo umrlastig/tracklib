@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Write GPS track in Gpx file(s)."""
 
 from tracklib.core.Track import Track

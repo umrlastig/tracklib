@@ -1,6 +1,5 @@
-# ------------------------- Interpolation -------------------------------------
-# Class to manage interpolation and smoothing functions
-# -----------------------------------------------------------------------------
+"""Class to manage interpolation and smoothing functions"""
+
 import sys
 import math
 import numpy as np

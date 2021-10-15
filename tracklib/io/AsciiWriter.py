@@ -1,16 +1,18 @@
-# -*- coding: utf-8 -*-
 """
-Write Grid to Ascii Raster file (*.asc).
+Write Grid to Ascii Raster file (\\*.asc).
 
 
 The header data includes the following keywords and values:
 
     - ncols : number of columns in the data set.
     - nrows : number of rows in the data set.
-    - xllcenter or xllcorner – x-coordinate of the center or lower-left corner of the lower-left cell.
-    - yllcenter or yllcorner – y-coordinate of the center or lower-left corner of the lower-left cell.
+    - xllcenter or xllcorner – x-coordinate of the center or lower-left corner of 
+      he lower-left cell.
+    - yllcenter or yllcorner – y-coordinate of the center or lower-left corner of 
+      the lower-left cell.
     - cellsize – cell size for the data set.
-    - nodata_value – value in the file assigned to cells whose value is unknown. This keyword and value is optional. The nodata_value defaults to -9999.
+    - nodata_value – value in the file assigned to cells whose value is unknown. 
+      This keyword and value is optional. The nodata_value defaults to -9999.
 
 """
 

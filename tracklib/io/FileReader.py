@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 """Read GPS track from CSV file(s)."""
+
 import csv
 import os
 

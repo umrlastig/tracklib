@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+"""Ign Reader module"""
 
 import json
 import os.path

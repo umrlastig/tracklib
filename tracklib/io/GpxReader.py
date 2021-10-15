@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Read GPS track from gpx file.
-"""
+"""Read GPS track from gpx file."""
 
 from xml.dom import minidom
 

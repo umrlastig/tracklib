@@ -1,7 +1,6 @@
-# --------------------------- BuiltIn AF algo ---------------------------------
-# ds, speed, abs_curv
-# Algorithms to detect stop
-# -----------------------------------------------------------------------------
+"""ds, speed, abs_curv
+Algorithms to detect stop
+"""
 
 import math
 import tracklib.core.Utils as utils

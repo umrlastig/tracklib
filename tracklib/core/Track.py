@@ -2,6 +2,10 @@
 This module contains the class to manage GPS tracks. Points are referenced in geodetic coordinates
 """
 
+# For type annotation
+from __future__ import annotations
+from typing import Union
+
 import sys
 import math
 import copy
@@ -1819,12 +1823,17 @@ class Track:
             if (dim == 2) or (dim in ["z", "Z", "U"]):
                 self.getObs(i).position.setZ(val - self.getObs(i).position.getZ())
 
-    # ------------------------------------------------------------
-    # Removal of idle points at the begining or end of track
-    # Input: parameter to set and mode in "begin" or "end"
-    # Output: cleared track
-    # ------------------------------------------------------------
-    def removeIdleEnds(self, parameter, mode="begin"):
+    def removeIdleEnds(self, parameter, mode: str = "begin") -> Track:
+        """Removal of idle points at the begining or end of track
+
+        :param parameter: TODO
+        :param mode: Mode of cleaning. Choose between:
+
+            1. `'begin'`
+            2. `'end'`
+
+        :return: Cleared track
+        """
         track = self.copy()
         n = track.size()
         if track.size() <= 5:

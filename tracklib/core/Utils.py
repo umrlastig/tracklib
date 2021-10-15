@@ -2,6 +2,7 @@
 This module contains an algorithm of Analytical Features calculation and 
 some utility functions.
 """
+
 # For type annotation
 from __future__ import annotations
 from typing import Any, Iterable, Optional, Union

@@ -1,6 +1,4 @@
-"""
-Moduke to manage mapping of GPS tracks on geographic features
-"""
+"""Moduke to manage mapping of GPS tracks on geographic features"""
 
 # For type annotation
 from __future__ import annotations
@@ -191,9 +189,9 @@ def mapOn(
     framework. This method requires however that the "initial guess" (i.e. scale
     difference and rotation between both datasets) be not too far from reality, in
     order to reach a good solution. For standard least squares, time complexity of the
-    method is :math:`O(n^2)` with :math:`n` the number of points used for data matching. 
-    For ICP, data association step is :math:`O(n^2)` and least squares resolution 
-    is :math:`O(n^2)` hence an overall complexity equal to N_ITER_MAX * O(NPTS^2). 
+    method is :math:`O(n^2)` with :math:`n` the number of points used for data matching.
+    For ICP, data association step is :math:`O(n^2)` and least squares resolution
+    is :math:`O(n^2)` hence an overall complexity equal to N_ITER_MAX * O(NPTS^2).
     In general NPTS = 30 performs fair enough.
 
     Note that mapOn does not handle negative determinant (symetries not allowed)

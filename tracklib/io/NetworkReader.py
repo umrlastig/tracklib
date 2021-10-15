@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+"""Read network files"""
 
 import csv
 import progressbar

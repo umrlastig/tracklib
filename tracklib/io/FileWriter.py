@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Write GPS track to CSV file(s)."""
 
 import os

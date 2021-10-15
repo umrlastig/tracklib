@@ -1,7 +1,5 @@
-# --------------------------- Comparison --------------------------------------
-# --------------------------- Comparison --------------------------------------
-# Class to manage comparisons of GPS tracks
-# -----------------------------------------------------------------------------
+"""Class to manage comparisons of GPS tracks"""
+
 
 import sys
 import math
@@ -16,8 +14,8 @@ import tracklib.algo.Interpolation as Interpolation
 
 # ------------------------------------------------------------
 # Difference profile plot
-# ------------------------------------------------------------	
-def plotDifferenceProfile(profile, track2, af_name="pair", sym='g--', NO_DATA_VALUE=-1):
+# ------------------------------------------------------------
+def plotDifferenceProfile(profile, track2, af_name="pair", sym="g--", NO_DATA_VALUE=-1):
     for i in range(profile.size()):
         if profile.getObsAnalyticalFeature(af_name, i) == NO_DATA_VALUE:
             continue
@@ -25,45 +23,46 @@ def plotDifferenceProfile(profile, track2, af_name="pair", sym='g--', NO_DATA_VA
         y1 = profile.getObs(i).position.getY()
         x2 = track2.getObs(profile.getObsAnalyticalFeature(af_name, i)).position.getX()
         y2 = track2.getObs(profile.getObsAnalyticalFeature(af_name, i)).position.getY()
-        plt.plot([x1,x2],[y1,y2],sym,linewidth=0.5)
+        plt.plot([x1, x2], [y1, y2], sym, linewidth=0.5)
+
 
 # ------------------------------------------------------------
 # Profile of difference between two traces : t2 - t1
-# Two possible modes: 
+# Two possible modes:
 # - NN (Nearest Neighbour): O(n^2) time and O(n) space
 # - DTW (Dynamic Time Warping): O(n^3) time and O(n^2) space
 # - FDTW (Fast Dynamic Time Warping): same as DTW with reduced
-#   search space. In this particular case, 'ends' parameter is 
-#   an integer giving the number of points to search for a 
+#   search space. In this particular case, 'ends' parameter is
+#   an integer giving the number of points to search for a
 #   match ahead and behind the current point. E.g. for ends=0,
-#   there is a strict matching track1[i] <-> track2[i] for 
+#   there is a strict matching track1[i] <-> track2[i] for
 #   each epoch i. For ends=10 for example, each point track[i]
-#   can be matched with any point chronologically between the 
-#   bounds track2[i-10] and track2[i+10]. Default is equal to 
-#   3, meaning that track1 may be at most 3 times faster or 
-#   slower than track2 on ant given sub-interval. Note that 
-#   this method is designed for pairs of tracks having about 
-#   same number of points. Otherwise, it is strongly advised 
+#   can be matched with any point chronologically between the
+#   bounds track2[i-10] and track2[i+10]. Default is equal to
+#   3, meaning that track1 may be at most 3 times faster or
+#   slower than track2 on ant given sub-interval. Note that
+#   this method is designed for pairs of tracks having about
+#   same number of points. Otherwise, it is strongly advised
 #   to perform a spatial resampling before applying FDTW.
 # ------------------------------------------------------------
 # Output is a track objet, with an analytical feature diff
-# containing shortest distance of each point of track t1, to 
-# the points of track t2. We may get profile as a list with 
+# containing shortest distance of each point of track t1, to
+# the points of track t2. We may get profile as a list with
 # output.getAbsCurv() and output.getAnalyticalFeature("diff")
 # The selected candidate in registerd in AF "pair"
 # Set "ends" parameter to True to force end points to meet
-# p is Minkowski's exponent for distance computation. Default 
-# value is 1 for summation of distances, 2 for least squares 
-# solution and 10 for an approximation of Frechet solution. 
-# ------------------------------------------------------------		
+# p is Minkowski's exponent for distance computation. Default
+# value is 1 for summation of distances, 2 for least squares
+# solution and 10 for an approximation of Frechet solution.
+# ------------------------------------------------------------
 def differenceProfile(track1, track2, mode="NN", ends=False, p=1, verbose=True):
 
     output = track1.copy()
-    output.createAnalyticalFeature("diff");
-    output.createAnalyticalFeature("pair");
-    output.createAnalyticalFeature("ex");
-    output.createAnalyticalFeature("ey");
- 
+    output.createAnalyticalFeature("diff")
+    output.createAnalyticalFeature("pair")
+    output.createAnalyticalFeature("ex")
+    output.createAnalyticalFeature("ey")
+
     # --------------------------------------------------------
     # Nearest Neighbor (NN) algorithm
     # --------------------------------------------------------
@@ -81,8 +80,12 @@ def differenceProfile(track1, track2, mode="NN", ends=False, p=1, verbose=True):
                     id_min = j
             output.setObsAnalyticalFeature("diff", i, val_min)
             output.setObsAnalyticalFeature("pair", i, id_min)
-            ex = track1.getObs(i).position.getX() - track2.getObs(id_min).position.getX()
-            ey = track1.getObs(i).position.getY() - track2.getObs(id_min).position.getY()
+            ex = (
+                track1.getObs(i).position.getX() - track2.getObs(id_min).position.getX()
+            )
+            ey = (
+                track1.getObs(i).position.getY() - track2.getObs(id_min).position.getY()
+            )
             output.setObsAnalyticalFeature("ex", i, ex)
             output.setObsAnalyticalFeature("ey", i, ey)
 
@@ -90,75 +93,82 @@ def differenceProfile(track1, track2, mode="NN", ends=False, p=1, verbose=True):
     # Dynamic time warping (DTW) algorithm
     # --------------------------------------------------------
     if mode == "DTW":
-	
-        p = max(min(p,15),1e-2)
-        
+
+        p = max(min(p, 15), 1e-2)
+
         track1 = track1.copy()
         track2 = track2.copy()
-		
+
         # Forming distance matrix
         D = np.zeros((track1.size(), track2.size()))
         for i in range(track1.size()):
             for j in range(track2.size()):
-                D[i,j] = track1.getObs(i).distance2DTo(track2.getObs(j))**p
-        
+                D[i, j] = track1.getObs(i).distance2DTo(track2.getObs(j)) ** p
+
         # Optimal path with dynamic programming
         T = np.zeros((track1.size(), track2.size()))
         M = np.zeros((track1.size(), track2.size()))
-        T[0,0] = D[0,0]
-        M[0,0] = -1
-		
-		# Forward step
-        step_to_run = range(1,T.shape[0])
+        T[0, 0] = D[0, 0]
+        M[0, 0] = -1
+
+        # Forward step
+        step_to_run = range(1, T.shape[0])
         if verbose:
             step_to_run = progressbar.progressbar(step_to_run)
         for i in step_to_run:
-            T[i,0] = T[i-1,0] + D[i,0]
-            M[i,0] = 0
+            T[i, 0] = T[i - 1, 0] + D[i, 0]
+            M[i, 0] = 0
             for j in range(1, T.shape[1]):
-                K = D[i,0:(j+1)]
-                for k in range(j-1,-1,-1):
-                    K[k] = K[k] + K[k+1]
-                V = T[i-1,0:(j+1)] + K
-                M[i,j] = np.argmin(V) 
-                T[i,j] = V[int(M[i,j])]
-                
-        
+                K = D[i, 0 : (j + 1)]
+                for k in range(j - 1, -1, -1):
+                    K[k] = K[k] + K[k + 1]
+                V = T[i - 1, 0 : (j + 1)] + K
+                M[i, j] = np.argmin(V)
+                T[i, j] = V[int(M[i, j])]
+
         # Backward step
-        S = [0]*(track1.size())
+        S = [0] * (track1.size())
         if ends:
-            S[track1.size()-1] = int(M[track1.size()-1,track2.size()-1]) 
+            S[track1.size() - 1] = int(M[track1.size() - 1, track2.size() - 1])
         else:
-            S[track1.size()-1] = np.argmin(T[track1.size()-1,:])
-        for i in range(track1.size()-2, -1, -1):
-            S[i] = int(M[i+1,S[i+1]])
-			
-        #print((T[track1.size()-1, S[track1.size()-1]] / track1.size())**(1.0/p))
-		
-        #plt.plot(S, 'r-')			
-        #plt.imshow(M)
+            S[track1.size() - 1] = np.argmin(T[track1.size() - 1, :])
+        for i in range(track1.size() - 2, -1, -1):
+            S[i] = int(M[i + 1, S[i + 1]])
+
+        # print((T[track1.size()-1, S[track1.size()-1]] / track1.size())**(1.0/p))
+
+        # plt.plot(S, 'r-')
+        # plt.imshow(M)
 
         __fillAFProfile(track1, track2, output, S)
-			
+
     # --------------------------------------------------------
     # Fast Dynamic time warping (FDTW) algorithm
     # --------------------------------------------------------
     if mode == "FDTW":
-	
+
         if isinstance(ends, bool):
             if not ends:
                 ends = 12
-	
-        S = lambda track, k: [p for p in range(max(0,k-ends),  min(len(track2)-1, k+ends))]
-        Q = lambda i,j,k,t: (j<i+30)*(j>=i)*1
-        P = lambda s,y,k,t: math.exp(-track2[s].position.distance2DTo(y))
 
-        Dynamics.HMM(S, Q, P).estimate(output, ["x","y"], mode=Dynamics.MODE_OBS_AS_2D_POSITIONS, verbose=2*verbose)
+        S = lambda track, k: [
+            p for p in range(max(0, k - ends), min(len(track2) - 1, k + ends))
+        ]
+        Q = lambda i, j, k, t: (j < i + 30) * (j >= i) * 1
+        P = lambda s, y, k, t: math.exp(-track2[s].position.distance2DTo(y))
 
-        __fillAFProfile(track1, track2, output, output['hmm_inference'])
+        Dynamics.HMM(S, Q, P).estimate(
+            output,
+            ["x", "y"],
+            mode=Dynamics.MODE_OBS_AS_2D_POSITIONS,
+            verbose=2 * verbose,
+        )
+
+        __fillAFProfile(track1, track2, output, output["hmm_inference"])
 
     output.compute_abscurv()
     return output
+
 
 def __fillAFProfile(track1, track2, output, S):
     for i in range(track1.size()):
@@ -173,48 +183,48 @@ def __fillAFProfile(track1, track2, output, S):
         output.setObsAnalyticalFeature("pair", i, S[i])
         output.setObsAnalyticalFeature("ex", i, ex)
         output.setObsAnalyticalFeature("ey", i, ey)
-				
-	
+
 
 def synchronize(self, track):
-        
-    '''Resampling of 2 tracks with linear interpolation
+
+    """Resampling of 2 tracks with linear interpolation
     on a common base of timestamps
-    track: track to synchronize with'''
-    
+    track: track to synchronize with"""
+
     Interpolation.synchronize(self, track)
+
 
 def compare(track1, track2):
 
-    '''Comparison of 2 tracks. Tracks are interpolated
+    """Comparison of 2 tracks. Tracks are interpolated
     linearly on a common base of timestamps
-    track: track to compare with'''
-    
+    track: track to compare with"""
+
     trackA = track1.copy()
     trackB = track2.copy()
-    
+
     track2.synchronize(track3)
-    
+
     rmse = 0
     for i in range(trackA.size()):
-        rmse += trackA.getObs(i).distanceTo(trackB.getObs(i))**2
-    
-    return math.sqrt(rmse/trackA.size())
-	
-	
+        rmse += trackA.getObs(i).distanceTo(trackB.getObs(i)) ** 2
+
+    return math.sqrt(rmse / trackA.size())
+
+
 # ------------------------------------------------------------
 # Computes central track of a track collection
 # Inputs:
 #     - tracks:  TrackCollection or list of tracks
-#     - mode  :  "NN", "DTW" or "FDTW" for track pair matching   
-# ------------------------------------------------------------	
+#     - mode  :  "NN", "DTW" or "FDTW" for track pair matching
+# ------------------------------------------------------------
 def centralTrack(tracks, mode="NN", verbose=True):
     tracks = tracks.copy()
     if isinstance(tracks, list):
         tracks = TrackCollection(tracks)
     base = tracks.toENUCoordsIfNeeded()
     central = tracks[0].copy()
-    for i in range(1,len(tracks)):
+    for i in range(1, len(tracks)):
         diff = differenceProfile(tracks[0], tracks[i], mode=mode, verbose=verbose)
         for j in range(len(central)):
             dx = tracks[i][diff["pair", j]].position.getX()
@@ -222,10 +232,7 @@ def centralTrack(tracks, mode="NN", verbose=True):
             dz = tracks[i][diff["pair", j]].position.getZ()
             central[j].position.translate(dx, dy, dz)
     for j in range(len(central)):
-        central[j].position.scale(1.0/len(tracks))
+        central[j].position.scale(1.0 / len(tracks))
     if not base is None:
         central.toGeoCoords(base)
     return central
-
-
-
