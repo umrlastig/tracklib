@@ -1,4 +1,6 @@
-# -*- coding: utf-8 -*-
+"""
+This module contains the class to manipulate rasters
+"""
 
 import math
 import matplotlib.pyplot as plt

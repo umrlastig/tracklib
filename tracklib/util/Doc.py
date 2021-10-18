@@ -17,7 +17,7 @@ import tracklib.io.FileReader as fr
 
 import tracklib.core.Track as t
 import tracklib.core.Operator as op
-import tracklib.io.PostgresReader as pg
+#import tracklib.io.PostgresReader as pg
 
 
 # =============================================================================

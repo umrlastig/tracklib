@@ -113,14 +113,20 @@ Examples
    simplify
    summarize
    
-
-
 .. toctree::
    :maxdepth: 1
    :caption: Use Cases
    
    ./usecase/speedprofil.rst
-   
+
+
+.. toctree::
+   :caption: Api
+
+   ./api_documentation/core.rst
+   ./api_documentation/algo.rst
+   ./api_documentation/io.rst
+   ./api_documentation/util.rst
 
 
 
