@@ -1,6 +1,6 @@
 """This module contains the class to manipulate a spatial Index"""
 
-
+from __future__ import annotations
 from typing import Any
 
 
@@ -21,6 +21,7 @@ import tracklib.util.Geometry as Geometry
 
 class SpatialIndex:
     """Definition of a spatial index"""
+
     def __init__(self, collection, resolution=None, margin=0.05, verbose=True):
         """Constructor of :class:`SaptialIndex` class
 
