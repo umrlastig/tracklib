@@ -13,10 +13,11 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath('..'))
-sys.path.insert(0, os.path.abspath('../'))
-sys.path.insert(0, os.path.abspath("../../tracklib"))
+#sys.path.insert(0, os.path.abspath('.'))
+#sys.path.insert(0, os.path.abspath('..'))
+#sys.path.insert(0, os.path.abspath('../'))
+sys.path.insert(0, os.path.abspath('../..'))
+#sys.path.insert(0, os.path.abspath("../../tracklib"))
 
 
 # -- Project information -----------------------------------------------------
