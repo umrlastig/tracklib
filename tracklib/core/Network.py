@@ -2,7 +2,7 @@
 
 # For type annotation
 from __future__ import annotations
-from typing import Literal, Union
+from typing import Literal, Union, Dict, Tuple
 
 import random
 from typing import Union
@@ -880,7 +880,7 @@ class Network:
 
     def all_shortest_distances(
         self, cut: float = 1e300, output_dict: dict = None
-    ) -> dict[tuple[int, int], float]:
+    ) -> Dict[Tuple[int, int], float]:
         """Computes all shortest distances between pairs of nodes
 
         The results are saved in a dictionnary `{key=(source, n), value=d}`.
