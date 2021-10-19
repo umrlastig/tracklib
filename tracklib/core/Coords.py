@@ -29,8 +29,8 @@ import copy
 import matplotlib.pyplot as plt
 
 
-Re = 6378137.0  # Earth equatorial radius
-Fe = 1.0 / 298.257223563  # Earth eccentricity
+Re: float = 6378137.0  #: Earth equatorial radius
+Fe: float = 1.0 / 298.257223563  #: Earth eccentricity
 
 
 class GeoCoords:

@@ -26,36 +26,39 @@ def plotDifferenceProfile(profile, track2, af_name="pair", sym="g--", NO_DATA_VA
         plt.plot([x1, x2], [y1, y2], sym, linewidth=0.5)
 
 
-# ------------------------------------------------------------
-# Profile of difference between two traces : t2 - t1
-# Two possible modes:
-# - NN (Nearest Neighbour): O(n^2) time and O(n) space
-# - DTW (Dynamic Time Warping): O(n^3) time and O(n^2) space
-# - FDTW (Fast Dynamic Time Warping): same as DTW with reduced
-#   search space. In this particular case, 'ends' parameter is
-#   an integer giving the number of points to search for a
-#   match ahead and behind the current point. E.g. for ends=0,
-#   there is a strict matching track1[i] <-> track2[i] for
-#   each epoch i. For ends=10 for example, each point track[i]
-#   can be matched with any point chronologically between the
-#   bounds track2[i-10] and track2[i+10]. Default is equal to
-#   3, meaning that track1 may be at most 3 times faster or
-#   slower than track2 on ant given sub-interval. Note that
-#   this method is designed for pairs of tracks having about
-#   same number of points. Otherwise, it is strongly advised
-#   to perform a spatial resampling before applying FDTW.
-# ------------------------------------------------------------
-# Output is a track objet, with an analytical feature diff
-# containing shortest distance of each point of track t1, to
-# the points of track t2. We may get profile as a list with
-# output.getAbsCurv() and output.getAnalyticalFeature("diff")
-# The selected candidate in registerd in AF "pair"
-# Set "ends" parameter to True to force end points to meet
-# p is Minkowski's exponent for distance computation. Default
-# value is 1 for summation of distances, 2 for least squares
-# solution and 10 for an approximation of Frechet solution.
-# ------------------------------------------------------------
-def differenceProfile(track1, track2, mode="NN", ends=False, p=1, verbose=True):
+def differenceProfile(track1, track2, mode="NN", ends=False, p=1, verbose: bool = True):
+    """Profile of difference between two traces
+    
+    Two possible modes:
+
+    - NN (Nearest Neighbour): :math:`O(n^2)` time and :math:`O(n)` space
+    - DTW (Dynamic Time Warping): :math:`O(n^3)` time and :math:`O(n^2)` space
+    - FDTW (Fast Dynamic Time Warping): same as DTW with reduced search space. In this
+      particular case, 'ends' parameter is an integer giving the number of points to
+      search for a match ahead and behind the current point. E.g. for ends=0, there is a
+      strict matching track1[i] <-> track2[i] for each epoch i. For ends=10 for example,
+      each point track[i] can be matched with any point chronologically between the
+      bounds track2[i-10] and track2[i+10]. Default is equal to 3, meaning that track1
+      may be at most 3 times faster or slower than track2 on ant given sub-interval.
+      Note that this method is designed for pairs of tracks having about same number of
+      points. Otherwise, it is strongly advised to perform a spatial resampling before
+      applying FDTW
+
+    :param track1: TODO
+    :param track2: TODO
+    :param mode: TODO
+    :param ends: TODO
+    :param p: TODO
+    :param verbose: Verbose mode
+    :return: A track objet, with an analytical feature diff containing shortest distance
+             of each point of track t1, to the points of track t2. We may get profile as
+             a list with :func:`output.getAbsCurv()` and
+             :func:`output.getAnalyticalFeature("diff")` The selected candidate in
+             registerd in AF "pair" Set "ends" parameter to True to force end points to
+             meet p is Minkowski's exponent for distance computation. Default value is
+             1 for summation of distances, 2 for least squares solution and 10 for an
+             approximation of Frechet solution.
+    """
 
     output = track1.copy()
     output.createAnalyticalFeature("diff")

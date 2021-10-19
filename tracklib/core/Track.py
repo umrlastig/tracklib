@@ -4,7 +4,7 @@ This module contains the class to manage GPS tracks. Points are referenced in ge
 
 # For type annotation
 from __future__ import annotations
-from typing import Literal, Union
+from typing import Any, Literal, Union
 
 import sys
 import math
@@ -855,45 +855,76 @@ class Track:
             # print(self.__compare(i-1, i, code))
         self.__POINTS = [self.__POINTS[i] for i in range(len(self)) if not TO_DEL[i]]
 
-    # -------------------------------------------------------------------------
-    # General function to perform computations on analytical features.
-    # Short-cut "op"
-    # -------------------------------------------------------------------------
-    # Case 1 : operator and operand listed separately
-    #    - operator : to be selected in Operator class
-    #    	-> Unary void operator  : arg2 = F(arg1), arg1, arg2 must be provided
-    #    	-> Binary void operator : arg3 = F(arg1, arg2)
-    #       -> Unary operator  :  F(arg1), arg1 must be provided
-    #       -> Binary operator :  F(arg1, arg2), arg1, arg2 must be provided
-    # Note that arg2 may be an AF name or a scalar value. When output AF name
-    # is not provided, it is automatically set as the first AF input in the
-    # formula. AF "x", "y", "z", "t", "timestamp" and "idx" are right away
-    # availables as "virtual" analytical features.
-    # -------------------------------------------------------------------------
-    # Case 2 : operator and operand listed in an algebraic expression
-    # arg1 defines the algebraic expression. If this expression contains '='
-    # sign, then output is registered as an AF in track, with name defined by
-    # the left-hand side of arg1. For example : track.operate("P=X+Y") performs
-    # the sum of AFs X and Y, and returns the result as an AF named P in track.
-    #   - Available operators : +, -, /, *, ^ in scalar and AF versions.
-    #   - Available functions : almost all those listed in Operator class
-    #   - Functions are expressed with '{}'. E.g: track.operate("P=LOG{X}")
-    #   - Special shorthand functions: D for differentiation, I for integration
-    #     D2 for second-order differentiation and >> (resp. <<) for advance
-    #     (resp. delay) scalar operators. E.g: track.operate("v=3.6*D{s}/D{t}")
-    #     performs speed computation (in km/h), provided that curvilinear
-    #     abscissa s is already ddefined inside track. It is equivalent to the
-    #     somehow more sophisticated following version with delay operator:
-    #     track.operate("v=3.6*(s-(s>>1))/(t-(t>>1))")
-    #   - It is possible to add external identificator to the computations by
-    #     using passing a dictionnary of variables in arg2. For example, to
-    #     divide an AF A in a track by a (beforehand unknown) variable var:
-    #     track.operate("A=A/factor", {'factor' : var}])
-    # -------------------------------------------------------------------------
     def op(self, operator, arg1=None, arg2=None, arg3=None):
+        """Shortcut for :func:`operate` function
+
+        :param operator: TODO
+        :param arg1: TODO
+        :param arg2: TODO
+        :param arg3: TODO
+        :return: TODO
+        """
         return self.operate(operator, arg1, arg2, arg3)
 
     def operate(self, operator, arg1=None, arg2=None, arg3=None):
+        """General function to perform computations on analytical features.
+
+        * Case 1 : operator and operand listed separately
+
+            - operator : to be selected in :class:`Operator` class
+
+                - Unary void operator  : arg2 = F(arg1), arg1, arg2 must be provided
+                - Binary void operator : arg3 = F(arg1, arg2)
+                - Unary operator  :  F(arg1), arg1 must be provided
+                - Binary operator :  F(arg1, arg2), arg1, arg2 must be provided
+
+        Note that arg2 may be an AF name or a scalar value. When output AF name
+        is not provided, it is automatically set as the first AF input in the
+        formula. AF "x", "y", "z", "t", "timestamp" and "idx" are right away
+        availables as "virtual" analytical features.
+
+        * Case 2 : operator and operand listed in an algebraic expression
+
+        arg1 defines the algebraic expression. If this expression contains '='
+        sign, then output is registered as an AF in track, with name defined by
+        the left-hand side of arg1. For example :
+
+        >>> track.operate("P=X+Y")
+
+        performs the sum of AFs X and Y, and returns the result as an AF named P
+        in track.
+
+        - Available operators : +, -, /, *, ^ in scalar and AF versions.
+        - Available functions : almost all those listed in Operator class
+        - Functions are expressed with ``'{}'``. E.g:
+
+          >>> track.operate("P=LOG{X}")
+
+        - Special shorthand functions: D for differentiation, I for integration D2 for
+          second-order differentiation and >> (resp. <<) for advance (resp. delay)
+          scalar operators. E.g:
+
+          >>> track.operate("v=3.6*D{s}/D{t}")
+
+          performs speed computation (in km/h), provided that curvilinear abscissa s is
+          already definedinside track. It is equivalent to the somehow more
+          sophisticated following version with delay operator:
+
+          >>> track.operate("v=3.6*(s-(s>>1))/(t-(t>>1))")
+
+        - It is possible to add external identificator to the computations by using
+          passing a dictionnary of variables in arg2. For example, to divide an AF A in
+          a track by a (beforehand unknown) variable var:
+
+          >>> track.operate("A=A/factor", {'factor' : var}])
+
+
+        :param operator: TODO
+        :param arg1: TODO
+        :param arg2: TODO
+        :param arg3: TODO
+        :return: TODO
+        """
 
         # Algebraic expression (arg1 = list of externals)
         if isinstance(operator, str):
@@ -990,18 +1021,24 @@ class Track:
             for i in range(len(arg1)):
                 operator.execute(self, arg1[i], arg2, arg3[i])
 
-    # -------------------------------------------------------------------------
-    # Algebraic operation on 2 tracks. Short-cut "biop"
-    # If expression contains a left hand side AF, it is added to self track.
-    # Self track and second track may have same name AF. Any AF referring to
-    # to the second track must be terminated with single ° character.
-    # For example t1.bioperate(t2, "a=b°+c") adds 1st track's AF c with 2nd
-    # track's AF b and the result a is stored in 1st track AF a.
-    # -------------------------------------------------------------------------
     def biop(self, track, expression):
+        """Shortcut for :func:`bioperate` function"""
         return self.bioperate(track, expression)
 
     def bioperate(self, track, expression):
+        """Algebraic operation on 2 tracks.
+
+        If expression contains a left hand side AF, it is added to self track. Self
+        track and second track may have same name AF. Any AF referring to to the second
+        track must be terminated with single ° character.
+
+        For example :
+
+        >>> t1.bioperate(t2, "a=b°+c")
+
+        adds 1st track's AF c with 2nd track's AF b and the result a is stored in 1st
+        track AF a.
+        """
         track_tmp = self.copy()
         expression = expression.strip()
         tab = Track.__makeRPN(expression)
@@ -1013,19 +1050,16 @@ class Track:
         self.createAnalyticalFeature(new_field, track_tmp[new_field])
         return track_tmp[new_field]
 
-    # =========================================================================
-    # Return a reversed track (based on index)
-    # Important: track may not be valid for some other functions
-    # Used mostly to simplify backward kalman filter formulation
-    # =========================================================================
     def reverse(self):
+        """Return a reversed track (based on index)
+
+        Important: track may not be valid for some other functions
+        Used mostly to simplify backward kalman filter formulation
+        """
         output = self.copy()
         output.__POINTS = output.__POINTS[::-1]
         return output
 
-    # =========================================================================
-    #  Resampling
-    # =========================================================================
     def resample(self, delta, algo=1, mode=2):
         """Resampling a track with linear interpolation
 
@@ -1339,37 +1373,6 @@ class Track:
     #         id_fin = self.size()-1
     #     return Cinematics.computeCurvAbsBetweenTwoPoints(self, id_ini, id_fin)
 
-    # ----------------------------------------------------------------------------------------------------
-    # Tools to query observations in a track with SQL-like commands. Output depends on the SELECT clause:
-    #     - If "SELECT *" then output is a copied track of the original track (with all its AF hopefully)
-    #     - If "SELECT f1, f2... fp", then output is a (p x n)-dimensional array, with p = number of fields
-    #       queried and n = number of observations selected by the WHERE conditions.
-    #     - If "SELECT AGG1(f1), AGG2(f2)... AGGp(fp)", with AGG1, AGG2,.. AGGp, a set of p aggregators,
-    #       then output is a p-dimensional array, with on value for each aggregator
-    #     - If "SELECT AGG(f)", then output is the floating point value returned by the operator.
-    # Note that operators take as input only analytical feature names. Therefore, "SELECT COUNT(*)" syntax
-    # is not allowed and must be replaced equivalently by "SELECT COUNT(f)" with any AF name f.
-    # General rules:
-    #     - Only SELECT and WHERE keywords (SET and DELETE available soon)
-    #     - All analytical features + x, y, z, t, and timestamp are available as fields
-    #     - Fields are written without quotes. They must not contain blank spaces
-    #     - "t" is time as integer in seconds since 1970/01/01 00:00:00, and "timestamp" is GPSTIme object
-    #     - Blank space must be used between every other words, symbols and operators
-    #     - WHERE clause may contain as many conditions as needed, separated by OR/AND key words
-    #     - Parenthesis are not allowed within WHERE clause. Use boolean algebra rules to reformulate
-    #       query without parenthesis: e.g. A AND (B OR C) = A AND B OR A AND C. Or use successive queries.
-    #     - Each condition must contain exactly 3 parts (separated by blank spaces) in this exact order:
-    #         (1) the name of an analytical feature to test
-    #         (2) a comparison operator among >, <, >=, <=, ==, != and LIKE (with % in str and timestamps)
-    #         (3) a threshold value which is automatically casted to the type of the AF given in (1).
-    #             Intended types accepted are: integers, floats, strings, boolean and GPSTime.
-    #             When GPSTime is used as a threshold value, eventhough it may contain 2 parts
-    #            (date and time), it must not be enclosed within quotes. For boolean, "1", "T" and "TRUE"
-    #             are considered as logical True, all other values are considered as False.
-    #     - Important: no computation allowed in WHERE conditions. E.g. "... WHERE z-2 > 10" not allowed
-    #     - Available aggregators: all unary operators as described in Operator.py, except MSE
-    #     - Capital letters must be used for SQL keywords SELECT, WHERE, AND, OR and aggregators
-    # ----------------------------------------------------------------------------------------------------
     def __condition(val1, operator, val2):
 
         if operator == "LIKE":
@@ -1397,7 +1400,64 @@ class Track:
         if operator == "!=":
             return val1 != val2
 
-    def query(self, cmd):
+    def query(self, cmd : str) -> list[Any]:
+        """Query observations in a track with SQL-like commands.
+
+        Output depends on the SELECT clause:
+
+            - If ``SELECT *`` then output is a copied track of the original track (with
+              all its AF hopefully)
+            - If ``SELECT f1, f2... fp``, then output is a (p x n)-dimensional array,
+              with p = number of fields queried and n = number of observations selected
+              by the WHERE conditions.
+            - If ``SELECT AGG1(f1), AGG2(f2)... AGGp(fp)``, with AGG1, AGG2,.. AGGp, a set
+              of p aggregators, then output is a p-dimensional array, with on value for
+              each aggregator
+            - If ``SELECT AGG(f)``, then output is the floating point value returned by
+              the operator.
+
+        Note that operators take as input only analytical feature names. Therefore,
+        ``SELECT COUNT(*)`` syntax is not allowed and must be replaced equivalently by
+        ``SELECT COUNT(f)`` with any AF name f.
+
+        General rules:
+
+            - Only ``SELECT`` and ``WHERE`` keywords (``SET`` and ``DELETE`` available 
+              soon)
+            - All analytical features + x, y, z, t, and timestamp are available as
+              fields
+            - Fields are written without quotes. They must not contain blank spaces
+            - "t" is time as integer in seconds since 1970/01/01 00:00:00, and
+              "timestamp" is GPSTIme object
+            - Blank space must be used between every other words, symbols and operators
+            - ``WHERE`` clause may contain as many conditions as needed, separated by 
+              ``OR`` / ``AND`` key words
+            - Parenthesis are not allowed within ``WHERE`` clause. Use boolean algebra 
+              rules to reformulate query without parenthesis: e.g.
+              ``A AND (B OR C) = A AND B OR A AND C``. Or use successive queries.
+            - Each condition must contain exactly 3 parts (separated by blank spaces) in
+              this exact order:
+
+                1. the name of an analytical feature to test
+                2. a comparison operator among >, <, >=, <=, ==, != and LIKE
+                   (with % in str and timestamps)
+                3. a threshold value which is automatically casted to the type of the AF
+                   given in (1). Intended types accepted are: integers, floats, strings,
+                   boolean and GPSTime. When GPSTime is used as a threshold value,
+                   eventhough it may contain 2 parts (date and time), it must not be
+                   enclosed within quotes. For boolean, "1", "T" and "TRUE" are
+                   considered as logical True, all other values are considered as False.
+
+            - Important: no computation allowed in ``WHERE`` conditions.
+              E.g. "... ``WHERE z-2 > 10``" not allowed
+            - Available aggregators: all unary operators as described in Operator.py,
+              except MSE
+            - Capital letters must be used for SQL keywords ``SELECT, WHERE, AND, OR`` 
+              and aggregator
+
+        :param cmd: TODO
+        :return: TODO
+        """
 
         cmd = cmd.strip()
 
