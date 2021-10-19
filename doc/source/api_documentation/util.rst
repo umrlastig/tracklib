@@ -4,12 +4,12 @@ Module util
 .. automodule:: util
     :members: 
 
-util.Doc
---------
+Doc
+---
 .. automodule:: util.Doc
     :members: 
 
-util.Geometry
--------------
+Geometry
+--------
 .. automodule:: util.Geometry
     :members: 

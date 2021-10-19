@@ -4,76 +4,19 @@ Module core
 .. automodule:: core
     :members: 
 
-core.Bbox
-----------
-.. automodule:: core.Bbox
-    :members:
+.. toctree::
 
-core.Coords
------------
-.. automodule:: core.Coords
-    :members:
-
-core.GPSTime
-------------
-.. automodule:: core.GPSTime
-    :members:
-
-core.Grid
----------
-.. automodule:: core.Grid
-    :members:
-
-core.Kernel
------------
-.. automodule:: core.Kernel
-    :members:
-
-core.Network
-------------
-.. automodule:: core.Network
-    :members:
-
-core.Obs
---------
-.. automodule:: core.Obs
-    :members:
-
-core.Operator
--------------
-.. autoclass:: core.Operator.Operator
-    :class-doc-from: class
-
-.. automodule:: core.Operator
-    :exclude-members: Operator
-    :members:
-
-core.Plot
--------------
-.. automodule:: core.Plot
-    :members:
-
-core.Raster
-------------
-.. automodule:: core.Raster
-    :members:
-
-core.SpatialIndex
------------------
-.. automodule:: core.SpatialIndex
-    :members:
-
-core.Track
-----------
-.. automodule:: core.Track
-    :members:
-
-core.TrackCollection
---------------------
-.. automodule:: core.TrackCollection
-    :members:
-
-core.Utils
-----------
-.. automodule:: core.Utils
-    :members:
+   ./core/core-bbox.rst
+   ./core/core-coords.rst
+   ./core/core-gpstime.rst
+   ./core/core-grid.rst
+   ./core/core-kernel.rst
+   ./core/core-network.rst
+   ./core/core-obs.rst
+   ./core/core-operator.rst
+   ./core/core-plot.rst
+   ./core/core-raster.rst
+   ./core/core-index.rst
+   ./core/core-track.rst
+   ./core/core-trackcollection.rst
+   ./core/core-utils.rst
