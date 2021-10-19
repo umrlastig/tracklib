@@ -880,10 +880,10 @@ class Network:
 
     def all_shortest_distances(
         self, cut: float = 1e300, output_dict: dict = None
-    ) -> Union[dict, None]:
+    ) -> dict[tuple[int, int], float]:
         """Computes all shortest distances between pairs of nodes
 
-        The results are saved in a dictionnary {key=(source, n), value=d}.
+        The results are saved in a dictionnary `{key=(source, n), value=d}`.
 
         If output dictionnary structure is provided as input, it is directly incremented
         during the process, otherwise, it is created before begining to search for
@@ -1001,7 +1001,7 @@ class Network:
 
     def prepare(self, cut: Union[float, None] = 1e300):
         """Precomputes shortest distances between all pairs of nodes and saves the
-        result in DISTANCES attribute.
+        result in :attr:`DISTANCES` attribute.
 
         :param cut: A maximal distance for search
         """
