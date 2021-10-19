@@ -13,7 +13,7 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('../..'))
+sys.path.insert(0, os.path.abspath("../.."))
 sys.path.insert(0, os.path.abspath("../../tracklib"))
 
 
@@ -73,5 +73,6 @@ autodoc_default_options = {
     "undoc-members": True,
     "private-members": False,
 }
+
 
 autodoc_mock_imports = []

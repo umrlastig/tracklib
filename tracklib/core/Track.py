@@ -4,7 +4,7 @@ This module contains the class to manage GPS tracks. Points are referenced in ge
 
 # For type annotation
 from __future__ import annotations
-from typing import Union
+from typing import Literal, Union
 
 import sys
 import math
@@ -49,13 +49,13 @@ class Track:
     def copy(self):
         return copy.deepcopy(self)
 
-    def __str__(self):
+    def __str__(self) -> str:
         output = ""
         for i in range(self.size()):
             output += (str)(self.__POINTS[i]) + "\n"
         return output
 
-    def getSRID(self):
+    def getSRID(self) -> str:
         return str(type(self.getFirstObs().position)).split(".")[-1][0:-8]
 
     def getTimeZone(self):
@@ -73,14 +73,14 @@ class Track:
         return self.getLastObs().timestamp - self.getFirstObs().timestamp
 
     # Average frequency    in Hz (resp. m/pt) for temporal (resp. spatial) mode
-    def frequency(self, mode="temporal"):
+    def frequency(self, mode: Literal["temporal", "spatial"] = "temporal") -> float:
         if (mode == "spatial") or (mode == 1):
             return self.size() / self.length()
         if (mode == "temporal") or (mode == 0):
             return self.size() / self.duration()
 
     # Inverse of average frequency in pt/sec (resp. pt/m) for temporal (resp. spatial) mode
-    def interval(self, mode="temporal"):
+    def interval(self, mode: Literal["temporal", "spatial"] = "temporal") -> float:
         return 1.0 / self.frequency(mode)
 
     # =========================================================================
@@ -698,7 +698,7 @@ class Track:
     #         id_fin = self.size()-1
     #     return Cinematics.computeDescDeniv(self, id_ini, id_fin)
 
-    def toWKT(self):
+    def toWKT(self) -> str:
         """Transforms track into WKT string"""
         output = "LINESTRING("
         for i in range(self.size()):

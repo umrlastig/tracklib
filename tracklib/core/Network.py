@@ -2,7 +2,7 @@
 
 # For type annotation
 from __future__ import annotations
-from typing import Union
+from typing import Literal, Union
 
 import random
 from typing import Union
@@ -279,7 +279,7 @@ class Network:
 
         :param tolerance: TODO
         :param mode: Mode of simplification. The possibles values are:
-        
+
             1. DOUGLAS_PEUCKER
             2. VISVALINGAM
             3. MINIMIZE_LARGEST_DEVIATION
@@ -689,8 +689,8 @@ class Network:
         self,
         source: Union[int, Node, Union[GeoCoords, ENUCoords, ECEFCoords]],
         cut: float,
-        mode: str = "TOPOLOGIC",
-        verbose: str = True,
+        mode: Literal["TOPOLOGIC", "GEOMETRIC"] = "TOPOLOGIC",
+        verbose: bool = True,
     ) -> Network:
         """Extracts sub-network from routing forward search
 
@@ -952,7 +952,7 @@ class Network:
         :param cut: a maximal distance for search
         :param output_dict: output structure for retrieved distances
 
-        :return: A track between source and target node. If target is not reachable 
+        :return: A track between source and target node. If target is not reachable
             during forward step, None object is output
         """
         self.run_routing_forward(source, target, cut=cut, output_dict=output_dict)

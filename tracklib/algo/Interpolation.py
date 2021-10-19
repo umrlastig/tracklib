@@ -1,5 +1,9 @@
 """Class to manage interpolation and smoothing functions"""
 
+# For type annotation
+from __future__ import annotations
+from typing import Literal
+
 import sys
 import math
 import numpy as np
@@ -30,7 +34,7 @@ GP_SMOOTHING = 0
 from tracklib.core.Track import Track
 
 
-def resample(track, delta, algo=1, mode=2):
+def resample(track, delta, algo: Literal[1, 2] = 1, mode: Literal[1, 2, 3, 4] = 2):
     """Resampling of a track with linear interpolation delta
 
     Interpolation interval (time in sec if temporal mode is selected,
@@ -53,6 +57,9 @@ def resample(track, delta, algo=1, mode=2):
         - an integer or float: interval in seconds
         - a list of timestamps where interpolation should be computed
         - a reference track
+
+    :param algo: TODO
+    :param mode: TODO
 
     """
 

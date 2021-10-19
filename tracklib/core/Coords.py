@@ -37,7 +37,7 @@ class GeoCoords:
     """Class to represent geographics coordinates"""
 
     def __init__(self, lon: float, lat: float, hgt: float = 0.0):
-        """__init__ Constructor of class:`GeoCoords` class
+        """Constructor of :class:`GeoCoords` class
 
         :param lon: longitude in decimal degrees
         :param lat: latitude in decimal degrees
@@ -48,7 +48,7 @@ class GeoCoords:
         self.hgt = hgt
 
     def __str__(self) -> str:
-        """__str__ Transform the object in string
+        """Transform the object in string
 
         :return: String representation of coordinates
         """
