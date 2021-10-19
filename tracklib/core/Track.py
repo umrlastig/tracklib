@@ -1101,7 +1101,7 @@ class Track:
            - TP1: list of tie points indices (relative to track self)
            - TP2: list of tie points indices (relative to track)
            - mode: could be "2D" (default) or "3D" if TP2 is not specified,
-                it is assumed equal to TP1.
+             it is assumed equal to TP1.
 
         TP1 and TP2 must have same size. Adjustment is performed with least squares.
         The general transformation from point X to point X' is provided below:

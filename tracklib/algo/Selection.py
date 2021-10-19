@@ -33,7 +33,7 @@ Constraints may be based on:
         - MODE_PARALLEL: tracks  following t are selected
 
    - a "toll gate" segment, defined by two Coords objects: tracks crossing 
-        (at least once) the toll gate are selected 
+     (at least once) the toll gate are selected 
 
 All these constraint may be provided with an additional time constraint, 
 specifying the time interval (between two GPSTime dates) where crossing /
