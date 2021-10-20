@@ -681,6 +681,7 @@ class Network:
     # calls of pairwise shortest_distance function.
     # ------------------------------------------------------------
     def __correctInputNode(self, node):
+        """TODO"""
         if isinstance(node, Node):
             return node.id
         return node

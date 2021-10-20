@@ -71,7 +71,7 @@ autodoc_default_options = {
     "member-order": "bysource",
     "special-members": "__init__, __str__",
     "undoc-members": True,
-    "private-members": False,
+    "private-members": True,
 }
 
 

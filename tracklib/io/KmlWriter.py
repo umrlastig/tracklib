@@ -14,6 +14,8 @@ from tracklib.core.Track import TrackCollection
 
 
 class KmlWriter:
+    """TODO"""
+
     @staticmethod
     def writeToKml(
         track,
@@ -136,6 +138,7 @@ class KmlWriter:
         print("KML written in file [" + path + "]")
 
     def __writeCollectionToKml(tracks, path, c1=[1, 1, 1, 1]):
+        """TODO"""
 
         clampToGround = True
         f = open(path, "w")

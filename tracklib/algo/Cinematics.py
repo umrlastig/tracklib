@@ -22,7 +22,12 @@ def estimate_speed(track):
 # Difference finie centree lissee
 # --------------------------------------------------
 def smoothed_speed_calculation(track, width):
+    """TODO
 
+    :param track: TODO
+    :param width: TODO
+    :return: TODO
+    """
     S = track.compute_abscurv()
     track.estimate_speed()
 
@@ -58,6 +63,12 @@ def estimate_heading(track):
 # Difference finie centree lissee
 # --------------------------------------------------
 def smoothed_speed_calculation(track, width):
+    """TODO
+
+    :param track: TODO
+    :param width: TODO
+    :return: TODO
+    """
 
     S = track.compute_abscurv()
     track.estimate_speed()

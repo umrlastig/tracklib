@@ -58,6 +58,7 @@ class GeoCoords:
         return output
 
     def copy(self) -> GeoCoords:
+        """TODO"""
         return copy.deepcopy(self)
 
     def toECEFCoords(self) -> ECEFCoords:
@@ -622,6 +623,7 @@ class ECEFCoords:
 # Static projection methods
 # --------------------------------------------------
 def _proj(coords, srid: int):
+    """TODO"""
     if srid == 2154:
         return _projToLambert93(coords)
     print("Error: SRID code " + str(srid) + " is not implmented in Tracklib")
@@ -629,6 +631,7 @@ def _proj(coords, srid: int):
 
 
 def _unproj(coords, srid: int):
+    """TODO"""
     if srid == 2154:
         return __projFromLambert93(coords)
     if (srid >= 32600) and (srid <= 32799):
@@ -640,7 +643,7 @@ def _unproj(coords, srid: int):
 
 
 def __projFromLambert93(coords) -> GeoCoords:
-
+    """TODO"""
     E = 0.08181919106
     Xp = 700000.000
     Yp = 12655612.050
@@ -664,6 +667,7 @@ def __projFromLambert93(coords) -> GeoCoords:
 
 
 def _projToLambert93(coords) -> ENUCoords:
+    """TODO"""
 
     E = 0.08181919106
     Xp = 700000.000
@@ -705,6 +709,7 @@ def _projToLambert93(coords) -> ENUCoords:
 # DEALINGS IN THE SOFTWARE.
 # --------------------------------------------------------------------------
 def _projFromUTM(coords, zone, northern=True):
+    """TODO"""
 
     x = coords.getX() - 500000
     y = coords.getY()

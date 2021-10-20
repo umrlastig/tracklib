@@ -119,13 +119,14 @@ class SpatialIndex:
                 self.addFeature(feature.geom, num)
 
     def __str__(self):
+        """TODO"""
         c = [(self.xmin + self.xmax) / 2.0, (self.ymin + self.ymax) / 2.0]
         output = "[" + str(self.csize) + " x " + str(self.lsize) + "] "
         output += "spatial index centered on [" + str(c[0]) + "; " + str(c[1]) + "]"
         return output
 
     def addFeature(self, track, num):
-        """ """
+        """TODO"""
         coord1 = None
         for i in range(track.size()):
             obs = track.getObs(i)
@@ -139,7 +140,8 @@ class SpatialIndex:
             coord1 = coord2
 
     def __addSegment(self, coord1, coord2, data):
-        """
+        """TODO
+
         data de type: int, liste, tuple, dictionnaire
         ajoute les données data dans toutes les cellules de la grille
                traversée par le segment [coord1, coord2] avec
@@ -166,6 +168,7 @@ class SpatialIndex:
                     self.inventaire.add((i, j, data))
 
     def __addPoint(self, coord, data):
+        """TODO"""
         pass
 
     # ------------------------------------------------------------
@@ -175,6 +178,7 @@ class SpatialIndex:
     # Returns None if out of grid
     # ------------------------------------------------------------
     def __getCell(self, coord):
+        """TODO"""
 
         if (coord.getX() < self.xmin) or (coord.getX() > self.xmax):
             overflow = "{:5.5f}".format(
@@ -200,6 +204,7 @@ class SpatialIndex:
     #   - base: plot support network or track collection if True
     # ------------------------------------------------------------
     def plot(self, base=True):
+        """TODO"""
 
         fig = plt.figure()
         ax = fig.add_subplot(
@@ -233,6 +238,7 @@ class SpatialIndex:
     # Plot a specific cell (i,j)
     # ------------------------------------------------------------
     def highlight(self, i, j, sym="r-", size=0.5):
+        """TODO"""
         x0 = self.xmin + i * self.dX
         x1 = x0 + self.dX
         y0 = self.ymin + j * self.dY
@@ -335,7 +341,8 @@ class SpatialIndex:
     # ------------------------------------------------------------
 
     def neighborhood(self, obj, j=None, unit=0):
-        """
+        """TODO
+
         retourne toutes les données (sous forme de liste simple) référencées
         dans la cellule (i,j).
 
@@ -460,6 +467,7 @@ class SpatialIndex:
     # assumed to be orthonormal) into unit number
     # ------------------------------------------------------------
     def groundDistanceToUnits(self, distance):
+        """TODO"""
         return math.floor(distance / max(self.dX, self.dY) + 1)
 
     # ------------------------------------------------------------
@@ -472,6 +480,7 @@ class SpatialIndex:
     #   or equal than u units (Manhattan L1 discretized distance)
     # ------------------------------------------------------------
     def __neighboringcells(self, i, j, u=0, incremental=False):
+        """TODO"""
         NC = []
         imin = max(i - u, 0)
         imax = min(i + u + 1, self.csize)
@@ -490,6 +499,7 @@ class SpatialIndex:
     # Add data registered in cell within TAB structure
     # ------------------------------------------------------------
     def __addCellValuesInTAB(self, TAB, cell):
+        """TODO"""
         values = self.request(cell[0], cell[1])
         for d in values:
             if d not in TAB:
@@ -499,6 +509,7 @@ class SpatialIndex:
     # List of cells crossing segment [coord1, coord2] (in px)
     # ------------------------------------------------------------
     def __cellsCrossSegment(self, coord1, coord2):
+        """TODO"""
 
         CELLS = []
         segment2 = [coord1[0], coord1[1], coord2[0], coord2[1]]
@@ -555,11 +566,13 @@ class SpatialIndex:
         return CELLS
 
     def save(self, filename):
+        """TODO"""
         outfile = open(filename, "wb")
         pickle.dump(self, outfile)
         outfile.close()
 
     def load(filename):
+        """TODO"""
         infile = open(filename, "rb")
         index = pickle.load(infile)
         infile.close()

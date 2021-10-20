@@ -15,10 +15,16 @@ from tracklib.io.FileFormat import FileFormat
 
 
 class FileWriter:
+    """TODO"""
+
     def __takeFirst(elem):
+        """TODO"""
+
         return elem[0]
 
     def __printInOrder(E, N, U, T, O, sep):
+        """TODO"""
+
         D = [E, N, U, T]
         output = ""
         output += str(D[O[0][1]]) + sep
@@ -121,6 +127,7 @@ class FileWriter:
         separator=",",
         h=0,
     ):
+        """TODO"""
 
         root = "track_output"
 

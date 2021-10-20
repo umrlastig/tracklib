@@ -327,9 +327,11 @@ class ExperimentalKernel:
             self.H[i] = i * r
 
     def addTrackPair(self, track1, track2):
+        """TODO"""
         self.addTrackCollection(TrackCollection([track1, track2]))
 
     def addTrackCollection(self, trackCollection, verbose=False):
+        """TODO"""
         import tracklib.algo.Comparison as Comparison  # <- Assez moche... A voir comment resoudre
 
         N = trackCollection.size()

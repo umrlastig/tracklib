@@ -6,6 +6,8 @@ from tracklib.core.TrackCollection import TrackCollection
 
 
 class GpxWriter:
+    """TODO"""
+
     @staticmethod
     def writeToGpx(tracks, path, af=False):
         """

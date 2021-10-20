@@ -58,6 +58,7 @@ __KHI_SQUARED_TABLE = [
 
 
 def khi2cdf(dof, prob=0.05):
+    """TODO"""
     if prob == 1:
         return 1e300
     if dof > 30:
@@ -72,11 +73,15 @@ def khi2cdf(dof, prob=0.05):
 
 
 def khi2test(X, SIGMA, prob=0.05):
+    """TODO"""
     return X.transpose() @ np.linalg.inv(SIGMA) @ X > khi2cdf(SIGMA.shape[0], prob)
 
 
 class NoiseProcess:
+    """TODO"""
+
     def __init__(self, amps=None, kernels=None, distribution=DISTRIBUTION_NORMAL):
+        """TODO"""
 
         if amps is None:
             self.amplitudes = [1]
@@ -94,6 +99,7 @@ class NoiseProcess:
             exit()
 
     def __str__(self):
+        """TODO"""
         output = "Noise process: "
         for i in range(len(self.amplitudes)):
             output += (
@@ -108,6 +114,7 @@ class NoiseProcess:
         return output
 
     def noise(self, track, N=1):
+        """TODO"""
         if N == 1:
             return noise(track, self.amplitudes, self.kernels, self.distribution)
         else:
@@ -119,6 +126,7 @@ class NoiseProcess:
             return collection
 
     def plot(self):
+        """TODO"""
         dh = self.kernels[0].support / 500.0
         h = np.arange(-self.kernels[0].support, self.kernels[0].support, dh)
         y = (
@@ -135,6 +143,7 @@ class NoiseProcess:
 
 
 def seed(integer):
+    """TODO"""
     random.seed(integer)
     np.random.seed(integer)
 
@@ -168,6 +177,7 @@ def gaussian_process(self, timestamps, kernel, factor=1.0, sigma=0.0, cp_var=Fal
 
 
 def randomColor():
+    """TODO"""
     return [random.random(), random.random(), random.random()]
 
 

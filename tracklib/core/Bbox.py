@@ -124,6 +124,7 @@ class Bbox:
         return self.ur.setY(ymax)
 
     def plot(self, sym="b-"):
+        """TODO"""
         X = [
             self.getXmin(),
             self.getXmax(),
@@ -158,6 +159,7 @@ class Bbox:
         return Bbox(ll, ur)
 
     def __and__(self, bbox):
+        """TODO"""
         return None  # TO DO
 
     def contains(self, point) -> bool:

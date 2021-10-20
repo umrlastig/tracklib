@@ -47,33 +47,41 @@ class Track:
         self.__analyticalFeaturesDico = {}
 
     def copy(self):
+        """TODO"""
         return copy.deepcopy(self)
 
     def __str__(self) -> str:
+        """TODO"""
         output = ""
         for i in range(self.size()):
             output += (str)(self.__POINTS[i]) + "\n"
         return output
 
     def getSRID(self) -> str:
+        """TODO"""
         return str(type(self.getFirstObs().position)).split(".")[-1][0:-8]
 
     def getTimeZone(self):
+        """TODO"""
         return self.getFirstObs().timestamp.zone
 
     def setTimeZone(self, zone):
+        """TODO"""
         for i in range(len(self)):
             self[i].timestamp.zone = zone
 
     def convertToTimeZone(self, zone):
+        """TODO"""
         for i in range(len(self)):
             self[i].timestamp = self[i].timestamp.convertToZone(zone)
 
     def duration(self):
+        """TODO"""
         return self.getLastObs().timestamp - self.getFirstObs().timestamp
 
     # Average frequency    in Hz (resp. m/pt) for temporal (resp. spatial) mode
     def frequency(self, mode: Literal["temporal", "spatial"] = "temporal") -> float:
+        """TODO"""
         if (mode == "spatial") or (mode == 1):
             return self.size() / self.length()
         if (mode == "temporal") or (mode == 0):
@@ -81,6 +89,7 @@ class Track:
 
     # Inverse of average frequency in pt/sec (resp. pt/m) for temporal (resp. spatial) mode
     def interval(self, mode: Literal["temporal", "spatial"] = "temporal") -> float:
+        """TODO"""
         return 1.0 / self.frequency(mode)
 
     # =========================================================================
@@ -88,6 +97,7 @@ class Track:
     # =========================================================================
 
     def toECEFCoords(self, base=None):
+        """TODO"""
         if self.getSRID() == "Geo":
             for i in range(self.size()):
                 self.getObs(i).position = self.getObs(i).position.toECEFCoords()
@@ -106,6 +116,7 @@ class Track:
             return
 
     def toENUCoords(self, base=None):
+        """TODO"""
         if self.getSRID() in ["Geo", "ECEF"]:
             if base == None:
                 base = self.getFirstObs().position
@@ -138,6 +149,7 @@ class Track:
             return base
 
     def toGeoCoords(self, base=None):
+        """TODO"""
         if self.getSRID() == "ECEF":
             for i in range(self.size()):
                 self.getObs(i).position = self.getObs(i).position.toGeoCoords()
@@ -154,6 +166,7 @@ class Track:
                 self.getObs(i).position = self.getObs(i).position.toGeoCoords(base)
 
     def toProjCoords(self, srid):
+        """TODO"""
         if not (self.getSRID().upper() == "GEO"):
             print(
                 "Error: track must be in GEO coordinate for projection to SRID = "
@@ -168,6 +181,7 @@ class Track:
     # Input: two points p1, p2 (image coordinates), P1, P2 (track coordinate system)
     # p1 and p2 are provided as lists. P1 and P2 are GeoCoords or ENUCoords.
     def toImageCoords(self, P1, P2, p1, p2):
+        """TODO"""
         if not (self.getSRID() in ["Geo", "ENU"]):
             print(
                 "Error: track coordinate system must be GEO or ENU for image projection"
@@ -185,6 +199,7 @@ class Track:
     # Function to convert track to ENUCoords if it is in GeoCoords. Returns None
     # if no transformation operated, and returns used reference point otherwise
     def toENUCoordsIfNeeded(self):
+        """TODO"""
         base = None
         if self.getSRID() in ["GEO", "Geo"]:
             base = self.getObs(0).position.copy()
@@ -195,23 +210,29 @@ class Track:
     # Basic methods to get metadata and/or data
     # =========================================================================
     def size(self):
+        """TODO"""
         return len(self.__POINTS)
 
     def getFirstObs(self):
+        """TODO"""
         return self.__POINTS[0]
 
     def getLastObs(self):
+        """TODO"""
         return self.__POINTS[self.size() - 1]
 
     def getObsList(self):
+        """TODO"""
         return self.__POINTS
 
     def getObs(self, i):
+        """TODO"""
         if i < 0:
             raise IndexError
         return self.__POINTS[i]
 
     def getX(self, i=None):
+        """TODO"""
         if i is None:
             X = []
             for i in range(self.size()):
@@ -221,6 +242,7 @@ class Track:
         return X
 
     def getY(self, i=None):
+        """TODO"""
         if i is None:
             Y = []
             for i in range(self.size()):
@@ -230,6 +252,7 @@ class Track:
         return Y
 
     def getZ(self, i=None):
+        """TODO"""
         if i is None:
             Z = []
             for i in range(self.size()):
@@ -239,6 +262,7 @@ class Track:
         return Z
 
     def getT(self, i=None):
+        """TODO"""
         if i is None:
             T = []
             for i in range(self.size()):
@@ -248,6 +272,7 @@ class Track:
         return T
 
     def getTimestamps(self, i=None):
+        """TODO"""
         if i is None:
             T = []
             for i in range(self.size()):
@@ -257,6 +282,7 @@ class Track:
         return T
 
     def getCentroid(self):
+        """TODO"""
         m = self.getObs(0).position.copy()
         m.setX(self.operate(Operator.Operator.AVERAGER, "x"))
         m.setY(self.operate(Operator.Operator.AVERAGER, "y"))
@@ -265,27 +291,35 @@ class Track:
         return m
 
     def getEnclosedPolygon(self):
+        """TODO"""
         return Polygon(self.getX(), self.getY())
 
     def getMinX(self):
+        """TODO"""
         return self.operate(Operator.Operator.MIN, "x")
 
     def getMinY(self):
+        """TODO"""
         return self.operate(Operator.Operator.MIN, "y")
 
     def getMinZ(self):
+        """TODO"""
         return self.operate(Operator.Operator.MIN, "z")
 
     def getMaxX(self):
+        """TODO"""
         return self.operate(Operator.Operator.MAX, "x")
 
     def getMaxY(self):
+        """TODO"""
         return self.operate(Operator.Operator.MAX, "y")
 
     def getMaxZ(self):
+        """TODO"""
         return self.operate(Operator.Operator.MAX, "z")
 
     def getLowerLeftPoint(self):
+        """TODO"""
         ll = self.getObs(0).position.copy()
         ll.setX(self.getMinX())
         ll.setY(self.getMinY())
@@ -293,6 +327,7 @@ class Track:
         return ll
 
     def getUpperRightPoint(self):
+        """TODO"""
         ur = self.getObs(0).position.copy()
         ur.setX(self.getMaxX())
         ur.setY(self.getMaxY())
@@ -300,9 +335,11 @@ class Track:
         return ur
 
     def bbox(self):
+        """TODO"""
         return Bbox(self.getLowerLeftPoint(), self.getUpperRightPoint())
 
     def shiftTo(self, idx_point, new_coords=ENUCoords(0, 0, 0)):
+        """TODO"""
         if self.getSRID() != "ENU":
             print("Error: shift may be applied only to ENU coords")
             exit()
@@ -311,23 +348,28 @@ class Track:
             self.getObs(i).position = delta + self.getObs(i).position
 
     def makeOdd(self):
+        """TODO"""
         if self.size() % 2 == 0:
             self.__POINTS.pop()
 
     def makeEven(self):
+        """TODO"""
         if self.size() % 2 == 1:
             self.__POINTS.pop()
 
     # Internal methods
     def __transmitAF(self, track):
+        """TODO"""
         self.__analyticalFeaturesDico = track.__analyticalFeaturesDico.copy()
 
     def hasAnalyticalFeature(self, af_name):
+        """TODO"""
         return (af_name in self.__analyticalFeaturesDico) or (
             af_name in ["x", "y", "z", "t", "timestamp", "idx"]
         )
 
     def getAnalyticalFeatures(self, af_names):
+        """TODO"""
         af_names = Utils.listify(af_names)
         output = []
         for af in af_names:
@@ -370,6 +412,7 @@ class Track:
         return AF
 
     def getObsAnalyticalFeatures(self, af_names, i):
+        """TODO"""
         af_names = Utils.listify(af_names)
         output = []
         for af in af_names:
@@ -377,6 +420,7 @@ class Track:
         return output
 
     def getObsAnalyticalFeature(self, af_name, i):
+        """TODO"""
         if af_name == "x":
             return self.getObs(i).position.getX()
         if af_name == "y":
@@ -397,6 +441,7 @@ class Track:
         return self.__POINTS[i].features[index]
 
     def setObsAnalyticalFeature(self, af_name, i, val):
+        """TODO"""
         if af_name == "x":
             self.getObs(i).position.setX(val)
             return
@@ -414,25 +459,31 @@ class Track:
         self.__POINTS[i].features[index] = val
 
     def getListAnalyticalFeatures(self):
+        """TODO"""
         return list(self.__analyticalFeaturesDico.keys())
 
     def setXFromAnalyticalFeature(self, af_name):
+        """TODO"""
         for i in range(self.size()):
             self.getObs(i).position.setX(self.getObsAnalyticalFeature(af_name, i))
 
     def setYFromAnalyticalFeature(self, af_name):
+        """TODO"""
         for i in range(self.size()):
             self.getObs(i).position.setY(self.getObsAnalyticalFeature(af_name, i))
 
     def setZFromAnalyticalFeature(self, af_name):
+        """TODO"""
         for i in range(self.size()):
             self.getObs(i).position.setZ(self.getObsAnalyticalFeature(af_name, i))
 
     def setTFromAnalyticalFeature(self, af_name):
+        """TODO"""
         for i in range(self.size()):
             self.getObs(i).timestamp = self.getObsAnalyticalFeature(af_name, i)
 
     def setOrder(self, name="order", start=0):
+        """TODO"""
         self.createAnalyticalFeature("order", list(range(start, start + self.size())))
 
     # =========================================================================
@@ -440,6 +491,7 @@ class Track:
     # =========================================================================
 
     def sort(self):
+        """TODO"""
         sort_index = np.argsort(np.array(self.getTimestamps()))
         new_list = []
         for i in range(self.size()):
@@ -447,38 +499,47 @@ class Track:
         self.__POINTS = new_list
 
     def isSorted(self):
+        """TODO"""
         for i in range(self.size() - 1):
             if self.__POINTS[i + 1].timestamp - self.__POINTS[i].timestamp <= 0:
                 return False
         return True
 
     def addObs(self, obs):
+        """TODO"""
         self.__POINTS.append(obs)
 
     def insertObs(self, obs, i=None):
+        """TODO"""
         if i == None:
             self.insertObsInChronoOrder(obs)
         else:
             self.__POINTS.insert(i, obs)
 
     def insertObsInChronoOrder(self, obs):
+        """TODO"""
         self.insertObs(obs, self.__getInsertionIndex(obs.timestamp))
 
     def setObs(self, i, obs):
+        """TODO"""
         self.__POINTS[i] = obs
 
     def setObsList(self, list_of_obs):
+        """TODO"""
         self.__POINTS = list_of_obs
 
     def removeObs(self, arg):
+        """TODO"""
         return self.removeObsList([arg])
 
     def popObs(self, idx):
+        """TODO"""
         obs = self.getObs(idx)
         self.removeObs(idx)
         return obs
 
     def removeObsList(self, tab):
+        """TODO"""
         if len(tab) == 0:
             return 0
         tab.sort()
@@ -496,15 +557,18 @@ class Track:
         return 0
 
     def setUid(self, used_id):
+        """TODO"""
         self.uid = used_id
 
     def setTid(self, trace_id):
+        """TODO"""
         self.tid = trace_id
 
     # ------------------------------------------------------------------
     # Timestamp sort in O(n)
     # ------------------------------------------------------------------
     def sortRadix(self):
+        """TODO"""
 
         SEC = []
         for sec in range(60 * 1000):
@@ -566,11 +630,13 @@ class Track:
     # Basic private methods to handle track object
     # =========================================================================
     def __removeObsById(self, i):
+        """TODO"""
         length = self.size()
         del self.__POINTS[i]
         return length - self.size()
 
     def __removeObsByTimestamp(self, tps):
+        """TODO"""
         for i in range(self.size()):
             if self.__POINTS[i].timestamp == tps:
                 self.__removeObsById(i)
@@ -578,18 +644,21 @@ class Track:
         return 0
 
     def __removeObsListById(self, tab_idx):
+        """TODO"""
         counter = 0
         for i in range(len(tab_idx) - 1, -1, -1):
             counter += self.__removeObsById(tab_idx[i])
         return counter
 
     def __removeObsListByTimestamp(self, tab_tps):
+        """TODO"""
         counter = 0
         for i in range(len(tab_tps)):
             counter += self.__removeObsByTimestamp(tab_tps[i])
         return counter
 
     def __getInsertionIndex(self, timestamp):
+        """TODO"""
         N = self.size()
         if N == 0:
             return 0
@@ -619,7 +688,9 @@ class Track:
         return id
 
     def print(self, af_names="#all_features"):
-        """Console print of track with analytical features"""
+        """TODO
+
+        Console print of track with analytical features"""
         if self.size() == 0:
             return
         if af_names == "#all_features":
@@ -641,7 +712,8 @@ class Track:
             print(output)
 
     def summary(self):
-        """
+        """TODO
+
         Print summary (complete wkt below)
         """
         output = "-------------------------------------\n"
@@ -666,9 +738,10 @@ class Track:
             output += "\n-------------------------------------\n"
         print(output)
 
-    def length(self):
-        """
-        Total length of track
+    def length(self) -> int:
+        """Total length of track
+
+        :return: Length of track
         """
         s = 0
         for i in range(1, self.size()):
@@ -713,11 +786,12 @@ class Track:
         output += ")"
         return output
 
-    def extract(self, id_ini, id_fin):
-        """
-        Extract between two indices from a track
-        id_ini: Initial index of extraction
-        id_fin: final index of extraction
+    def extract(self, id_ini: int, id_fin: int) -> Track:
+        """Extract between two indices from a track
+
+        :param id_ini: Initial index of extraction
+        :param id_fin: final index of extraction
+        :retun: TODO
         """
         track = Track(base=self.base)
         track.setUid(self.uid)
@@ -727,8 +801,8 @@ class Track:
         return track
 
     def extractSpanTime(self, tini, tfin=None):
-        """
-        Extract span time from a track
+        """Extract span time from a track
+
         tini: Initial time of extraction
         tfin: final time of extraction
         """
@@ -761,6 +835,7 @@ class Track:
     # Analytical algorithms
     # =========================================================================
     def __controlName(name):
+        """TODO"""
         if name in ["x", "y", "z", "t", "timestamp", "idx"]:
             sys.exit("Error: analytical feature name '" + name + "' is not available")
 
@@ -811,6 +886,7 @@ class Track:
                 self.getObs(i).features.append(val_init)
 
     def removeAnalyticalFeature(self, name):
+        """TODO"""
         if not self.hasAnalyticalFeature(name):
             sys.exit("Error: track does not contain analytical feature '" + name + "'")
         idAF = self.__analyticalFeaturesDico[name]
@@ -834,6 +910,7 @@ class Track:
     # E.g. "XYT" : obs with same (X,Y,T) are considered identical
     # -------------------------------------------------------------------------
     def __compare(self, k1, k2, code):
+        """TODO"""
         same = True
         if "X" in code:
             same = same and (self[k1].position.getX() == self[k2].position.getX())
@@ -849,6 +926,7 @@ class Track:
         return same
 
     def cleanDuplicates(self, code="XYZ"):
+        """TODO"""
         TO_DEL = [False] * len(self)
         for i in range(1, len(self)):
             TO_DEL[i] = self.__compare(i - 1, i, code)
@@ -1099,6 +1177,7 @@ class Track:
     #  Thin plates smoothing
     # =========================================================================
     def smooth(self, constraint=1e3):
+        """TODO"""
         from tracklib.algo.Interpolation import SPLINE_PENALIZATION
         from tracklib.algo.Interpolation import ALGO_THIN_SPLINES
         from tracklib.algo.Interpolation import MODE_TEMPORAL
@@ -1160,6 +1239,7 @@ class Track:
     #  Adding noise to tracks
     # =========================================================================
     def noise(self, sigma=5, kernel=None):
+        """TODO"""
         from tracklib.algo.Stochastics import noise as stochastics_noise
 
         if kernel is None:
@@ -1172,6 +1252,7 @@ class Track:
     def plotAsMarkers(
         self, size=8, frg="k", bkg="w", sym_frg="+", sym_bkg="o", type=None
     ):
+        """TODO"""
         if not type is None:
             if type == Plot.MARKERS_TYPE_NO_ENTRY:
                 frg = "w"
@@ -1240,6 +1321,7 @@ class Track:
     # first two dimensions are arbitrarily considered
     # ----------------------------------------------------
     def plotEllipses(self, sym="r-", factor=3, af=None, append=True):
+        """TODO"""
         plot = Plot.Plot(self)
         plot.sym = sym
         plot.w = 6
@@ -1282,9 +1364,7 @@ class Track:
         plot.plotProfil(template, afs)
 
     def plotAnalyticalFeature(self, af_name, template="BOXPLOT"):
-        """
-        TEMPLATE: BOXPLOT
-        """
+        """TODO"""
         plot = Plot.Plot(self)
         plot.plotAnalyticalFeature(af_name, template)
 
@@ -1296,6 +1376,7 @@ class Track:
     # =========================================================================
     # DEPRECATED
     def simplify(self, tolerance, mode=1):
+        """TODO"""
         from tracklib.algo.Simplification import simplify as simplification_simplify
 
         return simplification_simplify(self, tolerance, mode)
@@ -1315,17 +1396,20 @@ class Track:
 
     # DEPRECATED
     def estimate_raw_speed(self):
+        """TODO"""
         from tracklib.algo.Cinematics import estimate_speed
 
         return estimate_speed(self)
 
     # DEPRECATED
     def smoothed_speed_calculation(self, kernel):
+        """TODO"""
         from tracklib.algo.Cinematics import smoothed_speed_calculation
 
         return smoothed_speed_calculation(self, kernel)
 
     def getSpeed(self):
+        """TODO"""
         if self.hasAnalyticalFeature(BIAF_SPEED):
             return self.getAnalyticalFeature(BIAF_SPEED)
         else:
@@ -1358,6 +1442,7 @@ class Track:
         return computeAbsCurv(self)
 
     def getAbsCurv(self):
+        """TODO"""
         if self.hasAnalyticalFeature(BIAF_ABS_CURV):
             return self.getAnalyticalFeature(BIAF_ABS_CURV)
         else:
@@ -1374,6 +1459,7 @@ class Track:
     #     return Cinematics.computeCurvAbsBetweenTwoPoints(self, id_ini, id_fin)
 
     def __condition(val1, operator, val2):
+        """TODO"""
 
         if operator == "LIKE":
             return Utils.compLike(str(val1), val2)
@@ -1400,7 +1486,7 @@ class Track:
         if operator == "!=":
             return val1 != val2
 
-    def query(self, cmd : str) -> list[Any]:
+    def query(self, cmd: str) -> list[Any]:
         """Query observations in a track with SQL-like commands.
 
         Output depends on the SELECT clause:
@@ -1422,7 +1508,7 @@ class Track:
 
         General rules:
 
-            - Only ``SELECT`` and ``WHERE`` keywords (``SET`` and ``DELETE`` available 
+            - Only ``SELECT`` and ``WHERE`` keywords (``SET`` and ``DELETE`` available
               soon)
             - All analytical features + x, y, z, t, and timestamp are available as
               fields
@@ -1430,9 +1516,9 @@ class Track:
             - "t" is time as integer in seconds since 1970/01/01 00:00:00, and
               "timestamp" is GPSTIme object
             - Blank space must be used between every other words, symbols and operators
-            - ``WHERE`` clause may contain as many conditions as needed, separated by 
+            - ``WHERE`` clause may contain as many conditions as needed, separated by
               ``OR`` / ``AND`` key words
-            - Parenthesis are not allowed within ``WHERE`` clause. Use boolean algebra 
+            - Parenthesis are not allowed within ``WHERE`` clause. Use boolean algebra
               rules to reformulate query without parenthesis: e.g.
               ``A AND (B OR C) = A AND B OR A AND C``. Or use successive queries.
             - Each condition must contain exactly 3 parts (separated by blank spaces) in
@@ -1452,7 +1538,7 @@ class Track:
               E.g. "... ``WHERE z-2 > 10``" not allowed
             - Available aggregators: all unary operators as described in Operator.py,
               except MSE
-            - Capital letters must be used for SQL keywords ``SELECT, WHERE, AND, OR`` 
+            - Capital letters must be used for SQL keywords ``SELECT, WHERE, AND, OR``
               and aggregator
 
         :param cmd: TODO
@@ -1590,6 +1676,7 @@ class Track:
     # ------------------------------------------------------------
 
     def __makeRPN(expression):
+        """TODO"""
         s = expression
         for operator in ["=", "<>", "+-", "!", "*/", "%", "^", "@", "&$"]:
             depth = 0
@@ -1608,6 +1695,7 @@ class Track:
         return [s]
 
     def __applyOperation(self, op1, op2, operator, temp_af_counter):
+        """TODO"""
         # Handling special case of affectation
         if operator == "=":
             if self.hasAnalyticalFeature(op2):
@@ -1706,6 +1794,7 @@ class Track:
         exit(1)
 
     def __evaluateRPN(self, expression, external=[]):
+        """TODO"""
         stack = []
         operators = ["=", "+", "-", "*", "/", "^", "@", "&", "$", "<", ">", "%", "!"]
         temp_af_counter = 0
@@ -1727,6 +1816,7 @@ class Track:
         return expression
 
     def __convertReflexOperator(expression):
+        """TODO"""
         OPS = ["+", "-", "*", "/", "^", ">>", "<<", "%", "!"]
         for op in OPS:
             if op + "=" in expression:
@@ -1735,6 +1825,7 @@ class Track:
         return expression
 
     def __unaryOp(expression):
+        """TODO"""
         if expression[0] in ["-", "+"]:
             expression = "0" + expression
         expression = expression.replace("=-", "=0-").replace("=+", "=0+")
@@ -1744,6 +1835,7 @@ class Track:
         return expression
 
     def __specialOpChar(expression):
+        """TODO"""
         expression = expression.replace("**", "^")
         expression = expression.replace(".*", "!")
         expression = expression.replace("{", "@(").replace("}", ")")
@@ -1751,6 +1843,7 @@ class Track:
         return expression
 
     def __prime(rpn):
+        """TODO"""
         out = []
         for e in rpn:
             if e[-1] == "'":
@@ -1761,9 +1854,11 @@ class Track:
         return out
 
     def __double_prime(rpn):
+        """TODO"""
         return Track.__prime(Track.__prime(rpn))
 
     def __evaluate(self, expression, external=[]):
+        """TODO"""
         expression = expression.replace(" ", "")
         expression = Track.__specialOpChar(expression)
         expression = Track.__convertReflexOperator(expression)
@@ -1791,6 +1886,7 @@ class Track:
     # Output: rotated track (in ENU coords)
     # ------------------------------------------------------------
     def rotate(self, theta):
+        """TODO"""
         if not (self.getSRID() == "ENU"):
             print("Error: track to rotate must be in ENU coordinates")
             exit()
@@ -1805,6 +1901,7 @@ class Track:
     # Output: rotated track (in ENU/ECEF coords)
     # ------------------------------------------------------------
     def rotate3D(self, R):
+        """TODO"""
         if not (self.getSRID() in ["ENU", "ECEF"]):
             print("Error: track to scale must be in ENU/ECEF coordinates")
             exit()
@@ -1822,6 +1919,7 @@ class Track:
     # Output: scaled track (in ENU coords)
     # ------------------------------------------------------------
     def scale(self, h):
+        """TODO"""
         if not (self.getSRID() == "ENU"):
             print("Error: track to scale must be in ENU coordinates")
             exit()
@@ -1837,6 +1935,7 @@ class Track:
     # Output: scaled track (in ENU coords)
     # ------------------------------------------------------------
     def scale3D(self, h, center=None):
+        """TODO"""
         if not (self.getSRID() in ["ENU", "ECEF"]):
             print("Error: track to scale must be in ENU/ECEF coordinates")
             exit()
@@ -1859,6 +1958,7 @@ class Track:
     # Output: translated track (in ENU coords)
     # ------------------------------------------------------------
     def translate(self, tx, ty, tz=0):
+        """TODO"""
         if not (self.getSRID() == "ENU"):
             print("Error: track to scale must be in ENU coordinates")
             exit()
@@ -1872,6 +1972,7 @@ class Track:
     # Output: translated track (in ENU r ECEF coords)
     # ------------------------------------------------------------
     def symmetrize(self, dim, val=0):
+        """TODO"""
         if not (self.getSRID() in ["ENU", "ECEF"]):
             print("Error: track to scale must be in ENU/ECEF coordinates")
             exit()
@@ -1929,6 +2030,7 @@ class Track:
     # [+] Concatenation of two tracks
     # ------------------------------------------------------------
     def __add__(self, track):
+        """TODO"""
         t1 = self  # copy (long) ?
         t2 = track  # copy (long) ?
         AF1 = self.getListAnalyticalFeatures()
@@ -1948,6 +2050,7 @@ class Track:
     # [/] Even split of tracks (returns n+1 segments)
     # ------------------------------------------------------------
     def __truediv__(self, number):
+        """TODO"""
         N = (int)(self.size() / number)
         R = self.size() - N * number
         SPLITS = TrackCollection()
@@ -1963,6 +2066,7 @@ class Track:
     # [>] Removes first n points of track or time comp
     # ------------------------------------------------------------
     def __gt__(self, arg):
+        """TODO"""
         if isinstance(arg, Track):
             t1i = self.getFirstObs().timestamp
             t2f = arg.getLastObs().timestamp
@@ -1978,6 +2082,7 @@ class Track:
     # [<] Removes last n points of track or time comp
     # ------------------------------------------------------------
     def __lt__(self, arg):
+        """TODO"""
         if isinstance(arg, Track):
             t1f = self.getLastObs().timestamp
             t2i = arg.getFirstObs().timestamp
@@ -1993,6 +2098,7 @@ class Track:
     # [>=] Remove idle points at the start of track or time comp
     # ------------------------------------------------------------
     def __ge__(self, arg):
+        """TODO"""
         if isinstance(arg, Track):
             t1i = self.getFirstObs().timestamp
             t1f = self.getLastObs().timestamp
@@ -2006,6 +2112,7 @@ class Track:
     # [<=] Remove idle points at the end of track or time comp
     # ------------------------------------------------------------
     def __le__(self, arg):
+        """TODO"""
         if isinstance(arg, Track):
             t1i = self.getFirstObs().timestamp
             t1f = self.getLastObs().timestamp
@@ -2019,12 +2126,14 @@ class Track:
     # [!=] Available operator
     # ------------------------------------------------------------
     def __neq__(self, arg):
+        """TODO"""
         return None
 
     # ------------------------------------------------------------
     # [Unary -] Available operator
     # ------------------------------------------------------------
     def __neg__(self, arg):
+        """TODO"""
         return None
 
     # ------------------------------------------------------------
@@ -2032,6 +2141,7 @@ class Track:
     # Linear interpolation and temporal resampling
     # ------------------------------------------------------------
     def __pow__(self, nb_points):
+        """TODO"""
         output = self.copy()
         dt = output.duration() / (nb_points) * (1 - 1e-3)
         output.resample(dt)  # Linear / temporal
@@ -2041,18 +2151,21 @@ class Track:
     # [abs] Available operator
     # ------------------------------------------------------------
     def __abs__(self):
+        """TODO"""
         return None
 
     # ------------------------------------------------------------
     # [len] Number of points in track
     # ------------------------------------------------------------
     def __len__(self):
+        """TODO"""
         return self.size()
 
     # ------------------------------------------------------------
     # [-] Computes difference profile of 2 tracks
     # ------------------------------------------------------------
     def __sub__(self, arg):
+        """TODO"""
         from tracklib.algo.Comparison import differenceProfile as comp_differenceProfile
 
         if isinstance(arg, int):
@@ -2065,6 +2178,7 @@ class Track:
     # [*] Temporal resampling of track or track intersections
     # ------------------------------------------------------------
     def __mul__(self, arg):
+        """TODO"""
         if isinstance(arg, Track):
             return intersection(self, arg)
         else:
@@ -2077,6 +2191,7 @@ class Track:
     # [%] Remove one point out of n (or according to list pattern)
     # ------------------------------------------------------------
     def __mod__(self, sample):
+        """TODO"""
         if isinstance(sample, int):
             track = Track(self.__POINTS[::sample], self.uid, self.tid, base=self.base)
             track.__transmitAF(self)
@@ -2093,6 +2208,7 @@ class Track:
     # [//] Time resample of a track according to another track
     # ------------------------------------------------------------
     def __floordiv__(self, track):
+        """TODO"""
         from tracklib.algo.Interpolation import MODE_TEMPORAL
 
         track_resampled = self.copy()
@@ -2106,6 +2222,7 @@ class Track:
     # as an algebraic operation on analytical features.
     # ------------------------------------------------------------
     def __getitem__(self, n):
+        """TODO"""
         if isinstance(n, tuple):
             if isinstance(n[0], str):
                 return self.getObsAnalyticalFeature(n[0], n[1])
@@ -2131,4 +2248,5 @@ class Track:
         return self.__POINTS[n]
 
     def __setitem__(self, n, obs):
+        """TODO"""
         self.__POINTS[n] = obs

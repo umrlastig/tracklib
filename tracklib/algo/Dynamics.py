@@ -22,18 +22,22 @@ MODE_VERBOSE_PROGRESS_BY_EPOCH = 3
 
 
 def DYN_MAT_2D_CST_POS():
+    """TODO"""
     return np.array([[1, 0], [0, 1]])
 
 
 def DYN_MAT_3D_CST_POS():
+    """TODO"""
     return np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
 
 
 def DYN_MAT_2D_CST_SPEED(dt):
+    """TODO"""
     return np.array([[1, 0, dt, 0], [0, 1, 0, dt], [0, 0, 1, 0], [0, 0, 0, 1]])
 
 
 def DYN_MAT_2D_CST_ACC(dt):
+    """TODO"""
     dt2 = 0.5 * dt ** 2
     return np.array(
         [
@@ -48,6 +52,7 @@ def DYN_MAT_2D_CST_ACC(dt):
 
 
 def DYN_MAT_3D_CST_SPEED(dt):
+    """TODO"""
     return np.array(
         [
             [1, 0, 0, dt, 0, 0],
@@ -61,6 +66,7 @@ def DYN_MAT_3D_CST_SPEED(dt):
 
 
 def DYN_MAT_3D_CST_ACC(dt):
+    """TODO"""
     dt2 = 0.5 * dt ** 2
     return np.array(
         [
@@ -78,16 +84,19 @@ def DYN_MAT_3D_CST_ACC(dt):
 
 
 def DYN_MAT_2D_CST_SPEED_COV(dt, std_acc):
+    """TODO"""
     G = np.array([[0.5 * dt ** 2], [0.5 * dt ** 2], [dt], [dt]])
     return std_acc ** 2 * G @ G.transpose()
 
 
 def DYN_MAT_3D_CST_SPEED_COV(dt, std_acc):
+    """TODO"""
     G = np.array([[0.5 * dt ** 2], [0.5 * dt ** 2], [0.5 * dt ** 2], [dt], [dt], [dt]])
     return std_acc ** 2 * G @ G.transpose()
 
 
 def DYN_MAT_2D_CST_ACC_COV(dt, std_jrk):
+    """TODO"""
     G = np.array(
         [
             [1.0 / 6.0 * dt ** 3],
@@ -102,6 +111,7 @@ def DYN_MAT_2D_CST_ACC_COV(dt, std_jrk):
 
 
 def DYN_MAT_3D_CST_ACC_COV(dt, std_jrk):
+    """TODO"""
     G = np.array(
         [
             [1.0 / 6.0 * dt ** 3],
@@ -118,35 +128,36 @@ def DYN_MAT_3D_CST_ACC_COV(dt, std_jrk):
     return std_jrk ** 2 * G @ G.transpose()
 
 
-# -------------------------------------------------------
-# Unscented Kalman Filter is designed to perform non-
-# linear and non-gaussian estimation on a sequence of
-# unknown states, given a dynamic model F and an
-# observation model H :
-#    - F is a function taking as input an [n x 1] state
-#      vector x(t) and returning x(t+1), the prior mean
-#      of state vector at time t+1. If F is a matrix
-#      transition is handled as standard KF or EKF.
-#    - Q is a the [n x n] state transition covariance
-#      matrix where Qij = Cov(vi, vj) with:
-#                   xi(t+1) = F(xi(t)) + vi
-#    - H is a function taking as input an [nx1] state
-#      vector x(t) and returning an [m x 1] vector y(t),
-#      the observation vetcor at time t. If H is a matrix
-#      observation is handled as a standard KF or EKF.
-#    - R is a the [m x m] state observation covariance
-#      matrix where Rij = Cov(wi, wj) with:
-#                   yi(t) = H(xi(t)) + wi
-#    - X0 is a a [n x 1] initial state vector
-#    - P0 is a a [n x n] initial state covariance matrix
-#    - Spreading is a parameter describing the distance
-#      between central mean and sampled sigma points. As
-#      a default 2n+1 sigma points are generated.
-# -------------------------------------------------------
 class Kalman:
+    """Class to define a Kalman filter"""
+
     def __init__(
         self, F=None, Q=None, H=None, R=None, X0=None, P0=None, spreading=None, iter=1
     ):
+        """Constructor of :class:`Kalman` class
+
+        Unscented Kalman Filter is designed to perform non-linear and non-gaussian
+        estimation on a sequence of unknown states, given a dynamic model F and an
+        observation model H
+
+        :param F: A function taking as input an [n x 1] state vector x(t) and returning
+                  x(t+1), the prior mean of state vector at time t+1. If F is a matrix
+                  transition is handled as standard KF or EKF.
+        :param Q: The [n x n] state transition covariance matrix where
+                  :math:`Qij = Cov(vi, vj)`, with: :math:`xi(t+1) = F(xi(t)) + vi`
+        :param H: A function taking as input an [nx1] state vector x(t) and returning an
+                  ``[m x 1]`` vector y(t), the observation vetcor at time t. If H is a matrix
+                  observation is handled as a standard KF or EKF.
+        :param R: The ``[m x m]`` state observation covariance matrix where
+                  :math:`Rij = Cov(wi, wj)`,  with: :math:`yi(t) = H(xi(t)) + wi`
+        :param X0: A :``[n x 1]`` initial state vector
+        :param P0: A :``[n x n]`` initial state covariance matrix
+        :param spreading: Parameter describing the distance between central mean and
+                          sampled sigma points. As a default 2n+1 sigma points are
+                          generated.
+        :param iter: TODO
+        """
+
         self.F = F
         self.Q = Q
         self.H = H
@@ -518,36 +529,40 @@ class Kalman:
             track.setZFromAnalyticalFeature(out[2])
 
 
-# -------------------------------------------------------
-# Hidden Markov Model is designed to estimate discrete
-# sequential variables on tracks, given a probabilistic
-# transition model Q and observation model P on S :
-#    - S is a two-valued function, where S(t, k)
-#      provides a list of all the possible states of
-#      track t at epoch k.
-#    - Q is a four-valued function, giving the (possibly
-#    non-normalized) probability function Q(s1,s2,k,t)
-#    to observe a transition from state s1 to state s2, at
-#    in track t at epoch k.
-#    - P is a four-valued function, giving the (possibly
-#    non-normalized) probability P(s,y,k,t) = P(y|si),
-#    the probability to observe y when (actual) state is
-#    s in track t at epoch k.
-# Note that s1 and s2 arguments in transition Q must belong
-# to the sets S(t,k) and S(t,k+1), respectively.
-# Observation y may be  any value (continuous or discrete,
-# even string or boolean). It may also be a list of values
-# for multi-dimensional hidden markov model.
-# If the underlying Markov model is stationnary, then
-# Q, P and S do not depend on k. In this case, track t
-# and epoch k are no longer mandatory in S, Q and P
-# functions. They can be 0-valued (constant output),
-# 2-valued and 2-valued (respectively), if the boolean
-# member value "stationarity" is set to True.
-# log: set to True if Q and P are already log values
-# -------------------------------------------------------
 class HMM:
+    """TODO
+
+    Hidden Markov Model is designed to estimate discrete
+    sequential variables on tracks, given a probabilistic
+    transition model Q and observation model P on S :
+
+        - S is a two-valued function, where S(t, k)
+            provides a list of all the possible states of
+            track t at epoch k.
+        - Q is a four-valued function, giving the (possibly
+          non-normalized) probability function Q(s1,s2,k,t)
+          to observe a transition from state s1 to state s2, at
+          in track t at epoch k.
+        - P is a four-valued function, giving the (possibly
+          non-normalized) probability P(s,y,k,t) = P(y|si),
+          the probability to observe y when (actual) state is
+          s in track t at epoch k.
+
+    Note that s1 and s2 arguments in transition Q must belong
+    to the sets S(t,k) and S(t,k+1), respectively.
+    Observation y may be  any value (continuous or discrete,
+    even string or boolean). It may also be a list of values
+    for multi-dimensional hidden markov model.
+    If the underlying Markov model is stationnary, then
+    Q, P and S do not depend on k. In this case, track t
+    and epoch k are no longer mandatory in S, Q and P
+    functions. They can be 0-valued (constant output),
+    2-valued and 2-valued (respectively), if the boolean
+    member value "stationarity" is set to True.
+    log: set to True if Q and P are already log values"""
+
     def __init__(self, S=None, Q=None, P=None, log=False, stationarity=False):
+        """TODO"""
         self.S = S
         self.P = P
         self.Q = Q
@@ -555,38 +570,46 @@ class HMM:
         self.stationarity = stationarity
 
     def setLog(self, log):
+        """TODO"""
         self.log = log
 
     def setStationarity(self, stat):
+        """TODO"""
         self.stationarity = stat
 
     def setStates(self, S):
+        """TODO"""
         self.S = S
 
     def setObservationModel(self, P):
+        """TODO"""
         self.P = P
 
     def setTransitionModel(self, Q):
+        """TODO"""
         self.Q = Q
 
     def Qlog(self, s1, s2, k, track):
+        """TODO"""
         q = self.Q(s1, s2, k, track)
         if not (self.log):
             q = math.log(q + 1e-300)
         return q
 
     def Plog(self, s, y, k, track):
+        """TODO"""
         p = self.P(s, y, k, track)
         if not (self.log):
             p = math.log(p + 1e-300)
         return p
 
-    # ------------------------------------------------------------
-    # Internal function to get all observations at epoch k in a
-    # track, from a list of analytical feature names (obs) and a
-    # mode if retrieved values must be converted to positions
-    # ------------------------------------------------------------
     def __getObs(self, track, obs, k, mode):
+        """Internal function to get all observations at epoch k in a
+        track, from a list of analytical feature names (obs) and a
+        mode if retrieved values must be converted to positions
+
+        TODO
+        """
 
         y = track.getObsAnalyticalFeatures(obs, k)
 
@@ -611,10 +634,12 @@ class HMM:
 
     # Method to deal with computation trace
     def printTrace(self, message, importance, level):
+        """TODO"""
         if level in importance:
             print(message)
 
     def printSeparator(self, importance, level, type):
+        """TODO"""
         if level in importance:
             if type == 0:
                 style = "--------------------------------------"
@@ -648,6 +673,7 @@ class HMM:
         mode=MODE_OBS_AS_SCALAR,
         verbose=MODE_VERBOSE_PROGRESS_BY_EPOCH,
     ):
+        """TODO"""
 
         # -----------------------------------------------
         # Preprocessing

@@ -302,6 +302,7 @@ class priority_dict(dict):
         return k
 
     def __setitem__(self, key, val):
+        """TODO"""
         # We are not going to remove the previous value from the heap,
         # since this would have a cost O(n).
         super(priority_dict, self).__setitem__(key, val)
@@ -313,12 +314,14 @@ class priority_dict(dict):
             self._rebuild_heap()
 
     def setdefault(self, key, val):
+        """TODO"""
         if key not in self:
             self[key] = val
             return val
         return self[key]
 
     def update(self, *args, **kwargs):
+        """TODO"""
         # Reimplementing dict.update is tricky -- see e.g.
         # http://mail.python.org/pipermail/python-ideas/2007-May/000744.html
         # We just rebuild the heap from scratch after passing to super.
