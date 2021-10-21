@@ -21,7 +21,7 @@ class Bbox:
         ll: Union[Coords.ENUCoords, Coords.ENUCoords, Coords.GeoCoords],
         ur: Union[Coords.ENUCoords, Coords.ENUCoords, Coords.GeoCoords],
     ):
-        """__init__ Constructor of Bbox
+        """Constructor of :class:`Bbox`
 
         :param ll: lower left point
         :param ur: upper right point
@@ -30,7 +30,7 @@ class Bbox:
         self.ur = ur
 
     def __str__(self) -> str:
-        """__str__ String representation of bbox
+        """String representation of :class:`Bbox`
 
         :return: String representation of bbox
         """
@@ -49,7 +49,7 @@ class Bbox:
     def getLowerLeft(
         self,
     ) -> Union[Coords.ENUCoords, Coords.ENUCoords, Coords.GeoCoords]:
-        """getLowerLeft Return the lower-left coordinates of bbox
+        """Return the lower-left coordinates of :class:`Bbox`
 
         :return: Lower-left coordinates
         """
@@ -58,66 +58,66 @@ class Bbox:
     def getUpperRight(
         self,
     ) -> Union[Coords.ENUCoords, Coords.ENUCoords, Coords.GeoCoords]:
-        """getUpperRight Return the upper-right coordinates of bbox
+        """Return the upper-right coordinates of :class:`Bbox`
 
         :return: Upper-right coordinates
         """
         return self.ur
 
     def getXmin(self) -> float:
-        """getXmin Return the min X coordinate"""
+        """Return the min X coordinate"""
         return self.ll.getX()
 
     def getYmin(self) -> float:
-        """getYmin Return the min Y coordinate"""
+        """Return the min Y coordinate"""
         return self.ll.getY()
 
     def getXmax(self) -> float:
-        """getXmax Return the max X coordinate"""
+        """Return the max X coordinate"""
         return self.ur.getX()
 
     def getYmax(self) -> float:
-        """getYmax Return the max Y coordinate"""
+        """Return the max Y coordinate"""
         return self.ur.getY()
 
     def getDx(self) -> float:
-        """getDx Return the difference of X coordinates"""
+        """Return the difference of X coordinates"""
         return self.getXmax() - self.getXmin()
 
     def getDy(self) -> float:
-        """getDy Return the difference of Y coordinates"""
+        """Return the difference of Y coordinates"""
         return self.getYmax() - self.getYmin()
 
     def getDimensions(self) -> tuple[float, float]:
-        """getDimensions Return Dx and Dy
+        """Return Dx and Dy
 
         :return: Tuple with structure : (Dx, Dy)
         """
         return (self.getDx(), self.getDy())
 
     def setXmin(self, xmin: float):
-        """setXmin Set Xmin coordinate
+        """Set Xmin coordinate
 
         :param xmin: Xmin coordinate
         """
         self.ll.setX(xmin)
 
     def setYmin(self, ymin: float):
-        """setYmin Set Ymin coordinate
+        """Set Ymin coordinate
 
         :param ymin: Ymin coordinate
         """
         return self.ll.setY(ymin)
 
     def setXmax(self, xmax: float):
-        """setXmax Set Xmax coordinate
+        """Set Xmax coordinate
 
         :param xmax: Xmax coordinate
         """
         return self.ur.setX(xmax)
 
     def setYmax(self, ymax: float):
-        """setYmax Set Ymax coordinate
+        """Set Ymax coordinate
 
         :param ymax: Ymax coordinate
         """
@@ -142,7 +142,7 @@ class Bbox:
         plt.plot(X, Y, sym)
 
     def __add__(self, bbox: Bbox) -> Bbox:
-        """__add__ Bounding boxes combination
+        """Bounding boxes combination
 
         :param bbox: Bbox 2
         """
@@ -163,7 +163,7 @@ class Bbox:
         return None  # TO DO
 
     def contains(self, point) -> bool:
-        """contains Check if a point is in the bbox"""
+        """Check if a point is in the bbox"""
         return self.geom().contains(point)
 
     def copy(self) -> Bbox:
@@ -174,7 +174,7 @@ class Bbox:
         return copy.deepcopy(self)
 
     def translate(self, dx: float, dy: float):
-        """translate Translation (2D) of shape
+        """Translation (2D) of shape
 
         :param dx: dx in ground units
         :param dy: dy in ground units
@@ -183,7 +183,7 @@ class Bbox:
         self.ur.translate(dx, dy)
 
     def rotate(self, theta: float):
-        """rotate Rotation (2D) of shape
+        """Rotation (2D) of shape
 
         :param theta: angle in radians
         """
@@ -191,7 +191,7 @@ class Bbox:
         self.ur.rotate(theta)
 
     def scale(self, h: float):
-        """scale Homothetic transformation (2D) of shape
+        """Homothetic transformation (2D) of shape
 
         :param h: factor
         """
@@ -199,7 +199,7 @@ class Bbox:
         self.ur.scale(h)
 
     def geom(self) -> Polygon:
-        """geom Convert to Geometrics (Polygon)
+        """Convert to Geometrics (Polygon)
 
         :return: Polygon
         """
@@ -222,7 +222,7 @@ class Bbox:
     def toECEFCoords(
         self, base: Union[Coords.ENUCoords, Coords.ENUCoords, Coords.GeoCoords] = None
     ):
-        """toECEFCoords Coordinate transformation to :class:`core.Coords.ECEFCoords`
+        """Coordinate transformation to :class:`core.Coords.ECEFCoords`
 
         :param base: base coordinates, defaults to None
         """
@@ -232,7 +232,7 @@ class Bbox:
     def toGeoCoords(
         self, base: Union[Coords.ENUCoords, Coords.ENUCoords, Coords.GeoCoords] = None
     ):
-        """toGeoCoords Coordinate transformation to :class:`core.Coords.GeoCoords`
+        """Coordinate transformation to :class:`core.Coords.GeoCoords`
 
         :param base: base coordinates, defaults to None
         """
@@ -242,7 +242,7 @@ class Bbox:
     def toENUCoords(
         self, base: Union[Coords.ENUCoords, Coords.ENUCoords, Coords.GeoCoords] = None
     ):
-        """toENUCoords Coordinate transformation to :class:`core.Coords.ENUCoords`
+        """Coordinate transformation to :class:`core.Coords.ENUCoords`
 
         :param base: base coordinates, defaults to None
         """
@@ -250,7 +250,7 @@ class Bbox:
         self.ur.toENUCoords(base)
 
     def addMargin(self, margin: float = 0.05):
-        """addMargin Adding margin (relative float) to bounding box
+        """Adding margin (relative float) to bounding box
 
         :param margin: margin, defaults to 0.05
         """
@@ -261,7 +261,7 @@ class Bbox:
         self.setYmax(self.getYmax() + margin * dy)
 
     def __getitem__(self, index: int) -> float:
-        """__getitem__ Get value by index
+        """Get value by index
 
         - 0: xmin
         - 1: xmax
@@ -281,7 +281,7 @@ class Bbox:
             return self.getYmax()
 
     def __setitem__(self, index: int, value: float):
-        """__setitem__ Set value by index
+        """Set value by index
 
         :param index: index of value
         :pram value: value to set
@@ -296,7 +296,7 @@ class Bbox:
             self.setYmax(value)
 
     def asTuple(self) -> tuple[float, float, float, float]:
-        """asTuple Transform the Bbox object in a tuple of coordinates
+        """Transform the Bbox object in a tuple of coordinates
 
         :return: Tuple of coordinates with this structure (x min, x max, y min, y max)
         """

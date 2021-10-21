@@ -1,5 +1,6 @@
 """This module contain a class to manage the collections of tracks"""
 
+from typing import Literal
 import matplotlib.pyplot as plt
 
 import tracklib.core.Utils as Utils
@@ -237,7 +238,7 @@ class TrackCollection:
             bbox = bbox + self.getTrack(i).bbox()
         return bbox
 
-    def resample(self, delta, algo=1, mode=2):
+    def resample(self, delta, algo: Literal[1, 2] = 1, mode: Literal[1, 2, 3, 4] = 2):
         """Resampling tracks with linear interpolation
 
 

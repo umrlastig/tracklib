@@ -19,9 +19,9 @@ from tracklib.core.TrackCollection import TrackCollection
 class Kernel:
     """Generic kernel class"""
 
-    __filter_boundary = True
-    __kernel_function = None
-    __support = None
+    __filter_boundary = True  #: TODO
+    __kernel_function = None  #: TODO
+    __support = None  #: TODO
 
     def __init__(self, function: Callable[[float], float], support: float):
         """Kernel constructor

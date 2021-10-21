@@ -1196,11 +1196,13 @@ class Track:
         for i in range(len(self)):
             self.getObs(i).timestamp = self.getObs(i).timestamp.addSec(i * dt + offset)
 
-    # DEPRECATED
     def mapOn(
         self, reference, TP1, TP2=[], init=[], N_ITER_MAX=20, mode="2D", verbose=True
     ):
         """Geometric affine transformation to align two tracks with different coordinate systems.
+
+        .. deprecated:: 1.0.0
+            TODO: Check if is really deprecated
 
         For "2D" mode, coordinates must be :class:`core.Coords.ENUCoords` or
         :class:`core.Coords.GeoCoords`. For "3D" mode, any type of coordinates is valid.
@@ -1489,7 +1491,7 @@ class Track:
     def query(self, cmd: str) -> list[Any]:
         """Query observations in a track with SQL-like commands.
 
-        Output depends on the SELECT clause:
+        Output depends on the ``SELECT`` clause:
 
             - If ``SELECT *`` then output is a copied track of the original track (with
               all its AF hopefully)
@@ -1514,7 +1516,7 @@ class Track:
               fields
             - Fields are written without quotes. They must not contain blank spaces
             - "t" is time as integer in seconds since 1970/01/01 00:00:00, and
-              "timestamp" is GPSTIme object
+              "timestamp" is :class:`core.GPSTime.GPSTime` object
             - Blank space must be used between every other words, symbols and operators
             - ``WHERE`` clause may contain as many conditions as needed, separated by
               ``OR`` / ``AND`` key words
@@ -1528,16 +1530,18 @@ class Track:
                 2. a comparison operator among >, <, >=, <=, ==, != and LIKE
                    (with % in str and timestamps)
                 3. a threshold value which is automatically casted to the type of the AF
-                   given in (1). Intended types accepted are: integers, floats, strings,
-                   boolean and GPSTime. When GPSTime is used as a threshold value,
+                   given in (1). Intended types accepted are: :class:`int`, 
+                   :class:`float`, :class:`str`, :class:`bool` 
+                   and :class:`core.GPSTime.GPSTime`. When 
+                   :class:`core.GPSTime.GPSTime` is used as a threshold value,
                    eventhough it may contain 2 parts (date and time), it must not be
                    enclosed within quotes. For boolean, "1", "T" and "TRUE" are
                    considered as logical True, all other values are considered as False.
 
             - Important: no computation allowed in ``WHERE`` conditions.
               E.g. "... ``WHERE z-2 > 10``" not allowed
-            - Available aggregators: all unary operators as described in Operator.py,
-              except MSE
+            - Available aggregators: all unary operators as described in *
+              :class:`core.Operator.Operator`, except :class:`core.Operator.Mse`
             - Capital letters must be used for SQL keywords ``SELECT, WHERE, AND, OR``
               and aggregator
 
