@@ -20,57 +20,6 @@ class TestDijkstra(TestCase):
     #chemin = '../../data/network_ecrin.wkt'
     #network = NetworkReader.readFromFile(chemin, 'TEST1')
 
-    def test_bdtopo(self):
-        
-        xmin = 6.11779213241985538
-        xmax = 6.12425230208879839
-        ymin = 44.985438233863199
-        ymax = 44.99425829041950919
-        
-        xmin = 2.34850
-        xmax = 2.35463
-        ymin = 48.83896
-        ymax = 48.84299
-        
-        network = IgnReader.getNetwork((xmin, xmax, ymin, ymax), None, 0.0, 0.1, False)
-        self.assertEqual(107, len(network.EDGES))
-        self.assertEqual(78, len(network.NODES))
-        
-        network.plot('k-', '', 'g-', 'r-', 0.5, plt)
-        #plt.legend()
-        
-        node1 = network.getNode('8')
-        plt.scatter(node1.coord.lon, node1.coord.lat, color="blue")
-        self.assertIsInstance(node1, Node)
-        self.assertEqual(1, len(network.PREV_EDGES[node1.id]))
-        self.assertEqual(2, len(network.NEXT_EDGES[node1.id]))
-        
-        node2 = network.getNode('15')
-        plt.scatter(node2.coord.lon, node2.coord.lat, color="red")
-        self.assertIsInstance(node2, Node)
-        self.assertEqual(2, len(network.PREV_EDGES[node2.id]))
-        self.assertEqual(2, len(network.NEXT_EDGES[node2.id]))
-        
-        # trace = network.shortest_path(node1, node2)
-        # self.assertIsInstance(trace, Track)
-        # plt.plot(trace.getX(), trace.getY(), 'b-')
-
-        # self.assertLessEqual((73.0961 - trace.length()), self.__epsilon, "len pcc")
-        # self.assertEqual(3, trace.size())
-
-        # #        
-        # trace = network.shortest_path(node1, node2, 25)
-        # self.assertIsNone(trace, 'Pas de trace inférieure à 50')
-        
-        # #
-        # DIST = network.shortest_distance(node1)
-        # self.assertLessEqual((272.5967 - DIST[13]), self.__epsilon, "len pcc")
-        # self.assertLessEqual((0.0 - DIST[11]), self.__epsilon, "len pcc")
-        # self.assertEqual (len(network.NODES), len(DIST), 'matrix')
-        
-        
-        
-    
     def test_dijkstra_bdtopo(self):
         
         chemin = os.path.join(self.resource_path, 'data/network/network_ecrin_extrait.csv')
@@ -174,7 +123,6 @@ if __name__ == '__main__':
     suite.addTest(TestDijkstra("test_dijkstra"))
     suite.addTest(TestDijkstra("test_igast"))
     suite.addTest(TestDijkstra("test_dijkstra_bdtopo"))
-    suite.addTest(TestDijkstra("test_bdtopo"))
     runner = TextTestRunner()
     runner.run(suite)
     

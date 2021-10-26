@@ -152,6 +152,7 @@ Segmentation per speed change:
 - Yann Méneroux
 - Marie-Dominique Van Damme
 - Nisar Hakam
+- [Lâmân LELÉGARD](https://www.umr-lastig.fr/laman-lelegard/) 
 
 ### Institute
 - LASTIG, Univ Gustave Eiffel, ENSG, IGN

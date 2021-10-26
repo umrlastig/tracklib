@@ -1,9 +1,11 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-Algorithme de calcul des Analytical Features.
-Plus quelques fonctions utilitaires
+This module contains an algorithm of Analytical Features calculation and 
+some utility functions.
 """
+
+# For type annotation
+from __future__ import annotations
+from typing import Any, Iterable, Optional, Union
 
 import numpy as np
 
@@ -16,40 +18,56 @@ import matplotlib.colors as mcolors
 from heapq import heapify, heappush, heappop
 
 
-
 # =============================================================================
-#   Gestion des valeurs non renseignées et non calculées  
+#   Gestion des valeurs non renseignées et non calculées
 # =============================================================================
 
-NAN = float('nan')
+NAN = float("nan")
 
-def isnan(number):
+
+def isnan(number: Union[int, float]) -> bool:
+    """Check if two numbers are different"""
     return number != number
 
-def isfloat(value):
+
+def isfloat(value: Any) -> bool:
+    """Check is a value is a float"""
     try:
         float(value)
         return True
     except ValueError:
         return False
 
-# Make to list if needed
-def listify(input):
+
+def listify(input) -> list[Any]:
+    """Make to list if needed"""
     if not isinstance(input, list):
-        input = [input]   
+        input = [input]
     return input
 
-# Remove list if needed
+
 def unlistify(input):
+    """Remove list if needed
+
+    :param input: TODO
+    :return: TODO
+    """
     if len(input) == 1:
-        input = input[0]   
+        input = input[0]
     return input
+
 
 # LIKE comparisons
-def compLike(s1, s2):
-    tokens = s2.split('%')
+def compLike(s1, s2) -> bool:
+    """TODO
+
+    :param s1: TODO
+    :param s2: TODO
+    :return: TODO
+    """
+    tokens = s2.split("%")
     if len(tokens) == 1:
-        return s1 in s2  # 'in' or 'equal' yet to be decided 
+        return s1 in s2  # 'in' or 'equal' yet to be decided
     occ = []
     s = s1
     d = len(s)
@@ -58,169 +76,182 @@ def compLike(s1, s2):
         if id < 0:
             return False
         occ.append(id)
-        s = s[id+len(tok):len(s)]
-    return True    
+        s = s[id + len(tok) : len(s)]
+    return True
 
 
+def makeCoords(
+    x: float, y: float, z: float, srid: int
+) -> Union[ENUCoords, ECEFCoords, GeoCoords]:
+    """Function to form coords object from (x,y,z) data
 
+    :param x: 1st coordinate (X, lon or E)
+    :param y: 2nd coordinate (Y, lat or N)
+    :param z: 3rd coordinate (Z, hgt or U)
+    :param srid: Id of coord system (ECEF, GEO or ENU)
 
-# --------------------------------------------------------------------------
-# Function to form coords object from (x,y,z) data
-# --------------------------------------------------------------------------
-# Input : 
-#   - x       ::     1st coordinate (X, lon or E)
-#   - y       ::     2nd coordinate (Y, lat or N)
-#    - z       ::     3rd coordinate (Z, hgt or U)
-#   - srid    ::     Id of coord system (ECEF, GEO or ENU)
-# --------------------------------------------------------------------------
-# Output : Coords object in the proper srid
-# --------------------------------------------------------------------------
-def makeCoords(x, y, z, srid):
-    if (srid.upper() in ["ENUCOORDS", "ENU"]):
+    :return: Coords object in the proper srid
+    """
+    if srid.upper() in ["ENUCOORDS", "ENU"]:
         return ENUCoords(x, y, z)
-    if (srid.upper() in ["GEOCOORDS", "GEO"]):
+    if srid.upper() in ["GEOCOORDS", "GEO"]:
         return GeoCoords(x, y, z)
-    if (srid.upper() in ["ECEFCOORDS", "ECEF"]):
+    if srid.upper() in ["ECEFCOORDS", "ECEF"]:
         return ECEFCoords(x, y, z)
 
 
-    
-# --------------------------------------------------------------------------
-# Function to form distance matrix
-# --------------------------------------------------------------------------
-# Input : 
-#   - T1     :: a list of points
-#   - T2     :: a list of points
-# --------------------------------------------------------------------------
-# Output : numpy distance matrix between T1 and T2
-# --------------------------------------------------------------------------    
-def makeDistanceMatrix(T1, T2):
-    
+def makeDistanceMatrix(
+    T1: list[tuple[float, float]], T2: list[tuple[float, float]]
+) -> np.float32:
+    """Function to form distance matrix
+
+    :param T1: A list of points
+    :param T2: A list of points
+    :return: numpy distance matrix between T1 and T2
+    """
     T1 = np.array(T1)
     T2 = np.array(T2)
-    
+
     # Signal stationnarity
-    base = min(np.concatenate((T1,T2)))
+    base = min(np.concatenate((T1, T2)))
     T1 = T1 - base
     T2 = T2 - base
     T1 = T1.T
     T2 = T2.T
 
-    return np.sqrt((T1**2).reshape(-1, 1) + (T2**2) - 2 * (T1.reshape(-1, 1)*T2.T))
-    
-# --------------------------------------------------------------------------
-# Function to form covariance matrix from kernel
-# --------------------------------------------------------------------------
-# Input : 
-#   - kernel :: a function describing statistical similarity between points
-#   - T1     :: a list of points
-#   - T2     :: a list of points
-#   - factor :: unit factor of std dev (default 1.0)
-# --------------------------------------------------------------------------
-# Output : numpy covariance matrix between T1 and T2
-# --------------------------------------------------------------------------    
-def makeCovarianceMatrixFromKernel(kernel, T1, T2, factor=1.0):
-    
-    D = makeDistanceMatrix(T1,T2)
-    kfunc = np.vectorize(kernel.getFunction())
-    
-    return factor**2*kfunc(D)
+    return np.sqrt(
+        (T1 ** 2).reshape(-1, 1) + (T2 ** 2) - 2 * (T1.reshape(-1, 1) * T2.T)
+    )
 
-# --------------------------------------------------------------------------
-# Function to convert RGBA color to hexadecimal
-# --------------------------------------------------------------------------
-# Input : 
-#   - color :: a 3 or 4-element array R, G, B [,alpha]
-# Each color and transparency channel is in [0,1]
-# --------------------------------------------------------------------------
-# Output : a string containing color in hexadecimal
-# --------------------------------------------------------------------------
-def rgbToHex(color):
+
+def makeCovarianceMatrixFromKernel(
+    kernel,
+    T1: list[tuple[float, float]],
+    T2: list[tuple[float, float]],
+    factor: float = 1.0,
+):
+    """Function to form covariance matrix from kernel
+
+    :param kernel: A function describing statistical similarity between points
+    :param T1: A list of points
+    :param T2: A list of points
+    :param factor: Unit factor of std dev (default 1.0)
+    """
+
+    D = makeDistanceMatrix(T1, T2)
+    kfunc = np.vectorize(kernel.getFunction())
+
+    return factor ** 2 * kfunc(D)
+
+
+def rgbToHex(color: list[float, float, float, Optional[float]]) -> str:
+    """Function to convert RGBA color to hexadecimal
+
+    :param color: A 3 or 4-element array R, G, B [,alpha]. Each color and transparency
+        channel is in [0,1]
+    :return: A string containing color in hexadecimal
+    """
     if len(color) == 3:
         color.append(1)
-    R = hex((int)(color[0]*255))[2:]
-    G = hex((int)(color[1]*255))[2:]
-    B = hex((int)(color[2]*255))[2:]
-    A = hex((int)(color[3]*255))[2:]
-    if (len(R) < 2):
-        R = "0"+R
-    if (len(G) < 2):
-        G = "0"+G
-    if (len(B) < 2):
-        B = "0"+B
-    if (len(A) < 2):
-        A = "0"+A
-    return "0x"+A+B+G+R
+    R = hex((int)(color[0] * 255))[2:]
+    G = hex((int)(color[1] * 255))[2:]
+    B = hex((int)(color[2] * 255))[2:]
+    A = hex((int)(color[3] * 255))[2:]
+    if len(R) < 2:
+        R = "0" + R
+    if len(G) < 2:
+        G = "0" + G
+    if len(B) < 2:
+        B = "0" + B
+    if len(A) < 2:
+        A = "0" + A
+    return "0x" + A + B + G + R
 
-# --------------------------------------------------------------------------
-# Function to interpolate RGBA (or RGB) color between two values
-# --------------------------------------------------------------------------
-# Input : 
-#   - v: a float value
-#   - vmin: minimal value of v (color cmin)
-#   - vmax: maximal value of v (color cmax)
-#   - cmin : a 3 or 4-element array R, G, B [,alpha]
-#   - cmax : a 3 or 4-element array R, G, B [,alpha]
-# --------------------------------------------------------------------------
-# Output : a 4-element array 
-# --------------------------------------------------------------------------
-def interpColors(v, vmin, vmax, cmin, cmax):
+
+def interpColors(
+    v: float,
+    vmin: float,
+    vmax: float,
+    cmin: list[float, float, float, Optional[float]],
+    cmax: list[float, float, float, Optional[float]],
+) -> list[float, float, float, float]:
+    """
+    Function to interpolate RGBA (or RGB) color between two values
+
+    :param v: a float value
+    :param vmin: minimal value of v (color cmin)
+    :param vmax: maximal value of v (color cmin)
+    :param cmin: a 3 or 4-element array R, G, B [,alpha]
+    :param cmax: a 3 or 4-element array R, G, B [,alpha]
+
+    :return: A 4-element array
+    """
     # norm = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax)
     O = []
-    O.append(((vmax-v)*cmin[0] + (v-vmin)*cmax[0])/(vmax-vmin))
-    O.append(((vmax-v)*cmin[1] + (v-vmin)*cmax[1])/(vmax-vmin))
-    O.append(((vmax-v)*cmin[2] + (v-vmin)*cmax[2])/(vmax-vmin))
+    O.append(((vmax - v) * cmin[0] + (v - vmin) * cmax[0]) / (vmax - vmin))
+    O.append(((vmax - v) * cmin[1] + (v - vmin) * cmax[1]) / (vmax - vmin))
+    O.append(((vmax - v) * cmin[2] + (v - vmin) * cmax[2]) / (vmax - vmin))
     if len(cmin) == 4:
-        O.append( ((vmax-v)*cmin[3] + (v-vmin)*cmax[3]) / (vmax-vmin))
+        O.append(((vmax - v) * cmin[3] + (v - vmin) * cmax[3]) / (vmax - vmin))
     return O
 
 
 def getColorMap(cmin, cmax):
-   
+    """TODO
+
+    :param cmin: TODO
+    :param cmax: TODO
+    :return: TODO
+    """
+
     # On définit la map color
-    cdict = {'red': [], 'green': [], 'blue': []}
-    cdict['red'].append([0.0, None, cmin[0]/255])
-    cdict['red'].append([1.0, cmax[0]/255, None])
-    cdict['green'].append([0.0, None, cmin[1]/255])
-    cdict['green'].append([1.0, cmax[1]/255, None])
-    cdict['blue'].append([0.0, None, cmin[2]/255])
-    cdict['blue'].append([1.0, cmax[2]/255, None])
-    
-    cmap = mcolors.LinearSegmentedColormap('CustomMap', cdict)
+    cdict = {"red": [], "green": [], "blue": []}
+    cdict["red"].append([0.0, None, cmin[0] / 255])
+    cdict["red"].append([1.0, cmax[0] / 255, None])
+    cdict["green"].append([0.0, None, cmin[1] / 255])
+    cdict["green"].append([1.0, cmax[1] / 255, None])
+    cdict["blue"].append([0.0, None, cmin[2] / 255])
+    cdict["blue"].append([1.0, cmax[2] / 255, None])
+
+    cmap = mcolors.LinearSegmentedColormap("CustomMap", cdict)
 
     return cmap
 
 
 def getOffsetColorMap(cmin, cmax, part):
-   
+    """TODO
+
+    :param cmin: TODO
+    :param cmax: TODO
+    :param part: TODO
+    :return: TODO
+    """
+
     # On définit la map color
-    cdict = {'red': [], 'green': [], 'blue': []}
-    cdict['red'].append([0.0, None, cmin[0]/255])
-    cdict['red'].append([part, cmin[0]/255, cmin[0]/255])
-    cdict['red'].append([1.0, cmax[0]/255, None])
-    
-    cdict['green'].append([0.0, None, cmin[1]/255])
-    cdict['green'].append([part, cmin[1]/255, cmin[1]/255])
-    cdict['green'].append([1.0, cmax[1]/255, None])
-    
-    cdict['blue'].append([0.0, None, cmin[2]/255])
-    cdict['blue'].append([part, cmin[2]/255, cmin[2]/255])
-    cdict['blue'].append([1.0, cmax[2]/255, None])
-    
-    cmap = mcolors.LinearSegmentedColormap('CustomMap', cdict)
+    cdict = {"red": [], "green": [], "blue": []}
+    cdict["red"].append([0.0, None, cmin[0] / 255])
+    cdict["red"].append([part, cmin[0] / 255, cmin[0] / 255])
+    cdict["red"].append([1.0, cmax[0] / 255, None])
+
+    cdict["green"].append([0.0, None, cmin[1] / 255])
+    cdict["green"].append([part, cmin[1] / 255, cmin[1] / 255])
+    cdict["green"].append([1.0, cmax[1] / 255, None])
+
+    cdict["blue"].append([0.0, None, cmin[2] / 255])
+    cdict["blue"].append([part, cmin[2] / 255, cmin[2] / 255])
+    cdict["blue"].append([1.0, cmax[2] / 255, None])
+
+    cmap = mcolors.LinearSegmentedColormap("CustomMap", cdict)
 
     return cmap
-
-
-
 
 
 # --------------------------------------------------------------------------
 # Priority heap
 # --------------------------------------------------------------------------
 # Source code from Matteo Dell'Amico
-# https://gist.github.com/matteodellamico/4451520 
-# --------------------------------------------------------------------------   
+# https://gist.github.com/matteodellamico/4451520
+# --------------------------------------------------------------------------
 class priority_dict(dict):
     """Dictionary that can be used as a priority queue.
 
@@ -235,7 +266,7 @@ class priority_dict(dict):
 
     The 'sorted_iter' method provides a destructive sorted iterator.
     """
-    
+
     def __init__(self, *args, **kwargs):
         super(priority_dict, self).__init__(*args, **kwargs)
         self._rebuild_heap()
@@ -249,7 +280,7 @@ class priority_dict(dict):
 
         Raises IndexError if the object is empty.
         """
-        
+
         heap = self._heap
         v, k = heap[0]
         while k not in self or self[k] != v:
@@ -262,7 +293,7 @@ class priority_dict(dict):
 
         Raises IndexError if the object is empty.
         """
-        
+
         heap = self._heap
         v, k = heappop(heap)
         while k not in self or self[k] != v:
@@ -271,6 +302,7 @@ class priority_dict(dict):
         return k
 
     def __setitem__(self, key, val):
+        """TODO"""
         # We are not going to remove the previous value from the heap,
         # since this would have a cost O(n).
         super(priority_dict, self).__setitem__(key, val)
@@ -281,18 +313,19 @@ class priority_dict(dict):
             # from scratch to avoid wasting too much memory.
             self._rebuild_heap()
 
-
     def setdefault(self, key, val):
+        """TODO"""
         if key not in self:
             self[key] = val
             return val
         return self[key]
 
     def update(self, *args, **kwargs):
+        """TODO"""
         # Reimplementing dict.update is tricky -- see e.g.
         # http://mail.python.org/pipermail/python-ideas/2007-May/000744.html
         # We just rebuild the heap from scratch after passing to super.
-        
+
         super(priority_dict, self).update(*args, **kwargs)
         self._rebuild_heap()
 
@@ -301,7 +334,6 @@ class priority_dict(dict):
 
         Beware: this will destroy elements as they are returned.
         """
-        
+
         while self:
             yield self.pop_smallest()
-			
