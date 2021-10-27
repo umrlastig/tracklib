@@ -180,11 +180,7 @@ class Polygon:
         for i in range(len(self.X)):
             self.X[i] *= h
             self.Y[i] *= h
-<<<<<<< HEAD
-        
-=======
 
->>>>>>> 7be149349dd4def8d1c8dbae586f7a0b093c0495
     # --------------------------------------------------
     # Polygon area
     # --------------------------------------------------
@@ -272,16 +268,9 @@ class Polygon:
                     # plt.plot([c[0],visee[0]], [c[1],visee[1]], 'r--')
                     break
             if count == 0:
-<<<<<<< HEAD
-                N += 1    
-                #plt.plot([c[0],visee[0]], [c[1],visee[1]], 'r--')        
-
-        return 1.0-N/D    
-=======
                 N += 1
                 # plt.plot([c[0],visee[0]], [c[1],visee[1]], 'r--')
         return 1.0 - N / D
->>>>>>> 7be149349dd4def8d1c8dbae586f7a0b093c0495
 
     # --------------------------------------------------
     # Radial signature of a polygon

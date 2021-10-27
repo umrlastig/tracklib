@@ -101,7 +101,7 @@ def makeCoords(
 
 
 def makeDistanceMatrix(
-    T1: list[tuple[float, float]], T2: list[tuple[float, float]]
+    T1: list[tuple[float, float]], T2: list[tuple[float, float]], cycle: bool = False
 ) -> np.float32:
     """Function to form distance matrix
 
@@ -119,9 +119,14 @@ def makeDistanceMatrix(
     T1 = T1.T
     T2 = T2.T
 
-    return np.sqrt(
+    D = np.sqrt(
         (T1 ** 2).reshape(-1, 1) + (T2 ** 2) - 2 * (T1.reshape(-1, 1) * T2.T)
     )
+	
+    if cycle:
+        D = np.minimum(D, np.max(D)-D)
+
+    return D
 
 
 def makeCovarianceMatrixFromKernel(
@@ -129,6 +134,8 @@ def makeCovarianceMatrixFromKernel(
     T1: list[tuple[float, float]],
     T2: list[tuple[float, float]],
     factor: float = 1.0,
+	force: bool = False,
+	cycle: bool = False,	
 ):
     """Function to form covariance matrix from kernel
 
@@ -138,10 +145,16 @@ def makeCovarianceMatrixFromKernel(
     :param factor: Unit factor of std dev (default 1.0)
     """
 
-    D = makeDistanceMatrix(T1, T2)
+    D = makeDistanceMatrix(T1, T2, cycle)
     kfunc = np.vectorize(kernel.getFunction())
-
-    return factor ** 2 * kfunc(D)
+    SIGMA = factor ** 2 * kfunc(D)
+    if force:
+        w, v = np.linalg.eig(SIGMA)
+        for i in range(w.shape[0]):
+            if w[i] < 0:
+                w[i] = 0
+        SIGMA = v @ np.diag(w) @ v.transpose()
+    return SIGMA
 
 
 def rgbToHex(color: list[float, float, float, Optional[float]]) -> str:

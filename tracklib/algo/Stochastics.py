@@ -182,7 +182,7 @@ def randomColor():
 
 
 def noise(
-    track, sigma=[1], kernel=[Kernel.DiracKernel()], distribution=DISTRIBUTION_NORMAL
+    track, sigma=[1], kernel=[Kernel.DiracKernel()], distribution=DISTRIBUTION_NORMAL, force=False, cycle=False
 ):
     """Track noising with Cholesky factorization of gaussian process covariance matrix:
 
@@ -214,7 +214,7 @@ def noise(
     for n in range(len(sigma)):
 
         S = track.getAnalyticalFeature(BIAF_ABS_CURV)
-        SIGMA_S = utils.makeCovarianceMatrixFromKernel(kernel[n], S, S)
+        SIGMA_S = utils.makeCovarianceMatrixFromKernel(kernel[n], S, S, force=force, cycle=cycle)
         SIGMA_S += np.identity(N) * 1e-12
         SIGMA_S *= sigma[n] ** 2 / SIGMA_S[0, 0]
 
@@ -245,7 +245,10 @@ def noise(
             pt.setY(pt.getY() + Yy[i])
             pt.setZ(pt.getZ() + Yz[i])
             obs = Obs(pt, track.getObs(i).timestamp)
-
+			
+        if cycle:
+            noised_track.loop()
+		   
     return noised_track
 
 

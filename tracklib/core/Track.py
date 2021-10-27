@@ -288,20 +288,12 @@ class Track:
         m.setX(self.operate(Operator.Operator.AVERAGER, "x"))
         m.setY(self.operate(Operator.Operator.AVERAGER, "y"))
         if not Utils.isnan(m.getZ()):
-<<<<<<< HEAD
             m.setZ(self.operate(Operator.Operator.AVERAGER, 'z'))
         return m    
-
-    def getEnclosedPolygon(self):
-        return Polygon(self.getX(), self.getY())			
-=======
-            m.setZ(self.operate(Operator.Operator.AVERAGER, "z"))
-        return m
-
+		
     def getEnclosedPolygon(self):
         """TODO"""
         return Polygon(self.getX(), self.getY())
->>>>>>> 7be149349dd4def8d1c8dbae586f7a0b093c0495
 
     def getMinX(self):
         """TODO"""
@@ -365,6 +357,11 @@ class Track:
         """TODO"""
         if self.size() % 2 == 1:
             self.__POINTS.pop()
+			
+    def loop(self):
+        self[0].position.setX(self[-1].position.getX())
+        self[0].position.setY(self[-1].position.getY())
+        self[0].position.setZ(self[-1].position.getZ())
 
     # Internal methods
     def __transmitAF(self, track):
@@ -1249,13 +1246,13 @@ class Track:
     # =========================================================================
     #  Adding noise to tracks
     # =========================================================================
-    def noise(self, sigma=5, kernel=None):
+    def noise(self, sigma=5, kernel=None, force=False, cycle=False):
         """TODO"""
         from tracklib.algo.Stochastics import noise as stochastics_noise
 
         if kernel is None:
             kernel = DiracKernel()
-        return stochastics_noise(self, sigma, kernel)
+        return stochastics_noise(self, sigma, kernel, force=force, cycle=cycle)
 
     # =========================================================================
     # Graphical methods
@@ -1321,6 +1318,9 @@ class Track:
         """
         plot = Plot.Plot(self)
         plot.sym = sym
+        if not '-' in sym:
+            type = "POINT"
+            plot.pointsize = 20
         plot.color = sym[0]
         plot.w = 6
         plot.h = 5
