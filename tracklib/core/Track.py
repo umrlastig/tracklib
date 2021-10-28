@@ -538,6 +538,14 @@ class Track:
         """TODO"""
         return self.removeObsList([arg])
 
+    def removeFirstObs(self):
+        """TODO"""
+        return self.removeObs(0)
+
+    def removeLastObs(self):
+        """TODO"""
+        return self.removeObs(len(self)-1)
+        
     def popObs(self, idx):
         """TODO"""
         obs = self.getObs(idx)

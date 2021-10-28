@@ -174,3 +174,11 @@ def computeDescDeniv(track, id_ini=0, id_fin=None):
             dn += Z2 - Z1
 
     return dn
+
+def computeRadialSignature(track, factor=1):
+    track = track.copy(); track.loop()
+    R = track.getEnclosedPolygon().signature()
+    track.createAnalyticalFeature("s", R[0])
+    track.createAnalyticalFeature("r", R[1])
+    return track
+    
