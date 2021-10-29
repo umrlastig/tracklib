@@ -107,7 +107,8 @@ def __resampleSpatial(track, ds):
     sfin = S[len(S) - 1]
     N = (int)((sfin - sini) / ds)
 
-    interp_points = [track.getFirstObs()]
+    interp_points = [track.getFirstObs().copy()]
+    interp_points[0].features = []
     running_id = 0
 
     for k in range(1, N + 1):

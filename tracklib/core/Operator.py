@@ -370,7 +370,6 @@ class Reverser(UnaryVoidOperator):
         temp = [0] * track.size()
         for i in range(0, track.size()):
             temp[i] = track.getObsAnalyticalFeature(af_input, track.size()-i-1)
-        algoAF.addListToAF(track, af_output, temp)
         return temp
 
 

@@ -898,7 +898,6 @@ class Track:
         else:
             for i in range(self.size()):
                 self.getObs(i).features.append(val_init)
-
     def removeAnalyticalFeature(self, name):
         """TODO"""
         if not self.hasAnalyticalFeature(name):
@@ -1152,11 +1151,16 @@ class Track:
         output.__POINTS = output.__POINTS[::-1]
         return output
 
-    def resample(self, delta, algo=1, mode=2):
+    def resample(self, delta=None, algo=1, mode=1, npts=None, factor=1):
         """Resampling a track with linear interpolation
 
-        Resampling a track with linear interpolation delta: interpolation
-        interval (time in sec if temporal mode is selected, space in meters if spatial).
+        Resampling a track with linear interpolation 
+	    delta: interpolation interval 
+		   (time in sec if temporal mode is selected, space in meters if spatial).
+		npts = number of points
+		If none of delta and npts are specified, the track is resampled regularly 
+		with the same number of points * factor.
+	    If both are specified, priority is given to delta.
 
         Available modes are:
 
@@ -1167,7 +1171,7 @@ class Track:
 
             - ALGO_LINEAR (*algo=1*)
             - ALGO_THIN_SPLINE (*algo=2*)
-            - ALGO_B_SPLINES (*lgo=3*)
+            - ALGO_B_SPLINES (*algo=3*)
             - ALGO_GAUSSIAN_PROCESS (*algo=4*)
 
         In temporal mode, argument may be:
@@ -1177,6 +1181,13 @@ class Track:
             - a reference track
         """
 
+        if delta is None:  # Number of points only is specified
+            if npts is None:
+                npts = len(self)*factor
+            delta = (1+1e-8)*self.length()/npts
+            self.resample(delta=delta, algo=algo, mode=mode, npts=None)
+            return
+		
         from tracklib.algo.Interpolation import resample as interpolation_resample
 
         # (Temporaire)
@@ -1257,7 +1268,6 @@ class Track:
     def noise(self, sigma=5, kernel=None, force=False, cycle=False):
         """TODO"""
         from tracklib.algo.Stochastics import noise as stochastics_noise
-
         if kernel is None:
             kernel = DiracKernel()
         return stochastics_noise(self, sigma, kernel, force=force, cycle=cycle)
@@ -2165,8 +2175,7 @@ class Track:
     def __pow__(self, nb_points):
         """TODO"""
         output = self.copy()
-        dt = output.duration() / (nb_points) * (1 - 1e-3)
-        output.resample(dt)  # Linear / temporal
+        output.resample(npts = nb_points)  # Linear / temporal
         return output
 
     # ------------------------------------------------------------
