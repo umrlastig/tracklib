@@ -49,10 +49,15 @@ class TestNetworkReader(TestCase):
         self.assertIsInstance(node2, Node)
         self.assertEqual(3, len(network.PREV_EDGES[node2.id]))
         self.assertEqual(3, len(network.NEXT_EDGES[node2.id]))
+        
+
+    def test_read_alti(self):
+        IgnReader.getAltitude('aa')
 
 
 if __name__ == '__main__':
     suite = TestSuite()
-    suite.addTest(TestNetworkReader("test_read_default"))
+    #suite.addTest(TestNetworkReader("test_read_default"))
+    suite.addTest(TestNetworkReader("test_read_alti"))
     runner = TextTestRunner()
     runner.run(suite)
