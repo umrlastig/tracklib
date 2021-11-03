@@ -10,6 +10,8 @@ from tracklib.core.TrackCollection import TrackCollection
 
 
 class GpxReader:
+    """TODO"""
+
     @staticmethod
     def readFromGpx(path, srid="GEO"):
         """

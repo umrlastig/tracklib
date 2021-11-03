@@ -2,7 +2,7 @@
 
 # For type annotation
 from __future__ import annotations
-from typing import Union
+from typing import Literal, Union, Dict, Tuple
 
 import random
 from typing import Union
@@ -279,7 +279,7 @@ class Network:
 
         :param tolerance: TODO
         :param mode: Mode of simplification. The possibles values are:
-        
+
             1. DOUGLAS_PEUCKER
             2. VISVALINGAM
             3. MINIMIZE_LARGEST_DEVIATION
@@ -681,6 +681,7 @@ class Network:
     # calls of pairwise shortest_distance function.
     # ------------------------------------------------------------
     def __correctInputNode(self, node):
+        """TODO"""
         if isinstance(node, Node):
             return node.id
         return node
@@ -689,8 +690,8 @@ class Network:
         self,
         source: Union[int, Node, Union[GeoCoords, ENUCoords, ECEFCoords]],
         cut: float,
-        mode: str = "TOPOLOGIC",
-        verbose: str = True,
+        mode: Literal["TOPOLOGIC", "GEOMETRIC"] = "TOPOLOGIC",
+        verbose: bool = True,
     ) -> Network:
         """Extracts sub-network from routing forward search
 
@@ -880,10 +881,10 @@ class Network:
 
     def all_shortest_distances(
         self, cut: float = 1e300, output_dict: dict = None
-    ) -> Union[dict, None]:
+    ) -> Dict[Tuple[int, int], float]:
         """Computes all shortest distances between pairs of nodes
 
-        The results are saved in a dictionnary {key=(source, n), value=d}.
+        The results are saved in a dictionnary `{key=(source, n), value=d}`.
 
         If output dictionnary structure is provided as input, it is directly incremented
         during the process, otherwise, it is created before begining to search for
@@ -952,7 +953,7 @@ class Network:
         :param cut: a maximal distance for search
         :param output_dict: output structure for retrieved distances
 
-        :return: A track between source and target node. If target is not reachable 
+        :return: A track between source and target node. If target is not reachable
             during forward step, None object is output
         """
         self.run_routing_forward(source, target, cut=cut, output_dict=output_dict)
@@ -1001,7 +1002,7 @@ class Network:
 
     def prepare(self, cut: Union[float, None] = 1e300):
         """Precomputes shortest distances between all pairs of nodes and saves the
-        result in DISTANCES attribute.
+        result in :attr:`DISTANCES` attribute.
 
         :param cut: A maximal distance for search
         """

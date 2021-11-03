@@ -4,6 +4,7 @@ import os.path
 
 
 class NetworkFormat:
+    """TODO"""
 
     resource_path = os.path.join(os.path.split(__file__)[0], "../..")
     NETWORK_FILE_FORMAT = os.path.join(resource_path, "resources/network_file_format")
@@ -12,6 +13,7 @@ class NetworkFormat:
     # Load file format from network_file_format
     # -------------------------------------------------------------
     def __init__(self, name=None):
+        """TODO"""
 
         if name != None and name != "":
             self.createFromFile(name)
@@ -19,6 +21,7 @@ class NetworkFormat:
             self.name = "UNDEFINED"
 
     def createFromFile(self, name):
+        """TODO"""
 
         FIELDS = []
         with open(NetworkFormat.NETWORK_FILE_FORMAT) as ffmt:
@@ -61,6 +64,7 @@ class NetworkFormat:
     """
 
     def createFromDict(self, param):
+        """TODO"""
 
         if param["name"] != None and param["name"] != "":
             self.name = param["name"]

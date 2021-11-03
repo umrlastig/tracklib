@@ -17,7 +17,7 @@ class UnaryOperator:
     @abstractmethod
     def execute(self, track, af_input):
         """Execution of the operator
-        
+
         :param track: TODO
         :param af_input: TODO
         """
@@ -30,7 +30,7 @@ class BinaryOperator:
     @abstractmethod
     def execute(self, track, af_input1, af_input2):
         """Execution of the operator
-        
+
         :param track: TODO
         :param af_input1: TODO
         :param af_input2: TODO
@@ -44,7 +44,7 @@ class UnaryVoidOperator:
     @abstractmethod
     def execute(self, track, af_input, af_output):
         """Execution of the operator
-        
+
         :param track: TODO
         :param af_input: TODO
         :param af_output: TODO
@@ -58,7 +58,7 @@ class BinaryVoidOperator:
     @abstractmethod
     def execute(self, track, af_input1, af_input2, af_output):
         """Execution of the operator
-        
+
         :param track: TODO
         :param af_input1: TODO
         :param af_input2: TODO
@@ -73,7 +73,7 @@ class ScalarOperator:
     @abstractmethod
     def execute(self, track, af_input1, arg):
         """Execution of the operator
-        
+
         :param track: TODO
         :param af_input1: TODO
         :param arg: TODO
@@ -87,7 +87,7 @@ class ScalarVoidOperator:
     @abstractmethod
     def execute(self, track, af_input1, arg, af_output):
         """Execution of the operator
-        
+
         :param track: TODO
         :param af_input1: TODO
         :param arg: TODO
@@ -284,13 +284,26 @@ class ShiftRight(UnaryVoidOperator):
         :return: TODO
         """
         return track.operate(Operator.SHIFT, af_input, +1, af_output)
+		
+class ShiftCircularRight(UnaryVoidOperator):
+    """ShiftRight Operator"""
+
+    def execute(self, track, af_input, af_output):
+        """Execute the ShiftRight operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
+        return track.operate(Operator.SHIFT_CIRCULAR, af_input, +1, af_output)
 
 
 class ShiftLeft(UnaryVoidOperator):
     """ShiftLeft Operator"""
 
     def execute(self, track, af_input, af_output):
-        """Execute the ShiftLeft operator
+        """Execute the ShiftCircularLeft operator
 
         :param track: TODO
         :param af_input: TODO
@@ -298,6 +311,19 @@ class ShiftLeft(UnaryVoidOperator):
         :return: TODO
         """
         return track.operate(Operator.SHIFT, af_input, -1, af_output)
+		
+class ShiftCircularLeft(UnaryVoidOperator):
+    """ShiftLeft Operator"""
+
+    def execute(self, track, af_input, af_output):
+        """Execute the ShiftCircularLeft operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
+        return track.operate(Operator.SHIFT_CIRCULAR, af_input, -1, af_output)
 
 
 class Inverter(UnaryVoidOperator):
@@ -328,6 +354,23 @@ class Inverser(UnaryVoidOperator):
         """
         f = lambda x: 1.0 / x
         return track.operate(Operator.APPLY, af_input, f, af_output)
+		
+class Reverser(UnaryVoidOperator):
+    """Reverser Operator"""
+
+    def execute(self, track, af_input, af_output):
+        """Execute the Reverser operator
+
+        :param track: TODO
+        :param af_input: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
+        track.createAnalyticalFeature(af_output)
+        temp = [0] * track.size()
+        for i in range(0, track.size()):
+            temp[i] = track.getObsAnalyticalFeature(af_input, track.size()-i-1)
+        return temp
 
 
 class Rectifier(UnaryVoidOperator):
@@ -800,6 +843,26 @@ class Convolution(BinaryVoidOperator):
         temp = np.abs(np.fft.ifft(H * np.conj(G)))
         algoAF.addListToAF(track, af_output, temp)
         return temp
+		
+class Correlator(BinaryVoidOperator):
+    """Correlator Operator"""
+
+    def execute(self, track, af_input1, af_input2, af_output):
+        """Execute the Correlator operator
+
+        :param track: TODO
+        :param af_input1: TODO
+        :param af_input2: TODO
+        :param af_output: TODO
+        :return: TODO
+        """
+        track.createAnalyticalFeature(af_output)
+        temp = [0] * track.size()
+        for i in range(0, track.size()):
+            track.operate(Operator.SHIFT_CIRCULAR, af_input1, i, "temp") 
+            temp[i] = track.operate(Operator.CORRELATION, "temp", af_input2)
+        algoAF.addListToAF(track, af_output, temp)
+        return temp
 
 
 # -----------------------------------------------------------------------------
@@ -809,7 +872,9 @@ class Convolution(BinaryVoidOperator):
 
 class Min(UnaryOperator):
     """Min Operator"""
+
     def execute(self, track, af_input):
+        """TODO"""
         minimum = +1e300
         for i in range(track.size()):
             val = track.getObsAnalyticalFeature(af_input, i)
@@ -819,7 +884,10 @@ class Min(UnaryOperator):
 
 
 class Max(UnaryOperator):
+    """TODO"""
+
     def execute(self, track, af_input):
+        """TODO"""
         maximum = -1e300
         for i in range(track.size()):
             val = track.getObsAnalyticalFeature(af_input, i)
@@ -829,7 +897,10 @@ class Max(UnaryOperator):
 
 
 class Argmin(UnaryOperator):
+    """TODO"""
+
     def execute(self, track, af_input):
+        """TODO"""
         minimum = +1e300
         idmin = 0
         for i in range(track.size()):
@@ -841,7 +912,10 @@ class Argmin(UnaryOperator):
 
 
 class Argmax(UnaryOperator):
+    """TODO"""
+
     def execute(self, track, af_input):
+        """TODO"""
         maximum = -1e300
         idmax = 0
         for i in range(track.size()):
@@ -853,7 +927,10 @@ class Argmax(UnaryOperator):
 
 
 class Median(UnaryOperator):
+    """TODO"""
+
     def execute(self, track, af_input):
+        """TODO"""
         vals = track.getAnalyticalFeature(af_input)
         sort_index = np.argsort(np.array(vals))
         N = len(sort_index)
@@ -866,7 +943,10 @@ class Median(UnaryOperator):
 
 
 class Zeros(UnaryOperator):
+    """TODO"""
+
     def execute(self, track, af_input):
+        """TODO"""
         zeros = []
         for i in range(0, track.size()):
             if abs(track.getObsAnalyticalFeature(af_input, i)) == 0:
@@ -875,7 +955,10 @@ class Zeros(UnaryOperator):
 
 
 class Sum(UnaryOperator):
+    """TODO"""
+
     def execute(self, track, af_input):
+        """TODO"""
         somme = 0
         for i in range(track.size()):
             val = track.getObsAnalyticalFeature(af_input, i)
@@ -889,6 +972,7 @@ class Averager(UnaryOperator):
     """The average operator: y = mean(x)"""
 
     def execute(self, track, af_input):
+        """TODO"""
         mean = 0
         count = 0
         for i in range(track.size()):
@@ -901,7 +985,10 @@ class Averager(UnaryOperator):
 
 
 class Variance(UnaryOperator):
+    """TODO"""
+
     def execute(self, track, af_input):
+        """TODO"""
         mean = track.operate(Operator.AVERAGER, af_input)
         count = 0
         var = 0
@@ -915,12 +1002,18 @@ class Variance(UnaryOperator):
 
 
 class StdDev(UnaryOperator):
+    """TODO"""
+
     def execute(self, track, af_input):
+        """TODO"""
         return math.sqrt(track.operate(Operator.VARIANCE, af_input))
 
 
 class Mse(UnaryOperator):
+    """TODO"""
+
     def execute(self, track, af_input):
+        """TODO"""
         mse = 0
         count = 0
         for i in range(track.size()):
@@ -934,13 +1027,17 @@ class Mse(UnaryOperator):
 
 class Rmse(UnaryOperator):
     """Rmse Operator"""
+
     def execute(self, track, af_input):
         """Execution of Rmse operator"""
         return math.sqrt(track.operate(Operator.MSE, af_input))
 
 
 class Mad(UnaryOperator):
+    """TODO"""
+
     def execute(self, track, af_input):
+        """TODO"""
         AD = []
         for i in range(track.size()):
             val = track.getObsAnalyticalFeature(af_input, i)
@@ -963,7 +1060,10 @@ class Mad(UnaryOperator):
 
 
 class Covariance(BinaryOperator):
+    """TODO"""
+
     def execute(self, track, af_input1, af_input2):
+        """TODO"""
         m1 = track.operate(Operator.AVERAGER, af_input1)
         m2 = track.operate(Operator.AVERAGER, af_input2)
         rho = 0
@@ -978,15 +1078,21 @@ class Covariance(BinaryOperator):
         return rho / count
 
 
-class Correlator(BinaryOperator):
+class Correlation(BinaryOperator):
+    """TODO"""
+
     def execute(self, track, af_input1, af_input2):
+        """TODO"""
         s1 = track.operate(Operator.STDDEV, af_input1)
         s2 = track.operate(Operator.STDDEV, af_input2)
         return track.operate(Operator.COVARIANCE, af_input1, af_input2) / (s1 * s2)
 
 
 class L0Diff(BinaryOperator):
+    """TODO"""
+
     def execute(self, track, af_input1, af_input2):
+        """TODO"""
         ecart = 0
         for i in range(track.size()):
             x1 = track.getObsAnalyticalFeature(af_input1, i)
@@ -1000,7 +1106,10 @@ class L0Diff(BinaryOperator):
 
 
 class L1Diff(BinaryOperator):
+    """TODO"""
+
     def execute(self, track, af_input1, af_input2):
+        """TODO"""
         ecart = 0
         count = 0
         for i in range(track.size()):
@@ -1014,7 +1123,10 @@ class L1Diff(BinaryOperator):
 
 
 class L2Diff(BinaryOperator):
+    """TODO"""
+
     def execute(self, track, af_input1, af_input2):
+        """TODO"""
         ecart = 0
         count = 0
         for i in range(track.size()):
@@ -1028,7 +1140,10 @@ class L2Diff(BinaryOperator):
 
 
 class LInfDiff(BinaryOperator):
+    """TODO"""
+
     def execute(self, track, af_input1, af_input2):
+        """TODO"""
         ecart = 0
         for i in range(track.size()):
             x1 = track.getObsAnalyticalFeature(af_input1, i)
@@ -1042,7 +1157,10 @@ class LInfDiff(BinaryOperator):
 
 
 class Equal(BinaryOperator):
+    """TODO"""
+
     def execute(self, track, af_input1, af_input2):
+        """TODO"""
         for i in range(track.size()):
             val1 = track.getObsAnalyticalFeature(af_input1, i)
             val2 = track.getObsAnalyticalFeature(af_input2, i)
@@ -1057,7 +1175,10 @@ class Equal(BinaryOperator):
 #      ScalarOperator
 # -----------------------------------------------------------------------------
 class Aggregate(ScalarOperator):
+    """TODO"""
+
     def execute(self, track, af_input, function):
+        """TODO"""
         temp = [0] * track.size()
         for i in range(0, track.size()):
             temp[i] = track.getObsAnalyticalFeature(af_input, i)
@@ -1068,7 +1189,10 @@ class Aggregate(ScalarOperator):
 #      ScalarVoidOperator
 # -----------------------------------------------------------------------------
 class Shift(ScalarVoidOperator):
+    """TODO"""
+
     def execute(self, track, af_input, number, af_output):
+        """TODO"""
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(track.size()):
@@ -1078,15 +1202,40 @@ class Shift(ScalarVoidOperator):
             temp[i] = track.getObsAnalyticalFeature(af_input, int(i - number))
         algoAF.addListToAF(track, af_output, temp)
         return temp
+		
+class ShiftCircular(ScalarVoidOperator):
+    """TODO"""
+
+    def execute(self, track, af_input, number, af_output):
+        """TODO"""
+        track.createAnalyticalFeature(af_output)
+        temp = [0] * track.size()
+        for i in range(track.size()):
+            temp[i] = track.getObsAnalyticalFeature(af_input, int((i-number)%track.size()))
+        algoAF.addListToAF(track, af_output, temp)
+        return temp
 
 
 class ShiftRev(ScalarVoidOperator):
+    """TODO"""
+
     def execute(self, track, af_input, number, af_output):
+        """TODO"""
         return track.operate(Operator.SHIFT, af_input, -number, af_output)
+		
+class ShiftCircularRev(ScalarVoidOperator):
+    """TODO"""
+
+    def execute(self, track, af_input, number, af_output):
+        """TODO"""
+        return track.operate(Operator.SHIFT_CIRCULAR, af_input, -number, af_output)
 
 
 class ScalarAdder(ScalarVoidOperator):
+    """TODO"""
+
     def execute(self, track, af_input, number, af_output):
+        """TODO"""
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(0, track.size()):
@@ -1096,7 +1245,10 @@ class ScalarAdder(ScalarVoidOperator):
 
 
 class ScalarSubstracter(ScalarVoidOperator):
+    """TODO"""
+
     def execute(self, track, af_input, number, af_output):
+        """TODO"""
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(0, track.size()):
@@ -1106,7 +1258,10 @@ class ScalarSubstracter(ScalarVoidOperator):
 
 
 class ScalarRevSubstracter(ScalarVoidOperator):
+    """TODO"""
+
     def execute(self, track, af_input, number, af_output):
+        """TODO"""
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(0, track.size()):
@@ -1116,7 +1271,10 @@ class ScalarRevSubstracter(ScalarVoidOperator):
 
 
 class ScalarMuliplier(ScalarVoidOperator):
+    """TODO"""
+
     def execute(self, track, af_input, number, af_output):
+        """TODO"""
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(0, track.size()):
@@ -1126,20 +1284,29 @@ class ScalarMuliplier(ScalarVoidOperator):
 
 
 class ScalarDivider(ScalarVoidOperator):
+    """TODO"""
+
     def execute(self, track, af_input, number, af_output):
+        """TODO"""
         return track.operate(
             Operator.SCALAR_MULTIPLIER, af_input, 1.0 / number, af_output
         )
 
 
 class ScalarRevDivider(ScalarVoidOperator):
+    """TODO"""
+
     def execute(self, track, af_input, number, af_output):
+        """TODO"""
         track.operate(Operator.INVERSER, af_input, af_output)
         return track.operate(Operator.SCALAR_MULTIPLIER, af_output, number, af_output)
 
 
 class ScalarPower(ScalarVoidOperator):
+    """TODO"""
+
     def execute(self, track, af_input, number, af_output):
+        """TODO"""
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(0, track.size()):
@@ -1149,7 +1316,10 @@ class ScalarPower(ScalarVoidOperator):
 
 
 class ScalarModulo(ScalarVoidOperator):
+    """TODO"""
+
     def execute(self, track, af_input, number, af_output):
+        """TODO"""
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(0, track.size()):
@@ -1159,7 +1329,10 @@ class ScalarModulo(ScalarVoidOperator):
 
 
 class ScalarBelow(ScalarVoidOperator):
+    """TODO"""
+
     def execute(self, track, af_input, number, af_output):
+        """TODO"""
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(0, track.size()):
@@ -1169,7 +1342,10 @@ class ScalarBelow(ScalarVoidOperator):
 
 
 class ScalarRevBelow(ScalarVoidOperator):
+    """TODO"""
+
     def execute(self, track, af_input, number, af_output):
+        """TODO"""
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(0, track.size()):
@@ -1179,7 +1355,10 @@ class ScalarRevBelow(ScalarVoidOperator):
 
 
 class ScalarAbove(ScalarVoidOperator):
+    """TODO"""
+
     def execute(self, track, af_input, number, af_output):
+        """TODO"""
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(0, track.size()):
@@ -1189,7 +1368,10 @@ class ScalarAbove(ScalarVoidOperator):
 
 
 class ScalarRevAbove(ScalarVoidOperator):
+    """TODO"""
+
     def execute(self, track, af_input, number, af_output):
+        """TODO"""
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(0, track.size()):
@@ -1199,7 +1381,10 @@ class ScalarRevAbove(ScalarVoidOperator):
 
 
 class ScalarRevPower(ScalarVoidOperator):
+    """TODO"""
+
     def execute(self, track, af_input, number, af_output):
+        """TODO"""
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(0, track.size()):
@@ -1209,7 +1394,10 @@ class ScalarRevPower(ScalarVoidOperator):
 
 
 class ScalarRevModulo(ScalarVoidOperator):
+    """TODO"""
+
     def execute(self, track, af_input, number, af_output):
+        """TODO"""
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(0, track.size()):
@@ -1219,13 +1407,19 @@ class ScalarRevModulo(ScalarVoidOperator):
 
 
 class Thresholder(ScalarVoidOperator):
+    """TODO"""
+
     def execute(self, track, af_input, number, af_output):
+        """TODO"""
         f = lambda x: x * (x < number) + number * (x >= number)
         track.operate(Operator.APPLY, af_input, f, af_output)
 
 
 class Apply(ScalarVoidOperator):
+    """TODO"""
+
     def execute(self, track, af_input, function, af_output):
+        """TODO"""
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(0, track.size()):
@@ -1235,7 +1429,10 @@ class Apply(ScalarVoidOperator):
 
 
 class Filter(ScalarVoidOperator):
+    """TODO"""
+
     def execute(self, track, af_input, kernel, af_output):
+        """TODO"""
 
         # --------------------------------------------------------------
         # Preparing kernel
@@ -1292,7 +1489,10 @@ class Filter(ScalarVoidOperator):
 
 
 class Filter_FFT(ScalarVoidOperator):
+    """TODO"""
+
     def execute(self, track, af_input, kernel, af_output):
+        """TODO"""
 
         # --------------------------------------------------------------
         # Preparing kernel
@@ -1342,7 +1542,10 @@ class Filter_FFT(ScalarVoidOperator):
 
 
 class Random(ScalarVoidOperator):
+    """TODO"""
+
     def execute(self, track, af_input, probability, af_output):
+        """TODO"""
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(0, track.size()):
@@ -1366,6 +1569,8 @@ class Operator:
             - `INTEGRATOR`: :math:`y(t) = y(t-1) + y(t)`
             - `SHIFT_RIGHT`: :math:`y(t) = x(t-1)`
             - `SHIFT_LEFT`: :math:`y(t) = x(t+1)`
+            - `SHIFT_CIRCULAR_RIGHT`: :math:`y(t) = x((t-1)%n)`
+            - `SHIFT_CIRCULAR_LEFT`: :math:`y(t) = x((t+1)%n)`
             - `INVERTER`: :math:`y(t) = -x(t)`
             - `INVERSER`: :math:`y(t) = 1/x(t)`
             - `DEBIASER`: :math:`y(t) = x(t) - \\bar{x}`
@@ -1436,6 +1641,8 @@ class Operator:
             -  `APPLY`:  :math:`y(t) = arg(x(t))` (arg is a real function)
             -  `SHIFT`:  :math:`y(t) = x(t-arg)` (arg is a integer)
             -  `SHIFT_REV`:  :math:`y(t) = x(t+arg)` (arg is a integer)
+            -  `SHIFT_CIRCULAR`:  :math:`y(t) = x((t-arg)%n)` (arg is a integer)
+            -  `SHIFT_CIRCULAR_REV`:  :math:`y(t) = x((t+arg)%n)` (arg is a integer)
             -  `SCALAR_ADDER`:  :math:`y(t) = x(t) + arg` (arg is a numeric)
             -  `SCALAR_SUBSTRACTER`: :math:`:(t) = x(t) - arg` (arg is a numeric)
             -  `SCALAR_MULTIPLIER`:  :math:`y(t) = arg * x(t)` (arg is a numeric)
@@ -1462,8 +1669,11 @@ class Operator:
     INTEGRATOR = Integrator()  # y(t) = y(t-1) + y(t)
     SHIFT_RIGHT = ShiftRight()  # y(t) = x(t-1)
     SHIFT_LEFT = ShiftLeft()  # y(t) = x(t+1)
+    SHIFT_CIRCULAR_RIGHT = ShiftCircularRight()  # y(t) = x((t-1)%n)
+    SHIFT_CIRCULAR_LEFT = ShiftCircularLeft()  # y(t) = x((t+1)%n)
     INVERTER = Inverter()  # y(t) = -x(t)
     INVERSER = Inverser()  # y(t) = 1/x(t)
+    REVERSER = Reverser()  # y(t) = x(n-t)
     DEBIASER = Debiaser()  # y(t) = x(t) - mean(x)
     SQUARE = Square()  # y(t) = x(t)*x(t)
     SQRT = Sqrt()  # y(t) = x(t)**(0.5)
@@ -1495,6 +1705,7 @@ class Operator:
     DERIVATOR = Derivator()  # y(t) = (x1(t)-x1(t-1))/(x2(t)-x2(t-1)) = dx1/dx2
     POINTWISE_EQUALER = PointwiseEqualer()  # y(t) = 1 if x1(t)=x2(t), 0 otherwise
     CONVOLUTION = Convolution()  # y(t) = int(x1(h)*x2(t-h)dh)
+    CORRELATOR = Correlator()  # y(t) = cov(x1(k+t),x2(k))/(sigma(x1)*sigma(x2))
 
     # Unary operator
     SUM = Sum()  # y = sum(x)
@@ -1513,7 +1724,7 @@ class Operator:
 
     # Binary operator
     COVARIANCE = Covariance()  # y = m[x1x2] - m[x1]*m[x2]
-    CORRELATOR = Correlator()  # y = cov(x1,x2)/(sigma(x1)*sigma(x2))
+    CORRELATION = Correlation()  # y = cov(x1,x2)/(sigma(x1)*sigma(x2))
     L0 = L0Diff()  # y = #{t | x1(t) != x2(t)}
     L1 = L1Diff()  # y = mean(|x1(t)-x2(t)|)
     L2 = L2Diff()  # y = mean(|x1(t)-x2(t)|**2)
@@ -1526,7 +1737,9 @@ class Operator:
     # Scalar void operator
     APPLY = Apply()  # y(t) = arg(x(t))     (arg is a real function)
     SHIFT = Shift()  # y(t) = x(t-arg)      (arg is a integer)
+    SHIFT_CIRCULAR = ShiftCircular()  # y(t) = x((t-arg)%n)  (arg is a integer)
     SHIFT_REV = ShiftRev()  # y(t) = x(t+arg)      (arg is a integer)
+    SHIFT_CIRCULAR_REV = ShiftCircularRev()  # y(t) = x((t+arg)%n)  (arg is a integer)
     SCALAR_ADDER = ScalarAdder()  # y(t) = x(t) + arg    (arg is a numeric)
     SCALAR_SUBSTRACTER = ScalarSubstracter()  # y(t) = x(t) - arg    (arg is a numeric)
     SCALAR_MULTIPLIER = ScalarMuliplier()  # y(t) = arg * x(t)    (arg is a numeric)
@@ -1584,8 +1797,8 @@ class Operator:
         "s*": SCALAR_MULTIPLIER,
         "s/": SCALAR_DIVIDER,
         "s^": SCALAR_POWER,
-        "s&": SHIFT,
-        "s$": SHIFT_REV,
+        "s&": SHIFT_CIRCULAR,
+        "s$": SHIFT_CIRCULAR_REV,
         "s>": SCALAR_ABOVE,
         "s<": SCALAR_BELOW,
         "s%": SCALAR_MODULO,

@@ -4,72 +4,19 @@ Module algo
 .. automodule:: algo
     :members: 
 
-algo.Analytics
---------------
-.. automodule:: algo.Analytics
-    :members:
+.. toctree::
 
-algo.Cinematics
----------------
-.. automodule:: algo.Cinematics
-    :members:
-
-algo.Comparison
----------------
-.. automodule:: algo.Comparison
-    :members:
-
-algo.Dynamics
--------------
-.. automodule:: algo.Dynamics
-    :members:
-
-algo.Filtering
---------------
-.. automodule:: algo.Filtering
-    :members:
-
-algo.Geometrics
----------------
-.. automodule:: algo.Geometrics
-    :members:
-
-algo.Interpolation
-------------------
-.. automodule:: algo.Interpolation
-    :members:
-
-algo.Mapping
-------------
-.. automodule:: algo.Mapping
-    :members:
-
-algo.Segmentation
------------------
-.. automodule:: algo.Segmentation
-    :members:
-
-algo.Selection
---------------
-.. automodule:: algo.Selection
-    :members:
-
-algo.Simplification
--------------------
-.. automodule:: algo.Simplification
-    :members:
-
-algo.Stochastics
-----------------
-.. automodule:: algo.Stochastics
-    :members:
-
-algo.Summarising
-----------------
-.. automodule:: algo.Summarising
-    :members:
-
-algo.Synthetics
----------------
-.. automodule:: algo.Synthetics
-    :members:
+    ./algo/algo-analytics.rst
+    ./algo/algo-cinematics.rst
+    ./algo/algo-comparison.rst
+    ./algo/algo-dynamics.rst
+    ./algo/algo-filtering.rst
+    ./algo/algo-geometrics.rst
+    ./algo/algo-interpolation.rst
+    ./algo/algo-mapping.rst
+    ./algo/algo-segmentation.rst
+    ./algo/algo-selection.rst
+    ./algo/algo-simplification.rst
+    ./algo/algo-stochastics.rst
+    ./algo/algo-summarising.rst
+    ./algo/algo-synthetics.rst

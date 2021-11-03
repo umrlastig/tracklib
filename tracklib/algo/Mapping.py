@@ -27,6 +27,7 @@ from tracklib.core.Track import Track
 # Utils function for map-matching
 # --------------------------------------------------------------------------
 def __projOnTrack(point, track):
+    """TODO"""
     proj = Geometry.proj_polyligne(
         track.getX(), track.getY(), point.getX(), point.getY()
     )
@@ -34,6 +35,7 @@ def __projOnTrack(point, track):
 
 
 def __distToNode(track, coord, i, end=0):
+    """TODO"""
     si1 = track["abs_curv", i]
     si2 = track["abs_curv", i + 1]
     if end == 0:
@@ -52,15 +54,18 @@ def __distToNode(track, coord, i, end=0):
 # Based on popular Newson & Krumm paper
 # --------------------------------------------------------------------------
 def __states(track, k):
+    """TODO"""
     return STATES[k]
 
 
 def __obs_log(s, y, k, track):
+    """TODO"""
     obs_noise = track["obs_noise", k]
     return math.exp(-((s[0].distance2DTo(y) / obs_noise) ** 2))
 
 
 def __tst_log(s1, s2, k, track):
+    """TODO"""
     dtopo = net.distanceBtwPts(s1[1], s1[2], s2[1], s2[2])
     dgeom = s1[0].distance2DTo(s2[0])
     return math.exp(-(dtopo - dgeom) / 10.0)
@@ -69,6 +74,7 @@ def __tst_log(s1, s2, k, track):
 def __mapOnNetwork(
     track, network, obs_noise=50, transition_cost=10, search_radius=50, debug=False
 ):
+    """TODO"""
 
     if debug:
         f1 = open("observation.dat", "a")
@@ -139,6 +145,7 @@ def __mapOnNetwork(
 def mapOnNetwork(
     tracks, network, gps_noise=50, transition_cost=10, search_radius=50, debug=False
 ):
+    """TODO"""
     if isinstance(tracks, Track):
         tracks = TrackCollection([tracks])
     for track in tracks:
@@ -149,6 +156,7 @@ def mapOnNetwork(
 # TO DO: map-matching on raster
 # --------------------------------------------------------------------------
 def mapOnRaster(track, grid):
+    """TODO"""
     return None
 
 

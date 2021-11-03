@@ -33,7 +33,7 @@ Constraints may be based on:
         - MODE_PARALLEL: tracks  following t are selected
 
    - a "toll gate" segment, defined by two Coords objects: tracks crossing 
-        (at least once) the toll gate are selected 
+     (at least once) the toll gate are selected 
 
 All these constraint may be provided with an additional time constraint, 
 specifying the time interval (between two GPSTime dates) where crossing /
@@ -91,6 +91,7 @@ COMBINATION_XOR = 2
 
 
 def printMode(constraint):
+    """TODO"""
     if constraint.mode == MODE_CROSSES:
         return "CROSS"
     if constraint.mode == MODE_INSIDE:
@@ -106,6 +107,7 @@ class TimeConstraint:
     """Time constraints"""
 
     def __init__(self, begin=None, end=None, pattern=None):
+        """TODO"""
         if begin is None:
             self.minTimestamp = GPSTime(0, 0, 0, 0, 0, 0)
         else:
@@ -117,6 +119,7 @@ class TimeConstraint:
         self.pattern = pattern
 
     def __str__(self):
+        """TODO"""
         output = "Temporal constraint: \n"
         if self.minTimestamp - GPSTime(0, 0, 0, 0, 0, 0) != 0:
             if self.maxTimestamp - GPSTime(2100, 0, 0, 0, 0, 0) != 0:
@@ -127,12 +130,15 @@ class TimeConstraint:
         return output
 
     def setMinTimestamp(self, timestamp):
+        """TODO"""
         self.minTimestamp = timestamp
 
     def setMaxTimestamp(self, timestamp):
+        """TODO"""
         self.maxTimestamp = timestamp
 
     def contains(self, timestamp):
+        """TODO"""
         output = (self.minTimestamp <= timestamp) and (timestamp <= self.maxTimestamp)
         if not (self.pattern is None):
             output = output & utils.compLike(str(timestamp), self.pattern)
@@ -145,6 +151,8 @@ class TimeConstraint:
 # Special case of constraint defined by a track
 # -------------------------------------------------
 class TrackConstraint:
+    """TODO"""
+
     def __init__(
         self,
         track,
@@ -156,6 +164,7 @@ class TrackConstraint:
         mode=MODE_PARALLEL,
         type=TYPE_SELECT,
     ):
+        """TODO"""
         self.track = track
         self.time = time
         self.type = type
@@ -176,16 +185,19 @@ class TrackConstraint:
             self.segments.append(Track([Obs(pt1), Obs(pt2)]))
 
     def __str__(self):
+        """TODO"""
         output = "Track-based selecting constraint (mode '" + printMode(self) + "')"
         output += " with " + str(self.time).lower()
         return output
 
     def plot(self, sym="r-"):
+        """TODO"""
         plt.plot(self.track.getX(), self.track.getY(), sym)
         for i in range(len(self.segments)):
             plt.plot(self.segments[i].getX(), self.segments[i].getY(), sym)
 
     def contains(self, track):
+        """TODO"""
         if self.mode == MODE_PARALLEL:
             counter = 0
             lgth = 0
@@ -204,6 +216,7 @@ class TrackConstraint:
             return Geometry.intersects(self.track, track)
 
     def select(self, tracks):
+        """TODO"""
         if self.type == TYPE_SELECT:
             output = TrackCollection()
             for track in tracks:
@@ -218,24 +231,31 @@ class TrackConstraint:
 # Special case of constraint defined by a segment
 # -------------------------------------------------
 class TollGateConstraint:
+    """TODO"""
+
     def __init__(self, pt1, pt2, time=None, type=TYPE_SELECT):
+        """TODO"""
         self.gate = Track([Obs(pt1), Obs(pt2)])
         self.time = time
         self.type = type
 
     def __str__(self):
+        """TODO"""
         output = "Toll gate selecting constraint"
         if not self.time is None:
             output += " with " + str(self.time).lower()
         return output
 
     def plot(self, sym="ro-"):
+        """TODO"""
         plt.plot(self.gate.getX(), self.gate.getY(), sym)
 
     def contains(self, track):
+        """TODO"""
         return Geometry.intersects(self.gate, track)
 
     def select(self, tracks):
+        """TODO"""
         if self.type == TYPE_SELECT:
             output = TrackCollection()
             for track in tracks:
@@ -247,9 +267,12 @@ class TollGateConstraint:
 
 
 class Constraint:
+    """TODO"""
+
     def __init__(
         self, shape=None, time=None, mode=MODE_CROSSES, type=TYPE_SELECT, srid="ENU"
     ):
+        """TODO"""
         if shape is None:
             if srid.upper in ["GEO", "GeoCoords"]:
                 shape = Rectangle(GeoCoords(-180, -90), GeoCoords(180, 90))
@@ -264,15 +287,18 @@ class Constraint:
             self.time = time
 
     def __str__(self):
+        """TODO"""
         output = str(type(self.shape))[33:-2] + "-shaped selecting constraint "
         output += "(mode '" + str(printMode(self)) + "')"
         output += " with " + str(self.time).lower()
         return output
 
     def setShape(self, shape):
+        """TODO"""
         self.shape = shape
 
     def contains(self, track):
+        """TODO"""
         if not str(type(self.shape))[33:-2] in ["Circle", "Rectangle", "Polygon"]:
             return False
         if self.mode == MODE_CROSSES:
@@ -304,6 +330,7 @@ class Constraint:
             return False
 
     def select(self, tracks):
+        """TODO"""
         if self.type == TYPE_SELECT:
             output = TrackCollection()
             for track in tracks:
@@ -314,6 +341,7 @@ class Constraint:
             return tracks
 
     def plot(self, sym):
+        """TODO"""
         self.shape.plot(sym)
 
 
@@ -321,14 +349,19 @@ class Constraint:
 
 
 class Selector:
+    """TODO"""
+
     def __init__(self, constraints, combination=COMBINATION_AND):
+        """TODO"""
         self.constraints = utils.listify(constraints)
         self.combination = combination
 
     def __len__(self):
+        """TODO"""
         return len(self.constraints)
 
     def __str__(self):
+        """TODO"""
         if self.combination == COMBINATION_AND:
             output = "Conjunctive"
         if self.combination == COMBINATION_OR:
@@ -341,17 +374,21 @@ class Selector:
         return output
 
     def setCombinationMode(self, combination):
+        """TODO"""
         self.combination = combination
 
     def addConstraint(self, constraint):
+        """TODO"""
         self.constraints.append(constraint)
 
     def plot(self, sym=["r-", "g-", "b-"]):
+        """TODO"""
         sym = utils.listify(sym)
         for i in range(len(self)):
             self.constraints[i].plot(sym[i % len(sym)])
 
     def __combine(self, bool1, bool2):
+        """TODO"""
         if self.combination == COMBINATION_AND:
             return bool1 and bool2
         if self.combination == COMBINATION_OR:
@@ -360,6 +397,7 @@ class Selector:
             return (bool1 and not (bool2)) or (not (bool1) and bool2)
 
     def __initCombination(self):
+        """TODO"""
         if self.combination == COMBINATION_AND:
             return True
         if self.combination == COMBINATION_OR:
@@ -368,6 +406,7 @@ class Selector:
             return False
 
     def contains(self, track):
+        """TODO"""
         inside = self.__initCombination()
         for c in self.constraints:
             inside = self.__combine(inside, c.contains(track))
@@ -378,20 +417,26 @@ class Selector:
 
 
 class GlobalSelector:
+    """TODO"""
+
     def __init__(self, selectors, combination=COMBINATION_AND):
+        """TODO"""
         self.selectors = utils.listify(selectors)
         self.combination = combination
 
     def __len__(self):
+        """TODO"""
         return len(self.selectors)
 
     def numberOfConstraints(self):
+        """TODO"""
         count = 0
         for i in range(len(self)):
             count += len(self.selectors)
         return count
 
     def __str__(self):
+        """TODO"""
         alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i"]
         if self.combination == COMBINATION_AND:
             output = "Conjunctive"
@@ -405,10 +450,12 @@ class GlobalSelector:
         return output
 
     def plot(self):
+        """TODO"""
         for i in range(len(self.selectors)):
             self.selectors[i].plot()
 
     def __combine(self, bool1, bool2):
+        """TODO"""
         if self.combination == COMBINATION_AND:
             return bool1 and bool2
         if self.combination == COMBINATION_OR:
@@ -417,6 +464,7 @@ class GlobalSelector:
             return (bool1 and not (bool2)) or (not (bool1) and bool2)
 
     def __initCombination(self):
+        """TODO"""
         if self.combination == COMBINATION_AND:
             return True
         if self.combination == COMBINATION_OR:
@@ -425,12 +473,15 @@ class GlobalSelector:
             return False
 
     def addSelector(self, selector):
+        """TODO"""
         self.selectors.append(selector)
 
     def setCombinationMode(self, combination):
+        """TODO"""
         self.combination = combination
 
     def contains(self, track):
+        """TODO"""
         inside = self.__initCombination()
         for s in self.selectors:
             inside = self.__combine(inside, s.contains(track))

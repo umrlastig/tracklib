@@ -156,7 +156,7 @@ class GPSTime:
 
     @staticmethod
     def readUnixTime(elapsed_seconds: float) -> GPSTime:
-        """readUnixTime Converting elapsed float seconds since 01/01/1970 in GPSTime
+        """Converting elapsed float seconds since 01/01/1970 in GPSTime
 
         **Warning:** does not consider leap seconds (31 since 1970)
 
@@ -215,7 +215,7 @@ class GPSTime:
         return time
 
     def toAbsTime(self) -> float:
-        """toAbsTime Converting to elapsed float seconds since 01/01/1970
+        """Converting to elapsed float seconds since 01/01/1970
 
         **Warning:** does not consider leap seconds (31 since 1970)
 
@@ -240,7 +240,7 @@ class GPSTime:
 
     @staticmethod
     def random() -> GPSTime:
-        """random Generate random date between 01/01/1970 and 01/01/2050"""
+        """Generate random date between 01/01/1970 and 01/01/2050"""
         t0 = GPSTime(2050, 1, 1, 0, 0, 0, 0)
         s0 = t0.toAbsTime()
         return GPSTime.readUnixTime(random.random() * s0)

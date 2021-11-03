@@ -2,8 +2,11 @@
 
 
 class NetworkWriter:
+    """TODO"""
+
     @staticmethod
     def writeToCsv(network, path="", separator=",", h=1):
+        """TODO"""
 
         if h == 1:
             output = "link_id" + separator

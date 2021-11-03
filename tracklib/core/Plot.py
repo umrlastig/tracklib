@@ -16,7 +16,14 @@ from PIL import Image
 # MODE_REPRESENT_TRACK2D = 1
 # MODE_REPRESENT_SPEED_PROFIL = 2
 
-COLOR_POINT = ["gold", "orangered", "dodgerblue", "purple", "lime", "turquoise"]
+COLOR_POINT = [
+    "gold",
+    "orangered",
+    "dodgerblue",
+    "purple",
+    "lime",
+    "turquoise",
+]  #: TODO
 
 MARKERS_TYPE_NO_ENTRY = 0
 MARKERS_TYPE_INFORMATION = 1
@@ -28,7 +35,10 @@ MARKERS_TYPE_INTERDICTION = 6
 
 
 class Plot:
+    """TODO"""
+
     def __init__(self, track):
+        """TODO"""
         self.track = track
         self.color = "forestgreen"
         self.sym = "g-"
@@ -62,8 +72,8 @@ class Plot:
     #  Ax object (may be input into append parameter)
     # ----------------------------------------------------
     def plot(self, type="LINE", af_name=None, cmap=-1, margin=0.1, append=False):
+        """TODO
 
-        """
         Représentation d'une trace sous forme de ligne ou de point.
         On peut visualiser la valeur d'une AF avec une couleur sur les points.
         """
@@ -129,6 +139,7 @@ class Plot:
     # first two dimensions are arbitrarily considered
     # ----------------------------------------------------
     def plotEllipses(self, track, sym="r-", factor=3, af=None, append=False):
+        """TODO"""
 
         if isinstance(append, bool):
             if append:
@@ -163,7 +174,8 @@ class Plot:
         return ax1
 
     def plotAnalyticalFeature(self, af_name, template="BOXPLOT"):
-        """
+        """TODO
+
         Plot AF values by abcisse curvilign.
         """
         if not self.track.hasAnalyticalFeature(BIAF_ABS_CURV):
@@ -173,6 +185,7 @@ class Plot:
         self.__plotBoxplot(af_name)
 
     def __plotBoxplot(self, af_name):
+        """TODO"""
 
         fig, ax1 = plt.subplots(figsize=(6, 2))
         ax1.set(xlabel="absciss curvilign")
@@ -180,7 +193,8 @@ class Plot:
         ax1.boxplot(self.track.getAnalyticalFeature(af_name), vert=False)
 
     def plotProfil(self, template="SPATIAL_SPEED_PROFIL", afs=[]):
-        """
+        """TODO
+
         TEMPLATE:
             SPATIAL_SPEED_PROFIL, SPATIAL_ALTI_PROFIL,
                   TEMPORAL_SPEED_PROFIL, TEMPORAL_ALTI_PROFIL
@@ -281,6 +295,7 @@ class Plot:
             plt.title(afs[0])
 
     def __plotProfile(self, af_name):
+        """TODO"""
 
         fig, ax1 = plt.subplots(figsize=(8, 3))
         ax1.set(xlabel="absciss curvilign")
@@ -294,6 +309,7 @@ class Plot:
 
 
 def plotOnImage(track, image_path, sym="r.", markersize=1):
+    """TODO"""
     N = len(track)
     img = Image.open(image_path)
     plt.imshow(img)
@@ -301,6 +317,7 @@ def plotOnImage(track, image_path, sym="r.", markersize=1):
 
 
 def videoOnImage(track, image_path, sym="r.", markersize=1):
+    """TODO"""
     N = len(track)
     img = Image.open(image_path)
     plt.imshow(img)

@@ -27,14 +27,15 @@ KALMAN_COMBINED = 2
 # -----------------------------------------
 # Global variables for Markov filtering
 # -----------------------------------------
-sig = 0
-res = 0
+sig = 0  #: TODO
+res = 0  #: TODO
 # -----------------------------------------
 
 # --------------------------------------------------------------------------
 # TODO: Gaussian process filtering
 # --------------------------------------------------------------------------
 def gaussianProcess(track):
+    """TODO"""
     return None
 
 
@@ -42,10 +43,12 @@ def gaussianProcess(track):
 # TODO: Wavelet filtering (Donoho and Johnstone)
 # --------------------------------------------------------------------------
 def waveletTransform(track):
+    """TODO"""
     return None
 
 
 def waveletFiltering(track):
+    """TODO"""
     return None
 
 
@@ -53,14 +56,17 @@ def waveletFiltering(track):
 # TODO: Karhunen-Loeve filtering
 # --------------------------------------------------------------------------
 def KLBasis(TrackCollection):
+    """TODO"""
     return None
 
 
 def KLTransform(track):
+    """TODO"""
     return None
 
 
 def KLFiltering(track):
+    """TODO"""
     return None
 
 
@@ -75,6 +81,7 @@ def KLFiltering(track):
 # Important: tracks are assumed to be sampled at constant time frequency
 # --------------------------------------------------------------------------
 def __kalman(track, sigma, speed_std, speed_af=None, verbose=True):
+    """TODO"""
 
     track = track.copy()
     dt = abs(track.frequency())
@@ -138,6 +145,7 @@ def __kalman(track, sigma, speed_std, speed_af=None, verbose=True):
 
 
 def Kalman(track, sigma, speed_std, speed_af=None, mode=KALMAN_FORWARD, verbose=True):
+    """TODO"""
     if mode == KALMAN_FORWARD:
         return __kalman(track, sigma, speed_std, speed_af, verbose)
     if mode == KALMAN_BACKWARD:
@@ -183,6 +191,7 @@ def Kalman(track, sigma, speed_std, speed_af=None, mode=KALMAN_FORWARD, verbose=
 #      resolution of 1 m provides a thin modelization.
 # --------------------------------------------------------------------------
 def __Markov_S(track, i):
+    """TODO"""
     etats = []
     N = int(2 * sig / res) + 1
     for kx in range(-N, N + 1):
@@ -194,10 +203,12 @@ def __Markov_S(track, i):
 
 
 def __Markov_Plog(pi, y, k, track):
+    """TODO"""
     return -((pi.distance2DTo(y) / 20) ** 2)
 
 
 def MarkovRegularization(track, sigma, speed, resolution):
+    """TODO"""
     global res, sig
     sig = sigma
     res = resolution
@@ -229,6 +240,7 @@ def MarkovRegularization(track, sigma, speed, resolution):
 # function twice sequentially with FILTER_LOW_PASS and FILTER_HIGH_PASS.
 # --------------------------------------------------------------------------
 def filter(track, fc, mode=FILTER_TEMPORAL, type=FILTER_LOW_PASS, dim=FILTER_XYZ):
+    """TODO"""
 
     output = track.copy()
     fs = output.frequency(mode)

@@ -17,6 +17,7 @@ from tracklib.io.NetworkFormat import NetworkFormat
 
 
 class IgnReader:
+    """TODO"""
 
     NB_PER_PAGE = 1000
 
@@ -216,6 +217,7 @@ class IgnReader:
     # --------------------------------------------------------------------------
     @staticmethod
     def __getNbRouteEmprise(bbox, proxyDict):
+        """TODO"""
 
         nb = 0
 
@@ -266,6 +268,7 @@ def selectNodes(network, node, distance):
 
 
 def tabCoordsLineStringToObs(coords, srid):
+    """TODO"""
 
     # Creation d'une liste vide
     TAB_OBS = list()

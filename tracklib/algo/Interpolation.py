@@ -1,5 +1,9 @@
 """Class to manage interpolation and smoothing functions"""
 
+# For type annotation
+from __future__ import annotations
+from typing import Literal
+
 import sys
 import math
 import numpy as np
@@ -30,7 +34,7 @@ GP_SMOOTHING = 0
 from tracklib.core.Track import Track
 
 
-def resample(track, delta, algo=1, mode=2):
+def resample(track, delta, algo: Literal[1, 2] = 1, mode: Literal[1, 2, 3, 4] = 2):
     """Resampling of a track with linear interpolation delta
 
     Interpolation interval (time in sec if temporal mode is selected,
@@ -54,6 +58,8 @@ def resample(track, delta, algo=1, mode=2):
         - a list of timestamps where interpolation should be computed
         - a reference track
 
+    :param algo: TODO
+    :param mode: TODO
     """
 
     if mode == MODE_SPATIAL:
@@ -87,8 +93,9 @@ def resample(track, delta, algo=1, mode=2):
 
 
 def __resampleSpatial(track, ds):
+    """TODO
 
-    """Resampling of a track with linear interpolation
+    Resampling of a track with linear interpolation
     ds: curv abs interval (in m) between two samples"""
 
     S = [0]
@@ -100,7 +107,8 @@ def __resampleSpatial(track, ds):
     sfin = S[len(S) - 1]
     N = (int)((sfin - sini) / ds)
 
-    interp_points = [track.getFirstObs()]
+    interp_points = [track.getFirstObs().copy()]
+    interp_points[0].features = []
     running_id = 0
 
     for k in range(1, N + 1):
@@ -131,8 +139,9 @@ def __resampleSpatial(track, ds):
 
 
 def __resampleTemporal(track, reference):
+    """TODO
 
-    """Resampling of a track with linear interpolation
+    Resampling of a track with linear interpolation
     reference: list of timestamps, track or sec interval"""
 
     T = []
@@ -268,6 +277,7 @@ def gaussian_process(track, timestamps, kernel, factor=1.0, sigma=0.0, cp_var=Fa
 # Output : a list of timestamps
 # --------------------------------------------------------------------------
 def prepareTimeSampling(input, tini=None, tfin=None):
+    """TODO"""
     output = []
     if isinstance(input, list):
         for i in range(len(input)):
@@ -295,6 +305,7 @@ def prepareTimeSampling(input, tini=None, tfin=None):
 # Note: method is symetric on track1 and track2
 # --------------------------------------------------------------------------
 def synchronize(track1, track2):
+    """TODO"""
 
     # Merge timestamps of tracks
     timestamps = track1.getTimestamps() + [] + track2.getTimestamps()
@@ -324,8 +335,9 @@ def synchronize(track1, track2):
 
 
 def __smooth_resample_spatial(track, ds):
+    """TODO
 
-    """Resampling of a track with spline interpolation
+    Resampling of a track with spline interpolation
     ds: curv abs interval (in m) between two samples"""
 
     S = [0]
@@ -423,8 +435,9 @@ def __smooth_resample_spatial(track, ds):
 
 
 def __smooth_resample_temporal(track, reference):
+    """TODO
 
-    """Resampling of a track with spline interpolation
+    Resampling of a track with spline interpolation
     reference: list of timestamps, track or sec interval"""
 
     T = []
@@ -514,6 +527,7 @@ def __smooth_resample_temporal(track, reference):
 
 
 def __phi(x, tab):
+    """TODO"""
     n = (int)(len(tab) / 2)
     id = (int)(n + x * 400)
     if id < 0:
@@ -524,8 +538,9 @@ def __phi(x, tab):
 
 
 def __bsplines_temporal(track, reference, degree=3, knots_nb=None):
+    """TODO
 
-    """Resampling of a track with B-spline interpolation
+    Resampling of a track with B-spline interpolation
     reference: list of timestamps, track or sec interval"""
 
     if degree > 3:
@@ -610,8 +625,9 @@ def __bsplines_temporal(track, reference, degree=3, knots_nb=None):
 
 
 def __bsplines_spatial(track, ds, degree=3, knots_nb=None):
+    """TODO
 
-    """Resampling of a track with spline interpolation
+    Resampling of a track with spline interpolation
     ds: curv abs interval (in m) between two samples"""
 
     if degree > 3:
@@ -706,7 +722,8 @@ def __bsplines_spatial(track, ds, degree=3, knots_nb=None):
 
 
 def smooth_cv(track, smooth_function, params=[], verbose=True):
-    """Cross validation for determining optimal parameters of smoothing/interpolating/simplifying functions
+    """Cross validation for determining optimal parameters of
+     smoothing/interpolating/simplifying functions
 
     Note that if params contains a single element, smooth_cv function is a simple
     statistical control. If no parameters are provided in input, a default set of 1000
@@ -716,6 +733,7 @@ def smooth_cv(track, smooth_function, params=[], verbose=True):
     :param track: a (timestamped) track on which cross validation is performed
     :param smooth_function: any function with track as input and output
     :param params: a list of parameters to test in smooth_function
+    :return: TODO
     """
 
     if verbose:

@@ -24,6 +24,7 @@ def generate(
     verbose=True,
     N=1,
 ):
+    """TODO"""
     randomTrack = y_t is None
     if randomTrack:
         if N > 1:
@@ -67,6 +68,7 @@ def generate(
 # Generate field of tracks from integral curves of vector field
 # =========================================================================
 def generateDataSet(vx, vy, N=100, pmin=(0, 0), pmax=(100, 100), Nbmax=1000):
+    """TODO"""
 
     TRACKS = []
     for i in range(N):

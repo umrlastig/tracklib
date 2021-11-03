@@ -19,9 +19,9 @@ from tracklib.core.TrackCollection import TrackCollection
 class Kernel:
     """Generic kernel class"""
 
-    __filter_boundary = True
-    __kernel_function = None
-    __support = None
+    __filter_boundary = True  #: TODO
+    __kernel_function = None  #: TODO
+    __support = None  #: TODO
 
     def __init__(self, function: Callable[[float], float], support: float):
         """Kernel constructor
@@ -327,9 +327,11 @@ class ExperimentalKernel:
             self.H[i] = i * r
 
     def addTrackPair(self, track1, track2):
+        """TODO"""
         self.addTrackCollection(TrackCollection([track1, track2]))
 
     def addTrackCollection(self, trackCollection, verbose=False):
+        """TODO"""
         import tracklib.algo.Comparison as Comparison  # <- Assez moche... A voir comment resoudre
 
         N = trackCollection.size()

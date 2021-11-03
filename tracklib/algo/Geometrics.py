@@ -8,9 +8,8 @@ import random
 import matplotlib.pyplot as plt
 
 from tracklib.core.Coords import ENUCoords
-from tracklib.util.Geometry import right, inclusion, collinear, cartesienne
-from tracklib.util.Geometry import transform, transform_inverse, isSegmentIntersects
-
+from tracklib.util.Geometry import right, inclusion, collinear, cartesienne, isSegmentIntersects
+from tracklib.util.Geometry import transform, transform_inverse
 
 MODE_ENCLOSING_BBOX = 0
 MODE_ENCLOSING_MBR = 1
@@ -19,11 +18,15 @@ MODE_ENCLOSING_CONVEX = 3
 
 
 class Circle:
+    """TODO"""
+
     def __init__(self, center, radius):
+        """TODO"""
         self.center = center
         self.radius = radius
 
     def plot(self, sym="r-", append=plt):
+        """TODO"""
 
         if isinstance(append, bool):
             if append:
@@ -45,23 +48,30 @@ class Circle:
         return ax1
 
     def contains(self, point):
+        """TODO"""
         return (point.getX() - self.center.getX()) ** 2 + (
             point.getY() - self.center.getY()
         ) ** 2 <= self.radius ** 2
 
     def copy(self):
+        """TODO"""
         return copy.deepcopy(self)
 
     def translate(self, dx, dy):
+        """TODO"""
         self.center.translate(dx, dy)
 
 
 class Rectangle:
+    """TODO"""
+
     def __init__(self, pmin, pmax):
+        """TODO"""
         self.pmin = pmin
         self.pmax = pmax
 
     def plot(self, sym="r-"):
+        """TODO"""
         XR = [
             self.pmin.getX(),
             self.pmax.getX(),
@@ -79,6 +89,7 @@ class Rectangle:
         plt.plot(XR, YR, sym)
 
     def contains(self, point):
+        """TODO"""
         inside_x = (self.pmin.getX() < point.getX()) and (
             point.getX() < self.pmax.getX()
         )
@@ -88,12 +99,14 @@ class Rectangle:
         return inside_x and inside_y
 
     def copy(self):
+        """TODO"""
         return copy.deepcopy(self)
 
     # --------------------------------------------------
     # Translation (2D) of shape (dx, dy in ground units)
     # --------------------------------------------------
     def translate(self, dx, dy):
+        """TODO"""
         self.pmin.translate(dx, dy)
         self.pmax.translate(dx, dy)
 
@@ -101,6 +114,7 @@ class Rectangle:
     # Rotation (2D) of shape (theta in radians)
     # --------------------------------------------------
     def rotate(self, theta):
+        """TODO"""
         self.pmin.rotate(theta)
         self.pmax.rotate(theta)
 
@@ -108,12 +122,16 @@ class Rectangle:
     # Homothetic transformation (2D) of shape
     # --------------------------------------------------
     def scale(self, h):
+        """TODO"""
         self.pmin.scale(h)
         self.pmax.scale(h)
 
 
 class Polygon:
+    """TODO"""
+
     def __init__(self, X, Y):
+        """TODO"""
         self.X = X
         self.Y = Y
         if not ((self.X[-1] == self.X[0]) and (self.Y[-1] == self.Y[0])):
@@ -121,18 +139,22 @@ class Polygon:
             self.Y.append(self.Y[0])
 
     def plot(self, sym="r-"):
+        """TODO"""
         plt.plot(self.X, self.Y, sym)
 
     def contains(self, point):
+        """TODO"""
         return inclusion(self.X, self.Y, point.getX(), point.getY())
 
     def copy(self):
+        """TODO"""
         return copy.deepcopy(self)
 
     # --------------------------------------------------
     # Translation (2D) of shape (dx, dy in ground units)
     # --------------------------------------------------
     def translate(self, dx, dy):
+        """TODO"""
         for i in range(len(self.X)):
             self.X[i] = self.X[i] + dx
             self.Y[i] = self.Y[i] + dy
@@ -141,6 +163,7 @@ class Polygon:
     # Rotation (2D) of shape (theta in radians)
     # --------------------------------------------------
     def rotate(self, theta):
+        """TODO"""
         cr = math.cos(theta)
         sr = math.sin(theta)
         for i in range(len(self.X)):
@@ -153,6 +176,7 @@ class Polygon:
     # Homotehtic transformation (2D) of shape
     # --------------------------------------------------
     def scale(self, h):
+        """TODO"""
         for i in range(len(self.X)):
             self.X[i] *= h
             self.Y[i] *= h
@@ -161,6 +185,7 @@ class Polygon:
     # Polygon area
     # --------------------------------------------------
     def area(self):
+        """TODO"""
         aire = 0
         for i in range(len(self.X) - 1):
             aire += self.X[i] * self.Y[i + 1] - self.X[i + 1] * self.Y[i]
@@ -170,6 +195,7 @@ class Polygon:
     # Polygon centroid
     # --------------------------------------------------
     def centroid(self):
+        """TODO"""
         aire = 0
         center = [0, 0]
         dx = self.X[0]
@@ -191,6 +217,7 @@ class Polygon:
     # Test if a polygon is star-shaped
     # --------------------------------------------------
     def isStarShaped(self):
+        """TODO"""
         eps = 1e-6
         c = self.centroid()
         # self.plot('k-')
@@ -218,6 +245,7 @@ class Polygon:
     # Computes angular ratio of polygon star-shaped
     # --------------------------------------------------
     def starShapedRatio(self, resolution=1, inf=1e3):
+        """TODO"""
         eps = inf
         c = self.centroid()
         # self.plot('k-')
@@ -248,6 +276,7 @@ class Polygon:
     # Radial signature of a polygon
     # --------------------------------------------------
     def signature(self):
+        """TODO"""
         C = self.centroid()
         S = [0]
         R = [math.sqrt((C[0] - self.X[0]) ** 2 + (C[1] - self.Y[0]) ** 2)]
@@ -271,6 +300,7 @@ class Polygon:
 # Function to get enclosing shape
 # ----------------------------------------
 def boundingShape(track, mode=MODE_ENCLOSING_BBOX):
+    """TODO"""
     if mode == MODE_ENCLOSING_BBOX:
         return track.getBBox()
     if mode == MODE_ENCLOSING_MBR:
@@ -282,7 +312,8 @@ def boundingShape(track, mode=MODE_ENCLOSING_BBOX):
 
 
 def __convexHull(T):
-    """
+    """TODO
+
     Finds the convex hull of a set of coordinates, returned as
     a list of x an y coordinates : [x1, y1, x2, y2,...]
     Computation is performed with Jarvis march algorithm
@@ -302,7 +333,8 @@ def __convexHull(T):
 
 
 def convexHull(track):
-    """
+    """TODO
+
     Finds the convex hull of a track, returned as
     a list of x an y coordinates : [x1, y1, x2, y2,...]
     Computation is performed with Jarvis march algorithm
@@ -323,7 +355,8 @@ def convexHull(track):
 
 
 def diameter(track):
-    """
+    """TODO
+
     Finds longest distance between points on track
     The two selected points are returned in a vector
     along with the minimal distance : [min_dist, idx_p1, idx_p2].
@@ -342,7 +375,9 @@ def diameter(track):
 
 
 def __circle(p1, p2=None, p3=None):
-    """Finds circle through 1, 2 or 3 points
+    """TODO
+
+    Finds circle through 1, 2 or 3 points
     Returns Circle(C, R)
     """
 
@@ -409,7 +444,9 @@ def __circle(p1, p2=None, p3=None):
 
 
 def __welzl(C):
-    """Finds minimal bounding circle with Welzl's algorithm"""
+    """TODO
+
+    Finds minimal bounding circle with Welzl's algorithm"""
 
     P = C.center
     P = P.copy()
@@ -445,7 +482,9 @@ def __welzl(C):
 
 
 def plotPolygon(P, color=[1, 0, 0, 1]):
-    """Function to plot a polygon  from a vector:
+    """TODO
+
+    Function to plot a polygon  from a vector:
     R = [x1,y1,x2,y2,x3,y3,...x1,y1]
     Needs to call plt.show() after this function"""
     XR = P[::2]
@@ -454,7 +493,8 @@ def plotPolygon(P, color=[1, 0, 0, 1]):
 
 
 def minCircle(track):
-    """
+    """TODO
+
     Finds minimal bounding circle with Welzl's recursive
     algorithm in O(n) complexity. Output is given as a list
     [p, R], where p is a Coords object defining circle center
@@ -484,7 +524,9 @@ def minCircle(track):
 
 
 def minCircleMatrix(track):
-    """Computes matrix of all min circles in a track.
+    """TODO
+
+    Computes matrix of all min circles in a track.
     M[i,j] gives the radius of the min circle enclosing
     points in track from obs i to obs j (included)"""
 
@@ -498,6 +540,7 @@ def minCircleMatrix(track):
 
 
 def fitCircle(track, iter_max=100, epsilon=1e-10):
+    """TODO"""
 
     X = np.ones((3, 1))
     c = track.getCentroid()
@@ -584,6 +627,7 @@ def fitCircle(track):
 # Output :     R = [[x1,y1],[x2,y2],[x3,y3],[x4,y4], area, l, L]
 # ------------------------------------------------------------
 def __mbr(COORDS):
+    """TODO"""
 
     HULL = __convexHull(COORDS)
     XH = [COORDS[p][0] for p in HULL]
@@ -636,6 +680,7 @@ def __mbr(COORDS):
 
 
 def minimumBoundingRectangle(track):
+    """TODO"""
 
     T = []
     for i in range(len(track)):

@@ -22,7 +22,12 @@ def estimate_speed(track):
 # Difference finie centree lissee
 # --------------------------------------------------
 def smoothed_speed_calculation(track, width):
+    """TODO
 
+    :param track: TODO
+    :param width: TODO
+    :return: TODO
+    """
     S = track.compute_abscurv()
     track.estimate_speed()
 
@@ -58,6 +63,12 @@ def estimate_heading(track):
 # Difference finie centree lissee
 # --------------------------------------------------
 def smoothed_speed_calculation(track, width):
+    """TODO
+
+    :param track: TODO
+    :param width: TODO
+    :return: TODO
+    """
 
     S = track.compute_abscurv()
     track.estimate_speed()
@@ -163,3 +174,11 @@ def computeDescDeniv(track, id_ini=0, id_fin=None):
             dn += Z2 - Z1
 
     return dn
+
+def computeRadialSignature(track, factor=1):
+    track = track.copy(); track.loop()
+    R = track.getEnclosedPolygon().signature()
+    track.createAnalyticalFeature("s", R[0])
+    track.createAnalyticalFeature("r", R[1])
+    return track
+    

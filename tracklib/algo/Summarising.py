@@ -5,11 +5,13 @@ from tracklib.core.Raster import Raster
 
 
 def summarize(grid, af_algos, aggregates):
+    """TODO"""
     raster = Raster(grid, af_algos, aggregates)
     return raster
 
 
 def co_sum(tarray):
+    """TODO"""
     tarray = utils.listify(tarray)
     somme = 0
     for i in range(len(tarray)):
@@ -21,6 +23,7 @@ def co_sum(tarray):
 
 
 def co_min(tarray):
+    """TODO"""
     tarray = utils.listify(tarray)
     if len(tarray) <= 0:
         return utils.NAN
@@ -35,6 +38,7 @@ def co_min(tarray):
 
 
 def co_max(tarray):
+    """TODO"""
     tarray = utils.listify(tarray)
     if len(tarray) <= 0:
         return utils.NAN
@@ -49,6 +53,7 @@ def co_max(tarray):
 
 
 def co_count(tarray):
+    """TODO"""
     tarray = utils.listify(tarray)
     count = 0
     for i in range(len(tarray)):
@@ -60,6 +65,7 @@ def co_count(tarray):
 
 
 def co_avg(tarray):
+    """TODO"""
     tarray = utils.listify(tarray)
     if len(tarray) <= 0:
         return utils.NAN
@@ -77,8 +83,8 @@ def co_avg(tarray):
 
 
 def co_dominant(tarray):
+    """TODO"""
     tarray = utils.listify(tarray)
-    """ Most frequent value """
     if len(tarray) <= 0:
         return utils.NAN
 
@@ -103,6 +109,7 @@ def co_dominant(tarray):
 
 
 def co_median(tarray):
+    """TODO""" 
     tarray = utils.listify(tarray)
     if len(tarray) <= 0:
         return utils.NAN

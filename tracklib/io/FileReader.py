@@ -15,6 +15,7 @@ from tracklib.io.FileFormat import FileFormat
 
 
 class FileReader:
+    """TODO"""
 
     NMEA_GGA = "GGA"
     NMEA_RMC = "RMC"
@@ -217,6 +218,7 @@ class FileReader:
         verbose=False,
         selector=None,
     ):
+        """TODO"""
 
         TRACES = TrackCollection()
         LISTFILE = os.listdir(pathdir)
@@ -267,6 +269,7 @@ class FileReader:
         bboxFilter=None,
         doublequote=False,
     ):
+        """TODO"""
 
         if separator == " ":
             print("Error: separator must not be space for reading WKT file")

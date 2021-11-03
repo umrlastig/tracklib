@@ -46,7 +46,9 @@ MODE_SIMPLIFY_FREE_MAXIMIZE = 7
 #       - tolerance is a customed function to maximize
 # --------------------------------------------------------------------------
 def simplify(track, tolerance, mode=MODE_SIMPLIFY_DOUGLAS_PEUCKER, verbose=True):
-    """Simplify a track"""  
+    """TODO
+
+    Simplify a track"""
     if mode == MODE_SIMPLIFY_DOUGLAS_PEUCKER:
         return douglas_peucker(track, tolerance)
     if mode == MODE_SIMPLIFY_VISVALINGAM:
@@ -79,6 +81,7 @@ def simplify(track, tolerance, mode=MODE_SIMPLIFY_DOUGLAS_PEUCKER, verbose=True)
 # Output : simplified
 # --------------------------------------------------------------------------
 def visvalingam(track, eps):
+    """TODO"""
     eps **= 2
     output = track.copy()
     output.addAnalyticalFeature(Geometry.aire_visval, "@aire")
@@ -109,6 +112,7 @@ def visvalingam(track, eps):
 # Output : simplified
 # --------------------------------------------------------------------------
 def douglas_peucker(track, eps):
+    """TODO"""
 
     L = track.getObsList()
 
@@ -153,6 +157,7 @@ def douglas_peucker(track, eps):
 # Output : simplified
 # --------------------------------------------------------------------------
 def optimalSimplification(track, cost, eps, mode=MODE_SEGMENTATION_MINIMIZE):
+    """TODO"""
 
     simplified = Track(user_id=track.uid, track_id=track.tid, base=track.base)
     segmentation = optimalSegmentation(track, cost, eps)
@@ -172,6 +177,7 @@ def optimalSimplification(track, cost, eps, mode=MODE_SEGMENTATION_MINIMIZE):
 # Width of MBR + offset penalty (used with MINIMIZATION)
 # ------------------------------------------------------------
 def __cost_largest_deviation(track, i, j, offset):
+    """TODO"""
     if j <= i + 1:
         return offset
     else:
@@ -184,6 +190,7 @@ def __cost_largest_deviation(track, i, j, offset):
 # l/L ratio of MBR + offset penalty (used with MINIMIZATION)
 # ------------------------------------------------------------
 def __cost_mbr_ratio(track, i, j, offset):
+    """TODO"""
     if j <= i + 1:
         return offset
     else:
@@ -198,6 +205,7 @@ def __cost_mbr_ratio(track, i, j, offset):
 # Width should be lower than offset + unit penalty (used with MINIMIZATION)
 # ------------------------------------------------------------
 def __cost_largest_deviation_strict(track, i, j, offset):
+    """TODO"""
     if j <= i + 1:
         return offset
     else:

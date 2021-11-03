@@ -3,19 +3,29 @@
 
 import sys
 import math
+from typing import Iterable, Literal, Union
 import progressbar
 import numpy as np
 import matplotlib.pyplot as plt
 
 from tracklib.core.TrackCollection import TrackCollection
+from tracklib.core.Track import Track
 
 import tracklib.algo.Dynamics as Dynamics
 import tracklib.algo.Interpolation as Interpolation
 
-# ------------------------------------------------------------
-# Difference profile plot
-# ------------------------------------------------------------
-def plotDifferenceProfile(profile, track2, af_name="pair", sym="g--", NO_DATA_VALUE=-1):
+
+def plotDifferenceProfile(
+    profile, track2, af_name="pair", sym="g--", NO_DATA_VALUE: int = -1
+):
+    """Difference profile plot
+
+    :param profile: TODO
+    :param track2: TODO
+    :param af_name: TODO
+    :param sym: TODO
+    :param NO_DATA_VALUE: TODO
+    """
     for i in range(profile.size()):
         if profile.getObsAnalyticalFeature(af_name, i) == NO_DATA_VALUE:
             continue
@@ -26,36 +36,46 @@ def plotDifferenceProfile(profile, track2, af_name="pair", sym="g--", NO_DATA_VA
         plt.plot([x1, x2], [y1, y2], sym, linewidth=0.5)
 
 
-# ------------------------------------------------------------
-# Profile of difference between two traces : t2 - t1
-# Two possible modes:
-# - NN (Nearest Neighbour): O(n^2) time and O(n) space
-# - DTW (Dynamic Time Warping): O(n^3) time and O(n^2) space
-# - FDTW (Fast Dynamic Time Warping): same as DTW with reduced
-#   search space. In this particular case, 'ends' parameter is
-#   an integer giving the number of points to search for a
-#   match ahead and behind the current point. E.g. for ends=0,
-#   there is a strict matching track1[i] <-> track2[i] for
-#   each epoch i. For ends=10 for example, each point track[i]
-#   can be matched with any point chronologically between the
-#   bounds track2[i-10] and track2[i+10]. Default is equal to
-#   3, meaning that track1 may be at most 3 times faster or
-#   slower than track2 on ant given sub-interval. Note that
-#   this method is designed for pairs of tracks having about
-#   same number of points. Otherwise, it is strongly advised
-#   to perform a spatial resampling before applying FDTW.
-# ------------------------------------------------------------
-# Output is a track objet, with an analytical feature diff
-# containing shortest distance of each point of track t1, to
-# the points of track t2. We may get profile as a list with
-# output.getAbsCurv() and output.getAnalyticalFeature("diff")
-# The selected candidate in registerd in AF "pair"
-# Set "ends" parameter to True to force end points to meet
-# p is Minkowski's exponent for distance computation. Default
-# value is 1 for summation of distances, 2 for least squares
-# solution and 10 for an approximation of Frechet solution.
-# ------------------------------------------------------------
-def differenceProfile(track1, track2, mode="NN", ends=False, p=1, verbose=True):
+def differenceProfile(
+    track1,
+    track2,
+    mode: Literal["NN", "DTW", "FDTW"] = "NN",
+    ends=False,
+    p=1,
+    verbose: bool = True,
+):
+    """Profile of difference between two traces
+
+    Three possible modes:
+
+    - **NN** (Nearest Neighbour): :math:`O(n^2)` time and :math:`O(n)` space
+    - **DTW** (Dynamic Time Warping): :math:`O(n^3)` time and :math:`O(n^2)` space
+    - **FDTW** (Fast Dynamic Time Warping): same as DTW with reduced search space. In this
+      particular case, 'ends' parameter is an integer giving the number of points to
+      search for a match ahead and behind the current point. E.g. for ends=0, there is a
+      strict matching track1[i] <-> track2[i] for each epoch i. For ends=10 for example,
+      each point track[i] can be matched with any point chronologically between the
+      bounds track2[i-10] and track2[i+10]. Default is equal to 3, meaning that track1
+      may be at most 3 times faster or slower than track2 on ant given sub-interval.
+      Note that this method is designed for pairs of tracks having about same number of
+      points. Otherwise, it is strongly advised to perform a spatial resampling before
+      applying FDTW
+
+    :param track1: TODO
+    :param track2: TODO
+    :param mode: Mode for the interpolation. Three modes are possible : NN, DTW and FDTW
+    :param ends: TODO
+    :param p: TODO
+    :param verbose: Verbose mode
+    :return: A track objet, with an analytical feature diff containing shortest distance
+             of each point of track t1, to the points of track t2. We may get profile as
+             a list with :func:`output.getAbsCurv()` and
+             :func:`output.getAnalyticalFeature("diff")` The selected candidate in
+             registerd in AF "pair" Set "ends" parameter to True to force end points to
+             meet p is Minkowski's exponent for distance computation. Default value is
+             1 for summation of distances, 2 for least squares solution and 10 for an
+             approximation of Frechet solution.
+    """
 
     output = track1.copy()
     output.createAnalyticalFeature("diff")
@@ -171,6 +191,13 @@ def differenceProfile(track1, track2, mode="NN", ends=False, p=1, verbose=True):
 
 
 def __fillAFProfile(track1, track2, output, S):
+    """TODO
+
+    :param track1: TODO
+    :param track2: TODO
+    :param output: TODO
+    :param S: TODO
+    """
     for i in range(track1.size()):
         x1 = track1.getObs(i).position.getX()
         y1 = track1.getObs(i).position.getY()
@@ -186,19 +213,24 @@ def __fillAFProfile(track1, track2, output, S):
 
 
 def synchronize(self, track):
+    """Resampling of 2 tracks with linear interpolation on a common base of
+    timestamps
 
-    """Resampling of 2 tracks with linear interpolation
-    on a common base of timestamps
-    track: track to synchronize with"""
-
+    :param track: track to synchronize with
+    """
     Interpolation.synchronize(self, track)
 
 
-def compare(track1, track2):
+def compare(track1, track2) -> float:
+    """Comparison of 2 tracks.
 
-    """Comparison of 2 tracks. Tracks are interpolated
-    linearly on a common base of timestamps
-    track: track to compare with"""
+    Tracks are interpolated linearly on a common base of timestamps
+
+    :param track1: track to compare with
+    :param track2: track to compare with
+
+    :return: TODO
+    """
 
     trackA = track1.copy()
     trackB = track2.copy()
@@ -212,27 +244,39 @@ def compare(track1, track2):
     return math.sqrt(rmse / trackA.size())
 
 
-# ------------------------------------------------------------
-# Computes central track of a track collection
-# Inputs:
-#     - tracks:  TrackCollection or list of tracks
-#     - mode  :  "NN", "DTW" or "FDTW" for track pair matching
-# ------------------------------------------------------------
-def centralTrack(tracks, mode="NN", verbose=True):
+def centralTrack(
+    tracks: Union[TrackCollection, Iterable[Track]],
+    mode: Literal["NN", "DTW", "FDTW"] = "NN",
+    verbose: bool = True,
+) -> Track:
+    """Computes central track of a track collection
+
+    :param tracks: TrackCollection or list of tracks
+    :param mode: "NN", "DTW" or "FDTW" for track pair matching (see the documentation
+                  of :func:`differenceProfile` function for more infos on modes)
+    :return: The central track
+    """
+
     tracks = tracks.copy()
+
     if isinstance(tracks, list):
         tracks = TrackCollection(tracks)
     base = tracks.toENUCoordsIfNeeded()
     central = tracks[0].copy()
+
     for i in range(1, len(tracks)):
         diff = differenceProfile(tracks[0], tracks[i], mode=mode, verbose=verbose)
+
         for j in range(len(central)):
             dx = tracks[i][diff["pair", j]].position.getX()
             dy = tracks[i][diff["pair", j]].position.getY()
             dz = tracks[i][diff["pair", j]].position.getZ()
             central[j].position.translate(dx, dy, dz)
+
     for j in range(len(central)):
         central[j].position.scale(1.0 / len(tracks))
+
     if not base is None:
         central.toGeoCoords(base)
+
     return central

@@ -17,6 +17,7 @@ BUILT_IN_AF = [BIAF_DS, BIAF_SPEED, BIAF_ABS_CURV, BIAF_HEADING]
 
 
 def addListToAF(track, af_name, array):
+    """TODO"""
     if af_name == None:
         return
     for i in range(track.size()):
@@ -24,12 +25,14 @@ def addListToAF(track, af_name, array):
 
 
 def ds(track, i):
+    """TODO"""
     if i == 0:
         return 0
     return track.getObs(i).distance2DTo(track.getObs(i - 1))
 
 
 def abs_curv(track, i):
+    """TODO"""
     S = [0]
     for i in range(1, track.size()):
         ds = track.getObs(i - 1).position.distance2DTo(track.getObs(i).position)
@@ -38,6 +41,7 @@ def abs_curv(track, i):
 
 
 def heading(track, i):
+    """TODO"""
     if i == len(track):
         return heading(track, i - 1)
     return track.getObs(i).position.azimuthTo(track.getObs(i - 1).position)
@@ -105,13 +109,13 @@ def acceleration(track, i):
 #    Des AF algo sur les angles
 # =============================================================================
 
-"""
-Mesure l'angle  géométrique (non orienté) intérieur abc.
-@return mesure de l'angle abc en degrés
-"""
 
+def anglegeom(track, i) -> float:
+    """
+    Mesure l'angle  géométrique (non orienté) intérieur abc.
 
-def anglegeom(track, i):
+    :return: Angle abc (degrees)
+    """
     long_ab = track.getObs(i - 1).distance2DTo(track.getObs(i))
     long_bc = track.getObs(i).distance2DTo(track.getObs(i + 1))
     long_ac = track.getObs(i - 1).distance2DTo(track.getObs(i + 1))
@@ -125,13 +129,11 @@ def anglegeom(track, i):
     return angle1
 
 
-"""
-Mesure l'angle orienté dans le sens trigonométrique abc.
-https://medium.com/@manivannan_data/find-the-angle-between-three-points-from-2d-using-python-348c513e2cd
-"""
-
-
 def calculAngleOriente(track, i):
+    """Mesure l'angle orienté dans le sens trigonométrique abc.
+
+    https://medium.com/@manivannan_data/find-the-angle-between-three-points-from-2d-using-python-348c513e2cd
+    """
 
     a = track.getObs(i - 1).position
     b = track.getObs(i).position
@@ -190,12 +192,10 @@ def orientation(track, i):
 # =============================================================================
 #    Des AF algo sur le timestamp
 # =============================================================================
-"""
-Pour diviser les traces par le jour de l'année
-"""
 
 
 def diffJourAnneeTrace(track, i):
+    """For divide tracks by year day"""
     if i == 0:
         return 0
     return track.getObs(i).timestamp.day - track.getObs(i - 1).timestamp.day
@@ -204,8 +204,10 @@ def diffJourAnneeTrace(track, i):
 # =============================================================================
 # =============================================================================
 def stop_point_with_acceleration_criteria(track, i):
-    """
-    This algorithm detect stop point. A point is a stop when:
+    """This algorithm detect stop point. 
+    
+    A point is a stop when:
+    
         - speed is null
         - acceleration is negative
     """
