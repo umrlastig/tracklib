@@ -52,8 +52,8 @@ from tracklib.io.NetworkReader import NetworkReader
 
 def example0():
 
-    path_cam = "data/hybridation_gnss_camera.dat"
-    path_gps = "data/hybridation_gnss_camera.pos"
+    path_cam = "../data/hybridation_gnss_camera.dat"
+    path_gps = "../data/hybridation_gnss_camera.pos"
 
     GPSTime.setReadFormat("2D/2M/4Y-2h:2m:2s.3z")
     track_cam = FileReader.readFromFile(path_cam, 1, 2, 3, 0, " ", srid="ENUCoords")
@@ -72,3 +72,5 @@ def example0():
     track_cam.plot('r-')
     track_gps.plot('b+')
     plt.show()
+    
+example0()
