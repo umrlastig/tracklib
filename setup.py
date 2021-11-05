@@ -25,11 +25,11 @@ setup(
     author="Yann Méneroux, Marie-Dominique Van Damme",
     author_email="todo@ign.fr",
     license="cecill-c",
-    python_requires=">=3.5",
+    python_requires=">=3.8",
     classifiers=[
         "Development Status :: 1 - Alpha",
         "Intended Audience :: Developers",
-        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.8",
     ],
     packages=find_packages(include=["test", "resources"]),
     install_requires=requirements,
