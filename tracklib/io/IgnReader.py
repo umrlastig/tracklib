@@ -28,6 +28,9 @@ class IgnReader:
     URL_SERVER += "outputFormat=json&"
     # URL_SERVER += "BBOX=44.538617443499014,5.808794912294471,45.05505710140573,6.644301708889899"
     # URL_SERVER += "&count=3&startIndex=0"
+    
+    URL_ELEVATION = "https://wxs.ign.fr/choisirgeoportail/alti/rest/elevation.json?"
+    URL_ELEVATION += "zonly=true"
 
     resource_path = os.path.join(os.path.split(__file__)[0], "../..")
     PROXY_FILE_FORMAT = os.path.join(resource_path, "resources/proxy")
@@ -236,6 +239,13 @@ class IgnReader:
         nb = int(result[0].attributes["numberMatched"].value)
 
         return nb
+    
+    
+    @staticmethod
+    def getAltitude(
+        bbox, proj=None, nomproxy=None
+    ):
+        URL_ELEVATION = '&lon=0.2367|2.1570&lat=48.0551|46.6077'
 
 
 def selectNodes(network, node, distance):
