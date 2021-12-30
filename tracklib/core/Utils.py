@@ -100,9 +100,7 @@ def makeCoords(
         return ECEFCoords(x, y, z)
 
 
-def makeDistanceMatrix(
-    T1: list[tuple[float, float]], T2: list[tuple[float, float]], cycle: bool = False
-) -> np.float32:
+def makeDistanceMatrix(T1: list[tuple[float, float]], T2: list[tuple[float, float]], cycle: bool = False) -> np.float32:
     """Function to form distance matrix
 
     :param T1: A list of points
@@ -129,14 +127,7 @@ def makeDistanceMatrix(
     return D
 
 
-def makeCovarianceMatrixFromKernel(
-    kernel,
-    T1: list[tuple[float, float]],
-    T2: list[tuple[float, float]],
-    factor: float = 1.0,
-	force: bool = False,
-	cycle: bool = False,	
-):
+def makeCovarianceMatrixFromKernel(kernel, T1: list[tuple[float, float]], T2: list[tuple[float, float]], factor: float = 1.0, force: bool = False, cycle: bool = False):
     """Function to form covariance matrix from kernel
 
     :param kernel: A function describing statistical similarity between points
@@ -181,13 +172,7 @@ def rgbToHex(color: list[float, float, float, Optional[float]]) -> str:
     return "0x" + A + B + G + R
 
 
-def interpColors(
-    v: float,
-    vmin: float,
-    vmax: float,
-    cmin: list[float, float, float, Optional[float]],
-    cmax: list[float, float, float, Optional[float]],
-) -> list[float, float, float, float]:
+def interpColors(v: float, vmin: float, vmax: float, cmin: list[float, float, float, Optional[float]], cmax: list[float, float, float, Optional[float]]) -> list[float, float, float, float]:
     """
     Function to interpolate RGBA (or RGB) color between two values
 

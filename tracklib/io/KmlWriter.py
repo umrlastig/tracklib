@@ -17,15 +17,7 @@ class KmlWriter:
     """TODO"""
 
     @staticmethod
-    def writeToKml(
-        track,
-        path,
-        type: Literal["LINE", "POINT"] = "LINE",
-        af=None,
-        c1=[0, 0, 1, 1],
-        c2=[1, 0, 0, 1],
-        name=False,
-    ):
+    def writeToKml(track, path, type: Literal["LINE", "POINT"] = "LINE", af=None, c1=[0, 0, 1, 1], c2=[1, 0, 0, 1], name=False):
         """Transforms track/track collection/network into KML string
 
         :param path: file to write kml (kml returned in standard output if empty)

@@ -262,9 +262,7 @@ class ENUCoords:
         point_ecef = self.toECEFCoords(base_ecef)
         return point_ecef.toGeoCoords()
 
-    def toENUCoords(
-        self, base1: Union[ECEFCoords, GeoCoords], base2: Union[ECEFCoords, GeoCoords]
-    ) -> ENUCoords:
+    def toENUCoords(self, base1: Union[ECEFCoords, GeoCoords], base2: Union[ECEFCoords, GeoCoords]) -> ENUCoords:
         """Convert local ENU coordinates relative to base1 to
         local ENU coordinates relative to base2.
 

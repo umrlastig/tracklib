@@ -113,15 +113,15 @@ class NoiseProcess:
                 output += "\n + "
         return output
 
-    def noise(self, track, N=1):
+    def noise(self, track, N=1, cycle=False, force=False):
         """TODO"""
         if N == 1:
-            return noise(track, self.amplitudes, self.kernels, self.distribution)
+            return noise(track, self.amplitudes, self.kernels, self.distribution, cycle=cycle, force=force)
         else:
             collection = TrackCollection()
             for i in range(N):
                 collection.addTrack(
-                    noise(track, self.amplitudes, self.kernels, self.distribution)
+                    noise(track, self.amplitudes, self.kernels, self.distribution, cycle=cycle, force=force)
                 )
             return collection
 
@@ -278,3 +278,4 @@ def randomizer(input, f, sigma=[7], kernel=[Kernel.GaussianKernel(650)], N=10):
     print("")
 
     return noised_output
+

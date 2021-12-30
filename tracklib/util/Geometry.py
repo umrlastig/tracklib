@@ -153,9 +153,7 @@ def distance_to_segment(
     return d
 
 
-def projection_droite(
-    param: tuple[float, float, float], x: float, y: float
-) -> tuple[float, float]:
+def projection_droite(param: tuple[float, float, float], x: float, y: float) -> tuple[float, float]:
     """projection_droite Fonction projection orthogonal sur une droite
 
     :param param: Paramètres a,b,c d'une droite

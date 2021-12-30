@@ -268,6 +268,7 @@ class FileReader:
         srid="ENUCoords",
         bboxFilter=None,
         doublequote=False,
+		verbose=False,
     ):
         """TODO"""
 
@@ -357,6 +358,8 @@ class FileReader:
                         continue
 
                 TRACES.addTrack(track)
+                if verbose:
+                    print("Polygon", len(TRACES), "loaded")
 
         return TRACES
 

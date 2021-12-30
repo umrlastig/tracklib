@@ -36,14 +36,7 @@ def plotDifferenceProfile(
         plt.plot([x1, x2], [y1, y2], sym, linewidth=0.5)
 
 
-def differenceProfile(
-    track1,
-    track2,
-    mode: Literal["NN", "DTW", "FDTW"] = "NN",
-    ends=False,
-    p=1,
-    verbose: bool = True,
-):
+def differenceProfile(track1, track2, mode: Literal["NN", "DTW", "FDTW"] = "NN", ends=False, p=1, verbose: bool = True):
     """Profile of difference between two traces
 
     Three possible modes:
@@ -244,11 +237,7 @@ def compare(track1, track2) -> float:
     return math.sqrt(rmse / trackA.size())
 
 
-def centralTrack(
-    tracks: Union[TrackCollection, Iterable[Track]],
-    mode: Literal["NN", "DTW", "FDTW"] = "NN",
-    verbose: bool = True,
-) -> Track:
+def centralTrack(tracks: Union[TrackCollection, Iterable[Track]], mode: Literal["NN", "DTW", "FDTW"] = "NN", verbose: bool = True) -> Track:
     """Computes central track of a track collection
 
     :param tracks: TrackCollection or list of tracks

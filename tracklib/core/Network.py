@@ -686,13 +686,7 @@ class Network:
             return node.id
         return node
 
-    def sub_network(
-        self,
-        source: Union[int, Node, Union[GeoCoords, ENUCoords, ECEFCoords]],
-        cut: float,
-        mode: Literal["TOPOLOGIC", "GEOMETRIC"] = "TOPOLOGIC",
-        verbose: bool = True,
-    ) -> Network:
+    def sub_network(self, source: Union[int, Node, Union[GeoCoords, ENUCoords, ECEFCoords]], cut: float, mode: Literal["TOPOLOGIC", "GEOMETRIC"] = "TOPOLOGIC", verbose: bool = True) -> Network:
         """Extracts sub-network from routing forward search
 
         An edge is added to the output network if bot its ends have been visited during
@@ -736,9 +730,7 @@ class Network:
             sub_net.addEdge(e, e.source, e.target)
         return sub_net
 
-    def __sub_network_geometric(
-        self, source: Union[Node, str], cut: float, verbose: bool
-    ) -> Network:
+    def __sub_network_geometric(self, source: Union[Node, str], cut: float, verbose: bool) -> Network:
         """Sub network generation, based on geometry
 
         :param source: Source for the sub-network
@@ -779,13 +771,7 @@ class Network:
             elem[1].antecedent = ""
             elem[1].antecedent_edge = ""
 
-    def run_routing_forward(
-        self,
-        source: Union[Node, int],
-        target: Union[Node, int] = None,
-        cut: float = 1e300,
-        output_dict: dict = None,
-    ):
+    def run_routing_forward(self, source: Union[Node, int], target: Union[Node, int] = None, cut: float = 1e300, output_dict: dict = None):
         """Executes forward pass of routing algorithm to find shortest distance between
         source node and all other nodes in graph.
 
@@ -846,13 +832,7 @@ class Network:
                     fils.antecedent_edge = e.id
                     fil.__setitem__(fils, fils.poids)
 
-    def shortest_distance(
-        self,
-        source: Union[int, Node],
-        target: Union[int, Node] = None,
-        cut: float = 1e300,
-        output_dict: dict = None,
-    ) -> Union[float, list[float]]:
+    def shortest_distance( self, source: Union[int, Node], target: Union[int, Node] = None, cut: float = 1e300, output_dict: dict = None) -> Union[float, list[float]]:
         """Finds shortest distance between source node and either a target node or a
         list of target nodes.
 
@@ -879,9 +859,7 @@ class Network:
         else:
             return [(n[1].poids < 0) * 1e300 + n[1].poids for n in self.NODES.items()]
 
-    def all_shortest_distances(
-        self, cut: float = 1e300, output_dict: dict = None
-    ) -> Dict[Tuple[int, int], float]:
+    def all_shortest_distances(self, cut: float = 1e300, output_dict: dict = None) -> Dict[Tuple[int, int], float]:
         """Computes all shortest distances between pairs of nodes
 
         The results are saved in a dictionnary `{key=(source, n), value=d}`.
@@ -939,13 +917,7 @@ class Network:
             node = node.antecedent
         return track
 
-    def shortest_path(
-        self,
-        source: Union[int, Node],
-        target: Union[int, Node],
-        cut: float = 1e300,
-        output_dict: dict = None,
-    ) -> Union[Track, None]:
+    def shortest_path( self, source: Union[int, Node], target: Union[int, Node], cut: float = 1e300, output_dict: dict = None) -> Union[Track, None]:
         """Computes shortest path between source and target nodes
 
         :param source: A source node
@@ -959,9 +931,7 @@ class Network:
         self.run_routing_forward(source, target, cut=cut, output_dict=output_dict)
         return self.run_routing_backward(target)
 
-    def distanceBtwPts(
-        self, edge1: int, abs_curv_1: float, edge2: int, abs_curv_2: float
-    ) -> float:
+    def distanceBtwPts( self, edge1: int, abs_curv_1: float, edge2: int, abs_curv_2: float) -> float:
         """Distance between 2 points
 
         Each points being described by:
@@ -1010,9 +980,7 @@ class Network:
             self.DISTANCES = dict()
         self.all_shortest_distances(cut=cut, output_dict=self.DISTANCES)
 
-    def has_prepared_shortest_distance(
-        self, source: Union[int, Node], target: Union[int, Node]
-    ) -> bool:
+    def has_prepared_shortest_distance(self, source: Union[int, Node], target: Union[int, Node]) -> bool:
         """Tests if a shortest distance has been precomputed
 
         :param source: A source node
@@ -1031,9 +999,7 @@ class Network:
         key = (source, target)
         return key in self.DISTANCES
 
-    def prepared_shortest_distance(
-        self, source: Union[int, Node], target: Union[int, Node]
-    ) -> float:
+    def prepared_shortest_distance(self, source: Union[int, Node], target: Union[int, Node]) -> float:
         """Finds shortest distance from the precomputation. May be called only after
         :func:`prepare` or :func:`load_prep.`
 
