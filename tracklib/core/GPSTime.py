@@ -2,7 +2,7 @@
 This module contains the class to manage timestamps
 """
 # For type annotation
-from __future__ import annotations
+from __future__ import annotations   
 from typing import Union
 
 import copy
@@ -112,7 +112,7 @@ class GPSTime:
             self.ms = ms
             self.zone = zone
 
-    def copy(self) -> GPSTime:
+    def copy(self) -> GPSTime:   
         """Copy the object
 
         :return: copy of current object
@@ -120,7 +120,7 @@ class GPSTime:
         return copy.deepcopy(self)
 
     @staticmethod
-    def setPrintFormat(format: str):
+    def setPrintFormat(format: str):   
         """Set the format for printing a GPSTime object
 
         The print format is use by the :func:`GPSTime.__str__` method
@@ -130,7 +130,7 @@ class GPSTime:
         GPSTime.__PRINT_FMT = format
 
     @staticmethod
-    def setReadFormat(format: str):
+    def setReadFormat(format: str):   
         """Set the format for reading a GPSTime object
 
         :param format: Format for reading
@@ -139,7 +139,7 @@ class GPSTime:
         GPSTime.__PRECOMPILED_READ_FMT = GPSTime.__precompileReadFmt(GPSTime.__READ_FMT)
 
     @staticmethod
-    def getPrintFormat() -> str:
+    def getPrintFormat() -> str:   
         """Return the print format
 
         :return: The print format
@@ -147,7 +147,7 @@ class GPSTime:
         return GPSTime.__PRINT_FMT
 
     @staticmethod
-    def getReadFormat() -> str:
+    def getReadFormat() -> str:   
         """Return the read format
 
         :return: The read format
@@ -155,7 +155,7 @@ class GPSTime:
         return GPSTime.__READ_FMT
 
     @staticmethod
-    def readUnixTime(elapsed_seconds: float) -> GPSTime:
+    def readUnixTime(elapsed_seconds: float) -> GPSTime:   
         """Converting elapsed float seconds since 01/01/1970 in GPSTime
 
         **Warning:** does not consider leap seconds (31 since 1970)
@@ -214,7 +214,7 @@ class GPSTime:
 
         return time
 
-    def toAbsTime(self) -> float:
+    def toAbsTime(self) -> float:   
         """Converting to elapsed float seconds since 01/01/1970
 
         **Warning:** does not consider leap seconds (31 since 1970)
@@ -239,13 +239,13 @@ class GPSTime:
         return seconds
 
     @staticmethod
-    def random() -> GPSTime:
+    def random() -> GPSTime:   
         """Generate random date between 01/01/1970 and 01/01/2050"""
         t0 = GPSTime(2050, 1, 1, 0, 0, 0, 0)
         s0 = t0.toAbsTime()
         return GPSTime.readUnixTime(random.random() * s0)
 
-    def printZone(self) -> str:
+    def printZone(self) -> str:   
         """Print zone code (Z if greenwhich) ISO 8601"""
         if self.zone == 0:
             return "Z"
@@ -255,7 +255,7 @@ class GPSTime:
             else:
                 return "-" + "{:02d}".format(abs(self.zone)) + ":00"
 
-    def timeWithZone(self) -> str:
+    def timeWithZone(self) -> str:   
         """Print as Gpx time"""
         fmt_save = GPSTime.getPrintFormat()
         GPSTime.setPrintFormat("4Y-2M-2DT2h:2m:2s")
@@ -263,7 +263,7 @@ class GPSTime:
         GPSTime.setPrintFormat(fmt_save)
         return output
 
-    def convertToZone(self, zone: int) -> GPSTime:
+    def convertToZone(self, zone: int) -> GPSTime:   
         """Zone conversion
 
         :param zone: Time zone
@@ -274,7 +274,7 @@ class GPSTime:
         new_time.zone = zone
         return new_time
 
-    def getDayOfWeek(self) -> str:
+    def getDayOfWeek(self) -> str:   
         """Return the current day of week"""
         seconds = self.toAbsTime()
         return GPSTime.__day_names[
@@ -306,7 +306,7 @@ class GPSTime:
         return elem[1]
 
     @staticmethod
-    def __rep(char: str, n: int) -> str:
+    def __rep(char: str, n: int) -> str:   
         """Generate a string repeting a char
 
         :param char: Caracter to repeate
@@ -319,7 +319,7 @@ class GPSTime:
         return output
 
     @staticmethod
-    def __precompileReadFmt(format: str) -> list[tuple[str, int]]:
+    def __precompileReadFmt(format: str) -> list[tuple[str, int]]:   
         """Precompile the reader
 
         :param format: A format string
@@ -356,7 +356,7 @@ class GPSTime:
         return PRECOMPILED_LIST
 
     @staticmethod
-    def readTimestamp(timeAsString: str) -> GPSTime:
+    def readTimestamp(timeAsString: str) -> GPSTime:   
         """Build timestamp from string according to READ_FMT
 
         :param timeAsString: Timestamp in string format
@@ -378,7 +378,7 @@ class GPSTime:
     # in string 'chaine' with new string 'new'
     # ------------------------------------------------------------
     @staticmethod
-    def __replace(chaine: str, id: int, length: int, new: str) -> str:
+    def __replace(chaine: str, id: int, length: int, new: str) -> str:   
         """Remplacing substring of length `length`, starting at pos `id`
         in string `chaine` with new string `new`
 
@@ -390,7 +390,7 @@ class GPSTime:
         """
         return chaine[:id] + new + chaine[id + length :]
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:   
         """Prints timestamp according to PRINT_FMT specification
 
         :retunr: the timestamp to print
@@ -432,7 +432,7 @@ class GPSTime:
 
         return output
 
-    def addSec(self, nb: int) -> GPSTime:
+    def addSec(self, nb: int) -> GPSTime:   
         """Add `nb` seconds to current time
 
         :param nb: Number of seconds to add
@@ -441,7 +441,7 @@ class GPSTime:
         sec = self.toAbsTime() + nb
         return GPSTime.readUnixTime(sec)
 
-    def addMin(self, nb: int) -> GPSTime:
+    def addMin(self, nb: int) -> GPSTime:   
         """Add `nb` minutes to current time
 
         :param nb: Number of minutes to add
@@ -468,7 +468,7 @@ class GPSTime:
         sec = self.toAbsTime() + nb * 86400
         return GPSTime.readUnixTime(sec)
 
-    def __sub__(self, time: GPSTime) -> float:
+    def __sub__(self, time: GPSTime) -> float:   
         """Difference between 2 dates
 
         :param time: :class:`GPSTime` to substract
@@ -476,7 +476,7 @@ class GPSTime:
         """
         return self.toAbsTime() - time.toAbsTime()
 
-    def __eq__(self, time: GPSTime) -> bool:
+    def __eq__(self, time: GPSTime) -> bool:   
         """Tests if two timestamps are strictly equal (up to 1 ms)
 
         :param time: :class:`GPSTime` to compare
@@ -497,14 +497,14 @@ class GPSTime:
             return False
         return True
 
-    def __ne__(self, time: GPSTime) -> bool:
+    def __ne__(self, time: GPSTime) -> bool:   
         """Test if two timestamps are different
 
         :param time: :class:`GPSTime` to compare
         """
         return not (time == self)
 
-    def __gt__(self, time: GPSTime) -> bool:
+    def __gt__(self, time: GPSTime) -> bool:   
         """Tests chronological order of two timestamps
 
         :param time: :class:`GPSTime` to compare
@@ -523,7 +523,7 @@ class GPSTime:
             return self.sec > time.sec
         return self.ms > time.ms
 
-    def __lt__(self, time: GPSTime) -> bool:
+    def __lt__(self, time: GPSTime) -> bool:   
         """Tests chronological order of two timestamps
 
         :param time: :class:`GPSTime` to compare
@@ -542,7 +542,7 @@ class GPSTime:
             return self.sec < time.sec
         return self.ms < time.ms
 
-    def __ge__(self, time: GPSTime) -> bool:
+    def __ge__(self, time: GPSTime) -> bool:   
         """Inverse of :method:`__gt__`
 
         :param time: :class:`GPSTime` to compare
@@ -550,7 +550,7 @@ class GPSTime:
 
         return not (self < time)
 
-    def __le__(self, time: GPSTime) -> bool:
+    def __le__(self, time: GPSTime) -> bool:   
         """Inverse of :method:`__lt__`
 
         :param time: :class:`GPSTime` to compare

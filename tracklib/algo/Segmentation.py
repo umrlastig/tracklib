@@ -79,7 +79,7 @@ def segmentation(
             track.setObsAnalyticalFeature(af_output, i, 0)
 
 
-def split(track, source) -> TrackCollection:
+def split(track, source) -> TrackCollection:   
     """Splits track according to :
 
         - af name (considered as a marker) if `source` is a string

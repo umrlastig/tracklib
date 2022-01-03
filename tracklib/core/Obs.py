@@ -4,7 +4,7 @@ Points are referenced in geodetic coordinates
 """
 
 # For type annotation
-from __future__ import annotations
+from __future__ import annotations   
 from typing import Union
 
 import sys
@@ -17,7 +17,7 @@ from tracklib.core.GPSTime import GPSTime
 class Obs:
     """Class to define an observation"""
 
-    def __init__(self, position: ENUCoords, timestamp: GPSTime = None):
+    def __init__(self, position: ENUCoords, timestamp: GPSTime = None):   
         """Constructor of :class:`Obs` class
 
         :param position: A point coordinate
@@ -45,18 +45,18 @@ class Obs:
         self.azimut = 0
         self.elevation = 0
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:   
         """String of observation"""
         return (str)(self.timestamp) + "  " + (str)(self.position)
 
-    def copy(self) -> Obs:
+    def copy(self) -> Obs:   
         """Copy the current object"""
         return copy.deepcopy(self)
 
     # --------------------------------------------------
     # Geom. methods (should not depend on coords type)
     # --------------------------------------------------
-    def __check_call_geom1(fname, obs1: Obs, obs2: Obs):
+    def __check_call_geom1(fname, obs1: Obs, obs2: Obs):   
         """TODO
 
         :param fname: TODO
@@ -68,7 +68,7 @@ class Obs:
         ):
             sys.exit("Error: cannot call " + fname + " with ECEF coordinates")
 
-    def __check_call_geom2(fname, obs1: Obs, obs2: Obs):
+    def __check_call_geom2(fname, obs1: Obs, obs2: Obs):   
         """TODO
 
         :param fname: TODO
@@ -90,7 +90,7 @@ class Obs:
                 + " objects"
             )
 
-    def distanceTo(self, obs: Obs) -> float:
+    def distanceTo(self, obs: Obs) -> float:   
         """Compute the distance between two observations
 
         :param obs: Observation
@@ -99,7 +99,7 @@ class Obs:
         Obs.__check_call_geom2("distanceTo", self, obs)
         return self.position.distanceTo(obs.position)
 
-    def distance2DTo(self, obs: Obs) -> float:
+    def distance2DTo(self, obs: Obs) -> float:   
         """Compute the 2d distance between two observations
 
         :param obs: Observation
@@ -108,7 +108,7 @@ class Obs:
         Obs.__check_call_geom1("distance2DTo", self, obs)
         return self.position.distance2DTo(obs.position)
 
-    def azimuthTo(self, obs: Obs) -> float:
+    def azimuthTo(self, obs: Obs) -> float:   
         """Compute the azimuth between two observations
 
         :param obs: Observation
@@ -117,7 +117,7 @@ class Obs:
         Obs.__check_call_geom2("azimuthTo", self, obs)
         return self.position.azimuthTo(obs.position)
 
-    def elevationTo(self, obs: Obs) -> float:
+    def elevationTo(self, obs: Obs) -> float:   
         """Compute the elevation between two observations
 
         :param obs: Observation
@@ -126,7 +126,7 @@ class Obs:
         Obs.__check_call_geom2("elevationTo", self, obs)
         return self.position.elevationTo(obs.position)
 
-    def __getitem__(self, af_index: int):
+    def __getitem__(self, af_index: int):   
         """Get the n-est feature
 
         :param af_index: Index of feature
@@ -134,7 +134,7 @@ class Obs:
         """
         return self.features[af_index]
 
-    def __setitem__(self, af_index: int, value):
+    def __setitem__(self, af_index: int, value):   
         """Set the n-est feature
 
         :param af_index: Index of feature

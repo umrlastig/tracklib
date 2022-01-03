@@ -3,8 +3,8 @@ This module contains the class to manage GPS tracks. Points are referenced in ge
 """
 
 # For type annotation
-from __future__ import annotations
-from typing import Any, Literal, Union
+from __future__ import annotations   
+from typing import Any, Literal, Union   
 
 import sys
 import math
@@ -51,14 +51,14 @@ class Track:
         """TODO"""
         return copy.deepcopy(self)
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:   
         """TODO"""
         output = ""
         for i in range(self.size()):
             output += (str)(self.__POINTS[i]) + "\n"
         return output
 
-    def getSRID(self) -> str:
+    def getSRID(self) -> str:   
         """TODO"""
         return str(type(self.getFirstObs().position)).split(".")[-1][0:-8]
 
@@ -81,7 +81,7 @@ class Track:
         return self.getLastObs().timestamp - self.getFirstObs().timestamp
 
     # Average frequency    in Hz (resp. m/pt) for temporal (resp. spatial) mode
-    def frequency(self, mode: Literal["temporal", "spatial"] = "temporal") -> float:
+    def frequency(self, mode: Literal["temporal", "spatial"] = "temporal") -> float:   
         """TODO"""
         if (mode == "spatial") or (mode == 1):
             return self.size() / self.length()
@@ -89,7 +89,7 @@ class Track:
             return self.size() / self.duration()
 
     # Inverse of average frequency in pt/sec (resp. pt/m) for temporal (resp. spatial) mode
-    def interval(self, mode: Literal["temporal", "spatial"] = "temporal") -> float:
+    def interval(self, mode: Literal["temporal", "spatial"] = "temporal") -> float:   
         """TODO"""
         return 1.0 / self.frequency(mode)
 
@@ -752,7 +752,7 @@ class Track:
             output += "\n-------------------------------------\n"
         print(output)
 
-    def length(self) -> int:
+    def length(self) -> int:   
         """Total length of track
 
         :return: Length of track
@@ -785,7 +785,7 @@ class Track:
     #         id_fin = self.size()-1
     #     return Cinematics.computeDescDeniv(self, id_ini, id_fin)
 
-    def toWKT(self) -> str:
+    def toWKT(self) -> str:   
         """Transforms track into WKT string"""
         output = "LINESTRING("
         for i in range(self.size()):
@@ -800,7 +800,7 @@ class Track:
         output += ")"
         return output
 
-    def extract(self, id_ini: int, id_fin: int) -> Track:
+    def extract(self, id_ini: int, id_fin: int) -> Track:   
         """Extract between two indices from a track
 
         :param id_ini: Initial index of extraction
@@ -1516,7 +1516,7 @@ class Track:
         if operator == "!=":
             return val1 != val2
 
-    def query(self, cmd: str) -> list[Any]:
+    def query(self, cmd: str) -> list[Any]:   
         """Query observations in a track with SQL-like commands.
 
         Output depends on the ``SELECT`` clause:
@@ -2016,7 +2016,7 @@ class Track:
             if (dim == 2) or (dim in ["z", "Z", "U"]):
                 self.getObs(i).position.setZ(val - self.getObs(i).position.getZ())
 
-    def removeIdleEnds(self, parameter, mode: str = "begin") -> Track:
+    def removeIdleEnds(self, parameter, mode: str = "begin") -> Track:   
         """Removal of idle points at the begining or end of track
 
         :param parameter: TODO
@@ -2241,9 +2241,8 @@ class Track:
     def __floordiv__(self, track):
         """TODO"""
         from tracklib.algo.Interpolation import MODE_TEMPORAL
-
         track_resampled = self.copy()
-        track_resampled.resample(track, MODE_TEMPORAL)
+        track_resampled.resample(track, mode = MODE_TEMPORAL)
         return track_resampled
 
     # ------------------------------------------------------------

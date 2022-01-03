@@ -1,8 +1,8 @@
 """Write GPS track in KML file(s)."""
 
 # For type annotation
-from __future__ import annotations
-from typing import Literal
+from __future__ import annotations   
+from typing import Literal   
 
 import progressbar
 
@@ -17,12 +17,12 @@ class KmlWriter:
     """TODO"""
 
     @staticmethod
-    def writeToKml(track, path, type: Literal["LINE", "POINT"] = "LINE", af=None, c1=[0, 0, 1, 1], c2=[1, 0, 0, 1], name=False):
+    def writeToKml(track, path, type: Literal["LINE", "POINT"] = "LINE", af=None, c1=[0, 0, 1, 1], c2=[1, 0, 0, 1], name=False):   
         """Transforms track/track collection/network into KML string
 
         :param path: file to write kml (kml returned in standard output if empty)
         :param type: "POINT" or "LINE"
-        :param name: True -> label with point number (in GPS sequence)
+        :param name: True -> label with point number (in GPS sequence)   
             Str  -> label with AF name (no name if AF value is empty or ".")
         :param af: AF used for coloring in POINT mode
         :param c1: color for min value (default blue) in POINT mode or color in "LINE" mode

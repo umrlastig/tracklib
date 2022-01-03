@@ -52,7 +52,7 @@ class GpxReader:
             tracks.addTrack(trace)
 
         # pourquoi ?
-        # --> pour remettre le format comme il etait avant la lectre :)
+        # --> pour remettre le format comme il etait avant la lectre :)   
         GPSTime.setReadFormat(format_old)
 
         collection = TrackCollection(tracks)
