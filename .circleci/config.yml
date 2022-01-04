@@ -19,8 +19,8 @@ workflows:
     # For more details on extending your workflow, see the configuration docs: https://circleci.com/docs/2.0/configuration-reference/#workflows 
     jobs:
       - build-and-test-and-coverage
-      - build-and-test-python-3-4
-      - build-and-test-2-7-10
+      - build-and-test-python-3-9
+      - build-and-test-python-3-7
 
 
 jobs:
@@ -51,7 +51,7 @@ jobs:
       - codecov/upload:
           file: coverage.xml
 
-  build-and-test-python-3-4:  
+  build-and-test-python-3-9:  
     docker:
       - image: circleci/python:3.9
     steps:
@@ -62,10 +62,10 @@ jobs:
           name: Run tests
           command: |
             pytest test/
-
-  build-and-test-2-7-10:
+  
+  build-and-test-python-3-7:  
     docker:
-      - image: circleci/python:3.8
+      - image: circleci/python:3.7
     steps:
       - checkout
       - python/install-packages:
@@ -74,5 +74,7 @@ jobs:
           name: Run tests
           command: |
             pytest test/
+
+  
 
 
