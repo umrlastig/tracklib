@@ -4,7 +4,6 @@
 #
 version: 2.1
 
-
 orbs:
   # The python orb contains a set of prepackaged CircleCI configuration you can use repeatedly in your configuration files
   # Orb commands and jobs help you with common scripting around a language/tool
@@ -19,13 +18,13 @@ workflows:
     # Inside the workflow, you define the jobs you want to run. 
     # For more details on extending your workflow, see the configuration docs: https://circleci.com/docs/2.0/configuration-reference/#workflows 
     jobs:
-      - build-and-test
+      - build-and-test-and-coverage
       - build-and-test-python-3-4
       - build-and-test-2-7-10
 
 
 jobs:
-  build-and-test:  
+  build-and-test-and-coverage:  
     # These next lines defines a Docker executors: https://circleci.com/docs/2.0/executor-types/
     # You can specify an image from Dockerhub or use one of the convenience images from CircleCI's Developer Hub
     # A list of available CircleCI Docker convenience images are available here: https://circleci.com/developer/images/image/cimg/python
@@ -54,7 +53,7 @@ jobs:
 
   build-and-test-python-3-4:  
     docker:
-      - image: cimg/python:3.4.3
+      - image: circleci/python:3.4.3
     steps:
       - checkout
       - python/install-packages:
@@ -66,7 +65,7 @@ jobs:
 
   build-and-test-2-7-10:
     docker:
-      - image: cimg/python:2.7.10
+      - image: circleci/python:2.7.10
     steps:
       - checkout
 
