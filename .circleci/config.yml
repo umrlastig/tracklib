@@ -69,6 +69,8 @@ jobs:
       - checkout
       - python/install-packages:
           pkg-manager: pip
+      - run:
+          python retro.py
       - run: 
           name: Run tests
           command: |
