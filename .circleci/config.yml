@@ -70,7 +70,9 @@ jobs:
       - python/install-packages:
           pkg-manager: pip
       - run:
-          cd tracklib
+          commande: |
+            cd tracklib
+      - run:
           python retro.py
       - run: 
           name: Run tests
