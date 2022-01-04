@@ -9,7 +9,7 @@ orbs:
   # Orb commands and jobs help you with common scripting around a language/tool
   # so you dont have to copy and paste it everywhere.
   # See the orb documentation here: https://circleci.com/developer/orbs/orb/circleci/python
-  python: circleci/python@1.2
+  python: circleci/python@1.5.0
   codecov: codecov/codecov@3.0.0
   
   
@@ -24,14 +24,14 @@ workflows:
 
 
 jobs:
-  build-and-test-and-coverage:  
+  build-and-test-and-coverage: 
     # These next lines defines a Docker executors: https://circleci.com/docs/2.0/executor-types/
     # You can specify an image from Dockerhub or use one of the convenience images from CircleCI's Developer Hub
     # A list of available CircleCI Docker convenience images are available here: https://circleci.com/developer/images/image/cimg/python
     # The executor is the environment in which the steps below will be executed - below will use a python 3.9 container
     # Change the version below to your required version of python
     docker:
-      - image: cimg/python:3.8
+      - image: circleci/python:3.8
     # Checkout the code as the first step. This is a dedicated CircleCI step.
     # The python orb's install-packages step will install the dependencies from a Pipfile via Pipenv by default.
     # Here we're making sure we use just use the system-wide pip. By default it uses the project root's requirements.txt.
@@ -53,7 +53,7 @@ jobs:
 
   build-and-test-python-3-4:  
     docker:
-      - image: circleci/python:3.4.3
+      - image: circleci/python:3.7
     steps:
       - checkout
       - python/install-packages:
