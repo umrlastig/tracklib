@@ -25,7 +25,7 @@ import tracklib.algo.Summarising as summ
 # Lecture des donnees
 # ---------------------------------------------------
 GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
-tracks = GpxReader.readFromGpx("../data/activity_5807084803.gpx")
+tracks = GpxReader.readFromGpx("./data/activity_5807084803.gpx")
 trace = tracks.getTrack(0)
 
 # Transformation GEO coordinates to ENU
