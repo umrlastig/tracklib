@@ -1,7 +1,7 @@
 """Moduke to manage mapping of GPS tracks on geographic features"""
 
 # For type annotation
-from __future__ import annotations
+from __future__ import annotations   
 from typing import Union
 
 import math

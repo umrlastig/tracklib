@@ -3,7 +3,7 @@ This module contains the class to generate a grid
 """
 
 # For type annotation
-from __future__ import annotations
+from __future__ import annotations   
 from typing import Union
 
 import matplotlib.pyplot as plt
@@ -73,10 +73,10 @@ class Grid:
 
     def getCell(
         self, coord: Union[ENUCoords, ECEFCoords, GeoCoords]
-    ) -> Union[tuple[float, float], None]:
+    ) -> Union[tuple[float, float], None]:   
         """Normalized coordinates of coord
 
-        (x,) -> (i,j) with:
+        (x,) -> (i,j) with:   
 
             - i = (x-xmin)/(xmax-xmin)*nb_cols
             - j = (y-ymin)/(ymax-ymin)*nb_rows
@@ -103,7 +103,7 @@ class Grid:
 
         return (idx, idy)
 
-    def plot(self, base: bool = True, af_algo=None, aggregate=None):
+    def plot(self, base: bool = True, af_algo=None, aggregate=None):   
         """Plot grid
         
         :param base: TODO

@@ -1,6 +1,6 @@
 """This module contains the class to manipulate a spatial Index"""
 
-from __future__ import annotations
+from __future__ import annotations   
 from typing import Any
 
 
@@ -172,7 +172,7 @@ class SpatialIndex:
         pass
 
     # ------------------------------------------------------------
-    # Normalized coordinates of coord: (x,) -> (i,j) with:
+    # Normalized coordinates of coord: (x,) -> (i,j) with:   
     #   i = (x-xmin)/(xmax-xmin)*nb_cols
     #   j = (y-ymin)/(ymax-ymin)*nb_rows
     # Returns None if out of grid
@@ -260,7 +260,7 @@ class SpatialIndex:
     # 	- request(track) returns data registered in all cells
     #     crossed by a track.
     # ------------------------------------------------------------
-    def request(self, obj, j=None) -> list[Any]:
+    def request(self, obj, j=None) -> list[Any]:   
         """Request function to get data registered in spatial index
 
         TODO

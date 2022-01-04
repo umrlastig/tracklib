@@ -28,7 +28,7 @@
 # ----------------------------------------------------------------
 
 # For type annotation
-from __future__ import annotations
+from __future__ import annotations   
 
 import math
 import numpy as np
@@ -41,7 +41,7 @@ from tracklib.core.GPSTime import GPSTime
 import tracklib.core.Utils as Utils
 
 
-def cartesienne(segment) -> list[float, float, float]:
+def cartesienne(segment) -> list[float, float, float]:   
     """Fonction equation cartesienne
 
     :return: liste de paramètres
@@ -114,9 +114,7 @@ def dist_point_to_segment(point, segment):
     return dist_point_droite(cartesienne(segment), point.getX(), point.getY())
 
 
-def distance_to_segment(
-    x0: float, y0: float, x1: float, y1: float, x2: float, y2: float
-) -> float:
+def distance_to_segment(x0: float, y0: float, x1: float, y1: float, x2: float, y2: float) -> float:   
     """Function to compute distance between a point and a segment
 
     :param x0: point coordinate X
@@ -153,9 +151,7 @@ def distance_to_segment(
     return d
 
 
-def projection_droite(
-    param: tuple[float, float, float], x: float, y: float
-) -> tuple[float, float]:
+def projection_droite(param: tuple[float, float, float], x: float, y: float) -> tuple[float, float]:   
     """projection_droite Fonction projection orthogonal sur une droite
 
     :param param: Paramètres a,b,c d'une droite

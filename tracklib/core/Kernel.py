@@ -3,7 +3,7 @@ Kernels for filtering, smoothing and stochastics simulations
 """
 
 # For type annotation
-from __future__ import annotations
+from __future__ import annotations   
 from typing import Any, Union
 from collections.abc import Callable
 
@@ -23,7 +23,7 @@ class Kernel:
     __kernel_function = None  #: TODO
     __support = None  #: TODO
 
-    def __init__(self, function: Callable[[float], float], support: float):
+    def __init__(self, function: Callable[[float], float], support: float):   
         """Kernel constructor
 
         :param function: Kernel function
@@ -32,35 +32,35 @@ class Kernel:
         self.function = Kernel.__kernel_function
         self.support = support
 
-    def setFilterBoundary(self, bool: bool):
+    def setFilterBoundary(self, bool: bool):   
         """Set filter boundary
 
         :param bool: TODO
         """
         self.__filter_boundary = bool
 
-    def filterBoundary(self) -> bool:
+    def filterBoundary(self) -> bool:   
         """Return the `filterBoundary` parameter value
 
         :return: `filterBoundary` value
         """
         return self.__filter_boundary
 
-    def setFunction(self, function: Callable[[float], float]):
+    def setFunction(self, function: Callable[[float], float]):   
         """Set the function used by Kernel
 
         :param function: A kernel function
         """
         self.__kernel_function = function
 
-    def getFunction(self) -> Callable[[float], float]:
+    def getFunction(self) -> Callable[[float], float]:   
         """Return the function used by the kernel
 
         :return: A kernel function
         """
         return self.__kernel_function
 
-    def plot(self, append: bool = False):
+    def plot(self, append: bool = False):   
         """Plot the kernel
 
         :param append: TODO
@@ -72,7 +72,7 @@ class Kernel:
         if not append:
             plt.show()
 
-    def evaluate(self, x: float) -> float:
+    def evaluate(self, x: float) -> float:   
         """Evaluate the kernel for a given value
 
         :param x: Value to evaluate
@@ -85,7 +85,7 @@ class Kernel:
             return float(output)
         return output
 
-    def toSlidingWindow(self) -> list[int]:
+    def toSlidingWindow(self) -> list[int]:   
         """Transform the kernel in a sliding windows
 
         :return: A sliding windows
@@ -117,7 +117,7 @@ class DiracKernel(Kernel):
         self.setFunction(f)
         self.support = 500  # Arbitrary value for plot
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:   
         """Print the kernel type"""
         return "Dirac kernel"
 
@@ -125,7 +125,7 @@ class DiracKernel(Kernel):
 class UniformKernel(Kernel):
     """Define a unifomr kernel"""
 
-    def __init__(self, size: float):
+    def __init__(self, size: float):   
         """Constructor of a Uniform kernel
 
         The kernel's function is :
@@ -142,7 +142,7 @@ class UniformKernel(Kernel):
         self.setFunction(f)
         self.support = 2 * size
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:   
         """Print the kernel type"""
         return "Uniform kernel (width=" + str(self.support) + ")"
 
@@ -150,7 +150,7 @@ class UniformKernel(Kernel):
 class TriangularKernel(Kernel):
     """Define a triangular kernel"""
 
-    def __init__(self, size: float):
+    def __init__(self, size: float):   
         """Constructor of triangular Kernel
 
         The kernel's function is :
@@ -167,7 +167,7 @@ class TriangularKernel(Kernel):
         self.setFunction(f)
         self.support = 1.5 * size
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:   
         """Print the kernel type"""
         return "Triangular kernel (width=" + str(self.support / 1.5) + ")"
 
@@ -175,7 +175,7 @@ class TriangularKernel(Kernel):
 class GaussianKernel(Kernel):
     """Define a Gaussian Kernel"""
 
-    def __init__(self, sigma: float):
+    def __init__(self, sigma: float):   
         """Constructor of Gaussian kernel
 
         The kernel's function is :
@@ -193,7 +193,7 @@ class GaussianKernel(Kernel):
         self.setFunction(f)
         self.support = 3 * sigma
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:   
         """Print the kernel type"""
         return "Gaussian kernel (sigma=" + str(self.support / 3) + ")"
 
@@ -201,7 +201,7 @@ class GaussianKernel(Kernel):
 class ExponentialKernel(Kernel):
     """Define an Exponential Kernel"""
 
-    def __init__(self, sigma: float):
+    def __init__(self, sigma: float):   
         """Constructor of Exponential Kernel
 
         The Kernel function is:
@@ -217,7 +217,7 @@ class ExponentialKernel(Kernel):
         self.setFunction(f)
         self.support = 3 * sigma
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:   
         """Print the kernel type"""
         return "Exponential kernel (tau=" + str(self.support / 3) + ")"
 
@@ -225,7 +225,7 @@ class ExponentialKernel(Kernel):
 class EpanechnikovKernel(Kernel):
     """Define a Epanechnikov Kernel"""
 
-    def __init__(self, size: float):
+    def __init__(self, size: float):   
         """Constructor of a Epanechnikov Kernel
 
         The kernel function is :
@@ -244,7 +244,7 @@ class EpanechnikovKernel(Kernel):
         self.setFunction(f)
         self.support = 1.5 * size
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:   
         """Print the kernel type"""
         return "Epanechnikov kernel (width=" + str(self.support / 1.5) + ")"
 
@@ -252,7 +252,7 @@ class EpanechnikovKernel(Kernel):
 class SincKernel(Kernel):
     """Define a Sinc Kernel"""
 
-    def __init__(self, size: float):
+    def __init__(self, size: float):   
         """Constructor of a Sinc Kernel
 
         The kernel function is :
@@ -278,7 +278,7 @@ class SincKernel(Kernel):
         self.setFunction(f)
         self.support = 3 * size
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:   
         """Print the kernel type"""
         return "Sinc kernel (width=" + str(self.support / 3) + ")"
 
@@ -305,7 +305,7 @@ class ExperimentalKernel:
     The fitted kernel is returned as standard output.
     """
 
-    def __init__(self, dmax: float, method: str = "DTW", r: float = None):
+    def __init__(self, dmax: float, method: str = "DTW", r: float = None):   
         """Constructor of Experimental kernel
 
         :param dmax: TODO
@@ -345,7 +345,7 @@ class ExperimentalKernel:
                 )
                 self.addDifferenceProfile(pf)
 
-    def addDifferenceProfile(self, profile: Any):
+    def addDifferenceProfile(self, profile: Any):   
         """add a Difference Profile
 
         :param profile: TODO
@@ -366,7 +366,7 @@ class ExperimentalKernel:
                 self.GAMMA[idx] += (yix - yjx) ** 2 + (yiy - yjy) ** 2
                 self.COUNT[idx] += 2
 
-    def __getGamma(self, scale: int = 1) -> float:
+    def __getGamma(self, scale: int = 1) -> float:   
         """Return gamma value
 
         :param scale: Scale value

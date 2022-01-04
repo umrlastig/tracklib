@@ -101,7 +101,7 @@ class ScalarVoidOperator:
 # =============================================================================
 
 
-def makeRPN(expression: str) -> str:
+def makeRPN(expression: str) -> str:   
     """TODO
 
     :param expression: An RPN expression

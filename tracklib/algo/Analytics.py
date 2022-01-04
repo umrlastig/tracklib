@@ -110,7 +110,7 @@ def acceleration(track, i):
 # =============================================================================
 
 
-def anglegeom(track, i) -> float:
+def anglegeom(track, i) -> float:   
     """
     Mesure l'angle  géométrique (non orienté) intérieur abc.
 

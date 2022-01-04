@@ -12,7 +12,6 @@ from tracklib.core.TrackCollection import TrackCollection
 import tracklib.core.Utils as utils
 import tracklib.core.Kernel as Kernel
 
-from tracklib.algo.Analytics import BIAF_ABS_CURV
 from tracklib.algo.Interpolation import (
     gaussian_process as interpolation_gaussian_process,
 )
@@ -113,15 +112,15 @@ class NoiseProcess:
                 output += "\n + "
         return output
 
-    def noise(self, track, N=1):
+    def noise(self, track, N=1, mode='linear', force=False):
         """TODO"""
         if N == 1:
-            return noise(track, self.amplitudes, self.kernels, self.distribution)
+            return noise(track, self.amplitudes, self.kernels, self.distribution, mode=mode, force=force)
         else:
             collection = TrackCollection()
             for i in range(N):
                 collection.addTrack(
-                    noise(track, self.amplitudes, self.kernels, self.distribution)
+                    noise(track, self.amplitudes, self.kernels, self.distribution, mode=mode, force=force)
                 )
             return collection
 
@@ -182,7 +181,7 @@ def randomColor():
 
 
 def noise(
-    track, sigma=[1], kernel=[Kernel.DiracKernel()], distribution=DISTRIBUTION_NORMAL, force=False, cycle=False
+    track, sigma=[1], kernel=[Kernel.DiracKernel()], distribution=DISTRIBUTION_NORMAL, mode='linear', force=False
 ):
     """Track noising with Cholesky factorization of gaussian process covariance matrix:
 
@@ -196,7 +195,9 @@ def noise(
 
     :param track: the track to be smoothed (input track is not modified)
     :param sigma: noise amplitude(s) (in observation coordinate units)
-    :param kernel: noise autocovariance function(s)"""
+    :param kernel: noise autocovariance function(s)
+	:param mode: 'linear' (default), 'circular' or 'euclidian'
+	:param force: force definite-positive matrix with removal of negative eigen values"""
 
     sigma = utils.listify(sigma)
     kernel = utils.listify(kernel)
@@ -213,8 +214,7 @@ def noise(
 
     for n in range(len(sigma)):
 
-        S = track.getAnalyticalFeature(BIAF_ABS_CURV)
-        SIGMA_S = utils.makeCovarianceMatrixFromKernel(kernel[n], S, S, force=force, cycle=cycle)
+        SIGMA_S = utils.makeCovarianceMatrixFromKernel(kernel[n], track, force=force, mode=mode)
         SIGMA_S += np.identity(N) * 1e-12
         SIGMA_S *= sigma[n] ** 2 / SIGMA_S[0, 0]
 
@@ -246,7 +246,7 @@ def noise(
             pt.setZ(pt.getZ() + Yz[i])
             obs = Obs(pt, track.getObs(i).timestamp)
 			
-        if cycle:
+        if mode == 'circular':
             noised_track.loop()
 		   
     return noised_track
@@ -278,3 +278,4 @@ def randomizer(input, f, sigma=[7], kernel=[Kernel.GaussianKernel(650)], N=10):
     print("")
 
     return noised_output
+

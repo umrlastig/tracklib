@@ -4,9 +4,10 @@ some utility functions.
 """
 
 # For type annotation
-from __future__ import annotations
+from __future__ import annotations   
 from typing import Any, Iterable, Optional, Union
 
+import sys
 import numpy as np
 
 from tracklib.core.Coords import GeoCoords
@@ -25,12 +26,12 @@ from heapq import heapify, heappush, heappop
 NAN = float("nan")
 
 
-def isnan(number: Union[int, float]) -> bool:
+def isnan(number: Union[int, float]) -> bool:   
     """Check if two numbers are different"""
     return number != number
 
 
-def isfloat(value: Any) -> bool:
+def isfloat(value: Any) -> bool:   
     """Check is a value is a float"""
     try:
         float(value)
@@ -39,7 +40,7 @@ def isfloat(value: Any) -> bool:
         return False
 
 
-def listify(input) -> list[Any]:
+def listify(input) -> list[Any]:   
     """Make to list if needed"""
     if not isinstance(input, list):
         input = [input]
@@ -58,7 +59,7 @@ def unlistify(input):
 
 
 # LIKE comparisons
-def compLike(s1, s2) -> bool:
+def compLike(s1, s2) -> bool:   
     """TODO
 
     :param s1: TODO
@@ -80,9 +81,7 @@ def compLike(s1, s2) -> bool:
     return True
 
 
-def makeCoords(
-    x: float, y: float, z: float, srid: int
-) -> Union[ENUCoords, ECEFCoords, GeoCoords]:
+def makeCoords(x: float, y: float, z: float, srid: int) -> Union[ENUCoords, ECEFCoords, GeoCoords]:   
     """Function to form coords object from (x,y,z) data
 
     :param x: 1st coordinate (X, lon or E)
@@ -100,52 +99,39 @@ def makeCoords(
         return ECEFCoords(x, y, z)
 
 
-def makeDistanceMatrix(
-    T1: list[tuple[float, float]], T2: list[tuple[float, float]], cycle: bool = False
-) -> np.float32:
+def makeDistanceMatrix(track, mode = 'linear'):
     """Function to form distance matrix
 
-    :param T1: A list of points
-    :param T2: A list of points
+    :param track: a track
+	:mode: computation mode ('linear', 'circular' or 'euclidian')
     :return: numpy distance matrix between T1 and T2
     """
-    T1 = np.array(T1)
-    T2 = np.array(T2)
-
-    # Signal stationnarity
-    base = min(np.concatenate((T1, T2)))
-    T1 = T1 - base
-    T2 = T2 - base
-    T1 = T1.T
-    T2 = T2.T
-
-    D = np.sqrt(
-        (T1 ** 2).reshape(-1, 1) + (T2 ** 2) - 2 * (T1.reshape(-1, 1) * T2.T)
-    )
 	
-    if cycle:
+    if mode not in ['linear', 'circular', 'euclidian']:
+        print("Error: unknown mode: "+mode)
+        sys.exit(1)
+    if mode in ['linear', 'circular']:
+        S = np.array(track.getAnalyticalFeature("abs_curv"))
+        z = np.array([complex(s, 0) for s in S])
+    if mode == 'euclidian':
+	    z = np.array([complex(obs.position.getX(), obs.position.getY()) for obs in track])
+    m, n = np.meshgrid(z, z)
+    D = abs(m-n)
+    if mode == 'circular':
         D = np.minimum(D, np.max(D)-D)
-
     return D
 
 
-def makeCovarianceMatrixFromKernel(
-    kernel,
-    T1: list[tuple[float, float]],
-    T2: list[tuple[float, float]],
-    factor: float = 1.0,
-	force: bool = False,
-	cycle: bool = False,	
-):
+def makeCovarianceMatrixFromKernel(kernel, track, factor = 1.0, mode = 'linear', force = False):   
     """Function to form covariance matrix from kernel
 
     :param kernel: A function describing statistical similarity between points
-    :param T1: A list of points
-    :param T2: A list of points
+    :param track: A track
+	:mode: computation mode ('linear', 'circular' or 'euclidian')
     :param factor: Unit factor of std dev (default 1.0)
     """
 
-    D = makeDistanceMatrix(T1, T2, cycle)
+    D = makeDistanceMatrix(track, mode)
     kfunc = np.vectorize(kernel.getFunction())
     SIGMA = factor ** 2 * kfunc(D)
     if force:
@@ -157,7 +143,7 @@ def makeCovarianceMatrixFromKernel(
     return SIGMA
 
 
-def rgbToHex(color: list[float, float, float, Optional[float]]) -> str:
+def rgbToHex(color: list[float, float, float, Optional[float]]) -> str:   
     """Function to convert RGBA color to hexadecimal
 
     :param color: A 3 or 4-element array R, G, B [,alpha]. Each color and transparency
@@ -181,13 +167,7 @@ def rgbToHex(color: list[float, float, float, Optional[float]]) -> str:
     return "0x" + A + B + G + R
 
 
-def interpColors(
-    v: float,
-    vmin: float,
-    vmax: float,
-    cmin: list[float, float, float, Optional[float]],
-    cmax: list[float, float, float, Optional[float]],
-) -> list[float, float, float, float]:
+def interpColors(v: float, vmin: float, vmax: float, cmin: list[float, float, float, Optional[float]], cmax: list[float, float, float, Optional[float]]) -> list[float, float, float, float]:   
     """
     Function to interpolate RGBA (or RGB) color between two values
 
