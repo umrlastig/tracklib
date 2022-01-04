@@ -12,13 +12,12 @@ orbs:
   python: circleci/python@1.5.0
   codecov: codecov/codecov@3.0.0
   
-  
 workflows:
-  test_et_couverture:  # This is the name of the workflow, feel free to change it to better match your workflow.
-    # Inside the workflow, you define the jobs you want to run. 
-    # For more details on extending your workflow, see the configuration docs: https://circleci.com/docs/2.0/configuration-reference/#workflows 
+  test_et_couverture:
     jobs:
       - build-and-test-and-coverage
+  test:
+    jobs:
       - build-and-test-python-3-9
       - build-and-test-python-3-7
 
