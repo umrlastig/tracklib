@@ -21,6 +21,7 @@ workflows:
     jobs:
       - build-and-test
       - build-and-test-python-3-4
+      - build-and-test-2-7-10
 
 
 jobs:
@@ -63,6 +64,11 @@ jobs:
           command: |
             pytest test/
 
+  build-and-test-2-7-10:
+    docker:
+      - image: cimg/python:2.7.10
+    steps:
+      - checkout
 
 
 
