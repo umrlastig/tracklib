@@ -65,9 +65,14 @@ jobs:
 
   build-and-test-2-7-10:
     docker:
-      - image: circleci/python:2.7.10
+      - image: circleci/python:2.7
     steps:
       - checkout
-
+      - python/install-packages:
+          pkg-manager: pip
+      - run: 
+          name: Run tests
+          command: |
+            pytest test/
 
 
