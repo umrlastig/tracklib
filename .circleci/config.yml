@@ -53,7 +53,7 @@ jobs:
 
   build-and-test-python-3-4:  
     docker:
-      - image: circleci/python:3.7
+      - image: circleci/python:3.8
     steps:
       - checkout
       - python/install-packages:
@@ -65,7 +65,7 @@ jobs:
 
   build-and-test-2-7-10:
     docker:
-      - image: circleci/python:2.7
+      - image: circleci/python:3.8
     steps:
       - checkout
       - python/install-packages:
