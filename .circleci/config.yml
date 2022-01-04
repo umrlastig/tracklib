@@ -18,8 +18,8 @@ workflows:
       - build-and-test-and-coverage
   test:
     jobs:
+      - build-and-test-python-2-7
       - build-and-test-python-3-9
-      - build-and-test-python-3-7
 
 
 jobs:
@@ -62,9 +62,9 @@ jobs:
           command: |
             pytest test/
   
-  build-and-test-python-3-7:  
+  build-and-test-python-2-7:  
     docker:
-      - image: circleci/python:3.7
+      - image: circleci/python:2.7
     steps:
       - checkout
       - python/install-packages:
