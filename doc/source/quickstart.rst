@@ -1,3 +1,7 @@
+:Author: Marie-Dominique Van Damme
+:Version: 1.0
+:License: --
+:Date: 07/03/2021
 
 Quick start 
 =============

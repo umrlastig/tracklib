@@ -1,4 +1,4 @@
 Stochastics
 -----------
-.. automodule:: algo.Stochastics
+.. automodule:: tracklib.algo.Stochastics
     :members:

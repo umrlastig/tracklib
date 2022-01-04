@@ -1,4 +1,4 @@
 Raster
 -------
-.. automodule:: core.Raster
+.. automodule:: tracklib.core.Raster
     :members:

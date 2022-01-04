@@ -1,4 +1,4 @@
 Segmentation
 ------------
-.. automodule:: algo.Segmentation
+.. automodule:: tracklib.algo.Segmentation
     :members:

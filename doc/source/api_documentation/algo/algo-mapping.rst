@@ -1,4 +1,4 @@
 Mapping
 -------
-.. automodule:: algo.Mapping
+.. automodule:: tracklib.algo.Mapping
     :members:

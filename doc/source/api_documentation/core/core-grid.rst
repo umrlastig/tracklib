@@ -1,4 +1,4 @@
 Grid
 ----
-.. automodule:: core.Grid
+.. automodule:: tracklib.core.Grid
     :members:

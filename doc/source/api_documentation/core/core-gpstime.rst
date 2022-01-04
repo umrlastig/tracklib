@@ -1,4 +1,4 @@
 GPSTime
 -------
-.. automodule:: core.GPSTime
+.. automodule:: tracklib.core.GPSTime
     :members:

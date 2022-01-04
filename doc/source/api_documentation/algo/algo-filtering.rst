@@ -1,4 +1,4 @@
 Filtering
 ---------
-.. automodule:: algo.Filtering
+.. automodule:: tracklib.algo.Filtering
     :members:

@@ -1,4 +1,4 @@
 Dynamics
 --------
-.. automodule:: algo.Dynamics
+.. automodule:: tracklib.algo.Dynamics
     :members:

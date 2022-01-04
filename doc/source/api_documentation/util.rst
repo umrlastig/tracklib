@@ -1,15 +1,15 @@
 Module util
 ===========
 
-.. automodule:: util
+.. automodule:: tracklib.util
     :members: 
 
 Doc
 ---
-.. automodule:: util.Doc
+.. automodule:: tracklib.util.Doc
     :members: 
 
 Geometry
 --------
-.. automodule:: util.Geometry
+.. automodule:: tracklib.util.Geometry
     :members: 

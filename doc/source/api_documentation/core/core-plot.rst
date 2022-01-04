@@ -1,4 +1,4 @@
 Plot
 ----
-.. automodule:: core.Plot
+.. automodule:: tracklib.core.Plot
     :members:

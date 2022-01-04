@@ -1,4 +1,4 @@
 Summarising
 -----------
-.. automodule:: algo.Summarising
+.. automodule:: tracklib.algo.Summarising
     :members:

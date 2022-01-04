@@ -3,59 +3,17 @@ Module io
 
 .. automodule:: tracklib.io
     :members: 
+	
+.. toctree::
 
-AsciiWriter
------------
-.. automodule:: tracklib.io.AsciiWriter
-    :members:
-
-FileFormat
-----------
-.. automodule:: tracklib.io.FileFormat
-    :members:
-
-FileReader
-----------
-.. automodule:: tracklib.io.FileReader
-    :members:
-
-FileWriter
-----------
-.. automodule:: tracklib.io.FileWriter
-    :members:
-
-GpxReader
----------
-.. automodule:: tracklib.io.GpxReader
-    :members:
-
-GpxWriter
----------
-.. automodule:: tracklib.io.GpxWriter
-    :members:
-
-IgnReader
----------
-.. automodule:: tracklib.io.IgnReader
-    :members:
-
-KmlWriter
----------
-.. automodule:: tracklib.io.KmlWriter
-    :members:
-
-NetworkFormat
--------------
-.. automodule:: tracklib.io.NetworkFormat
-    :members:
-
-NetworkReader
--------------
-.. automodule:: tracklib.io.NetworkReader
-    :members:
-
-NetworkWriter
--------------
-.. automodule:: tracklib.io.NetworkWriter
-    :members:
-
+    ./io/io-asciiwriter
+    ./io/io-fileformat
+    ./io/io-filereader
+    ./io/io-filewriter
+    ./io/io-gpxreader
+    ./io/io-gpxwriter
+    ./io/io-ignreader
+    ./io/io-kmlwriter
+    ./io/io-networkformat
+    ./io/io-networkreader
+    ./io/io-networkwriter

@@ -1,4 +1,4 @@
 Comparison
-----------
-.. automodule:: algo.Comparison
+------------
+.. automodule:: tracklib.algo.Comparison
     :members:

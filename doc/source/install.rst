@@ -48,9 +48,11 @@ Tracklib developer mode
    python setup.py install
  
  
-5. Quit
+5. Later, if you want to quit
 
-deactivate
+.. code-block:: shell
+   
+   deactivate
  
 
 Running test
@@ -63,6 +65,7 @@ Running test
    pip install pytest
    pip install pytest-runner
    pip install pytest-benchmark
+   pip install coverage
 
 
 Running documentation
@@ -75,8 +78,9 @@ Running documentation
    pip install sphinx
    pip install recommonmark
    pip install sphinx_rtd_theme
+   pip install sphinx-autodoc-typehints
 
-To launch the documentation:
+7. To launch the documentation:
 
 .. code-block:: shell
 
@@ -84,16 +88,16 @@ To launch the documentation:
    make html
 
 
-Spyder IDE
--------------
+IDE Spyder
+-----------
 
-7. A python IDE make the development more easy. 
+8. A python IDE make the development more easy. 
 
-pip install spyder
+.. code-block:: shell
 
-pip install spyder-kernels
-
-spyder &
+   pip install spyder
+   pip install spyder-kernels
+   spyder &
 
 
 To use spyder, you have to create a new project with an existing directory. 

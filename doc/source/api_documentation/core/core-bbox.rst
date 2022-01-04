@@ -1,4 +1,4 @@
 Bbox
 -----
-.. automodule:: core.Bbox
+.. automodule:: tracklib.core.Bbox
     :members:

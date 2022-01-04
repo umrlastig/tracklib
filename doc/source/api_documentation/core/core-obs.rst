@@ -1,4 +1,4 @@
 Obs
 ---
-.. automodule:: core.Obs
+.. automodule:: tracklib.core.Obs
     :members:

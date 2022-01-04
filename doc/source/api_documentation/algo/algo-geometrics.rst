@@ -1,4 +1,4 @@
 Geometrics
 ----------
-.. automodule:: algo.Geometrics
+.. automodule:: tracklib.algo.Geometrics
     :members:
