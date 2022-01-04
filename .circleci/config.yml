@@ -53,7 +53,7 @@ jobs:
 
   build-and-test-python-3-4:  
     docker:
-      - image: cimg/python:3.4
+      - image: cimg/python:3.4.3
     steps:
       - checkout
       - python/install-packages:
