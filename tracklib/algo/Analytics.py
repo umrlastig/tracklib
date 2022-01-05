@@ -219,7 +219,7 @@ def stop_point_with_acceleration_criteria(track, i):
 
     # Si un point d'indice [i] affiche une vitesse nulle suivant une deccelération,
     #    on cherche le prochain point d'accélération
-    if v == 0 and acceleration(track, i) < 0:
+    if v < 0.001 and acceleration(track, i) < 0:
         # Initialisation d'un compteur sur i
         j = i
         # Tant qu'aucun des points suivants n'accélère, on ne marque pas le point d'arrêt
