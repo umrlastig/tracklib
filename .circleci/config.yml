@@ -14,12 +14,12 @@ orbs:
   
 workflows:
   test_et_couverture:
-    jobs:
-      - build-and-test-and-coverage
+#    jobs:
+#      - build-and-test-and-coverage
   test:
     jobs:
       - build-and-test-python-2-7
-      - build-and-test-python-3-9
+#      - build-and-test-python-3-9
 
 
 jobs:
@@ -71,6 +71,8 @@ jobs:
           pkg-manager: pip
       - run:
           python retro.py
+      - run:
+          ls -al
       - run:
           mv tracklib27 tracklib
       - run: 
