@@ -77,6 +77,8 @@ jobs:
           ls -al
       - run:
           mv tracklib27 tracklib
+      - run:
+          ls -al
       - run: 
           name: Run tests
           command: |
