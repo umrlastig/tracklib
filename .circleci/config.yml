@@ -74,13 +74,13 @@ jobs:
           rm -r tracklib
           ls -al
           mv tracklib27 tracklib
-          pwd
           export PYTHONPATH="${PYTHONPATH}:/home/circleci/project/tracklib/"
           python .circleci/env.py
           ls -al
       - run: 
           name: Run tests
           command: |
+            export PYTHONPATH="${PYTHONPATH}:/home/circleci/project/tracklib/"
             pytest test/
 
   
