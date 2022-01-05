@@ -90,15 +90,16 @@ Examples
 * Further examples of *tracklib* use-cases can be found in the *example* folder: SpeedProfil.py, Interpolation.py, LoadFromDatabase.py
 
 
-
+   
 
 .. toctree::
    :maxdepth: 1
-   :caption: Tutorials
-
+   
    install
-   quickstart
-   convention
+   
+..   :caption: Tutorials
+
+..   convention
    
 .. toctree::
    :maxdepth: 1
@@ -117,7 +118,8 @@ Examples
    :maxdepth: 1
    :caption: Use Cases
    
-   ./usecase/speedprofil.rst
+   quickstart
+   ./usecase/speedprofil
 
 
 .. toctree::

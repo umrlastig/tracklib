@@ -1,4 +1,4 @@
 Cinematics
 ----------
-.. automodule:: algo.Cinematics
+.. automodule:: tracklib.algo.Cinematics
     :members:

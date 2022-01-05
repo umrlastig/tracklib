@@ -1,4 +1,4 @@
 Selection
 ---------
-.. automodule:: algo.Selection
+.. automodule:: tracklib.algo.Selection
     :members:

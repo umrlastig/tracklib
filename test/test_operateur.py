@@ -9,8 +9,8 @@ import os
 import random
 import unittest
 
-from tracklib.core.GPSTime import GPSTime
 import tracklib.algo.Analytics as algo
+from tracklib.core.GPSTime import GPSTime
 from tracklib.core.Operator import Operator
 from tracklib.core.Kernel import GaussianKernel
 import tracklib.algo.Interpolation as interpolation

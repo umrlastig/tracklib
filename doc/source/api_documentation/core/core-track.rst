@@ -1,4 +1,4 @@
 Track
 -----
-.. automodule:: core.Track
+.. automodule:: tracklib.core.Track
     :members:

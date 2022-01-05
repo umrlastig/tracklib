@@ -1,4 +1,4 @@
 Analytics
 ---------
-.. automodule:: algo.Analytics
+.. automodule:: tracklib.algo.Analytics
     :members:

@@ -1,8 +1,8 @@
 Operator
 --------
-.. autoclass:: core.Operator.Operator
+.. autoclass:: tracklib.core.Operator.Operator
     :class-doc-from: class
 
-.. automodule:: core.Operator
+.. automodule:: tracklib.core.Operator
     :exclude-members: Operator
     :members:

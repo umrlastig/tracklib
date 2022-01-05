@@ -1,4 +1,4 @@
 Kernel
 ------
-.. automodule:: core.Kernel
+.. automodule:: tracklib.core.Kernel
     :members:

@@ -1,4 +1,4 @@
 Coords
 ------
-.. automodule:: core.Coords
+.. automodule:: tracklib.core.Coords
     :members:

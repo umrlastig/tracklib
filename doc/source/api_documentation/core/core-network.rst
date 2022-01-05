@@ -1,4 +1,4 @@
 Network
 -------
-.. automodule:: core.Network
+.. automodule:: tracklib.core.Network
     :members:

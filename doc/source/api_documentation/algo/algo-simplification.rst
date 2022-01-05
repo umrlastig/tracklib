@@ -1,4 +1,4 @@
 Simplification
 --------------
-.. automodule:: algo.Simplification
+.. automodule:: tracklib.algo.Simplification
     :members:

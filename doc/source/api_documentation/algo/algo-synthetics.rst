@@ -1,4 +1,4 @@
 Synthetics
 ----------
-.. automodule:: algo.Synthetics
+.. automodule:: tracklib.algo.Synthetics
     :members:
