@@ -1,4 +1,4 @@
-"""ds, speed, abs_curv
+﻿"""ds, speed, abs_curv
 Algorithms to detect stop
 """
 
