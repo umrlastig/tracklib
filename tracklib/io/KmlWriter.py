@@ -1,5 +1,3 @@
-"""Write GPS track in KML file(s)."""
-
 # For type annotation
 from __future__ import annotations   
 from typing import Literal   
@@ -14,7 +12,7 @@ from tracklib.core.Track import TrackCollection
 
 
 class KmlWriter:
-    """TODO"""
+    """Write GPS track in KML file(s)."""
 
     @staticmethod
     def writeToKml(track, path, type: Literal["LINE", "POINT"] = "LINE", af=None, c1=[0, 0, 1, 1], c2=[1, 0, 0, 1], name=False):   
