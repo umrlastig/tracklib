@@ -74,6 +74,7 @@ jobs:
           rm -r tracklib
           ls -al
           mv tracklib27 tracklib
+          export PYTHONPATH="${PYTHONPATH}:/home/circleci/project/tracklib/"
           python .circleci/env.py
           ls -al
       - run: 
