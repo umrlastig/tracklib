@@ -77,6 +77,8 @@ jobs:
           export PYTHONPATH="${PYTHONPATH}:/home/circleci/project/tracklib/"
           python .circleci/env.py
           ls -al
+          ls -al /home/circleci/project/tracklib/
+          ls -al /home/circleci/project/tracklib/algo/
       - run: 
           name: Run tests
           command: |
