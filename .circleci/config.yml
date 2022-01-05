@@ -71,7 +71,7 @@ jobs:
           pkg-manager: pip
       - run:
           python retro.py
-		  mv tracklib27 tracklib
+          mv tracklib27 tracklib
       - run: 
           name: Run tests
           command: |
