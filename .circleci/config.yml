@@ -87,7 +87,6 @@ jobs:
       - run: 
           name: Run tests
           command: |
-            export PYTHONPATH="${PYTHONPATH}:/home/circleci/project/tracklib/"
             pytest test/
 
   
