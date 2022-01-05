@@ -77,6 +77,11 @@ jobs:
           export PYTHONPATH="${PYTHONPATH}:/home/circleci/project/tracklib/"
           python .circleci/env.py
           ls -al
+          touch /home/circleci/project/tracklib/__init__.py
+          touch /home/circleci/project/tracklib/util/__init__.py
+          touch /home/circleci/project/tracklib/io/__init__.py
+          touch /home/circleci/project/tracklib/core/__init__.py
+          touch /home/circleci/project/tracklib/algo/__init__.py
           ls -al /home/circleci/project/tracklib/
           ls -al /home/circleci/project/tracklib/algo/
       - run: 
