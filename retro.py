@@ -102,12 +102,11 @@ def upgrade(rev):
 		os.mkdir(output_folder_temp + "/" + f1)
 		for f2 in F2:
 			path = root + "/" + f1 + "/" + f2
-			print("????", path)
 			path_output = output_folder_temp + "/" + f1 + "/" + f2
 			if not os.path.isfile(path):
 				continue
-			#if "__" in path:
-			#	continue
+			if "__" in path:
+				continue
 			print("Creating file", path_output)
 			fin = open(path, "r")
 			fout = open(path_output, "w")
@@ -171,8 +170,8 @@ def downgrade(rev):
 			path_output = output_folder_temp + "/" + f1 + "/" + f2
 			if not os.path.isfile(path):
 				continue
-			if "__" in path:
-				continue
+			#if "__" in path:
+			#	continue
 			print("Creating file", path_output)
 			fin = open(path, "r")
 			fout = open(path_output, "w")
