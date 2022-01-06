@@ -70,6 +70,14 @@ jobs:
       - checkout
       - python/install-packages:
           pkg-manager: pip
+      - run: |
+          python retro.py
+          rm -r tracklib
+          mv tracklib27 tracklib
+          export PYTHONPATH="${PYTHONPATH}:/home/circleci/project/tracklib/"
+          python .circleci/env.py
+          ls -al /home/circleci/project/tracklib/
+          ls -al /home/circleci/project/tracklib/algo/
       - run: 
           name: Run tests
           command: |
