@@ -102,7 +102,7 @@ def upgrade(rev):
 		os.mkdir(output_folder_temp + "/" + f1)
 		for f2 in F2:
 			path = root + "/" + f1 + "/" + f2
-			print ("????" + path, output_folder_temp)
+			print("????", path)
 			path_output = output_folder_temp + "/" + f1 + "/" + f2
 			if not os.path.isfile(path):
 				continue
