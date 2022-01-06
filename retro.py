@@ -162,6 +162,14 @@ def downgrade(rev):
 	for f1 in F1:
 		path = root + "/" + f1
 		if os.path.isfile(path):
+			fin = open(path, "r")
+			fout = open(output_folder_temp + "/" + f1, "w")
+			L = fin.readlines()
+			sleep(0.1*random.random())
+			for line in L:
+				fout.write(line)
+			fin.close()
+			fout.close()
 			continue
 		F2 = os.listdir(path)
 		os.mkdir(output_folder_temp + "/" + f1)
