@@ -1,3 +1,4 @@
+﻿# -*- coding: utf-8 -*-
 """
 This module contains an algorithm of Analytical Features calculation and 
 some utility functions.
