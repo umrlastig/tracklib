@@ -105,8 +105,8 @@ def upgrade(rev):
 			path_output = output_folder_temp + "/" + f1 + "/" + f2
 			if not os.path.isfile(path):
 				continue
-			if "__" in path:
-				continue
+			#if "__" in path:
+			#	continue
 			print("Creating file", path_output)
 			fin = open(path, "r")
 			fout = open(path_output, "w")
