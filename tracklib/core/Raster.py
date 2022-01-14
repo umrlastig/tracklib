@@ -6,7 +6,7 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 
-from skimage import io
+#from skimage import io
 
 import tracklib.core.Utils as utils
 

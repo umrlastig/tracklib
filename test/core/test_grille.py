@@ -210,10 +210,7 @@ class TestGrille(TestCase):
 
 if __name__ == '__main__':
     suite = TestSuite()
-    #suite.addTest(TestGrille("test_summarize_aa"))
     suite.addTest(TestGrille("test_summarize_af"))
-    #suite.addTest(TestGrille("test_sum_trace"))
-    #suite.addTest(TestGrille("test_mixte_aa_af_uid"))
     runner = TextTestRunner()
     runner.run(suite)
     
