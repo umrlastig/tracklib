@@ -71,9 +71,9 @@ jobs:
       - python/install-packages:
           pkg-manager: pip
       - run: |
-          ls -al /home/circleci/project/tracklib/
-          ls -al /home/circleci/project/tracklib/.circleci/
-          python /home/circleci/project/tracklib/.circleci/retro.py
+          ls -al /home/circleci/project/
+          ls -al /home/circleci/project/.circleci/
+          python /home/circleci/project/.circleci/retro.py
           rm -r tracklib
           mv tracklib27 tracklib
           export PYTHONPATH="${PYTHONPATH}:/home/circleci/project/tracklib/"
