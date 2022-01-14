@@ -235,6 +235,9 @@ def downgrade(rev):
                     line = line.replace("margin: float =", "margin = ")
                 if "verbose: bool =" in line:
                     line = line.replace("verbose: bool =", "verbose = ")
+                if "collection: Union[Bbox, TrackCollection]" in line:
+                    line = line.replace("collection: Union[Bbox, TrackCollection]", "collection")
+                    
                     
                 fout.write(line)
                 if function_flag and rev:
