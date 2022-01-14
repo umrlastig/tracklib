@@ -231,6 +231,11 @@ def downgrade(rev):
                     line = line.replace("Re: float =", "Re = ")
                 if "Fe: float =" in line:
                     line = line.replace("Fe: float =", "Re = ")
+                if "margin: float =" in line:
+                    line = line.replace("margin: float =", "margin = ")
+                if "verbose: bool =" in line:
+                    line = line.replace("verbose: bool =", "verbose = ")
+                    
                 fout.write(line)
                 if function_flag and rev:
                     fout.write(saved_line[:-1] + "   #RETRO: TO UNCOMMENT\n")
