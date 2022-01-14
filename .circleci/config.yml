@@ -71,6 +71,8 @@ jobs:
       - python/install-packages:
           pkg-manager: pip
       - run: |
+          ls -al .
+          ls -al ./circleci
           python ./circleci/retro.py
           rm -r tracklib
           mv tracklib27 tracklib
