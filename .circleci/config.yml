@@ -18,8 +18,8 @@ workflows:
       - build-and-test-and-coverage
   test:
     jobs:
-      - build-and-test-python-2-7
-      - build-and-test-python-3-5
+      - build-and-test-python-3-6
+      - build-and-test-python-3-7
       - build-and-test-python-3-9
 
 
@@ -63,9 +63,9 @@ jobs:
           command: |
             pytest test/
 
-  build-and-test-python-3-5:  
+  build-and-test-python-3-6:  
     docker:
-      - image: circleci/python:3.5
+      - image: circleci/python:3.6
     steps:
       - checkout
       - python/install-packages:
@@ -80,9 +80,9 @@ jobs:
           command: |
             pytest test/
 
-  build-and-test-python-2-7:  
+  build-and-test-python-3-7:  
     docker:
-      - image: circleci/python:2.7
+      - image: circleci/python:3.7
     steps:
       - checkout
       - python/install-packages:
@@ -92,9 +92,6 @@ jobs:
           rm -r tracklib
           mv tracklib27 tracklib
           export PYTHONPATH="${PYTHONPATH}:/home/circleci/project/tracklib/"
-          python .circleci/env.py
-          ls -al /home/circleci/project/tracklib/
-          ls -al /home/circleci/project/tracklib/algo/
       - run: 
           name: Run tests
           command: |
