@@ -230,7 +230,7 @@ def downgrade(rev):
                 if "Re: float =" in line:
                     line = line.replace("Re: float =", "Re = ")
                 if "Fe: float =" in line:
-                    line = line.replace("Fe: float =", "Re = ")
+                    line = line.replace("Fe: float =", "Fe = ")
                 if "margin: float =" in line:
                     line = line.replace("margin: float =", "margin = ")
                 if "verbose: bool =" in line:
