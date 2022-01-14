@@ -38,7 +38,10 @@ class TestVitesseMethods(unittest.TestCase):
         #print (track.getListAnalyticalFeatures())
         self.assertEqual(len(track.getListAnalyticalFeatures()), 10)
         L = ['speed', 'dx', 'dy', 'dx2', 'dy2', 'dx2+dy2', 'ds', 't1', 'dt', 'ds/dt']
-        self.assertEqual(track.getListAnalyticalFeatures(), L)
+        L.sort()
+        T = track.getListAnalyticalFeatures()
+        T.sort()
+        self.assertEqual(T, L)
 
         track.operate(Operator.SUBSTRACTER, "speed", "ds/dt", "err")
         track.operate(Operator.SQUARE, "err", "err2")
@@ -68,7 +71,10 @@ class TestVitesseMethods(unittest.TestCase):
         
         self.assertEqual(len(track.getListAnalyticalFeatures()), 10)
         L = ['speed', 'dx', 'dy', 'dx2', 'dy2', 'dx2+dy2', 'ds', 't1', 'dt', 'ds/dt']
-        self.assertEqual(track.getListAnalyticalFeatures(), L)
+        L.sort()
+        T = track.getListAnalyticalFeatures()
+        T.sort()
+        self.assertEqual(T, L)
 
         track.operate(Operator.SUBSTRACTER, "speed", "ds/dt", "err")
         track.operate(Operator.SQUARE, "err", "err2")
