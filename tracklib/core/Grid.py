@@ -71,9 +71,7 @@ class Grid:
         self.XPixelSize = ax / self.ncol
         self.YPixelSize = ay / self.nrow
 
-    def getCell(
-        self, coord: Union[ENUCoords, ECEFCoords, GeoCoords]
-    ) -> Union[tuple[float, float], None]:   
+    def getCell(self, coord: Union[ENUCoords, ECEFCoords, GeoCoords]) -> Union[tuple[float, float], None]:   
         """Normalized coordinates of coord
 
         (x,) -> (i,j) with:   
