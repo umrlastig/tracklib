@@ -1,46 +1,46 @@
-"""Write GPS track to CSV file(s)."""
-
-import os
+# -*- coding: utf-8 -*-
 
 from tracklib.core.GPSTime import GPSTime
-from tracklib.core.Coords import ENUCoords
-from tracklib.core.Coords import GeoCoords
-from tracklib.core.Coords import ECEFCoords
-from tracklib.core.Obs import Obs
-from tracklib.core.Track import Track
-from tracklib.core.Coords import ECEFCoords
-from tracklib.core.TrackCollection import TrackCollection
-
 from tracklib.io.FileFormat import FileFormat
 
 
 class FileWriter:
-    """TODO"""
+    """Write GPS track to CSV file(s)."""
 
     def __takeFirst(elem):
-        """TODO"""
-
         return elem[0]
 
     def __printInOrder(E, N, U, T, O, sep):
-        """TODO"""
-
         D = [E, N, U, T]
         output = ""
-        output += str(D[O[0][1]]) + sep
-        output += str(D[O[1][1]]) + sep
-        output += str(D[O[2][1]]) + sep
-        output += str(D[O[3][1]])
+        output += str(D[O[0][1]]).strip() + sep
+        output += str(D[O[1][1]]).strip() + sep
+        output += str(D[O[2][1]]).strip() + sep
+        output += str(D[O[3][1]]).strip()
         return output
 
+
     @staticmethod
-    def writeToFile(
-        track, path, id_E=-1, id_N=-1, id_U=-1, id_T=-1, separator=",", h=0
-    ):
+    def writeToFile (track, path, id_E=-1, id_N=-1, id_U=-1, id_T=-1, 
+                     separator=",", h=0, af_names=[]):
         """
-        The method assumes a single track in file.
-        If only path is provided as input parameters: file format is infered from extension according to file track_file_format
-        If only path and a string s parameters are provied, the name of file format is set equal to s.
+        The method assumes a single track in file. <br/>
+        
+        If only path is provided as input parameters: file format is infered 
+        from extension according to file track_file_format.<br/>
+        
+        If only path and a string s parameters are provied, 
+        the name of file format is set equal to s.<br/>
+        
+        :param track: track
+        :param path: path to write information of the track
+        :param id_E: index (starts from 0) of column containing coordinate X (for ECEF), longitude (GEO) or E (ENU)
+        :param id_N: index (starts from 0) of column containing coordinate Y (for ECEF), latitude (GEO) or N (ENU)
+        :param id_U: index (starts from 0) of column containing Z (for ECEF), height or altitude (GEO/ENU)
+        :param id_T: index (starts from 0) of column containing timestamp (in seconds or in time_fmt format)
+        :param separator: separating characters (can be multiple characters). Can be c (comma), b (blankspace), s (semi-column)
+        :param h: display heading (1) or not (0)
+        :param af_names:
         """
 
         # -------------------------------------------------------
@@ -104,6 +104,7 @@ class FileWriter:
             float_fmt = "{:20.10f}"
         if track.getSRID().upper() == "ECEF":
             float_fmt = "{:10.3f}"
+        
         for i in range(track.size()):
             x = float_fmt.format(track.getObs(i).position.getX())
             y = float_fmt.format(track.getObs(i).position.getY())
@@ -111,22 +112,15 @@ class FileWriter:
             t = track.getObs(i).timestamp
             if isinstance(fmt.DateIni, GPSTime):
                 t = t.toAbsTime() - fmt.DateIni.toAbsTime()
+            
             f.write(FileWriter.__printInOrder(x, y, z, t, O, fmt.separator) + "\n")
 
         f.close()
 
+    
     @staticmethod
-    def writeToFiles(
-        trackCollection,
-        pathDir,
-        ext,
-        id_E=-1,
-        id_N=-1,
-        id_U=-1,
-        id_T=-1,
-        separator=",",
-        h=0,
-    ):
+    def writeToFiles(trackCollection, pathDir, ext, id_E=-1, id_N=-1, id_U=-1, 
+                     id_T=-1, separator=",", h=0):
         """TODO"""
 
         root = "track_output"
