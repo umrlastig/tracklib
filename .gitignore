@@ -52,4 +52,4 @@ data/traj_rm_all.pos
 data/traj_rm_remove_sat_all.pos
 data/traj_rm_sat_vertical.pos
 data/traj_rm_vertical.pos
-data/test/test_write_csv_minim.wkt
+data/test/
