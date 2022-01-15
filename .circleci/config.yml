@@ -16,7 +16,7 @@ workflows:
   test_et_couverture:
     jobs:
       - build-and-test-and-coverage
-  test:
+  tests_different_python_version:
     jobs:
       - build-and-test-python-3-6
       - build-and-test-python-3-7
@@ -45,6 +45,7 @@ jobs:
       - run: 
           name: Run tests
           command: |
+            chmod 777 -R /home/circleci/project/data/
             pytest test/
             coverage run -m --source=tracklib/ pytest test/
             coverage xml
