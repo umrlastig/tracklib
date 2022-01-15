@@ -10,13 +10,14 @@ class FileWriter:
     def __takeFirst(elem):
         return elem[0]
 
-    def __printInOrder(E, N, U, T, O, sep):
+    def __printInOrder(E, N, U, T, headerAF, O, sep):
         D = [E, N, U, T]
         output = ""
         output += str(D[O[0][1]]).strip() + sep
         output += str(D[O[1][1]]).strip() + sep
         output += str(D[O[2][1]]).strip() + sep
         output += str(D[O[3][1]]).strip()
+        output += headerAF
         return output
 
 
@@ -64,6 +65,11 @@ class FileWriter:
         # Data order
         # -------------------------------------------------------
         O = [(fmt.id_E, 0), (fmt.id_N, 1), (fmt.id_U, 2), (fmt.id_T, 3)]
+        headerAF = ""
+        if len(af_names) > 0:
+            for idx, af_name in enumerate(af_names):
+                O.append((4 + idx, 4 + idx))
+                headerAF += fmt.separator + af_name
         O.sort(key=FileWriter.__takeFirst)
 
         # -------------------------------------------------------
@@ -76,24 +82,26 @@ class FileWriter:
             f.write(fmt.com + "srid: " + track.getSRID() + "\n")
             if isinstance(fmt.DateIni, GPSTime):
                 f.write(fmt.com + "Reference epoch: " + fmt.DateIni + "\n")
+            
             if track.getSRID().upper() == "ENU":
                 f.write(
                     fmt.com
-                    + FileWriter.__printInOrder("E", "N", "U", "time", O, fmt.separator)
+                    + FileWriter.__printInOrder(
+                        "E", "N", "U", "time", headerAF, O, fmt.separator)
                     + "\n"
                 )
             if track.getSRID().upper() == "GEO":
                 f.write(
                     fmt.com
                     + FileWriter.__printInOrder(
-                        "lon", "lat", "h", "time", O, fmt.separator
-                    )
+                        "lon", "lat", "h", "time", headerAF, O, fmt.separator)
                     + "\n"
                 )
             if track.getSRID().upper() == "ECEF":
                 f.write(
                     fmt.com
-                    + FileWriter.__printInOrder("X", "Y", "Z", "time", O, fmt.separator)
+                    + FileWriter.__printInOrder("X", "Y", "Z", "time", 
+                                                headerAF, O, fmt.separator)
                     + "\n"
                 )
 
@@ -113,7 +121,13 @@ class FileWriter:
             if isinstance(fmt.DateIni, GPSTime):
                 t = t.toAbsTime() - fmt.DateIni.toAbsTime()
             
-            f.write(FileWriter.__printInOrder(x, y, z, t, O, fmt.separator) + "\n")
+            afs = ""
+            if len(af_names) > 0:
+                for af_name in af_names:
+                    afs += fmt.separator + str(track.getObsAnalyticalFeature(af_name, i))
+                    
+            f.write(FileWriter.__printInOrder(x, y, z, t,
+                                              afs, O, fmt.separator) + "\n")
 
         f.close()
 
