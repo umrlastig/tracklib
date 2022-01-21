@@ -237,8 +237,8 @@ def downgrade(rev):
 							line = line + "   #RETRO: TO UNCOMMENT\n"
 						else:
 							line = line + "   #RETRO: TO REMOVE\n"
-				if "year: int =" in line:
-					line = line.replace("year: int =", "year =")
+#				if "year: int =" in line:
+#					line = line.replace("year: int =", "year =")
 				if "month: int =" in line:
 					line = line.replace("month: int =", "month =")
 				if "day: int =" in line:
@@ -257,8 +257,7 @@ def downgrade(rev):
 					line = line.replace("coord: Union[ENUCoords, ECEFCoords, GeoCoords]", "coord: ")
 				if "-> Union[tuple[float, float], None]:" in line:
 					line = line.replace("-> Union[tuple[float, float], None]:", ": ")
-#				if "base: bool = True" in line:
-#					line = line.replace("base: bool = True", "base = True")
+
 					
 				fout.write(line)
 				if function_flag and rev:
