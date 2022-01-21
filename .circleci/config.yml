@@ -18,7 +18,6 @@ workflows:
       - build-and-test-and-coverage
   tests_different_python_version:
     jobs:
-      - build-and-test-python-3-5
       - build-and-test-python-3-6
       - build-and-test-python-3-7
       - build-and-test-python-3-9
