@@ -69,6 +69,7 @@ class TestOperateurMethods(unittest.TestCase):
             #print (Speed)
             #print (trace.getListAnalyticalFeatures())
             tabAF = trace.getListAnalyticalFeatures()
+            tabAF.sort()
             self.assertEqual(2, len(tabAF))
             self.assertEqual('abs_curv', tabAF[0])
             self.assertEqual('speed', tabAF[1])
