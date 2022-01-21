@@ -251,12 +251,12 @@ def downgrade(rev):
 					line = line.replace("sec: int =", "sec =")
 				if "ms: int =" in line:
 					line = line.replace("ms: int =", "ms =")
-#				if "collection: Union[Bbox, TrackCollection]" in line:
-#					line = line.replace("collection: Union[Bbox, TrackCollection]", "collection")
-#				if "coord: Union[ENUCoords, ECEFCoords, GeoCoords]" in line:
-#					line = line.replace("coord: Union[ENUCoords, ECEFCoords, GeoCoords]", "coord: ")
-#				if "-> Union[tuple[float, float], None]:" in line:
-#					line = line.replace("-> Union[tuple[float, float], None]:", ": ")
+				if "collection: Union[Bbox, TrackCollection]" in line:
+					line = line.replace("collection: Union[Bbox, TrackCollection]", "collection")
+				if "coord: Union[ENUCoords, ECEFCoords, GeoCoords]" in line:
+					line = line.replace("coord: Union[ENUCoords, ECEFCoords, GeoCoords]", "coord: ")
+				if "-> Union[tuple[float, float], None]:" in line:
+					line = line.replace("-> Union[tuple[float, float], None]:", ": ")
 #				if "base: bool = True" in line:
 #					line = line.replace("base: bool = True", "base = True")
 					
