@@ -237,10 +237,10 @@ def downgrade(rev):
 							line = line + "   #RETRO: TO UNCOMMENT\n"
 						else:
 							line = line + "   #RETRO: TO REMOVE\n"
-				if "Re: float =" in line:
-					line = line.replace("Re: float =", "Re = ")
-				if "Fe: float =" in line:
-					line = line.replace("Fe: float =", "Fe = ")
+#				if "Re: float =" in line:
+#					line = line.replace("Re: float =", "Re = ")
+#				if "Fe: float =" in line:
+#					line = line.replace("Fe: float =", "Fe = ")
 				if "year: int =" in line:
 					line = line.replace("year: int =", "year =")
 				if "month: int =" in line:
@@ -255,12 +255,12 @@ def downgrade(rev):
 					line = line.replace("sec: int =", "sec =")
 				if "ms: int =" in line:
 					line = line.replace("ms: int =", "ms =")
-				if "zone: int =" in line:
-					line = line.replace("zone: int =", "zone =")
-				if "margin: float =" in line:
-					line = line.replace("margin: float =", "margin = ")
-				if "verbose: bool =" in line:
-					line = line.replace("verbose: bool =", "verbose = ")
+#				if "zone: int =" in line:
+#					line = line.replace("zone: int =", "zone =")
+#				if "margin: float =" in line:
+#					line = line.replace("margin: float =", "margin = ")
+#				if "verbose: bool =" in line:
+#					line = line.replace("verbose: bool =", "verbose = ")
 				if "collection: Union[Bbox, TrackCollection]" in line:
 					line = line.replace("collection: Union[Bbox, TrackCollection]", "collection")
 				if "coord: Union[ENUCoords, ECEFCoords, GeoCoords]" in line:
