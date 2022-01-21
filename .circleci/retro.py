@@ -237,20 +237,6 @@ def downgrade(rev):
 							line = line + "   #RETRO: TO UNCOMMENT\n"
 						else:
 							line = line + "   #RETRO: TO REMOVE\n"
-#				if "year: int =" in line:
-#					line = line.replace("year: int =", "year =")
-#				if "month: int =" in line:
-#					line = line.replace("month: int =", "month =")
-#				if "day: int =" in line:
-#					line = line.replace("day: int =", "day =")
-#				if "hour: int =" in line:
-#					line = line.replace("hour: int =", "hour =")
-#				if "min: int =" in line:
-#					line = line.replace("min: int =", "min =")
-#				if "sec: int =" in line:
-#					line = line.replace("sec: int =", "sec =")
-#				if "ms: int =" in line:
-#					line = line.replace("ms: int =", "ms =")
 				if "collection: Union[Bbox, TrackCollection]" in line:
 					line = line.replace("collection: Union[Bbox, TrackCollection]", "collection")
 				if "coord: Union[ENUCoords, ECEFCoords, GeoCoords]" in line:
