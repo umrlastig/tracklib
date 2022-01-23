@@ -64,17 +64,7 @@ class GPSTime:
 
     __day_of_base_date = 3  # Thu 01/01/1970
 
-    def __init__(
-        self,
-        year: int = 1970,
-        month: int = 1,
-        day: int = 1,
-        hour: int = 0,
-        min: int = 0,
-        sec: int = 0,
-        ms: int = 0,
-        zone: int = 0,
-    ):
+    def __init__(self, year: int = 1970, month: int = 1, day: int = 1, hour: int = 0, min: int = 0, sec: int = 0, ms: int = 0, zone: int = 0):
         """__init__ Constructor of :class:`GPSTime` class
 
         Default value : 01/01/1970 00:00:00.000

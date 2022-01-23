@@ -3,6 +3,8 @@
 # -----------------------------------------------------------------------------
 
 import sys
+import math
+import numpy as np
 
 import tracklib.util.Geometry as Geometry
 import tracklib.core.Operator as Operator
@@ -21,11 +23,12 @@ from tracklib.core.Track import Track
 
 MODE_SIMPLIFY_DOUGLAS_PEUCKER = 1
 MODE_SIMPLIFY_VISVALINGAM = 2
-MODE_SIMPLIFY_MINIMIZE_LARGEST_DEVIATION = 3
-MODE_SIMPLIFY_MINIMIZE_ELONGATION_RATIO = 4
-MODE_SIMPLIFY_PRECLUDE_LARGE_DEVIATION = 5
-MODE_SIMPLIFY_FREE = 6
-MODE_SIMPLIFY_FREE_MAXIMIZE = 7
+MODE_SIMPLIFY_SQUARING = 3
+MODE_SIMPLIFY_MINIMIZE_LARGEST_DEVIATION = 4
+MODE_SIMPLIFY_MINIMIZE_ELONGATION_RATIO = 5
+MODE_SIMPLIFY_PRECLUDE_LARGE_DEVIATION = 6
+MODE_SIMPLIFY_FREE = 7
+MODE_SIMPLIFY_FREE_MAXIMIZE = 8
 
 # --------------------------------------------------------------------------
 # Generic method to simplify a track
@@ -34,15 +37,17 @@ MODE_SIMPLIFY_FREE_MAXIMIZE = 7
 #       - tolerance is max allowed deviation with respect to straight line
 #   MODE_SIMPLIFY_VISVALINGAM (2)
 #       - tolerance is maximal triangle area of 3 consecutive points
-#   MODE_SIMPLIFY_MINIMIZE_LARGEST_DEVIATION (3)
+#   MODE_SIMPLIFY_SQUARING (3)
+#       - tolerance is threshold on flat and right angles
+#   MODE_SIMPLIFY_MINIMIZE_LARGEST_DEVIATION (4)
 #       - tolerance is typical max deviation with respect to straight line
-#   MODE_SIMPLIFY_MINIMIZE_ELONGATION_RATIO (4)
+#   MODE_SIMPLIFY_MINIMIZE_ELONGATION_RATIO (5)
 #       - tolerance is typical elongation ratio of min bounding rectangle
-#   MODE_SIMPLIFY_PRECLUDE_LARGE_DEVIATION (5)
+#   MODE_SIMPLIFY_PRECLUDE_LARGE_DEVIATION (6)
 #       - tolerance is max allowed deviation with respect to straight line
-#   MODE_SIMPLIFY_FREE (6)
+#   MODE_SIMPLIFY_FREE (7)
 #       - tolerance is a customed function to minimize
-#   MODE_SIMPLIFY_FREE_MAXIMIZE (7)
+#   MODE_SIMPLIFY_FREE_MAXIMIZE (8)
 #       - tolerance is a customed function to maximize
 # --------------------------------------------------------------------------
 def simplify(track, tolerance, mode=MODE_SIMPLIFY_DOUGLAS_PEUCKER, verbose=True):
@@ -53,6 +58,8 @@ def simplify(track, tolerance, mode=MODE_SIMPLIFY_DOUGLAS_PEUCKER, verbose=True)
         return douglas_peucker(track, tolerance)
     if mode == MODE_SIMPLIFY_VISVALINGAM:
         return visvalingam(track, tolerance)
+    if mode == MODE_SIMPLIFY_SQUARING:
+        return squaring(track, tolerance)
     if mode == MODE_SIMPLIFY_MINIMIZE_LARGEST_DEVIATION:
         return optimalSimplification(
             track, __cost_largest_deviation, tolerance, verbose
@@ -212,3 +219,110 @@ def __cost_largest_deviation_strict(track, i, j, offset):
         R = Geometrics.boundingShape(track.extract(i, j), Geometrics.MODE_ENCLOSING_MBR)
         l = min(R[2], R[3])
         return 1e300 * (l > offset) + 1
+
+
+# --------------------------------------------------------------------------
+# Function to simplify a GPS track with squaring algorithm
+# --------------------------------------------------------------------------
+# Input :
+#   - track ::     GPS track
+#   - eps   ::     angle threshold on right and flat angles (radians)
+# --------------------------------------------------------------------------
+# Output : simplified
+# --------------------------------------------------------------------------
+def squaring(track, eps):
+
+    N = len(track)
+
+    CR = []
+    for i in range(0,N-1):
+        p0 = track[(i-1)%N].position
+        p1 = track[i].position
+        p2 = track[(i+1)%N].position
+        du = p0.distanceTo(p1)
+        dv = p1.distanceTo(p2)
+        x0 = p0.getX(); x1 = p1.getX(); x2 = p2.getX()
+        y0 = p0.getY(); y1 = p1.getY(); y2 = p2.getY()
+        ux = x1-x0; uy = y1-y0
+        vx = x2-x1; vy = y2-y1
+        angle = math.acos((ux*vx + uy*vy)/(du*dv))
+        #if abs(angle) < eps:
+            #p1.plot('go')
+            #print(i, "FLAT")
+        if abs(angle-math.pi/2) < eps:
+            #p1.plot('ro')
+            CR.append(i)
+
+    X = [v for pair in zip(track.getX(), track.getY()) for v in pair]			
+
+    for iter in range(5):
+        J = np.eye(2*N)
+        B = [v for pair in zip(track.getX(), track.getY()) for v in pair]
+        B = [B[j] - X[j] for j in range(len(X))]
+        for idx in CR:
+            x0 = X[2*(idx-1)];   x1 = X[2*idx];   x2 = X[2*(idx+1)]
+            y0 = X[2*(idx-1)+1]; y1 = X[2*idx+1]; y2 = X[2*(idx+1)+1]
+            constraint = [0]*(2*N)
+            constraint[2*idx-2] = -(x2-x1)
+            constraint[2*idx-1] = -(y2-y1)
+            constraint[2*idx-0] =  (x2-2*x1+x0)
+            constraint[2*idx+1] =  (y2-2*y1+y0)
+            constraint[2*idx+2] =  (x1-x0)
+            constraint[2*idx+3] =  (y1-y0)
+            J = np.vstack([J, constraint])
+            B.append(-((x1-x0)*(x2-x1) + (y1-y0)*(y2-y1)))
+        B = np.array(B)
+        dX = np.linalg.solve(J.transpose()@J, J.transpose()@B)
+        print(dX)
+        for i in range(len(X)):
+            X[i] += dX[i]
+    output = track.copy()
+    for i in range(len(output)):
+        output[i].position.setX(X[2*i])
+        output[i].position.setY(X[2*i+1])
+    return output
+
+'''
+    for iter in range(5):
+        print("ITER ", iter)
+        J = np.eye(2*N)
+        B = [v for pair in zip(track.getX(), track.getY()) for v in pair]
+        B = [B[j] - X[j] for j in range(len(X))]
+        for i in range(0,N-1):
+            p0 = track[(i-1)%N].position
+            p1 = track[i].position
+            p2 = track[(i+1)%N].position
+            du = p0.distanceTo(p1)
+            dv = p1.distanceTo(p2)
+            x0 = p0.getX(); x1 = p1.getX(); x2 = p2.getX()
+            y0 = p0.getY(); y1 = p1.getY(); y2 = p2.getY()
+            ux = x1-x0; uy = y1-y0
+            vx = x2-x1; vy = y2-y1
+            angle = math.acos((ux*vx + uy*vy)/(du*dv))
+            #if abs(angle) < eps:
+                #p1.plot('go')
+                #print(i, "FLAT")
+            if abs(angle-math.pi/2) < eps:
+                p1.plot('ro')
+                constraint = [0]*(2*N)
+                constraint[2*i-2] = -(x2-x1)
+                constraint[2*i-1] = -(y2-y1)
+                constraint[2*i-0] =  (x2-2*x1+x0)
+                constraint[2*i+1] =  (y2-2*y1+y0)
+                constraint[2*i+2] =  (x1-x0)
+                constraint[2*i+3] =  (y1-y0)
+                J = np.vstack([J, constraint])
+                B.append(-((x1-x0)*(x2-x1) + (y1-y0)*(y2-y1)))
+                #print(i, "RIGHT")
+        B = np.array(B)
+        dX = np.linalg.solve(J.transpose()@J, J.transpose()@B)
+        print(B)
+        for i in range(len(X)):
+            X[i] += dX[i]
+    output = track.copy()
+    for i in range(len(output)):
+        output[i].position.setX(X[2*i])
+        output[i].position.setY(X[2*i+1])
+    #output.loop()
+'''
+

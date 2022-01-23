@@ -358,10 +358,13 @@ class Track:
         if self.size() % 2 == 1:
             self.__POINTS.pop()
 			
-    def loop(self):
-        self[0].position.setX(self[-1].position.getX())
-        self[0].position.setY(self[-1].position.getY())
-        self[0].position.setZ(self[-1].position.getZ())
+    def loop(self, add = False):
+        if add:
+            self.addObs(self[0].copy())		
+        else:
+            self[0].position.setX(self[-1].position.getX())
+            self[0].position.setY(self[-1].position.getY())
+            self[0].position.setZ(self[-1].position.getZ())
 
     # Internal methods
     def __transmitAF(self, track):
