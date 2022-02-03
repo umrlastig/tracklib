@@ -276,7 +276,7 @@ def squaring(track, eps):
             B.append(-((x1-x0)*(x2-x1) + (y1-y0)*(y2-y1)))
         B = np.array(B)
         dX = np.linalg.solve(J.transpose()@J, J.transpose()@B)
-        print(dX)
+        #print(dX)
         for i in range(len(X)):
             X[i] += dX[i]
     output = track.copy()
