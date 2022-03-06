@@ -1333,7 +1333,7 @@ class Track:
     # Output:
     #  Ax object (may be input into append parameter)
     # ----------------------------------------------------
-    def plot(self, sym="k-", type="LINE", af_name="", cmap=-1, append=True):
+    def plot(self, sym="k-", type="LINE", af_name="", cmap=-1, append=True, label=None):
         """
         af_name: test si isAFTransition
         """
@@ -1345,7 +1345,7 @@ class Track:
         plot.color = sym[0]
         plot.w = 6
         plot.h = 5
-        return plot.plot(type, af_name, cmap, append=append)
+        return plot.plot(type, af_name, cmap, append=append, label=label)
 
     # ----------------------------------------------------
     # Plot track uncertainty (as error ellipses)
