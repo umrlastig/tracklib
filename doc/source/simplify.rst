@@ -4,10 +4,10 @@
 :Date: 07/03/2021, 06/03/2022
 
 
-Simplification of GPS tracks
-=============================
+Simplify a track
+=================
 
-The process "Track simplification" returns a new track. Tolerance is in the unit of track observation coordinates.
+The process "Track simplification" generally returns a new track. Tolerance is in the unit of track observation coordinates.
 
 
 Douglas Peucker Simplication
