@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import matplotlib.pyplot as plt
 from tracklib.io.FileReader import FileReader
 import tracklib.algo.Simplification as Simplification
 
@@ -21,8 +22,9 @@ trace1 = Simplification.simplify(
              trace, tolerance, 
 			 Simplification.MODE_SIMPLIFY_SQUARING
 )
-trace.plot(append = False, sym='g-')
-trace1.plot(append = True, sym='b-')
+trace.plot(append = False, sym='g-', label='origin')
+trace1.plot(append = True, sym='b-', label='simplify:squaring')
+plt.legend()
 
 
 # ---------------------------------------------------
