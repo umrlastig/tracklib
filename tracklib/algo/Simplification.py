@@ -237,7 +237,7 @@ def squaring(track, eps):
     N = len(track)
 
     CR = []
-    for i in range(0,N-1):
+    for i in range(0, N-1):
         p0 = track[(i-1)%N].position
         p1 = track[i].position
         p2 = track[(i+1)%N].position
@@ -256,8 +256,8 @@ def squaring(track, eps):
 	        if abs(angle-math.pi/2) < eps:
 	            #p1.plot('ro')
 	            CR.append(i)
-        else:
-            pass
+        # else:  # on a que 2 points
+		#  todo ?
 
     X = [v for pair in zip(track.getX(), track.getY()) for v in pair]			
 
