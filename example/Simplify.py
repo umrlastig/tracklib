@@ -22,7 +22,7 @@ trace1 = Simplification.simplify(
              trace, tolerance, 
 			 Simplification.MODE_SIMPLIFY_SQUARING
 )
-trace.plot(append = False, sym='g-', label='origin')
+trace.plot(append = False, sym='g-', label='original track')
 trace1.plot(append = True, sym='b-', label='simplify:squaring')
 plt.legend()
 
