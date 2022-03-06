@@ -121,7 +121,7 @@ Examples
    
    ./usecase/stoppoints
    ./usecase/summarize
-   ./usecas/sinuousroadsection
+   ./usecase/sinuousroadsection
 
 .. toctree::
    :caption: API Reference
