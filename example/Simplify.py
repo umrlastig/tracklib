@@ -23,9 +23,9 @@ trace1 = Simplification.simplify(
              trace, tolerance, 
 			 Simplification.MODE_SIMPLIFY_SQUARING
 )
-#trace.plot(append = False, sym='g-', label='original track')
-#trace1.plot(append = True, sym='b-', label='simplify:squaring')
-#plt.legend()
+trace.plot(append = False, sym='g-', label='original track')
+trace1.plot(append = True, sym='b-', label='simplify:squaring')
+plt.legend()
 
 
 # ---------------------------------------------------
@@ -34,9 +34,9 @@ trace2 = Simplification.simplify(
              trace, tolerance, 
 			 Simplification.MODE_SIMPLIFY_DOUGLAS_PEUCKER
 )
-#trace.plot(append = False, sym='g-', label='original track')
-#trace2.plot(append = True, sym='b-', label='simplify:douglas peucker')
-#plt.legend()
+trace.plot(append = False, sym='g-', label='original track')
+trace2.plot(append = True, sym='b-', label='simplify:douglas peucker')
+plt.legend()
 
 
 # ---------------------------------------------------
@@ -54,9 +54,9 @@ plt.legend()
 kernel = GaussianKernel(3)
 trace.operate(Operator.FILTER, "x", kernel, "x_filtered")
 trace.operate(Operator.FILTER, "y", kernel, "y_filtered")
-#trace.plot(append = False, sym='g-', label='original track')
-#plt.plot(trace.getAnalyticalFeature("x_filtered"), trace.getAnalyticalFeature("y_filtered"), 
-#		 'b-', label='simplify:gaussian filter')
-#plt.legend()
+trace.plot(append = False, sym='g-', label='original track')
+plt.plot(trace.getAnalyticalFeature("x_filtered"), trace.getAnalyticalFeature("y_filtered"), 
+		 'b-', label='simplify:gaussian filter')
+plt.legend()
 
 
