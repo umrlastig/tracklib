@@ -19,7 +19,7 @@ Thomas K. Peucker
 https://utpjournals.press/doi/10.3138/FM57-6770-U75U-7727
 
 
-.. figure:: ./img/simplify_douglaspeucker.png
+.. figure:: ../img/simplify_douglaspeucker.png
    :width: 450px
    :align: center
 
@@ -54,7 +54,7 @@ Visvalingram Simplification
 Line generalisation by repeated elimination of points - https://www.tandfonline.com/doi/abs/10.1179/000870493786962263
 
 
-.. figure:: ./img/simplify_visvalingam.png
+.. figure:: ../img/simplify_visvalingam.png
    :width: 450px
    :align: center
 
@@ -87,7 +87,7 @@ Line generalisation by repeated elimination of points - https://www.tandfonline.
 Kernel simplification
 **********************
 
-.. figure:: ./img/simplify_gaussian_filter.png
+.. figure:: ../img/simplify_gaussian_filter.png
    :width: 450px
    :align: center
 
@@ -127,7 +127,7 @@ Build a kernel. For example a [Gaussian Filter](https://tracklib.readthedocs.io/
 Squaring algorithm
 *******************
 
-.. figure:: ./img/simplify_squaring.png
+.. figure:: ../img/simplify_squaring.png
    :width: 450px
    :align: center
 
