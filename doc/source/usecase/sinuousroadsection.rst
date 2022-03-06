@@ -6,6 +6,7 @@
 sinuous road section
 =======================
 
-Proposal of two methods to detect sinuous road sections.
+.. Proposal of two methods to detect sinuous road sections.
 
+Un point d'inflexion est un point où la courbe change de convexité.
 

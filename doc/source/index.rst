@@ -110,10 +110,11 @@ Examples
    loading
    coreconcept
    operator
-   interpolation
-   smoothing
-   mapmatching
-   simplify
+   ./userguide/mapmatching
+   ./userguide/simplify
+..   interpolation
+..   smoothing
+ 
    
 .. toctree::
    :maxdepth: 1
@@ -123,11 +124,12 @@ Examples
    ./usecase/summarize
    ./usecase/sinuousroadsection
 
+
 .. toctree::
    :caption: API Reference
 
-   ./api_documentation/core.rst
    ./api_documentation/algo.rst
+   ./api_documentation/core.rst
    ./api_documentation/io.rst
    ./api_documentation/util.rst
 

@@ -94,7 +94,8 @@ Kernel simplification
    Figure 1 : Simplification with a gaussian kernel filter
 
 
-Build a kernel. For example a Gaussian Filter:
+Build a kernel. For example a [Gaussian Filter](https://tracklib.readthedocs.io/en/latest/api_documentation/core/core-kernel.html#tracklib.core.Kernel.GaussianKernel):
+
 
 .. code-block:: python
 
