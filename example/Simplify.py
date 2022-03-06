@@ -40,13 +40,23 @@ trace2 = Simplification.simplify(
 
 
 # ---------------------------------------------------
+tolerance = 50
+trace3 = Simplification.simplify(
+             trace, tolerance, 
+			 Simplification.MODE_SIMPLIFY_VISVALINGAM
+)
 trace.plot(append = False, sym='g-', label='original track')
+trace3.plot(append = True, sym='b-', label='simplify:visvalingam')
+plt.legend()
 
+
+# ---------------------------------------------------
 kernel = GaussianKernel(3)
 trace.operate(Operator.FILTER, "x", kernel, "x_filtered")
 trace.operate(Operator.FILTER, "y", kernel, "y_filtered")
-plt.plot(trace.getAnalyticalFeature("x_filtered"), trace.getAnalyticalFeature("y_filtered"), 
-		 'b-', label='simplify:gaussian filter')
-plt.legend()
+#trace.plot(append = False, sym='g-', label='original track')
+#plt.plot(trace.getAnalyticalFeature("x_filtered"), trace.getAnalyticalFeature("y_filtered"), 
+#		 'b-', label='simplify:gaussian filter')
+#plt.legend()
 
 
