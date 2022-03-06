@@ -70,7 +70,11 @@ For example a Gaussian Filter:
 Squaring algorithm
 *******************
 
+.. figure:: ./img/simplify_squaring.png
+   :width: 550px
+   :align: center
 
+   Figure 1 : Simplification with squaring algorithm
 
 
 .. code-block:: python
