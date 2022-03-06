@@ -96,6 +96,8 @@ Examples
    :maxdepth: 1
    
    install
+   quickstart   
+..   overview   
    
 ..   :caption: Tutorials
 
@@ -112,18 +114,17 @@ Examples
    smoothing
    mapmatching
    simplify
-   summarize
    
 .. toctree::
    :maxdepth: 1
    :caption: Use Cases
    
-   quickstart
-   ./usecase/speedprofil
-
+   ./usecase/stoppoints
+   ./usecase/summarize
+   ./usecas/sinuousroadsection
 
 .. toctree::
-   :caption: Api
+   :caption: API Reference
 
    ./api_documentation/core.rst
    ./api_documentation/algo.rst
