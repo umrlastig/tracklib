@@ -96,6 +96,8 @@ Examples
    :maxdepth: 1
    
    install
+   quickstart   
+..   overview   
    
 ..   :caption: Tutorials
 
@@ -108,25 +110,26 @@ Examples
    loading
    coreconcept
    operator
-   interpolation
-   smoothing
-   mapmatching
-   simplify
-   summarize
+   ./userguide/mapmatching
+   ./userguide/simplify
+..   interpolation
+..   smoothing
+ 
    
 .. toctree::
    :maxdepth: 1
    :caption: Use Cases
    
-   quickstart
-   ./usecase/speedprofil
+   ./usecase/stoppoints
+   ./usecase/summarize
+   ./usecase/sinuousroadsection
 
 
 .. toctree::
-   :caption: Api
+   :caption: API Reference
 
-   ./api_documentation/core.rst
    ./api_documentation/algo.rst
+   ./api_documentation/core.rst
    ./api_documentation/io.rst
    ./api_documentation/util.rst
 

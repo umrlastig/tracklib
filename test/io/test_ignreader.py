@@ -57,7 +57,7 @@ class TestNetworkReader(TestCase):
 
 if __name__ == '__main__':
     suite = TestSuite()
-    #suite.addTest(TestNetworkReader("test_read_default"))
+    suite.addTest(TestNetworkReader("test_read_default"))
     suite.addTest(TestNetworkReader("test_read_alti"))
     runner = TextTestRunner()
     runner.run(suite)

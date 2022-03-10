@@ -30,6 +30,8 @@ MODE_SIMPLIFY_PRECLUDE_LARGE_DEVIATION = 6
 MODE_SIMPLIFY_FREE = 7
 MODE_SIMPLIFY_FREE_MAXIMIZE = 8
 
+SQUARING_RECALL = 0.1
+
 # --------------------------------------------------------------------------
 # Generic method to simplify a track
 # Tolerance is in the unit of track observation coordinates
@@ -235,7 +237,7 @@ def squaring(track, eps):
     N = len(track)
 
     CR = []
-    for i in range(0,N-1):
+    for i in range(0, N-1):
         p0 = track[(i-1)%N].position
         p1 = track[i].position
         p2 = track[(i+1)%N].position
@@ -245,20 +247,24 @@ def squaring(track, eps):
         y0 = p0.getY(); y1 = p1.getY(); y2 = p2.getY()
         ux = x1-x0; uy = y1-y0
         vx = x2-x1; vy = y2-y1
-        angle = math.acos((ux*vx + uy*vy)/(du*dv))
-        #if abs(angle) < eps:
-            #p1.plot('go')
-            #print(i, "FLAT")
-        if abs(angle-math.pi/2) < eps:
-            #p1.plot('ro')
-            CR.append(i)
+        if du*dv != 0:
+	        arg = max(min((ux*vx + uy*vy)/(du*dv), 1), -1)
+	        angle = math.acos(arg)
+	        #if abs(angle) < eps:
+	            #p1.plot('go')
+	            #print(i, "FLAT")
+	        if abs(angle-math.pi/2) < eps:
+	            #p1.plot('ro')
+	            CR.append(i)
+        # else:  # on a que 2 points
+		#  todo ?
 
     X = [v for pair in zip(track.getX(), track.getY()) for v in pair]			
 
     for iter in range(5):
-        J = np.eye(2*N)
+        J = SQUARING_RECALL*np.eye(2*N)
         B = [v for pair in zip(track.getX(), track.getY()) for v in pair]
-        B = [B[j] - X[j] for j in range(len(X))]
+        B = [SQUARING_RECALL*(B[j] - X[j]) for j in range(len(X))]
         for idx in CR:
             x0 = X[2*(idx-1)];   x1 = X[2*idx];   x2 = X[2*(idx+1)]
             y0 = X[2*(idx-1)+1]; y1 = X[2*idx+1]; y2 = X[2*(idx+1)+1]
@@ -273,7 +279,7 @@ def squaring(track, eps):
             B.append(-((x1-x0)*(x2-x1) + (y1-y0)*(y2-y1)))
         B = np.array(B)
         dX = np.linalg.solve(J.transpose()@J, J.transpose()@B)
-        print(dX)
+        #print(dX)
         for i in range(len(X)):
             X[i] += dX[i]
     output = track.copy()
