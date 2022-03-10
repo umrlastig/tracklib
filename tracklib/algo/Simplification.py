@@ -256,8 +256,8 @@ def squaring(track, eps):
 	        if abs(angle-math.pi/2) < eps:
 	            #p1.plot('ro')
 	            CR.append(i)
-        # else:  # on a que 2 points
-		#  todo ?
+        else:  # on a que 2 points
+            print("Warning: identical points")
 
     X = [v for pair in zip(track.getX(), track.getY()) for v in pair]			
 
