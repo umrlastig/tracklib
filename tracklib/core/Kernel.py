@@ -386,5 +386,5 @@ class ExperimentalKernel:
         N = len(gamma)
         x = [i * (-1) for i in list(reversed(self.H))] + self.H
         y = list(reversed(gamma)) + gamma
-        y = np.max(y) - y
+        y = (np.max(y) - y)/np.max(y)
         plt.plot(x, y, sym)
