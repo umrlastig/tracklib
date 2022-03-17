@@ -12,8 +12,12 @@ import tracklib.core.Utils as utils
 class TestAlgoAnalyticsMethods(unittest.TestCase):
     
     def setUp (self):
+        
         GPSTime.GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         self.trace1 = Track.Track([], 1)
+        self.trace2 = Track.Track([], 1)
+
+        # ---------------------------------------------------------------------
 		
         c1 = Coords.ENUCoords(0, 0, 0)
         p1 = Obs.Obs(c1, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
@@ -46,6 +50,24 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
         c8 = Coords.ENUCoords(5, 20, 0)
         p8 = Obs.Obs(c8, GPSTime.GPSTime.readTimestamp("2018-01-01 10:02:35"))
         self.trace1.addObs(p8)
+		
+        # ---------------------------------------------------------------------		
+		
+        c1 = Coords.ENUCoords(0, 0, 0)
+        p1 = Obs.Obs(c1, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
+        self.trace2.addObs(p1)
+		
+        c2 = Coords.ENUCoords(0, 10, 0)
+        p2 = Obs.Obs(c2, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:10"))
+        self.trace2.addObs(p2)
+		
+        c3 = Coords.ENUCoords(0, 10, 0)
+        p3 = Obs.Obs(c3, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:20"))
+        self.trace2.addObs(p3)
+		
+        c4 = Coords.ENUCoords(0, 30, 0)
+        p4 = Obs.Obs(c4, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:30"))
+        self.trace2.addObs(p4)
 		
 		
     def testDS(self):
@@ -142,8 +164,27 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
 		
 		
     def testStopPointWithAccelerationCriteria(self):
-        self.assertLessEqual(3, 5)
+		
+        self.trace2.addAnalyticalFeature(Analytics.speed)
+        self.trace2.addAnalyticalFeature(Analytics.acceleration)
         
+        v1 = self.trace2.getObsAnalyticalFeature('speed', 1)
+        a1 = self.trace2.getObsAnalyticalFeature('acceleration', 1)
+        self.assertTrue(abs(v1 - 0.5) < 0.000001)
+        self.assertTrue(abs(a1 + 0.0) < 0.000001)
+        isSTP = Analytics.stop_point_with_acceleration_criteria(self.trace2, 1)
+        print (v1, a1, isSTP)		
+        self.assertEqual(isSTP, 0)
+		
+        v2 = self.trace2.getObsAnalyticalFeature('speed', 2)
+        a2 = self.trace2.getObsAnalyticalFeature('acceleration', 2)
+        self.assertTrue(abs(v2 - 1.0) < 0.000001)
+        self.assertTrue(abs(a2 - 0.075) < 0.000001)
+        isSTP = Analytics.stop_point_with_acceleration_criteria(self.trace2, 2)
+        print (v2, a2, isSTP)		
+        self.assertEqual(isSTP, 0)
+        
+		
     def testStopPointWithTimeWindowCriteria(self):
         self.assertLessEqual(3, 5)
     
@@ -157,7 +198,7 @@ if __name__ == '__main__':
     suite.addTest(TestAlgoAnalyticsMethods("testAngleGeom"))
     suite.addTest(TestAlgoAnalyticsMethods("testCalculAngleOriente"))
     suite.addTest(TestAlgoAnalyticsMethods("testOrientation"))
-    #suite.addTest(TestAlgoAnalyticsMethods("testStopPointWithAccelerationCriteria"))
+    suite.addTest(TestAlgoAnalyticsMethods("testStopPointWithAccelerationCriteria"))
     #suite.addTest(TestAlgoAnalyticsMethods("testStopPointWithTimeWindowCriteria"))
     
     runner = unittest.TextTestRunner()
