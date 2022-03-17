@@ -85,6 +85,7 @@ def speed(track, i):
 
 def acceleration(track, i):
     """Acceleration instantannée de la trace"""
+    
     if i == 0:
         return utils.NAN
 
