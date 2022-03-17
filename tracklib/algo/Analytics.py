@@ -139,11 +139,16 @@ def anglegeom(track, i) -> float:
 	
 
 def calculAngleOriente(track, i):
-    """Mesure l'angle orienté dans le sens trigonométrique abc.
+    """Mesure l'angle orienté dans le sens trigonométrique abc."""
 
-    https://medium.com/@manivannan_data/find-the-angle-between-three-points-from-2d-using-python-348c513e2cd
-    """
-
+    if i == 0:
+        return utils.NAN
+    
+    N = track.size()
+    if i == N - 1:
+        return utils.NAN
+	
+	
     a = track.getObs(i - 1).position
     b = track.getObs(i).position
     c = track.getObs(i + 1).position
