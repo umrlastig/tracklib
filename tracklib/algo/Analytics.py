@@ -116,6 +116,13 @@ def anglegeom(track, i) -> float:
 
     :return: Angle abc (degrees)
     """
+	
+    if i == 0:
+        return utils.NAN
+    N = track.size()
+    if i == N - 1:
+        return utils.NAN
+	
     long_ab = track.getObs(i - 1).distance2DTo(track.getObs(i))
     long_bc = track.getObs(i).distance2DTo(track.getObs(i + 1))
     long_ac = track.getObs(i - 1).distance2DTo(track.getObs(i + 1))
