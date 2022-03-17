@@ -115,8 +115,32 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
 		
 		
     def testOrientation(self):
-        self.assertLessEqual(3, 5)
         
+        a = Analytics.orientation(self.trace1, 0)
+        self.assertEqual(math.isnan(a), math.isnan(utils.NAN))
+		
+        a = Analytics.orientation(self.trace1, self.trace1.size() - 1)
+        self.assertEqual(math.isnan(a), math.isnan(utils.NAN))
+		
+        a = Analytics.orientation(self.trace1, 1)
+        self.assertEqual(a, 1)
+        
+        a = Analytics.orientation(self.trace1, 2)
+        self.assertEqual(a, 3)
+        
+        a = Analytics.orientation(self.trace1, 3)
+        self.assertEqual(a, 3)
+		
+        a = Analytics.orientation(self.trace1, 4)
+        self.assertEqual(a, 5)
+		
+        a = Analytics.orientation(self.trace1, 5)
+        self.assertEqual(a, 7)
+		
+        a = Analytics.orientation(self.trace1, 6)
+        self.assertEqual(a, 3)
+		
+		
     def testStopPointWithAccelerationCriteria(self):
         self.assertLessEqual(3, 5)
         
@@ -132,7 +156,7 @@ if __name__ == '__main__':
     #suite.addTest(TestAlgoAnalyticsMethods("testAcceleration"))
     suite.addTest(TestAlgoAnalyticsMethods("testAngleGeom"))
     suite.addTest(TestAlgoAnalyticsMethods("testCalculAngleOriente"))
-    #suite.addTest(TestAlgoAnalyticsMethods("testOrientation"))
+    suite.addTest(TestAlgoAnalyticsMethods("testOrientation"))
     #suite.addTest(TestAlgoAnalyticsMethods("testStopPointWithAccelerationCriteria"))
     #suite.addTest(TestAlgoAnalyticsMethods("testStopPointWithTimeWindowCriteria"))
     
