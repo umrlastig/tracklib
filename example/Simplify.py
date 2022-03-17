@@ -40,7 +40,7 @@ plt.legend()
 
 
 # ---------------------------------------------------
-tolerance = 50
+tolerance = 25
 trace3 = Simplification.simplify(
              trace, tolerance, 
 			 Simplification.MODE_SIMPLIFY_VISVALINGAM

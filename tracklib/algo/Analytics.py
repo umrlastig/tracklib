@@ -134,8 +134,13 @@ def anglegeom(track, i) -> float:
 	
     num = (x1 - x2) * (x3 - x2) + (y1 - y2) * (y3 - y2)
     den = math.sqrt((x1-x2)**2 + (y1-y2)**2) * math.sqrt((x3-x2)**2 + (y3-y2)**2)
-	
-    angle = math.degrees(math.acos(num/den))
+    r = num / den
+    if r > 1:
+        r = 1
+    if r < -1:
+        r = -1
+    # print (num, den)
+    angle = math.degrees(math.acos(r))
     return angle	
 	
 
