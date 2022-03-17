@@ -16,7 +16,7 @@ workflows:
   test_et_couverture:
     jobs:
       - build-and-test-and-coverage
-  tests_zdifferent_python_version:
+  tests_different_python_version:
     jobs:
       - build-and-test-python-3-5
       - build-and-test-python-3-6
