@@ -119,22 +119,24 @@ def anglegeom(track, i) -> float:
 	
     if i == 0:
         return utils.NAN
+    
     N = track.size()
     if i == N - 1:
         return utils.NAN
 	
-    long_ab = track.getObs(i - 1).distance2DTo(track.getObs(i))
-    long_bc = track.getObs(i).distance2DTo(track.getObs(i + 1))
-    long_ac = track.getObs(i - 1).distance2DTo(track.getObs(i + 1))
-
-    cos_abc = long_ab * long_ab + long_bc * long_bc - long_ac * long_ac
-    cos_abc = cos_abc / (2 * long_ab * long_bc)
-    if abs(cos_abc - 1) < 0.0001 or abs(cos_abc + 1) < 0.0001:
-        return 90
-
-    angle1 = math.degrees(math.acos(cos_abc))
-    return angle1
-
+    x1 = track.getObs(i-1).position.getX()
+    x2 = track.getObs(i).position.getX()
+    x3 = track.getObs(i+1).position.getX()
+    y1 = track.getObs(i-1).position.getY()
+    y2 = track.getObs(i).position.getY()
+    y3 = track.getObs(i+1).position.getY()
+	
+    num = (x1 - x2) * (x3 - x2) + (y1 - y2) * (y3 - y2)
+    den = math.sqrt((x1-x2)**2 + (y1-y2)**2) * math.sqrt((x3-x2)**2 + (y3-y2)**2)
+	
+    angle = math.degrees(math.acos(num/den))
+    return angle	
+	
 
 def calculAngleOriente(track, i):
     """Mesure l'angle orienté dans le sens trigonométrique abc.
