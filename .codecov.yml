@@ -18,5 +18,5 @@ codecov:
   
 ignore:
   # Ignore coverage for generated and third party code.
-  - "tracklib/core/Plot.py"
+  - "**/Plot_*.py"
 
