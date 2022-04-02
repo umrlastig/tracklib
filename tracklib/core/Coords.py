@@ -5,19 +5,6 @@ This Module contains the classes to manage point coordinates:
     - :class:`ENUCoords` : For local projection (East, North, Up)
     - :class:`ECEFCoords` : For Earth-Centered-Earth-Fixed coordinates (X, Y, Z)
 
-The current constants are used in this module : 
-
-.. py:data:: Re
-    :type: float
-    :value: 6378137.0 
-
-Earth equatorial radius
-
-.. py:data:: Fe
-    :type: float
-    :value: 1.0 / 298.257223563
-
-Earth eccentricity
 """
 
 # For type annotation
@@ -29,6 +16,7 @@ import copy
 import matplotlib.pyplot as plt
 
 
+# The current constants are used in this module : 
 Re: float = 6378137.0  #: Earth equatorial radius
 Fe: float = 1.0 / 298.257223563  #: Earth eccentricity
 

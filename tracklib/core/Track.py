@@ -1,5 +1,6 @@
 """
-This module contains the class to manage GPS tracks. Points are referenced in geodetic coordinates
+This module contains the class to manage GPS tracks. 
+Points are referenced in geodetic coordinates
 """
 
 # For type annotation

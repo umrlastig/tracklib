@@ -50,7 +50,7 @@ Unary void operator
 These operators give us the possibility to create a new analytical feature *y(t)* on the same observation 
 according to one existing analytical feature *x(t)*:
 
-.. figure:: ./img/op_unary_void_02.png
+.. figure:: ../img/op_unary_void_02.png
    :width: 450px
    :align: center
 	   
@@ -108,7 +108,7 @@ Binary void operator
 These operators give us the possibility to create a new analytical feature *y(t)* on the same observation 
 according to two existing analytical features *x1(t)* and *x2(t)*:
 
-.. figure:: ./img/op_binary_void_01.png
+.. figure:: ../img/op_binary_void_01.png
    :width: 450px
    :align: center
 	   
@@ -151,7 +151,7 @@ Unary operator
 These operators give us the possibility to create a new analytical feature *y* on the trajectory 
 according to one existing analytical feature *x(t)* defined on all observations:
 
-.. figure:: ./img/op_unary_01.png
+.. figure:: ../img/op_unary_01.png
    :width: 450px
    :align: center
 	   
@@ -205,7 +205,7 @@ Binary operator
 These operators give us the possibility to create a new analytical feature *y* on the trajectory 
 according to two existing analytical features *x1(t)* and *x2(t)* defined on all observations:
 
-.. figure:: ./img/op_binary_01.png
+.. figure:: ../img/op_binary_01.png
    :width: 450px
    :align: center
 	   

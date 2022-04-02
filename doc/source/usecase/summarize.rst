@@ -11,7 +11,7 @@ This functionality of tracklib reduce the full dataset of GPS traces into a regu
 In each cell, n aggregated features (such as mean and standard deviation of speeds, number of traces, most frequent bearing ...) 
 are computed to produce a set of raster maps, which may be seen as a single image with one channel.
 
-.. figure:: ./img/summarize.png
+.. figure:: ../img/summarize.png
    :width: 450px
    :align: center
 
@@ -82,7 +82,7 @@ Example
 
 
 
-.. figure:: ./img/speed_features.png
+.. figure:: ../img/speed_features.png
    :width: 650px
    :align: center
 

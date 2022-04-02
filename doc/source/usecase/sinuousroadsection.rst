@@ -3,8 +3,9 @@
 :License: --
 :Date: 06/03/2022
 
-sinuous road section
-=======================
+
+Sinuous road section
+=====================
 
 .. Proposal of two methods to detect sinuous road sections.
 

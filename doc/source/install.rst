@@ -4,8 +4,8 @@
 :Date: 21/09/2020
 
 
-Install
-*********
+Installing tracklib
+********************
 
 Installing from source
 ==========================

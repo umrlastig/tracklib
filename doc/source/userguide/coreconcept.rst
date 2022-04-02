@@ -9,7 +9,7 @@ Core concept
 
 .. container:: centerside
   
-   .. figure:: ./img/dc_track.png
+   .. figure:: ../img/dc_track.png
       :width: 700px
       :align: center
 		
@@ -42,7 +42,7 @@ Ces 2 attributs font partie des AF de Track. Il faut lancer le calcul si on veut
 .. * randomizer, noise
 
 
-.. figure:: ./img/Profil_vitesse_spatial_temporel.png
+.. figure:: ../img/Profil_vitesse_spatial_temporel.png
    :width: 450px
    :align: center
 		
