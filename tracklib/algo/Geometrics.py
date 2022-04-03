@@ -1,4 +1,14 @@
-"""Class to manage general operations on a track"""
+"""Class to manage general operations on a track
+
+.. code-block:: python
+
+    circle1 = Geometrics.fitCircle(trace2)
+    circle1.plot()
+    circle2 = Geometrics.minCircle(trace2)
+    circle2.plot()
+
+
+"""
 
 import sys
 import math
@@ -8,7 +18,8 @@ import random
 import matplotlib.pyplot as plt
 
 from tracklib.core.Coords import ENUCoords
-from tracklib.util.Geometry import right, inclusion, collinear, cartesienne, isSegmentIntersects
+# cartesienne
+from tracklib.util.Geometry import right, inclusion, collinear, isSegmentIntersects
 from tracklib.util.Geometry import transform, transform_inverse
 
 MODE_ENCLOSING_BBOX = 0
@@ -18,7 +29,8 @@ MODE_ENCLOSING_CONVEX = 3
 
 
 class Circle:
-    """TODO"""
+    """
+    """
 
     def __init__(self, center, radius):
         """TODO"""
@@ -48,7 +60,8 @@ class Circle:
         return ax1
 
     def contains(self, point):
-        """TODO"""
+        """return true if the point is in the cercle, 
+        false otherwise. """
         return (point.getX() - self.center.getX()) ** 2 + (
             point.getY() - self.center.getY()
         ) ** 2 <= self.radius ** 2
