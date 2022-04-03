@@ -109,7 +109,7 @@ def makeDistanceMatrix(track, mode = 'linear'):
     """
 	
     if mode not in ['linear', 'circular', 'euclidian']:
-        print("Error: unknown mode: "+mode)
+        print("Error: unknown mode: "+str(mode))
         sys.exit(1)
     if mode in ['linear', 'circular']:
         S = np.array(track.getAnalyticalFeature("abs_curv"))
