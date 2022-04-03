@@ -19,4 +19,14 @@ Sinuous road section
 
 
 .. note:: Reference: Plazanet, Corinne Margote. (2001). Modeling Geometry for Linear Feature Generalization. 
+
+
+
+
+.. figure:: ../img/fourier2.png
+   :width: 650px
+   :align: center
+
+   Figure 2 : Le filtrage de Fourier pour la détection des virages en lacets
+
 		
