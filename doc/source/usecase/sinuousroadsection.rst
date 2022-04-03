@@ -8,6 +8,13 @@ Sinuous road section
 =====================
 
 .. Proposal of two methods to detect sinuous road sections.
+.. Un point d'inflexion est un point où la courbe change de convexité.
 
-Un point d'inflexion est un point où la courbe change de convexité.
+
+.. figure:: ../img/sommet.png
+   :width: 650px
+   :align: center
+
+   Figure 1 : Méthode Plazanet
+
 

@@ -25,7 +25,7 @@ GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
 GPSTime.setPrintFormat("4Y-2M-2D 2h:2m:2s.3z")
 
 
-chemin = "../data/trace0.gps"
+chemin = "./data/trace0.gps"
 
 GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
 
