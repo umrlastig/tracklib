@@ -109,9 +109,11 @@ class Plot:
                 cmap = utils.getColorMap((255, 0, 0), (32, 178, 170))
             values = self.track.getAnalyticalFeature(af_name)
 
-            scatter = ax1.scatter(X, Y, c=values, cmap=cmap, s=self.pointsize)
+            s = [self.pointsize + values[n]*15 for n in range(len(X))]
+            scatter = ax1.scatter(X, Y, c=values, cmap=cmap, s=s, label=label)
             # plt.scatter(X, Y, s=self.pointsize, c=self.color)
-            fig.colorbar(scatter, ax=ax1)
+            if not append:
+                fig.colorbar(scatter, ax=ax1)
         elif type == "POINT":
             ax1.scatter(X, Y, s=self.pointsize, c=self.color)
         else:
