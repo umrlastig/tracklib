@@ -18,3 +18,5 @@ Sinuous road section
    Figure 1 : Méthode Plazanet
 
 
+.. note:: Plazanet, Corinne Margote. (2001). Modeling Geometry for Linear Feature Generalization. 
+		
