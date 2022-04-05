@@ -223,3 +223,40 @@ def isInflection(track, i):
     return 0
 
 
+def sommet(track, i):
+    
+    import tracklib.algo.Analytics as Algo
+    seuil = 150
+    
+    # on cherche imin
+    imin = 1
+    j = i-1
+    while j > 0:
+        if track.getObsAnalyticalFeature('pointinflexion', j) == 1:
+            imin = j
+            break
+        j -= 1
+    # on cherche imax
+    imax = track.size()-2
+    j = i+1
+    while j < track.size()-1:
+        if track.getObsAnalyticalFeature('pointinflexion', j) == 1:
+            imax = j
+            break
+        j += 1
+    
+    # on cherche la plus petite courbure dans ]imin, imax[
+    K = 400
+    iK = -1
+    for j in range(imin, imax):
+        kj = Algo.anglegeom(track, j)
+        #print (kj)
+        if kj < K:
+            K = kj
+            iK = j
+            
+    if iK == i:
+        if K < seuil:
+            return 1
+
+    return 0
