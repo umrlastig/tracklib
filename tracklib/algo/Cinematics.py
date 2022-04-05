@@ -181,4 +181,45 @@ def computeRadialSignature(track, factor=1):
     track.createAnalyticalFeature("s", R[0])
     track.createAnalyticalFeature("r", R[1])
     return track
+
+
+def isInflection(track, i):
+    '''
+    AF algorithm to compute if the observation is an inflection point.
+
+    Parameters
+    ----------
+    track : Track
+    i : integer
+        the th point.
+
+    Returns
+    -------
+    int
+        ième point de la trace.
+
+    '''
     
+    if i == 0 or i == 1:
+        return 0
+    if i == track.size() -1 or i == track.size() - 2:
+        return 0
+    
+    x1 = track.getObs(i-1).position.getX()
+    y1 = track.getObs(i-1).position.getY()
+    x2 = track.getObs(i).position.getX()
+    y2 = track.getObs(i).position.getY()
+    x3 = track.getObs(i+1).position.getX()
+    y3 = track.getObs(i+1).position.getY()
+    x4 = track.getObs(i+2).position.getX()
+    y4 = track.getObs(i+2).position.getY()
+  
+    d1 = (x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1)
+    d2 = (x3 - x2) * (y4 - y2) - (y3 - y2) * (x4 - x2)
+    
+    if (d1 > 0 and d2 < 0) or (d1 < 0 and d2 > 0):
+        return 1
+    
+    return 0
+
+
