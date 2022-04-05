@@ -4,6 +4,7 @@ from tracklib.algo.Analytics import BIAF_SPEED, speed
 from tracklib.algo.Analytics import BIAF_HEADING, heading
 from tracklib.algo.Analytics import BIAF_DS, ds
 from tracklib.algo.Analytics import BIAF_ABS_CURV
+from tracklib.algo.Analytics import anglegeom
 import tracklib.core.Operator as Operator
 
 
@@ -223,9 +224,8 @@ def isInflection(track, i):
     return 0
 
 
-def sommet(track, i):
+def vertex(track, i):
     
-    import tracklib.algo.Analytics as Algo
     seuil = 150
     
     # on cherche imin
@@ -249,7 +249,7 @@ def sommet(track, i):
     K = 400
     iK = -1
     for j in range(imin, imax):
-        kj = Algo.anglegeom(track, j)
+        kj = anglegeom(track, j)
         #print (kj)
         if kj < K:
             K = kj
