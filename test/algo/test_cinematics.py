@@ -68,7 +68,7 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         self.trace1.addAnalyticalFeature(Cinematics.isInflection, "pointinflexion")
         self.trace1.addAnalyticalFeature(Cinematics.vertex)
         afVertex = self.trace1.getAnalyticalFeature('vertex')
-        print (afVertex)
+        #print (afVertex)
         self.assertEqual(afVertex[0], 0)
         self.assertEqual(afVertex[1], 1)
         self.assertEqual(afVertex[2], 0)

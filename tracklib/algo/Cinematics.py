@@ -229,14 +229,14 @@ def vertex(track, i):
     # on cherche imin
     imin = 1
     j = i-1
-    while j > 0:
+    while j >= 0:
         if track.getObsAnalyticalFeature('pointinflexion', j) == 1:
             imin = j
             break
         j -= 1
     # on cherche imax
     imax = track.size()-2
-    j = i+1
+    j = i #+1
     while j < track.size()-1:
         if track.getObsAnalyticalFeature('pointinflexion', j) == 1:
             imax = j
