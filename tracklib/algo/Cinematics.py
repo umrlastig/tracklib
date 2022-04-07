@@ -226,8 +226,6 @@ def isInflection(track, i):
 
 def vertex(track, i):
     
-    seuil = 150
-    
     # on cherche imin
     imin = 1
     j = i-1
@@ -256,7 +254,6 @@ def vertex(track, i):
             iK = j
             
     if iK == i:
-        if K < seuil:
-            return 1
+        return 1
 
     return 0
