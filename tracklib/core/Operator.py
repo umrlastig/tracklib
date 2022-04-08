@@ -1440,7 +1440,10 @@ class Filter(ScalarVoidOperator):
         boundary = True
         if isinstance(kernel, Kernel):
             boundary = kernel.filterBoundary()
-            kernel = kernel.toSlidingWindow()
+            if (str(kernel) == 'Dirac kernel'):
+                kernel = [0,1,0]
+            else:
+                kernel = kernel.toSlidingWindow()
         else:
             if isinstance(kernel, str):
                 kernel = track.getAnalyticalFeature(kernel)
