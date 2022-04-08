@@ -237,7 +237,7 @@ def squaring(track, eps):
     N = len(track)
 
     CR = []
-    for i in range(0,N-1):
+    for i in range(0, N-1):
         p0 = track[(i-1)%N].position
         p1 = track[i].position
         p2 = track[(i+1)%N].position
@@ -247,14 +247,17 @@ def squaring(track, eps):
         y0 = p0.getY(); y1 = p1.getY(); y2 = p2.getY()
         ux = x1-x0; uy = y1-y0
         vx = x2-x1; vy = y2-y1
-        arg = max(min((ux*vx + uy*vy)/(du*dv), 1), -1)
-        angle = math.acos(arg)
-        #if abs(angle) < eps:
-            #p1.plot('go')
-            #print(i, "FLAT")
-        if abs(angle-math.pi/2) < eps:
-            #p1.plot('ro')
-            CR.append(i)
+        if du*dv != 0:
+	        arg = max(min((ux*vx + uy*vy)/(du*dv), 1), -1)
+	        angle = math.acos(arg)
+	        #if abs(angle) < eps:
+	            #p1.plot('go')
+	            #print(i, "FLAT")
+	        if abs(angle-math.pi/2) < eps:
+	            #p1.plot('ro')
+	            CR.append(i)
+        else:  # on a que 2 points
+            print("Warning: identical points")
 
     X = [v for pair in zip(track.getX(), track.getY()) for v in pair]			
 

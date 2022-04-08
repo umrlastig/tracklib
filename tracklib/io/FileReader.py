@@ -119,7 +119,7 @@ class FileReader:
                     if fmt.id_U >= 0:
                         U = (float)(fields[fmt.id_U])
                     else:
-                        U = utils.NAN
+                        U = 0
 
                     if not fmt.srid.upper() in [
                         "ENUCOORDS",

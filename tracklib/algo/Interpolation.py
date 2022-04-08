@@ -34,7 +34,7 @@ GP_SMOOTHING = 0
 from tracklib.core.Track import Track
 
 
-def resample(track, delta, algo: Literal[1, 2] = 1, mode: Literal[1, 2, 3, 4] = 2):   
+def resample(track, delta, algo: Literal[1, 2, 3, 4] = 2, mode: Literal[1, 2] = 1):   
     """Resampling of a track with linear interpolation delta
 
     Interpolation interval (time in sec if temporal mode is selected,

@@ -71,7 +71,8 @@ class Plot:
     # Output:
     #  Ax object (may be input into append parameter)
     # ----------------------------------------------------
-    def plot(self, type="LINE", af_name=None, cmap=-1, margin=0.1, append=False):
+    def plot(self, type="LINE", af_name=None, cmap=-1, margin=0.1, append=False,
+			 label=None):
         """TODO
 
         Représentation d'une trace sous forme de ligne ou de point.
@@ -108,13 +109,15 @@ class Plot:
                 cmap = utils.getColorMap((255, 0, 0), (32, 178, 170))
             values = self.track.getAnalyticalFeature(af_name)
 
-            scatter = ax1.scatter(X, Y, c=values, cmap=cmap, s=self.pointsize)
+            s = [self.pointsize + values[n]*15 for n in range(len(X))]
+            scatter = ax1.scatter(X, Y, c=values, cmap=cmap, s=s, label=label)
             # plt.scatter(X, Y, s=self.pointsize, c=self.color)
-            fig.colorbar(scatter, ax=ax1)
+            if not append:
+                fig.colorbar(scatter, ax=ax1)
         elif type == "POINT":
             ax1.scatter(X, Y, s=self.pointsize, c=self.color)
         else:
-            ax1.plot(X, Y, "-", color=self.color)
+            ax1.plot(X, Y, "-", color=self.color, label=label)
 
         # TODO : tenir compte du type Coord
         if self.track.getSRID() == "Geo":

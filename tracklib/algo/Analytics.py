@@ -85,6 +85,7 @@ def speed(track, i):
 
 def acceleration(track, i):
     """Acceleration instantannée de la trace"""
+    
     if i == 0:
         return utils.NAN
 
@@ -116,25 +117,44 @@ def anglegeom(track, i) -> float:
 
     :return: Angle abc (degrees)
     """
-    long_ab = track.getObs(i - 1).distance2DTo(track.getObs(i))
-    long_bc = track.getObs(i).distance2DTo(track.getObs(i + 1))
-    long_ac = track.getObs(i - 1).distance2DTo(track.getObs(i + 1))
-
-    cos_abc = long_ab * long_ab + long_bc * long_bc - long_ac * long_ac
-    cos_abc = cos_abc / (2 * long_ab * long_bc)
-    if abs(cos_abc - 1) < 0.0001 or abs(cos_abc + 1) < 0.0001:
-        return 90
-
-    angle1 = math.degrees(math.acos(cos_abc))
-    return angle1
-
+	
+    if i == 0:
+        return utils.NAN
+    
+    N = track.size()
+    if i == N - 1:
+        return utils.NAN
+	
+    x1 = track.getObs(i-1).position.getX()
+    x2 = track.getObs(i).position.getX()
+    x3 = track.getObs(i+1).position.getX()
+    y1 = track.getObs(i-1).position.getY()
+    y2 = track.getObs(i).position.getY()
+    y3 = track.getObs(i+1).position.getY()
+	
+    num = (x1 - x2) * (x3 - x2) + (y1 - y2) * (y3 - y2)
+    den = math.sqrt((x1-x2)**2 + (y1-y2)**2) * math.sqrt((x3-x2)**2 + (y3-y2)**2)
+    r = num / den
+    if r > 1:
+        r = 1
+    if r < -1:
+        r = -1
+    # print (num, den)
+    angle = math.degrees(math.acos(r))
+    return angle	
+	
 
 def calculAngleOriente(track, i):
-    """Mesure l'angle orienté dans le sens trigonométrique abc.
+    """Mesure l'angle orienté dans le sens trigonométrique abc."""
 
-    https://medium.com/@manivannan_data/find-the-angle-between-three-points-from-2d-using-python-348c513e2cd
-    """
-
+    if i == 0:
+        return utils.NAN
+    
+    N = track.size()
+    if i == N - 1:
+        return utils.NAN
+	
+	
     a = track.getObs(i - 1).position
     b = track.getObs(i).position
     c = track.getObs(i + 1).position
@@ -154,19 +174,35 @@ def calculAngleOriente(track, i):
 
 def orientation(track, i):
     """Calcul l'orientation d'un point de la trace"""
-    orientation_dictionnary = {
+    """orientation_dictionnary = {
         1: [-(1 / 8) * math.pi, (1 / 8) * math.pi],
         2: [(1 / 8) * math.pi, (3 / 8) * math.pi],
         3: [(3 / 8) * math.pi, (5 / 8) * math.pi],
         4: [(5 / 8) * math.pi, (7 / 8) * math.pi],
-        5: [(7 / 8) * math.pi, (-7 / 8) * math.pi],
+        5: [(-7 / 8) * math.pi, (7 / 8) * math.pi],
         6: [-(7 / 8) * math.pi, -(5 / 8) * math.pi],
         7: [-(5 / 8) * math.pi, -(3 / 8) * math.pi],
         8: [-(3 / 8) * math.pi, -(1 / 8) * math.pi],
+    }"""
+    
+    orientation_dictionnary = {
+        1: [0, 22.5 + 0*45],
+        2: [22.5 + 0*45, 22.5 + 1*45],
+        3: [22.5 + 1*45, 22.5 + 2*45],
+        4: [22.5 + 2*45, 22.5 + 3*45],
+        5: [22.5 + 3*45, 22.5 + 4*45],
+        6: [22.5 + 4*45, 22.5 + 5*45],
+        7: [22.5 + 5*45, 22.5 + 6*45],
+        8: [22.5 + 6*45, 22.5 + 7*45],
+        9: [22.5 + 7*45, 360], 
     }
     # 1:E, 2:NE, 3:N, 4:NW, 5:W, 6:SW, 7:S, 8:SE
 
     if i == 0:
+        return utils.NAN
+	
+    N = track.size()
+    if i == N - 1:
         return utils.NAN
 
     dx = float(track.getObs(i).position.getX()) - float(
@@ -176,16 +212,26 @@ def orientation(track, i):
         track.getObs(i - 1).position.getY()
     )
     orientation = math.atan2(dy, dx)
+    #print (orientation)
+    angle = math.degrees(orientation)
+    if angle < 0:
+        angle += 360
+    #print (angle)		
 
     # On convertit la valeur calculée en orientation relative
     cap = utils.NAN
+	
     for direction in orientation_dictionnary:
         if (
-            orientation > orientation_dictionnary[direction][0]
-            and orientation < orientation_dictionnary[direction][1]
+            angle >= orientation_dictionnary[direction][0]
+            and angle < orientation_dictionnary[direction][1]
         ):
             cap = direction
 
+    if cap == 9:
+        cap = 1
+
+    #print (cap)
     return cap
 
 

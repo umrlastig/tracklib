@@ -44,14 +44,14 @@ But there is no Python library that would contain all these basic functionality.
 
 Furthermore, adding analytical features on a observation or on all observation of a trajectory (function of coordinates or timestamp) 
 is, in general, a complex and a boring task. So, to make it easier, *Tracklib* module offers a multitude of operators 
-and functions to simplify the creation of analytical features on a GPS traces. 
+and functions to simplify the creation of analytical features on a GPS tracks. 
 
 
 Among tracklib main functionalities
 *************************************
 
 * Structured data to store GPS data
-* Load GPS data from files (GPS, CSV) or from databse
+* Load GPS data from files (GPX, CSV) 
 * Operation classes for manipulating track
 * Propose generic method to simplify a track. For example (Douglas Peucker, Visvalingram algorithms or kernel Filter (Gaussian, Uniform, Dirac, etc.)).
 
@@ -90,43 +90,38 @@ Examples
 * Further examples of *tracklib* use-cases can be found in the *example* folder: SpeedProfil.py, Interpolation.py, LoadFromDatabase.py
 
 
-   
-
 .. toctree::
    :maxdepth: 1
    
    install
+   quickstart   
+   overview   
    
-..   :caption: Tutorials
-
-..   convention
    
 .. toctree::
    :maxdepth: 1
    :caption: User Guide
 
-   loading
-   coreconcept
-   operator
-   interpolation
-   smoothing
-   mapmatching
-   simplify
-   summarize
+   ./userguide/loading
+   ./userguide/coreconcept
+   ./userguide/operator
+   ./userguide/simplify
+ 
    
 .. toctree::
    :maxdepth: 1
    :caption: Use Cases
    
-   quickstart
-   ./usecase/speedprofil
+   ./usecase/stoppoints
+   ./usecase/summarize
+   ./usecase/sinuousroadsection
 
 
 .. toctree::
-   :caption: Api
+   :caption: API Reference
 
-   ./api_documentation/core.rst
    ./api_documentation/algo.rst
+   ./api_documentation/core.rst
    ./api_documentation/io.rst
    ./api_documentation/util.rst
 
