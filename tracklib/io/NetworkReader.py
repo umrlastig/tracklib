@@ -55,7 +55,6 @@ class NetworkReader:
 
 def readLineAndAddToNetwork(row, fmt):
     """TODO"""
-
     edge_id = str(row[fmt.pos_edge_id])
     if fmt.pos_edge_id < 0:
         edge_id = NetworkReader.counter
