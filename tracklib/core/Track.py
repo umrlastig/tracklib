@@ -1205,18 +1205,11 @@ class Track:
     # =========================================================================
     #  Thin plates smoothing
     # =========================================================================
-    def smooth(self, constraint=1e3):
+    def smooth(self, width=1):
         """TODO"""
-        from tracklib.algo.Interpolation import SPLINE_PENALIZATION
-        from tracklib.algo.Interpolation import ALGO_THIN_SPLINES
-        from tracklib.algo.Interpolation import MODE_TEMPORAL
-
-        times = self.copy()
-        val = SPLINE_PENALIZATION
-        SPLINE_PENALIZATION = constraint
-        self.resample(self.frequency(), ALGO_THIN_SPLINES, mode=MODE_TEMPORAL)
-        SPLINE_PENALIZATION = val
-        self = self // times
+        import tracklib.algo.Filtering as Filtering
+        from tracklib.core.Kernel import GaussianKernel
+        self = Filtering.filter_seq(self, GaussianKernel(width))
 
     def incrementTime(self, dt=1, offset=0):
         """Add 1 sec to each subsequent record. Use incrementTime to

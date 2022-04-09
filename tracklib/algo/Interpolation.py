@@ -61,7 +61,6 @@ def resample(track, delta, algo: Literal[1, 2, 3, 4] = 2, mode: Literal[1, 2] = 
     :param algo: TODO
     :param mode: TODO
     """
-
     if mode == MODE_SPATIAL:
         if algo == ALGO_LINEAR:
             __resampleSpatial(track, delta)
@@ -360,7 +359,7 @@ def __smooth_resample_spatial(track, ds):
     for i in range(len(Si)):
         Si[i] = Si[i] / M
 
-    D = utils.makeDistanceMatrix(S, S)
+    D = utils.makeDistanceMatrixOld(S, S)
     D = D ** 2 * np.log(D + 1e-100)
 
     for i in range(D.shape[0]):
@@ -413,7 +412,7 @@ def __smooth_resample_spatial(track, ds):
     at1 = CT[1]
 
     PTS = np.array(S)
-    Di = utils.makeDistanceMatrix(Si, S)
+    Di = utils.makeDistanceMatrixOld(Si, S)
 
     Xi = [0] * len(Si)
     Yi = [0] * len(Si)
@@ -460,7 +459,7 @@ def __smooth_resample_temporal(track, reference):
     for i in range(len(REF)):
         REF[i] = REF[i] - M
 
-    D = utils.makeDistanceMatrix(T, T)
+    D = utils.makeDistanceMatrixOld(T, T)
     D = D ** 2 * np.log(D + 1e-100)
 
     for i in range(D.shape[0]):
@@ -505,7 +504,7 @@ def __smooth_resample_temporal(track, reference):
     az1 = CZ[1]
 
     PTS = np.array(T)
-    Di = utils.makeDistanceMatrix(REF, T)
+    Di = utils.makeDistanceMatrixOld(REF, T)
 
     Xi = [0] * len(REF)
     Yi = [0] * len(REF)
@@ -595,8 +594,8 @@ def __bsplines_temporal(track, reference, degree=3, knots_nb=None):
     kfunc = np.vectorize(lambda t: __phi(t / knots_nb, phi))
 
     # Spline coefficients
-    A = kfunc(utils.makeDistanceMatrix(T, BP))
-    DI = kfunc(utils.makeDistanceMatrix(BP, REF))
+    A = kfunc(utils.makeDistanceMatrixOld(T, BP))
+    DI = kfunc(utils.makeDistanceMatrixOld(BP, REF))
     if A.shape[1] == X.shape[0]:
         C = np.linalg.solve(A, np.column_stack((X, Y, Z)))
     else:
@@ -692,8 +691,8 @@ def __bsplines_spatial(track, ds, degree=3, knots_nb=None):
     kfunc = np.vectorize(lambda t: __phi(t / knots_nb, phi))
 
     # Spline coefficients
-    A = kfunc(utils.makeDistanceMatrix(S, BP))
-    DI = kfunc(utils.makeDistanceMatrix(BP, Si))
+    A = kfunc(utils.makeDistanceMatrixOld(S, BP))
+    DI = kfunc(utils.makeDistanceMatrixOld(BP, Si))
     if A.shape[1] == X.shape[0]:
         C = np.linalg.solve(A, np.column_stack((X, Y, Z, T)))
     else:

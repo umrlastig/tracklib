@@ -1437,7 +1437,7 @@ class Filter(ScalarVoidOperator):
         # --------------------------------------------------------------
         # Preparing kernel
         # --------------------------------------------------------------
-        boundary = True
+        boundary = False
         if isinstance(kernel, Kernel):
             boundary = kernel.filterBoundary()
             if (str(kernel) == 'Dirac kernel'):
@@ -1479,7 +1479,7 @@ class Filter(ScalarVoidOperator):
             temp[i] /= norm
 
         # --------------------------------------------------------------
-        # Boundary correction
+        # Boundary correction if boundary is filtered
         # --------------------------------------------------------------
         if not boundary:
             for i in range(D):

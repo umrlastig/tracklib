@@ -100,6 +100,12 @@ def makeCoords(x: float, y: float, z: float, srid: int) -> Union[ENUCoords, ECEF
         return ECEFCoords(x, y, z)
 
 
+def makeDistanceMatrixOld(T1, T2):
+    z1 = np.array([complex(s, 0) for s in T1])
+    z2 = np.array([complex(s, 0) for s in T2])
+    m, n = np.meshgrid(z2, z1)
+    return abs(m-n)
+
 def makeDistanceMatrix(track, mode = 'linear'):
     """Function to form distance matrix
 

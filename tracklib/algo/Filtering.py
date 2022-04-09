@@ -2,12 +2,14 @@
 
 import numpy as np
 
+from tracklib.core.Operator import Operator
+
 from tracklib.algo.Dynamics import MODE_OBS_AND_STATES_AS_3D_POSITIONS
 from tracklib.algo.Dynamics import DYN_MAT_2D_CST_SPEED
 from tracklib.algo.Dynamics import HMM as dynamics_hmm
 
-FILTER_LOW_PASS = 0
-FILTER_HIGH_PASS = 1
+FILTER_LOW_PASS = 0     # Low-pass brick-wall filter
+FILTER_HIGH_PASS = 1    # High-pass brick-wall filter
 
 FILTER_TEMPORAL = 0
 FILTER_SPATIAL = 1
@@ -23,6 +25,10 @@ FILTER_XYZ = ["x", "y", "z"]
 KALMAN_FORWARD = 0
 KALMAN_BACKWARD = 1
 KALMAN_COMBINED = 2
+
+
+
+# Parameter of generic 
 
 # -----------------------------------------
 # Global variables for Markov filtering
@@ -221,7 +227,7 @@ def MarkovRegularization(track, sigma, speed, resolution):
 
 
 # --------------------------------------------------------------------------
-# Generic method to filter a track with Fast Fourier Transforms
+# Generic method to filter a track in the frequency domain
 # Mode :
 #     - FILTER_TEMPORAL (0)
 #     - FILTER_SPATIAL (1)
@@ -239,7 +245,7 @@ def MarkovRegularization(track, sigma, speed, resolution):
 # Note that pass-band and cut-band filters may be obtained by calling filter
 # function twice sequentially with FILTER_LOW_PASS and FILTER_HIGH_PASS.
 # --------------------------------------------------------------------------
-def filter(track, fc, mode=FILTER_TEMPORAL, type=FILTER_LOW_PASS, dim=FILTER_XYZ):
+def filter_freq(track, fc, mode=FILTER_TEMPORAL, type=FILTER_LOW_PASS, dim=FILTER_XYZ):
     """TODO"""
 
     output = track.copy()
@@ -264,3 +270,31 @@ def filter(track, fc, mode=FILTER_TEMPORAL, type=FILTER_LOW_PASS, dim=FILTER_XYZ
             output.setObsAnalyticalFeature(af, i, f[i])
 
     return output
+
+# --------------------------------------------------------------------------
+# Generic method to filter a track in the sequence domain (time or spatial 
+# domain if the track is regularly sampled in time and/or space).
+# Kernel, may be one of the following
+#     - a float number giving the half_width of  rectangular window
+#     - an odd-sized float array giving the digital realization of a kernel
+#     - a Kernel object (GaussianKernel, ExponentialKernel...)
+# Dimension dim : FILTER_X, FILTER_Y, FILTER_Z, FILTER_XY, FILTER_YZ,
+# FILTER_XY or FILTER XYZ depending in the number of dimensions to filter. 
+# May also be a list of analytical features names
+# Filtering is applied to a regularly sampled track. If track is temporally 
+# (resp. spatially) sampled, kernel dimensions are given as relative values 
+# to the temporal (resp. spatial) frequency.
+# --------------------------------------------------------------------------
+def filter_seq(track, kernel=1, dim=FILTER_XYZ):
+    output = track.copy()
+    if isinstance(kernel, int):
+        kernel = [1]*kernel
+    for af in dim:
+        track.operate(Operator.FILTER, af, kernel, "temp")
+        if af == "x":
+            track.setXFromAnalyticalFeature("temp")
+        if af == "y":
+            track.setYFromAnalyticalFeature("temp")
+        if af == "z":
+            track.setZFromAnalyticalFeature("temp")
+    return track

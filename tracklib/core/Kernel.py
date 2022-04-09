@@ -19,7 +19,7 @@ from tracklib.core.TrackCollection import TrackCollection
 class Kernel:
     """Generic kernel class"""
 
-    __filter_boundary = True  #: TODO
+    __filter_boundary = False  #: TODO
     __kernel_function = None  #: TODO
     __support = None  #: TODO
 
