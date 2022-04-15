@@ -100,18 +100,37 @@ def makeCoords(x: float, y: float, z: float, srid: int) -> Union[ENUCoords, ECEF
         return ECEFCoords(x, y, z)
 
 
+# --------------------------------------------------------------------------
+# Function to form distance matrix (old version)
+# --------------------------------------------------------------------------
+# Input :
+#   - T1     :: a list of points
+#   - T2     :: a list of points
+# --------------------------------------------------------------------------
+# Output : numpy distance matrix between T1 and T2
+# --------------------------------------------------------------------------    
 def makeDistanceMatrixOld(T1, T2):
-    z1 = np.array([complex(s, 0) for s in T1])
-    z2 = np.array([complex(s, 0) for s in T2])
-    m, n = np.meshgrid(z2, z1)
-    return abs(m-n)
+    
+    T1 = np.array(T1)
+    T2 = np.array(T2)
+    
+    # Signal stationnarity
+    base = min(np.concatenate((T1,T2)))
+    T1 = T1 - base
+    T2 = T2 - base
+    T1 = T1.T
+    T2 = T2.T
+
+    return np.sqrt((T1**2).reshape(-1, 1) + (T2**2) - 2 * (T1.reshape(-1, 1)*T2.T))
+    
+
 
 def makeDistanceMatrix(track, mode = 'linear'):
     """Function to form distance matrix
 
     :param track: a track
 	:mode: computation mode ('linear', 'circular' or 'euclidian')
-    :return: numpy distance matrix between T1 and T2
+    :return: numpy distance matrix with a track
     """
 	
     if mode not in ['linear', 'circular', 'euclidian']:
@@ -127,6 +146,26 @@ def makeDistanceMatrix(track, mode = 'linear'):
     if mode == 'circular':
         D = np.minimum(D, np.max(D)-D)
     return D
+
+
+def makeCovarianceMatrixFromKernelOld(kernel, T1: list[tuple[float, float]], T2: list[tuple[float, float]], factor: float = 1.0, force: bool = False, cycle: bool = False):
+    """Function to form covariance matrix from kernel
+    :param kernel: A function describing statistical similarity between points
+    :param T1: A list of points
+    :param T2: A list of points
+    :param factor: Unit factor of std dev (default 1.0)
+    """
+
+    D = makeDistanceMatrixOld(T1, T2)
+    kfunc = np.vectorize(kernel.getFunction())
+    SIGMA = factor ** 2 * kfunc(D)
+    if force:
+        w, v = np.linalg.eig(SIGMA)
+        for i in range(w.shape[0]):
+            if w[i] < 0:
+                w[i] = 0
+        SIGMA = v @ np.diag(w) @ v.transpose()
+    return SIGMA
 
 
 def makeCovarianceMatrixFromKernel(kernel, track, factor = 1.0, mode = 'linear', force = False):   

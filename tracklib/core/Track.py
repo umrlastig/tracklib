@@ -1185,15 +1185,20 @@ class Track:
             - a reference track
         """
 
+        from tracklib.algo.Interpolation import resample as interpolation_resample
+        from tracklib.algo.Interpolation import MODE_SPATIAL as MODE_SPATIAL
+
         if delta is None:  # Number of points only is specified
             if npts is None:
                 npts = len(self)*factor
-            delta = (1+1e-8)*self.length()/npts
+            if mode == MODE_SPATIAL:
+                delta = (1+1e-8)*self.length()/npts
+            else:
+                delta = (1+1e-8)*self.duration()/npts
             self.resample(delta=delta, algo=algo, mode=mode, npts=None)
             return
 		
-        from tracklib.algo.Interpolation import resample as interpolation_resample
-
+        
         # (Temporaire)
         if not (self.getSRID() == "ENU"):
             print("Error: track data must be in ENU coordinates for resampling")
@@ -1337,6 +1342,7 @@ class Track:
             type = "POINT"
             plot.pointsize = 20
         plot.color = sym[0]
+        plot.marker = sym[1]
         plot.w = 6
         plot.h = 5
         return plot.plot(type, af_name, cmap, append=append, label=label)
@@ -2172,7 +2178,7 @@ class Track:
     def __pow__(self, nb_points):
         """TODO"""
         output = self.copy()
-        output.resample(npts = nb_points)  # Linear / temporal
+        output.resample(npts = nb_points, mode = 2)
         return output
 
     # ------------------------------------------------------------
@@ -2211,8 +2217,7 @@ class Track:
             return intersection(self, arg)
         else:
             track = self.copy()
-            dt = (track.frequency("temporal") / arg) * (1 - 1e-3)
-            track.resample(dt)  # Linear / Temporal
+            track.resample(factor = arg)
             return track
 
     # ------------------------------------------------------------

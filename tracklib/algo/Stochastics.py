@@ -181,7 +181,7 @@ def randomColor():
 
 
 def noise(
-    track, sigma=[1], kernel=[Kernel.DiracKernel()], distribution=DISTRIBUTION_NORMAL, mode='linear', force=False
+    track, sigma=[1], kernel=[Kernel.DiracKernel()], distribution=DISTRIBUTION_NORMAL, mode='linear', force=False, cycle=False
 ):
     """Track noising with Cholesky factorization of gaussian process covariance matrix:
 

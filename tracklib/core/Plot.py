@@ -42,6 +42,7 @@ class Plot:
         self.track = track
         self.color = "forestgreen"
         self.sym = "g-"
+        self.marker = "-"
         self.w = 10
         self.h = 3
         self.pointsize = 5
@@ -115,7 +116,7 @@ class Plot:
             if not append:
                 fig.colorbar(scatter, ax=ax1)
         elif type == "POINT":
-            ax1.scatter(X, Y, s=self.pointsize, c=self.color)
+            ax1.scatter(X, Y, s=self.pointsize, c=self.color, marker=self.marker)
         else:
             ax1.plot(X, Y, "-", color=self.color, label=label)
 

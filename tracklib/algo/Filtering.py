@@ -91,6 +91,8 @@ def __kalman(track, sigma, speed_std, speed_af=None, verbose=True):
 
     track = track.copy()
     dt = abs(track.frequency())
+    
+    from tracklib.algo.Dynamics import Kalman as dynamics_kalman
 
     # -----------------------------------------------------
     # Mode speed recorded in AF field
@@ -111,8 +113,6 @@ def __kalman(track, sigma, speed_std, speed_af=None, verbose=True):
             [[track[0].position.getX()], [track[0].position.getY()], [0], [0]]
         )
         P0 = sigma ** 2 * np.eye(4, 4)
-
-        from tracklib.algo.Dynamics import kalman as dynamics_kalman
 
         UKF = dynamics_kalman(spreading=1)
         UKF.setTransition(F, Q)
@@ -137,7 +137,7 @@ def __kalman(track, sigma, speed_std, speed_af=None, verbose=True):
         P0 = sigma ** 2 * np.eye(2, 2)  # Initial covariance
 
         UKF = dynamics_kalman(spreading=1)
-        UKF.setTransition(F, Q)  # Dynamic model
+        UKF.setTransition(F, Q)   # Dynamic model
         UKF.setObservation(H, R)  # Observation model
         UKF.setInitState(X0, P0)  # Initialization
 

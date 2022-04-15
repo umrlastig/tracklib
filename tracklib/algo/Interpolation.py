@@ -34,7 +34,7 @@ GP_SMOOTHING = 0
 from tracklib.core.Track import Track
 
 
-def resample(track, delta, algo: Literal[1, 2, 3, 4] = 2, mode: Literal[1, 2] = 1):   
+def resample(track, delta, algo: Literal[1, 2, 3, 4] = 1, mode: Literal[1, 2] = 1):   
     """Resampling of a track with linear interpolation delta
 
     Interpolation interval (time in sec if temporal mode is selected,
@@ -61,6 +61,7 @@ def resample(track, delta, algo: Literal[1, 2, 3, 4] = 2, mode: Literal[1, 2] = 
     :param algo: TODO
     :param mode: TODO
     """
+    
     if mode == MODE_SPATIAL:
         if algo == ALGO_LINEAR:
             __resampleSpatial(track, delta)
@@ -203,9 +204,9 @@ def gaussian_process(track, timestamps, kernel, factor=1.0, sigma=0.0, cp_var=Fa
         :math:`k(t2-t1) = Cov(Z(t1), Z(t2))`
 
     :param factor: unit factor of variance if the kernel must be scaled
-        :param sigma: observation noise standard deviation (in coords units)
+    :param sigma: observation noise standard deviation (in coords units)
     :param cp_var: compute covariance matrix and store pointwise sigmas
-        :return: interpolated/smoothed track (without AF)
+    :return: interpolated/smoothed track (without AF)
     """
 
     new_track = Track()
@@ -231,14 +232,14 @@ def gaussian_process(track, timestamps, kernel, factor=1.0, sigma=0.0, cp_var=Fa
     yz = yz - bz
 
     # Computing obs covariance matrix
-    K = utils.makeCovarianceMatrixFromKernel(kernel, TO, TO, factor)
+    K = utils.makeCovarianceMatrixFromKernelOld(kernel, TO, TO, factor)
     K = np.add(K, sigma ** 2 * np.identity(len(TO)))
 
     # Computing unknown sites covariance matrix
-    KSS = utils.makeCovarianceMatrixFromKernel(kernel, TU, TU, factor)
+    KSS = utils.makeCovarianceMatrixFromKernelOld(kernel, TU, TU, factor)
 
     # Computing obs - unknown sites covariance matrix
-    KS = utils.makeCovarianceMatrixFromKernel(kernel, TO, TU, factor)
+    KS = utils.makeCovarianceMatrixFromKernelOld(kernel, TO, TU, factor)
 
     # Computing posterior distribution means
     MUX = np.matmul(KS.T, np.linalg.solve(K, yx))
