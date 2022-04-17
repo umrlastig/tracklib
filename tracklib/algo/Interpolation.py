@@ -70,9 +70,12 @@ def resample(track, delta, algo: Literal[1, 2, 3, 4] = 1, mode: Literal[1, 2] = 
         if algo == ALGO_B_SPLINES:
             __bsplines_spatial(track, delta, B_SPLINE_DEGREE, B_SPLINE_RESOL)
         if algo == ALGO_GAUSSIAN_PROCESS:
-            sys.exit(
-                "Gaussian process interpolation is not supported in spatial mode yet"
-            )
+            if GP_KERNEL == None:
+                sys.exit(
+                    "Kernel must be defined with 'GP_KERNEL' before using gaussian process interpolation"
+                )
+            t = gaussian_process(track, delta, GP_KERNEL, 1, GP_SMOOTHING, mode=MODE_SPATIAL)
+            track.setObsList(t.getObsList())
 
     if mode == MODE_TEMPORAL:
         if algo == ALGO_LINEAR:
@@ -189,7 +192,7 @@ def __resampleTemporal(track, reference):
     track.setObsList(interp_points)
 
 
-def gaussian_process(track, timestamps, kernel, factor=1.0, sigma=0.0, cp_var=False):
+def gaussian_process(track, timestamps, kernel, factor=1.0, sigma=0.0, cp_var=False, mode=MODE_TEMPORAL):
     """Track interpolation and smoothing with Gaussian Process (GP)
 
     :param timestamps: points where interpolation must be computed.
@@ -206,10 +209,27 @@ def gaussian_process(track, timestamps, kernel, factor=1.0, sigma=0.0, cp_var=Fa
     :param factor: unit factor of variance if the kernel must be scaled
     :param sigma: observation noise standard deviation (in coords units)
     :param cp_var: compute covariance matrix and store pointwise sigmas
+    :param mode: MODE_TEMPORAL or MODE_SPATIAL
     :return: interpolated/smoothed track (without AF)
     """
+    if mode==MODE_TEMPORAL:
+        return gaussian_process_temporal(track, timestamps, kernel, factor, sigma, cp_var)
+    else:
+        return gaussian_process_spatial(track, timestamps, kernel, factor, sigma, cp_var)
+    
+	
+def gaussian_process_spatial(track, delta, kernel, factor=1.0, sigma=0.0, cp_var=False):
+	
+    temp = track.copy()
 
-    new_track = Track()
+    # Vector of observed and unknown points
+    TO = temp.getT()
+    temp.resample(delta, mode=MODE_SPATIAL)
+    TU = temp.getT()
+	
+    return __gaussian_process(track, TO, TU, kernel, factor, sigma, cp_var)
+
+def gaussian_process_temporal(track, timestamps, kernel, factor=1.0, sigma=0.0, cp_var=False):
 
     tini = track.getFirstObs().timestamp.toAbsTime()
     tfin = track.getLastObs().timestamp.toAbsTime()
@@ -217,6 +237,12 @@ def gaussian_process(track, timestamps, kernel, factor=1.0, sigma=0.0, cp_var=Fa
     # Vector of observed and unknown points
     TO = prepareTimeSampling(track, tini, tfin)
     TU = prepareTimeSampling(timestamps, tini, tfin)
+	
+    return __gaussian_process(track, TO, TU, kernel, factor, sigma, cp_var)
+
+def __gaussian_process(track, TO, TU, kernel, factor, sigma, cp_var):
+
+    new_track = Track()
 
     # Observations
     yx = np.array(track.getX())
