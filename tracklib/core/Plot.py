@@ -110,7 +110,8 @@ class Plot:
                 cmap = utils.getColorMap((255, 0, 0), (32, 178, 170))
             values = self.track.getAnalyticalFeature(af_name)
 
-            s = [self.pointsize + values[n]*15 for n in range(len(X))]
+            #s = [self.pointsize + values[n]*15 for n in range(len(X))]
+            s = [self.pointsize + values[n] for n in range(len(X))]
             scatter = ax1.scatter(X, Y, c=values, cmap=cmap, s=s, label=label)
             # plt.scatter(X, Y, s=self.pointsize, c=self.color)
             if not append:
