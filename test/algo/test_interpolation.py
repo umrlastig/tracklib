@@ -58,19 +58,27 @@ class TestInterpolation(TestCase):
         print("Nb pts = ", self.track.size())
         plt.show()
 
-   
-    # Interpolation lineaire en mode spatial : 1 pt / 10 m
+    # =========================================================================
+    
     def test1(self, sym = 'r-'):
+        '''
+        Interpolation lineaire en mode spatial : 1 pt / 10 m
+        '''
         self.track.resample(delta=1000)  
         for i in range(11):
             d = self.track.getObs(i).distanceTo(self.track.getObs(i+1))
             self.assertLessEqual(abs(1000 - d), self.__epsilon, 'erreur pour ' + str(i))
         self.view(sym)
+
         
-    # Interpolation lineaire en mode temporel :  1 pt/s 
     def test2(self, sym = 'r-'):
+        '''
+        Interpolation lineaire en mode temporel :  1 pt/s 
+        '''
         self.track.resample(delta=1, mode = itp.MODE_TEMPORAL)  
         self.view(sym)
+        self.assertEqual(self.track.size(), 452)
+
 
     def test3(self, sym = 'r-'):
         '''
@@ -83,22 +91,28 @@ class TestInterpolation(TestCase):
         self.track.resample(delta=T, mode = itp.MODE_TEMPORAL)
         self.view(sym)
         
+
+    def test4(self, sym = 'r-'):
+        '''
+        Interpolation lineaire en mode temporel :  definition // autre trace
+        '''
+        temp = self.track.copy()
+        self.track %= 5
+        self.track.resample(delta=self.track, mode = itp.MODE_TEMPORAL)
+        self.view(sym)
+
         
-# # Interpolation lineaire en mode temporel :  definition // autre trace
-# def test4(sym = 'r-'):
-# 	temp = track.copy()
-# 	temp %= 5
-# 	temp.resample(delta=track, mode = itp.MODE_TEMPORAL)
-# 	view(temp, sym)
-# 	
-# # Idem test 4 en raccourci
-# def test5(sym = 'r-'):
-# 	temp = track.copy()
-# 	temp %= 5
-# 	temp = temp // track   
-# 	view(temp, sym)
-# 	
-# # Interpolation lineaire en mode spatial : en 100 pts
+    def test5(self, sym = 'r-'):
+        '''
+        Idem test 4 en raccourci
+        '''
+        temp = self.track.copy()
+        temp %= 5
+        temp = temp // self.track   
+        self.view(sym)
+
+        
+# Interpolation lineaire en mode spatial : en 100 pts
 # def test6(sym = 'r-'):
 # 	temp = track.copy()
 # 	temp.resample(npts = 100)  
@@ -323,6 +337,8 @@ if __name__ == '__main__':
     suite.addTest(TestInterpolation("test1"))
     suite.addTest(TestInterpolation("test2"))
     suite.addTest(TestInterpolation("test3"))
+    suite.addTest(TestInterpolation("test4"))
+    suite.addTest(TestInterpolation("test5"))
     runner = TextTestRunner()
     runner.run(suite)
 
