@@ -76,11 +76,11 @@ class TestInterpolation(TestCase):
         '''
         Interpolation lineaire en mode temporel :  definition par timestamps
         '''
-        temp = self.track.copy()
+        #temp = self.track.copy()
         a = int(self.track[0].timestamp.toAbsTime())
         b = int(self.track[-1].timestamp.toAbsTime())
         T = [GPSTime.readUnixTime(x) for x in range(a, b, 10)]
-        temp.resample(delta=T, mode = itp.MODE_TEMPORAL)
+        self.track.resample(delta=T, mode = itp.MODE_TEMPORAL)
         self.view(sym)
         
         
