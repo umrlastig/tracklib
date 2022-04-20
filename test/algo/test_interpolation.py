@@ -23,16 +23,16 @@ import matplotlib.pyplot as plt
 
 from unittest import TestCase, TestSuite, TextTestRunner
 
-sys.path.append('~/Bureau/KitYann/2-Tracklib/tracklib/tracklib')
+#sys.path.append('~/Bureau/KitYann/2-Tracklib/tracklib/tracklib')
 
 from tracklib.core.GPSTime import GPSTime
 from tracklib.io.FileReader import FileReader
-#from tracklib.core.Kernel import DiracKernel
+from tracklib.core.Kernel import DiracKernel
 from tracklib.core.Kernel import GaussianKernel
-#from tracklib.core.Kernel import TriangularKernel
-#from tracklib.core.Kernel import ExponentialKernel
+from tracklib.core.Kernel import TriangularKernel
+from tracklib.core.Kernel import ExponentialKernel
 
-#import tracklib.algo.Filtering as flt
+import tracklib.algo.Filtering as flt
 import tracklib.algo.Interpolation as itp
 #import tracklib.algo.Simplification as spf
 
@@ -276,75 +276,111 @@ class TestInterpolation(TestCase):
      # Lissage
      # --------------------------------------------------------------------
 
-# # Filtrage par noyau fenetre glissante de taille 5
-# def test22(sym = 'r-'):
-# 	temp = flt.filter_seq(track, kernel=5, dim=flt.FILTER_XY)
-# 	view(temp, sym)	
-# 	
-# # Filtrage par noyau 'user-defined'
-# def test23(sym = 'r-'):
-# 	temp = flt.filter_seq(track, kernel=[1,2,32,1], dim=["x","y"])
-# 	view(temp, sym)	
-# 	
-# # Filtrage par noyau 'user-defined' pour faire un filtre 'avance'
-# def test24(sym = 'r-'):
-# 	temp = flt.filter_seq(track, kernel=[0,0,1], dim=["y"])
-# 	view(temp, sym)	
-# 	
-# # Filtrage par noyau 'user-defined' pour faire un filtre 'retard'
-# def test25(sym = 'r-'):
-# 	temp = flt.filter_seq(track, kernel=[1,0,0], dim=["y"])
-# 	view(temp, sym)	
-# 	
-# # Filtrage par noyau gaussien
-# def test26(sym = 'r-'):
-# 	temp = track.copy()
-# 	temp *= 10
-# 	temp = flt.filter_seq(temp, kernel=GaussianKernel(20), dim=flt.FILTER_XY)
-# 	view(temp, sym)	
+    def test22(self, sym = 'r-'):
+        '''
+        Filtrage par noyau fenetre glissante de taille 5
+        '''
+        self.track = flt.filter_seq(self.track, kernel=5, dim=flt.FILTER_XY)
+        self.view(sym)	
+	
 
-# # Filtrage par noyau exponentiel
-# def test27(sym = 'r-'):
-# 	temp = track.copy()
-# 	temp *= 10
-# 	temp = flt.filter_seq(temp, kernel=ExponentialKernel(20), dim=flt.FILTER_XY)
-# 	view(temp, sym)	
+    def test23(self, sym = 'r-'):
+        '''
+        Filtrage par noyau 'user-defined'
+        '''
+        self.track = flt.filter_seq(self.track, kernel=[1,2,32,2,1], dim=["x","y"])
+        self.view(sym)	
+ 	
 
-# # Filtrage par noyau triangulaire
-# def test28(sym = 'r-'):
-# 	temp = track.copy()
-# 	temp *= 10
-# 	temp = flt.filter_seq(temp, kernel=TriangularKernel(20), dim=flt.FILTER_XY)
-# 	view(temp, sym)	
-# 	
-# # Filtrage par noyau de Dirac (sans effet)
-# def test29(sym = 'r-'):
-# 	temp = track.copy()
-# 	temp *= 10
-# 	temp = flt.filter_seq(temp, kernel=DiracKernel(), dim=flt.FILTER_XY)
-# 	view(temp, sym)	
+    def test24(self, sym = 'r-'):
+        '''
+        Filtrage par noyau 'user-defined' pour faire un filtre 'avance'
+        '''
+        self.track = flt.filter_seq(self.track, kernel=[0,0,1], dim=["y"])
+        self.view(sym)	
+ 	
 
-# # Filtrage passe-bas par transformation de Fourier (frequence temporelle)
-# def test30(sym = 'r-'):
-#     temp = flt.filter_freq(track, 1, mode=flt.FILTER_TEMPORAL, type=flt.FILTER_LOW_PASS, dim=flt.FILTER_XY)
-#     view(temp, sym)	
+    def test25(self, sym = 'r-'):
+        '''
+        Filtrage par noyau 'user-defined' pour faire un filtre 'retard'
+        '''
+        self.track = flt.filter_seq(self.track, kernel=[1,0,0], dim=["y"])
+        self.view(sym)	
+ 	
+
+    def test26(self, sym = 'r-'):
+        '''
+        Filtrage par noyau gaussien
+        '''
+        self.track = self.track.copy()
+        self.track *= 10
+        self.track = flt.filter_seq(self.track, kernel=GaussianKernel(20), dim=flt.FILTER_XY)
+        self.view(sym)	
+
+
+    def test27(self, sym = 'r-'):
+        '''
+        Filtrage par noyau exponentiel
+        '''
+        self.track = self.track.copy()
+        self.track *= 10
+        self.track = flt.filter_seq(self.track, kernel=ExponentialKernel(20), dim=flt.FILTER_XY)
+        self.view(sym)	
+
+
+    def test28(self, sym = 'r-'):
+        '''
+        Filtrage par noyau triangulaire
+        '''
+        self.track = self.track.copy()
+        self.track *= 10
+        self.track = flt.filter_seq(self.track, kernel=TriangularKernel(20), dim=flt.FILTER_XY)
+        self.view(sym)	
+ 	
+        
+    def test29(self, sym = 'r-'):
+         '''
+         Filtrage par noyau de Dirac (sans effet)
+         '''
+         self.track = self.track.copy()
+         self.track *= 10
+         self.track = flt.filter_seq(self.track, kernel=DiracKernel(), dim=flt.FILTER_XY)
+         self.view(sym)	
+
+
+    def test30(self, sym = 'r-'):
+        '''
+        Filtrage passe-bas par transformation de Fourier (frequence temporelle)
+        '''
+        self.track = flt.filter_freq(self.track, 1, mode=flt.FILTER_TEMPORAL, 
+                                     type=flt.FILTER_LOW_PASS, dim=flt.FILTER_XY)
+        self.view(sym)	
     
-# # Filtrage passe-bas par transformation de Fourier (frequence spatiale)
-# def test31(sym = 'r-'):
-#     temp = track.copy()
-#     temp *= 10
-#     temp = flt.filter_freq(temp, 0.03, mode=flt.FILTER_SPATIAL, type=flt.FILTER_LOW_PASS, dim=flt.FILTER_XY)
-#     view(temp, sym)	
+    
+    def test31(self, sym = 'r-'):
+        '''
+        Filtrage passe-bas par transformation de Fourier (frequence spatiale)
+        '''
+        self.track *= 10
+        self.track = flt.filter_freq(self.track, 0.03, 
+                                     mode=flt.FILTER_SPATIAL, 
+                                     type=flt.FILTER_LOW_PASS, 
+                                     dim=flt.FILTER_XY)
+        self.view(sym)	
 
-# # Filtrage de Kalman (50 cm sur le GPS / 2 m.s-1 sur la vitesse)
-# def test32(sym = 'r-'):
-#     temp = flt.Kalman(track, 0.5, 2)
-#     view(temp, sym)	
+
+    def test32(self, sym = 'r-'):
+        '''
+        Filtrage de Kalman (50 cm sur le GPS / 2 m.s-1 sur la vitesse)
+        '''
+        self.track = flt.Kalman(self.track, 0.5, 2)
+        self.view(sym)	
     
     
-# # --------------------------------------------------------------------
-# # Simplification
-# # --------------------------------------------------------------------
+    # =========================================================================
+    # --------------------------------------------------------------------
+    # Simplification
+    # --------------------------------------------------------------------
 
 # # Douglas-Peucker, tolerance 50 m
 # def test33(sym = 'r-'):
@@ -404,6 +440,18 @@ if __name__ == '__main__':
     suite.addTest(TestInterpolation("test19"))
     suite.addTest(TestInterpolation("test20"))
     suite.addTest(TestInterpolation("test21"))
+    
+    suite.addTest(TestInterpolation("test22"))
+    suite.addTest(TestInterpolation("test23"))
+    suite.addTest(TestInterpolation("test24"))
+    suite.addTest(TestInterpolation("test25"))
+    suite.addTest(TestInterpolation("test26"))
+    suite.addTest(TestInterpolation("test27"))
+    suite.addTest(TestInterpolation("test28"))
+    suite.addTest(TestInterpolation("test29"))
+    suite.addTest(TestInterpolation("test30"))
+    suite.addTest(TestInterpolation("test31"))
+    suite.addTest(TestInterpolation("test32"))
     
     runner = TextTestRunner()
     runner.run(suite)
