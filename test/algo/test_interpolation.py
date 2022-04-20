@@ -18,7 +18,6 @@
 #    - Simplification : toutes les fonctions qui visent a conserver 
 #      la forme globale de la trace en réduisant le nombre de points
 # --------------------------------------------------------------------
-import math
 import sys
 import matplotlib.pyplot as plt
 
@@ -29,7 +28,7 @@ sys.path.append('~/Bureau/KitYann/2-Tracklib/tracklib/tracklib')
 from tracklib.core.GPSTime import GPSTime
 from tracklib.io.FileReader import FileReader
 #from tracklib.core.Kernel import DiracKernel
-#from tracklib.core.Kernel import GaussianKernel
+from tracklib.core.Kernel import GaussianKernel
 #from tracklib.core.Kernel import TriangularKernel
 #from tracklib.core.Kernel import ExponentialKernel
 
@@ -40,25 +39,24 @@ import tracklib.algo.Interpolation as itp
 
 class TestInterpolation(TestCase):
     
-    # --------------------------------------------------------------------
-    # Interpolation
-    # --------------------------------------------------------------------
-    
     __epsilon = 280
     
     def setUp(self):
         GPSTime.setPrintFormat("2D/2M/4Y 2h:2m:2s.3z")
         self.track = FileReader.readFromFile('data/trace0.gps') % 10
         self.track.plot('kx')
-        print (self.track.size(), ', ', self.track.length())
+        #print (self.track.size(), ', ', self.track.length())
 
     def view(self, sym):
         self.track.plot(sym); 
         #print(self.track);
-        print("Nb pts = ", self.track.size())
+        #print("Nb pts = ", self.track.size())
         plt.show()
 
     # =========================================================================
+    # --------------------------------------------------------------------
+    # Interpolation
+    # --------------------------------------------------------------------
     
     def test1(self, sym = 'r-'):
         '''
@@ -112,122 +110,171 @@ class TestInterpolation(TestCase):
         self.view(sym)
 
         
-# Interpolation lineaire en mode spatial : en 100 pts
-# def test6(sym = 'r-'):
-# 	temp = track.copy()
-# 	temp.resample(npts = 100)  
-# 	view(temp, sym)
-# 	
-# # Interpolation lineaire en mode temporel : en 20 pts
-# def test7(sym = 'r-'):
-# 	temp = track.copy()
-# 	temp.resample(npts = 80, mode = itp.MODE_TEMPORAL)  
-# 	view(temp, sym)
-# 	
-# # Idem test7 en raccourci
-# def test8(sym = 'r-'):
-# 	temp = track.copy()
-# 	temp = temp**80
-# 	view(temp, sym)
+    def test6(self, sym = 'r-'):
+        '''
+        Interpolation lineaire en mode spatial : en 100 pts
+        '''
+        #temp = self.track.copy()
+        self.track.resample(npts = 100)  
+        self.view(sym)
 
-# # Interpolation lineaire : sur-echantillonnage temporel facteur 5
-# def test9(sym = 'r-'):
-# 	temp = track.copy()
-# 	temp.resample(factor = 5)  
-# 	view(temp, sym)
-# 	
-# # Idem test9 en raccourci
-# def test10(sym = 'r-'):
-# 	temp = track.copy()
-# 	temp = temp*5
-# 	view(temp, sym)
+        
+    def test7(self, sym = 'r-'):
+        '''
+        Interpolation lineaire en mode temporel : en 20 pts
+        '''
+        #temp = track.copy()
+        self.track.resample(npts = 80, mode = itp.MODE_TEMPORAL)  
+        self.view(sym)
 
-# # Interpolation lineaire : sur-echantillonnage spatial facteur 2
-# def test11(sym = 'r-'):
-# 	temp = track.copy()
-# 	temp.resample(factor = 2, mode = itp.MODE_SPATIAL)  
-# 	view(temp, sym)
-# 	
-# # Interpolation par splines plaques minces en mode spatial : 1 pt / 10 m
-# def test12(sym = 'r-'):
-# 	temp = track.copy()
-# 	temp.resample(delta=10, algo = itp.ALGO_THIN_SPLINES)  
-# 	view(temp, sym)
-# 	
-# # Interpolation par splines plaques minces en mode temporel : 2 pt/s
-# def test13(sym = 'r-'):
-# 	temp = track.copy()
-# 	temp.resample(delta=0.5, algo = itp.ALGO_THIN_SPLINES, mode = itp.MODE_TEMPORAL)  
-# 	view(temp, sym)
-# 	
-# # Interpolation par B-splines en mode spatial : 1 pt / m
-# def test14(sym = 'r-'):
-# 	temp = track.copy()
-# 	temp %= 5
-# 	temp.resample(delta=1, algo = itp.ALGO_B_SPLINES)  
-# 	view(temp, sym)
-# 	
-# # Interpolation par B-splines en mode temporel : 1 pt/s
-# def test15(sym = 'r-'):
-# 	temp = track.copy()
-# 	temp %= 5
-# 	temp.resample(delta=1, algo = itp.ALGO_B_SPLINES, mode = itp.MODE_TEMPORAL)  
-# 	view(temp, sym)
-# 	
-# 	
-# # Interpolation par processus gaussien en mode spatial : 1 pt / m
-# def test16(sym = 'r-'):
-# 	temp = track.copy()
-# 	itp.GP_KERNEL = GaussianKernel(10)
-# 	temp.resample(delta=100, algo = itp.ALGO_GAUSSIAN_PROCESS)  
-# 	view(temp, sym)	
-# 	
-# # Interpolation par processus gaussien en mode temporel : 1 pt/s   
-# def test17(sym = 'r-'):
-# 	temp = track.copy()
-# 	itp.GP_KERNEL = GaussianKernel(10)
-# 	temp.resample(delta=1, algo = itp.ALGO_GAUSSIAN_PROCESS, mode = itp.MODE_TEMPORAL)  
-# 	view(temp, sym)	
+        
+    def test8(self, sym = 'r-'):
+        '''
+        Idem test7 en raccourci
+        '''
+        #temp = track.copy()
+        self.track = self.track**80
+        self.view(sym)
+
+
+    def test9(self, sym = 'r-'):
+        '''
+        Interpolation lineaire : sur-echantillonnage temporel facteur 5
+        '''
+ 	    #temp = track.copy()
+        self.track.resample(factor = 5)  
+        self.view(sym)
+ 	
+
+    def test10(self, sym = 'r-'):
+        '''
+        Idem test9 en raccourci
+        '''
+ 	    #temp = track.copy()
+        self.track = self.track*5
+        self.view(sym)
+
+
+    def test11(self, sym = 'r-'):
+        '''
+        Interpolation lineaire : sur-echantillonnage spatial facteur 2
+        '''
+        #temp = track.copy()
+        self.track.resample(factor = 2, mode = itp.MODE_SPATIAL)  
+        self.view(sym)
+
+        
+    def test12(self, sym = 'r-'):
+        '''
+        Interpolation par splines plaques minces en mode spatial : 1 pt / 10 m
+        '''
+        # temp = track.copy()
+        self.track.resample(delta=10, algo = itp.ALGO_THIN_SPLINES)  
+        self.view(sym)
+
+        
+    def test13(self, sym = 'r-'):
+        '''
+        Interpolation par splines plaques minces en mode temporel : 2 pt/s
+        '''
+        # temp = track.copy()
+        self.track.resample(delta=0.5, algo = itp.ALGO_THIN_SPLINES, mode = itp.MODE_TEMPORAL)  
+        self.view(sym)
+ 	
+
+    def test14(self, sym = 'r-'):
+        '''
+        Interpolation par B-splines en mode spatial : 1 pt / m
+        '''
+        # temp = track.copy()
+        self.track %= 5
+        self.track.resample(delta=1, algo = itp.ALGO_B_SPLINES)  
+        self.view(sym)
+
+        
+    def test15(self, sym = 'r-'):
+        '''
+        Interpolation par B-splines en mode temporel : 1 pt/s
+        '''
+        # temp = track.copy()
+        self.track %= 5
+        self.track.resample(delta=1, algo = itp.ALGO_B_SPLINES, mode = itp.MODE_TEMPORAL)  
+        self.view(sym)
+ 	
+ 	
+    def test16(self, sym = 'r-'):
+        '''
+        Interpolation par processus gaussien en mode spatial : 1 pt / m
+        '''
+        # temp = track.copy()
+        itp.GP_KERNEL = GaussianKernel(10)
+        self.track.resample(delta=100, algo = itp.ALGO_GAUSSIAN_PROCESS)  
+        self.view(sym)	
+
+        
+    def test17(self, sym = 'r-'):
+        '''
+        Interpolation par processus gaussien en mode temporel : 1 pt/s   
+        '''
+        # temp = track.copy()
+        itp.GP_KERNEL = GaussianKernel(10)
+        self.track.resample(delta=1, algo = itp.ALGO_GAUSSIAN_PROCESS, mode = itp.MODE_TEMPORAL)  
+        self.view(sym)	
 	        
+        
+        
+    # =========================================================================
+    # --------------------------------------------------------------------
+    # Interpolation + Lissage
+    # --------------------------------------------------------------------
 
-# --------------------------------------------------------------------
-# Interpolation + Lissage
-# --------------------------------------------------------------------
+    def test18(self, sym = 'r-'):
+        '''
+        Lissage/interpolation par splines plaques minces en mode spatial : 1 pt / 10 m
+        '''
+        # temp = track.copy()
+        itp.SPLINE_PENALIZATION = 1e-2
+        self.track.resample(delta=10, algo = itp.ALGO_THIN_SPLINES)  
+        self.view(sym)
+ 	
 
-# # Lissage/interpolation par splines plaques minces en mode spatial : 1 pt / 10 m
-# def test18(sym = 'r-'):
-# 	temp = track.copy()
-# 	itp.SPLINE_PENALIZATION = 1e-2
-# 	temp.resample(delta=10, algo = itp.ALGO_THIN_SPLINES)  
-# 	view(temp, sym)
-# 	
-# # Lissage/interpolation par splines plaques minces en mode temporel : 1 pt/s
-# def test19(sym = 'r-'):
-# 	temp = track.copy()
-# 	itp.SPLINE_PENALIZATION = 1e4
-# 	temp.resample(delta=10, algo = itp.ALGO_THIN_SPLINES, mode = itp.MODE_TEMPORAL)  
-# 	view(temp, sym)
-# 	
-# # Lissage/interpolation par processus gaussien en mode spatial : 1 pt / 10 m
-# def test20(sym = 'r-'):
-# 	temp = track.copy()
-# 	itp.GP_KERNEL = GaussianKernel(100)
-# 	itp.GP_SMOOTHING = 0.001
-# 	temp.resample(delta=10, algo = itp.ALGO_GAUSSIAN_PROCESS)  
-# 	view(temp, sym)	
-# 	
-# # Lissage/interpolation par processus gaussien en mode temporel : 1 pt/s    
-# def test21(sym = 'r-'):
-# 	temp = track.copy()
-# 	itp.GP_KERNEL = GaussianKernel(100)
-# 	itp.GP_SMOOTHING = 0.001
-# 	temp.resample(delta=1, algo = itp.ALGO_GAUSSIAN_PROCESS, mode = itp.MODE_TEMPORAL)  
-# 	view(temp, sym)	
-# 	
-# 	
-# # --------------------------------------------------------------------
-# # Lissage
-# # --------------------------------------------------------------------
+    def test19(self, sym = 'r-'):
+         '''
+         Lissage/interpolation par splines plaques minces en mode temporel : 1 pt/s
+         '''
+         # temp = track.copy()
+         itp.SPLINE_PENALIZATION = 1e4
+         self.track.resample(delta=10, algo = itp.ALGO_THIN_SPLINES, mode = itp.MODE_TEMPORAL)  
+         self.view(sym)
+ 	
+
+    def test20(self, sym = 'r-'):
+        '''
+        Lissage/interpolation par processus gaussien en mode spatial : 1 pt / 10 m
+        '''
+        # temp = track.copy()
+        itp.GP_KERNEL = GaussianKernel(100)
+        itp.GP_SMOOTHING = 0.001
+        self.track.resample(delta=10, algo = itp.ALGO_GAUSSIAN_PROCESS)  
+        self.view(sym)	
+ 	
+
+    def test21(self, sym = 'r-'):
+        '''
+        Lissage/interpolation par processus gaussien en mode temporel : 1 pt/s    
+        '''
+        # temp = track.copy()
+        itp.GP_KERNEL = GaussianKernel(100)
+        itp.GP_SMOOTHING = 0.001
+        self.track.resample(delta=1, algo = itp.ALGO_GAUSSIAN_PROCESS, mode = itp.MODE_TEMPORAL)  
+        self.view(sym)	
+ 	
+ 	
+     
+     # =========================================================================
+     # --------------------------------------------------------------------
+     # Lissage
+     # --------------------------------------------------------------------
 
 # # Filtrage par noyau fenetre glissante de taille 5
 # def test22(sym = 'r-'):
@@ -334,11 +381,30 @@ class TestInterpolation(TestCase):
 
 if __name__ == '__main__':
     suite = TestSuite()
+    
     suite.addTest(TestInterpolation("test1"))
     suite.addTest(TestInterpolation("test2"))
     suite.addTest(TestInterpolation("test3"))
     suite.addTest(TestInterpolation("test4"))
     suite.addTest(TestInterpolation("test5"))
+    suite.addTest(TestInterpolation("test6"))
+    suite.addTest(TestInterpolation("test7"))
+    suite.addTest(TestInterpolation("test8"))
+    suite.addTest(TestInterpolation("test9"))
+    suite.addTest(TestInterpolation("test10"))
+    suite.addTest(TestInterpolation("test11"))
+    suite.addTest(TestInterpolation("test12"))
+    suite.addTest(TestInterpolation("test13"))
+    suite.addTest(TestInterpolation("test14"))
+    suite.addTest(TestInterpolation("test15"))
+    suite.addTest(TestInterpolation("test16"))
+    suite.addTest(TestInterpolation("test17"))
+    
+    suite.addTest(TestInterpolation("test18"))
+    suite.addTest(TestInterpolation("test19"))
+    suite.addTest(TestInterpolation("test20"))
+    suite.addTest(TestInterpolation("test21"))
+    
     runner = TextTestRunner()
     runner.run(suite)
 
