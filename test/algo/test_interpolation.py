@@ -18,11 +18,11 @@
 #    - Simplification : toutes les fonctions qui visent a conserver 
 #      la forme globale de la trace en réduisant le nombre de points
 # --------------------------------------------------------------------
-import sys
 import matplotlib.pyplot as plt
 
 from unittest import TestCase, TestSuite, TextTestRunner
 
+#import sys
 #sys.path.append('~/Bureau/KitYann/2-Tracklib/tracklib/tracklib')
 
 from tracklib.core.GPSTime import GPSTime
@@ -34,7 +34,7 @@ from tracklib.core.Kernel import ExponentialKernel
 
 import tracklib.algo.Filtering as flt
 import tracklib.algo.Interpolation as itp
-#import tracklib.algo.Simplification as spf
+import tracklib.algo.Simplification as spf
 
 
 class TestInterpolation(TestCase):
@@ -382,36 +382,53 @@ class TestInterpolation(TestCase):
     # Simplification
     # --------------------------------------------------------------------
 
-# # Douglas-Peucker, tolerance 50 m
-# def test33(sym = 'r-'):
-#     temp = track.copy()
-#     temp *= 10
-#     temp = spf.simplify(temp, 50, mode = spf.MODE_SIMPLIFY_DOUGLAS_PEUCKER)
-#     view(temp, sym)	
+    def test33(self, sym = 'r-'):
+        '''
+        Douglas-Peucker, tolerance 50 m
+        '''
+        self.track *= 10
+        self.track = spf.simplify(self.track, 50, 
+                                  mode = spf.MODE_SIMPLIFY_DOUGLAS_PEUCKER)
+        self.view(sym)	
     
-# # Vis-Valingam, tolerance 500 m2
-# def test34(sym = 'r-'):
-#     temp = track.copy()
-#     temp *= 10
-#     temp = spf.simplify(temp, 5e2, mode = spf.MODE_SIMPLIFY_VISVALINGAM)
-#     view(temp, sym)	
-    
-# # Equarissage, tolerance 50 m
-# def test35(sym = 'r-'):
-#     temp = spf.simplify(track, 50, mode = spf.MODE_SIMPLIFY_SQUARING)
-#     view(temp, sym)	
 
-# # Minimisation des elongations par segment  
-# def test36(sym = 'r-'):
-#     temp = spf.simplify(track, 0.05, mode = spf.MODE_SIMPLIFY_MINIMIZE_ELONGATION_RATIO)
-#     view(temp, sym)	
+    def test34(self, sym = 'r-'):
+        '''
+        Vis-Valingam, tolerance 500 m2
+        '''
+        self.track *= 10
+        self.track = spf.simplify(self.track, 5e2, 
+                                  mode = spf.MODE_SIMPLIFY_VISVALINGAM)
+        self.view(sym)	
     
-# # Minimisation des deviations
-# def test37(sym = 'r-'):
-#     temp = spf.simplify(track, 0.05, mode = spf.MODE_SIMPLIFY_PRECLUDE_LARGE_DEVIATION)
-#     view(temp, sym)	
+
+    def test35(self, sym = 'r-'):
+        '''
+        Equarissage, tolerance 50 m
+        '''
+        self.track = spf.simplify(self.track, 50, 
+                                  mode = spf.MODE_SIMPLIFY_SQUARING)
+        self.view(sym)	
+
+
+    def test36(self, sym = 'r-'):
+        '''
+        Minimisation des elongations par segment  
+        '''
+        self.track = spf.simplify(self.track, 0.05, 
+                                  mode = spf.MODE_SIMPLIFY_MINIMIZE_ELONGATION_RATIO)
+        self.view(sym)	
     
-# test15() 
+    
+    def test37(self, sym = 'r-'):
+        '''
+        Minimisation des deviations
+        '''
+        self.track = spf.simplify(self.track, 0.05, 
+                                  mode = spf.MODE_SIMPLIFY_PRECLUDE_LARGE_DEVIATION)
+        self.view(sym)	
+    
+
 
 
 
@@ -452,6 +469,12 @@ if __name__ == '__main__':
     suite.addTest(TestInterpolation("test30"))
     suite.addTest(TestInterpolation("test31"))
     suite.addTest(TestInterpolation("test32"))
+    
+    suite.addTest(TestInterpolation("test33"))
+    suite.addTest(TestInterpolation("test34"))
+    suite.addTest(TestInterpolation("test35"))
+    suite.addTest(TestInterpolation("test36"))
+    suite.addTest(TestInterpolation("test37"))
     
     runner = TextTestRunner()
     runner.run(suite)
