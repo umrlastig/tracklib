@@ -15,7 +15,7 @@ class TestGPSTime(unittest.TestCase):
         GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         madate = '2018-01-31 13:21:46'
         t = GPSTime.readTimestamp(madate)
-        self.assertEqual("31/01/2018 13:21:46", str(t))
+        self.assertEqual("31/01/2018 13:21:46", str(t)[0:19])
         
         GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2s1Z")
         madate = '2018-01-31T11:17:46Z'
