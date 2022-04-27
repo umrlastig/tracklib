@@ -20,6 +20,7 @@
 # -----------------------------------------------------------------------------
 import math
 import matplotlib.pyplot as plt
+import os.path
 
 from unittest import TestCase, TestSuite, TextTestRunner
 
@@ -66,13 +67,17 @@ class TestInterpolation(TestCase):
     __epsilon = 1
     
     def setUp(self):
+        
+        self.resource_path = os.path.join(os.path.split(__file__)[0], "../..")
+        self.csvpath = os.path.join(self.resource_path, 'data/trace0.gps')
+        
         GPSTime.setPrintFormat("2D/2M/4Y 2h:2m:2s.3z")
-        # self.track = FileReader.readFromFile('data/trace0.gps') % 10
+        # self.track = FileReader.readFromFile(self.csvpath) % 10
         # self.track.plot('kx')
         
 
-    def view(self, sym):
-        self.trackCercle.plot(sym)
+    def view(self, track, sym):
+        track.plot(sym)
         
 
     # =========================================================================
@@ -94,7 +99,7 @@ class TestInterpolation(TestCase):
             ei = 20.67 / self.trackCercle.size()**3 * R
             epsilon = ei + R
         
-            self.view(sym)
+            self.view(self.trackCercle, sym)
             for i in range(self.trackCercle.size() - 2):
                 d = self.trackCercle.getObs(i).distanceTo(self.trackCercle.getObs(i+1))
                 self.assertLessEqual(d, epsilon, 'erreur pour ' + str(i))
@@ -109,23 +114,32 @@ class TestInterpolation(TestCase):
             self.trackCercle = Synthetics.generate(x_t, y_t, dt=5, verbose=False) % 10
             self.trackCercle.plot('kx') # , append = False
             self.trackCercle.resample(delta=z, mode = itp.MODE_TEMPORAL)  
-            self.view(sym)
+            self.view(self.trackCercle, sym)
             for i in range(self.trackCercle.size() - 2):
                 d = self.trackCercle.getObs(i).distanceTo(self.trackCercle.getObs(i+1))
                 err = abs(d - 2*3.1515*100/self.trackCercle.size())
                 self.assertLessEqual(err, self.__epsilon, 'erreur pour ' + str(i))
 
 
-    # def test3(self, sym = 'r-'):
-    #     '''
-    #     Interpolation lineaire en mode temporel :  definition par timestamps
-    #     '''
-    #     #temp = self.track.copy()
-    #     a = int(self.track[0].timestamp.toAbsTime())
-    #     b = int(self.track[-1].timestamp.toAbsTime())
-    #     T = [GPSTime.readUnixTime(x) for x in range(a, b, 10)]
-    #     self.track.resample(delta=T, mode = itp.MODE_TEMPORAL)
-    #     self.view(sym)
+    def test3(self, sym = 'r-'):
+        '''
+        Interpolation lineaire en mode temporel :  definition par timestamps
+        '''
+        R = 100
+        for z in range(2, R):
+            self.trackCercle = Synthetics.generate(x_t, y_t, dt=z, verbose=False) % 10
+            self.trackCercle.plot('kx')
+        
+            a = int(self.trackCercle[0].timestamp.toAbsTime())
+            b = int(self.trackCercle[-1].timestamp.toAbsTime())
+            T = [GPSTime.readUnixTime(x) for x in range(a, b, 10)]
+        
+            self.trackCercle.resample(delta=T, mode = itp.MODE_TEMPORAL)
+            self.view(self.trackCercle, sym)
+            for i in range(self.trackCercle.size() - 2):
+                d = self.trackCercle.getObs(i).distanceTo(self.trackCercle.getObs(i+1))
+                err = abs(d - 2*3.1515*100/self.trackCercle.size())
+                self.assertLessEqual(err, self.__epsilon, 'erreur pour ' + str(i))
         
 
     # def test4(self, sym = 'r-'):
@@ -473,9 +487,9 @@ class TestInterpolation(TestCase):
 if __name__ == '__main__':
     suite = TestSuite()
     
-    suite.addTest(TestInterpolation("test1"))
-    suite.addTest(TestInterpolation("test2"))
-    # suite.addTest(TestInterpolation("test3"))
+    #suite.addTest(TestInterpolation("test1"))
+    #suite.addTest(TestInterpolation("test2"))
+    #suite.addTest(TestInterpolation("test3"))
     # suite.addTest(TestInterpolation("test4"))
     # suite.addTest(TestInterpolation("test5"))
     # suite.addTest(TestInterpolation("test6"))
