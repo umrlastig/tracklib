@@ -117,7 +117,7 @@ class TestInterpolation(TestCase):
             self.view(self.trackCercle, sym)
             for i in range(self.trackCercle.size() - 2):
                 d = self.trackCercle.getObs(i).distanceTo(self.trackCercle.getObs(i+1))
-                err = abs(d - 2*3.1515*100/self.trackCercle.size())
+                err = abs(d - 2*3.1415*100/self.trackCercle.size())
                 self.assertLessEqual(err, self.__epsilon, 'erreur pour ' + str(i))
 
 
@@ -138,28 +138,42 @@ class TestInterpolation(TestCase):
             self.view(self.trackCercle, sym)
             for i in range(self.trackCercle.size() - 2):
                 d = self.trackCercle.getObs(i).distanceTo(self.trackCercle.getObs(i+1))
-                err = abs(d - 2*3.1515*100/self.trackCercle.size())
+                err = abs(d - 2*3.1415*100/self.trackCercle.size())
                 self.assertLessEqual(err, self.__epsilon, 'erreur pour ' + str(i))
         
 
-    # def test4(self, sym = 'r-'):
-    #     '''
-    #     Interpolation lineaire en mode temporel :  definition // autre trace
-    #     '''
-    #     temp = self.track.copy()
-    #     self.track %= 5
-    #     self.track.resample(delta=self.track, mode = itp.MODE_TEMPORAL)
-    #     self.view(sym)
+    def test4(self, sym = 'r-'):
+        '''
+        Interpolation lineaire en mode temporel :  definition // autre trace
+        '''
+        R = 100
+        for z in range(2, R):
+            self.trackCercle = Synthetics.generate(x_t, y_t, dt=z, verbose=False) % 10
+            self.trackCercle.plot('kx')
+            
+            temp = self.trackCercle.copy()
+            temp %= 5
+            if temp.size() < 2:
+                continue
+            temp.resample(delta=self.trackCercle, mode = itp.MODE_TEMPORAL)
+            self.view(temp, sym)
+            
 
+    def test5(self, sym = 'r-'):
+        '''
+        Idem test 4 en raccourci
+        '''
+        R = 100
+        for z in range(2, R):
+            self.trackCercle = Synthetics.generate(x_t, y_t, dt=z, verbose=False) % 10
+            self.trackCercle.plot('kx')
         
-    # def test5(self, sym = 'r-'):
-    #     '''
-    #     Idem test 4 en raccourci
-    #     '''
-    #     temp = self.track.copy()
-    #     temp %= 5
-    #     temp = temp // self.track   
-    #     self.view(sym)
+            temp = self.trackCercle.copy()
+            temp %= 5
+            if temp.size() < 2:
+                continue
+            temp = temp // self.trackCercle   
+            self.view(temp, sym)
 
         
     # def test6(self, sym = 'r-'):
@@ -490,8 +504,8 @@ if __name__ == '__main__':
     #suite.addTest(TestInterpolation("test1"))
     #suite.addTest(TestInterpolation("test2"))
     #suite.addTest(TestInterpolation("test3"))
-    # suite.addTest(TestInterpolation("test4"))
-    # suite.addTest(TestInterpolation("test5"))
+    #suite.addTest(TestInterpolation("test4"))
+    suite.addTest(TestInterpolation("test5"))
     # suite.addTest(TestInterpolation("test6"))
     # suite.addTest(TestInterpolation("test7"))
     # suite.addTest(TestInterpolation("test8"))
