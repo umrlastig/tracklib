@@ -72,8 +72,8 @@ class TestInterpolation(TestCase):
         self.csvpath = os.path.join(self.resource_path, 'data/trace0.gps')
         
         GPSTime.setPrintFormat("2D/2M/4Y 2h:2m:2s.3z")
-        # self.track = FileReader.readFromFile(self.csvpath) % 10
-        # self.track.plot('kx')
+        self.track = FileReader.readFromFile(self.csvpath) % 10
+        self.track.plot('kx')
         
 
     def view(self, track, sym):
@@ -176,31 +176,31 @@ class TestInterpolation(TestCase):
             self.view(temp, sym)
 
         
-    # def test6(self, sym = 'r-'):
-    #     '''
-    #     Interpolation lineaire en mode spatial : en 100 pts
-    #     '''
-    #     #temp = self.track.copy()
-    #     self.track.resample(npts = 100)  
-    #     self.view(sym)
+    def test6(self, sym = 'r-'):
+        '''
+        Interpolation lineaire en mode spatial : en 100 pts
+        '''
+        #temp = self.track.copy()
+        self.track.resample(npts = 100)  
+        self.view(self.track, sym)
 
         
-    # def test7(self, sym = 'r-'):
-    #     '''
-    #     Interpolation lineaire en mode temporel : en 20 pts
-    #     '''
-    #     #temp = track.copy()
-    #     self.track.resample(npts = 80, mode = itp.MODE_TEMPORAL)  
-    #     self.view(sym)
+    def test7(self, sym = 'r-'):
+        '''
+        Interpolation lineaire en mode temporel : en 20 pts
+        '''
+        #temp = track.copy()
+        self.track.resample(npts = 80, mode = itp.MODE_TEMPORAL)  
+        self.view(self.track, sym)
 
         
-    # def test8(self, sym = 'r-'):
-    #     '''
-    #     Idem test7 en raccourci
-    #     '''
-    #     #temp = track.copy()
-    #     self.track = self.track**80
-    #     self.view(sym)
+    def test8(self, sym = 'r-'):
+        '''
+        Idem test7 en raccourci
+        '''
+        #temp = track.copy()
+        self.track = self.track**80
+        self.view(self.track, sym)
 
 
     # def test9(self, sym = 'r-'):
@@ -505,10 +505,10 @@ if __name__ == '__main__':
     #suite.addTest(TestInterpolation("test2"))
     #suite.addTest(TestInterpolation("test3"))
     #suite.addTest(TestInterpolation("test4"))
-    suite.addTest(TestInterpolation("test5"))
-    # suite.addTest(TestInterpolation("test6"))
-    # suite.addTest(TestInterpolation("test7"))
-    # suite.addTest(TestInterpolation("test8"))
+    #suite.addTest(TestInterpolation("test5"))
+    #suite.addTest(TestInterpolation("test6"))
+    #suite.addTest(TestInterpolation("test7"))
+    suite.addTest(TestInterpolation("test8"))
     # suite.addTest(TestInterpolation("test9"))
     # suite.addTest(TestInterpolation("test10"))
     # suite.addTest(TestInterpolation("test11"))
