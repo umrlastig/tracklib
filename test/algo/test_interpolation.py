@@ -203,89 +203,89 @@ class TestInterpolation(TestCase):
         self.view(self.track, sym)
 
 
-    # def test9(self, sym = 'r-'):
-    #     '''
-    #     Interpolation lineaire : sur-echantillonnage temporel facteur 5
-    #     '''
- 	  #   #temp = track.copy()
-    #     self.track.resample(factor = 5)  
-    #     self.view(sym)
+    def test9(self, sym = 'r-'):
+        '''
+        Interpolation lineaire : sur-echantillonnage temporel facteur 5
+        '''
+ 	    #temp = track.copy()
+        self.track.resample(factor = 5)  
+        self.view(self.track, sym)
  	
 
-    # def test10(self, sym = 'r-'):
-    #     '''
-    #     Idem test9 en raccourci
-    #     '''
- 	  #   #temp = track.copy()
-    #     self.track = self.track*5
-    #     self.view(sym)
+    def test10(self, sym = 'r-'):
+        '''
+        Idem test9 en raccourci
+        '''
+ 	    #temp = track.copy()
+        self.track = self.track*5
+        self.view(self.track, sym)
 
 
-    # def test11(self, sym = 'r-'):
-    #     '''
-    #     Interpolation lineaire : sur-echantillonnage spatial facteur 2
-    #     '''
-    #     #temp = track.copy()
-    #     self.track.resample(factor = 2, mode = itp.MODE_SPATIAL)  
-    #     self.view(sym)
-
-        
-    # def test12(self, sym = 'r-'):
-    #     '''
-    #     Interpolation par splines plaques minces en mode spatial : 1 pt / 10 m
-    #     '''
-    #     # temp = track.copy()
-    #     self.track.resample(delta=10, algo = itp.ALGO_THIN_SPLINES)  
-    #     self.view(sym)
+    def test11(self, sym = 'r-'):
+        '''
+        Interpolation lineaire : sur-echantillonnage spatial facteur 2
+        '''
+        #temp = track.copy()
+        self.track.resample(factor = 2, mode = itp.MODE_SPATIAL)  
+        self.view(self.track, sym)
 
         
-    # def test13(self, sym = 'r-'):
-    #     '''
-    #     Interpolation par splines plaques minces en mode temporel : 2 pt/s
-    #     '''
-    #     # temp = track.copy()
-    #     self.track.resample(delta=0.5, algo = itp.ALGO_THIN_SPLINES, mode = itp.MODE_TEMPORAL)  
-    #     self.view(sym)
+    def test12(self, sym = 'r-'):
+        '''
+        Interpolation par splines plaques minces en mode spatial : 1 pt / 10 m
+        '''
+        # temp = track.copy()
+        self.track.resample(delta=10, algo = itp.ALGO_THIN_SPLINES)  
+        self.view(self.track, sym)
+
+        
+    def test13(self, sym = 'r-'):
+        '''
+        Interpolation par splines plaques minces en mode temporel : 2 pt/s
+        '''
+        # temp = track.copy()
+        self.track.resample(delta=0.5, algo = itp.ALGO_THIN_SPLINES, mode = itp.MODE_TEMPORAL)  
+        self.view(self.track, sym)
  	
 
-    # def test14(self, sym = 'r-'):
-    #     '''
-    #     Interpolation par B-splines en mode spatial : 1 pt / m
-    #     '''
-    #     # temp = track.copy()
-    #     self.track %= 5
-    #     self.track.resample(delta=1, algo = itp.ALGO_B_SPLINES)  
-    #     self.view(sym)
+    def test14(self, sym = 'r-'):
+        '''
+        Interpolation par B-splines en mode spatial : 1 pt / m
+        '''
+        # temp = track.copy()
+        self.track %= 5
+        self.track.resample(delta=1, algo = itp.ALGO_B_SPLINES)  
+        self.view(self.track, sym)
 
         
-    # def test15(self, sym = 'r-'):
-    #     '''
-    #     Interpolation par B-splines en mode temporel : 1 pt/s
-    #     '''
-    #     # temp = track.copy()
-    #     self.track %= 5
-    #     self.track.resample(delta=1, algo = itp.ALGO_B_SPLINES, mode = itp.MODE_TEMPORAL)  
-    #     self.view(sym)
+    def test15(self, sym = 'r-'):
+        '''
+        Interpolation par B-splines en mode temporel : 1 pt/s
+        '''
+        # temp = track.copy()
+        self.track %= 5
+        self.track.resample(delta=1, algo = itp.ALGO_B_SPLINES, mode = itp.MODE_TEMPORAL)  
+        self.view(self.track, sym)
  	
  	
-    # def test16(self, sym = 'r-'):
-    #     '''
-    #     Interpolation par processus gaussien en mode spatial : 1 pt / m
-    #     '''
-    #     # temp = track.copy()
-    #     itp.GP_KERNEL = GaussianKernel(10)
-    #     self.track.resample(delta=100, algo = itp.ALGO_GAUSSIAN_PROCESS)  
-    #     self.view(sym)	
+    def test16(self, sym = 'r-'):
+        '''
+        Interpolation par processus gaussien en mode spatial : 1 pt / m
+        '''
+        # temp = track.copy()
+        itp.GP_KERNEL = GaussianKernel(10)
+        self.track.resample(delta=100, algo = itp.ALGO_GAUSSIAN_PROCESS)  
+        self.view(self.track, sym)	
 
         
-    # def test17(self, sym = 'r-'):
-    #     '''
-    #     Interpolation par processus gaussien en mode temporel : 1 pt/s   
-    #     '''
-    #     # temp = track.copy()
-    #     itp.GP_KERNEL = GaussianKernel(10)
-    #     self.track.resample(delta=1, algo = itp.ALGO_GAUSSIAN_PROCESS, mode = itp.MODE_TEMPORAL)  
-    #     self.view(sym)	
+    def test17(self, sym = 'r-'):
+        '''
+        Interpolation par processus gaussien en mode temporel : 1 pt/s   
+        '''
+        # temp = track.copy()
+        itp.GP_KERNEL = GaussianKernel(10)
+        self.track.resample(delta=1, algo = itp.ALGO_GAUSSIAN_PROCESS, mode = itp.MODE_TEMPORAL)  
+        self.view(self.track, sym)	
 	        
         
         
@@ -294,46 +294,46 @@ class TestInterpolation(TestCase):
     # Interpolation + Lissage
     # --------------------------------------------------------------------
 
-    # def test18(self, sym = 'r-'):
-    #     '''
-    #     Lissage/interpolation par splines plaques minces en mode spatial : 1 pt / 10 m
-    #     '''
-    #     # temp = track.copy()
-    #     itp.SPLINE_PENALIZATION = 1e-2
-    #     self.track.resample(delta=10, algo = itp.ALGO_THIN_SPLINES)  
-    #     self.view(sym)
+    def test18(self, sym = 'r-'):
+        '''
+        Lissage/interpolation par splines plaques minces en mode spatial : 1 pt / 10 m
+        '''
+        # temp = track.copy()
+        itp.SPLINE_PENALIZATION = 1e-2
+        self.track.resample(delta=10, algo = itp.ALGO_THIN_SPLINES)  
+        self.view(self.track, sym)
  	
 
-    # def test19(self, sym = 'r-'):
-    #      '''
-    #      Lissage/interpolation par splines plaques minces en mode temporel : 1 pt/s
-    #      '''
-    #      # temp = track.copy()
-    #      itp.SPLINE_PENALIZATION = 1e4
-    #      self.track.resample(delta=10, algo = itp.ALGO_THIN_SPLINES, mode = itp.MODE_TEMPORAL)  
-    #      self.view(sym)
+    def test19(self, sym = 'r-'):
+         '''
+         Lissage/interpolation par splines plaques minces en mode temporel : 1 pt/s
+         '''
+         # temp = track.copy()
+         itp.SPLINE_PENALIZATION = 1e4
+         self.track.resample(delta=10, algo = itp.ALGO_THIN_SPLINES, mode = itp.MODE_TEMPORAL)  
+         self.view(self.track, sym)
  	
 
-    # def test20(self, sym = 'r-'):
-    #     '''
-    #     Lissage/interpolation par processus gaussien en mode spatial : 1 pt / 10 m
-    #     '''
-    #     # temp = track.copy()
-    #     itp.GP_KERNEL = GaussianKernel(100)
-    #     itp.GP_SMOOTHING = 0.001
-    #     self.track.resample(delta=10, algo = itp.ALGO_GAUSSIAN_PROCESS)  
-    #     self.view(sym)	
+    def test20(self, sym = 'r-'):
+        '''
+        Lissage/interpolation par processus gaussien en mode spatial : 1 pt / 10 m
+        '''
+        # temp = track.copy()
+        itp.GP_KERNEL = GaussianKernel(100)
+        itp.GP_SMOOTHING = 0.001
+        self.track.resample(delta=10, algo = itp.ALGO_GAUSSIAN_PROCESS)  
+        self.view(self.track, sym)	
  	
 
-    # def test21(self, sym = 'r-'):
-    #     '''
-    #     Lissage/interpolation par processus gaussien en mode temporel : 1 pt/s    
-    #     '''
-    #     # temp = track.copy()
-    #     itp.GP_KERNEL = GaussianKernel(100)
-    #     itp.GP_SMOOTHING = 0.001
-    #     self.track.resample(delta=1, algo = itp.ALGO_GAUSSIAN_PROCESS, mode = itp.MODE_TEMPORAL)  
-    #     self.view(sym)	
+    def test21(self, sym = 'r-'):
+        '''
+        Lissage/interpolation par processus gaussien en mode temporel : 1 pt/s    
+        '''
+        # temp = track.copy()
+        itp.GP_KERNEL = GaussianKernel(100)
+        itp.GP_SMOOTHING = 0.001
+        self.track.resample(delta=1, algo = itp.ALGO_GAUSSIAN_PROCESS, mode = itp.MODE_TEMPORAL)  
+        self.view(self.track, sym)	
  	
  	
      
@@ -342,105 +342,105 @@ class TestInterpolation(TestCase):
      # Lissage
      # --------------------------------------------------------------------
 
-    # def test22(self, sym = 'r-'):
-    #     '''
-    #     Filtrage par noyau fenetre glissante de taille 5
-    #     '''
-    #     self.track = flt.filter_seq(self.track, kernel=5, dim=flt.FILTER_XY)
-    #     self.view(sym)	
+    def test22(self, sym = 'r-'):
+        '''
+        Filtrage par noyau fenetre glissante de taille 5
+        '''
+        self.track = flt.filter_seq(self.track, kernel=5, dim=flt.FILTER_XY)
+        self.view(self.track, sym)	
 	
 
-    # def test23(self, sym = 'r-'):
-    #     '''
-    #     Filtrage par noyau 'user-defined'
-    #     '''
-    #     self.track = flt.filter_seq(self.track, kernel=[1,2,32,2,1], dim=["x","y"])
-    #     self.view(sym)	
+    def test23(self, sym = 'r-'):
+        '''
+        Filtrage par noyau 'user-defined'
+        '''
+        self.track = flt.filter_seq(self.track, kernel=[1,2,32,2,1], dim=["x","y"])
+        self.view(self.track, sym)	
  	
 
-    # def test24(self, sym = 'r-'):
-    #     '''
-    #     Filtrage par noyau 'user-defined' pour faire un filtre 'avance'
-    #     '''
-    #     self.track = flt.filter_seq(self.track, kernel=[0,0,1], dim=["y"])
-    #     self.view(sym)	
+    def test24(self, sym = 'r-'):
+        '''
+        Filtrage par noyau 'user-defined' pour faire un filtre 'avance'
+        '''
+        self.track = flt.filter_seq(self.track, kernel=[0,0,1], dim=["y"])
+        self.view(self.track, sym)	
  	
 
-    # def test25(self, sym = 'r-'):
-    #     '''
-    #     Filtrage par noyau 'user-defined' pour faire un filtre 'retard'
-    #     '''
-    #     self.track = flt.filter_seq(self.track, kernel=[1,0,0], dim=["y"])
-    #     self.view(sym)	
+    def test25(self, sym = 'r-'):
+        '''
+        Filtrage par noyau 'user-defined' pour faire un filtre 'retard'
+        '''
+        self.track = flt.filter_seq(self.track, kernel=[1,0,0], dim=["y"])
+        self.view(self.track, sym)	
  	
 
-    # def test26(self, sym = 'r-'):
-    #     '''
-    #     Filtrage par noyau gaussien
-    #     '''
-    #     self.track = self.track.copy()
-    #     self.track *= 10
-    #     self.track = flt.filter_seq(self.track, kernel=GaussianKernel(20), dim=flt.FILTER_XY)
-    #     self.view(sym)	
+    def test26(self, sym = 'r-'):
+        '''
+        Filtrage par noyau gaussien
+        '''
+        self.track = self.track.copy()
+        self.track *= 10
+        self.track = flt.filter_seq(self.track, kernel=GaussianKernel(20), dim=flt.FILTER_XY)
+        self.view(self.track, sym)	
 
 
-    # def test27(self, sym = 'r-'):
-    #     '''
-    #     Filtrage par noyau exponentiel
-    #     '''
-    #     self.track = self.track.copy()
-    #     self.track *= 10
-    #     self.track = flt.filter_seq(self.track, kernel=ExponentialKernel(20), dim=flt.FILTER_XY)
-    #     self.view(sym)	
+    def test27(self, sym = 'r-'):
+        '''
+        Filtrage par noyau exponentiel
+        '''
+        self.track = self.track.copy()
+        self.track *= 10
+        self.track = flt.filter_seq(self.track, kernel=ExponentialKernel(20), dim=flt.FILTER_XY)
+        self.view(self.track, sym)	
 
 
-    # def test28(self, sym = 'r-'):
-    #     '''
-    #     Filtrage par noyau triangulaire
-    #     '''
-    #     self.track = self.track.copy()
-    #     self.track *= 10
-    #     self.track = flt.filter_seq(self.track, kernel=TriangularKernel(20), dim=flt.FILTER_XY)
-    #     self.view(sym)	
+    def test28(self, sym = 'r-'):
+        '''
+        Filtrage par noyau triangulaire
+        '''
+        self.track = self.track.copy()
+        self.track *= 10
+        self.track = flt.filter_seq(self.track, kernel=TriangularKernel(20), dim=flt.FILTER_XY)
+        self.view(self.track, sym)	
  	
         
-    # def test29(self, sym = 'r-'):
-    #      '''
-    #      Filtrage par noyau de Dirac (sans effet)
-    #      '''
-    #      self.track = self.track.copy()
-    #      self.track *= 10
-    #      self.track = flt.filter_seq(self.track, kernel=DiracKernel(), dim=flt.FILTER_XY)
-    #      self.view(sym)	
+    def test29(self, sym = 'r-'):
+         '''
+         Filtrage par noyau de Dirac (sans effet)
+         '''
+         self.track = self.track.copy()
+         self.track *= 10
+         self.track = flt.filter_seq(self.track, kernel=DiracKernel(), dim=flt.FILTER_XY)
+         self.view(self.track, sym)	
 
 
-    # def test30(self, sym = 'r-'):
-    #     '''
-    #     Filtrage passe-bas par transformation de Fourier (frequence temporelle)
-    #     '''
-    #     self.track = flt.filter_freq(self.track, 1, mode=flt.FILTER_TEMPORAL, 
-    #                                  type=flt.FILTER_LOW_PASS, dim=flt.FILTER_XY)
-    #     self.view(sym)	
+    def test30(self, sym = 'r-'):
+        '''
+        Filtrage passe-bas par transformation de Fourier (frequence temporelle)
+        '''
+        self.track = flt.filter_freq(self.track, 1, mode=flt.FILTER_TEMPORAL, 
+                                     type=flt.FILTER_LOW_PASS, dim=flt.FILTER_XY)
+        self.view(self.track, sym)	
     
     
-    # def test31(self, sym = 'r-'):
-    #     '''
-    #     Filtrage passe-bas par transformation de Fourier (frequence spatiale)
-    #     '''
-    #     self.track *= 10
-    #     self.track = flt.filter_freq(self.track, 0.03, 
-    #                                  mode=flt.FILTER_SPATIAL, 
-    #                                  type=flt.FILTER_LOW_PASS, 
-    #                                  dim=flt.FILTER_XY)
-    #     self.view(sym)	
+    def test31(self, sym = 'r-'):
+        '''
+        Filtrage passe-bas par transformation de Fourier (frequence spatiale)
+        '''
+        self.track *= 10
+        self.track = flt.filter_freq(self.track, 0.03, 
+                                     mode=flt.FILTER_SPATIAL, 
+                                     type=flt.FILTER_LOW_PASS, 
+                                     dim=flt.FILTER_XY)
+        self.view(self.track, sym)	
 
 
-    # def test32(self, sym = 'r-'):
-    #     '''
-    #     Filtrage de Kalman (50 cm sur le GPS / 2 m.s-1 sur la vitesse)
-    #     '''
-    #     self.track = flt.Kalman(self.track, 0.5, 2)
-    #     self.view(sym)	
+    def test32(self, sym = 'r-'):
+        '''
+        Filtrage de Kalman (50 cm sur le GPS / 2 m.s-1 sur la vitesse)
+        '''
+        self.track = flt.Kalman(self.track, 0.5, 2)
+        self.view(self.track, sym)	
     
     
     # =========================================================================
@@ -448,51 +448,51 @@ class TestInterpolation(TestCase):
     # Simplification
     # --------------------------------------------------------------------
 
-    # def test33(self, sym = 'r-'):
-    #     '''
-    #     Douglas-Peucker, tolerance 50 m
-    #     '''
-    #     self.track *= 10
-    #     self.track = spf.simplify(self.track, 50, 
-    #                               mode = spf.MODE_SIMPLIFY_DOUGLAS_PEUCKER)
-    #     self.view(sym)	
+    def test33(self, sym = 'r-'):
+        '''
+        Douglas-Peucker, tolerance 50 m
+        '''
+        self.track *= 10
+        self.track = spf.simplify(self.track, 50, 
+                                  mode = spf.MODE_SIMPLIFY_DOUGLAS_PEUCKER)
+        self.view(self.track, sym)	
     
 
-    # def test34(self, sym = 'r-'):
-    #     '''
-    #     Vis-Valingam, tolerance 500 m2
-    #     '''
-    #     self.track *= 10
-    #     self.track = spf.simplify(self.track, 5e2, 
-    #                               mode = spf.MODE_SIMPLIFY_VISVALINGAM)
-    #     self.view(sym)	
+    def test34(self, sym = 'r-'):
+        '''
+        Vis-Valingam, tolerance 500 m2
+        '''
+        self.track *= 10
+        self.track = spf.simplify(self.track, 5e2, 
+                                  mode = spf.MODE_SIMPLIFY_VISVALINGAM)
+        self.view(self.track, sym)	
     
 
-    # def test35(self, sym = 'r-'):
-    #     '''
-    #     Equarissage, tolerance 50 m
-    #     '''
-    #     self.track = spf.simplify(self.track, 50, 
-    #                               mode = spf.MODE_SIMPLIFY_SQUARING)
-    #     self.view(sym)	
+    def test35(self, sym = 'r-'):
+        '''
+        Equarissage, tolerance 50 m
+        '''
+        self.track = spf.simplify(self.track, 50, 
+                                  mode = spf.MODE_SIMPLIFY_SQUARING)
+        self.view(self.track, sym)	
 
 
-    # def test36(self, sym = 'r-'):
-    #     '''
-    #     Minimisation des elongations par segment  
-    #     '''
-    #     self.track = spf.simplify(self.track, 0.05, 
-    #                               mode = spf.MODE_SIMPLIFY_MINIMIZE_ELONGATION_RATIO)
-    #     self.view(sym)	
+    def test36(self, sym = 'r-'):
+        '''
+        Minimisation des elongations par segment  
+        '''
+        self.track = spf.simplify(self.track, 0.05, 
+                                  mode = spf.MODE_SIMPLIFY_MINIMIZE_ELONGATION_RATIO)
+        self.view(self.track, sym)	
     
     
-    # def test37(self, sym = 'r-'):
-    #     '''
-    #     Minimisation des deviations
-    #     '''
-    #     self.track = spf.simplify(self.track, 0.05, 
-    #                               mode = spf.MODE_SIMPLIFY_PRECLUDE_LARGE_DEVIATION)
-    #     self.view(sym)	
+    def test37(self, sym = 'r-'):
+        '''
+        Minimisation des deviations
+        '''
+        self.track = spf.simplify(self.track, 0.05, 
+                                  mode = spf.MODE_SIMPLIFY_PRECLUDE_LARGE_DEVIATION)
+        self.view(self.track, sym)	
     
 
 
@@ -501,46 +501,46 @@ class TestInterpolation(TestCase):
 if __name__ == '__main__':
     suite = TestSuite()
     
-    #suite.addTest(TestInterpolation("test1"))
-    #suite.addTest(TestInterpolation("test2"))
-    #suite.addTest(TestInterpolation("test3"))
-    #suite.addTest(TestInterpolation("test4"))
-    #suite.addTest(TestInterpolation("test5"))
-    #suite.addTest(TestInterpolation("test6"))
-    #suite.addTest(TestInterpolation("test7"))
+    suite.addTest(TestInterpolation("test1"))
+    suite.addTest(TestInterpolation("test2"))
+    suite.addTest(TestInterpolation("test3"))
+    suite.addTest(TestInterpolation("test4"))
+    suite.addTest(TestInterpolation("test5"))
+    suite.addTest(TestInterpolation("test6"))
+    suite.addTest(TestInterpolation("test7"))
     suite.addTest(TestInterpolation("test8"))
-    # suite.addTest(TestInterpolation("test9"))
-    # suite.addTest(TestInterpolation("test10"))
-    # suite.addTest(TestInterpolation("test11"))
-    # suite.addTest(TestInterpolation("test12"))
-    # suite.addTest(TestInterpolation("test13"))
-    # suite.addTest(TestInterpolation("test14"))
-    # suite.addTest(TestInterpolation("test15"))
-    # suite.addTest(TestInterpolation("test16"))
-    # suite.addTest(TestInterpolation("test17"))
+    suite.addTest(TestInterpolation("test9"))
+    suite.addTest(TestInterpolation("test10"))
+    suite.addTest(TestInterpolation("test11"))
+    suite.addTest(TestInterpolation("test12"))
+    suite.addTest(TestInterpolation("test13"))
+    suite.addTest(TestInterpolation("test14"))
+    suite.addTest(TestInterpolation("test15"))
+    suite.addTest(TestInterpolation("test16"))
+    suite.addTest(TestInterpolation("test17"))
     
-    # suite.addTest(TestInterpolation("test18"))
-    # suite.addTest(TestInterpolation("test19"))
-    # suite.addTest(TestInterpolation("test20"))
-    # suite.addTest(TestInterpolation("test21"))
+    suite.addTest(TestInterpolation("test18"))
+    suite.addTest(TestInterpolation("test19"))
+    suite.addTest(TestInterpolation("test20"))
+    suite.addTest(TestInterpolation("test21"))
     
-    # suite.addTest(TestInterpolation("test22"))
-    # suite.addTest(TestInterpolation("test23"))
-    # suite.addTest(TestInterpolation("test24"))
-    # suite.addTest(TestInterpolation("test25"))
-    # suite.addTest(TestInterpolation("test26"))
-    # suite.addTest(TestInterpolation("test27"))
-    # suite.addTest(TestInterpolation("test28"))
-    # suite.addTest(TestInterpolation("test29"))
-    # suite.addTest(TestInterpolation("test30"))
-    # suite.addTest(TestInterpolation("test31"))
-    # suite.addTest(TestInterpolation("test32"))
+    suite.addTest(TestInterpolation("test22"))
+    suite.addTest(TestInterpolation("test23"))
+    suite.addTest(TestInterpolation("test24"))
+    suite.addTest(TestInterpolation("test25"))
+    suite.addTest(TestInterpolation("test26"))
+    suite.addTest(TestInterpolation("test27"))
+    suite.addTest(TestInterpolation("test28"))
+    suite.addTest(TestInterpolation("test29"))
+    suite.addTest(TestInterpolation("test30"))
+    suite.addTest(TestInterpolation("test31"))
+    suite.addTest(TestInterpolation("test32"))
     
-    # suite.addTest(TestInterpolation("test33"))
-    # suite.addTest(TestInterpolation("test34"))
-    # suite.addTest(TestInterpolation("test35"))
-    # suite.addTest(TestInterpolation("test36"))
-    # suite.addTest(TestInterpolation("test37"))
+    suite.addTest(TestInterpolation("test33"))
+    suite.addTest(TestInterpolation("test34"))
+    suite.addTest(TestInterpolation("test35"))
+    suite.addTest(TestInterpolation("test36"))
+    suite.addTest(TestInterpolation("test37"))
     
     runner = TextTestRunner()
     runner.run(suite)
