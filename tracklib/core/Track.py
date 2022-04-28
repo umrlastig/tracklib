@@ -1332,7 +1332,7 @@ class Track:
     # Output:
     #  Ax object (may be input into append parameter)
     # ----------------------------------------------------
-    def plot(self, sym="k-", type="LINE", af_name="", cmap=-1, append=True, label=None):
+    def plot(self, sym="k-", type="LINE", af_name="", cmap=-1, append=True, label=None, pointsize=5):
         """
         af_name: test si isAFTransition
         """
@@ -1341,6 +1341,7 @@ class Track:
         if not '-' in sym:
             type = "POINT"
             plot.pointsize = 20
+        plot.pointsize = pointsize
         plot.color = sym[0]
         plot.marker = sym[1]
         plot.w = 6
