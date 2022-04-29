@@ -8,10 +8,12 @@ lecture d'un gpx
 
 '''
 import matplotlib.pyplot as plt
+import os.path
 
 from tracklib.core.GPSTime import GPSTime
 from tracklib.io.GpxReader import GpxReader
 from tracklib.core.Operator import Operator
+from tracklib.core.Plot import Plot
 
 import tracklib.algo.Analytics as algo
 import tracklib.algo.Interpolation as interp
@@ -25,7 +27,9 @@ import tracklib.algo.Summarising as summ
 # Lecture des donnees
 # ---------------------------------------------------
 GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
-tracks = GpxReader.readFromGpx("./data/activity_5807084803.gpx")
+resource_path = os.path.join(os.path.split(__file__)[0], "..")
+gpxpath = os.path.join(resource_path, 'data/activity_5807084803.gpx')
+tracks = GpxReader.readFromGpx(gpxpath)
 trace = tracks.getTrack(0)
 
 # Transformation GEO coordinates to ENU
@@ -39,8 +43,10 @@ trace.plot()
 # SPEED : different 
 trace.estimate_speed()
 
-trace.plotAnalyticalFeature('speed', 'BOXPLOT')
-trace.plotProfil('SPATIAL_SPEED_PROFIL')
+plot = Plot(trace)
+
+plot.plotAnalyticalFeature('speed', 'BOXPLOT')
+plot.plotProfil('SPATIAL_SPEED_PROFIL')
 trace.plot(type='POINT', af_name='speed', append = False)
 plt.show()
 
@@ -59,7 +65,7 @@ raster.plot(algo.speed, summ.co_avg)
 # ================================================
 trace.operate(Operator.DIFFERENTIATOR, "speed", "dv")
 trace.operate(Operator.RECTIFIER, "dv", "absdv")
-trace.plotProfil("SPATIAL_absdv_PROFIL")
+plot.plotProfil("SPATIAL_absdv_PROFIL")
 plt.show()
 
 

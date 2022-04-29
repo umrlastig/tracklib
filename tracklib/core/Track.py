@@ -1338,41 +1338,6 @@ class Track:
         plot.h = 5
         return plot.plotEllipses(self, sym, factor, af, append)
 
-    def plotProfil(self, template="SPATIAL_SPEED_PROFIL", afs=[]):
-        """Représentation du profil de la trace suivant une AF.
-
-        Le nom du template doit respecter: XXX_YYYY_PROFILE avec:
-
-            - XXX: SPATIAL ou TEMPORAL
-            - YYY: ALTI, SPEED ou AF_NAME
-
-        Le tableau de nom afs: teste si isAFTransition
-        """
-
-        nomaxes = template.split("_")
-        if len(nomaxes) != 3:
-            sys.exit("Error: pour le profil il faut respecter XXX_YYY_PROFIL")
-
-        if nomaxes[0] != "SPATIAL" and nomaxes[0] != "TEMPORAL":
-            sys.exit(
-                "Error: pour le profil il faut respecter XXX_YYY_PROFIL avec XXX SPATIAL or TEMPORAL"
-            )
-
-        if nomaxes[2] != "PROFIL":
-            sys.exit("Error: pour le profil il faut respecter XXX_YYY_PROFIL")
-
-        if (
-            nomaxes[1] != "SPEED"
-            and nomaxes[1] != "ALTI"
-            and not self.hasAnalyticalFeature(nomaxes[1])
-        ):
-            sys.exit(
-                "Error: pour le profil il faut respecter XXX_YYY_PROFIL avec YYY: ALTI, SPEED or existing AF"
-            )
-
-        plot = Plot.Plot(self)
-        plot.plotProfil(template, afs)
-
     
 
     # =========================================================================

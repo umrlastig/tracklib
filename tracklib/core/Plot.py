@@ -6,12 +6,13 @@ import math
 import numpy as np
 import progressbar
 import matplotlib.pyplot as plt
+from matplotlib.patches import Ellipse
+from PIL import Image
+import sys
+
 from tracklib.algo.Analytics import BIAF_ABS_CURV
 import tracklib.core.Utils as utils
 
-from matplotlib.patches import Ellipse
-
-from PIL import Image
 
 # MODE_REPRESENT_TRACK2D = 1
 # MODE_REPRESENT_SPEED_PROFIL = 2
@@ -178,6 +179,7 @@ class Plot:
 
         return ax1
 
+
     def plotAnalyticalFeature(self, af_name, template="BOXPLOT"):
         """TODO
 
@@ -197,17 +199,48 @@ class Plot:
         ax1.set_title(af_name + " observations boxplot")
         ax1.boxplot(self.track.getAnalyticalFeature(af_name), vert=False)
 
-    def plotProfil(self, template="SPATIAL_SPEED_PROFIL", afs=[]):
-        """TODO
 
-        TEMPLATE:
+    def plotProfil(self, template="SPATIAL_SPEED_PROFIL", afs=[]):
+        """Représentation du profil de la trace suivant une AF.
+
+        Le nom du template doit respecter: XXX_YYYY_PROFILE avec:
+
+            - XXX: SPATIAL ou TEMPORAL
+            - YYY: ALTI, SPEED ou AF_NAME
+        
+        Example:
             SPATIAL_SPEED_PROFIL, SPATIAL_ALTI_PROFIL,
                   TEMPORAL_SPEED_PROFIL, TEMPORAL_ALTI_PROFIL
 
-        On sait déjà que l'abscur est calculée si nécessaire
+
+        Le tableau de nom afs: teste si isAFTransition
+        
+        On sait déjà que l'abscurv est calculée si nécessaire
 
         afs: uniquement si 'isAFTransition'
         """
+        
+        nomaxes = template.split("_")
+        if len(nomaxes) != 3:
+            sys.exit("Error: pour le profil il faut respecter XXX_YYY_PROFIL")
+
+        if nomaxes[0] != "SPATIAL" and nomaxes[0] != "TEMPORAL":
+            sys.exit(
+                "Error: pour le profil il faut respecter XXX_YYY_PROFIL avec XXX SPATIAL or TEMPORAL"
+            )
+
+        if nomaxes[2] != "PROFIL":
+            sys.exit("Error: pour le profil il faut respecter XXX_YYY_PROFIL")
+
+        if (
+            nomaxes[1] != "SPEED"
+            and nomaxes[1] != "ALTI"
+            and not self.track.hasAnalyticalFeature(nomaxes[1])
+        ):
+            sys.exit(
+                "Error: pour le profil il faut respecter XXX_YYY_PROFIL avec YYY: ALTI, SPEED or existing AF"
+            )
+        
         import tracklib.core.Operator as Operator
 
         tabplot = []
