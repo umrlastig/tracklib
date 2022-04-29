@@ -9,9 +9,8 @@
    <p/>
   
 
-
 Welcome to TrackLib’s documentation!
-=======================================
+=====================================
 
 *tracklib library provide a variety of tools, operators and functions to manipulate GPS trajectories.*
 
@@ -36,7 +35,7 @@ Welcome to TrackLib’s documentation!
 
 
 Background
-**************
+***********
 
 More and more datasets of GPS trajectories are now available and they are studied very frequently in many scientific domains. 
 Python libraries for trajectories are available to load, simplify, interpolate, summarize and visualize them. 
@@ -92,11 +91,18 @@ Examples
 
 .. toctree::
    :maxdepth: 1
+   :caption: Generalité
    
    install
    quickstart   
    overview   
    
+.. toctree::
+   :maxdepth: 1
+   :caption: Test jupyter
+
+   test
+
    
 .. toctree::
    :maxdepth: 1
@@ -106,7 +112,8 @@ Examples
    ./userguide/coreconcept
    ./userguide/operator
    ./userguide/simplify
- 
+   ./userguide/plot
+   
    
 .. toctree::
    :maxdepth: 1
