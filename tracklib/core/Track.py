@@ -1400,9 +1400,12 @@ class Track:
         if raw speeds are required. If kernel is specified
         smoothed speed estimation is computed."""
         if kernel is None:
-            return self.estimate_raw_speed()
+            from tracklib.algo.Cinematics import estimate_speed
+            return estimate_speed(self)
         else:
-            return self.smoothed_speed_calculation(kernel)
+            from tracklib.algo.Cinematics import smoothed_speed_calculation
+            return smoothed_speed_calculation(kernel)
+        
 
     # DEPRECATED
     # def estimate_raw_speed(self):

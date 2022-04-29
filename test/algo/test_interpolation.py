@@ -37,7 +37,7 @@ import tracklib.algo.Synthetics as Synthetics
 
 import tracklib.algo.Filtering as flt
 import tracklib.algo.Interpolation as itp
-import tracklib.algo.Simplification as spf
+
 
 
 # changer aussi R dans setUp
@@ -443,61 +443,6 @@ class TestInterpolation(TestCase):
         self.view(self.track, sym)	
     
     
-    # =========================================================================
-    # --------------------------------------------------------------------
-    # Simplification
-    # --------------------------------------------------------------------
-
-    def test33(self, sym = 'r-'):
-        '''
-        Douglas-Peucker, tolerance 50 m
-        '''
-        self.track *= 10
-        self.track = spf.simplify(self.track, 50, 
-                                  mode = spf.MODE_SIMPLIFY_DOUGLAS_PEUCKER)
-        self.view(self.track, sym)	
-    
-
-    def test34(self, sym = 'r-'):
-        '''
-        Vis-Valingam, tolerance 500 m2
-        '''
-        self.track *= 10
-        self.track = spf.simplify(self.track, 5e2, 
-                                  mode = spf.MODE_SIMPLIFY_VISVALINGAM)
-        self.view(self.track, sym)	
-    
-
-    def test35(self, sym = 'r-'):
-        '''
-        Equarissage, tolerance 50 m
-        '''
-        self.track = spf.simplify(self.track, 50, 
-                                  mode = spf.MODE_SIMPLIFY_SQUARING)
-        self.view(self.track, sym)	
-
-
-    def test36(self, sym = 'r-'):
-        '''
-        Minimisation des elongations par segment  
-        '''
-        self.track = spf.simplify(self.track, 0.05, 
-                                  mode = spf.MODE_SIMPLIFY_MINIMIZE_ELONGATION_RATIO)
-        self.view(self.track, sym)	
-    
-    
-    def test37(self, sym = 'r-'):
-        '''
-        Minimisation des deviations
-        '''
-        self.track = spf.simplify(self.track, 0.05, 
-                                  mode = spf.MODE_SIMPLIFY_PRECLUDE_LARGE_DEVIATION)
-        self.view(self.track, sym)	
-    
-
-
-
-
 if __name__ == '__main__':
     suite = TestSuite()
     
@@ -535,12 +480,6 @@ if __name__ == '__main__':
     suite.addTest(TestInterpolation("test30"))
     suite.addTest(TestInterpolation("test31"))
     suite.addTest(TestInterpolation("test32"))
-    
-    suite.addTest(TestInterpolation("test33"))
-    suite.addTest(TestInterpolation("test34"))
-    suite.addTest(TestInterpolation("test35"))
-    suite.addTest(TestInterpolation("test36"))
-    suite.addTest(TestInterpolation("test37"))
     
     runner = TextTestRunner()
     runner.run(suite)
