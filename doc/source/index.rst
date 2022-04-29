@@ -97,11 +97,7 @@ Examples
    quickstart   
    overview   
    
-.. toctree::
-   :maxdepth: 1
-   :caption: Test jupyter
 
-   test
 
    
 .. toctree::
