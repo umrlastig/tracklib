@@ -99,7 +99,7 @@ Examples
    
 .. toctree::
    :maxdepth: 1
-   :caption: Test jupyter
+   :caption: Examples
 
    test
 
