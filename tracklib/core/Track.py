@@ -1373,10 +1373,7 @@ class Track:
         plot = Plot.Plot(self)
         plot.plotProfil(template, afs)
 
-    def plotAnalyticalFeature(self, af_name, template="BOXPLOT"):
-        """TODO"""
-        plot = Plot.Plot(self)
-        plot.plotAnalyticalFeature(af_name, template)
+    
 
     # =========================================================================
     # Track simplification (returns a new track)
