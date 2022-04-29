@@ -1,11 +1,12 @@
 version: 2
-
+formats: all
 python:
   version: "3.8"
   install:
     - method: pip
       path: .
     - requirements: doc/requirements.txt
+  system_packages: true
 
 sphinx:
   fail_on_warning: false
