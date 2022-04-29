@@ -23,7 +23,6 @@ import tracklib.core.Plot as Plot
 import tracklib.core.Utils as Utils
 import tracklib.core.Operator as Operator
 
-from tracklib.algo.Geometrics import Polygon
 from tracklib.util.Geometry import intersection
 
 from tracklib.core.Bbox import Bbox
@@ -766,29 +765,6 @@ class Track:
             s += self.getObs(i - 1).distanceTo(self.getObs(i))
         return s
 
-    # # DEPRECATED
-    # def computeNetDeniv(self, id_ini=0, id_fin=None):
-    #     '''
-    #     Computes net denivellation (in meters)
-    #     '''
-    #     if id_fin is None:
-    #         id_fin = self.size()-1
-    #     return Cinematics.computeNetDeniv(self, id_ini, id_fin)
-
-    # # DEPRECATED
-    # def computeAscDeniv(self, id_ini=0, id_fin=None):
-    #     '''Computes positive denivellation (in meters)'''
-    #     if id_fin is None:
-    #         id_fin = self.size()-1
-    #     return  Cinematics.computeAscDeniv(self, id_ini, id_fin)
-
-    #  # DEPRECATED
-    # def computeDescDeniv(self, id_ini=0, id_fin=None):
-    #     '''Computes negative denivellation (in meters)'''
-    #     if id_fin is None:
-    #         id_fin = self.size()-1
-    #     return Cinematics.computeDescDeniv(self, id_ini, id_fin)
-
     def toWKT(self) -> str:   
         """Transforms track into WKT string"""
         output = "LINESTRING("
@@ -1409,11 +1385,11 @@ class Track:
     #   MODE_SIMPLIFY_VISVALINGAM (2)
     # =========================================================================
     # DEPRECATED
-    def simplify(self, tolerance, mode=1):
-        """TODO"""
-        from tracklib.algo.Simplification import simplify as simplification_simplify
+    # def simplify(self, tolerance, mode=1):
+    #     """TODO"""
+    #     from tracklib.algo.Simplification import simplify as simplification_simplify
 
-        return simplification_simplify(self, tolerance, mode)
+    #     return simplification_simplify(self, tolerance, mode)
 
     # =========================================================================
     #    Built-in Analytical Features
@@ -1429,18 +1405,18 @@ class Track:
             return self.smoothed_speed_calculation(kernel)
 
     # DEPRECATED
-    def estimate_raw_speed(self):
-        """TODO"""
-        from tracklib.algo.Cinematics import estimate_speed
+    # def estimate_raw_speed(self):
+    #     """TODO"""
+    #     from tracklib.algo.Cinematics import estimate_speed
 
-        return estimate_speed(self)
+    #     return estimate_speed(self)
 
     # DEPRECATED
-    def smoothed_speed_calculation(self, kernel):
-        """TODO"""
-        from tracklib.algo.Cinematics import smoothed_speed_calculation
+    # def smoothed_speed_calculation(self, kernel):
+    #     """TODO"""
+    #     from tracklib.algo.Cinematics import smoothed_speed_calculation
 
-        return smoothed_speed_calculation(self, kernel)
+    #     return smoothed_speed_calculation(self, kernel)
 
     def getSpeed(self):
         """TODO"""
