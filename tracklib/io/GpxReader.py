@@ -1,5 +1,6 @@
 """Read GPS track from gpx file."""
 
+import os
 from xml.dom import minidom
 
 from tracklib.core.GPSTime import GPSTime
@@ -57,3 +58,15 @@ class GpxReader:
 
         collection = TrackCollection(tracks)
         return collection
+    
+    
+    @staticmethod
+    def readFromGpxFiles(pathdir, srid="GEO"):
+        TRACES = TrackCollection()
+        LISTFILE = os.listdir(pathdir)
+        for f in LISTFILE:
+            collection = GpxReader.readFromGpx(pathdir + f)
+            trace = collection.getTrack(0)
+            TRACES.addTrack(trace)
+        return TRACES
+
