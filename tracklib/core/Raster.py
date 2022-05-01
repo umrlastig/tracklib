@@ -123,12 +123,21 @@ class Raster:
                         grid.grid[column][line][af_name].append(val)
 
         # On calcule les agregats
+        # print (aggregates[0].__name__)
         for cle in self.summarizeFields.keys():
+            
+            aggname = cle.split("#")[1]
+            for idx in range(len(aggregates)):
+                agg = aggregates[idx]
+                if agg.__name__ == aggname:
+                    aggregate = agg
+            
             for i in range(grid.nrow):
                 for j in range(grid.ncol):
                     ii = grid.nrow - 1 - i
                     tabnames = cle.split("#")
                     tarray = grid.grid[j][i][tabnames[0]]
+                    
                     sumval = aggregate(tarray)
                     if utils.isnan(sumval):
                         self.bands[cle][ii][j] = 0
@@ -149,6 +158,7 @@ class Raster:
             cle = "uid" + "#" + aggregate.__name__
         return self.bands[cle]
 
+    
     def plot(self, af_algo, aggregate, valmax=None, startpixel=0):
         """TODO"""
         if af_algo != "uid":
