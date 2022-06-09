@@ -1,11 +1,7 @@
 version: 2
-
+formats: all
 python:
-  version: "3.8"
+  version: 3
   install:
-    - method: pip
-      path: .
     - requirements: doc/requirements.txt
-
-sphinx:
-  fail_on_warning: false
+  system_packages: true

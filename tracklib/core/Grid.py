@@ -14,8 +14,9 @@ from tracklib.core.TrackCollection import TrackCollection
 
 
 class Grid:
-    """Class for defining a spatial grid
-
+    """
+    Class for defining a spatial grid: structure de données un peu plus évoluées
+          qu'un tableau 2x2
     Mainly used by :class:`core.SpatialIndex.SpatialIndex` and for Summarizing
     """
 
@@ -37,8 +38,9 @@ class Grid:
         # Bbox only or collection
         if isinstance(collection, Bbox):
             bb = collection
-        else:
+        elif isinstance(collection, TrackCollection):
             bb = collection.bbox()
+        #else:
 
         bb = bb.copy()
         bb.addMargin(margin)
@@ -70,6 +72,23 @@ class Grid:
 
         self.XPixelSize = ax / self.ncol
         self.YPixelSize = ay / self.nrow
+        
+        
+    def __str__(self):
+        
+        output  = "-------------------------------------\n"
+        output += "Grid :\n"
+        output += "       nrows = " + str(self.nrow) + "\n"
+        output += "       ncols = " + str(self.ncol) + "\n"
+        output += "       XPixelSize = " + str(self.XPixelSize) + "\n"
+        output += "       YPixelSize = " + str(self.YPixelSize) + "\n"
+        output += " Bounding box: \n"
+        output += "       Lower left corner : " + str(self.xmin) + "," + str(self.ymin) + "\n"
+        output += "       Upper right corner: " + str(self.xmax) + "," + str(self.ymax) + "\n"
+        output += "-------------------------------------\n"
+        
+        return output
+
 
     def getCell(self, coord: Union[ENUCoords, ECEFCoords, GeoCoords]) -> Union[tuple[float, float], None]:   
         """Normalized coordinates of coord

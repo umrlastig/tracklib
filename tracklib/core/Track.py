@@ -23,7 +23,6 @@ import tracklib.core.Plot as Plot
 import tracklib.core.Utils as Utils
 import tracklib.core.Operator as Operator
 
-from tracklib.algo.Geometrics import Polygon
 from tracklib.util.Geometry import intersection
 
 from tracklib.core.Bbox import Bbox
@@ -766,29 +765,6 @@ class Track:
             s += self.getObs(i - 1).distanceTo(self.getObs(i))
         return s
 
-    # # DEPRECATED
-    # def computeNetDeniv(self, id_ini=0, id_fin=None):
-    #     '''
-    #     Computes net denivellation (in meters)
-    #     '''
-    #     if id_fin is None:
-    #         id_fin = self.size()-1
-    #     return Cinematics.computeNetDeniv(self, id_ini, id_fin)
-
-    # # DEPRECATED
-    # def computeAscDeniv(self, id_ini=0, id_fin=None):
-    #     '''Computes positive denivellation (in meters)'''
-    #     if id_fin is None:
-    #         id_fin = self.size()-1
-    #     return  Cinematics.computeAscDeniv(self, id_ini, id_fin)
-
-    #  # DEPRECATED
-    # def computeDescDeniv(self, id_ini=0, id_fin=None):
-    #     '''Computes negative denivellation (in meters)'''
-    #     if id_fin is None:
-    #         id_fin = self.size()-1
-    #     return Cinematics.computeDescDeniv(self, id_ini, id_fin)
-
     def toWKT(self) -> str:   
         """Transforms track into WKT string"""
         output = "LINESTRING("
@@ -1332,7 +1308,7 @@ class Track:
     # Output:
     #  Ax object (may be input into append parameter)
     # ----------------------------------------------------
-    def plot(self, sym="k-", type="LINE", af_name="", cmap=-1, append=True, label=None):
+    def plot(self, sym="k-", type="LINE", af_name="", cmap=-1, append=True, label=None, pointsize=5):
         """
         af_name: test si isAFTransition
         """
@@ -1341,6 +1317,7 @@ class Track:
         if not '-' in sym:
             type = "POINT"
             plot.pointsize = 20
+        plot.pointsize = pointsize
         plot.color = sym[0]
         plot.marker = sym[1]
         plot.w = 6
@@ -1361,45 +1338,7 @@ class Track:
         plot.h = 5
         return plot.plotEllipses(self, sym, factor, af, append)
 
-    def plotProfil(self, template="SPATIAL_SPEED_PROFIL", afs=[]):
-        """Représentation du profil de la trace suivant une AF.
-
-        Le nom du template doit respecter: XXX_YYYY_PROFILE avec:
-
-            - XXX: SPATIAL ou TEMPORAL
-            - YYY: ALTI, SPEED ou AF_NAME
-
-        Le tableau de nom afs: teste si isAFTransition
-        """
-
-        nomaxes = template.split("_")
-        if len(nomaxes) != 3:
-            sys.exit("Error: pour le profil il faut respecter XXX_YYY_PROFIL")
-
-        if nomaxes[0] != "SPATIAL" and nomaxes[0] != "TEMPORAL":
-            sys.exit(
-                "Error: pour le profil il faut respecter XXX_YYY_PROFIL avec XXX SPATIAL or TEMPORAL"
-            )
-
-        if nomaxes[2] != "PROFIL":
-            sys.exit("Error: pour le profil il faut respecter XXX_YYY_PROFIL")
-
-        if (
-            nomaxes[1] != "SPEED"
-            and nomaxes[1] != "ALTI"
-            and not self.hasAnalyticalFeature(nomaxes[1])
-        ):
-            sys.exit(
-                "Error: pour le profil il faut respecter XXX_YYY_PROFIL avec YYY: ALTI, SPEED or existing AF"
-            )
-
-        plot = Plot.Plot(self)
-        plot.plotProfil(template, afs)
-
-    def plotAnalyticalFeature(self, af_name, template="BOXPLOT"):
-        """TODO"""
-        plot = Plot.Plot(self)
-        plot.plotAnalyticalFeature(af_name, template)
+    
 
     # =========================================================================
     # Track simplification (returns a new track)
@@ -1408,11 +1347,11 @@ class Track:
     #   MODE_SIMPLIFY_VISVALINGAM (2)
     # =========================================================================
     # DEPRECATED
-    def simplify(self, tolerance, mode=1):
-        """TODO"""
-        from tracklib.algo.Simplification import simplify as simplification_simplify
+    # def simplify(self, tolerance, mode=1):
+    #     """TODO"""
+    #     from tracklib.algo.Simplification import simplify as simplification_simplify
 
-        return simplification_simplify(self, tolerance, mode)
+    #     return simplification_simplify(self, tolerance, mode)
 
     # =========================================================================
     #    Built-in Analytical Features
@@ -1423,23 +1362,26 @@ class Track:
         if raw speeds are required. If kernel is specified
         smoothed speed estimation is computed."""
         if kernel is None:
-            return self.estimate_raw_speed()
+            from tracklib.algo.Cinematics import estimate_speed
+            return estimate_speed(self)
         else:
-            return self.smoothed_speed_calculation(kernel)
+            from tracklib.algo.Cinematics import smoothed_speed_calculation
+            return smoothed_speed_calculation(kernel)
+        
 
     # DEPRECATED
-    def estimate_raw_speed(self):
-        """TODO"""
-        from tracklib.algo.Cinematics import estimate_speed
+    # def estimate_raw_speed(self):
+    #     """TODO"""
+    #     from tracklib.algo.Cinematics import estimate_speed
 
-        return estimate_speed(self)
+    #     return estimate_speed(self)
 
     # DEPRECATED
-    def smoothed_speed_calculation(self, kernel):
-        """TODO"""
-        from tracklib.algo.Cinematics import smoothed_speed_calculation
+    # def smoothed_speed_calculation(self, kernel):
+    #     """TODO"""
+    #     from tracklib.algo.Cinematics import smoothed_speed_calculation
 
-        return smoothed_speed_calculation(self, kernel)
+    #     return smoothed_speed_calculation(self, kernel)
 
     def getSpeed(self):
         """TODO"""

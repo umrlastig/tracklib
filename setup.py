@@ -13,6 +13,8 @@ doc_requirements = (
     "sphinx_rtd_theme",
     "recommonmark",
     "sphinx-autodoc-typehints",
+	"nbsphinx",
+	"ipykernel"
 )
 
 
@@ -22,7 +24,7 @@ setup(
     description="Python module providing the main objects to manipulate GPS traces with a variety of tools, operators and functions to perform spatial analysis using these objects",
     long_description="See https://github.com/umrlastig/tracklib",
     url="https://github.com/umrlastig/tracklib",
-    author="Yann MÃ©neroux, Marie-Dominique Van Damme",
+    author="Yann Méneroux, Marie-Dominique Van Damme",
     author_email="todo@ign.fr",
     license="cecill-c",
     python_requires=">=3.8",
