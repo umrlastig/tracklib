@@ -569,7 +569,7 @@ class Track:
         if isinstance(tab[0], int):
             return self.__removeObsListById(tab)
         if isinstance(tab[0], GPSTime):
-            return self.__removeObsByListTimestamp(tab)
+            return self.__removeObsListByTimestamp(tab)
         print("Error: 'removePoint' is not implemented for type", type(tab[0]))
         return 0
 
@@ -643,6 +643,56 @@ class Track:
 
         self.__POINTS = new_list
 
+    # =========================================================================
+    # Track cleaning functions
+    # =========================================================================
+	
+    # -----------------------------------------------------	
+	# Same timestamp (up to et, default 1 ms) and same 
+	# position (up to ep, default 1 cm). All duplicate 
+	# points are removed.
+    # -----------------------------------------------------	
+    def removeObsDup(self, et = 1e-3, ep = 1e-2):
+        """TODO"""
+        return None
+	
+    # -----------------------------------------------------	
+	# Same timestamp (up to et, default 1 ms) and different 
+	# positions. Timestamps are reinterpolated
+    # -----------------------------------------------------		
+    def removeTpsDup(self, et = 1e-3):
+        self.compute_abscurv()
+        new_track = Track()
+        for i in range(len(self)):
+	        enu = ENUCoords(self["t", i], 0, 0)
+	        new_track.addObs(Obs(enu, GPSTime.readUnixTime(self["abs_curv",i])))
+
+        new_track["dx = D{x} < 0.01"]
+
+        T = []
+        for i in range(len(new_track)):
+	        if new_track["dx", i]:
+		        T.append(new_track[i].timestamp)
+		
+        Tini = new_track["timestamp"]	
+        new_track.removeObsList(T)
+        new_track.resample(Tini, mode=2)
+
+        new_track2 = Track()
+        for i in range(len(new_track)):
+	        enu = ENUCoords(self["x", i], self["y", i], self["z", i])
+	        new_track2.addObs(Obs(enu, GPSTime.readUnixTime(new_track["x",i])))
+
+        return new_track2
+		
+    # -----------------------------------------------------	
+	# Same position (up to ep, default 1 cm) and different 
+	# timestamps. All intermediary points discarded
+    # -----------------------------------------------------		
+    def removePosDup(self, ep = 1e-2):
+        """TODO"""
+        return None
+	
     # =========================================================================
     # Basic private methods to handle track object
     # =========================================================================
@@ -824,7 +874,13 @@ class Track:
         sec_number: number of seconds to add (may be < 0)"""
         for i in range(self.size()):
             self.getObs(i).timestamp = self.getObs(i).timestamp.addSec(sec_number)
-
+			
+    def roundTimestamps(self, unit = GPSTime.ROUND_TO_SEC):
+        """Rounds timestamps in a track
+        unit: round timestamps up to unit seconds (default = 1)"""
+        for obs in self:
+            obs.timestamp = obs.timestamp.round(unit)
+		
     # =========================================================================
     # Analytical algorithms
     # =========================================================================
