@@ -71,7 +71,10 @@ class FileReader:
         # -------------------------------------------------------
         # Reading data according to file format
         # -------------------------------------------------------
-        track = Track()
+        if os.path.basename(path).split(".")[0] != None:
+            track = Track(track_id=os.path.basename(path).split(".")[0])
+        else:
+            track = Track()
 
         time_fmt_save = GPSTime.getReadFormat()
         GPSTime.setReadFormat(fmt.time_fmt)
@@ -224,9 +227,6 @@ class FileReader:
         LISTFILE = os.listdir(pathdir)
         for f in LISTFILE:
             p = pathdir + "/" + f
-            if TRACES.size() > 10:
-                break
-            print(TRACES.size())
             trace = FileReader.readFromFile(
                 p,
                 id_E,
