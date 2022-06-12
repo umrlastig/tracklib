@@ -43,9 +43,6 @@ class Raster:
     def getCle(self, af_algo: Union[int, str], aggregate = None):
         """TODO"""
         
-        if isinstance(af_algo, int):
-            return self.bands[grid.DEFAULT_NAME + str(af_algo)]
-        
         if af_algo != "uid":
             if isinstance(af_algo, str):
                 cle = af_algo + "#" + aggregate.__name__
@@ -59,6 +56,10 @@ class Raster:
 
     def getRasterBand(self, af_algo: Union[int, str], aggregate = None):
         """TODO"""
+        
+        if isinstance(af_algo, int):
+            return self.bands[grid.DEFAULT_NAME + str(af_algo)]
+        
         cle = self.getCle(af_algo, aggregate)
         return self.bands[cle]
 
