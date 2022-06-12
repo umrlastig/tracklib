@@ -2,175 +2,75 @@
 This module contains the class to manipulate rasters
 """
 
-import math
+# For type annotation
+from __future__ import annotations   
+from typing import Union
+
 import matplotlib.pyplot as plt
 import numpy as np
 
 #from skimage import io
 
 import tracklib.core.Utils as utils
-
+import tracklib.core.Grid as grid
 
 class Raster:
-    """TODO"""
-
-    NO_DATA_VALUE = -99999.00  #: TODO
-
-    def __init__(self, grid, af_algos, aggregates, verbose=True):
-        """TODO
-
-        Example :
-            af_algos = [algo.speed, algo.speed]
-            cell_operators = [celloperator.co_avg, celloperator.co_max]
+    '''
+    '''
+    
+    def __init__(self, grids: Union[grid.Grid, list], verbose=True):
         """
-
-        if not isinstance(af_algos, list):
-            af_algos = [af_algos]
-        if not isinstance(aggregates, list):
-            aggregates = [aggregates]
-
-        if len(af_algos) == 0:
-            print("Error: af_algos is empty")
-            return 0
-
-        if len(af_algos) != len(aggregates):
-            print("Error: af_names and aggregates must have the same number elements")
-            return 0
+        On crée un raster avec une ou plusieurs grilles géographiques 
+        déjà chargées avec les données.
+        """
+        
+        grids = utils.listify(grids)
+        
+        self.bands = {}
+        for itergrid in grids:
+            self.bands[itergrid.name] = itergrid
 
         self.color1 = (0, 0, 0)
         self.color2 = (255, 255, 255)
 
-        # ---------------------------------------------------------------------
-        # Tableau des noms
-        self.af_names = []  # Utile pour stocker une seule fois l'af
-        self.summarizeFields = {}  # cle nom_algo#nom_agg
-
-        for idx, af_algo in enumerate(af_algos):
-
-            aggregate = aggregates[idx]
-
-            if isinstance(af_algo, str):
-                name = af_algo
-            else:
-                name = af_algo.__name__
-
-            cle = name + "#" + aggregate.__name__
-
-            if name not in self.af_names:
-                self.af_names.append(name)
-            if cle not in self.summarizeFields.keys():
-                self.summarizeFields[cle] = aggregate
-
-        # ---------------------------------------------------------------------
-        #  On construit des cellules vides
-
-        for i in range(grid.ncol):
-            for j in range(grid.nrow):
-                grid.grid[i][j] = {}
-                for name in self.af_names:
-                    grid.grid[i][j][name] = []
-
-        self.bands = {}
-        for cle in self.summarizeFields:
-            self.bands[cle] = []
-            for i in range(grid.nrow):
-                self.bands[cle].append([])
-                for j in range(grid.ncol):
-                    self.bands[cle][i].append(Raster.NO_DATA_VALUE)
-
-        # ---------------------------------------------------------------------
-        #  On ajoute les valeurs des af dans les cellules
-        for af_algo in af_algos:
-            """
-            On dispatch les valeurs de l'AF dans les cellules.
-            Avant on vérifie si l'AF existe, sinon on la calcule.
-            """
-            if not isinstance(af_algo, str):
-                af_name = af_algo.__name__
-            else:
-                af_name = af_algo
-
-            for trace in grid.collection.getTracks():
-
-                if not isinstance(af_algo, str):
-                    # On calcule l'AF si ce n'est pas fait
-                    trace.addAnalyticalFeature(af_algo)
-
-                # On eparpille dans les cellules
-                for i in range(trace.size()):
-                    obs = trace.getObs(i)
-
-                    (idx, idy) = grid.getCell(obs.position)
-                    column = math.floor(idx)
-                    line = math.floor(idy)
-                    # print (column, line)
-
-                    if (
-                        0 <= column
-                        and column < grid.ncol
-                        and 0 <= line
-                        and line < grid.nrow
-                    ):
-
-                        if not isinstance(af_algo, str):
-                            val = trace.getObsAnalyticalFeature(af_name, i)
-                        elif af_algo != "uid":
-                            val = trace.getObsAnalyticalFeature(af_algo, i)
-                        else:
-                            val = trace.uid
-                            # val = int(startpixel + (255 - startpixel) * (valmax - val) / valmax)
-
-                        grid.grid[column][line][af_name].append(val)
-
-        # On calcule les agregats
-        # print (aggregates[0].__name__)
-        for cle in self.summarizeFields.keys():
-            
-            aggname = cle.split("#")[1]
-            for idx in range(len(aggregates)):
-                agg = aggregates[idx]
-                if agg.__name__ == aggname:
-                    aggregate = agg
-            
-            for i in range(grid.nrow):
-                for j in range(grid.ncol):
-                    ii = grid.nrow - 1 - i
-                    tabnames = cle.split("#")
-                    tarray = grid.grid[j][i][tabnames[0]]
-                    
-                    sumval = aggregate(tarray)
-                    if utils.isnan(sumval):
-                        self.bands[cle][ii][j] = 0
-                    # elif valmax != None and val > valmax:
-                    else:
-                        self.bands[cle][ii][j] = sumval
 
     def setColor(self, c1, c2):
         """TODO"""
         self.color1 = c1
         self.color2 = c2
-
-    def getRasterBand(self, af_algo, aggregate):
+        
+        
+    def getCle(self, af_algo: Union[int, str], aggregate = None):
         """TODO"""
+        
+        if isinstance(af_algo, int):
+            return self.bands[grid.DEFAULT_NAME + str(af_algo)]
+        
         if af_algo != "uid":
-            cle = af_algo.__name__ + "#" + aggregate.__name__
+            if isinstance(af_algo, str):
+                cle = af_algo + "#" + aggregate.__name__
+            else:
+                cle = af_algo.__name__ + "#" + aggregate.__name__
         else:
             cle = "uid" + "#" + aggregate.__name__
+            
+        return cle
+
+
+    def getRasterBand(self, af_algo: Union[int, str], aggregate = None):
+        """TODO"""
+        cle = self.getCle(af_algo, aggregate)
         return self.bands[cle]
 
     
     def plot(self, af_algo, aggregate, valmax=None, startpixel=0):
         """TODO"""
-        if af_algo != "uid":
-            cle = af_algo.__name__ + "#" + aggregate.__name__
-        else:
-            cle = "uid" + "#" + aggregate.__name__
-
-        tab = np.array(self.bands[cle])
+        
+        tab = np.array(self.getRasterBand(af_algo, aggregate).grid)
 
         cmap = utils.getOffsetColorMap(self.color1, self.color2, 0)
         plt.imshow(tab, cmap=cmap)
-        plt.title(cle)
+        plt.title(self.getCle(af_algo, aggregate))
         plt.colorbar()
         plt.show()
 

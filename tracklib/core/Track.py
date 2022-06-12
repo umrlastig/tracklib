@@ -934,6 +934,7 @@ class Track:
         else:
             for i in range(self.size()):
                 self.getObs(i).features.append(val_init)
+    
     def removeAnalyticalFeature(self, name):
         """TODO"""
         if not self.hasAnalyticalFeature(name):

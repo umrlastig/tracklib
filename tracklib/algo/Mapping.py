@@ -152,11 +152,33 @@ def mapOnNetwork(
         __mapOnNetwork(track, network, gps_noise, transition_cost, search_radius, debug)
 
 
-# --------------------------------------------------------------------------
-# TO DO: map-matching on raster
-# --------------------------------------------------------------------------
-def mapOnRaster(track, grid):
-    """TODO"""
+# -----------------------------------------------------------------------------
+# Raster data transfer to track
+# -----------------------------------------------------------------------------
+def mapOnRaster(track, grid, name = 'raster'):
+    
+    """
+    - Pour chaque point p de la trace
+        - Si p en dehors du Raster
+            - Message d'insultes pas trop malpoli
+        - Récupération de la cellule contenant p
+        - Affectation de la valeur de cellule au champ AF de p
+    """
+    
+    # create a new empty analytical feature
+    track.createAnalyticalFeature(name)
+    
+    for i in range(track.size()):
+        pos = track.getObs(i).position
+        if isinstance(pos, ENUCoords):
+            if not grid.isIn(pos):
+                print ('hors les clous')
+    
+    
+    #message = "Warning: no reference point (base) provided for local projection to ENU coordinates. "
+    #message += "Arbitrarily used: " + str(base)
+    #print(message)
+    
     return None
 
 

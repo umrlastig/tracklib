@@ -13,6 +13,8 @@ class GPSTime:
     """Class to reprent a GPS time"""
 
     BASE_YEAR = 2000
+    
+    ROUND_TO_SEC = 0.1
 
     __READ_FMT = "2D/2M/4Y 2h:2m:2s"
     __PRINT_FMT = "2D/2M/4Y 2h:2m:2s"

@@ -4,7 +4,7 @@ import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
 
 from tracklib.io.AsciiReader import AsciiReader
-#from tracklib.core.TrackCollection import TrackCollection
+
 
 class TestAsciiReader(TestCase):
     
@@ -14,7 +14,8 @@ class TestAsciiReader(TestCase):
     def test_read_ign_mnt(self):
         # =============================================================
         csvpath = os.path.join(self.resource_path, 'data/asc/RGEALTI_FXX_0930_6415_MNT_LAMB93_IGN69.asc')
-        grid = AsciiReader.readFromFile(csvpath)
+        raster = AsciiReader.readFromAscFile(csvpath)
+        grid = raster.getRasterBand(1)
         
         self.assertEqual(1000, grid.nrow)
         self.assertEqual(1000, grid.ncol)
@@ -29,7 +30,8 @@ class TestAsciiReader(TestCase):
     def test_read_test_mnt(self):
         # =============================================================
         csvpath = os.path.join(self.resource_path, 'data/asc/test.asc')
-        grid = AsciiReader.readFromFile(csvpath)
+        raster = AsciiReader.readFromAscFile(csvpath)
+        grid = raster.getRasterBand(1)
         
         self.assertEqual(2000, grid.nrow)
         self.assertEqual(2000, grid.ncol)

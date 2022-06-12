@@ -12,12 +12,14 @@ from tracklib.core.Bbox import Bbox
 from tracklib.core.Coords import ECEFCoords, ENUCoords, GeoCoords
 from tracklib.core.TrackCollection import TrackCollection
 
+NO_DATA_VALUE = -9999
+DEFAULT_NAME = 'grid'
 
 class Grid:
     """
     Class for defining a spatial grid: structure de données un peu plus évoluées
           qu'un tableau 2x2
-    Mainly used by :class:`core.SpatialIndex.SpatialIndex` and for Summarizing
+    Mainly used by :class:`core.SpatialIndex.SpatialIndex` and `algo.Summarizing.summarize`
     """
 
     def __init__(
@@ -25,14 +27,16 @@ class Grid:
         collection: Union[Bbox, TrackCollection],
         resolution=None,
         margin: float = 0.05,
+        novalue: float = NO_DATA_VALUE,
+        name = DEFAULT_NAME,
         verbose: bool = True,
     ):
         """
         Grid constructor.
-
         :param collection: Collection of tracks or bbox
         :param resolution: Grid resolution
         :param margin: relative float. Default value is +5%
+        :param novalue: value that is regarded as "missing" or "not applicable";
         :param verbose: Verbose creation
         """
         # Bbox only or collection
@@ -56,7 +60,7 @@ class Grid:
             r = resolution
             resolution = (int(ax / r[0]), int(ay / r[1]))
 
-        self.collection = collection
+        # self.collection = collection
 
         # Nombre de dalles par cote
         self.ncol = resolution[0]
@@ -68,10 +72,18 @@ class Grid:
         for i in range(self.ncol):
             self.grid.append([])
             for j in range(self.nrow):
-                self.grid[i].append([])
+                self.grid[i].append(NO_DATA_VALUE)
 
         self.XPixelSize = ax / self.ncol
         self.YPixelSize = ay / self.nrow
+        
+        self.noDataValue = novalue
+        self.name = name
+        
+    
+    def isIn(self, coord: Union[ENUCoords, TrackCollection]):
+        
+        return False
         
         
     def __str__(self):
@@ -120,12 +132,11 @@ class Grid:
 
         return (idx, idy)
 
-    def plot(self, base: bool = True, af_algo=None, aggregate=None):   
+
+    def plot(self, base: bool = True):   
         """Plot grid
         
         :param base: TODO
-        :param af_algo: TODO
-        :param aggregate: TODO
         """
 
         fig = plt.figure()
@@ -140,8 +151,8 @@ class Grid:
             yj = j * self.YPixelSize + self.ymin
             ax.plot([self.xmin, self.xmax], [yj, yj], "-", color="lightgray")
 
-        if base:
-            self.collection.plot(append=ax)
+        #if base:
+        #    self.collection.plot(append=ax)
 
         for i in range(self.ncol):
             xi1 = i * self.XPixelSize + self.xmin
@@ -149,8 +160,8 @@ class Grid:
             for j in range(self.nrow):
                 yj1 = j * self.YPixelSize + self.ymin
                 yj2 = yj1 + self.YPixelSize
-                if len(self.grid[i][j]) > 0:
-                    print(self.grid[i][j])
+                if self.grid[i][j] != NO_DATA_VALUE:
+                    # print(self.grid[i][j])
                     polygon = plt.Polygon(
                         [[xi1, yj1], [xi2, yj1], [xi2, yj2], [xi1, yj2], [xi1, yj1]]
                     )
