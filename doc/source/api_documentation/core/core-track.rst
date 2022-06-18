@@ -1,4 +1,12 @@
+
 Track
------
-.. automodule:: tracklib.core.Track
-    :members:
+.............
+
+.. py:module:: Track
+
+.. autoclass:: tracklib.core.Track.Track
+   :members:
+   :autosummary:
+   :show-inheritance:
+
+

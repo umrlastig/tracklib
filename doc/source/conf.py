@@ -41,6 +41,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx_autodoc_typehints",
 	"nbsphinx",
+    "autodocsumm",
 ]
 
 # I execute the notebooks manually in advance. If notebooks test the code,
