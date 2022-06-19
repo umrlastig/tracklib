@@ -81,15 +81,33 @@ class Grid:
         self.name = name
         
     
-    def isIn(self, coord: Union[ENUCoords, TrackCollection]):
+    def isIn(self, coord: Union[ENUCoords]):
+        '''
+        Return true if coord is in spatial grid, false else.
+
+        Parameters
+        ----------
+        coord : Union[ENUCoords]
+            coordinate of the position to test the contain.
+
+        Returns
+        -------
+        bool
+            true if contains, false else.
+
+        '''
+        if coord.E < self.xmin and coord.E > self.xmax:
+            return False
+        if coord.N < self.ymin and coord.N > self.ymax:
+            return False
         
-        return False
-        
-        
+        return True
+    
+    
     def __str__(self):
         
         output  = "-------------------------------------\n"
-        output += "Grid :\n"
+        output += "Grid '" + self.name + "':\n"
         output += "       nrows = " + str(self.nrow) + "\n"
         output += "       ncols = " + str(self.ncol) + "\n"
         output += "       XPixelSize = " + str(self.XPixelSize) + "\n"
@@ -120,6 +138,7 @@ class Grid:
             )
             print("Warning: x overflow " + str(coord) + "  OVERFLOW = " + str(overflow))
             return None
+        
         if (coord.getY() < self.ymin) or (coord.getY() > self.ymax):
             overflow = "{:5.5f}".format(
                 max(self.ymin - coord.getY(), coord.getY() - self.ymax)
@@ -128,7 +147,7 @@ class Grid:
             return None
 
         idx = (float(coord.getX()) - self.xmin) / self.XPixelSize
-        idy = (float(coord.getY()) - self.ymin) / self.YPixelSize
+        idy = self.nrow - (float(coord.getY()) - self.ymin) / self.YPixelSize
 
         return (idx, idy)
 

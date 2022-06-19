@@ -139,48 +139,56 @@ def __mapOnNetwork(
         f2.close()
     """
 
-# --------------------------------------------------------------------------
-# Map-matching on a network
-# --------------------------------------------------------------------------
 def mapOnNetwork(
     tracks, network, gps_noise=50, transition_cost=10, search_radius=50, debug=False
 ):
-    """TODO"""
+    """
+    Map-matching on a network.
+    """
+    
     if isinstance(tracks, Track):
         tracks = TrackCollection([tracks])
     for track in tracks:
         __mapOnNetwork(track, network, gps_noise, transition_cost, search_radius, debug)
 
 
-# -----------------------------------------------------------------------------
-# Raster data transfer to track
-# -----------------------------------------------------------------------------
-def mapOnRaster(track, grid, name = 'raster'):
-    
+def mapOnRaster(track, raster):
     """
-    - Pour chaque point p de la trace
-        - Si p en dehors du Raster
-            - Message d'insultes pas trop malpoli
-        - Récupération de la cellule contenant p
-        - Affectation de la valeur de cellule au champ AF de p
+    Raster data transfer to track.
+    
+    Add an analytical feature for each grid in the raster. 
+    
+    :return: void
     """
     
-    # create a new empty analytical feature
-    track.createAnalyticalFeature(name)
-    
-    for i in range(track.size()):
-        pos = track.getObs(i).position
-        if isinstance(pos, ENUCoords):
-            if not grid.isIn(pos):
-                print ('hors les clous')
-    
-    
-    #message = "Warning: no reference point (base) provided for local projection to ENU coordinates. "
-    #message += "Arbitrarily used: " + str(base)
-    #print(message)
-    
-    return None
+    # create a new empty analytical feature for each raster band
+    for i in range(1, len(raster.bands)+1):
+        band = raster.getRasterBand(i)
+        name = band.name
+        track.createAnalyticalFeature(name)
 
+
+    # for each point         
+    for j in range(track.size()):
+        pos = track.getObs(j).position
+        
+        # for each band        
+        for i in range(1, len(raster.bands)+1):
+            name = raster.getRasterBand(i).name
+            
+            cell = band.getCell(pos)
+            
+            if cell == None:
+                message = "Warning: point is not located in the spatial grid. "
+                print(message)
+                continue
+            
+            cx = math.floor(cell[0])
+            cy = math.floor(cell[1])
+            val = band.grid[cx][cy]
+            
+            track.setObsAnalyticalFeature(name, j, val)
+            
 
 def mapOn(
     track,

@@ -195,6 +195,7 @@ class SpatialIndex:
 
         idx = (float(coord.getX()) - self.xmin) / self.dX
         idy = (float(coord.getY()) - self.ymin) / self.dY
+        # idy = self.nrow - idy ??
 
         return (idx, idy)
 
