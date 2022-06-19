@@ -94,27 +94,29 @@ class TestGrille(TestCase):
         speedTrace1 = self.collection.getTrack(0).getAnalyticalFeature('speed')
         speedTrace2 = self.collection.getTrack(1).getAnalyticalFeature('speed')
         
-        self.assertEqual(rasterBand.grid[0][0], (speedTrace1[0] + speedTrace2[0]) / 2)
-        self.assertEqual(rasterBand.grid[1][0], Grid.NO_DATA_VALUE)
-        self.assertEqual(rasterBand.grid[2][0], Grid.NO_DATA_VALUE)
-        
+        self.assertEqual(rasterBand.grid[0][2], (speedTrace1[0] + speedTrace2[0]) / 2)
         self.assertEqual(rasterBand.grid[0][1], speedTrace1[1])
-        # self.assertEqual(rasterBand[1][1], 0)
-        # self.assertEqual(rasterBand[2][1], 0)
-        # self.assertEqual(rasterBand[0][2], 0)
-        # self.assertEqual(rasterBand[1][2], 0)
-        # self.assertEqual(rasterBand[2][2], 0)
-        # self.assertEqual(rasterBand[0][3], 0)
-        # self.assertEqual(rasterBand[1][3], 0)
-        # self.assertEqual(rasterBand[2][3], 0)
+        self.assertEqual(rasterBand.grid[0][0], Grid.NO_DATA_VALUE)
         
-        # self.assertEqual(rasterBand[0][4], 0)
-        # self.assertEqual(rasterBand[1][4], (speedTrace1[2] + speedTrace2[1]) / 2)
-        # self.assertEqual(rasterBand[2][4], 0)
+        self.assertEqual(rasterBand.grid[1][1], Grid.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[1][1], Grid.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[1][2], Grid.NO_DATA_VALUE)
         
-        # self.assertEqual(rasterBand[0][5], speedTrace1[3])
-        # self.assertEqual(rasterBand[1][5], 0)
-        # self.assertEqual(rasterBand[2][5], speedTrace2[2])
+        self.assertEqual(rasterBand.grid[2][0], Grid.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[2][1], Grid.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[2][2], Grid.NO_DATA_VALUE)
+        
+        self.assertEqual(rasterBand.grid[3][0], Grid.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[3][1], Grid.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[3][2], Grid.NO_DATA_VALUE)
+        
+        self.assertEqual(rasterBand.grid[4][0], Grid.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[4][1], (speedTrace1[2] + speedTrace2[1]) / 2)
+        self.assertEqual(rasterBand.grid[4][2], Grid.NO_DATA_VALUE)
+        
+        self.assertEqual(rasterBand.grid[5][0], speedTrace1[3])
+        self.assertEqual(rasterBand.grid[5][1], Grid.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[5][2], speedTrace2[2])
         
     
     # def test_summarize_aa(self):
