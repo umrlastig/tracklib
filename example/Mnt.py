@@ -27,6 +27,7 @@ mapping.mapOnRaster(trace, raster)
 for j in range(trace.size()):
     pos = trace.getObs(j).position
     if pos.getX() == 942323.41762134002055973:
-        print ('ele MNT AF', trace.getObsAnalyticalFeature('grid1', j))
+        print ('ele MNT AF:', trace.getObsAnalyticalFeature('grid1', j))
+        print ('ele Z:', pos.getZ())
 #Point ( 6434246.95822110027074814)	
     
