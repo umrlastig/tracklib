@@ -656,3 +656,33 @@ def splitAR(track, pt1, pt2=None, radius=10, nb_min_pts=10, verbose=True):
                 "[" + str(len(tracks)) + "]",
             )
     return tracks
+
+
+
+def stdbscan(track, eps1, eps2, minPts, deltaT):
+    '''
+    Birant, D., & Kut, A. (2007). ST-DBSCAN: An algorithm for clustering 
+    spatial–temporal data. Data & Knowledge Engineering, 60(1), 208-221.
+    
+
+    Parameters
+    ----------
+    track : TYPE
+        DESCRIPTION.
+    eps1 : TYPE
+        DESCRIPTION.
+    eps2 : TYPE
+        DESCRIPTION.
+    minPts : TYPE
+        DESCRIPTION.
+    deltaT : float
+        threshold value to be included in a cluster.
+
+    Returns
+    -------
+    Cluster in AF 
+
+    '''
+    
+    pass
+
