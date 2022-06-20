@@ -249,99 +249,99 @@ def diffJourAnneeTrace(track, i):
 
 # =============================================================================
 # =============================================================================
-def stop_point_with_acceleration_criteria(track, i):
-    """This algorithm detect stop point. 
+# def stop_point_with_acceleration_criteria(track, i):
+#     """This algorithm detect stop point. 
     
-    A point is a stop when:
+#     A point is a stop when:
     
-        - speed is null
-        - acceleration is negative
-    """
-    if i == 0:
-        return 0
+#         - speed is null
+#         - acceleration is negative
+#     """
+#     if i == 0:
+#         return 0
 
-    stop_point = 0
-    v = speed(track, i)
+#     stop_point = 0
+#     v = speed(track, i)
 
-    # Si un point d'indice [i] affiche une vitesse nulle suivant une deccelération,
-    #    on cherche le prochain point d'accélération
-    if v < 0.001 and acceleration(track, i) < 0:
-        # Initialisation d'un compteur sur i
-        j = i
-        # Tant qu'aucun des points suivants n'accélère, on ne marque pas le point d'arrêt
-        while j <= track.size() - 2 and acceleration(track, j) <= 0:
-            j += 1
-            # Si on trouve un point d'accélération, on donne la valeur 1
-            #     au paramètre du point d'indice [i]
-            if acceleration(track, j) > 0:
-                stop_point = 1
+#     # Si un point d'indice [i] affiche une vitesse nulle suivant une deccelération,
+#     #    on cherche le prochain point d'accélération
+#     if v < 0.001 and acceleration(track, i) < 0:
+#         # Initialisation d'un compteur sur i
+#         j = i
+#         # Tant qu'aucun des points suivants n'accélère, on ne marque pas le point d'arrêt
+#         while j <= track.size() - 2 and acceleration(track, j) <= 0:
+#             j += 1
+#             # Si on trouve un point d'accélération, on donne la valeur 1
+#             #     au paramètre du point d'indice [i]
+#             if acceleration(track, j) > 0:
+#                 stop_point = 1
 
-    return stop_point
-
-
-VAL_AF_TIME_WINDOW_STOP = 1
-VAL_AF_TIME_WINDOW_MOVE = 0
-VAL_AF_TIME_WINDOW_NONE = -1
+#     return stop_point
 
 
-def stop_point_with_time_window_criteria(trace, i):
-    """This algorithm of stop detection is based on geographical moving distance in time windows.
+# VAL_AF_TIME_WINDOW_STOP = 1
+# VAL_AF_TIME_WINDOW_MOVE = 0
+# VAL_AF_TIME_WINDOW_NONE = -1
 
-    The AF has value:
 
-        - stop (*1*)
-        - not stop (*0*)
-        - not yet examined (*-1*)
+# def stop_point_with_time_window_criteria(trace, i):
+#     """This algorithm of stop detection is based on geographical moving distance in time windows.
 
-    """
+#     The AF has value:
 
-    name_af = "stop_point_with_time_window_criteria"
+#         - stop (*1*)
+#         - not stop (*0*)
+#         - not yet examined (*-1*)
 
-    N = trace.size()
+#     """
 
-    val = trace.getObsAnalyticalFeature(name_af, i)
-    if val > -1:
-        return val
+#     name_af = "stop_point_with_time_window_criteria"
 
-    if i == N - 1:
-        return trace.getObsAnalyticalFeature(name_af, N - 2)
+#     N = trace.size()
 
-    T = 40  # fenetre de 45s
-    D = 30  # 30 metres
+#     val = trace.getObsAnalyticalFeature(name_af, i)
+#     if val > -1:
+#         return val
 
-    S = trace.getAnalyticalFeature("abs_curv")
+#     if i == N - 1:
+#         return trace.getObsAnalyticalFeature(name_af, N - 2)
 
-    j = i + 1
-    ispause = False
+#     T = 40  # fenetre de 45s
+#     D = 30  # 30 metres
 
-    tj = trace.getObs(j).timestamp
-    ti = trace.getObs(i).timestamp
+#     S = trace.getAnalyticalFeature("abs_curv")
 
-    # On cherche la fin de la fenetre
-    while (tj - ti) <= T:
-        j = j + 1
-        if j == N - 1:
-            break
-        tj = trace.getObs(j).timestamp
+#     j = i + 1
+#     ispause = False
 
-    # On agrandit la fenetre
-    while (tj - ti) >= T and (S[j] - S[i]) <= D:
-        ispause = True
-        # print ('pause ' + str(i) + ',' + str(j))
-        j = j + 1
-        if j == N - 1:
-            break
-        tj = trace.getObs(j).timestamp
+#     tj = trace.getObs(j).timestamp
+#     ti = trace.getObs(i).timestamp
 
-    retour = VAL_AF_TIME_WINDOW_MOVE
-    if ispause:
-        # PAUSES.append([i, j-1])
-        # print ('pause de ' + str(i) + ',' + str(j-1))
-        retour = VAL_AF_TIME_WINDOW_STOP
-        for k in range(i, j - 1):
-            trace.setObsAnalyticalFeature(name_af, k, VAL_AF_TIME_WINDOW_STOP)
+#     # On cherche la fin de la fenetre
+#     while (tj - ti) <= T:
+#         j = j + 1
+#         if j == N - 1:
+#             break
+#         tj = trace.getObs(j).timestamp
 
-    else:
-        trace.setObsAnalyticalFeature(name_af, i, VAL_AF_TIME_WINDOW_MOVE)
+#     # On agrandit la fenetre
+#     while (tj - ti) >= T and (S[j] - S[i]) <= D:
+#         ispause = True
+#         # print ('pause ' + str(i) + ',' + str(j))
+#         j = j + 1
+#         if j == N - 1:
+#             break
+#         tj = trace.getObs(j).timestamp
 
-    return retour
+#     retour = VAL_AF_TIME_WINDOW_MOVE
+#     if ispause:
+#         # PAUSES.append([i, j-1])
+#         # print ('pause de ' + str(i) + ',' + str(j-1))
+#         retour = VAL_AF_TIME_WINDOW_STOP
+#         for k in range(i, j - 1):
+#             trace.setObsAnalyticalFeature(name_af, k, VAL_AF_TIME_WINDOW_STOP)
+
+#     else:
+#         trace.setObsAnalyticalFeature(name_af, i, VAL_AF_TIME_WINDOW_MOVE)
+
+#     return retour

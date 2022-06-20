@@ -17,7 +17,7 @@ GPSTime.setReadFormat("4Y/2M/2D 2h:2m:2s")
 trace = FileReader.readFromFile('tracklib/data/asc/8961191_v3.csv', 
                                 id_E=0, id_N=1, id_U=3, id_T=4, 
                                 separator=",", h=1)
-#print (trace.size())
+print (trace.size())
 #trace.plot()
 
 mapping.mapOnRaster(trace, raster)

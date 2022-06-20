@@ -195,27 +195,27 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
         self.assertEqual(a, 3)
 		
 		
-    def testStopPointWithAccelerationCriteria(self):
-		
-        v1 = self.trace2.getObsAnalyticalFeature('speed', 1)
-        a1 = self.trace2.getObsAnalyticalFeature('acceleration', 1)
-        self.assertTrue(abs(v1 - 0.5) < 0.000001)
-        self.assertTrue(abs(a1 + 0.0) < 0.000001)
-        isSTP = Analytics.stop_point_with_acceleration_criteria(self.trace2, 1)
-        #print (v1, a1, isSTP)		
-        self.assertEqual(isSTP, 0)
-		
-        v2 = self.trace2.getObsAnalyticalFeature('speed', 2)
-        a2 = self.trace2.getObsAnalyticalFeature('acceleration', 2)
-        self.assertTrue(abs(v2 - 1.0) < 0.000001)
-        self.assertTrue(abs(a2 - 0.075) < 0.000001)
-        isSTP = Analytics.stop_point_with_acceleration_criteria(self.trace2, 2)
-        #print (v2, a2, isSTP)		
-        self.assertEqual(isSTP, 0)
+    # def testStopPointWithAccelerationCriteria(self):
+	# 	
+    #     v1 = self.trace2.getObsAnalyticalFeature('speed', 1)
+    #     a1 = self.trace2.getObsAnalyticalFeature('acceleration', 1)
+    #     self.assertTrue(abs(v1 - 0.5) < 0.000001)
+    #     self.assertTrue(abs(a1 + 0.0) < 0.000001)
+    #     isSTP = Analytics.stop_point_with_acceleration_criteria(self.trace2, 1)
+    #     #print (v1, a1, isSTP)		
+    #     self.assertEqual(isSTP, 0)
+	# 	
+    #     v2 = self.trace2.getObsAnalyticalFeature('speed', 2)
+    #     a2 = self.trace2.getObsAnalyticalFeature('acceleration', 2)
+    #     self.assertTrue(abs(v2 - 1.0) < 0.000001)
+    #     self.assertTrue(abs(a2 - 0.075) < 0.000001)
+    #     isSTP = Analytics.stop_point_with_acceleration_criteria(self.trace2, 2)
+    #     #print (v2, a2, isSTP)		
+    #     self.assertEqual(isSTP, 0)
         
 		
-    def testStopPointWithTimeWindowCriteria(self):
-        self.assertLessEqual(3, 5)
+    # def testStopPointWithTimeWindowCriteria(self):
+    #     self.assertLessEqual(3, 5)
     
 	
 if __name__ == '__main__':
@@ -227,7 +227,7 @@ if __name__ == '__main__':
     suite.addTest(TestAlgoAnalyticsMethods("testAngleGeom"))
     suite.addTest(TestAlgoAnalyticsMethods("testCalculAngleOriente"))
     suite.addTest(TestAlgoAnalyticsMethods("testOrientation"))
-    suite.addTest(TestAlgoAnalyticsMethods("testStopPointWithAccelerationCriteria"))
+    #suite.addTest(TestAlgoAnalyticsMethods("testStopPointWithAccelerationCriteria"))
     #suite.addTest(TestAlgoAnalyticsMethods("testStopPointWithTimeWindowCriteria"))
     
     runner = unittest.TextTestRunner()
