@@ -11,7 +11,7 @@ class AsciiReader:
     CLES = ['ncols', 'nrows', 'xllcorner', 'yllcorner', 'cellsize', 'NODATA_value']
     
     @staticmethod
-    def readFromAscFile(path, srid="ENUCoords"):
+    def readFromAscFile(path, srid="ENUCoords", name=''):
         '''
 
         Parameters
