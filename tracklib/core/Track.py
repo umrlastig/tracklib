@@ -671,17 +671,22 @@ class Track:
 
         T = []
         for i in range(len(new_track)):
-	        if new_track["dx", i]:
-		        T.append(new_track[i].timestamp)
+            if new_track["dx", i]:
+                T.append(new_track[i].timestamp)	
 		
         Tini = new_track["timestamp"]	
-        new_track.removeObsList(T)
-        new_track.resample(Tini, mode=2)
+        new_track.removeObsList(T)     
+    
+        new_track.resample(Tini, mode=2) 
 
         new_track2 = Track()
         for i in range(len(new_track)):
-	        enu = ENUCoords(self["x", i], self["y", i], self["z", i])
-	        new_track2.addObs(Obs(enu, GPSTime.readUnixTime(new_track["x",i])))
+            enu = ENUCoords(self["x", i], self["y", i], self["z", i])
+            new_track2.addObs(Obs(enu, GPSTime.readUnixTime(new_track["x",i])))
+
+        new_track2.uid = self.uid
+        new_track2.tid = self.tid
+        new_track2.base = self.base       
 
         return new_track2
 		

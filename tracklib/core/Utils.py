@@ -82,7 +82,7 @@ def compLike(s1, s2) -> bool:
     return True
 
 
-def makeCoords(x: float, y: float, z: float, srid: int) -> Union[ENUCoords, ECEFCoords, GeoCoords]:   
+def makeCoords(x: float, y: float, z: float, srid: str) -> Union[ENUCoords, ECEFCoords, GeoCoords]:   
     """Function to form coords object from (x,y,z) data
 
     :param x: 1st coordinate (X, lon or E)
