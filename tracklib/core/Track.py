@@ -660,7 +660,8 @@ class Track:
 	# Same timestamp (up to et, default 1 ms) and different 
 	# positions. Timestamps are reinterpolated
     # -----------------------------------------------------		
-    def removeTpsDup(self, et = 1e-3):
+    def removeTpsDup(self, et = 1e-3):	
+		
         self.compute_abscurv()
         new_track = Track()
         for i in range(len(self)):
@@ -675,9 +676,19 @@ class Track:
                 T.append(new_track[i].timestamp)	
 		
         Tini = new_track["timestamp"]	
-        new_track.removeObsList(T)     
-    
+        
+        new_track.removeObsList(T)
+      
+         # Rustine de correction     
+        Tini.insert(0, Tini[0])
+        Tini[1] = Tini[1].addSec(0.001)
+
+
         new_track.resample(Tini, mode=2) 
+        
+        # Rustine de correction
+        new_track[0].timestamp = Tini[0]
+       
 
         new_track2 = Track()
         for i in range(len(new_track)):
@@ -686,7 +697,7 @@ class Track:
 
         new_track2.uid = self.uid
         new_track2.tid = self.tid
-        new_track2.base = self.base       
+        new_track2.base = self.base     
 
         return new_track2
 		

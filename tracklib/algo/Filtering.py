@@ -289,12 +289,18 @@ def filter_seq(track, kernel=1, dim=FILTER_XYZ):
     output = track.copy()
     if isinstance(kernel, int):
         kernel = [1]*kernel
+    if isinstance(kernel, list):
+        if len(kernel) == 1:
+            return track
     for af in dim:
-        track.operate(Operator.FILTER, af, kernel, "temp")
-        if af == "x":
-            track.setXFromAnalyticalFeature("temp")
-        if af == "y":
-            track.setYFromAnalyticalFeature("temp")
-        if af == "z":
-            track.setZFromAnalyticalFeature("temp")
+        if af in ["x", "y", "z"]:
+            track.operate(Operator.FILTER, af, kernel, "temp")
+            if af == "x":
+                track.setXFromAnalyticalFeature("temp")
+            if af == "y":
+                track.setYFromAnalyticalFeature("temp")
+            if af == "z":
+                track.setZFromAnalyticalFeature("temp")
+        else:
+            track.operate(Operator.FILTER, af, kernel, af)
     return track
