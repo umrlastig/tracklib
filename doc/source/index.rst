@@ -101,7 +101,8 @@ Examples
    :maxdepth: 1
    :caption: Examples
 
-   ./notebook/quickstart2
+   ./notebook/quickstart
+   ./notebook/SpeedProfil
 
    
 .. toctree::
