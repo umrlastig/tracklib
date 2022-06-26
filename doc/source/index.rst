@@ -101,7 +101,7 @@ Examples
    :maxdepth: 1
    :caption: Examples
 
-   test
+   ./notebook/quickstart2
 
    
 .. toctree::
@@ -112,7 +112,6 @@ Examples
    ./userguide/coreconcept
    ./userguide/operator
    ./userguide/simplify
-   ./userguide/plot
    
    
 .. toctree::
