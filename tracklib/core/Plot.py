@@ -288,7 +288,8 @@ class Plot:
         limit = ymax + 0.5
         for (indice, af_name) in enumerate(afs):
 
-            if self.__isAFTransition(self.track, af_name):
+            #if self.__isAFTransition(self.track, af_name):
+            if 1 == 1:
                 print("---")
 
                 tabmarqueurs = self.track.getAnalyticalFeature(af_name)
@@ -329,8 +330,7 @@ class Plot:
                 bbox_to_anchor=(0.5, -0.55),
             )
 
-        if len(afs) > 0 and afs[0] != None:
-            plt.title(afs[0])
+        
 
     def __plotProfile(self, af_name):
         """TODO"""
