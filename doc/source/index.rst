@@ -101,7 +101,7 @@ Examples
    :maxdepth: 1
    :caption: Examples
 
-   ./notebook/quickstart
+   ./notebook/Quickstart
    ./notebook/SpeedProfil
 
    
