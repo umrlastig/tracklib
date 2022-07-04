@@ -49,7 +49,6 @@ class TestAlgoSegmentationMethods(unittest.TestCase):
     
         #self.assertLessEqual(3, 5)
         
-        
     
 if __name__ == '__main__':
     suite = unittest.TestSuite()

@@ -1,6 +1,11 @@
 import math
 import matplotlib.pyplot as plt
 
+from tracklib.core.GPSTime import GPSTime
+from tracklib.core.Coords import ENUCoords
+from tracklib.core.Track import Track
+from tracklib.core.Obs import Obs
+
 import tracklib.algo.Stochastics as Stochastics
 import tracklib.algo.Synthetics as Synthetics
 import tracklib.algo.Geometrics as Geometrics
@@ -29,8 +34,23 @@ def example0():
     plt.show()
 
 
+def example1():
+    trace1 = Track()
+    time = GPSTime()
+    
+    p1 = Obs(ENUCoords(659007.266, 6860734.006, 53.500), time)
+    trace1.addObs(p1)
+    p2 = Obs(ENUCoords(658996.748, 6860730.745, 53.600), time)
+    trace1.addObs(p2)
+    p3 = Obs(ENUCoords(658996.748, 6860730.745, 53.600), time)
+    trace1.addObs(p3)
+    
+    plt.plot(trace1.getX(), trace1.getY(), 'ro')
+
+
 if __name__ == '__main__':
-    example0()
+    #example0()
+    example1()
 
 
 
