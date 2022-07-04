@@ -133,9 +133,32 @@ def split(track, source) -> TrackCollection:
 
 
 # -------------------------------------------------------------------
-# Function to find stop positions from a track
+# 
 # -------------------------------------------------------------------
-def findStops(track, spatial, temporal, mode, verbose=True):
+def findStops(track: Track, spatial, temporal, mode, 
+              verbose=True) -> Track:
+    '''
+    Function to find stop positions from a track
+
+    Parameters
+    ----------
+    track : Track
+        
+    spatial : float
+        
+    temporal : float
+        
+    mode : MODE_STOPS_LOCAL, MODE_STOPS_GLOBAL, MODE_STOPS_RTK
+        
+    verbose : bool, optional
+        The default is True.
+
+    Returns
+    -------
+    TYPE
+        DESCRIPTION.
+
+    '''
     if mode == MODE_STOPS_LOCAL:
         return findStopsLocal(track, spatial, temporal)
     if mode == MODE_STOPS_GLOBAL:
@@ -150,14 +173,14 @@ def findStops(track, spatial, temporal, mode, verbose=True):
 #     - duration: minimal stop duration (in seconds)
 #     - speed: maximal speed during stop (in ground units / sec)
 # Output: a track with centroids (and first time of stop sequence)
-# For classical standard GPS track set 1 m/s for 10 sec)'''
+# For classical standard GPS track set 1 m/s for 10 sec)
 # -----------------------------------------------------------------------------
 def findStopsLocal(track, speed=1, duration=10):
 
     track = track.copy()
     stops = Track()
 
-    # track.segmentation("speed", "#mark", speed)
+    segmentation(track, "speed", "#mark", speed)
     track.operate(Operator.Operator.DIFFERENTIATOR, "#mark")
     track.operate(Operator.Operator.RECTIFIER, "#mark")
 
@@ -195,6 +218,7 @@ def findStopsLocal(track, speed=1, duration=10):
 
     if stops.size() == 0:
         return stops
+    
 
     # stops.createAnalyticalFeature("radius", TMP_RADIUS)
     stops.createAnalyticalFeature("mean_x", TMP_MEAN_X)
@@ -243,10 +267,32 @@ def removeStops(track, stops=None):
 
 
 def findStopsGlobal(track, diameter=20, duration=60, downsampling=1, verbose=True):
-    """Find stop points in a track based on two parameters:
+    '''
+    Find stop points in a track based on two parameters:
     Maximal size of a stop (as the diameter of enclosing circle,
     in ground units) and minimal time duration (in seconds)
-    Use downsampling parameter > 1 to speed up the process"""
+    Use downsampling parameter > 1 to speed up the process
+
+    Parameters
+    ----------
+    track : Track
+        track to detect stop points
+    diameter : float, optional
+        Maximal size of a stop (as the diameter of enclosing circle,
+        in ground units). The default is 20.
+    duration : float, optional
+        minimal time duration (in seconds). The default is 60.
+    downsampling : TYPE, optional
+        DESCRIPTION. The default is 1.
+    verbose : boolean, optional
+        DESCRIPTION. The default is True.
+
+    Returns
+    -------
+    stops : TYPE
+        DESCRIPTION.
+    '''
+    
 
     # If down-sampling is required
     if downsampling > 1:
@@ -272,8 +318,15 @@ def findStopsGlobal(track, diameter=20, duration=60, downsampling=1, verbose=Tru
             if track[j - 1].timestamp - track[i].timestamp <= duration:
                 C[i, j] = 0
                 continue
-            C[i, j] = 2 * minCircle(track.extract(i, j - 1))[1]
-            C[i, j] = (C[i, j] < diameter) * (j - i) ** 2
+            
+            cercle = minCircle(track.extract(i, j - 1))
+            if cercle != None:
+                C[i, j] = 2 * cercle.radius
+                C[i, j] = (C[i, j] < diameter) * (j - i) ** 2
+            else:
+                # TODO : à valider
+                C[i, j] = 0
+                continue
     C = C + np.transpose(C)
 
     # ---------------------------------------------------------------------------
@@ -298,20 +351,21 @@ def findStopsGlobal(track, diameter=20, duration=60, downsampling=1, verbose=Tru
     for i in range(len(segmentation) - 1):
         portion = track.extract(segmentation[i], segmentation[i + 1] - 1)
         C = minCircle(portion)
-        if (C[1] > diameter / 2) or (portion.duration() < duration):
-            continue
-        stops.addObs(Obs(C[0], portion.getFirstObs().timestamp))
-        TMP_RADIUS.append(C[1])
-        TMP_MEAN_X.append(portion.operate(Operator.Operator.AVERAGER, "x"))
-        TMP_MEAN_Y.append(portion.operate(Operator.Operator.AVERAGER, "y"))
-        TMP_MEAN_Z.append(portion.operate(Operator.Operator.AVERAGER, "z"))
-        TMP_STD_X.append(portion.operate(Operator.Operator.STDDEV, "x"))
-        TMP_STD_Y.append(portion.operate(Operator.Operator.STDDEV, "y"))
-        TMP_STD_Z.append(portion.operate(Operator.Operator.STDDEV, "z"))
-        TMP_IDSTART.append(segmentation[i] * downsampling)
-        TMP_IDEND.append((segmentation[i + 1] - 1) * downsampling)
-        TMP_NBPOINTS.append(segmentation[i + 1] - segmentation[i])
-        TMP_DURATION.append(portion.duration())
+        if C != None:
+            if (C.radius > diameter / 2) or (portion.duration() < duration):
+                continue
+            stops.addObs(Obs(C.center, portion.getFirstObs().timestamp))
+            TMP_RADIUS.append(C.radius)
+            TMP_MEAN_X.append(portion.operate(Operator.Operator.AVERAGER, "x"))
+            TMP_MEAN_Y.append(portion.operate(Operator.Operator.AVERAGER, "y"))
+            TMP_MEAN_Z.append(portion.operate(Operator.Operator.AVERAGER, "z"))
+            TMP_STD_X.append(portion.operate(Operator.Operator.STDDEV, "x"))
+            TMP_STD_Y.append(portion.operate(Operator.Operator.STDDEV, "y"))
+            TMP_STD_Z.append(portion.operate(Operator.Operator.STDDEV, "z"))
+            TMP_IDSTART.append(segmentation[i] * downsampling)
+            TMP_IDEND.append((segmentation[i + 1] - 1) * downsampling)
+            TMP_NBPOINTS.append(segmentation[i + 1] - segmentation[i])
+            TMP_DURATION.append(portion.duration())
 
     if stops.size() == 0:
         return stops
