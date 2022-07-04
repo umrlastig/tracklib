@@ -30,20 +30,26 @@ class TestAlgoSegmentationMethods(unittest.TestCase):
         trace = trace.extract(1150, 2500)
         print (trace.size())
 
-        trace.plot()
+        
         #trace.summary()
 
-        #plot = Plot(trace)
-        #plot.plotProfil('SPATIAL_SPEED_PROFIL')
-        stops = findStopsGlobal(trace, downsampling = 1.5)
-        print (type(stops), len(stops), stops)
-        #self.assertLessEqual(3, 5)
+        plot = Plot(trace)
+        plot.plotProfil('SPATIAL_SPEED_PROFIL')
+        
+        trace.plot()
+        stops = findStopsGlobal(trace)
+        print (type(stops), len(stops))
+        
         
         #COLS = utils.getColorMap((220, 220, 220), (255, 0, 0))
         #trace.plot(type='POINT', af_name='virage', append = False, cmap = COLS)
     
         plt.plot(stops.getX(), stops.getY(), 'ro')
     
+    
+        #self.assertLessEqual(3, 5)
+        
+        
     
 if __name__ == '__main__':
     suite = unittest.TestSuite()

@@ -282,15 +282,15 @@ def findStopsGlobal(track, diameter=20, duration=60, downsampling=1, verbose=Tru
         in ground units). The default is 20.
     duration : float, optional
         minimal time duration (in seconds). The default is 60.
-    downsampling : TYPE, optional
-        DESCRIPTION. The default is 1.
+    downsampling : float, optional
+        to speed up the process, value need to be > 1. The default is 1.
     verbose : boolean, optional
-        DESCRIPTION. The default is True.
+        verbose or not. The default is True.
 
     Returns
     -------
-    stops : TYPE
-        DESCRIPTION.
+    stops : Track
+        stops points constitute a new Track.
     '''
     
 
