@@ -38,9 +38,7 @@ MODE_SEGMENTATION_MAXIMIZE = 1
 # -------------------------------------------------------------------------
 
 
-def segmentation(
-    track, afs_input, af_output, thresholds_max, mode_comparaison=MODE_COMPARAISON_AND
-):
+def segmentation(track, afs_input, af_output, thresholds_max, mode_comparaison=MODE_COMPARAISON_AND):
     """Method to divide a track into multiple according to analytical feaures value
     Creates an AF with 0 if change of division, 1 otherwise"""
 
