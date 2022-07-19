@@ -186,6 +186,12 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         self.assertEqual(R[1], 16.5)
         self.assertLessEqual(abs(3.104 - R[2]), self.__epsilon, "l")
         self.assertLessEqual(abs(5.315 - R[3]), self.__epsilon, "L")
+        
+        
+    # def testMinCircle(self):
+        
+    #     trace = Track()
+    #     D = Geometrics.minCircle(trace)
 
 
 
