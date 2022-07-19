@@ -77,7 +77,7 @@ def segmentation(track, afs_input, af_output, thresholds_max, mode_comparaison=M
             track.setObsAnalyticalFeature(af_output, i, 0)
 
 
-def split(track, source) -> TrackCollection:   
+def split(track, source) -> TrackCollection:
     """Splits track according to :
 
         - af name (considered as a marker) if `source` is a string
@@ -131,9 +131,9 @@ def split(track, source) -> TrackCollection:
 
 
 # -------------------------------------------------------------------
-# 
+#
 # -------------------------------------------------------------------
-def findStops(track: Track, spatial, temporal, mode, 
+def findStops(track: Track, spatial, temporal, mode,
               verbose=True) -> Track:
     '''
     Function to find stop positions from a track
@@ -141,13 +141,13 @@ def findStops(track: Track, spatial, temporal, mode,
     Parameters
     ----------
     track : Track
-        
+
     spatial : float
-        
+
     temporal : float
-        
+
     mode : MODE_STOPS_LOCAL, MODE_STOPS_GLOBAL, MODE_STOPS_RTK
-        
+
     verbose : bool, optional
         The default is True.
 
@@ -216,7 +216,7 @@ def findStopsLocal(track, speed=1, duration=10):
 
     if stops.size() == 0:
         return stops
-    
+
 
     # stops.createAnalyticalFeature("radius", TMP_RADIUS)
     stops.createAnalyticalFeature("mean_x", TMP_MEAN_X)
@@ -268,7 +268,7 @@ def findStopsGlobal(track, diameter=20, duration=60, downsampling=1, verbose=Tru
     '''
     Find stop points in a track based on two parameters:
     Maximal size of a stop (as the diameter of enclosing circle,
-    in ground units) and minimal time duration (in seconds)
+    in ground units) and minimal time duration (in seconds).
     Use downsampling parameter > 1 to speed up the process
 
     Parameters
@@ -290,7 +290,7 @@ def findStopsGlobal(track, diameter=20, duration=60, downsampling=1, verbose=Tru
     stops : Track
         stops points constitute a new Track.
     '''
-    
+
 
     # If down-sampling is required
     if downsampling > 1:
@@ -300,7 +300,7 @@ def findStopsGlobal(track, diameter=20, duration=60, downsampling=1, verbose=Tru
     # ---------------------------------------------------------------------------
     # Computes cost matrix as :
     #    Cij = 0 if size of enclosing circle of pi, pi+1, ... pj-1 is > diameter
-    #    Cij = 0 if time duration between pi and p-1 is < duration
+    #    Cij = 0 if time duration between pi and pj-1 is < duration
     #    Cij = (j-i)**2 = square of the number of points of segment otherwise
     # ---------------------------------------------------------------------------
     C = np.zeros((track.size(), track.size()))
@@ -316,7 +316,7 @@ def findStopsGlobal(track, diameter=20, duration=60, downsampling=1, verbose=Tru
             if track[j - 1].timestamp - track[i].timestamp <= duration:
                 C[i, j] = 0
                 continue
-            
+
             cercle = minCircle(track.extract(i, j - 1))
             if cercle != None:
                 C[i, j] = 2 * cercle.radius
@@ -713,9 +713,9 @@ def splitAR(track, pt1, pt2=None, radius=10, nb_min_pts=10, verbose=True):
 
 def stdbscan(track, eps1, eps2, minPts, deltaT):
     '''
-    Birant, D., & Kut, A. (2007). ST-DBSCAN: An algorithm for clustering 
+    Birant, D., & Kut, A. (2007). ST-DBSCAN: An algorithm for clustering
     spatial–temporal data. Data & Knowledge Engineering, 60(1), 208-221.
-    
+
 
     Parameters
     ----------
@@ -732,11 +732,11 @@ def stdbscan(track, eps1, eps2, minPts, deltaT):
 
     Returns
     -------
-    Cluster in AF 
+    Cluster in AF
 
     '''
-    
-    
-    
+
+
+
     pass
 
