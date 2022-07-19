@@ -105,6 +105,7 @@ def acceleration(track, i):
 
     if dt == 0:
         return utils.NAN
+
     return d / dt
 
 
@@ -260,10 +261,11 @@ def stop_point_with_acceleration_criteria(track, i):
 
     stop_point = 0
     v = speed(track, i)
-
+    acc = acceleration(track, i)
+    
     # Si un point d'indice [i] affiche une vitesse nulle suivant une deccelération,
     #    on cherche le prochain point d'accélération
-    if v < 0.001 and acceleration(track, i) < 0:
+    if abs(v) < 0.001 and acc < 0:
         # Initialisation d'un compteur sur i
         j = i
         # Tant qu'aucun des points suivants n'accélère, on ne marque pas le point d'arrêt

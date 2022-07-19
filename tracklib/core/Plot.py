@@ -290,8 +290,6 @@ class Plot:
 
             #if self.__isAFTransition(self.track, af_name):
             if 1 == 1:
-                print("---")
-
                 tabmarqueurs = self.track.getAnalyticalFeature(af_name)
                 marqueurs = set(tabmarqueurs)
                 if utils.NAN in marqueurs:
