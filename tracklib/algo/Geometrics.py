@@ -16,6 +16,7 @@ import copy
 import numpy as np
 import random
 import matplotlib.pyplot as plt
+import logging
 
 from tracklib.core.Coords import ENUCoords
 # cartesienne
@@ -26,6 +27,8 @@ MODE_ENCLOSING_BBOX = 0
 MODE_ENCLOSING_MBR = 1
 MODE_ENCLOSING_CIRCLE = 2
 MODE_ENCLOSING_CONVEX = 3
+
+logger = logging.getLogger()
 
 
 class Circle:
@@ -406,7 +409,7 @@ def __circle(p1, p2=None, p3=None):
     if collinear(
         [p1.getX(), p1.getY()], [p2.getX(), p2.getY()], [p3.getX(), p3.getY()]
     ):
-        print(str(p1) + "," + str(p2) + "," + str(p3) + " are collinear")
+        logger.warning(str(p1) + "," + str(p2) + "," + str(p3) + " are collinear")
         return None
 
     if p1.distance2DTo(p2) == 0:
@@ -457,10 +460,10 @@ def __circle(p1, p2=None, p3=None):
 
 
 def __welzl(C):
-    """TODO
-
-    Finds minimal bounding circle with Welzl's algorithm"""
-
+    """
+    Finds minimal bounding circle with Welzl's algorithm
+    """
+    
     P = C.center
     P = P.copy()
     R = C.radius
@@ -473,7 +476,9 @@ def __welzl(C):
             return __circle(R[0])
         if len(R) == 2:
             return __circle(R[0], R[1])
+        
         return __circle(R[0], R[1], R[2])
+    
     id = random.randint(0, len(P) - 1)
 
     p = P[id]
@@ -495,24 +500,25 @@ def __welzl(C):
 
 
 def plotPolygon(P, color=[1, 0, 0, 1]):
-    """TODO
-
-    Function to plot a polygon  from a vector:
+    """
+    Function to plot a polygon from a vector:
     R = [x1,y1,x2,y2,x3,y3,...x1,y1]
-    Needs to call plt.show() after this function"""
+    Needs to call plt.show() after this function
+    """
     XR = P[::2]
     YR = P[1::2]
     plt.plot(XR, YR, color=color)
 
 
 def minCircle(track):
-    """TODO
-
+    """
     Finds minimal bounding circle with Welzl's recursive
-    algorithm in O(n) complexity. Output is given as a list
-    [p, R], where p is a Coords object defining circle center
+    algorithm in O(n) complexity. 
+    Output is given as a list [p, R], where p is a Coords object defining circle center
     and R is its radius. Due to recursion limits, only tracks
-    with fewer than 800 points can be processed"""
+    with fewer than 800 points can be processed
+    """
+    
     if not track.getSRID() == "ENU":
         print("Error: ENU coordinates are required for min circle computation")
         exit()
