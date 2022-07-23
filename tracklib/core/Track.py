@@ -1,11 +1,11 @@
 """
-This module contains the class to manage GPS tracks. 
+This module contains the class to manage GPS tracks.
 Points are referenced in geodetic coordinates
 """
 
 # For type annotation
-from __future__ import annotations   
-from typing import Any, Literal, Union   
+from __future__ import annotations
+from typing import Any, Literal, Union
 
 import sys
 import math
@@ -51,14 +51,14 @@ class Track:
         """TODO"""
         return copy.deepcopy(self)
 
-    def __str__(self) -> str:   
+    def __str__(self) -> str:
         """TODO"""
         output = ""
         for i in range(self.size()):
             output += (str)(self.__POINTS[i]) + "\n"
         return output
 
-    def getSRID(self) -> str:   
+    def getSRID(self) -> str:
         """TODO"""
         return str(type(self.getFirstObs().position)).split(".")[-1][0:-8]
 
@@ -81,7 +81,7 @@ class Track:
         return self.getLastObs().timestamp - self.getFirstObs().timestamp
 
     # Average frequency    in Hz (resp. m/pt) for temporal (resp. spatial) mode
-    def frequency(self, mode: Literal["temporal", "spatial"] = "temporal") -> float:   
+    def frequency(self, mode: Literal["temporal", "spatial"] = "temporal") -> float:
         """TODO"""
         if (mode == "spatial") or (mode == 1):
             return self.size() / self.length()
@@ -89,7 +89,7 @@ class Track:
             return self.size() / self.duration()
 
     # Inverse of average frequency in pt/sec (resp. pt/m) for temporal (resp. spatial) mode
-    def interval(self, mode: Literal["temporal", "spatial"] = "temporal") -> float:   
+    def interval(self, mode: Literal["temporal", "spatial"] = "temporal") -> float:
         """TODO"""
         return 1.0 / self.frequency(mode)
 
@@ -289,8 +289,8 @@ class Track:
         m.setY(self.operate(Operator.Operator.AVERAGER, "y"))
         if not Utils.isnan(m.getZ()):
             m.setZ(self.operate(Operator.Operator.AVERAGER, 'z'))
-        return m    
-		
+        return m
+
     def getEnclosedPolygon(self):
         """TODO"""
         return Polygon(self.getX(), self.getY())
@@ -357,10 +357,10 @@ class Track:
         """TODO"""
         if self.size() % 2 == 1:
             self.__POINTS.pop()
-			
+
     def loop(self, add = False):
         if add:
-            self.addObs(self[0].copy())		
+            self.addObs(self[0].copy())
         else:
             self[0].position.setX(self[-1].position.getX())
             self[0].position.setY(self[-1].position.getY())
@@ -548,7 +548,7 @@ class Track:
     def removeLastObs(self):
         """TODO"""
         return self.removeObs(len(self)-1)
-        
+
     def popObs(self, idx):
         """TODO"""
         obs = self.getObs(idx)
@@ -646,49 +646,49 @@ class Track:
     # =========================================================================
     # Track cleaning functions
     # =========================================================================
-	
-    # -----------------------------------------------------	
-	# Same timestamp (up to et, default 1 ms) and same 
-	# position (up to ep, default 1 cm). All duplicate 
-	# points are removed.
-    # -----------------------------------------------------	
+
+    # -----------------------------------------------------
+    # Same timestamp (up to et, default 1 ms) and same
+    # position (up to ep, default 1 cm). All duplicate
+    # points are removed.
+    # -----------------------------------------------------
     def removeObsDup(self, et = 1e-3, ep = 1e-2):
         """TODO"""
         return None
-	
-    # -----------------------------------------------------	
-	# Same timestamp (up to et, default 1 ms) and different 
-	# positions. Timestamps are reinterpolated
-    # -----------------------------------------------------		
-    def removeTpsDup(self, et = 1e-3):	
-		
+
+    # -----------------------------------------------------
+    # Same timestamp (up to et, default 1 ms) and different
+    # positions. Timestamps are reinterpolated
+    # -----------------------------------------------------
+    def removeTpsDup(self, et = 1e-3):
+
         self.compute_abscurv()
         new_track = Track()
         for i in range(len(self)):
-	        enu = ENUCoords(self["t", i], 0, 0)
-	        new_track.addObs(Obs(enu, GPSTime.readUnixTime(self["abs_curv",i])))
+            enu = ENUCoords(self["t", i], 0, 0)
+            new_track.addObs(Obs(enu, GPSTime.readUnixTime(self["abs_curv",i])))
 
         new_track["dx = D{x} < 0.01"]
 
         T = []
         for i in range(len(new_track)):
             if new_track["dx", i]:
-                T.append(new_track[i].timestamp)	
-		
-        Tini = new_track["timestamp"]	
-        
+                T.append(new_track[i].timestamp)
+
+        Tini = new_track["timestamp"]
+
         new_track.removeObsList(T)
-      
-         # Rustine de correction     
+
+         # Rustine de correction
         Tini.insert(0, Tini[0])
         Tini[1] = Tini[1].addSec(0.001)
 
 
-        new_track.resample(Tini, mode=2) 
-        
+        new_track.resample(Tini, mode=2)
+
         # Rustine de correction
         new_track[0].timestamp = Tini[0]
-       
+
 
         new_track2 = Track()
         for i in range(len(new_track)):
@@ -697,18 +697,18 @@ class Track:
 
         new_track2.uid = self.uid
         new_track2.tid = self.tid
-        new_track2.base = self.base     
+        new_track2.base = self.base
 
         return new_track2
-		
-    # -----------------------------------------------------	
-	# Same position (up to ep, default 1 cm) and different 
-	# timestamps. All intermediary points discarded
-    # -----------------------------------------------------		
+
+    # -----------------------------------------------------
+    # Same position (up to ep, default 1 cm) and different
+    # timestamps. All intermediary points discarded
+    # -----------------------------------------------------
     def removePosDup(self, ep = 1e-2):
         """TODO"""
         return None
-	
+
     # =========================================================================
     # Basic private methods to handle track object
     # =========================================================================
@@ -821,7 +821,7 @@ class Track:
             output += "\n-------------------------------------\n"
         print(output)
 
-    def length(self) -> int:   
+    def length(self) -> int:
         """Total length of track
 
         :return: Length of track
@@ -831,7 +831,7 @@ class Track:
             s += self.getObs(i - 1).distanceTo(self.getObs(i))
         return s
 
-    def toWKT(self) -> str:   
+    def toWKT(self) -> str:
         """Transforms track into WKT string"""
         output = "LINESTRING("
         for i in range(self.size()):
@@ -846,7 +846,7 @@ class Track:
         output += ")"
         return output
 
-    def extract(self, id_ini: int, id_fin: int) -> Track:   
+    def extract(self, id_ini: int, id_fin: int) -> Track:
         """Extract between two indices from a track
 
         :param id_ini: Initial index of extraction
@@ -890,13 +890,13 @@ class Track:
         sec_number: number of seconds to add (may be < 0)"""
         for i in range(self.size()):
             self.getObs(i).timestamp = self.getObs(i).timestamp.addSec(sec_number)
-			
+
     def roundTimestamps(self, unit = GPSTime.ROUND_TO_SEC):
         """Rounds timestamps in a track
         unit: round timestamps up to unit seconds (default = 1)"""
         for obs in self:
             obs.timestamp = obs.timestamp.round(unit)
-		
+
     # =========================================================================
     # Analytical algorithms
     # =========================================================================
@@ -950,7 +950,7 @@ class Track:
         else:
             for i in range(self.size()):
                 self.getObs(i).features.append(val_init)
-    
+
     def removeAnalyticalFeature(self, name):
         """TODO"""
         if not self.hasAnalyticalFeature(name):
@@ -1207,13 +1207,13 @@ class Track:
     def resample(self, delta=None, algo=1, mode=1, npts=None, factor=1):
         """Resampling a track with linear interpolation
 
-        Resampling a track with linear interpolation 
-	    delta: interpolation interval 
-		   (time in sec if temporal mode is selected, space in meters if spatial).
-		npts = number of points
-		If none of delta and npts are specified, the track is resampled regularly 
-		with the same number of points * factor.
-	    If both are specified, priority is given to delta.
+        Resampling a track with linear interpolation
+        delta: interpolation interval
+           (time in sec if temporal mode is selected, space in meters if spatial).
+        npts = number of points
+        If none of delta and npts are specified, the track is resampled regularly
+        with the same number of points * factor.
+        If both are specified, priority is given to delta.
 
         Available modes are:
 
@@ -1246,8 +1246,8 @@ class Track:
                 delta = (1+1e-8)*self.duration()/npts
             self.resample(delta=delta, algo=algo, mode=mode, npts=None)
             return
-		
-        
+
+
         # (Temporaire)
         if not (self.getSRID() == "ENU"):
             print("Error: track data must be in ENU coordinates for resampling")
@@ -1411,20 +1411,8 @@ class Track:
         plot.h = 5
         return plot.plotEllipses(self, sym, factor, af, append)
 
-    
 
-    # =========================================================================
-    # Track simplification (returns a new track)
-    # Tolerance is in the unit of track observation coordinates
-    #   MODE_SIMPLIFY_DOUGLAS_PEUCKER (1)
-    #   MODE_SIMPLIFY_VISVALINGAM (2)
-    # =========================================================================
-    # DEPRECATED
-    # def simplify(self, tolerance, mode=1):
-    #     """TODO"""
-    #     from tracklib.algo.Simplification import simplify as simplification_simplify
 
-    #     return simplification_simplify(self, tolerance, mode)
 
     # =========================================================================
     #    Built-in Analytical Features
@@ -1440,7 +1428,7 @@ class Track:
         else:
             from tracklib.algo.Cinematics import smoothed_speed_calculation
             return smoothed_speed_calculation(kernel)
-        
+
 
     # DEPRECATED
     # def estimate_raw_speed(self):
@@ -1534,7 +1522,7 @@ class Track:
         if operator == "!=":
             return val1 != val2
 
-    def query(self, cmd: str) -> list[Any]:   
+    def query(self, cmd: str) -> list[Any]:
         """Query observations in a track with SQL-like commands.
 
         Output depends on the ``SELECT`` clause:
@@ -1576,9 +1564,9 @@ class Track:
                 2. a comparison operator among >, <, >=, <=, ==, != and LIKE
                    (with % in str and timestamps)
                 3. a threshold value which is automatically casted to the type of the AF
-                   given in (1). Intended types accepted are: :class:`int`, 
-                   :class:`float`, :class:`str`, :class:`bool` 
-                   and :class:`core.GPSTime.GPSTime`. When 
+                   given in (1). Intended types accepted are: :class:`int`,
+                   :class:`float`, :class:`str`, :class:`bool`
+                   and :class:`core.GPSTime.GPSTime`. When
                    :class:`core.GPSTime.GPSTime` is used as a threshold value,
                    eventhough it may contain 2 parts (date and time), it must not be
                    enclosed within quotes. For boolean, "1", "T" and "TRUE" are
@@ -2034,7 +2022,7 @@ class Track:
             if (dim == 2) or (dim in ["z", "Z", "U"]):
                 self.getObs(i).position.setZ(val - self.getObs(i).position.getZ())
 
-    def removeIdleEnds(self, parameter, mode: str = "begin") -> Track:   
+    def removeIdleEnds(self, parameter, mode: str = "begin") -> Track:
         """Removal of idle points at the begining or end of track
 
         :param parameter: TODO
