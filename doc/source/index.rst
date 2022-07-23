@@ -99,10 +99,12 @@ Examples
    
 .. toctree::
    :maxdepth: 1
-   :caption: Examples
+   :caption: Use Cases
 
    ./notebook/Quickstart
-   ./notebook/SpeedProfil
+   ./notebook/StopPoints
+   ./notebook/Switchbacks
+   ./usecase/summarize
 
    
 .. toctree::
@@ -115,15 +117,6 @@ Examples
    ./userguide/simplify
    
    
-.. toctree::
-   :maxdepth: 1
-   :caption: Use Cases
-   
-   ./usecase/stoppoints
-   ./usecase/summarize
-   ./usecase/sinuousroadsection
-
-
 .. toctree::
    :caption: API Reference
 
