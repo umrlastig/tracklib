@@ -60,37 +60,6 @@ def estimate_heading(track):
         return track.addAnalyticalFeature(heading)
 
 
-# --------------------------------------------------
-# Difference finie centree lissee
-# --------------------------------------------------
-def smoothed_speed_calculation(track, width):
-    """TODO
-
-    :param track: TODO
-    :param width: TODO
-    :return: TODO
-    """
-
-    S = track.compute_abscurv()
-    track.estimate_speed()
-
-    if track.size() < width:
-        print("warning:not enough point in track for this width")
-        return None
-
-    for i in range(width, len(S) - width):
-        ds = S[i + width] - S[i - width]
-        dt = track[i + width].timestamp - track[i - width].timestamp
-
-        if dt != 0:
-            track.setObsAnalyticalFeature("speed", i, ds / dt)
-
-    for i in range(width):
-        track.setObsAnalyticalFeature("speed", i, track["speed"][width])
-    for i in range(len(S) - width, len(S)):
-        track.setObsAnalyticalFeature("speed", i, track["speed"][len(S) - width])
-
-
 def computeAvgSpeed(track, id_ini=0, id_fin=None):
     """
     Computes averaged speed (m/s) between two points
