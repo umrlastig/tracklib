@@ -19,9 +19,9 @@ class QgisWriter:
     @staticmethod
     def writeTracksToQgisLayer(tracks, type: Literal["LINE", "POINT"] = "LINE", af=None):
         """
-            Transforms track into a Qgis Layer.
-            :param type: "POINT" or "LINE"
-            :param af: AF used for coloring in POINT mode
+        Transforms track into a Qgis Layer.
+        :param type: "POINT" or "LINE"
+        :param af: AF used for coloring in POINT mode
         """
         
         if isinstance(tracks, Track):
@@ -29,7 +29,7 @@ class QgisWriter:
             collection.addTrack(tracks)
             tracks = collection
         
-        layerPoint = QgsVectorLayer("Point?crs=epsg:2154", "Layer point", "memory")
+        layerPoint = QgsVectorLayer("Point?crs=epsg:2154", "Tracks", "memory")
         pr = layerPoint.dataProvider()
         pr.addAttributes([QgsField("idtrace", QVariant.Int)])
         pr.addAttributes([QgsField("idpoint", QVariant.Int)])
