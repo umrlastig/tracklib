@@ -18,11 +18,11 @@ class QgisWriter:
     """
     
     @staticmethod
-    def writeTracksToQgisLayer(tracks, type: Literal["LINE", "POINT"] = "LINE", af=None):
+    def writeTracksToQgisLayer(tracks, type: Literal["LINE", "POINT"] = "LINE", af=False):
         """
         Transforms track into a Qgis Layer.
         :param type: "POINT" or "LINE"
-        :param af: AF used for coloring in POINT mode
+        :param af: AF exported in qgis layer like attributes
         """
         
         if isinstance(tracks, Track):
@@ -39,6 +39,15 @@ class QgisWriter:
         pr = layerTracks.dataProvider()
         pr.addAttributes([QgsField("idtrace", QVariant.Int)])
         pr.addAttributes([QgsField("idpoint", QVariant.Int)])
+        # z 
+        # timestamp
+        
+        
+        if af:
+            for af_name in tracks.getTrack(0).getListAnalyticalFeatures():
+                pr.addAttributes([QgsField(af_name, QVariant.Double)])
+                # f.write(str())
+        
         layerTracks.updateFields()
 
         for i in range(tracks.size()):
@@ -52,20 +61,26 @@ class QgisWriter:
                 pt = QgsPointXY(X, Y)
                 gPoint = QgsGeometry.fromPointXY(pt)
                 
+                attrs = [i+1, j+1]
+                # AF
+                if af:
+                    for af_name in track.getListAnalyticalFeatures():
+                        attrs.append(track.getObsAnalyticalFeature(af_name, j))
+                        
                 if type == 'POINT':                
                     fet = QgsFeature()
-                    fet.setAttributes([i+1, j+1]) 
+                    fet.setAttributes(attrs)
                     fet.setGeometry(gPoint)
                     pr.addFeatures([fet])
                     
                 if type == 'LINE' and ptOld != None:
                     fet = QgsFeature()
-                    fet.setAttributes([i+1, j+1]) 
+                    fet.setAttributes(attrs) 
                     fet.setGeometry(QgsGeometry.fromPolylineXY([ptOld, pt]))
                     pr.addFeatures([fet])
                 
                 ptOld = pt
-
+                
         if type == 'POINT':
             symbol = QgsMarkerSymbol.createSimple({
                 'name': 'circle', 
