@@ -49,7 +49,6 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         p8 = Obs.Obs(c8, GPSTime.GPSTime.readTimestamp("2018-01-01 10:02:55"))
         self.trace1.addObs(p8)
 
-
     def testAFInflexion(self):
         self.trace1.plot()
         self.trace1.addAnalyticalFeature(Cinematics.inflection)
@@ -77,7 +76,7 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         self.assertEqual(afVertex[5], 0)
         self.assertEqual(afVertex[6], 0)
         self.assertEqual(afVertex[7], 0)
-	
+
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     suite.addTest(TestAlgoCinematicsMethods("testAFInflexion"))
