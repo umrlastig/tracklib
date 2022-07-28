@@ -18,7 +18,8 @@ class QgisWriter:
     """
     
     @staticmethod
-    def writeTracksToQgisLayer(tracks, type: Literal["LINE", "POINT"] = "LINE", af=False):
+    def writeTracksToQgisLayer(tracks, type: Literal["LINE", "POINT"] = "LINE", 
+                               af=False, layerName = "Tracks"):
         """
         Transforms track into a Qgis Layer.
         :param type: "POINT" or "LINE"
@@ -31,9 +32,9 @@ class QgisWriter:
             tracks = collection
         
         if type == 'POINT':
-            layerTracks = QgsVectorLayer("Point?crs=epsg:2154", "Tracks", "memory")
+            layerTracks = QgsVectorLayer("Point?crs=epsg:2154", layerName, "memory")
         if type == 'LINE':
-            layerTracks = QgsVectorLayer("LineString?crs=epsg:2154", "Tracks", "memory")
+            layerTracks = QgsVectorLayer("LineString?crs=epsg:2154", layerName, "memory")
 
             
         pr = layerTracks.dataProvider()
