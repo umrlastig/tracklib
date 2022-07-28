@@ -112,6 +112,30 @@ def acceleration(track, i):
 # =============================================================================
 #    Des AF algo sur les angles
 # =============================================================================
+def val_angle(o1, o2, o3):
+    """
+    Calcul l'angle entre trois points (l'angle est calcule au point 2).
+    Formule de la loi des cosinus.
+
+    :param float o_1: premier point
+    :param float o_2: deuxieme point
+    :param float o_3: troisieme point
+    :return:
+    """
+    import numpy as np
+
+    a = o3.distanceTo(o2)
+    b = o1.distanceTo(o2)
+    c = o1.distanceTo(o3)
+
+    try:
+        angle = np.arccos((a ** 2 + b ** 2 - c ** 2) / (2 * a * b))
+    except ZeroDivisionError:
+        # si a ou b = 0 c'est a dire si deux points se superposent,
+        #    on considere que l'angle est plat
+        angle = np.pi
+
+    return angle
 
 
 def anglegeom(track, i) -> float:
@@ -262,7 +286,7 @@ def stop_point_with_acceleration_criteria(track, i):
     stop_point = 0
     v = speed(track, i)
     acc = acceleration(track, i)
-    
+
     # Si un point d'indice [i] affiche une vitesse nulle suivant une deccelération,
     #    on cherche le prochain point d'accélération
     if abs(v) < 0.001 and acc < 0:
