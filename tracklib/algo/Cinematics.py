@@ -1,4 +1,5 @@
-"""Class to manage cinematic computations on GPS tracks"""
+"""Class to manage 
+cinematic computations on GPS tracks"""
 
 from tracklib.algo.Analytics import BIAF_SPEED, speed
 from tracklib.algo.Analytics import BIAF_HEADING, heading
@@ -145,6 +146,7 @@ def computeDescDeniv(track, id_ini=0, id_fin=None):
 
     return dn
 
+
 def computeRadialSignature(track, factor=1):
     track = track.copy(); track.loop()
     R = track.getEnclosedPolygon().signature()
@@ -153,21 +155,23 @@ def computeRadialSignature(track, factor=1):
     return track
 
 
-def isInflection(track, i):
+
+def inflection(track, i):
     '''
-    AF algorithm to compute if the observation is an inflection point.
+    Among the characteristic points, inflexion points are the minima of curvature.
+    This function is an AF algorithm to detect if the observation obs(i) 
+    is an inflection point or not.
 
     Parameters
-    ----------
+    -----------
     track : Track
     i : integer
         the th point.
 
     Returns
-    -------
+    --------
     int
-        ième point de la trace.
-
+        1 if obs(i) is a inflexion point, 0 else.
     '''
     
     if i == 0 or i == 1:
@@ -194,6 +198,22 @@ def isInflection(track, i):
 
 
 def vertex(track, i):
+    '''
+    Others characteristic points count the vertices, the maxima of curvature.
+    This function is an AF algorithm to detect if the observation obs(i) 
+    is a vertex point or not.
+
+    Parameters
+    -----------
+    track : Track
+    i : integer
+        the th point.
+
+    Returns
+    --------
+    int
+        1 if obs(i) is a vertex point, 0 else.
+    '''
     
     # on cherche imin
     imin = 1
@@ -226,3 +246,42 @@ def vertex(track, i):
         return 1
 
     return 0
+
+
+# def bend(track, i):
+#     '''
+#     Il faut les AF: sommet, pointinflexion
+#     '''
+
+#     deb = 0
+#     fin = 0
+
+#     afsommet = track.getObsAnalyticalFeature('sommet', i)
+
+#     if afsommet == 1:
+#         # on cherche le pt inflexion avant
+#         for j in range(fin, i):
+#             ptinflexion = track.getObsAnalyticalFeature('pointinflexion', j)
+#             if ptinflexion == 1:
+#                 deb = j
+#                 break
+        
+#         # On cherche le pt inflexion apres
+#         for j in range(i, track.size()):
+#             ptinflexion = track.getObsAnalyticalFeature('pointinflexion', j)
+#             if ptinflexion == 1:
+#                 fin = j
+#                 break
+
+#         angle_virage = Analytics.val_angle(track.getObs(deb), track.getObs(i), track.getObs(fin))
+            
+#         garde = False
+#         if angle_virage < np.pi/2:
+#             garde = True
+#         #print (deb, fin, angle_virage, garde)
+            
+#         if garde:
+#             for j in range(deb, fin):
+#                 track.setObsAnalyticalFeature('virage', j, 1)
+#             #cptvirage += 1
+            
