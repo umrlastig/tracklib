@@ -26,6 +26,7 @@ MODE_COMPARAISON_OR = 2
 MODE_STOPS_LOCAL = 0
 MODE_STOPS_GLOBAL = 1
 MODE_STOPS_RTK = 2
+MODE_STOPS_ACC = 3
 
 MODE_SPLIT_RETURN_EXHAUSTIVE = 0
 MODE_SPLIT_RETURN_FAST = 1
@@ -146,7 +147,7 @@ def findStops(track: Track, spatial, temporal, mode,
 
     temporal : float
 
-    mode : MODE_STOPS_LOCAL, MODE_STOPS_GLOBAL, MODE_STOPS_RTK
+    mode : MODE_STOPS_LOCAL, MODE_STOPS_GLOBAL, MODE_STOPS_RTK, MODE_STOPS_ACC
 
     verbose : bool, optional
         The default is True.
@@ -163,6 +164,8 @@ def findStops(track: Track, spatial, temporal, mode,
         return findStopsGlobal(track, spatial, temporal, verbose)
     if mode == MODE_STOPS_RTK:
         return findStopsGlobalForRTK(track, spatial, temporal, verbose)
+    if mode == MODE_STOPS_ACC:
+        pass
 
 
 # -----------------------------------------------------------------------------
