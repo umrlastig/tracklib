@@ -52,8 +52,8 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
 
     def testAFInflexion(self):
         self.trace1.plot()
-        self.trace1.addAnalyticalFeature(Cinematics.inflection, "pointinflexion")
-        afIsInflexion = self.trace1.getAnalyticalFeature('pointinflexion')
+        self.trace1.addAnalyticalFeature(Cinematics.inflection)
+        afIsInflexion = self.trace1.getAnalyticalFeature('inflection')
         #print (afIsInflexion)
         self.assertEqual(afIsInflexion[0], 0)
         self.assertEqual(afIsInflexion[1], 0)
@@ -65,7 +65,7 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         self.assertEqual(afIsInflexion[7], 0)
         
     def testAFvertex(self):
-        self.trace1.addAnalyticalFeature(Cinematics.inflection, "pointinflexion")
+        self.trace1.addAnalyticalFeature(Cinematics.inflection)
         self.trace1.addAnalyticalFeature(Cinematics.vertex)
         afVertex = self.trace1.getAnalyticalFeature('vertex')
         #print (afVertex)
