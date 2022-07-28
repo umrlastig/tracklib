@@ -4,8 +4,8 @@
 :Date: 07/03/2021
 
 
-Summarize GPS information into a grid
-============================================
+Summarize GPS information
+==========================
 
 This functionality of tracklib reduce the full dataset of GPS traces into a regular grid of summarized features. 
 In each cell, n aggregated features (such as mean and standard deviation of speeds, number of traces, most frequent bearing ...) 
