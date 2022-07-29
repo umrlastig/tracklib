@@ -296,6 +296,7 @@ def __bend(T, vertex):
     garde = False
     if angle_virage < pi/2:
         garde = True
+    
     #print (deb, fin, angle_virage, garde)
     
     if garde:
