@@ -119,10 +119,10 @@ Examples
 .. toctree::
    :caption: API Reference
 
-   ./api_documentation/algo.rst
-   ./api_documentation/core.rst
-   ./api_documentation/io.rst
-   ./api_documentation/util.rst
+   ./api/algo.rst
+   ./api/core.rst
+   ./api/io.rst
+   ./api/util.rst
 
 
 

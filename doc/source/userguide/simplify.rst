@@ -90,7 +90,7 @@ less angular results than the Douglas-Peucker algorithm.
 Kernel simplification
 **********************
 
-Build a kernel. For example a `Gaussian Filter <https://tracklib.readthedocs.io/en/latest/api_documentation/core/core-kernel.html#tracklib.core.Kernel.GaussianKernel>`__:
+Build a kernel. For example a `Gaussian Filter <https://tracklib.readthedocs.io/en/latest/api/core/core-kernel.html#tracklib.core.Kernel.GaussianKernel>`__:
 
 .. math::
 
