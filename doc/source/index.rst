@@ -111,7 +111,6 @@ Examples
    :maxdepth: 1
    :caption: User Guide
 
-   ./userguide/loading
    ./userguide/coreconcept
    ./userguide/operator
    ./userguide/simplify

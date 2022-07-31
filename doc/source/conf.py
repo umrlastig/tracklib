@@ -21,7 +21,7 @@ sys.path.append(os.path.abspath("../../tracklib"))
 
 project = "TrackLib"
 copyright = (
-    "2021, LASTIG lab, French National Institute of Geographic and Forest Information"
+    "2022, LASTIG lab, French National Institute of Geographic and Forest Information"
 )
 author = "Yann Méneroux, Marie-Dominique Van Damme"
 
@@ -42,6 +42,7 @@ extensions = [
     "sphinx_autodoc_typehints",
 	"nbsphinx",
     "autodocsumm",
+	"sphinx-apidoc"
 ]
 
 # I execute the notebooks manually in advance. If notebooks test the code,

@@ -18,6 +18,8 @@ class Qgis:
     
     vertFonce = '51,160,44'   # vertex
     #vertClair = '#b2df8a'
+    orange = '255,127,0'
+    jaune = '246,240,44'
     bleu = '68,174,240'       # bend
     rose = '237,55,234'       # switchbacks : 0
     turquoise = '54,202,202'  # switchbacks : 1
@@ -44,7 +46,7 @@ class Qgis:
                                                    'color_border': colors[k]})
             #symbolEdge.setColor(QColor.fromRgb(31, 120, 180))
             symbolEdge.setSize(1.8)
-            categoryEdge = QgsRendererCategory(values[k], symbolEdge, af)
+            categoryEdge = QgsRendererCategory(values[k], symbolEdge, str(values[k]))
             categories.append(categoryEdge)
             
         # On construit une expression pour appliquer les categories
@@ -79,7 +81,7 @@ class Qgis:
                 'width':'0.6',
                 'color': colors[k],  # '255,127,0'
                 'line_style':'dash'})
-            categoryEdge = QgsRendererCategory(values[k], symbolL, af)
+            categoryEdge = QgsRendererCategory(values[k], symbolL, str(values[k]))
             categories.append(categoryEdge)
         
         expression = af # field name
