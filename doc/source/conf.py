@@ -42,7 +42,6 @@ extensions = [
     "sphinx_autodoc_typehints",
 	"nbsphinx",
     "autodocsumm",
-	"sphinx-apidoc"
 ]
 
 # I execute the notebooks manually in advance. If notebooks test the code,

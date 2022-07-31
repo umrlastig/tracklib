@@ -4,12 +4,7 @@ Module util
 .. automodule:: tracklib.util
     :members: 
 
-Doc
----
-.. automodule:: tracklib.util.Doc
-    :members: 
+.. toctree::
 
-Geometry
---------
-.. automodule:: tracklib.util.Geometry
-    :members: 
+    ./util/util-geometry
+    ./util/util-qgis
