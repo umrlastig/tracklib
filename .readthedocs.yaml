@@ -1,11 +1,9 @@
 version: 2
 formats: all
-
 python:
   version: 3
   install:
     - requirements: doc/requirements.txt
   system_packages: true
-
 sphinx:
   fail_on_warning: true
