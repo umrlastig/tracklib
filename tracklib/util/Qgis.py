@@ -138,7 +138,7 @@ class Qgis:
                 pt = QgsPointXY(X, Y)
                 gPoint = QgsGeometry.fromPointXY(pt)
                 
-                attrs = [i+1, j+1]
+                attrs = [i, j]
                 # AF
                 if af:
                     for af_name in track.getListAnalyticalFeatures():

@@ -8,6 +8,7 @@ from tracklib.algo.Analytics import BIAF_DS, ds
 from tracklib.algo.Analytics import BIAF_ABS_CURV
 from tracklib.algo.Analytics import anglegeom, val_angle
 import tracklib.core.Operator as Operator
+from tracklib.core.Utils import NAN
 
 
 def estimate_speed(track):
@@ -161,6 +162,9 @@ def inflection(track, i):
     Among the characteristic points, inflection points are the minima of curvature.
     This function is an AF algorithm to detect if the observation obs(i) 
     is an inflection point or not.
+    Le principe de détection est fondé sur l'étude de la variation 
+    des produits vectoriels le long de la ligne. Les points d'inflexion sont 
+    détectés aux changements de signe de ces produits
 
     Parameters
     -----------
@@ -250,13 +254,64 @@ def vertex(track, i):
     return 0
 
 
-def __bend(T, vertex):
+def curvature_radius(track, i):
+    '''
+    
+
+    Parameters
+    -----------
+    track : Track
+    i : integer
+        the th point.
+
+    Returns
+    --------
+    float
+        
+    '''
+    
+    # on cherche imin, l'indice du point d'inflexion le plus proche 
+    # en amont de la trace
+    imin = 1
+    j = i-1
+    while j >= 0:
+        if track.getObsAnalyticalFeature('inflection', j) == 1:
+            imin = j
+            break
+        j -= 1
+    # on cherche imax, l'indice du point d'inflexion le plus proche 
+    # en aval de la trace
+    imax = track.size() - 2
+    j = i
+    while j < track.size() - 1:
+        if track.getObsAnalyticalFeature('inflection', j) == 1:
+            imax = j
+            break
+        j += 1
+    
+    # on cherche la plus petite courbure dans ]imin, imax[
+    K = 400
+    iK = -1
+    for j in range(imin, imax):
+        kj = anglegeom(track, j)
+        if kj < K:
+            K = kj
+            iK = j
+            
+    if iK == i:
+        return K
+
+    return NAN
+
+
+def setBendAsAf(T):
     '''
     Retourne la liste des indices des points de la trace qui composent 
     le virage défini par le sommet. Le virage commence et finit aux points 
     d'inflexion les plus proches du sommet.
     Un bon virage est un virage dont l'angle avec le sommet et ses 
     points d'inflexion est inférieur à pi/2.
+    Need vertex and inflection AF.
 
     Parameters
     ----------
@@ -269,91 +324,52 @@ def __bend(T, vertex):
     -------
     pointsvirage : list
         Indices des points de la trace qui compose le virage à partir d'un sommet.
-
-    '''
-    pointsvirage = []
-    
-    deb = 0
-    fin = 0
-    
-    # on cherche le pt inflexion avant
-    for j in range(vertex, -1, -1):
-        ptinflexion = T.getObsAnalyticalFeature('inflection', j)
-        if ptinflexion == 1:
-            deb = j
-            break
-    
-    # On cherche le pt inflexion apres
-    for j in range(vertex, T.size()):
-        ptinflexion = T.getObsAnalyticalFeature('inflection', j)
-        if ptinflexion == 1:
-            fin = j
-            break
-
-    angle_virage = val_angle(T.getObs(deb), T.getObs(vertex), T.getObs(fin))
-    
-    from numpy import pi
-    garde = False
-    if angle_virage < pi/2:
-        garde = True
-    
-    #print (deb, fin, angle_virage, garde)
-    
-    if garde:
-        # Le virage est un bon virage, on prend tous les points
-        for j in range(deb, fin):
-            pointsvirage.append(j)
-
-    # On retourne les points du virage
-    return pointsvirage
-
-
-def bend(track, i):
-    '''
-    Need vertex and inflection AF.
-    Condition: 
-    
-    Parameters
-    -----------
-    track : Track
-    i : integer
-        the th point.
-
-    Returns
-    --------
-    int
-        1 if obs(i) is in a bend, 0 else.
-    '''
-    
-    # 1. On cherche s'il y a un sommet avant
-    Vb = -1
-    for k in range (i, -1, -1):
-        afsommet = track.getObsAnalyticalFeature('vertex', k)
-        if afsommet == 1:
-            Vb = k
-            break
         
-    if Vb != -1:
-        pts = __bend(track, Vb)
-        for j in pts:
-            if i == j:
-                return 1
+        1 if obs(i) is in a bend, 0 else.
+
+    '''
     
-    # 2. On cherche s'il y a un sommet après
-    Va = -1
-    for k in range (i, track.size()):
-        afsommet = track.getObsAnalyticalFeature('vertex', k)
+    #    
+    T.createAnalyticalFeature('bend', 0)
+    
+    for i in range(T.size()):
+        
+        # On ne traite que les virages à partir des sommets
+        afsommet = T.getObsAnalyticalFeature('vertex', i)
         if afsommet == 1:
-            Va = k
-            break
+            deb = 0
+            fin = 0
     
-    if Va != -1:
-        pts = __bend(track, Va)
-        for j in pts:
-            if i == j:
-                return 1
+            # on cherche le pt inflexion avant
+            for j in range(i, -1, -1):
+                ptinflexion = T.getObsAnalyticalFeature('inflection', j)
+                if ptinflexion == 1:
+                    deb = j
+                    break
+            
+            # On cherche le pt inflexion apres
+            for j in range(i, T.size()):
+                ptinflexion = T.getObsAnalyticalFeature('inflection', j)
+                if ptinflexion == 1:
+                    fin = j
+                    break
+                
+            angle_virage = val_angle(T.getObs(deb), T.getObs(i), T.getObs(fin))
+            
+            from numpy import pi
+            garde = False
+            if angle_virage < 3*pi/4:
+                garde = True
     
-    return 0
+            # #print (deb, fin, angle_virage, garde)
+            # print (deb, i, fin, angle_virage, garde)
+    
+            if garde:
+                # Le virage est un bon virage, on prend tous les points
+                for j in range(deb, fin):
+                    T.setObsAnalyticalFeature('bend', j, 1)
+                if fin < T.size():
+                    T.setObsAnalyticalFeature('bend', fin, 1)
 
 
 def setSwitchbacksAsAf(track, nb_virage_min = 3, dist_max = 150):
