@@ -53,9 +53,11 @@ SQUARING_RECALL = 0.1
 #       - tolerance is a customed function to maximize
 # --------------------------------------------------------------------------
 def simplify(track, tolerance, mode=MODE_SIMPLIFY_DOUGLAS_PEUCKER, verbose=True):
-    """TODO
+    """
+    The process "Track simplification" generally returns a new simplified track. 
+    Tolerance is in the unit of track observation coordinates.
 
-    Simplify a track"""
+    """
     if mode == MODE_SIMPLIFY_DOUGLAS_PEUCKER:
         return douglas_peucker(track, tolerance)
     if mode == MODE_SIMPLIFY_VISVALINGAM:
@@ -90,7 +92,31 @@ def simplify(track, tolerance, mode=MODE_SIMPLIFY_DOUGLAS_PEUCKER, verbose=True)
 # Output : simplified
 # --------------------------------------------------------------------------
 def visvalingam(track, eps):
-    """TODO"""
+    """
+    The Visvalingram algorithm simplify the geometry of the track by reducing 
+    the number of points but the result presents less angular results than 
+    the Douglas-Peucker algorithm.
+
+    .. code-block:: python
+    
+      tolerance = 50
+      trace3 = Simplification.simplify(trace, tolerance, 
+    			 Simplification.MODE_SIMPLIFY_VISVALINGAM)
+      trace.plot(append = False, sym='g-', label='original track')
+      trace3.plot(append = True, sym='b-', label='simplify:visvalingam')
+      plt.legend()
+
+
+    .. figure:: ../img/simplify_visvalingam.png
+       :width: 450px
+       :align: center
+    
+       Figure 2 : Simplification with Visvalingram
+
+    .. note:: Reference: M. Visvalingam & J. D. Whyatt (1993) Line generalisation by repeated elimination of points, The Cartographic Journal, 30:1, 46-51, DOI: 
+              `10.1179/000870493786962263 <10.1179/000870493786962263>`_
+    
+    """
     eps **= 2
     output = track.copy()
     output.addAnalyticalFeature(Geometry.aire_visval, "@aire")

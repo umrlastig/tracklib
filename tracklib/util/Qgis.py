@@ -15,6 +15,9 @@ from qgis.core import QgsCategorizedSymbolRenderer, QgsRendererCategory
 
 
 class Qgis:
+    '''
+    Class to visualize GPS tracks and its AF in Qgis.
+    '''
     
     vertFonce = '51,160,44'   # vertex
     #vertClair = '#b2df8a'
