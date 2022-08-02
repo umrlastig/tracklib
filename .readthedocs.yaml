@@ -5,5 +5,3 @@ python:
   install:
     - requirements: doc/requirements.txt
   system_packages: true
-sphinx:
-  fail_on_warning: true

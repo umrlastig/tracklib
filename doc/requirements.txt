@@ -5,3 +5,7 @@ sphinx-autodoc-typehints
 ipykernel
 nbsphinx
 autodocsumm
+numpy
+matplotlib
+scikit-image
+progressbar2
