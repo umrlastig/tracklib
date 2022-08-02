@@ -83,16 +83,18 @@ def simplify(track, tolerance, mode=MODE_SIMPLIFY_DOUGLAS_PEUCKER, verbose=True)
 
 
 # --------------------------------------------------------------------------
-# Function to simplify a GPS track with Visvalingam algorithm
+# 
 # --------------------------------------------------------------------------
 # Input :
-#   - track ::     GPS track
-#   - eps   ::     length threshold epsilon (sqrt of triangle area)
+#   -  ::     
+#   -    ::     
 # --------------------------------------------------------------------------
-# Output : simplified
+# Output : 
 # --------------------------------------------------------------------------
-def visvalingam(track, eps):
+def visvalingam (track, eps):
     """
+    Function to simplify a GPS track with Visvalingam algorithm.
+    
     The Visvalingram algorithm simplify the geometry of the track by reducing 
     the number of points but the result presents less angular results than 
     the Douglas-Peucker algorithm.
@@ -116,6 +118,19 @@ def visvalingam(track, eps):
     .. note:: Reference: M. Visvalingam & J. D. Whyatt (1993) Line generalisation by repeated elimination of points, The Cartographic Journal, 30:1, 46-51, DOI: 
               `10.1179/000870493786962263 <10.1179/000870493786962263>`_
     
+    
+    Parameters
+    ----------
+    track : Track
+            GPS track
+    eps : float
+          length threshold epsilon (sqrt of triangle area)
+          
+    Returns
+    -------
+    simplified : Track
+                 simplified track
+
     """
     eps **= 2
     output = track.copy()
