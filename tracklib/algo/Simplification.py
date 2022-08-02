@@ -159,7 +159,7 @@ def douglas_peucker(track, eps):
       trace2.plot(append = True, sym='b-')
 
 
-    .. figure:: .../../../../_images/simplify_douglaspeucker.png
+    .. figure:: ../../../../_images/simplify_douglaspeucker.png
        :width: 450px
        :align: center
     
@@ -213,7 +213,7 @@ def douglas_peucker(track, eps):
 
 
 # --------------------------------------------------------------------------
-# Function to simplify a GPS track with dynamic programming
+# 
 # --------------------------------------------------------------------------
 # Input :
 #   - track ::     GPS track
@@ -224,7 +224,10 @@ def douglas_peucker(track, eps):
 # Output : simplified
 # --------------------------------------------------------------------------
 def optimalSimplification(track, cost, eps, mode=MODE_SEGMENTATION_MINIMIZE):
-    """TODO"""
+    """
+    Function to simplify a GPS track with dynamic programming.
+    
+    """
 
     simplified = Track(user_id=track.uid, track_id=track.tid, base=track.base)
     segmentation = optimalSegmentation(track, cost, eps)
@@ -285,14 +288,31 @@ def __cost_largest_deviation_strict(track, i, j, offset):
 # 
 # --------------------------------------------------------------------------
 # Input :
-#   - track ::     GPS track
-#   - eps   ::     angle threshold on right and flat angles (radians)
+#   - track ::     
+#   - eps   ::     
 # --------------------------------------------------------------------------
 # Output : simplified
 # --------------------------------------------------------------------------
 def squaring(track, eps):
     '''
     Function to simplify a GPS track with squaring algorithm.
+    
+    Example:
+    
+    .. code-block:: python
+
+      tolerance = 3
+      trace1 = Simplification.simplify(trace, tolerance, 
+    			 Simplification.MODE_SIMPLIFY_SQUARING)
+      trace.plot(append = False, sym='g-')
+      trace1.plot(append = True, sym='b-')
+
+
+    .. figure:: ../../../../_images/simplify_squaring.png
+       :width: 450px
+       :align: center
+    
+       Figure 3 : Simplification with squaring algorithm
     
     
     .. note:: Reference: Lokhat, Imran & Touya, Guillaume. (2016). 
@@ -303,15 +323,15 @@ def squaring(track, eps):
 
     Parameters
     ----------
-    track : TYPE
-        DESCRIPTION.
-    eps : TYPE
-        DESCRIPTION.
+    track : Track
+        GPS track
+    eps : float
+        angle threshold on right and flat angles (radians).
 
     Returns
     -------
-    output : TYPE
-        DESCRIPTION.
+    output : Track
+        simplified track.
 
     '''
 
