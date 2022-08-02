@@ -4,8 +4,8 @@
 :Date: 07/03/2021
 
 
-Operation classes for manipulating track
-==========================================
+Operation for manipulating track
+================================
 
 La librairie tracklib propose une multitude d'opérateurs et de fonctions 
 qui permettent de simplifier au maximum la création d'analytical features sur une trace. 

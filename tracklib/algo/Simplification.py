@@ -107,7 +107,7 @@ def visvalingam(track, eps):
       plt.legend()
 
 
-    .. figure:: ../img/simplify_visvalingam.png
+    .. figure:: ../../../img/simplify_visvalingam.png
        :width: 450px
        :align: center
     
