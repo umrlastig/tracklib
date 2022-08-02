@@ -304,28 +304,26 @@ def curvature_radius(track, i):
     return NAN
 
 
-def setBendAsAf(T):
+from numpy import pi
+def setBendAsAf(T, angle_min = pi/2):
     '''
-    Retourne la liste des indices des points de la trace qui composent 
-    le virage défini par le sommet. Le virage commence et finit aux points 
-    d'inflexion les plus proches du sommet.
+    Attribut les points de la trace qui composent 
+    le virage défini par le sommet et les points d'inflexion les plus proches 
+    de chaque côté.
     Un bon virage est un virage dont l'angle avec le sommet et ses 
-    points d'inflexion est inférieur à pi/2.
+    points d'inflexion est inférieur à angle_min.
+    
     Need vertex and inflection AF.
+    
+    AF = 'bend' and value is 1 if obs(i) is in a bend, 0 else.
+
 
     Parameters
     ----------
     T : Track
         La trace dont on veut extraire les points autour du sommet.
-    vertex : int
-        indice de la trace correspondant au sommet.
-
-    Returns
-    -------
-    pointsvirage : list
-        Indices des points de la trace qui compose le virage à partir d'un sommet.
-        
-        1 if obs(i) is in a bend, 0 else.
+    angle_min : float
+        angle min.
 
     '''
     
@@ -333,21 +331,18 @@ def setBendAsAf(T):
     T.createAnalyticalFeature('bend', 0)
     
     for i in range(T.size()):
-        
         # On ne traite que les virages à partir des sommets
         afsommet = T.getObsAnalyticalFeature('vertex', i)
         if afsommet == 1:
-            deb = 0
-            fin = 0
-    
             # on cherche le pt inflexion avant
+            deb = 0
             for j in range(i, -1, -1):
                 ptinflexion = T.getObsAnalyticalFeature('inflection', j)
                 if ptinflexion == 1:
                     deb = j
                     break
-            
             # On cherche le pt inflexion apres
+            fin = 0
             for j in range(i, T.size()):
                 ptinflexion = T.getObsAnalyticalFeature('inflection', j)
                 if ptinflexion == 1:
@@ -355,16 +350,8 @@ def setBendAsAf(T):
                     break
                 
             angle_virage = val_angle(T.getObs(deb), T.getObs(i), T.getObs(fin))
-            
-            from numpy import pi
-            garde = False
-            if angle_virage < 3*pi/4:
-                garde = True
-    
-            # #print (deb, fin, angle_virage, garde)
-            # print (deb, i, fin, angle_virage, garde)
-    
-            if garde:
+            if angle_virage < angle_min:
+                # print (deb, fin, angle_virage, garde)
                 # Le virage est un bon virage, on prend tous les points
                 for j in range(deb, fin):
                     T.setObsAnalyticalFeature('bend', j, 1)
@@ -372,10 +359,12 @@ def setBendAsAf(T):
                     T.setObsAnalyticalFeature('bend', fin, 1)
 
 
+
 def setSwitchbacksAsAf(track, nb_virage_min = 3, dist_max = 150):
     '''
-    Fusion des virages consécutifs si leur nombre est supérieur à nb_virage_min
-    et si la distance maximale entre deux sommets est inférieure à dist_max.
+    Fusion des virages (consécutifs ou pas) si leur nombre est supérieur à 
+    nb_virage_min et si la distance maximale entre deux sommets est inférieure 
+    à dist_max.
     Attention: c'est une structure de fonction particulière qui créée un AF, 
     elle ne s'appelle pas avec la méthode addAnalyticalFeature.
     
@@ -387,10 +376,6 @@ def setSwitchbacksAsAf(track, nb_virage_min = 3, dist_max = 150):
     nb_virage_min : nombre
     dist_max : distance
 
-    Returns
-    --------
-    int
-        1 if obs(i) is in a bend, 0 else.
     '''
     #    
     track.createAnalyticalFeature('switchbacks', 0)
@@ -409,8 +394,6 @@ def setSwitchbacksAsAf(track, nb_virage_min = 3, dist_max = 150):
         afsommet = track.getObsAnalyticalFeature('vertex', i)
         afvirage = track.getObsAnalyticalFeature('bend', i)
         
-        #print (i, afvirage, deb)
-        
         if afvirage == 1 and not SERIE:
             #print ("on démarre à : ", i)
             SERIE = True
@@ -419,19 +402,29 @@ def setSwitchbacksAsAf(track, nb_virage_min = 3, dist_max = 150):
         elif SERIE and afvirage == 1:
             dist += track.getObs(i).distanceTo(track.getObs(i-1))
         elif SERIE and afvirage != 1:
-            fin = i - 1
             
-            # On a finit la série, on passe les AF de la série à 1
-            # print ('fin, ', deb, fin, nbvirage)
-            if nbvirage >= nb_virage_min:
-                for k in range(deb, fin):
-                    track.setObsAnalyticalFeature('switchbacks', k, 1)
-
-            SERIE = False
-            deb = 0
-            fin = 0
-            nbvirage = 0
-            dist = 0
+            # Est-ce qu'on a fini la série ?
+            fini = False
+            for j in range(i+1, track.size()):
+                afprochainvirage = track.getObsAnalyticalFeature('bend', j)
+                if afprochainvirage == 1:
+                    dhorsvirage = track.getObs(j).distanceTo(track.getObs(i))
+                    if dhorsvirage > dist_max:
+                        fini = True
+                    break
+                
+            if fini:
+                # print ('fin, ', deb, fin, nbvirage)
+                # On a fini la série, on passe les AF de la série à 1
+                fin = i - 1
+                if nbvirage >= nb_virage_min:
+                    for k in range(deb, fin):
+                        track.setObsAnalyticalFeature('switchbacks', k, 1)
+                SERIE = False
+                deb = 0
+                fin = 0
+                nbvirage = 0
+                dist = 0
 
         if afsommet == 1 and afvirage == 1:
             if nbvirage == 0:
@@ -449,7 +442,7 @@ def setSwitchbacksAsAf(track, nb_virage_min = 3, dist_max = 150):
                 nbvirage += 1
                 dist = 0
 
-
+# 
 
 
 
