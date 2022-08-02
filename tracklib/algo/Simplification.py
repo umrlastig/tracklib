@@ -1,6 +1,29 @@
-# ------------------------- Simplification -------------------------------------
-# Class to manage simplification of GPS tracks
-# -----------------------------------------------------------------------------
+'''
+**Simplification of GPS tracks**
+
+We present on this page four filtering algorithms for track by using 
+Douglas & Peucker simplification, Visvalingram simplification, squaring algorithms
+and ...
+
+The process "Track simplification" generally returns a new simplified track. 
+Tolerance is in the unit of track observation coordinates.
+
+We use the same sample track in the different examples. For loading the data:
+
+.. code-block:: python
+
+  from tracklib.io.FileReader import FileReader
+  import tracklib.algo.Simplification as Simplification
+
+  chemin = './data/lacet/ecrins.csv'
+  tracks = FileReader.readFromWKTFile(chemin, 0, 1, 2, ",", 1, 
+                                    "ENUCoords", None, True)
+  trace = tracks["903959","%"][0]
+  trace = trace.extract(70,120)
+
+  trace.summary()
+
+'''
 
 import sys
 import math
@@ -141,7 +164,7 @@ def visvalingam (track, eps):
 
 
 
-def douglas_peucker(track, eps):
+def douglas_peucker (track, eps):
     """
     Function to simplify a GPS track with Douglas-Peucker algorithm.
     
@@ -284,16 +307,8 @@ def __cost_largest_deviation_strict(track, i, j, offset):
         return 1e300 * (l > offset) + 1
 
 
-# --------------------------------------------------------------------------
-# 
-# --------------------------------------------------------------------------
-# Input :
-#   - track ::     
-#   - eps   ::     
-# --------------------------------------------------------------------------
-# Output : simplified
-# --------------------------------------------------------------------------
-def squaring(track, eps):
+
+def squaring (track, eps):
     '''
     Function to simplify a GPS track with squaring algorithm.
     
@@ -323,16 +338,10 @@ def squaring(track, eps):
 
     Parameters
     ----------
-    track : Track
-        GPS track
-    eps : float
-        angle threshold on right and flat angles (radians).
-
-    Returns
-    -------
-    output : Track
-        simplified track.
-
+    :param track Track: GPS track
+    :param eps float: angle threshold on right and flat angles (radians)
+    :return Track: simplified track
+    
     '''
 
     N = len(track)
