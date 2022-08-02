@@ -404,13 +404,14 @@ def setSwitchbacksAsAf(track, nb_virage_min = 3, dist_max = 150):
         elif SERIE and afvirage != 1:
             
             # Est-ce qu'on a fini la série ?
-            fini = False
+            fini = True
+            # Sauf si le point suivant 
             for j in range(i+1, track.size()):
                 afprochainvirage = track.getObsAnalyticalFeature('bend', j)
                 if afprochainvirage == 1:
                     dhorsvirage = track.getObs(j).distanceTo(track.getObs(i))
-                    if dhorsvirage > dist_max:
-                        fini = True
+                    if dhorsvirage < dist_max:
+                        fini = False
                     break
                 
             if fini:
