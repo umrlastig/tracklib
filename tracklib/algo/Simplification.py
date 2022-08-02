@@ -82,15 +82,7 @@ def simplify(track, tolerance, mode=MODE_SIMPLIFY_DOUGLAS_PEUCKER, verbose=True)
     sys.exit("Error: track simplification mode " + (str)(mode) + " not implemented yet")
 
 
-# --------------------------------------------------------------------------
-# 
-# --------------------------------------------------------------------------
-# Input :
-#   -  ::     
-#   -    ::     
-# --------------------------------------------------------------------------
-# Output : 
-# --------------------------------------------------------------------------
+
 def visvalingam (track, eps):
     """
     Function to simplify a GPS track with Visvalingam algorithm.
@@ -98,6 +90,8 @@ def visvalingam (track, eps):
     The Visvalingram algorithm simplify the geometry of the track by reducing 
     the number of points but the result presents less angular results than 
     the Douglas-Peucker algorithm.
+    
+    Example:
 
     .. code-block:: python
     
@@ -113,7 +107,7 @@ def visvalingam (track, eps):
        :width: 450px
        :align: center
     
-       Figure 2 : Simplification with Visvalingram
+       Figure 1 : Simplification with Visvalingram
 
     .. note:: Reference: M. Visvalingam & J. D. Whyatt (1993) Line generalisation by repeated elimination of points, The Cartographic Journal, 30:1, 46-51, DOI: 
               `10.1179/000870493786962263 <10.1179/000870493786962263>`_
@@ -123,7 +117,7 @@ def visvalingam (track, eps):
     ----------
     :param track Track: GPS track
     :param eps float: length threshold epsilon (sqrt of triangle area)
-    :return simplified Track: simplified track
+    :return Track: simplified track
 
     """
     eps **= 2
@@ -146,17 +140,46 @@ def visvalingam (track, eps):
     return output
 
 
-# --------------------------------------------------------------------------
-# Function to simplify a GPS track with Douglas-Peucker algorithm
-# --------------------------------------------------------------------------
-# Input :
-#   - track ::     GPS track
-#   - eps   ::     length threshold epsilon
-# --------------------------------------------------------------------------
-# Output : simplified
-# --------------------------------------------------------------------------
+
 def douglas_peucker(track, eps):
-    """TODO"""
+    """
+    Function to simplify a GPS track with Douglas-Peucker algorithm.
+    
+    The Douglas-Peucker algorithm reduce the number of a line by reducing 
+    the number of points. The result should keep the original shape.
+    
+    Example:
+
+    .. code-block:: python
+    
+      tolerance = 20
+      trace2 = Simplification.simplify(trace, tolerance, 
+    			 Simplification.MODE_SIMPLIFY_DOUGLAS_PEUCKER)
+      trace.plot(append = False, sym='g-')
+      trace2.plot(append = True, sym='b-')
+
+
+    .. figure:: .../../../../_images/simplify_douglaspeucker.png
+       :width: 450px
+       :align: center
+    
+       Figure 2 : Simplification with Douglas Peucker
+
+
+    .. note:: Reference: David Douglas, Thomas Peucker: Algorithms for the 
+            reduction of the number of points required to represent a digitized 
+            line or its caricature. In Cartographica: The International Journal 
+            for Geographic Information and Geovisualization. 
+            Volume 10, Issue 2, Pages 112–122, 1973, 
+            `https://utpjournals.press/doi/10.3138/FM57-6770-U75U-7727 <https://utpjournals.press/doi/10.3138/FM57-6770-U75U-7727>`_
+    		
+    Parameters
+    ----------
+    :param track Track: GPS track
+    :param eps float: length threshold epsilon (sqrt of triangle area)
+    :return Track: simplified track
+    
+    """
 
     L = track.getObsList()
 
@@ -259,7 +282,7 @@ def __cost_largest_deviation_strict(track, i, j, offset):
 
 
 # --------------------------------------------------------------------------
-# Function to simplify a GPS track with squaring algorithm
+# 
 # --------------------------------------------------------------------------
 # Input :
 #   - track ::     GPS track
@@ -268,6 +291,29 @@ def __cost_largest_deviation_strict(track, i, j, offset):
 # Output : simplified
 # --------------------------------------------------------------------------
 def squaring(track, eps):
+    '''
+    Function to simplify a GPS track with squaring algorithm.
+    
+    
+    .. note:: Reference: Lokhat, Imran & Touya, Guillaume. (2016). 
+              Enhancing building footprints with squaring operations. 
+              Journal of Spatial Information Science. 13. 
+              `10.5311/JOSIS.2016.13.276 <http://dx.doi.org/10.5311/JOSIS.2016.13.276>`_
+
+
+    Parameters
+    ----------
+    track : TYPE
+        DESCRIPTION.
+    eps : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    output : TYPE
+        DESCRIPTION.
+
+    '''
 
     N = len(track)
 
