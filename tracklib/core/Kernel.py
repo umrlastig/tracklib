@@ -1,5 +1,33 @@
 """
-Kernels for filtering, smoothing and stochastics simulations       
+Kernels for filtering, smoothing and stochastics simulations .
+
+An example of Kernel simplification with an 
+`Gaussian Filter <https://tracklib.readthedocs.io/en/latest/api/core/core-kernel.html#tracklib.core.Kernel.GaussianKernel>`__:
+    
+.. math::
+
+    f(x)=\frac{e^{-0.5 \cdot \left(x/\sigma \right)^2}}
+    {\sigma \cdot \sqrt{2 \cdot \pi}}
+
+
+.. code-block:: python
+
+  kernel = GaussianKernel(3)
+  trace.operate(Operator.FILTER, "x", kernel, "x_filtered")
+  trace.operate(Operator.FILTER, "y", kernel, "y_filtered")
+  trace.plot(append = False, sym='g-', label='original track')
+  plt.plot(trace.getAnalyticalFeature("x_filtered"), trace.getAnalyticalFeature("y_filtered"), 
+		 'b-', label='simplify:gaussian filter')
+  plt.legend()
+
+
+.. figure:: ../../../../_images/simplify_gaussian_filter.png
+   :width: 450px
+   :align: center
+
+   Figure : Simplification with a gaussian kernel filter
+
+      
 """
 
 # For type annotation

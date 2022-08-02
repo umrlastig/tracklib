@@ -113,7 +113,6 @@ Examples
 
    ./userguide/coreconcept
    ./userguide/operator
-   ./userguide/simplify
    
    
 .. toctree::
