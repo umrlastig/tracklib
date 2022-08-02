@@ -121,15 +121,9 @@ def visvalingam (track, eps):
     
     Parameters
     ----------
-    track : Track
-            GPS track
-    eps : float
-          length threshold epsilon (sqrt of triangle area)
-          
-    Returns
-    -------
-    simplified : Track
-                 simplified track
+    :param track Track: GPS track
+    :param eps float: length threshold epsilon (sqrt of triangle area)
+    :return simplified Track: simplified track
 
     """
     eps **= 2
