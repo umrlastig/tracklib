@@ -188,8 +188,10 @@ class Plot:
         if not self.track.hasAnalyticalFeature(BIAF_ABS_CURV):
             self.track.compute_abscurv()
 
-        # if template == 'BOXPLOT':
-        self.__plotBoxplot(af_name)
+        if template == 'BOXPLOT':
+            self.__plotBoxplot(af_name)
+        else:
+            self.__plotAF(af_name)
 
     def __plotBoxplot(self, af_name):
         """TODO"""
@@ -197,7 +199,33 @@ class Plot:
         fig, ax1 = plt.subplots(figsize=(6, 2))
         ax1.set(xlabel="absciss curvilign")
         ax1.set_title(af_name + " observations boxplot")
-        ax1.boxplot(self.track.getAnalyticalFeature(af_name), vert=False)
+        
+        data = []
+        values = self.track.getAnalyticalFeature(af_name)
+        for i in range(len(values)):
+            val = values[i]
+            if not utils.isnan(val):
+                data.append(val)
+        
+        ax1.boxplot(data, vert=False)
+        
+    def __plotAF(self, af_name):
+        """TODO"""
+
+        fig, ax1 = plt.subplots(figsize=(6, 2))
+        ax1.set(xlabel="absciss curvilign")
+        ax1.set_title(af_name + " observations boxplot")
+        
+        x = []
+        data = []
+        values = self.track.getAnalyticalFeature(af_name)
+        for i in range(len(values)):
+            val = values[i]
+            if not utils.isnan(val):
+                x.append(self.track.getObsAnalyticalFeature('abs_curv', i))
+                data.append(val)
+        
+        ax1.plot(x, data)
 
 
     def plotProfil(self, template="SPATIAL_SPEED_PROFIL", afs=[]):

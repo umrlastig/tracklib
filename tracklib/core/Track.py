@@ -926,6 +926,7 @@ class Track:
             except IndexError:
                 value = Utils.NAN
             self.getObs(i).features[idAF] = value
+        
         return self.getAnalyticalFeature(name)
 
     def createAnalyticalFeature(self, name, val_init=0.0):
