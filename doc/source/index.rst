@@ -94,7 +94,6 @@ Examples
    :caption: Generalité
    
    install
-   quickstart   
    overview   
    
 .. toctree::
