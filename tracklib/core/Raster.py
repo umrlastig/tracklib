@@ -64,10 +64,13 @@ class Raster:
         return self.bands[cle]
 
     
-    def plot(self, af_algo, aggregate, valmax=None, startpixel=0):
+    def plot(self, af_algo, aggregate, valmax=None, startpixel=0, no_data_values = None):
         """TODO"""
         
         tab = np.array(self.getRasterBand(af_algo, aggregate).grid)
+        
+        if no_data_values != None:
+            tab[tab == grid.NO_DATA_VALUE] = no_data_values
 
         cmap = utils.getOffsetColorMap(self.color1, self.color2, 0)
         plt.imshow(tab, cmap=cmap)

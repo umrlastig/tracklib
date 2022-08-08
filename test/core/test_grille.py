@@ -2,6 +2,9 @@
 
 from unittest import TestCase, TestSuite, TextTestRunner
 import matplotlib.pyplot as plt
+import os.path
+
+from tracklib.io.GpxReader import GpxReader
 
 from tracklib.core import (Track, Obs, Coords, GPSTime, Grid)
 from tracklib.algo import (Analytics)
@@ -12,6 +15,8 @@ from tracklib.core.TrackCollection import TrackCollection
 class TestGrille(TestCase):
     
     def setUp (self):
+        
+        self.resource_path = os.path.join(os.path.split(__file__)[0], "../..")
         
         GPSTime.GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         self.TRACES = []
@@ -214,11 +219,39 @@ class TestGrille(TestCase):
     #     self.assertEqual(sumPlot[2][7][0], 0)
     #     self.assertEqual(sumPlot[3][7][0], 0)
     #     self.assertEqual(sumPlot[4][7][0], 0)
+    
+    
+    def test_quickstart(self):
+
+        GPSTime.GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
+        gpxpath = os.path.join(self.resource_path, 'data/activity_5807084803.gpx')
+        tracks = GpxReader.readFromGpx(gpxpath)
+        trace = tracks.getTrack(0)
+        # Transformation GEO coordinates to ENU
+        trace.toENUCoords()
+        # Display
+        trace.plot()
+        # speed
+        trace.estimate_speed()
+        
+        collection = TrackCollection([trace])
+        
+        af_algos = [Analytics.speed, Analytics.speed, Analytics.speed]
+        cell_operators = [Summarising.co_avg, Summarising.co_min, Summarising.co_max]
+        marge = 0.1
+        raster = Summarising.summarize(collection, af_algos, cell_operators, (3,3), marge)
+
+        raster.setColor((0, 0, 0), (255, 255, 255))
+        raster.plot(Analytics.speed, Summarising.co_avg, no_data_values = 0)
+        #raster.plot(Analytics.speed, Summarising.co_min)
+        #raster.plot(Analytics.speed, Summarising.co_max)
+        
 
 
 if __name__ == '__main__':
     suite = TestSuite()
-    suite.addTest(TestGrille("test_summarize_af"))
+    #suite.addTest(TestGrille("test_summarize_af"))
+    suite.addTest(TestGrille("test_quickstart"))
     runner = TextTestRunner()
     runner.run(suite)
     
