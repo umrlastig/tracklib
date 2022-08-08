@@ -73,9 +73,9 @@ class Raster:
             tab[tab == grid.NO_DATA_VALUE] = no_data_values
 
         cmap = utils.getOffsetColorMap(self.color1, self.color2, 0)
-        plt.imshow(tab, cmap=cmap)
+        im = plt.imshow(tab, cmap=cmap)
         plt.title(self.getCle(af_algo, aggregate))
-        plt.colorbar()
+        plt.colorbar(im,fraction=0.046, pad=0.04)
         plt.show()
 
 
