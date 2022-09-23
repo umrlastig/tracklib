@@ -5,10 +5,10 @@
 
 
 Installing tracklib
-********************
+*********************
 
-Installing from source
-==========================
+Installing tracklib for development
+====================================
 
 Tracklib developer mode 
 -------------------------
@@ -88,7 +88,7 @@ Running documentation
    make html
 
 
-IDE Spyder
+Spyder IDE
 -----------
 
 8. A python IDE make the development more easy. 
@@ -115,15 +115,55 @@ To use spyder, you have to create a new project with an existing directory.
 .. |br| raw:: html
 
    <br />
+   
+
+Run tracklib as an 3rd party python library for QGIS
+-----------------------------------------------------
+
+1. Check in the QGIS Python Console with which version of python, Qgis runs. To find out where: 
+
+.. code-block:: python
+
+   import sys
+   sys.executable
 
 
-Installing with pip
-=====================
+.. code-block:: shell
+   
+   >> '/usr/bin/python3'
+
+
+2. Then install dependencies in linux console:
+
+.. code-block:: shell
+
+   /usr/bin/python3 -m pip install -r /home/glagaffe/tracklib/requirements.txt
+
+
+3. At the end, add tracklib to the python system path:
+
+.. code-block:: shell
+
+   sys.path.append('/home/glagaffe/tracklib')
+   
+
+
+
+Installing tracklib for using in python script
+================================================
+
+**tracklib** is written in pure Python, so installation is easy. tracklib works on Python 3.5+.
+
+
+Installing from the Python Package Index
+------------------------------------------
 
 You can download it from PyPI repository using pip:
 
 .. code-block:: shell
    
    TODO
+
+
 
 
