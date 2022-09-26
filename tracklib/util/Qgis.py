@@ -8,7 +8,7 @@ from tracklib.core.TrackCollection import TrackCollection
 # import os # This is is needed in the pyqgis console also
 from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtGui import QColor
-from qgis.core import QgsVectorLayer, QgsField
+from qgis.core import QgsProject, QgsVectorLayer, QgsField
 from qgis.core import QgsPointXY, QgsFeature, QgsGeometry
 from qgis.core import QgsMarkerSymbol, QgsLineSymbol
 from qgis.core import QgsCategorizedSymbolRenderer, QgsRendererCategory
@@ -166,3 +166,9 @@ class Qgis:
         return layerTracks
 
         
+    """
+    Write GPS tracks in Qgis.
+    """
+    @staticmethod
+    def removeAllLayers():
+        QgsProject.instance().removeAllMapLayers()
