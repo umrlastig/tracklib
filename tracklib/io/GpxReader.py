@@ -70,7 +70,6 @@ class GpxReader:
         LISTFILE = os.listdir(pathdir)
         for f in LISTFILE:
             collection = GpxReader.readFromGpx(pathdir + f)
-            trace = collection.getTrack(0)
-            TRACES.addTrack(trace)
+            TRACES.addTrack(collection.getTrack(0))
         return TRACES
 
