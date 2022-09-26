@@ -98,7 +98,8 @@ class Qgis:
     """
     @staticmethod
     def createTracksLayer(tracks, type: Literal["LINE", "POINT"] = "LINE", 
-                               af=False, layerName = "Tracks"):
+                               af=False, layerName = "Tracks",
+                               crs="epsg:2154"):
         """
         Transforms track into a Qgis Layer.
         :param type: "POINT" or "LINE"
@@ -111,9 +112,9 @@ class Qgis:
             tracks = collection
         
         if type == 'POINT':
-            layerTracks = QgsVectorLayer("Point?crs=epsg:2154", layerName, "memory")
+            layerTracks = QgsVectorLayer("Point?crs=" + crs, layerName, "memory")
         if type == 'LINE':
-            layerTracks = QgsVectorLayer("LineString?crs=epsg:2154", layerName, "memory")
+            layerTracks = QgsVectorLayer("LineString?crs=" + crs, layerName, "memory")
 
             
         pr = layerTracks.dataProvider()
@@ -141,7 +142,12 @@ class Qgis:
                 pt = QgsPointXY(X, Y)
                 gPoint = QgsGeometry.fromPointXY(pt)
                 
-                attrs = [i, j]
+                tid = track.tid
+                print ('tid', tid)
+                if tid > 0:
+                    attrs = [tid, j]
+                else:
+                    attrs = [i, j]
                 # AF
                 if af:
                     for af_name in track.getListAnalyticalFeatures():
