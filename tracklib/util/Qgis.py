@@ -2,8 +2,11 @@
 
 from typing import Literal   
 
+from tracklib.core.GPSTime import GPSTime
+from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
 from tracklib.core.TrackCollection import TrackCollection
+import tracklib.core.Utils as utils
 
 # import os # This is is needed in the pyqgis console also
 from qgis.PyQt.QtCore import QVariant
@@ -12,7 +15,7 @@ from qgis.core import QgsProject, QgsVectorLayer, QgsField
 from qgis.core import QgsPointXY, QgsFeature, QgsGeometry
 from qgis.core import QgsMarkerSymbol, QgsLineSymbol
 from qgis.core import QgsCategorizedSymbolRenderer, QgsRendererCategory
-
+from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform
 
 class Qgis:
     '''
@@ -123,7 +126,6 @@ class Qgis:
         # z 
         # timestamp
         
-        
         if af:
             for af_name in tracks.getTrack(0).getListAnalyticalFeatures():
                 pr.addAttributes([QgsField(af_name, QVariant.Double)])
@@ -142,8 +144,7 @@ class Qgis:
                 pt = QgsPointXY(X, Y)
                 gPoint = QgsGeometry.fromPointXY(pt)
                 
-                tid = track.tid
-                print ('tid', tid)
+                tid = int(track.tid)
                 if tid > 0:
                     attrs = [tid, j]
                 else:
@@ -178,3 +179,36 @@ class Qgis:
     @staticmethod
     def removeAllLayers():
         QgsProject.instance().removeAllMapLayers()
+
+
+
+    @staticmethod
+    def transformTrack(tracks, source=4326, target=2154):
+        """
+          Convert coordinates from one projection system to another.
+        """
+        
+        crsSrc = QgsCoordinateReferenceSystem(source)    
+        crsDest = QgsCoordinateReferenceSystem(target)
+        xform = QgsCoordinateTransform(crsSrc, crsDest, QgsProject.instance())
+        
+        for i in range(tracks.size()):
+            track = tracks.getTrack(i)
+            for j in range(track.size()):
+                obs = track.getObs(j)
+                X = float(obs.position.getX())
+                Y = float(obs.position.getY())
+                pt = QgsPointXY(X, Y)
+                geom = QgsGeometry.fromPointXY(pt)
+                geom.transform(xform)
+                
+                time = GPSTime()
+                obs = Obs(utils.makeCoords(geom.asPoint().x(), geom.asPoint().y(), 0, "ENUCoords"), time)
+                track.setObs(j, obs)
+            
+        
+        
+
+        
+    
+
