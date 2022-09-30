@@ -95,7 +95,6 @@ class Qgis:
         
         return renderer
     
-    
     """
     Write GPS tracks in Qgis.
     """
@@ -171,6 +170,65 @@ class Qgis:
         layerTracks.updateExtents()
         
         return layerTracks
+    
+    
+    @staticmethod
+    def buildLinearTracksLayer(tracks, layerName = "Linear Tracks", crs="epsg:2154"):
+        """
+        Parameters
+        ----------
+        tracks : TYPE
+            DESCRIPTION.
+        layerName : TYPE, optional
+            DESCRIPTION. The default is "Linear Tracks".
+        crs : TYPE, optional
+            DESCRIPTION. The default is "epsg:2154".
+
+        Returns
+        -------
+        None.
+
+        """
+        
+        if isinstance(tracks, Track):
+            collection = TrackCollection()
+            collection.addTrack(tracks)
+            tracks = collection
+        
+        layerTracks = QgsVectorLayer("LineString?crs=" + crs, layerName, "memory")
+            
+        pr = layerTracks.dataProvider()
+        pr.addAttributes([QgsField("idtrace", QVariant.Int)])
+        
+        layerTracks.updateFields()
+
+        for i in range(tracks.size()):
+            track = tracks.getTrack(i)
+            tid = track.tid
+            
+            tid = int(track.tid)
+            if tid > 0:
+                attrs = [tid]
+            else:
+                attrs = [i]
+            
+            points = []
+            for j in range(track.size()):
+                obs = track.getObs(j)
+                X = float(obs.position.getX())
+                Y = float(obs.position.getY())
+                pt = QgsPointXY(X, Y)
+                points.append(pt)
+                
+            fet = QgsFeature()
+            fet.setAttributes(attrs) 
+            fet.setGeometry(QgsGeometry.fromPolylineXY(points))
+            pr.addFeatures([fet])
+                
+        layerTracks.updateExtents()
+        
+        return layerTracks
+        
 
         
     """
