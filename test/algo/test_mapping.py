@@ -6,7 +6,7 @@ import unittest
 import os.path
 from tracklib.core import (GPSTime)
 from tracklib.io.FileReader import FileReader
-from tracklib.io.AsciiReader import AsciiReader
+from tracklib.io.RasterReader import RasterReader
 import tracklib.algo.Mapping as mapping
 
 
@@ -15,7 +15,7 @@ class TestAlgoMappingMethods(unittest.TestCase):
     def setUp (self):
         resource_path = os.path.join(os.path.split(__file__)[0], "../..")
         mntpath = os.path.join(resource_path, 'data/asc/test.asc')
-        self.raster = AsciiReader.readFromAscFile(mntpath)
+        self.raster = RasterReader.readFromAscFile(mntpath)
         print (self.raster.getRasterBand(1))
         self.band = self.raster.getRasterBand(1)
         

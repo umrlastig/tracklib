@@ -5,8 +5,8 @@ import math
 import tracklib.core.Utils as utils
 
 from tracklib.core.Raster import Raster
-from tracklib.core.Grid import Grid
-from tracklib.core.Grid import NO_DATA_VALUE
+from tracklib.core.RasterBand import RasterBand
+from tracklib.core.RasterBand import NO_DATA_VALUE
 from tracklib.core.TrackCollection import TrackCollection
 
 
@@ -42,7 +42,7 @@ def summarize(collection: TrackCollection, af_algos, aggregates,
             name = af_algo.__name__
         cle = name + "#" + aggregate.__name__
             
-        grille = Grid(collection, resolution, margin, name = cle)
+        grille = RasterBand(collection, resolution, margin, name = cle)
         #print (grille.name)
         
         # ---------------------------------------------------------------------

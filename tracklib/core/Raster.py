@@ -12,13 +12,29 @@ import numpy as np
 #from skimage import io
 
 import tracklib.core.Utils as utils
-import tracklib.core.Grid as grid
+from tracklib.core.Coords import ECEFCoords, ENUCoords, GeoCoords
+from tracklib.core.TrackCollection import TrackCollection
+from tracklib.core.Bbox import Bbox
+import tracklib.core.RasterBand as grid
+
+NO_DATA_VALUE = -9999
+
+# Mainly used by :class:`core.SpatialIndex.SpatialIndex` and `algo.Summarizing.summarize`.
 
 class Raster:
     '''
+    Class for defining a spatial grid: structure de données un peu plus évoluée
+          qu'un tableau 2x2. 
+          
+    Parameters
+    ----------
+    nrow : int
+       Numbers of rows.
+    ncol : int
+       Numbers of cols.
     '''
     
-    def __init__(self, grids: Union[grid.Grid, list], verbose=True):
+    def __init__(self, grids: Union[grid.RasterBand, list], verbose=True):
         """
         On crée un raster avec une ou plusieurs grilles géographiques 
         déjà chargées avec les données.
@@ -52,8 +68,9 @@ class Raster:
             cle = "uid" + "#" + aggregate.__name__
             
         return cle
-
-
+    
+    
+    
     def getRasterBand(self, af_algo: Union[int, str], aggregate = None):
         """TODO"""
         

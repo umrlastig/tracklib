@@ -6,7 +6,7 @@ import os.path
 
 from tracklib.io.GpxReader import GpxReader
 
-from tracklib.core import (Track, Obs, Coords, GPSTime, Grid)
+from tracklib.core import (Track, Obs, Coords, GPSTime, RasterBand)
 from tracklib.algo import (Analytics)
 from tracklib.algo import (Summarising) 
 from tracklib.core.TrackCollection import TrackCollection
@@ -101,27 +101,29 @@ class TestGrille(TestCase):
         
         self.assertEqual(rasterBand.grid[0][2], (speedTrace1[0] + speedTrace2[0]) / 2)
         self.assertEqual(rasterBand.grid[0][1], speedTrace1[1])
-        self.assertEqual(rasterBand.grid[0][0], Grid.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[0][0], RasterBand.NO_DATA_VALUE)
         
-        self.assertEqual(rasterBand.grid[1][1], Grid.NO_DATA_VALUE)
-        self.assertEqual(rasterBand.grid[1][1], Grid.NO_DATA_VALUE)
-        self.assertEqual(rasterBand.grid[1][2], Grid.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[1][1], RasterBand.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[1][1], RasterBand.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[1][2], RasterBand.NO_DATA_VALUE)
         
-        self.assertEqual(rasterBand.grid[2][0], Grid.NO_DATA_VALUE)
-        self.assertEqual(rasterBand.grid[2][1], Grid.NO_DATA_VALUE)
-        self.assertEqual(rasterBand.grid[2][2], Grid.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[2][0], RasterBand.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[2][1], RasterBand.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[2][2], RasterBand.NO_DATA_VALUE)
         
-        self.assertEqual(rasterBand.grid[3][0], Grid.NO_DATA_VALUE)
-        self.assertEqual(rasterBand.grid[3][1], Grid.NO_DATA_VALUE)
-        self.assertEqual(rasterBand.grid[3][2], Grid.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[3][0], RasterBand.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[3][1], RasterBand.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[3][2], RasterBand.NO_DATA_VALUE)
         
-        self.assertEqual(rasterBand.grid[4][0], Grid.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[4][0], RasterBand.NO_DATA_VALUE)
         self.assertEqual(rasterBand.grid[4][1], (speedTrace1[2] + speedTrace2[1]) / 2)
-        self.assertEqual(rasterBand.grid[4][2], Grid.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[4][2], RasterBand.NO_DATA_VALUE)
         
         self.assertEqual(rasterBand.grid[5][0], speedTrace1[3])
-        self.assertEqual(rasterBand.grid[5][1], Grid.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[5][1], RasterBand.NO_DATA_VALUE)
         self.assertEqual(rasterBand.grid[5][2], speedTrace2[2])
+    
+        plt.show()
         
     
     # def test_summarize_aa(self):
@@ -238,19 +240,19 @@ class TestGrille(TestCase):
         
         af_algos = [Analytics.speed, Analytics.speed, Analytics.speed]
         cell_operators = [Summarising.co_avg, Summarising.co_min, Summarising.co_max]
-        marge = 0.1
-        raster = Summarising.summarize(collection, af_algos, cell_operators, (3,3), marge)
+        marge = 0.000005
+        raster = Summarising.summarize(collection, af_algos, cell_operators, margin = marge)
 
         raster.setColor((0, 0, 0), (255, 255, 255))
         raster.plot(Analytics.speed, Summarising.co_avg, no_data_values = 0)
-        #raster.plot(Analytics.speed, Summarising.co_min)
-        #raster.plot(Analytics.speed, Summarising.co_max)
-        
+        raster.plot(Analytics.speed, Summarising.co_min, no_data_values = 0)
+        raster.plot(Analytics.speed, Summarising.co_max, no_data_values = 0)
+        plt.show()
 
 
 if __name__ == '__main__':
     suite = TestSuite()
-    #suite.addTest(TestGrille("test_summarize_af"))
+    suite.addTest(TestGrille("test_summarize_af"))
     suite.addTest(TestGrille("test_quickstart"))
     runner = TextTestRunner()
     runner.run(suite)

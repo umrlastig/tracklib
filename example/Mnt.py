@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from tracklib.core.GPSTime import GPSTime
-from tracklib.io.AsciiReader import AsciiReader
+from tracklib.io.RasterReader import RasterReader
 from tracklib.io.FileReader import FileReader
 import tracklib.algo.Mapping as mapping
 
 
 chemin = 'tracklib/data/asc/test.asc'
-raster = AsciiReader.readFromAscFile(chemin)
+raster = RasterReader.readFromAscFile(chemin)
 print (raster.getRasterBand(1))
 band = raster.getRasterBand(1)
 print ('ele MNT VT:', band.grid[465][1151])

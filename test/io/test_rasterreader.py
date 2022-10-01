@@ -3,10 +3,10 @@
 import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
 
-from tracklib.io.AsciiReader import AsciiReader
+from tracklib.io.RasterReader import RasterReader
 
 
-class TestAsciiReader(TestCase):
+class TestRasterReader(TestCase):
     
     def setUp (self):
         self.resource_path = os.path.join(os.path.split(__file__)[0], "../..")
@@ -14,7 +14,7 @@ class TestAsciiReader(TestCase):
     def test_read_ign_mnt(self):
         # =============================================================
         csvpath = os.path.join(self.resource_path, 'data/asc/RGEALTI_FXX_0930_6415_MNT_LAMB93_IGN69.asc')
-        raster = AsciiReader.readFromAscFile(csvpath)
+        raster = RasterReader.readFromAscFile(csvpath)
         grid = raster.getRasterBand(1)
         
         self.assertEqual(1000, grid.nrow)
@@ -30,7 +30,7 @@ class TestAsciiReader(TestCase):
     def test_read_test_mnt(self):
         # =============================================================
         csvpath = os.path.join(self.resource_path, 'data/asc/test.asc')
-        raster = AsciiReader.readFromAscFile(csvpath)
+        raster = RasterReader.readFromAscFile(csvpath)
         grid = raster.getRasterBand(1)
         
         self.assertEqual(2000, grid.nrow)
@@ -50,8 +50,8 @@ class TestAsciiReader(TestCase):
 if __name__ == '__main__':
     #unittest.main()
     suite = TestSuite()
-    suite.addTest(TestAsciiReader("test_read_ign_mnt"))
-    suite.addTest(TestAsciiReader("test_read_test_mnt"))
+    suite.addTest(TestRasterReader("test_read_ign_mnt"))
+    suite.addTest(TestRasterReader("test_read_test_mnt"))
     runner = TextTestRunner()
     runner.run(suite)
 

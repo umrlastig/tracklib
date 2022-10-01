@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
-"""
-"""
-from tracklib.core import (Bbox, Grid, Raster)
+from tracklib.core import (Bbox, RasterBand, Raster)
 from tracklib.core.Coords import (ENUCoords)
 
 
-class AsciiReader:
+class RasterReader:
+    '''
+    
+    '''
     
     CLES = ['ncols', 'nrows', 'xllcorner', 'yllcorner', 'cellsize', 'NODATA_value']
     
@@ -40,10 +41,10 @@ class AsciiReader:
         ncols = 0
         
         cptrowheader = 0
-        novalue = Grid.NO_DATA_VALUE
+        novalue = RasterBand.NO_DATA_VALUE
         for line in lines:
             cle = line.split(" ")[0].strip()
-            if cle in AsciiReader.CLES:
+            if cle in RasterReader.CLES:
                 cptrowheader += 1
                     
                 i = 1
@@ -75,8 +76,8 @@ class AsciiReader:
         resolution = (cellsize, cellsize)
         marge = 0
             
-        grid = Grid.Grid(bbox, resolution=resolution, margin=marge, 
-                         novalue=novalue, name=Grid.DEFAULT_NAME + '1')
+        grid = RasterBand.RasterBand(bbox, resolution=resolution, margin=marge, 
+                         novalue=novalue, name=RasterBand.DEFAULT_NAME + '1')
            
         # Read the values
         i = 0
