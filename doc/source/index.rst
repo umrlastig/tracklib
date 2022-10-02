@@ -103,7 +103,7 @@ Examples
    ./notebook/Quickstart
    ./notebook/StopPoints
    ./notebook/Switchbacks
-   ./usecase/summarize
+   ./notebook/Summarize
 
    
 .. toctree::

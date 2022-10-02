@@ -14,6 +14,13 @@
 [![Documentation Status](https://readthedocs.org/projects/tracklib/badge/?version=latest)](https://tracklib.readthedocs.io/en/latest/?badge=latest)
 [![Software License](https://img.shields.io/badge/Licence-Cecill--C-blue.svg?style=flat)](https://github.com/umrlastig/tracklib/blob/main/LICENCE)
 
+More and more datasets of GPS trajectories are now available and they are studied very frequently in many scientific domains. 
+Python libraries for trajectories are available to load, simplify, interpolate, summarize and visualize them. 
+But there is no Python library that would contain all these basic functionality.  
+
+Furthermore, adding analytical features on a observation or on all observation of a trajectory (function of coordinates or timestamp) 
+is, in general, a complex and a boring task. So, to make it easier, *Tracklib* module offers a multitude of operators 
+and functions to simplify the creation of analytical features on a GPS tracks. 
 
 
 ## Documentation
