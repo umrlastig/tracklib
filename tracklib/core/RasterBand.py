@@ -53,13 +53,13 @@ class RasterBand:
             bb = collection
         elif isinstance(collection, TrackCollection):
             bb = collection.bbox()
-        #else:
     
         bb = bb.copy()
         bb.addMargin(margin)
         (self.xmin, self.xmax, self.ymin, self.ymax) = bb.asTuple()
     
         ax, ay = bb.getDimensions()
+        #print (ax, ay)
     
         if resolution is None:
             am = max(ax, ay)
@@ -70,6 +70,7 @@ class RasterBand:
             resolution = (int(ax / r[0]), int(ay / r[1]))
     
         # self.collection = collection
+        #print (resolution)
     
         # Nombre de dalles par cote
         self.ncol = resolution[0]
@@ -85,6 +86,7 @@ class RasterBand:
     
         self.XPixelSize = ax / self.ncol
         self.YPixelSize = ay / self.nrow
+        print (self.XPixelSize, self.YPixelSize)
         
         self.noDataValue = novalue
         self.name = name

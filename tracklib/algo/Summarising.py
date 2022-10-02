@@ -96,6 +96,7 @@ def summarize(collection: TrackCollection, af_algos, aggregates,
                 tarray = CUBE[j][i]
                     
                 sumval = aggregate(tarray)
+                # print (sumval)
                 if utils.isnan(sumval):
                     grille.grid[j][i] = NO_DATA_VALUE
                 # # elif valmax != None and val > valmax:
@@ -106,7 +107,6 @@ def summarize(collection: TrackCollection, af_algos, aggregates,
         # ---------------------------------------------------------------------
         #   On ajoute la grille au tableau de grilles
         grilles.append(grille)
-        
         
     raster = Raster(grilles)
     return raster
