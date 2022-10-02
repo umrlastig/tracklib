@@ -12,11 +12,11 @@ We use the same sample track in the different examples. For loading the data:
 
 .. code-block:: python
 
-  from tracklib.io.FileReader import FileReader
+  from tracklib.io.TrackReader import TrackReader
   import tracklib.algo.Simplification as Simplification
 
   chemin = './data/lacet/ecrins.csv'
-  tracks = FileReader.readFromWKTFile(chemin, 0, 1, 2, ",", 1, 
+  tracks = TrackReader.readFromWKTFile(chemin, 0, 1, 2, ",", 1, 
                                     "ENUCoords", None, True)
   trace = tracks["903959","%"][0]
   trace = trace.extract(70,120)
