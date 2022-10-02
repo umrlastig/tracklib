@@ -28,7 +28,7 @@ from unittest import TestCase, TestSuite, TextTestRunner
 #sys.path.append('~/Bureau/KitYann/2-Tracklib/tracklib/tracklib')
 
 from tracklib.core.GPSTime import GPSTime
-from tracklib.io.FileReader import FileReader
+from tracklib.io.TrackReader import TrackReader
 from tracklib.core.Kernel import DiracKernel
 from tracklib.core.Kernel import GaussianKernel
 from tracklib.core.Kernel import TriangularKernel
@@ -72,7 +72,7 @@ class TestInterpolation(TestCase):
         self.csvpath = os.path.join(self.resource_path, 'data/trace0.gps')
         
         GPSTime.setPrintFormat("2D/2M/4Y 2h:2m:2s.3z")
-        self.track = FileReader.readFromFile(self.csvpath) % 10
+        self.track = TrackReader.readFromFile(self.csvpath) % 10
         self.track.plot('kx')
         
 

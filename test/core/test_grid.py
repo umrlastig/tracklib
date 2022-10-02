@@ -4,7 +4,7 @@ from unittest import TestCase, TestSuite, TextTestRunner
 import matplotlib.pyplot as plt
 import os.path
 
-from tracklib.io.GpxReader import GpxReader
+from tracklib.io.TrackReader import TrackReader
 
 from tracklib.core import (Track, Obs, Coords, GPSTime, RasterBand)
 from tracklib.algo import (Analytics)
@@ -227,7 +227,7 @@ class TestGrille(TestCase):
 
         GPSTime.GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
         gpxpath = os.path.join(self.resource_path, 'data/activity_5807084803.gpx')
-        tracks = GpxReader.readFromGpx(gpxpath)
+        tracks = TrackReader.readFromGpx(gpxpath)
         trace = tracks.getTrack(0)
         # Transformation GEO coordinates to ENU
         trace.toENUCoords()

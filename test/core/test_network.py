@@ -6,7 +6,7 @@ from unittest import TestCase, TestSuite, TextTestRunner
 from tracklib.core.Track import Track
 from tracklib.core.Network import Node, Edge
 from tracklib.io.NetworkReader import NetworkReader
-from tracklib.io.IgnReader import IgnReader
+
 
 import matplotlib.pyplot as plt
 

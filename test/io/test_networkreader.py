@@ -5,7 +5,7 @@ import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
 
 from tracklib.core.Network import Node
-from tracklib.io.IgnReader import IgnReader
+from tracklib.io.NetworkReader import NetworkReader
 
 
 class TestNetworkReader(TestCase):
@@ -22,7 +22,7 @@ class TestNetworkReader(TestCase):
         ymin = 47.85971
         ymax = 47.86179
         
-        network = IgnReader.getNetwork((xmin, xmax, ymin, ymax), None, 0.0, 0.1, 
+        network = NetworkReader.getNetwork((xmin, xmax, ymin, ymax), None, 0.0, 0.1, 
                                        False, nomproxy = self.nomproxy)
         self.assertEqual(33, len(network.EDGES))
         self.assertEqual(32, len(network.NODES))
@@ -51,13 +51,11 @@ class TestNetworkReader(TestCase):
         self.assertEqual(3, len(network.NEXT_EDGES[node2.id]))
         
 
-    def test_read_alti(self):
-        IgnReader.getAltitude('aa')
+    
 
 
 if __name__ == '__main__':
     suite = TestSuite()
     suite.addTest(TestNetworkReader("test_read_default"))
-    suite.addTest(TestNetworkReader("test_read_alti"))
     runner = TextTestRunner()
     runner.run(suite)

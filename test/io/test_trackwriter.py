@@ -7,10 +7,11 @@ from tracklib.core.Coords import ENUCoords
 from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
 from tracklib.core.GPSTime import GPSTime
-from tracklib.io.FileWriter import FileWriter
+from tracklib.io.TrackWriter import TrackWriter
 from tracklib.algo import Analytics
 
-class TestFileWriter(TestCase):
+
+class TestTrackWriter(TestCase):
     
     def setUp (self):
         self.resource_path = os.path.join(os.path.split(__file__)[0], "../..")
@@ -25,7 +26,7 @@ class TestFileWriter(TestCase):
         track.addObs(p2)
         
         csvpath = os.path.join(self.resource_path, 'data/test/test_write_csv_minim.wkt')
-        FileWriter.writeToFile(track, csvpath, id_E=0,id_N=1,id_U=2,id_T=3,h=1, separator=";")
+        TrackWriter.writeToFile(track, csvpath, id_E=0,id_N=1,id_U=2,id_T=3,h=1, separator=";")
         contents = open(csvpath).read()
         
         txt  = "#srid: ENU\n"
@@ -55,7 +56,7 @@ class TestFileWriter(TestCase):
         
         csvpath = os.path.join(self.resource_path, 'data/test/test_write_csv_2AF.wkt')
         af_names = ['speed', 'abs_curv']
-        FileWriter.writeToFile(track, csvpath, id_E=0, id_N=1, id_U=2, id_T=3, h=1, 
+        TrackWriter.writeToFile(track, csvpath, id_E=0, id_N=1, id_U=2, id_T=3, h=1, 
                                separator=";", af_names=af_names)
         contents = open(csvpath).read()
         
@@ -89,7 +90,7 @@ class TestFileWriter(TestCase):
         
         csvpath = os.path.join(self.resource_path, 'data/test/test_write_csv_2AF_desordre.wkt')
         af_names = ['speed', 'abs_curv']
-        FileWriter.writeToFile(track, csvpath, id_E=3, id_N=2, id_U=0, id_T=1, h=1, 
+        TrackWriter.writeToFile(track, csvpath, id_E=3, id_N=2, id_U=0, id_T=1, h=1, 
                                separator=";", af_names=af_names)
         contents = open(csvpath).read()
         
@@ -119,7 +120,7 @@ class TestFileWriter(TestCase):
         track.addObs(p5)
         
         csvpath = os.path.join(self.resource_path, 'data/test/test_write_csv_path.wkt')
-        FileWriter.writeToFile(track, csvpath)
+        TrackWriter.writeToFile(track, csvpath)
         contents = open(csvpath).read()
         
         txt  = "0.000,0.000,0.000,01/01/2020 10:00:00.000\n"
@@ -132,10 +133,10 @@ class TestFileWriter(TestCase):
 
 if __name__ == '__main__':
     suite = TestSuite()
-    suite.addTest(TestFileWriter("test_write_csv_path"))
-    suite.addTest(TestFileWriter("test_write_csv_minim"))
-    suite.addTest(TestFileWriter("test_write_csv_2AF"))
-    suite.addTest(TestFileWriter("test_write_csv_2AF_desordre"))
+    suite.addTest(TestTrackWriter("test_write_csv_path"))
+    suite.addTest(TestTrackWriter("test_write_csv_minim"))
+    suite.addTest(TestTrackWriter("test_write_csv_2AF"))
+    suite.addTest(TestTrackWriter("test_write_csv_2AF_desordre"))
     runner = TextTestRunner()
     runner.run(suite)
 

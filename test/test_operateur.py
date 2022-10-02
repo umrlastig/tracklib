@@ -14,7 +14,7 @@ from tracklib.core.GPSTime import GPSTime
 from tracklib.core.Operator import Operator
 from tracklib.core.Kernel import GaussianKernel
 import tracklib.algo.Interpolation as interpolation
-from tracklib.io.FileReader import FileReader
+from tracklib.io.TrackReader import TrackReader
 import tracklib.algo.Segmentation as seg
 import tracklib.algo.Synthetics as synth
 
@@ -44,7 +44,7 @@ class TestOperateurMethods(unittest.TestCase):
         GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, 'data/trace1.dat')
         
-        track = FileReader.readFromFile(chemin, 2, 3, -1, 4, separator=",", DateIni=-1, h=0, com="#", no_data_value=-999999, srid="ENUCoords")
+        track = TrackReader.readFromFile(chemin, 2, 3, -1, 4, separator=",", DateIni=-1, h=0, com="#", no_data_value=-999999, srid="ENUCoords")
         
         track.addAnalyticalFeature(algo.diffJourAnneeTrace)
         track.operate(Operator.INVERTER, "diffJourAnneeTrace", "rando_jour_neg")
@@ -150,7 +150,7 @@ class TestOperateurMethods(unittest.TestCase):
         # Trajectoire calculee par GPS (mode standard)
         # ----------------------------------------------
         path = os.path.join(self.resource_path, 'data/rawGps1Data.pos')
-        track1 = FileReader.readFromFile(path, "RTKLIB")            # Lecture du fichier
+        track1 = TrackReader.readFromFile(path, "RTKLIB")            # Lecture du fichier
         track1.toProjCoords(2154)                                   # Projection Lambert 93
         track1 = track1 > 400                                       # Suppression 400 derniers points
 
@@ -158,7 +158,7 @@ class TestOperateurMethods(unittest.TestCase):
         # Trajectoire de reference IMU
         # ----------------------------------------------
         path = os.path.join(self.resource_path, "data/imu_opk_Vincennes1909121306.txt")
-        track3 = FileReader.readFromFile(path, "IMU_STEREOPOLIS")   # Lecture du fichier
+        track3 = TrackReader.readFromFile(path, "IMU_STEREOPOLIS")   # Lecture du fichier
         track3 = track3 < 400                                       # Suppression 400 derniers points
         track3.incrementTime(0, 18)                                 # Ajout 18 secondes UTC -> GPS Time
         track3.translate(0, 0, 47.66)                               # Conversion altitude -> hauteur

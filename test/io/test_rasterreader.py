@@ -45,6 +45,9 @@ class TestRasterReader(TestCase):
         self.assertEqual(902, grid.grid[884][600])
         self.assertEqual(1317, grid.grid[365][836])
         self.assertEqual(1678, grid.grid[935][1102])
+        
+    #def test_read_alti(self):
+    #    NetworkReader.getAltitude('aa')
 
 
 if __name__ == '__main__':
