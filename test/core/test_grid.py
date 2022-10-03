@@ -35,7 +35,7 @@ class TestGrille(TestCase):
         p3 = Obs.Obs(c3, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:40"))
         trace1.addObs(p3)
         
-        c4 = Coords.ENUCoords(360, 210, 0)
+        c4 = Coords.ENUCoords(370, 190, 0)
         p4 = Obs.Obs(c4, GPSTime.GPSTime.readTimestamp("2018-01-01 10:01:50"))
         trace1.addObs(p4)
         
@@ -68,27 +68,30 @@ class TestGrille(TestCase):
         cell_operators = [Summarising.co_avg] #, utils.sum]
         
         #  Construction du raster
-        marge = 0.05
-        raster = Summarising.summarize(self.collection, af_algos, cell_operators, (60,60), marge)
+        marge = 0.0
+        raster = Summarising.summarize(self.collection, 
+                                       af_algos, cell_operators, (60, 60), marge)
         
         grille = raster.getRasterBand('speed', Summarising.co_avg)
         grille.plot()
-        #plt.show()
-        #raster.plot(Analytics.speed, Summarising.co_avg)
+        plt.show()
+        raster.setColor((255, 255, 255), (0, 0, 0))
+        raster.plot(Analytics.speed, Summarising.co_avg, no_data_values=0)
+        plt.show()
         
         # ---------------------------------------------------------------------
         # On teste la construction de la grille
         
-        self.assertEqual(grille.xmin, 10.0 - marge*(360-10))
-        self.assertEqual(grille.xmax, 360.0 + marge*(360-10))
-        self.assertEqual(grille.ymin, 10.0 - marge*(210-10))
-        self.assertEqual(grille.ymax, 210.0 + marge*(210-10))
+        self.assertEqual(grille.xmin, 10.0 - marge*(370-10))
+        self.assertEqual(grille.xmax, 370.0 + marge*(370-10))
+        self.assertEqual(grille.ymin, 10.0 - marge*(190-10))
+        self.assertEqual(grille.ymax, 190.0 + marge*(190-10))
         
-        self.assertEqual(grille.ncol, int (((360-10) + marge*(360-10)) / 60))
-        self.assertEqual(grille.nrow, int (((210-10) + marge*(210-10)) / 60))
+        self.assertEqual(grille.ncol, int (((370-10) + marge*(370-10)) / 60))
+        self.assertEqual(grille.nrow, int (((190-10) + marge*(190-10)) / 60))
     
-        self.assertEqual(grille.XPixelSize, ((360-10) + 2*marge*(360-10)) / grille.ncol)
-        self.assertEqual(grille.YPixelSize, ((210-10) + 2*marge*(210-10)) / grille.nrow)
+        self.assertEqual(grille.XPixelSize, ((370-10) + 2*marge*(370-10)) / grille.ncol)
+        self.assertEqual(grille.YPixelSize, ((190-10) + 2*marge*(190-10)) / grille.nrow)
         
         
         # ---------------------------------------------------------------------
@@ -99,31 +102,31 @@ class TestGrille(TestCase):
         speedTrace1 = self.collection.getTrack(0).getAnalyticalFeature('speed')
         speedTrace2 = self.collection.getTrack(1).getAnalyticalFeature('speed')
         
-        self.assertEqual(rasterBand.grid[0][2], (speedTrace1[0] + speedTrace2[0]) / 2)
-        self.assertEqual(rasterBand.grid[0][1], speedTrace1[1])
+        self.assertEqual(rasterBand.grid[2][0], (speedTrace1[0] + speedTrace2[0]) / 2)
+        self.assertEqual(rasterBand.grid[1][0], speedTrace1[1])
         self.assertEqual(rasterBand.grid[0][0], RasterBand.NO_DATA_VALUE)
         
-        self.assertEqual(rasterBand.grid[1][1], RasterBand.NO_DATA_VALUE)
-        self.assertEqual(rasterBand.grid[1][1], RasterBand.NO_DATA_VALUE)
-        self.assertEqual(rasterBand.grid[1][2], RasterBand.NO_DATA_VALUE)
-        
-        self.assertEqual(rasterBand.grid[2][0], RasterBand.NO_DATA_VALUE)
         self.assertEqual(rasterBand.grid[2][1], RasterBand.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[1][1], RasterBand.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[0][1], RasterBand.NO_DATA_VALUE)
+        
         self.assertEqual(rasterBand.grid[2][2], RasterBand.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[1][2], RasterBand.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[0][2], RasterBand.NO_DATA_VALUE)
         
-        self.assertEqual(rasterBand.grid[3][0], RasterBand.NO_DATA_VALUE)
-        self.assertEqual(rasterBand.grid[3][1], RasterBand.NO_DATA_VALUE)
-        self.assertEqual(rasterBand.grid[3][2], RasterBand.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[2][3], RasterBand.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[1][3], RasterBand.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[0][3], RasterBand.NO_DATA_VALUE)
         
-        self.assertEqual(rasterBand.grid[4][0], RasterBand.NO_DATA_VALUE)
-        self.assertEqual(rasterBand.grid[4][1], (speedTrace1[2] + speedTrace2[1]) / 2)
-        self.assertEqual(rasterBand.grid[4][2], RasterBand.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[2][4], RasterBand.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[1][4], (speedTrace1[2] + speedTrace2[1]) / 2)
+        self.assertEqual(rasterBand.grid[0][4], RasterBand.NO_DATA_VALUE)
         
-        self.assertEqual(rasterBand.grid[5][0], speedTrace1[3])
-        self.assertEqual(rasterBand.grid[5][1], RasterBand.NO_DATA_VALUE)
-        self.assertEqual(rasterBand.grid[5][2], speedTrace2[2])
+        self.assertEqual(rasterBand.grid[0][5], speedTrace1[3])
+        self.assertEqual(rasterBand.grid[1][5], RasterBand.NO_DATA_VALUE)
+        self.assertEqual(rasterBand.grid[2][5], speedTrace2[2])
     
-        plt.show()
+
         
     
     # def test_summarize_aa(self):

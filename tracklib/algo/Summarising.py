@@ -13,7 +13,7 @@ from tracklib.core.TrackCollection import TrackCollection
 def summarize(collection: TrackCollection, af_algos, aggregates, 
               resolution=None, margin: float = 0.05, verbose: bool = True,):
     """
-    Example :
+    Example:
         af_algos = [algo.speed, algo.speed]
         cell_operators = [celloperator.co_avg, celloperator.co_max]
     
@@ -42,15 +42,15 @@ def summarize(collection: TrackCollection, af_algos, aggregates,
             name = af_algo.__name__
         cle = name + "#" + aggregate.__name__
             
-        grille = RasterBand(collection, resolution, margin, name = cle)
+        grille = RasterBand(collection.bbox(), resolution, margin, name = cle)
         #print (grille.name)
         
         # ---------------------------------------------------------------------
         #  On ajoute les valeurs des af dans les cellules
         CUBE = []
-        for i in range(grille.ncol):
+        for i in range(grille.nrow):
             CUBE.append([])
-            for j in range(grille.nrow):
+            for j in range(grille.ncol):
                 CUBE[i].append([])
     
         #  On dispatch les valeurs de l'AF dans les cellules.
@@ -66,17 +66,29 @@ def summarize(collection: TrackCollection, af_algos, aggregates,
                 obs = trace.getObs(i)
                 
                 (idx, idy) = grille.getCell(obs.position)
-                column = math.floor(idx)
-                line = math.floor(idy)
-                # print (column, line)
+                # print (obs.position, idx, idy)
+                
+                # Cas des bordures
+                if idx == grille.ncol:
+                    column = math.floor(idx) - 1
+                else:
+                    column = math.floor(idx)
+                
+                if idy.is_integer() and int(idy) > -1:
+                    line = int(idy)
+                elif idy.is_integer() and int(idy) == -1:
+                    line = int(idy) + 1
+                else:
+                    line = math.floor(idy) + 1 # il faut arrondir par le dessus!
+                
+                # print ('  ', obs.position, column, line)
                 
                 if (
                         0 <= column
-                        and column < grille.ncol
+                        and column <= grille.ncol
                         and 0 <= line
-                        and line < grille.nrow
+                        and line <= grille.nrow
                     ):
-
                     if not isinstance(af_algo, str):
                         val = trace.getObsAnalyticalFeature(name, i)
                     elif af_algo != "uid":
@@ -84,32 +96,36 @@ def summarize(collection: TrackCollection, af_algos, aggregates,
                     else:
                         val = trace.uid
                         # val = int(startpixel + (255 - startpixel) * (valmax - val) / valmax)
+                        
+                    CUBE[line][column].append(val)
+        
+        # print (CUBE[0][0])
 
-                    CUBE[column][line].append(val)
-                    
         # ---------------------------------------------------------------------
         # On calcule les agregats
         # print (aggregates[0].__name__)
         for i in range(grille.nrow):
             for j in range(grille.ncol):
                 #ii = grille.nrow - 1 - i
-                tarray = CUBE[j][i]
-                    
+                tarray = CUBE[i][j]
                 sumval = aggregate(tarray)
+                
                 # print (sumval)
                 if utils.isnan(sumval):
-                    grille.grid[j][i] = NO_DATA_VALUE
+                    grille.grid[i][j] = NO_DATA_VALUE
                 # # elif valmax != None and val > valmax:
                 else:
-                    grille.grid[j][i] = sumval
-        
+                    grille.grid[i][j] = sumval
         
         # ---------------------------------------------------------------------
         #   On ajoute la grille au tableau de grilles
+        # print (grille.grid)
         grilles.append(grille)
         
     raster = Raster(grilles)
     return raster
+    #return None
+
 
 
 def co_sum(tarray):

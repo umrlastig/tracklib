@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 
 from tracklib.core.Bbox import Bbox
 from tracklib.core.Coords import ECEFCoords, ENUCoords, GeoCoords
-from tracklib.core.TrackCollection import TrackCollection
 
 NO_DATA_VALUE = -9999
 DEFAULT_NAME = 'grid'
@@ -33,7 +32,7 @@ class RasterBand:
     
     def __init__(
         self,
-        collection: Union[Bbox, TrackCollection],
+        bb: Bbox,
         resolution=None,
         margin: float = 0.05,
         novalue: float = NO_DATA_VALUE,
@@ -42,22 +41,17 @@ class RasterBand:
     ):
         """
         Grid constructor.
-        :param collection: Collection of tracks or bbox
+        :param bbox: Bouding box
         :param resolution: Grid resolution
         :param margin: relative float. Default value is +5%
         :param novalue: value that is regarded as "missing" or "not applicable";
         :param verbose: Verbose creation
         """
-        # Bbox only or collection
-        if isinstance(collection, Bbox):
-            bb = collection
-        elif isinstance(collection, TrackCollection):
-            bb = collection.bbox()
-    
+        
         bb = bb.copy()
         bb.addMargin(margin)
         (self.xmin, self.xmax, self.ymin, self.ymax) = bb.asTuple()
-    
+        #print (self.xmin, self.xmax)
         ax, ay = bb.getDimensions()
         #print (ax, ay)
     
@@ -67,26 +61,26 @@ class RasterBand:
             resolution = (int(ax / r), int(ay / r))
         else:
             r = resolution
+            #print (ax, r[0])
             resolution = (int(ax / r[0]), int(ay / r[1]))
-    
-        # self.collection = collection
         #print (resolution)
     
         # Nombre de dalles par cote
         self.ncol = resolution[0]
         self.nrow = resolution[1]
+        #print (self.nrow, self.ncol)
     
         # Tableau de collections de features appartenant a chaque dalle.
         # Un feature peut appartenir a plusieurs dalles.
         self.grid = []
-        for i in range(self.ncol):
+        for i in range(self.nrow):
             self.grid.append([])
-            for j in range(self.nrow):
+            for j in range(self.ncol):
                 self.grid[i].append(NO_DATA_VALUE)
     
         self.XPixelSize = ax / self.ncol
         self.YPixelSize = ay / self.nrow
-        print (self.XPixelSize, self.YPixelSize)
+        #print (self.XPixelSize, self.YPixelSize)
         
         self.noDataValue = novalue
         self.name = name
@@ -158,7 +152,7 @@ class RasterBand:
             return None
     
         idx = (float(coord.getX()) - self.xmin) / self.XPixelSize
-        idy = self.nrow - (float(coord.getY()) - self.ymin) / self.YPixelSize
+        idy = (self.nrow-1) - (float(coord.getY()) - self.ymin) / self.YPixelSize
     
         return (idx, idy)
     
@@ -181,19 +175,30 @@ class RasterBand:
             yj = j * self.YPixelSize + self.ymin
             ax.plot([self.xmin, self.xmax], [yj, yj], "-", color="lightgray")
     
-        #if base:
-        #    self.collection.plot(append=ax)
-    
-        for i in range(self.ncol):
-            xi1 = i * self.XPixelSize + self.xmin
-            xi2 = xi1 + self.XPixelSize
-            for j in range(self.nrow):
-                yj1 = j * self.YPixelSize + self.ymin
-                yj2 = yj1 + self.YPixelSize
+        for i in range(self.nrow):
+            y1 = self.ymin + (self.nrow - 1 - i) * self.YPixelSize
+            y2 = self.ymin + (self.nrow - i) * self.YPixelSize
+            for j in range(self.ncol):
+                x1 = self.xmin + j * self.XPixelSize
+                x2 = x1 + self.XPixelSize
                 if self.grid[i][j] != NO_DATA_VALUE:
-                    # print(self.grid[i][j])
+                    #print (self.xmin, x1, y1, x2, y2)
                     polygon = plt.Polygon(
-                        [[xi1, yj1], [xi2, yj1], [xi2, yj2], [xi1, yj2], [xi1, yj1]]
+                        [[x1, y1], [x2, y1], [x2, y2], [x1, y2], [x1, y1]]
                     )
                     ax.add_patch(polygon)
                     polygon.set_facecolor("lightcyan")
+    
+        # for i in range(self.ncol):
+        #     xi1 = i * self.XPixelSize + self.xmin
+        #     xi2 = xi1 + self.XPixelSize
+        #     for j in range(self.nrow):
+        #         yj1 = j * self.YPixelSize + self.ymin
+        #         yj2 = yj1 + self.YPixelSize
+        #         if self.grid[i][j] != NO_DATA_VALUE:
+        #             # print(self.grid[i][j])
+        #             polygon = plt.Polygon(
+        #                 [[xi1, yj1], [xi2, yj1], [xi2, yj2], [xi1, yj2], [xi1, yj1]]
+        #             )
+        #             ax.add_patch(polygon)
+        #             polygon.set_facecolor("lightcyan")
