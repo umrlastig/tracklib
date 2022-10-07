@@ -28,14 +28,14 @@ Core
 	``Bbox``             Class to manage bounding box
 	``Coords``           Classes to manage point coordinates: GeoCoords, ENUCoords, ECEFCoords
 	``GPSTime``          Class to manage timestamps
-	``Grid``             Class for defining a spatial grid
 	``Kernel``           Kernel Class for filtering, smoothing and stochastics simulations
  	``Network``          Node, Edge and Network Class 
 	``Obs``              Class to define an observation
 	``Operator``         Classes to manage the operators
 	``Plot``             Class to plot GPS tracks and its AF
 	``Raster``           Class to manipulate rasters
-	``SpatialIndex``     Class to manipulate a spatial Index
+	``RasterBand``       Class for defining a raster band
+	``SpatialIndex``     Class to manipulate a spatial index
 	``Track``            Class to manage GPS tracks
 	``TrackCollection``  Class to manage a collection of tracks
 	=================== ====================================================================
@@ -55,14 +55,14 @@ Algo
 	================== ====================================================================
 	Module                Purpose
 	================== ====================================================================
-	``Analytics``       Functions to compute Analytical Features like speed, ds, abs_curv, etc.
+	``Analytics``       Functions to compute Analytical Features like speed, ds, abs_curv, orientation, curve, etc.
 	``Cinematics``      Functions to manage cinematic computations on GPS tracks
 	``Comparison``	    Functions to manage comparisons of GPS tracks
 	``Dynamics``	    Functions to manage cinematic computations on GPS tracks
 	``Filtering``	    Functions to manage filtering of GPS tracks
 	``Geometrics``	    Functions to manage general operations on a track
 	``Interpolation``	   
-	``Mapping``	   	
+	``Mapping``	   	    Functions to transfer information between track and raster or between track and network
 	``Segmentation``    Functions to manage segmentation of GPS tracks
 	``Selection``
 	``Simplification``  Functions to manage simplification of GPS tracks
@@ -81,6 +81,7 @@ Util
 	Module                Purpose
 	================== ====================================================================
 	``Geometry`` 	    Geometric functions
+	``Qgis``     	    Functions to display results tracklib in QGis software
 	================== ====================================================================
 
 

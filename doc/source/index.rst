@@ -101,10 +101,9 @@ Examples
    :caption: Use Cases
 
    ./notebook/Quickstart
-   ./notebook/StopPoints
-   ./notebook/Switchbacks
    ./notebook/Summarize
-
+   ./notebook/Switchbacks
+   ./notebook/StopPoints
    
 .. toctree::
    :maxdepth: 1
