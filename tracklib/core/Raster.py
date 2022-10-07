@@ -80,7 +80,8 @@ class Raster:
         return self.bands[cle]
 
     
-    def plot(self, af_algo, aggregate, no_data_values = None, ax = None):
+    def plot(self, af_algo, aggregate, no_data_values = None, 
+             axe = None, figure = None):
         """TODO"""
         
         tab = np.array(self.getRasterBand(af_algo, aggregate).grid)
@@ -90,39 +91,10 @@ class Raster:
 
         cmap = utils.getOffsetColorMap(self.color1, self.color2, 0)
         
-        if ax == None:
-            im = plt.imshow(tab, cmap=cmap)
-            plt.title(self.getCle(af_algo, aggregate))
-            plt.colorbar(im,fraction=0.046, pad=0.04)
-            plt.show()
-        else:
-            im = ax.imshow(tab, cmap=cmap)
-            ax.set_title(self.getCle(af_algo, aggregate))
-            ax.colorbar(im,fraction=0.046, pad=0.04)
-            ax.grid(True)
-
-
-    def saveGrid(self, path, af_algo, aggregate, no_data_values = None, 
-                 dpi = 300, axe = None, figure = None):
-
-        tab = np.array(self.getRasterBand(af_algo, aggregate).grid)
-        
-        if no_data_values != None:
-            tab[tab == grid.NO_DATA_VALUE] = no_data_values
-
-        cmap = utils.getOffsetColorMap(self.color1, self.color2, 0)
-        
-        # im = plt.imshow(tab, cmap=cmap)
-        # plt.title(self.getCle(af_algo, aggregate))
-        # plt.colorbar(im,fraction=0.046, pad=0.04)
-        # plt.savefig(path, dpi=dpi)
-        # plt.show()
-        
         if axe == None:
             im = plt.imshow(tab, cmap=cmap)
             plt.title(self.getCle(af_algo, aggregate))
             plt.colorbar(im,fraction=0.046, pad=0.04)
-            plt.savefig(path, dpi=dpi)
             plt.show()
         else:
             im = axe.imshow(tab, cmap=cmap)
@@ -132,7 +104,24 @@ class Raster:
             cax = divider.append_axes('right', size='5%', pad=0.1)
             if figure != None:
                 figure.colorbar(im, cax=cax, orientation='vertical', fraction=0.046)
+            # axe.grid(True)
             
-            axe.grid(True)
-            plt.savefig(path, dpi=dpi)
+
+    def saveGrid(self, path, af_algo, aggregate, no_data_values = None, dpi = 300):
+
+        tab = np.array(self.getRasterBand(af_algo, aggregate).grid)
+        
+        if no_data_values != None:
+            tab[tab == grid.NO_DATA_VALUE] = no_data_values
+
+        cmap = utils.getOffsetColorMap(self.color1, self.color2, 0)
+        
+        fig = plt.figure()
+        im = plt.imshow(tab, cmap=cmap)
+        plt.title(self.getCle(af_algo, aggregate))
+        plt.colorbar(im,fraction=0.046, pad=0.04)
+        plt.savefig(path, dpi=dpi)
+        plt.close(fig)
+        
+        
             
