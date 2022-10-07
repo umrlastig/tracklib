@@ -225,19 +225,20 @@ def orientation(track, i):
     }
     # 1:E, 2:NE, 3:N, 4:NW, 5:W, 6:SW, 7:S, 8:SE
 
+    cap = utils.NAN
+
     if i == 0:
-        return utils.NAN
-
-    N = track.size()
-    if i == N - 1:
-        return utils.NAN
-
-    dx = float(track.getObs(i).position.getX()) - float(
-        track.getObs(i - 1).position.getX()
-    )
-    dy = float(track.getObs(i).position.getY()) - float(
-        track.getObs(i - 1).position.getY()
-    )
+        # On calcule pour le point1 et on prend cette valeur
+        x0 = float(track.getObs(0).position.getX())
+        y0 = float(track.getObs(0).position.getY())
+        dx = float(track.getObs(1).position.getX()) - x0
+        dy = float(track.getObs(1).position.getY()) - y0
+    else:
+        xim1 = float(track.getObs(i - 1).position.getX())
+        yim1 = float(track.getObs(i - 1).position.getY())
+        dx = float(track.getObs(i).position.getX()) - xim1
+        dy = float(track.getObs(i).position.getY()) - yim1
+        
     orientation = math.atan2(dy, dx)
     #print (orientation)
     angle = math.degrees(orientation)
@@ -249,10 +250,9 @@ def orientation(track, i):
     cap = utils.NAN
 
     for direction in orientation_dictionnary:
-        if (
-            angle >= orientation_dictionnary[direction][0]
-            and angle < orientation_dictionnary[direction][1]
-        ):
+        binf = orientation_dictionnary[direction][0]
+        bsup = orientation_dictionnary[direction][1]
+        if angle >= binf and angle < bsup:
             cap = direction
 
     if cap == 9:

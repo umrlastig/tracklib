@@ -7,24 +7,22 @@ from __future__ import annotations
 from typing import Union
 
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
 
 #from skimage import io
 
 import tracklib.core.Utils as utils
-from tracklib.core.Coords import ECEFCoords, ENUCoords, GeoCoords
-from tracklib.core.TrackCollection import TrackCollection
-from tracklib.core.Bbox import Bbox
 import tracklib.core.RasterBand as grid
 
 NO_DATA_VALUE = -9999
-
-# Mainly used by :class:`core.SpatialIndex.SpatialIndex` and `algo.Summarizing.summarize`.
 
 class Raster:
     '''
     Class for defining a spatial grid: structure de données un peu plus évoluée
           qu'un tableau 2x2. 
+          
+    Mainly used by :function:`algo.Mapping.mapOnRaster` and `algo.Summarizing.summarize`.
           
     Parameters
     ----------
@@ -49,6 +47,9 @@ class Raster:
         self.color1 = (0, 0, 0)
         self.color2 = (255, 255, 255)
 
+    def getNamesOfRasterBand(self):
+        for name in self.bands:
+            print (name)
 
     def setColor(self, c1, c2):
         """TODO"""
@@ -69,8 +70,6 @@ class Raster:
             
         return cle
     
-    
-    
     def getRasterBand(self, af_algo: Union[int, str], aggregate = None):
         """TODO"""
         
@@ -81,7 +80,7 @@ class Raster:
         return self.bands[cle]
 
     
-    def plot(self, af_algo, aggregate, valmax=None, startpixel=0, no_data_values = None):
+    def plot(self, af_algo, aggregate, no_data_values = None, ax = None):
         """TODO"""
         
         tab = np.array(self.getRasterBand(af_algo, aggregate).grid)
@@ -90,61 +89,50 @@ class Raster:
             tab[tab == grid.NO_DATA_VALUE] = no_data_values
 
         cmap = utils.getOffsetColorMap(self.color1, self.color2, 0)
-        im = plt.imshow(tab, cmap=cmap)
-        plt.title(self.getCle(af_algo, aggregate))
-        plt.colorbar(im,fraction=0.046, pad=0.04)
-        plt.show()
+        
+        if ax == None:
+            im = plt.imshow(tab, cmap=cmap)
+            plt.title(self.getCle(af_algo, aggregate))
+            plt.colorbar(im,fraction=0.046, pad=0.04)
+            plt.show()
+        else:
+            im = ax.imshow(tab, cmap=cmap)
+            ax.set_title(self.getCle(af_algo, aggregate))
+            ax.colorbar(im,fraction=0.046, pad=0.04)
+            ax.grid(True)
 
 
-# #    def boxplot(self, af_algo, aggregate):
-# #        name = af_algo.__name__ + '#' + aggregate.__name__
-# #        k = self.__summarizeFieldDico[name]
-# #
-# #        sumPlot = np.zeros((self.nrow, self.ncol, len(self.__summarizeFieldDico)), dtype='float')
-# #        for i in range(self.nrow):
-# #            for j in range(self.ncol):
-# #                val = self.sum[i][j][k]
-# #                if utils.isnan(val):
-# #                    val = 0
-# #                sumPlot[i][j][k] = val
-# #
-# #        sumPlot = self.__getSumArray(af_algo, aggregate)
-# #
-# #        plt.boxplot(sumPlot[:,:,k], vert=False)
+    def saveGrid(self, path, af_algo, aggregate, no_data_values = None, 
+                 dpi = 300, axe = None, figure = None):
 
+        tab = np.array(self.getRasterBand(af_algo, aggregate).grid)
+        
+        if no_data_values != None:
+            tab[tab == grid.NO_DATA_VALUE] = no_data_values
 
-# #    def plotImage3AF(self, afs_algo, aggs):
-# #        w, h = self.ncol, self.nrow
-# #        t = (h, w, 3)
-# #        A = np.zeros(t, dtype=np.uint8)
-# #
-# #        maxs = []
-# #        #maxs.append(utils.co_max()
-# #        #        self.track.operate(Operator.Operator.MAX, afs_algo[0]))
-# #
-# #        for i in range(h):
-# #            for j in range(w):
-# #                rgb = [100, 155, 3]
-# #                for k in range(len(afs_algo)):
-# #                    af_algo = afs_algo[k]
-# #                    aggregate = aggs[k]
-# #
-# #                    name = af_algo.__name__ + '#' + aggregate.__name__
-# #                    ind = self.__summarizeFieldDico[name]
-# #
-# #                    val = self.sum[i][j][ind]
-# #                    if utils.isnan(val):
-# #                        val = 0
-# #
-# #                A[i,j] = rgb
-# #
-# #        #i = Image.fromarray(A, "RGB")
-# #        # im = Image.new(mode = "RGB", size = (200, 200) )
-# #        im = Image.fromarray(A)
-# #        im.show()
-
-
-#      def saveGrid(self, filename, af_algo, aggregate, valmax = None, startpixel = 0):
-
-#         sumPlot = self.buildArray(af_algo, aggregate, valmax, startpixel)
-#         io.imsave(filename, sumPlot)
+        cmap = utils.getOffsetColorMap(self.color1, self.color2, 0)
+        
+        # im = plt.imshow(tab, cmap=cmap)
+        # plt.title(self.getCle(af_algo, aggregate))
+        # plt.colorbar(im,fraction=0.046, pad=0.04)
+        # plt.savefig(path, dpi=dpi)
+        # plt.show()
+        
+        if axe == None:
+            im = plt.imshow(tab, cmap=cmap)
+            plt.title(self.getCle(af_algo, aggregate))
+            plt.colorbar(im,fraction=0.046, pad=0.04)
+            plt.savefig(path, dpi=dpi)
+            plt.show()
+        else:
+            im = axe.imshow(tab, cmap=cmap)
+            axe.set_title(self.getCle(af_algo, aggregate))
+            
+            divider = make_axes_locatable(axe)
+            cax = divider.append_axes('right', size='5%', pad=0.1)
+            if figure != None:
+                figure.colorbar(im, cax=cax, orientation='vertical', fraction=0.046)
+            
+            axe.grid(True)
+            plt.savefig(path, dpi=dpi)
+            

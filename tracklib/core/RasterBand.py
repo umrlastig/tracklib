@@ -85,6 +85,10 @@ class RasterBand:
         self.noDataValue = novalue
         self.name = name
         
+        
+    def getName(self):
+        return self.name
+        
     
     def isIn(self, coord: Union[ENUCoords]):
         '''
@@ -189,16 +193,3 @@ class RasterBand:
                     ax.add_patch(polygon)
                     polygon.set_facecolor("lightcyan")
     
-        # for i in range(self.ncol):
-        #     xi1 = i * self.XPixelSize + self.xmin
-        #     xi2 = xi1 + self.XPixelSize
-        #     for j in range(self.nrow):
-        #         yj1 = j * self.YPixelSize + self.ymin
-        #         yj2 = yj1 + self.YPixelSize
-        #         if self.grid[i][j] != NO_DATA_VALUE:
-        #             # print(self.grid[i][j])
-        #             polygon = plt.Polygon(
-        #                 [[xi1, yj1], [xi2, yj1], [xi2, yj2], [xi1, yj2], [xi1, yj1]]
-        #             )
-        #             ax.add_patch(polygon)
-        #             polygon.set_facecolor("lightcyan")
