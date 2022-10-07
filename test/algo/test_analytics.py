@@ -171,10 +171,10 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
     def testOrientation(self):
         
         a = Analytics.orientation(self.trace1, 0)
-        self.assertEqual(math.isnan(a), math.isnan(utils.NAN))
+        self.assertEqual(a, 1)
 		
         a = Analytics.orientation(self.trace1, self.trace1.size() - 1)
-        self.assertEqual(math.isnan(a), math.isnan(utils.NAN))
+        self.assertEqual(a, 1)
 		
         a = Analytics.orientation(self.trace1, 1)
         self.assertEqual(a, 1)
