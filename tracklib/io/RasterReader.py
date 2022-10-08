@@ -1,30 +1,52 @@
-# -*- coding: utf-8 -*-
-
 from tracklib.core import (Bbox, RasterBand, Raster)
 from tracklib.core.Coords import (ENUCoords)
 
-
 class RasterReader:
     '''
-    
+    This class offer static methods to load raster data, like:
+    - read raster from ascii files, 
+    - get DTM data from IGN web services.    
     '''
     
-    CLES = ['ncols', 'nrows', 'xllcorner', 'yllcorner', 'cellsize', 'NODATA_value']
+    CLES_ASC = ['ncols', 'nrows', 'xllcorner', 'yllcorner', 'cellsize', 'NODATA_value']
     
     @staticmethod
     def readFromAscFile(path, srid="ENUCoords", name=''):
         '''
+        Read grid data from an ASCII file.
+        The first six lines of the file indicate the reference of the grid, 
+        followed by the values listed in the order they would appear 
+        (left to right and top to bottom).
+        
+        Where:
+            - ncols is the numbers of rows (represented as integers)
+            - nrows is the numbers of rows (represented as integers)
+            - Lower-left corner refers to a cell corner, and not to a data point
+            - xllcorner and yllcorner are the western (left) X coordinate and southern (bottom) Y coordinates, such as easting and northing (represented as real numbers with an optional decimal point)
+            - xllcorner and yllcorner are the X and Y coordinates for the lower left corner of the lower left grid cell. Some ESRI raster files use xllcenter and yllcenter instead for the XY reference point, which indicate the X and Y coordinates for the center of the lower left grid cell. These values are represented as real numbers with an optional decimal point
+            - cellsize is the length of one side of a square cell (a real number)
+            - nodata_value is the value that is regarded as "missing" or "not applicable"; this line is optional, but highly recommended as some programs expect this line to be declared (a real number)
+            
+
+        Example
+        -------
+        raster = RasterReader.readFromAscFile('data/asc/RGEALTI_FXX_0930_6415_MNT_LAMB93_IGN69.asc')
+        grid = raster.getRasterBand(1)
+        self.assertEqual(1000, grid.nrow)
+
 
         Parameters
         ----------
         path : str
-            chemin du fichier contenent.
-        srid : TYPE, optional
-            DESCRIPTION. The default is "ENUCoords".
+            chemin du fichier.
+        srid : str
+            nom de la classe représentant le type des coordonnées. The default is "ENUCoords".
+        name: str
+            nom de la band du raster, par exemple 'speed#avg'
 
         Returns
         -------
-        TYPE
+        Raster
             DESCRIPTION.
 
         '''
@@ -44,7 +66,7 @@ class RasterReader:
         novalue = RasterBand.NO_DATA_VALUE
         for line in lines:
             cle = line.split(" ")[0].strip()
-            if cle in RasterReader.CLES:
+            if cle in RasterReader.CLES_ASC:
                 cptrowheader += 1
                     
                 i = 1
@@ -97,9 +119,9 @@ class RasterReader:
         return Raster.Raster(grid)
 
 
-    @staticmethod
-    def getAltitude(bbox, proj=None, nomproxy=None):
-        URL_ELEVATION = ''
-        # https://wxs.ign.fr/altimetrie/geoportail/r/wms?LAYERS=ELEVATION.ELEVATIONGRIDCOVERAGE.HIGHRES&EXCEPTIONS=text/xml&FORMAT=image%2Fgeotiff&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&STYLES=&CRS=EPSG:2154&BBOX=660034.3692562445,6859000.245020923,660169.3953205446,6859140.163403969&WIDTH=2048&HEIGHT=2048
+#    @staticmethod
+#    def getAltitude(bbox, proj=None, nomproxy=None):
+#        URL_ELEVATION = ''
+#        # https://wxs.ign.fr/altimetrie/geoportail/r/wms?LAYERS=ELEVATION.ELEVATIONGRIDCOVERAGE.HIGHRES&EXCEPTIONS=text/xml&FORMAT=image%2Fgeotiff&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&STYLES=&CRS=EPSG:2154&BBOX=660034.3692562445,6859000.245020923,660169.3953205446,6859140.163403969&WIDTH=2048&HEIGHT=2048
      
     

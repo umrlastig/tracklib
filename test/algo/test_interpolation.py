@@ -85,95 +85,95 @@ class TestInterpolation(TestCase):
     # Interpolation
     # --------------------------------------------------------------------
     
-    def test1(self, sym = 'r-'):
-        '''
-        Interpolation lineaire en mode spatial.
-        Trajectoire est un cercle, interpolation spatiale arc de cercle 
-                    dont on sait calculer l'écart.
-        '''
-        R = 100
-        for z in range(2, R):
-            self.trackCercle = Synthetics.generate(x_t, y_t, dt=5, verbose=False) % 10
-            self.trackCercle.resample(delta=z, mode=1)  
+    # def test1(self, sym = 'r-'):
+    #     '''
+    #     Interpolation lineaire en mode spatial.
+    #     Trajectoire est un cercle, interpolation spatiale arc de cercle 
+    #                 dont on sait calculer l'écart.
+    #     '''
+    #     R = 100
+    #     for z in range(2, R):
+    #         self.trackCercle = Synthetics.generate(x_t, y_t, dt=5, verbose=False) % 10
+    #         self.trackCercle.resample(delta=z, mode=1)  
         
-            ei = 20.67 / self.trackCercle.size()**3 * R
-            epsilon = ei + R
+    #         ei = 20.67 / self.trackCercle.size()**3 * R
+    #         epsilon = ei + R
         
-            self.view(self.trackCercle, sym)
-            for i in range(self.trackCercle.size() - 2):
-                d = self.trackCercle.getObs(i).distanceTo(self.trackCercle.getObs(i+1))
-                self.assertLessEqual(d, epsilon, 'erreur pour ' + str(i))
+    #         self.view(self.trackCercle, sym)
+    #         for i in range(self.trackCercle.size() - 2):
+    #             d = self.trackCercle.getObs(i).distanceTo(self.trackCercle.getObs(i+1))
+    #             self.assertLessEqual(d, epsilon, 'erreur pour ' + str(i))
 
         
-    def test2(self, sym = 'r-'):
-        '''
-        Interpolation lineaire en mode temporel :  1 pt/s 
-        '''
-        R = 100
-        for z in range(2, R):
-            self.trackCercle = Synthetics.generate(x_t, y_t, dt=5, verbose=False) % 10
-            self.trackCercle.plot('kx') # , append = False
-            self.trackCercle.resample(delta=z, mode = itp.MODE_TEMPORAL)  
-            self.view(self.trackCercle, sym)
-            for i in range(self.trackCercle.size() - 2):
-                d = self.trackCercle.getObs(i).distanceTo(self.trackCercle.getObs(i+1))
-                err = abs(d - 2*3.1415*100/self.trackCercle.size())
-                self.assertLessEqual(err, self.__epsilon, 'erreur pour ' + str(i))
+    # def test2(self, sym = 'r-'):
+    #     '''
+    #     Interpolation lineaire en mode temporel :  1 pt/s 
+    #     '''
+    #     R = 100
+    #     for z in range(2, R):
+    #         self.trackCercle = Synthetics.generate(x_t, y_t, dt=5, verbose=False) % 10
+    #         self.trackCercle.plot('kx') # , append = False
+    #         self.trackCercle.resample(delta=z, mode = itp.MODE_TEMPORAL)  
+    #         self.view(self.trackCercle, sym)
+    #         for i in range(self.trackCercle.size() - 2):
+    #             d = self.trackCercle.getObs(i).distanceTo(self.trackCercle.getObs(i+1))
+    #             err = abs(d - 2*3.1415*100/self.trackCercle.size())
+    #             self.assertLessEqual(err, self.__epsilon, 'erreur pour ' + str(i))
 
 
-    def test3(self, sym = 'r-'):
-        '''
-        Interpolation lineaire en mode temporel :  definition par timestamps
-        '''
-        R = 100
-        for z in range(2, R):
-            self.trackCercle = Synthetics.generate(x_t, y_t, dt=z, verbose=False) % 10
-            self.trackCercle.plot('kx')
+    # def test3(self, sym = 'r-'):
+    #     '''
+    #     Interpolation lineaire en mode temporel :  definition par timestamps
+    #     '''
+    #     R = 100
+    #     for z in range(2, R):
+    #         self.trackCercle = Synthetics.generate(x_t, y_t, dt=z, verbose=False) % 10
+    #         self.trackCercle.plot('kx')
         
-            a = int(self.trackCercle[0].timestamp.toAbsTime())
-            b = int(self.trackCercle[-1].timestamp.toAbsTime())
-            T = [GPSTime.readUnixTime(x) for x in range(a, b, 10)]
+    #         a = int(self.trackCercle[0].timestamp.toAbsTime())
+    #         b = int(self.trackCercle[-1].timestamp.toAbsTime())
+    #         T = [GPSTime.readUnixTime(x) for x in range(a, b, 10)]
         
-            self.trackCercle.resample(delta=T, mode = itp.MODE_TEMPORAL)
-            self.view(self.trackCercle, sym)
-            for i in range(self.trackCercle.size() - 2):
-                d = self.trackCercle.getObs(i).distanceTo(self.trackCercle.getObs(i+1))
-                err = abs(d - 2*3.1415*100/self.trackCercle.size())
-                self.assertLessEqual(err, self.__epsilon, 'erreur pour ' + str(i))
+    #         self.trackCercle.resample(delta=T, mode = itp.MODE_TEMPORAL)
+    #         self.view(self.trackCercle, sym)
+    #         for i in range(self.trackCercle.size() - 2):
+    #             d = self.trackCercle.getObs(i).distanceTo(self.trackCercle.getObs(i+1))
+    #             err = abs(d - 2*3.1415*100/self.trackCercle.size())
+    #             self.assertLessEqual(err, self.__epsilon, 'erreur pour ' + str(i))
         
 
-    def test4(self, sym = 'r-'):
-        '''
-        Interpolation lineaire en mode temporel :  definition // autre trace
-        '''
-        R = 100
-        for z in range(2, R):
-            self.trackCercle = Synthetics.generate(x_t, y_t, dt=z, verbose=False) % 10
-            self.trackCercle.plot('kx')
+    # def test4(self, sym = 'r-'):
+    #     '''
+    #     Interpolation lineaire en mode temporel :  definition // autre trace
+    #     '''
+    #     R = 100
+    #     for z in range(2, R):
+    #         self.trackCercle = Synthetics.generate(x_t, y_t, dt=z, verbose=False) % 10
+    #         self.trackCercle.plot('kx')
             
-            temp = self.trackCercle.copy()
-            temp %= 5
-            if temp.size() < 2:
-                continue
-            temp.resample(delta=self.trackCercle, mode = itp.MODE_TEMPORAL)
-            self.view(temp, sym)
+    #         temp = self.trackCercle.copy()
+    #         temp %= 5
+    #         if temp.size() < 2:
+    #             continue
+    #         temp.resample(delta=self.trackCercle, mode = itp.MODE_TEMPORAL)
+    #         self.view(temp, sym)
             
 
-    def test5(self, sym = 'r-'):
-        '''
-        Idem test 4 en raccourci
-        '''
-        R = 100
-        for z in range(2, R):
-            self.trackCercle = Synthetics.generate(x_t, y_t, dt=z, verbose=False) % 10
-            self.trackCercle.plot('kx')
+    # def test5(self, sym = 'r-'):
+    #     '''
+    #     Idem test 4 en raccourci
+    #     '''
+    #     R = 100
+    #     for z in range(2, R):
+    #         self.trackCercle = Synthetics.generate(x_t, y_t, dt=z, verbose=False) % 10
+    #         self.trackCercle.plot('kx')
         
-            temp = self.trackCercle.copy()
-            temp %= 5
-            if temp.size() < 2:
-                continue
-            temp = temp // self.trackCercle   
-            self.view(temp, sym)
+    #         temp = self.trackCercle.copy()
+    #         temp %= 5
+    #         if temp.size() < 2:
+    #             continue
+    #         temp = temp // self.trackCercle   
+    #         self.view(temp, sym)
 
         
     def test6(self, sym = 'r-'):

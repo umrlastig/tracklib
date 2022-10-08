@@ -1,5 +1,3 @@
-"""Read GPS track from CSV file(s)."""
-
 import csv
 import os
 from xml.dom import minidom
@@ -471,6 +469,22 @@ class TrackReader:
     
     @staticmethod
     def readFromGpxFiles(pathdir, srid="GEO"):
+        '''
+        
+
+        Parameters
+        ----------
+        pathdir : TYPE
+            DESCRIPTION.
+        srid : TYPE, optional
+            DESCRIPTION. The default is "GEO".
+
+        Returns
+        -------
+        TRACES : TYPE
+            DESCRIPTION.
+
+        '''
         TRACES = TrackCollection()
         LISTFILE = os.listdir(pathdir)
         for f in LISTFILE:
