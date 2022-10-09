@@ -118,12 +118,12 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         plt.show()        
         
         
-    def testPlotDifferenceProfile(self):
-        Comparison.plotDifferenceProfile(self.trace1, self.trace2)
+    # def testPlotDifferenceProfile(self):
+    #     Comparison.plotDifferenceProfile(self.trace1, self.trace2)
         
         
-    def testDifferenceProfileNN(self):
-        Comparison.differenceProfile(self.trace1, self.trace2, mode = "NN")
+    # def testDifferenceProfileNN(self):
+    #     Comparison.differenceProfile(self.trace1, self.trace2, mode = "NN")
 
     
 if __name__ == '__main__':
@@ -131,7 +131,7 @@ if __name__ == '__main__':
     suite.addTest(TestAlgoComparaisonMethods("testSynchronize"))
     suite.addTest(TestAlgoComparaisonMethods("testCompare"))
     suite.addTest(TestAlgoComparaisonMethods("testCentralTrack"))
-    suite.addTest(TestAlgoComparaisonMethods("testPlotDifferenceProfile"))
+    # suite.addTest(TestAlgoComparaisonMethods("testPlotDifferenceProfile"))
     # suite.addTest(TestAlgoComparaisonMethods("testDifferenceProfileNN"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
