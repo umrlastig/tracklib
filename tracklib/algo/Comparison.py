@@ -15,6 +15,10 @@ import tracklib.algo.Dynamics as Dynamics
 import tracklib.algo.Interpolation as Interpolation
 
 
+MODE_COMPARAISON_NEAREST_NEIGHBOUR = 1
+MODE_COMPARAISON_DTW = 1
+
+
 def plotDifferenceProfile(
     profile, track2, af_name="pair", sym="g--", NO_DATA_VALUE: int = -1
 ):
@@ -33,7 +37,7 @@ def plotDifferenceProfile(
         y1 = profile.getObs(i).position.getY()
         x2 = track2.getObs(profile.getObsAnalyticalFeature(af_name, i)).position.getX()
         y2 = track2.getObs(profile.getObsAnalyticalFeature(af_name, i)).position.getY()
-        plt.plot([x1, x2], [y1, y2], sym, linewidth=0.5)
+        plt.plot([x1, x2], [y1, y2], sym, linewidth=2)
 
 
 def differenceProfile(track1, track2, mode: Literal["NN", "DTW", "FDTW"] = "NN", 

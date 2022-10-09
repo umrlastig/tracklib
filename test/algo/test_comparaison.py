@@ -81,8 +81,6 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         r7 = Obs.Obs(d7, GPSTime.GPSTime.readTimestamp("2018-01-01 10:30:00"))
         self.trace2.addObs(r7)
         
-        
-        
     def plot(self):
         self.trace1.plot()
         self.trace1.plotAsMarkers()
@@ -118,12 +116,38 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         plt.show()        
         
         
-    # def testPlotDifferenceProfile(self):
-    #     Comparison.plotDifferenceProfile(self.trace1, self.trace2)
+    def testDifference21ProfileNN(self):
+        profile = Comparison.differenceProfile(self.trace2, self.trace1, 
+                                               mode = "NN", p=2)
+        self.trace1.plot('r-')
+        self.trace2.plot('r-')
+        Comparison.plotDifferenceProfile(profile, self.trace1)
+        plt.show()
         
         
-    # def testDifferenceProfileNN(self):
-    #     Comparison.differenceProfile(self.trace1, self.trace2, mode = "NN")
+    def testDifference12ProfileNN(self):
+        profile = Comparison.differenceProfile(self.trace1, self.trace2, 
+                                               mode = "NN", p=2)
+        self.trace1.plot('r-')
+        self.trace2.plot('r-')
+        Comparison.plotDifferenceProfile(profile, self.trace2)
+        plt.show()
+        
+    def testDifference21ProfileDTW(self):
+        profile = Comparison.differenceProfile(self.trace2, self.trace1, 
+                                               mode = "DTW", p=2)
+        self.trace1.plot('r-')
+        self.trace2.plot('r-')
+        Comparison.plotDifferenceProfile(profile, self.trace1)
+        plt.show()
+    
+    def testDifference21ProfileFDTW(self):
+        profile = Comparison.differenceProfile(self.trace2, self.trace1, 
+                                               mode = "FDTW", p=2)
+        self.trace1.plot('r-')
+        self.trace2.plot('r-')
+        Comparison.plotDifferenceProfile(profile, self.trace1)
+        plt.show()
 
     
 if __name__ == '__main__':
@@ -131,7 +155,11 @@ if __name__ == '__main__':
     suite.addTest(TestAlgoComparaisonMethods("testSynchronize"))
     suite.addTest(TestAlgoComparaisonMethods("testCompare"))
     suite.addTest(TestAlgoComparaisonMethods("testCentralTrack"))
-    # suite.addTest(TestAlgoComparaisonMethods("testPlotDifferenceProfile"))
-    # suite.addTest(TestAlgoComparaisonMethods("testDifferenceProfileNN"))
+    suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileNN"))
+    suite.addTest(TestAlgoComparaisonMethods("testDifference12ProfileNN"))
+    suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileDTW"))
+    suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileFDTW"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
+
+
