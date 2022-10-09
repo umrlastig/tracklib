@@ -31,7 +31,7 @@ The official documentation is available at **[ReadTheDocs](https://tracklib.read
 ### Dependencies
 
 Minimal requirements:
-- Python 3.7+
+- Python 3.8+
 
 
 ### License
