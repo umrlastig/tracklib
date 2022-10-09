@@ -98,12 +98,8 @@ def differenceProfile(track1, track2, mode: Literal["NN", "DTW", "FDTW"] = "NN",
                     id_min = j
             output.setObsAnalyticalFeature("diff", i, val_min)
             output.setObsAnalyticalFeature("pair", i, id_min)
-            ex = (
-                track1.getObs(i).position.getX() - track2.getObs(id_min).position.getX()
-            )
-            ey = (
-                track1.getObs(i).position.getY() - track2.getObs(id_min).position.getY()
-            )
+            ex = track1.getObs(i).position.getX() - track2.getObs(id_min).position.getX()
+            ey = track1.getObs(i).position.getY() - track2.getObs(id_min).position.getY()
             output.setObsAnalyticalFeature("ex", i, ex)
             output.setObsAnalyticalFeature("ey", i, ey)
 
