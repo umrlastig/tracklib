@@ -16,12 +16,12 @@ import tracklib.algo.Interpolation as Interpolation
 
 
 MODE_COMPARAISON_NEAREST_NEIGHBOUR = 1
-MODE_COMPARAISON_DTW = 1
+MODE_COMPARAISON_DTW = 2
+MODE_COMPARAISON_FDTW = 3
 
 
 def plotDifferenceProfile(
-    profile, track2, af_name="pair", sym="g--", NO_DATA_VALUE: int = -1
-):
+    profile, track2, af_name="pair", sym="g--", NO_DATA_VALUE: int = -1):
     """Difference profile plot
 
     :param profile: TODO
@@ -243,7 +243,8 @@ def compare(track1, track2) -> float:
     return math.sqrt(rmse / trackA.size())
 
 
-def centralTrack(tracks: Union[TrackCollection, Iterable[Track]], mode: Literal["NN", "DTW", "FDTW"] = "NN", verbose: bool = True) -> Track:   
+def centralTrack(tracks: Union[TrackCollection, Iterable[Track]], 
+                 mode: Literal["NN", "DTW", "FDTW"] = "NN", verbose: bool = True) -> Track:   
     """Computes central track of a track collection
 
     :param tracks: TrackCollection or list of tracks

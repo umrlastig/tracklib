@@ -98,7 +98,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
 
     def testCompare(self):
         a = Comparison.compare(self.trace1, self.trace2)
-        self.assertLessEqual(abs(a - 1.4925), self.__epsilon, "Azimuth")
+        self.assertLessEqual(abs(a - 1.4925), self.__epsilon, "Comparaison")
             
 
     def testCentralTrack(self):
