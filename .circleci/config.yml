@@ -18,8 +18,6 @@ workflows:
       - build-and-test-and-coverage
   tests_different_python_version:
     jobs:
-      - build-and-test-python-3-5
-      - build-and-test-python-3-6
       - build-and-test-python-3-7
       - build-and-test-python-3-9
 
@@ -68,25 +66,6 @@ jobs:
             chmod 777 -R /home/circleci/project/data/test
             pytest test/
 
-  build-and-test-python-3-6:  
-    docker:
-      - image: circleci/python:3.6
-    steps:
-      - checkout
-      - python/install-packages:
-          pkg-manager: pip
-      - run: |
-          python /home/circleci/project/.circleci/retro.py
-          rm -r tracklib
-          mv tracklib27 tracklib
-          export PYTHONPATH="${PYTHONPATH}:/home/circleci/project/tracklib/"
-      - run: 
-          name: Run tests
-          command: |
-            mkdir /home/circleci/project/data/test
-            chmod 777 -R /home/circleci/project/data/test
-            pytest test/
-
   build-and-test-python-3-7:  
     docker:
       - image: circleci/python:3.7
@@ -106,21 +85,3 @@ jobs:
             chmod 777 -R /home/circleci/project/data/test
             pytest test/
 
-  build-and-test-python-3-5:  
-    docker:
-      - image: circleci/python:3.5
-    steps:
-      - checkout
-      - python/install-packages:
-          pkg-manager: pip
-      - run: |
-          python /home/circleci/project/.circleci/retro.py
-          rm -r tracklib
-          mv tracklib27 tracklib
-          export PYTHONPATH="${PYTHONPATH}:/home/circleci/project/tracklib/"
-      - run: 
-          name: Run tests
-          command: |
-            mkdir /home/circleci/project/data/test
-            chmod 777 -R /home/circleci/project/data/test
-            pytest test/

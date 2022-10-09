@@ -446,11 +446,11 @@ class TestInterpolation(TestCase):
 if __name__ == '__main__':
     suite = TestSuite()
     
-    suite.addTest(TestInterpolation("test1"))
-    suite.addTest(TestInterpolation("test2"))
-    suite.addTest(TestInterpolation("test3"))
-    suite.addTest(TestInterpolation("test4"))
-    suite.addTest(TestInterpolation("test5"))
+    #suite.addTest(TestInterpolation("test1"))
+    #suite.addTest(TestInterpolation("test2"))
+    #suite.addTest(TestInterpolation("test3"))
+    #suite.addTest(TestInterpolation("test4"))
+    #suite.addTest(TestInterpolation("test5"))
     suite.addTest(TestInterpolation("test6"))
     suite.addTest(TestInterpolation("test7"))
     suite.addTest(TestInterpolation("test8"))

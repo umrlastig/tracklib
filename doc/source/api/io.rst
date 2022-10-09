@@ -4,7 +4,7 @@ Module IO
 -----------
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 1
    :caption: Load/Export Track
    	
    ./io/io-trackformat
@@ -12,7 +12,7 @@ Module IO
    ./io/io-trackwriter
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 1
    :caption: Load/Export Network
 
    ./io/io-networkformat
@@ -20,7 +20,7 @@ Module IO
    ./io/io-networkwriter
    
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 1
    :caption: Load/Export Raster
     
    ./io/io-rasterreader

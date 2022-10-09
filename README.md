@@ -28,6 +28,10 @@ and functions to simplify the creation of analytical features on a GPS tracks.
 The official documentation is available at **[ReadTheDocs](https://tracklib.readthedocs.io)**
 
 
+### Dependencies
+
+Minimal requirements:
+- Python 3.7+
 
 
 ### License
