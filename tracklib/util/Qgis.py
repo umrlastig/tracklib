@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from __future__ import annotations 
 from typing import Literal   
 
 from tracklib.core.GPSTime import GPSTime

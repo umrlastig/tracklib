@@ -1,10 +1,11 @@
-Module util
-===========
 
-.. automodule:: tracklib.util
-    :members: 
+
+Module util
+---------------
 
 .. toctree::
-
-    ./util/util-geometry
-    ./util/util-qgis
+   :maxdepth: 3
+   :caption: Load/Export Track
+   	
+   ./util/util-geometry
+   ./util/util-qgis

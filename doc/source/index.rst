@@ -98,20 +98,19 @@ Examples
    
 .. toctree::
    :maxdepth: 1
+   :caption: User Guide
+
+   ./userguide/coreconcept
+   ./userguide/operator
+
+.. toctree::
+   :maxdepth: 1
    :caption: Use Cases
 
    ./notebook/Quickstart
    ./notebook/Summarize
    ./notebook/Switchbacks
    ./notebook/StopPoints
-   
-.. toctree::
-   :maxdepth: 1
-   :caption: User Guide
-
-   ./userguide/coreconcept
-   ./userguide/operator
-   
    
 .. toctree::
    :maxdepth: 1

@@ -1,16 +1,28 @@
-Module io
-=============
-
-.. automodule:: tracklib.io
-    :members: 
 	
-.. toctree::
+    
+Module IO
+-----------
 
-	./io/io-networkformat
-    ./io/io-networkreader
-    ./io/io-networkwriter
-	./io/io-rasterreader
-	./io/io-rasterwriter
-	./io/io-trackformat
-    ./io/io-trackreader
-    ./io/io-trackwriter
+.. toctree::
+   :maxdepth: 3
+   :caption: Load/Export Track
+   	
+   ./io/io-trackformat
+   ./io/io-trackreader
+   ./io/io-trackwriter
+
+.. toctree::
+   :maxdepth: 3
+   :caption: Load/Export Network
+
+   ./io/io-networkformat
+   ./io/io-networkreader
+   ./io/io-networkwriter
+   
+.. toctree::
+   :maxdepth: 3
+   :caption: Load/Export Raster
+    
+   ./io/io-rasterreader
+   ./io/io-rasterwriter
+

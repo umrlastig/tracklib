@@ -1,23 +1,26 @@
-from tracklib.core import (Bbox, RasterBand, Raster)
+
+# For type annotation
+from __future__ import annotations   
+from typing import Union
+
+from tracklib.core import (Bbox, Coords, RasterBand, Raster)
 from tracklib.core.Coords import (ENUCoords)
+
 
 class RasterReader:
     '''
-    This class offer static methods to load raster data, like:
+    This class offer static methods to load raster data:
     - read raster from ascii files, 
     - get DTM data from IGN web services.    
     '''
     
-    CLES_ASC = ['ncols', 'nrows', 'xllcorner', 'yllcorner', 'cellsize', 'NODATA_value']
-    
     @staticmethod
-    def readFromAscFile(path, srid="ENUCoords", name=''):
+    def readFromAscFile(path: str, 
+                        srid: Union[Coords.ENUCoords, Coords.ENUCoords, Coords.GeoCoords] =  ENUCoords,  
+                        name: str ='')-> Raster:
         '''
-        Read grid data from an ASCII file.
-        The first six lines of the file indicate the reference of the grid, 
-        followed by the values listed in the order they would appear 
-        (left to right and top to bottom).
-        
+        Read grid data from an ASCII file. The first six lines of the file indicate the reference of the grid, 
+        followed by the values listed in the order they would appear (left to right and top to bottom).
         Where:
             - ncols is the numbers of rows (represented as integers)
             - nrows is the numbers of rows (represented as integers)
@@ -26,17 +29,20 @@ class RasterReader:
             - xllcorner and yllcorner are the X and Y coordinates for the lower left corner of the lower left grid cell. Some ESRI raster files use xllcenter and yllcenter instead for the XY reference point, which indicate the X and Y coordinates for the center of the lower left grid cell. These values are represented as real numbers with an optional decimal point
             - cellsize is the length of one side of a square cell (a real number)
             - nodata_value is the value that is regarded as "missing" or "not applicable"; this line is optional, but highly recommended as some programs expect this line to be declared (a real number)
-            
 
+        
         Example
-        -------
-        raster = RasterReader.readFromAscFile('data/asc/RGEALTI_FXX_0930_6415_MNT_LAMB93_IGN69.asc')
-        grid = raster.getRasterBand(1)
-        self.assertEqual(1000, grid.nrow)
+        *********
+        
+        .. code-block:: python
+        
+           raster = RasterReader.readFromAscFile('data/asc/RGEALTI_0930_6415_LAMB93_IGN69.asc')
+           grid = raster.getRasterBand(1)
+           self.assertEqual(1000, grid.nrow)
 
 
         Parameters
-        ----------
+        -----------
         path : str
             chemin du fichier.
         srid : str
@@ -45,7 +51,7 @@ class RasterReader:
             nom de la band du raster, par exemple 'speed#avg'
 
         Returns
-        -------
+        --------
         Raster
             DESCRIPTION.
 
@@ -66,7 +72,7 @@ class RasterReader:
         novalue = RasterBand.NO_DATA_VALUE
         for line in lines:
             cle = line.split(" ")[0].strip()
-            if cle in RasterReader.CLES_ASC:
+            if cle in  ['ncols', 'nrows', 'xllcorner', 'yllcorner', 'cellsize', 'NODATA_value']:
                 cptrowheader += 1
                     
                 i = 1

@@ -36,7 +36,8 @@ def plotDifferenceProfile(
         plt.plot([x1, x2], [y1, y2], sym, linewidth=0.5)
 
 
-def differenceProfile(track1, track2, mode: Literal["NN", "DTW", "FDTW"] = "NN", ends=False, p=1, verbose: bool = True):   
+def differenceProfile(track1, track2, mode: Literal["NN", "DTW", "FDTW"] = "NN", 
+                      ends=False, p=1, verbose: bool = True):   
     """Profile of difference between two traces
 
     Three possible modes:
@@ -205,13 +206,14 @@ def __fillAFProfile(track1, track2, output, S):
         output.setObsAnalyticalFeature("ey", i, ey)
 
 
-def synchronize(self, track):
+def synchronize(track1, track2):
     """Resampling of 2 tracks with linear interpolation on a common base of
     timestamps
 
     :param track: track to synchronize with
     """
-    Interpolation.synchronize(self, track)
+
+    Interpolation.synchronize(track1, track2)
 
 
 def compare(track1, track2) -> float:   
@@ -228,7 +230,7 @@ def compare(track1, track2) -> float:
     trackA = track1.copy()
     trackB = track2.copy()
 
-    track2.synchronize(track3)
+    Interpolation.synchronize(trackA, trackB)
 
     rmse = 0
     for i in range(trackA.size()):

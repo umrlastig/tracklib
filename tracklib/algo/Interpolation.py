@@ -321,17 +321,15 @@ def prepareTimeSampling(input, tini=None, tfin=None):
     return output
 
 
-# --------------------------------------------------------------------------
-# Function to synchronize two tracks
-# --------------------------------------------------------------------------
-# Input :
-#   - track1 ::   track to synchronize
-#   - track2 ::   track to synchronize
-# --------------------------------------------------------------------------
-# Note: method is symetric on track1 and track2
-# --------------------------------------------------------------------------
 def synchronize(track1, track2):
-    """TODO"""
+    """
+    Function to synchronize two tracks.
+    Note: method is symetric on track1 and track2
+    
+    Input :
+    - track1 ::   track to synchronize
+    - track2 ::   track to synchronize
+    """
 
     # Merge timestamps of tracks
     timestamps = track1.getTimestamps() + [] + track2.getTimestamps()
@@ -356,8 +354,8 @@ def synchronize(track1, track2):
             del sorted[i + 1]
 
     # Interpolation
-    track1.resample(sorted, MODE_TEMPORAL)
-    track2.resample(sorted, MODE_TEMPORAL)
+    track1.resample(sorted, mode = MODE_TEMPORAL) 
+    track2.resample(sorted, mode = MODE_TEMPORAL)
 
 
 def __smooth_resample_spatial(track, ds):
