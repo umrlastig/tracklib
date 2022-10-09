@@ -13,7 +13,7 @@ class TestRasterReader(TestCase):
 
     def test_read_ign_mnt(self):
         # =============================================================
-        csvpath = os.path.join(self.resource_path, 'data/asc/RGEALTI_FXX_0930_6415_MNT_LAMB93_IGN69.asc')
+        csvpath = os.path.join(self.resource_path, 'data/asc/RGEALTI_0930_6415_LAMB93_IGN69.asc')
         raster = RasterReader.readFromAscFile(csvpath)
         grid = raster.getRasterBand(1)
         
