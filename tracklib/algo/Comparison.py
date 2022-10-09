@@ -193,10 +193,6 @@ def __fillAFProfile(track1, track2, output, S):
     :param S: TODO
     """
     for i in range(track1.size()):
-        x1 = track1.getObs(i).position.getX()
-        y1 = track1.getObs(i).position.getY()
-        x2 = track2.getObs(S[i]).position.getX()
-        y2 = track2.getObs(S[i]).position.getY()
         d = track1.getObs(i).distance2DTo(track2.getObs(S[i]))
         ex = track1.getObs(i).position.getX() - track2.getObs(S[i]).position.getX()
         ey = track1.getObs(i).position.getY() - track2.getObs(S[i]).position.getY()
