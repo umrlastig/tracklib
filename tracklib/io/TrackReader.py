@@ -14,22 +14,15 @@ from tracklib.io.TrackFormat import TrackFormat
 
 
 class TrackReader:
-    """TODO"""
-
-    NMEA_GGA = "GGA"
-    NMEA_RMC = "RMC"
-    NMEA_GPGGA = "GPGGA"
-    NMEA_GNGGA = "GNGGA"
-    NMEA_GPRMC = "GPRMC"
-    NMEA_GNRMC = "GNRMC"
+    """
+    This class offers static methods to load track or track collection
+    from GPX, CSV files. Geometry can be structured in coordinates or in a wkt.
+    """
 
     @staticmethod
     def readFromFile(
         path,
-        id_E=-1,
-        id_N=-1,
-        id_U=-1,
-        id_T=-1,
+        id_E=-1, id_N=-1, id_U=-1, id_T=-1,
         separator=",",
         DateIni=-1,
         h=0,
@@ -362,6 +355,13 @@ class TrackReader:
 
         return TRACES
 
+    NMEA_GGA = "GGA"
+    NMEA_RMC = "RMC"
+    NMEA_GPGGA = "GPGGA"
+    NMEA_GNGGA = "GNGGA"
+    NMEA_GPRMC = "GPRMC"
+    NMEA_GNRMC = "GNRMC"
+
     @staticmethod
     def readFromNMEAFile(path, frame=NMEA_GGA):
         """The method assumes a single track in file."""
@@ -419,7 +419,18 @@ class TrackReader:
     @staticmethod
     def readFromGpx(path, srid="GEO"):
         """
-        Reads (multiple) tracks in .gpx file
+Reads (multiple) tracks in a .gpx file.
+
+.. code-block:: python
+        
+   from tracklib.io.TrackReader import TrackReader
+   from tracklib.core.GPSTime import GPSTime
+   
+   GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2s1Z")
+
+   tracks = TrackReader.readFromGpx('../../../data/activity_5807084803.gpx')
+   trace = tracks.getTrack(0)
+        
         """
 
         tracks = TrackCollection()

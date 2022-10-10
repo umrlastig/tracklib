@@ -77,16 +77,10 @@ Among tracklib main functionalities
 
 * Summarize GPS information into a grid
 
- 	.. figure:: ./img/grille_avg_speed.png
+ 	.. figure:: ./img/summarize_mitaka.png
 	   :width: 550px
 	   :align: center
   
-
-Examples
-**********
-
-* See quick start for a first example
-* Further examples of *tracklib* use-cases can be found in the *example* folder: SpeedProfil.py, Interpolation.py, LoadFromDatabase.py
 
 
 .. toctree::
@@ -100,8 +94,10 @@ Examples
    :maxdepth: 1
    :caption: User Guide
 
-   ./userguide/coreconcept
-   ./userguide/operator
+   ./userguide/1_coreconcept
+   ./userguide/2_operator
+..   ./userguide/3_filter
+..   ./userguide/4_mapping
 
 .. toctree::
    :maxdepth: 1
@@ -151,18 +147,6 @@ Examples
 .. Ok très bien. La fonction readFromCSV a l'air de correspondre à ce que je cherche. Comment elle fonctionne ?
 
 .. > u.help(Track.estimate_speed)
-
-
-.. -----------------------------------------------------
-.. FUNCTION: estimate_speed
-.. -----------------------------------------------------
-.. Description: blablabla
-.. Input(s):
-..     -...
-.. Output(s):
-..     -...
-.. Warning: blablabla
-.. -----------------------------------------------------
 
 
 .. .. figure:: ./img/Profil_vitesse_temporel_1.png
