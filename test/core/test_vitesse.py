@@ -20,7 +20,7 @@ class TestVitesseMethods(unittest.TestCase):
 
         GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, './data/trace1.dat')
-        track = TrackReader.readFromFile(chemin, 2, 3, -1, 4, separator=",")
+        track = TrackReader.readFromCsvFiles(chemin, 2, 3, -1, 4, separator=",")
 
         track.estimate_speed()
 
@@ -54,7 +54,7 @@ class TestVitesseMethods(unittest.TestCase):
 
         GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, './data/trace0.gps')
-        track = TrackReader.readFromFile(chemin, 2, 3, -1, 1, separator=",")
+        track = TrackReader.readFromCsvFiles(chemin, 2, 3, -1, 1, separator=",")
 
         track.estimate_speed()
 
@@ -93,7 +93,7 @@ class TestVitesseMethods(unittest.TestCase):
         
         GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, './data/trace0.gps')
-        track = TrackReader.readFromFile(chemin, 2, 3, -1, 1, separator=",")
+        track = TrackReader.readFromCsvFiles(chemin, 2, 3, -1, 1, separator=",")
         
         # 1ère méthode
         track.estimate_speed()

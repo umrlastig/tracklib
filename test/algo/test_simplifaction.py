@@ -18,7 +18,7 @@ class TestSimplificationMethods(TestCase):
         self.resource_path = os.path.join(os.path.split(__file__)[0], "../..")
         self.csvpath = os.path.join(self.resource_path, 'data/trace0.gps')
         GPSTime.setPrintFormat("2D/2M/4Y 2h:2m:2s.3z")
-        self.track = TrackReader.readFromFile(self.csvpath) % 10
+        self.track = TrackReader.readFromCsvFiles(self.csvpath) % 10
         #self.track2.plot('kx')
         
     def view(self, track, sym):
@@ -28,21 +28,21 @@ class TestSimplificationMethods(TestCase):
     def test_douglas_peucker(self):
         GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, 'data/trace1.dat')
-        track = TrackReader.readFromFile(chemin, 2, 3, -1, 4, separator=",")
+        track = TrackReader.readFromCsvFiles(chemin, 2, 3, -1, 4, separator=",")
         track = spf.simplify(track, 5, mode = spf.MODE_SIMPLIFY_DOUGLAS_PEUCKER)
         
     
     def test_visvalingam(self):
         GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, 'data/trace1.dat')
-        track = TrackReader.readFromFile(chemin, 2, 3, -1, 4, separator=",")
+        track = TrackReader.readFromCsvFiles(chemin, 2, 3, -1, 4, separator=",")
         track = spf.simplify(track, 5, mode = spf.MODE_SIMPLIFY_VISVALINGAM)
         
         
     def test_gaussien(self):
         GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, 'data/trace1.dat')
-        track = TrackReader.readFromFile(chemin, 2, 3, -1, 4, separator=",")
+        track = TrackReader.readFromCsvFiles(chemin, 2, 3, -1, 4, separator=",")
         kernel = GaussianKernel(201)
         track.operate(Operator.FILTER, "x", kernel, "x2")
         track.operate(Operator.FILTER, "y", kernel, "y2")

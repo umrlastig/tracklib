@@ -26,7 +26,7 @@ class TrackReader:
     """
 
     @staticmethod
-    def readFromFile(
+    def readFromCsvFiles(
         path,
         id_E=-1, id_N=-1, id_U=-1, id_T=-1,
         separator=",",
@@ -36,6 +36,7 @@ class TrackReader:
         no_data_value=-999999,
         srid="ENUCoords",
         read_all=False,
+        selector=None,
         verbose=False,
     ):
         """
@@ -43,6 +44,33 @@ class TrackReader:
         If only path is provided as input parameters: file format is infered from extension according to file track_file_format
         If only path and a string s parameters are provied, the name of file format is set equal to s.
         """
+        
+        TRACES = TrackCollection()
+        
+        if os.path.isdir(path):
+            LISTFILE = os.listdir(path)
+            for f in LISTFILE:
+                p = path + "/" + f
+                trace = TrackReader.readFromCsvFiles(
+                    p, id_E, id_N, id_U, id_T,
+                    separator, DateIni, h, com, no_data_value,
+                    srid, read_all, verbose=False,
+                )
+                if not selector is None:
+                    if not selector.contains(trace):
+                        continue
+                TRACES.addTrack(trace)
+                if verbose:
+                    print("File " + p
+                        + " loaded: \n"
+                        + (str)(trace.size())
+                        + " point(s) registered"
+                    )
+
+            return TRACES
+            
+        elif not os.path.isfile(path):
+            return None
 
         # -------------------------------------------------------
         # Infering file format from extension or name
@@ -202,61 +230,6 @@ class TrackReader:
 
         return track
 
-    @staticmethod
-    def readFromFiles(
-        pathdir,
-        id_E=-1,
-        id_N=-1,
-        id_U=-1,
-        id_T=-1,
-        separator=",",
-        DateIni=-1,
-        h=0,
-        com="#",
-        no_data_value=-999999,
-        srid="ENUCoords",
-        read_all=False,
-        verbose=False,
-        selector=None,
-    ):
-        """TODO"""
-
-        TRACES = TrackCollection()
-        LISTFILE = os.listdir(pathdir)
-        for f in LISTFILE:
-            p = pathdir + "/" + f
-            trace = TrackReader.readFromFile(
-                p,
-                id_E,
-                id_N,
-                id_U,
-                id_T,
-                separator,
-                DateIni,
-                h,
-                com,
-                no_data_value,
-                srid,
-                read_all,
-                verbose=False,
-            )
-            if not selector is None:
-                if not selector.contains(trace):
-                    continue
-            TRACES.addTrack(trace)
-            if verbose:
-                print(
-                    "File "
-                    + p
-                    + " loaded: \n"
-                    + (str)(trace.size())
-                    + " point(s) registered"
-                )
-
-        return TRACES
-
-
-    
 
     NMEA_GGA = "GGA"
     NMEA_RMC = "RMC"
@@ -328,7 +301,15 @@ class TrackReader:
         Reads multiple tracks (one per line) from csv file.
         
         :param path: file or directory
-        
+        :param id_geom: index of the column that contains the geometry
+        :param id_user: index of the column that contains the id of the user of the track
+        :param id_track: index of the column that contains the id of the track
+        :param separator: separating characters
+        :param h: number of heading line
+        :param srid:  coordinate system of points ("ENU", "Geo" or "ECEF") 
+        :param bboxFilter
+        :param doublequote
+        :return TrackCollection
         """
 
         if separator == " ":
@@ -338,16 +319,13 @@ class TrackReader:
         TRACES = TrackCollection()
 
         with open(path, newline="") as csvfile:
-            spamreader = csv.reader(
-                csvfile, delimiter=separator, doublequote=doublequote
-            )
+            spamreader = csv.reader(csvfile, delimiter=separator, doublequote=doublequote)
 
             # Header
             for i in range(h):
                 next(spamreader)
 
             for fields in spamreader:
-
                 if len(fields) <= 0:
                     continue
 
@@ -404,7 +382,7 @@ class TrackReader:
 
                 TRACES.addTrack(track)
                 if verbose:
-                    print("Polygon", len(TRACES), "loaded")
+                    print(len(TRACES), " wkt tracks loaded")
 
         return TRACES
     
@@ -437,10 +415,12 @@ class TrackReader:
         TRACES = TrackCollection()
         
         if os.path.isdir(path):
-
             LISTFILE = os.listdir(path)
             for f in LISTFILE:
-                collection = TrackReader.readFromGpx(path + f)
+                if path[len(path)-1:] == '/':
+                    collection = TrackReader.readFromGpxFiles(path + f)
+                else:
+                    collection = TrackReader.readFromGpxFiles(path + '/' + f)
                 TRACES.addTrack(collection.getTrack(0))
             return TRACES
         

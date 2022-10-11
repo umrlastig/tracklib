@@ -20,7 +20,7 @@ class TestAlgoSegmentationMethods(unittest.TestCase):
     def testStopsAFaire(self):
         GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         #chemin = os.path.join(self.resource_path, './data/trace1.dat')
-        #trace = FileReader.readFromFile(chemin, 2, 3, -1, 4, separator=",")
+        #trace = FileReader.readFromCsvFiles(chemin, 2, 3, -1, 4, separator=",")
         
 
     def testFindStopsLocal(self):
