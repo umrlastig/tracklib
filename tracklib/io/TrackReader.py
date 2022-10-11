@@ -256,108 +256,7 @@ class TrackReader:
         return TRACES
 
 
-    @staticmethod
-    def readFromWKTFile(path, id_geom,
-        id_user=-1, id_track=-1,
-        separator=";", h=0, srid="ENUCoords",
-        bboxFilter=None,
-        doublequote=False,
-		verbose=False,
-    ):
-        """
-        
-        """
-
-        if separator == " ":
-            print("Error: separator must not be space for reading WKT file")
-            exit()
-
-        TRACES = TrackCollection()
-
-        with open(path, newline="") as csvfile:
-            spamreader = csv.reader(
-                csvfile, delimiter=separator, doublequote=doublequote
-            )
-
-            # Header
-            for i in range(h):
-                next(spamreader)
-
-            for fields in spamreader:
-
-                if len(fields) <= 0:
-                    continue
-
-                track = Track()
-                if id_user >= 0:
-                    track.uid = fields[id_user]
-                if id_track >= 0:
-                    track.tid = fields[id_track]
-
-                wkt = fields[id_geom]
-                if wkt[0:4] == "POLY":
-                    wkt = fields[id_geom].split("((")[1].split("))")[0]
-                    wkt = wkt.split(",")
-                elif wkt[0:4] == "LINE":
-                    wkt = fields[id_geom].split("(")[1].split(")")[0]
-                    wkt = wkt.split(",")
-                elif wkt[0:7] == "MULTIPO":
-                    wkt = fields[id_geom].split("((")[1].split("))")[0]
-                    wkt = wkt.split(",")
-                    if wkt[0] == "(":
-                        wkt = wkt[1:]
-                    wkt = wkt.split("),(")[0]  # Multipolygon not handled yet
-                else:
-                    print("this type of wkt is not yet implemented")
-
-                for s in wkt:
-                    sl = s.split(" ")
-                    x = float(sl[0])
-                    y = float(sl[1])
-                    if len(sl) == 3:
-                        z = float(sl[2])
-                    else:
-                        z = 0.0
-                    if not srid.upper() in [
-                        "ENUCOORDS",
-                        "ENU",
-                        "GEOCOORDS",
-                        "GEO",
-                        "ECEFCOORDS",
-                        "ECEF",
-                    ]:
-                        print("Error: unknown coordinate type [" + str(srid) + "]")
-                        exit()
-                    if srid.upper() in ["ENUCOORDS", "ENU"]:
-                        point = ENUCoords(x, y, z)
-                    if srid.upper() in ["GEOCOORDS", "GEO"]:
-                        point = GeoCoords(x, y, z)
-                    if srid.upper() in ["ECEFCOORDS", "ECEF"]:
-                        point = ECEFCoords(x, y, z)
-
-                    track.addObs(Obs(point, GPSTime()))
-
-                if not (bboxFilter is None):
-                    xmin = bboxFilter[0]
-                    ymin = bboxFilter[1]
-                    xmax = bboxFilter[2]
-                    ymax = bboxFilter[3]
-                    for j in range(len(track)):
-                        inside = True
-                        inside = inside & (track[j].position.getX() > xmin)
-                        inside = inside & (track[j].position.getY() > ymin)
-                        inside = inside & (track[j].position.getX() < xmax)
-                        inside = inside & (track[j].position.getY() < ymax)
-                        if not inside:
-                            break
-                    if not inside:
-                        continue
-
-                TRACES.addTrack(track)
-                if verbose:
-                    print("Polygon", len(TRACES), "loaded")
-
-        return TRACES
+    
 
     NMEA_GGA = "GGA"
     NMEA_RMC = "RMC"
@@ -418,6 +317,96 @@ class TrackReader:
                 track.setObsAnalyticalFeature("hdop", i, TMP_HDOP[i])
 
         return track
+    
+    
+    @staticmethod
+    def readFromWKTFile(path, 
+                        id_geom, id_user=-1, id_track=-1,
+                        separator=";", h=0, srid="ENUCoords",
+                        bboxFilter=None, doublequote=False, verbose=False):
+        """
+        Reads multiple tracks (one per line) from csv file.
+        
+        :param path: file or directory
+        
+        """
+
+        if separator == " ":
+            print("Error: separator must not be space for reading WKT file")
+            exit()
+
+        TRACES = TrackCollection()
+
+        with open(path, newline="") as csvfile:
+            spamreader = csv.reader(
+                csvfile, delimiter=separator, doublequote=doublequote
+            )
+
+            # Header
+            for i in range(h):
+                next(spamreader)
+
+            for fields in spamreader:
+
+                if len(fields) <= 0:
+                    continue
+
+                track = Track()
+                if id_user >= 0:
+                    track.uid = fields[id_user]
+                if id_track >= 0:
+                    track.tid = fields[id_track]
+
+                wkt = fields[id_geom]
+                if wkt[0:4] == "POLY":
+                    wkt = fields[id_geom].split("((")[1].split("))")[0]
+                    wkt = wkt.split(",")
+                elif wkt[0:4] == "LINE":
+                    wkt = fields[id_geom].split("(")[1].split(")")[0]
+                    wkt = wkt.split(",")
+                elif wkt[0:7] == "MULTIPO":
+                    wkt = fields[id_geom].split("((")[1].split("))")[0]
+                    wkt = wkt.split(",")
+                    if wkt[0] == "(":
+                        wkt = wkt[1:]
+                    wkt = wkt.split("),(")[0]  # Multipolygon not handled yet
+                else:
+                    print("this type of wkt is not yet implemented")
+
+                for s in wkt:
+                    sl = s.split(" ")
+                    x = float(sl[0])
+                    y = float(sl[1])
+                    if len(sl) == 3:
+                        z = float(sl[2])
+                    else:
+                        z = 0.0
+                        
+                    point = Obs(utils.makeCoords(x, y, z, srid.upper()), GPSTime())   
+                    track.addObs(point)
+                    
+
+                if not (bboxFilter is None):
+                    xmin = bboxFilter[0]
+                    ymin = bboxFilter[1]
+                    xmax = bboxFilter[2]
+                    ymax = bboxFilter[3]
+                    for j in range(len(track)):
+                        inside = True
+                        inside = inside & (track[j].position.getX() > xmin)
+                        inside = inside & (track[j].position.getY() > ymin)
+                        inside = inside & (track[j].position.getX() < xmax)
+                        inside = inside & (track[j].position.getY() < ymax)
+                        if not inside:
+                            break
+                    if not inside:
+                        continue
+
+                TRACES.addTrack(track)
+                if verbose:
+                    print("Polygon", len(TRACES), "loaded")
+
+        return TRACES
     
     
     @staticmethod

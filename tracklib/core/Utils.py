@@ -98,7 +98,9 @@ def makeCoords(x: float, y: float, z: float, srid: str) -> Union[ENUCoords, ECEF
         return GeoCoords(x, y, z)
     if srid.upper() in ["ECEFCOORDS", "ECEF"]:
         return ECEFCoords(x, y, z)
-
+    
+    print("Error: unknown coordinate type [" + str(srid) + "]")
+    exit()
 
 # --------------------------------------------------------------------------
 # Function to form distance matrix (old version)
