@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+
+# For type annotation
+from __future__ import annotations   
+from typing import Union, IO, Literal
+
 import csv
 import os
 from xml.dom import minidom
@@ -249,20 +255,18 @@ class TrackReader:
 
         return TRACES
 
+
     @staticmethod
-    def readFromWKTFile(
-        path,
-        id_geom,
-        id_user=-1,
-        id_track=-1,
-        separator=";",
-        h=0,
-        srid="ENUCoords",
+    def readFromWKTFile(path, id_geom,
+        id_user=-1, id_track=-1,
+        separator=";", h=0, srid="ENUCoords",
         bboxFilter=None,
         doublequote=False,
 		verbose=False,
     ):
-        """TODO"""
+        """
+        
+        """
 
         if separator == " ":
             print("Error: separator must not be space for reading WKT file")
@@ -417,88 +421,86 @@ class TrackReader:
     
     
     @staticmethod
-    def readFromGpx(path, srid="GEO"):
+    def readFromGpxFiles(path: IO, 
+                         srid:Literal["GEO", "ENU"] ="GEO", 
+                         type: Literal["trk", "rte"]="trk"):
         """
-Reads (multiple) tracks in a .gpx file.
-
-.. code-block:: python
+        Reads (multiple) tracks or routes from gpx file(s).
         
-   from tracklib.io.TrackReader import TrackReader
-   from tracklib.core.GPSTime import GPSTime
+        :param path: file or directory
+        :param srid of
+        :param type: may be “trk” to load track points or 
+                     “rte” to load vertex from the route
+        :return TrackCollection
+
+        .. code-block:: python
+        
+           from tracklib.io.TrackReader import TrackReader
+           from tracklib.core.GPSTime import GPSTime
    
-   GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2s1Z")
+           GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2s1Z")
 
-   tracks = TrackReader.readFromGpx('../../../data/activity_5807084803.gpx')
-   trace = tracks.getTrack(0)
+           tracks = TrackReader.readFromGpxFiles('../../../data/activity_5807084803.gpx')
+           trace = tracks.getTrack(0)
         
         """
-
-        tracks = TrackCollection()
-
-        format_old = GPSTime.getReadFormat()
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
-
-        doc = minidom.parse(path)
-        
-
-        trks = doc.getElementsByTagName("trk")
-
-        for trk in trks:
-            if os.path.basename(path).split(".")[0] != None:
-                trace = Track(track_id=os.path.basename(path).split(".")[0])
-            else:
-                trace = Track()
-            trkpts = trk.getElementsByTagName("trkpt")
-            for trkpt in trkpts:
-                lon = float(trkpt.attributes["lon"].value)
-                lat = float(trkpt.attributes["lat"].value)
-
-                hgt = utils.NAN
-                eles = trkpt.getElementsByTagName("ele")
-                if eles.length > 0:
-                    hgt = float(eles[0].firstChild.data)
-
-                time = ""
-                times = trkpt.getElementsByTagName("time")
-                if times.length > 0:
-                    time = GPSTime(times[0].firstChild.data)
-                else:
-                    time = GPSTime()
-
-                point = Obs(utils.makeCoords(lon, lat, hgt, srid), time)
-                trace.addObs(point)
-
-            tracks.addTrack(trace)
-
-        # pourquoi ?
-        # --> pour remettre le format comme il etait avant la lectre :)   
-        GPSTime.setReadFormat(format_old)
-
-        collection = TrackCollection(tracks)
-        return collection
-    
-    
-    @staticmethod
-    def readFromGpxFiles(pathdir, srid="GEO"):
-        '''
-        
-
-        Parameters
-        ----------
-        pathdir : TYPE
-            DESCRIPTION.
-        srid : TYPE, optional
-            DESCRIPTION. The default is "GEO".
-
-        Returns
-        -------
-        TRACES : TYPE
-            DESCRIPTION.
-
-        '''
+             
         TRACES = TrackCollection()
-        LISTFILE = os.listdir(pathdir)
-        for f in LISTFILE:
-            collection = TrackReader.readFromGpx(pathdir + f)
-            TRACES.addTrack(collection.getTrack(0))
-        return TRACES
+        
+        if os.path.isdir(path):
+
+            LISTFILE = os.listdir(path)
+            for f in LISTFILE:
+                collection = TrackReader.readFromGpx(path + f)
+                TRACES.addTrack(collection.getTrack(0))
+            return TRACES
+        
+        elif os.path.isfile(path):
+        
+            format_old = GPSTime.getReadFormat()
+            GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+    
+            doc = minidom.parse(path)
+            trks = doc.getElementsByTagName(type)
+
+            for trk in trks:
+                if os.path.basename(path).split(".")[0] != None:
+                    trace = Track(track_id=os.path.basename(path).split(".")[0])
+                else:
+                    trace = Track()
+                
+                trkpts = trk.getElementsByTagName(type + "pt")
+                for trkpt in trkpts:
+                    lon = float(trkpt.attributes["lon"].value)
+                    lat = float(trkpt.attributes["lat"].value)
+    
+                    hgt = -1 # TODO: utils.NAN
+                    eles = trkpt.getElementsByTagName("ele")
+                    if eles.length > 0:
+                        hgt = float(eles[0].firstChild.data)
+    
+                    time = ""
+                    times = trkpt.getElementsByTagName("time")
+                    if times.length > 0:
+                        time = GPSTime(times[0].firstChild.data)
+                    else:
+                        time = GPSTime()
+    
+                    point = Obs(utils.makeCoords(lon, lat, hgt, srid), time)
+                    trace.addObs(point)
+    
+                TRACES.addTrack(trace)
+
+            # pourquoi ?
+            # --> pour remettre le format comme il etait avant la lectre :)   
+            GPSTime.setReadFormat(format_old)
+    
+            collection = TrackCollection(TRACES)
+            return collection
+        
+        else:
+            return None
+    
+    
+    
+        

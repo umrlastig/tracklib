@@ -28,8 +28,8 @@ import tracklib.algo.Summarising as summ
 # ---------------------------------------------------
 GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
 resource_path = os.path.join(os.path.split(__file__)[0], "..")
-gpxpath = os.path.join(resource_path, 'data/activity_5807084803.gpx')
-tracks = GpxReader.readFromGpx(gpxpath)
+gpxpath = os.path.join(resource_path, 'data/gpx/activity_5807084803.gpx')
+tracks = GpxReader.readFromGpxFiles(gpxpath)
 trace = tracks.getTrack(0)
 
 # Transformation GEO coordinates to ENU

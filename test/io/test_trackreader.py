@@ -11,19 +11,18 @@ from tracklib.io.TrackReader import TrackReader
 
 class TestTrackReader(TestCase):
     
+    __epsilon = 1
+    
     def setUp (self):
         self.resource_path = os.path.join(os.path.split(__file__)[0], "../..")
 
     def test_read_wkt_polygon(self):
-        # =============================================================
         csvpath = os.path.join(self.resource_path, 'data/wkt/bati.wkt')
         TRACES = TrackReader.readFromWKTFile(csvpath, 0)
         self.assertIsInstance(TRACES, TrackCollection)
         self.assertEqual(2312, TRACES.size())
 
-
     def test_read_wkt_linestring(self):
-        # =============================================================
         csvpath = os.path.join(self.resource_path, 'data/wkt/iti.wkt')
         TRACES = TrackReader.readFromWKTFile(csvpath, 0, -1, -1, "#", 1, "ENUCoords", None, True)
         # id_user=-1, id_track=-1, separator=";", h=0, srid="ENUCoords", bboxFilter=None
@@ -31,22 +30,56 @@ class TestTrackReader(TestCase):
         self.assertEqual(3, TRACES.size())
         
 
-    def test_read_gpx(self):
-        path = os.path.join(self.resource_path, 'data/vincennes.gpx')
+    def test_read_gpx_enu_trk(self):
+        path = os.path.join(self.resource_path, 'data/gpx/vincennes.gpx')
         GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
-        tracks = TrackReader.readFromGpx(path, srid='ENU')
+        tracks = TrackReader.readFromGpxFiles(path, srid='ENU', type="trk")
         trace = tracks[0]
         self.assertEqual(5370, trace.size())
         self.assertIsInstance(trace, Track)
+        self.assertLessEqual(abs(trace.length() - 10139), self.__epsilon, "Longueur gpx enu")
+        
+    def test_read_default_gpx(self):
+        path = os.path.join(self.resource_path, 'data/gpx/activity_5807084803.gpx')
+        GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
+        tracks = TrackReader.readFromGpxFiles(path)
+        trace = tracks[0]
+        self.assertEqual(190, trace.size())
+        self.assertIsInstance(trace, Track)
+        self.assertLessEqual(abs(trace.length() - 2412), self.__epsilon, "Longueur gpx geo")
+        
+    def test_read_gpx_geo_trk(self):
+        path = os.path.join(self.resource_path, 'data/gpx/activity_5807084803.gpx')
+        GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
+        tracks = TrackReader.readFromGpxFiles(path, srid='GEO', type="trk")
+        trace = tracks[0]
+        self.assertEqual(190, trace.size())
+        self.assertIsInstance(trace, Track)
+        self.assertLessEqual(abs(trace.length() - 2412), self.__epsilon, "Longueur gpx geo")
 
-
+    def test_read_gpx_geo_rte(self):
+        path = os.path.join(self.resource_path, 'data/gpx/903313.gpx')
+        GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
+        tracks = TrackReader.readFromGpxFiles(path, srid='GEO', type='rte')
+        trace = tracks[0]
+        self.assertEqual(1275, trace.size())
+        self.assertIsInstance(trace, Track)
+        self.assertLessEqual(abs(trace.length() - 12848), self.__epsilon, "Longueur gpx geo")
 
 if __name__ == '__main__':
     #unittest.main()
     suite = TestSuite()
+    
+    # WKT
     suite.addTest(TestTrackReader("test_read_wkt_polygon"))
     suite.addTest(TestTrackReader("test_read_wkt_linestring"))
-    suite.addTest(TestTrackReader("test_read_gpx"))
+    
+    # GPX
+    suite.addTest(TestTrackReader("test_read_default_gpx"))
+    suite.addTest(TestTrackReader("test_read_gpx_enu_trk"))
+    suite.addTest(TestTrackReader("test_read_gpx_geo_trk"))
+    suite.addTest(TestTrackReader("test_read_gpx_geo_rte"))
+    
     runner = TextTestRunner()
     runner.run(suite)
 

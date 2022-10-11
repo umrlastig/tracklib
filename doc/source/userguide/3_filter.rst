@@ -4,8 +4,10 @@
 :Date: 09/04/2022
 
 
-Simplify, Interpolate, Filter & Smooth Tracks
-===============================================
+Simplify, Interpolate, Resample, Filter & Smooth Tracks
+========================================================
+
+Resample, interpolation and smoothing functions
 
 
 Simplification
