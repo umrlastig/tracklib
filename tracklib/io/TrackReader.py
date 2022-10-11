@@ -40,9 +40,52 @@ class TrackReader:
         verbose=False,
     ):
         """
-        The method assumes a single track in file.
-        If only path is provided as input parameters: file format is infered from extension according to file track_file_format
-        If only path and a string s parameters are provied, the name of file format is set equal to s.
+        - The method assumes a single track in file.
+        - If only path is provided as input parameters: file format is infered 
+          from extension according to file track_file_format
+        - If only path and a string s parameters are provied, 
+          the name of file format is set equal to s.
+        
+        Parameters
+        -----------
+        
+        path str
+            file or directory
+        id_E int
+            index (starts from 0) of column containing coordinate X (for ECEF), longitude (GEO) or E (ENU)
+            -1 if file format is used
+        id_N int
+            index (starts from 0) of column containing coordinate Y (for ECEF), latitude (GEO) or N (ENU)
+            -1 if file format is used
+        id_U int
+            index (starts from 0) of column containing Z (for ECEF), height or altitude (GEO/ENU)
+            -1 if file format is used
+        id_T int
+            index (starts from 0) of column containing timestamp (in seconds or in time_fmt format)
+            -1 if file format is used
+        separator car
+            separating characters
+        DateIni str
+            initial date (in time_fmt format) if timestamps are provided in seconds (-1 if not used)
+        h int
+            number of heading line
+        com str
+            comment character (lines starting with cmt on the top left are skipped)
+        no_data_value int
+            a special float or integer indicating that record is non-valid and should be skipped
+        srid str
+            coordinate system of points ("ENU", "Geo" or "ECEF") 
+        read_all bool
+            ?
+        selector xx
+            ?
+            
+        Returns
+        --------
+        
+        TrackCollection
+            collection of tracks contains in wkt file.
+            
         """
         
         TRACES = TrackCollection()
@@ -298,18 +341,35 @@ class TrackReader:
                         separator=";", h=0, srid="ENUCoords",
                         bboxFilter=None, doublequote=False, verbose=False):
         """
-        Reads multiple tracks (one per line) from csv file.
+        Reads multiple tracks (one per line) from a csv file.
         
-        :param path: file or directory
-        :param id_geom: index of the column that contains the geometry
-        :param id_user: index of the column that contains the id of the user of the track
-        :param id_track: index of the column that contains the id of the track
-        :param separator: separating characters
-        :param h: number of heading line
-        :param srid:  coordinate system of points ("ENU", "Geo" or "ECEF") 
-        :param bboxFilter
-        :param doublequote
-        :return TrackCollection
+        Parameters
+        -----------
+        
+        path str
+            file or directory
+        id_geom int
+            index of the column that contains the geometry
+        id_user int
+            index of the column that contains the id of the user of the track
+        id_track int
+            index of the column that contains the id of the track
+        separator car
+            separating characters
+        h int
+            number of heading line
+        srid str
+            coordinate system of points ("ENU", "Geo" or "ECEF") 
+        bboxFilter
+        
+        doublequote
+        
+        Returns
+        --------
+        
+        TrackCollection
+            collection of tracks contains in wkt file.
+        
         """
 
         if separator == " ":
@@ -394,11 +454,22 @@ class TrackReader:
         """
         Reads (multiple) tracks or routes from gpx file(s).
         
-        :param path: file or directory
-        :param srid of
-        :param type: may be “trk” to load track points or 
-                     “rte” to load vertex from the route
-        :return TrackCollection
+        Parameters
+        -----------
+        
+        path str
+            file or directory
+        srid str
+            coordinate system of points ("ENU", "Geo" or "ECEF") 
+        type str
+            may be “trk” to load track points or 
+                   “rte” to load vertex from the route
+                   
+        Returns
+        --------
+        
+        TrackCollection
+            collection of tracks contains in Gps files.
 
         .. code-block:: python
         
