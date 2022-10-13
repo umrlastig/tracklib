@@ -133,8 +133,8 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         
     def testCompare(self):
         a = Comparison.compare(self.trace1, self.trace2)
-        self.assertLessEqual(abs(a - 2.1036), self.__epsilon, "Comparaison")
-            
+        self.assertLessEqual(abs(a - 4.0280), self.__epsilon, "Comparaison")
+
 
     def testCentralTrack(self):
         TRACES = []

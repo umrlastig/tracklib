@@ -336,9 +336,7 @@ def synchronize(track1, track2):
 
     # Common time range
     tini = max(track1.getFirstObs().timestamp, track2.getFirstObs().timestamp)
-    print (tini)
     tfin = min(track1.getLastObs().timestamp, track2.getLastObs().timestamp)
-    print (tfin)
 
     # Sort list of timestamps
     sort_index = np.argsort(np.array(timestamps))
