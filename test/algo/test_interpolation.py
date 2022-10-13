@@ -29,13 +29,8 @@ from unittest import TestCase, TestSuite, TextTestRunner
 
 from tracklib.core.GPSTime import GPSTime
 from tracklib.io.TrackReader import TrackReader
-from tracklib.core.Kernel import DiracKernel
 from tracklib.core.Kernel import GaussianKernel
-from tracklib.core.Kernel import TriangularKernel
-from tracklib.core.Kernel import ExponentialKernel
-import tracklib.algo.Synthetics as Synthetics
 
-import tracklib.algo.Filtering as flt
 import tracklib.algo.Interpolation as itp
 
 
@@ -337,110 +332,13 @@ class TestInterpolation(TestCase):
  	
  	
      
-     # =========================================================================
-     # --------------------------------------------------------------------
-     # Lissage
-     # --------------------------------------------------------------------
-
-    def test22(self, sym = 'r-'):
-        '''
-        Filtrage par noyau fenetre glissante de taille 5
-        '''
-        self.track = flt.filter_seq(self.track, kernel=5, dim=flt.FILTER_XY)
-        self.view(self.track, sym)	
-	
-
-    def test23(self, sym = 'r-'):
-        '''
-        Filtrage par noyau 'user-defined'
-        '''
-        self.track = flt.filter_seq(self.track, kernel=[1,2,32,2,1], dim=["x","y"])
-        self.view(self.track, sym)	
+     
  	
 
-    def test24(self, sym = 'r-'):
-        '''
-        Filtrage par noyau 'user-defined' pour faire un filtre 'avance'
-        '''
-        self.track = flt.filter_seq(self.track, kernel=[0,0,1], dim=["y"])
-        self.view(self.track, sym)	
- 	
-
-    def test25(self, sym = 'r-'):
-        '''
-        Filtrage par noyau 'user-defined' pour faire un filtre 'retard'
-        '''
-        self.track = flt.filter_seq(self.track, kernel=[1,0,0], dim=["y"])
-        self.view(self.track, sym)	
- 	
-
-    def test26(self, sym = 'r-'):
-        '''
-        Filtrage par noyau gaussien
-        '''
-        self.track = self.track.copy()
-        self.track *= 10
-        self.track = flt.filter_seq(self.track, kernel=GaussianKernel(20), dim=flt.FILTER_XY)
-        self.view(self.track, sym)	
-
-
-    def test27(self, sym = 'r-'):
-        '''
-        Filtrage par noyau exponentiel
-        '''
-        self.track = self.track.copy()
-        self.track *= 10
-        self.track = flt.filter_seq(self.track, kernel=ExponentialKernel(20), dim=flt.FILTER_XY)
-        self.view(self.track, sym)	
-
-
-    def test28(self, sym = 'r-'):
-        '''
-        Filtrage par noyau triangulaire
-        '''
-        self.track = self.track.copy()
-        self.track *= 10
-        self.track = flt.filter_seq(self.track, kernel=TriangularKernel(20), dim=flt.FILTER_XY)
-        self.view(self.track, sym)	
- 	
-        
-    def test29(self, sym = 'r-'):
-         '''
-         Filtrage par noyau de Dirac (sans effet)
-         '''
-         self.track = self.track.copy()
-         self.track *= 10
-         self.track = flt.filter_seq(self.track, kernel=DiracKernel(), dim=flt.FILTER_XY)
-         self.view(self.track, sym)	
-
-
-    def test30(self, sym = 'r-'):
-        '''
-        Filtrage passe-bas par transformation de Fourier (frequence temporelle)
-        '''
-        self.track = flt.filter_freq(self.track, 1, mode=flt.FILTER_TEMPORAL, 
-                                     type=flt.FILTER_LOW_PASS, dim=flt.FILTER_XY)
-        self.view(self.track, sym)	
     
+
+
     
-    def test31(self, sym = 'r-'):
-        '''
-        Filtrage passe-bas par transformation de Fourier (frequence spatiale)
-        '''
-        self.track *= 10
-        self.track = flt.filter_freq(self.track, 0.03, 
-                                     mode=flt.FILTER_SPATIAL, 
-                                     type=flt.FILTER_LOW_PASS, 
-                                     dim=flt.FILTER_XY)
-        self.view(self.track, sym)	
-
-
-    def test32(self, sym = 'r-'):
-        '''
-        Filtrage de Kalman (50 cm sur le GPS / 2 m.s-1 sur la vitesse)
-        '''
-        self.track = flt.Kalman(self.track, 0.5, 2)
-        self.view(self.track, sym)	
     
     
 if __name__ == '__main__':
@@ -468,18 +366,6 @@ if __name__ == '__main__':
     suite.addTest(TestInterpolation("test19"))
     suite.addTest(TestInterpolation("test20"))
     suite.addTest(TestInterpolation("test21"))
-    
-    suite.addTest(TestInterpolation("test22"))
-    suite.addTest(TestInterpolation("test23"))
-    suite.addTest(TestInterpolation("test24"))
-    suite.addTest(TestInterpolation("test25"))
-    suite.addTest(TestInterpolation("test26"))
-    suite.addTest(TestInterpolation("test27"))
-    suite.addTest(TestInterpolation("test28"))
-    suite.addTest(TestInterpolation("test29"))
-    suite.addTest(TestInterpolation("test30"))
-    suite.addTest(TestInterpolation("test31"))
-    suite.addTest(TestInterpolation("test32"))
     
     runner = TextTestRunner()
     runner.run(suite)

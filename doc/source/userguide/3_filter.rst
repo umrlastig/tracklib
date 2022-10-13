@@ -1,20 +1,23 @@
 :Author: Yann Méneroux
+:Author: Marie-Dominique Van Damme
 :Version: 1.0
 :License: --
 :Date: 09/04/2022
 
 
-Simplify, Interpolate, Resample, Filter & Smooth Tracks
-========================================================
+Simplify, Interpolate & Filter Tracks
+======================================
 
-Resample, interpolation and smoothing functions
+... Resample, interpolation and smoothing functions (1ère page de la doc)
 
 
 Simplification
------------------
+---------------
+
+Reduce the number of observations in track (while preserving time stamps and other information), but in very different ways
 
 Tous les outils qui visent globalement à simplifier une trace pour la rendre moins volumineuse ou plus lisible visuellement. 
-La classe comprend donc entre autres les outils de généralisation. Ca correspond à ce que C. Plazannet appelle le filtrage.
+La classe comprend donc entre autres les outils de généralisation. 
 
 
 Interpolation 
@@ -29,6 +32,8 @@ Il peut s'agir des méthodes locales (e.g. interpolation linéaire, bézier) ou 
 
 Ces méthodes ne sont sensées conserver les AF qui pour un sous-échantillonnage strict. La porte porte d'entrée de base 
 des méthodes d'interpolation dans Track est la fonction resample. 
+
+
 
 
 Filtering 

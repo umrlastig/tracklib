@@ -1,4 +1,4 @@
-"""Class to manage comparisons of GPS tracks"""
+"""to manage comparisons of GPS tracks"""
 
 
 import sys

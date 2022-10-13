@@ -96,7 +96,7 @@ Among tracklib main functionalities
 
    ./userguide/1_coreconcept
    ./userguide/2_operator
-..   ./userguide/3_filter
+   ./userguide/3_filter
 ..   ./userguide/4_mapping
 
 .. toctree::
