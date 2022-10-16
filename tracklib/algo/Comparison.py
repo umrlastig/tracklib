@@ -268,3 +268,102 @@ def centralTrack(tracks: Union[TrackCollection, Iterable[Track]],
         central.toGeoCoords(base)
 
     return central
+
+
+def premiereComposanteHausdorff(track1, track2):
+    '''
+    Première composante de Hausdorff.
+
+    Parameters
+    ----------
+    track1 : Track
+        the first track
+    track2 : Track
+        the second track
+
+    Returns
+    -------
+    double
+        directed Hausdorff distance
+
+    '''
+    result = 0
+    for p in range(track1.size()):
+        point = track1.getObs(p)
+        distmin = track2.getFirstObs().distanceTo(point);
+        for i in range(0, track2.size()): 
+            obs2i = track2.getObs(i)
+            #obs2ip1 = track2.getObs(i+1)
+            #dist = dist_point_to_segment(point.position, [obs2i.position.getX(), obs2i.position.getY(), 
+            #                                     obs2ip1.position.getX(), obs2ip1.position.getY()])
+            dist = point.distanceTo(obs2i)
+            distmin = min(dist, distmin)
+        result = max(distmin, result)
+    return result
+  
+
+def hausdorff(track1, track2):
+    '''
+    General Hausdorff distance between two tracks.
+
+    Parameters
+    ----------
+    track1 : Track
+        the first track
+    track2 : Track
+        the second track
+
+    Returns
+    -------
+    double
+        Hausdorff distance
+
+    '''
+    return max(premiereComposanteHausdorff(track1, track2),
+        premiereComposanteHausdorff(track2, track1))
+
+
+def discreteFrechet(track1, track2):
+    
+    sizeP = track1.size()
+    sizeQ = track2.size()
+    
+    ca = []
+    for i in range(sizeP):
+        ca.append([])
+        for j in range(sizeQ):
+            ca[i].append(-1)
+    
+    d = discreteFrechetCouplingMeasure(track1, track2, sizeP - 1, sizeQ - 1, ca);
+    return d;
+
+
+def discreteFrechetCouplingMeasure(track1, track2, i, j, ca):
+    if ca[i][j] > -1:
+        return ca[i][j]
+
+    d = track1.getObs(i).distanceTo(track2.getObs(j))
+    if i == 0 and j == 0:
+        ca[i][j] = d
+        return d
+
+    if i > 0 and j == 0:
+       ca[i][j] = max(
+           discreteFrechetCouplingMeasure(track1, track2, i - 1, j, ca), d)
+       return ca[i][j]
+   
+    if i == 0 and j > 0:
+        ca[i][j] = max(discreteFrechetCouplingMeasure(track1, track2, i, j - 1, ca), d)
+        return ca[i][j]
+    
+    if i > 0 and j > 0:
+         ca[i][j] = max(
+           min(discreteFrechetCouplingMeasure(track1, track2, i - 1, j, ca), 
+               min(discreteFrechetCouplingMeasure(track1, track2, i - 1, j - 1, ca),
+                   discreteFrechetCouplingMeasure(track1, track2, i, j - 1, ca))), d)
+         return ca[i][j]
+
+    ca[i][j] = sys.float_info.max
+    return ca[i][j]
+
+

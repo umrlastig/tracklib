@@ -125,8 +125,6 @@ def makeDistanceMatrixOld(T1, T2):
 
     return np.sqrt((T1**2).reshape(-1, 1) + (T2**2) - 2 * (T1.reshape(-1, 1)*T2.T))
     
-
-
 def makeDistanceMatrix(track, mode = 'linear'):
     """Function to form distance matrix
 

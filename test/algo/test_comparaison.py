@@ -170,6 +170,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         Comparison.plotDifferenceProfile(profile, self.trace2)
         plt.show()
         
+        
     def testDifference21ProfileDTW(self):
         profile = Comparison.differenceProfile(self.trace2, self.trace1, 
                                                mode = "DTW", p=2)
@@ -178,6 +179,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         Comparison.plotDifferenceProfile(profile, self.trace1)
         plt.show()
     
+    
     def testDifference21ProfileFDTW(self):
         profile = Comparison.differenceProfile(self.trace2, self.trace1, 
                                                mode = "FDTW", p=2)
@@ -185,6 +187,82 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         self.trace2.plot('r-')
         Comparison.plotDifferenceProfile(profile, self.trace1)
         plt.show()
+        
+        
+    def testHausdorffSimilarity(self):
+        trackA = Track.Track([], 1)
+        c = Coords.ENUCoords(1.0, 0.0, 0)
+        p = Obs.Obs(c, GPSTime.GPSTime())
+        trackA.addObs(p)
+        c = Coords.ENUCoords(0.0, 1.0, 0)
+        p = Obs.Obs(c, GPSTime.GPSTime())
+        trackA.addObs(p)
+        c = Coords.ENUCoords(-1.0, 0.0, 0)
+        p = Obs.Obs(c, GPSTime.GPSTime())
+        trackA.addObs(p)
+        c = Coords.ENUCoords(0.0, -1.0, 0)
+        p = Obs.Obs(c, GPSTime.GPSTime())
+        trackA.addObs(p)
+
+        trackB = Track.Track([], 1)
+        c = Coords.ENUCoords(2.0, 0.0, 0)
+        p = Obs.Obs(c, GPSTime.GPSTime())
+        trackB.addObs(p)
+        c = Coords.ENUCoords(0.0, 2.0, 0)
+        p = Obs.Obs(c, GPSTime.GPSTime())
+        trackB.addObs(p)
+        c = Coords.ENUCoords(-2.0, 0.0, 0)
+        p = Obs.Obs(c, GPSTime.GPSTime())
+        trackB.addObs(p)
+        c = Coords.ENUCoords(0.0, -4.0, 0)
+        p = Obs.Obs(c, GPSTime.GPSTime())
+        trackB.addObs(p)
+
+        dAB = Comparison.premiereComposanteHausdorff(trackA, trackB)
+        dBA = Comparison.premiereComposanteHausdorff(trackB, trackA)
+        
+        import numpy as np
+        from scipy.spatial.distance import directed_hausdorff
+        u = np.array([(1.0, 0.0), (0.0, 1.0), (-1.0, 0.0), (0.0, -1.0)])
+        v = np.array([(2.0, 0.0), (0.0, 2.0), (-2.0, 0.0), (0.0, -4.0)])
+        
+        duv = directed_hausdorff(u, v)[0]
+        dvu = directed_hausdorff(v, u)[0]
+        
+        self.assertEqual(dAB, duv)
+        self.assertEqual(dBA, dvu)
+        self.assertEqual(Comparison.hausdorff(trackA, trackB), 
+                         max(directed_hausdorff(u, v)[0], directed_hausdorff(v, u)[0]))
+        
+    def testFrechetSimilarity(self):
+        trackA = Track.Track([], 1)
+        c = Coords.ENUCoords(2.0, 1.0, 0)
+        p = Obs.Obs(c, GPSTime.GPSTime())
+        trackA.addObs(p)
+        c = Coords.ENUCoords(3.0, 1.0, 0)
+        p = Obs.Obs(c, GPSTime.GPSTime())
+        trackA.addObs(p)
+        c = Coords.ENUCoords(4.0, 2.0, 0)
+        p = Obs.Obs(c, GPSTime.GPSTime())
+        trackA.addObs(p)
+        c = Coords.ENUCoords(5.0, 1.0, 0)
+        p = Obs.Obs(c, GPSTime.GPSTime())
+        trackA.addObs(p)
+
+        trackB = Track.Track([], 1)
+        c = Coords.ENUCoords(2.0, 0.0, 0)
+        p = Obs.Obs(c, GPSTime.GPSTime())
+        trackB.addObs(p)
+        c = Coords.ENUCoords(3.0, 0.0, 0)
+        p = Obs.Obs(c, GPSTime.GPSTime())
+        trackB.addObs(p)
+        c = Coords.ENUCoords(4.0, 0.0, 0)
+        p = Obs.Obs(c, GPSTime.GPSTime())
+        trackB.addObs(p)
+
+        self.assertEqual(Comparison.discreteFrechet(trackA, trackB), 2.0)
+        
+
 
     
 if __name__ == '__main__':
@@ -195,6 +273,8 @@ if __name__ == '__main__':
     suite.addTest(TestAlgoComparaisonMethods("testDifference12ProfileNN"))
     suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileDTW"))
     suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileFDTW"))
+    suite.addTest(TestAlgoComparaisonMethods("testHausdorffSimilarity"))
+    suite.addTest(TestAlgoComparaisonMethods("testFrechetSimilarity"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

@@ -335,8 +335,6 @@ class ExperimentalKernel:
         :param method: TODO
         :param r: TODO
         """
-        import tracklib.algo.Comparison as Comparison
-
         self.dmax = dmax
         self.method = method
         if r is None:
@@ -406,7 +404,7 @@ class ExperimentalKernel:
     def plot(self, sym="k+"):
         """Plot the kernel"""
         gamma = self.__getGamma()
-        N = len(gamma)
+        # N = len(gamma)
         x = [i * (-1) for i in list(reversed(self.H))] + self.H
         y = list(reversed(gamma)) + gamma
         y = (np.max(y) - y)/np.max(y)
