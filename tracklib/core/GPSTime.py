@@ -3,14 +3,14 @@ This module contains the class to manage timestamps
 """
 # For type annotation
 from __future__ import annotations   
-from typing import Union
+# from typing import Union
 
 import copy
 import random
 
 
 class GPSTime:
-    """Class to reprent a GPS time"""
+    """Class to represent a GPS time"""
 
     BASE_YEAR = 2000
     
@@ -29,42 +29,25 @@ class GPSTime:
 
     __fmt_nd = ["{:01d}", "{:02d}", "{:03d}", "{:04d}"]
     __codes = [
-        "1D",
-        "2D",
-        "1M",
-        "2M",
-        "2Y",
-        "4Y",
-        "1h",
-        "2h",
-        "1m",
-        "2m",
-        "1s",
-        "2s",
-        "1z",
-        "2z",
-        "3z",
+        "1D", "2D",
+        "1M", "2M",
+        "2Y", "4Y",
+        "1h", "2h",
+        "1m", "2m",
+        "1s", "2s",
+        "1z", "2z", "3z",
     ]
 
     __day_per_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
     __month_names = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
     ]
     __day_names = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
     __day_of_base_date = 3  # Thu 01/01/1970
+    
 
     def __init__(self, year: int = 1970, month: int = 1, day: int = 1, hour: int = 0, min: int = 0, sec: int = 0, ms: int = 0, zone: int = 0):
         """__init__ Constructor of :class:`GPSTime` class

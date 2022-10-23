@@ -22,6 +22,13 @@ class TestGPSTime(unittest.TestCase):
         t = GPSTime.readTimestamp(madate)
         self.assertEqual("31/01/2018 11:17:46", str(t)[0:19])
         
+        # GPSTime.setReadFormat("2s")
+        # madate = '1345841684000'
+        # t = GPSTime.readTimestamp(madate)
+        # print (t)
+        
+    def test_readunixtime(self):
+        
         d = GPSTime.readUnixTime(1550941038.0)
         self.assertIsInstance(d, GPSTime)
         self.assertEqual('23/02/2019 16:57:18', str(d)[0:19])
@@ -37,5 +44,6 @@ if __name__ == '__main__':
     #unittest.main()
     suite = unittest.TestSuite()
     suite.addTest(TestGPSTime("test_format_time"))
+    suite.addTest(TestGPSTime("test_readunixtime"))
     runner = unittest.TextTestRunner()
     runner.run(suite)

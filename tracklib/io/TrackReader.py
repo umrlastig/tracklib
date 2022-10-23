@@ -82,10 +82,27 @@ class TrackReader:
             
         Returns
         --------
-        
         TrackCollection
             collection of tracks contains in wkt file.
+
             
+        Examples
+        ---------
+        
+        1. Timestamp is in seconds
+        
+        .. code-block:: python
+        
+           PATH = '/home/marie-dominique/tracklib/cotation/mopsi/routes/4'
+           GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+           date = '1970-01-01 00:00:00'
+           collection = reader.readFromCsvFiles(path=PATH, id_E=1, id_N=0, id_T=2, 
+                                                DateIni = GPSTime.readTimestamp(madate),
+                                                separator= ' ')
+           print ('Number of tracks: ' + str(collection.size()))
+        
+        2. xxx
+        
         """
         
         TRACES = TrackCollection()
