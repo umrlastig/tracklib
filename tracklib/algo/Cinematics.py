@@ -32,7 +32,9 @@ def smoothed_speed_calculation(track, width):
     :param width: TODO
     :return: TODO
     """
-    S = track.compute_abscurv()
+    
+    computeAbsCurv(track)
+    S = track.getAbsCurv()
     track.estimate_speed()
 
     if track.size() < width:

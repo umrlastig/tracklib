@@ -11,6 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import tracklib.util.Geometry as Geometry
+import tracklib.algo.Cinematics as Cinematics
 import tracklib.algo.Dynamics as Dynamics
 
 from tracklib.core.Obs import Obs
@@ -273,8 +274,10 @@ def mapOn(
                 track_copy.translate(init[2, 0], init[3, 0])
 
             # Match data by rough scale factor
-            track_copy.compute_abscurv()
-            reference.compute_abscurv()
+            Cinematics.computeAbsCurv(track_copy)
+            #track_copy.compute_abscurv()
+            Cinematics.computeAbsCurv(reference)
+            #reference.compute_abscurv()
             track_copy.operate(Operator.DIFFERENTIATOR, "abs_curv", "ds")
             reference.operate(Operator.DIFFERENTIATOR, "abs_curv", "ds")
             f = reference.operate(Operator.AVERAGER, "ds") / track_copy.operate(

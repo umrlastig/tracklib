@@ -12,6 +12,7 @@ from tracklib.core.TrackCollection import TrackCollection
 import tracklib.core.Utils as utils
 import tracklib.core.Kernel as Kernel
 
+import tracklib.algo.Cinematics as Cinematics
 from tracklib.algo.Interpolation import (
     gaussian_process as interpolation_gaussian_process,
 )
@@ -208,7 +209,8 @@ def noise(
         )
 
     N = track.size()
-    track.compute_abscurv()
+    #track.compute_abscurv()
+    Cinematics.computeAbsCurv(track)
 
     noised_track = track.copy()
 

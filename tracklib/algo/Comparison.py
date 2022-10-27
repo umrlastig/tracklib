@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from tracklib.core.TrackCollection import TrackCollection
 from tracklib.core.Track import Track
 
+import tracklib.algo.Cinematics as Cinematics
 import tracklib.algo.Dynamics as Dynamics
 import tracklib.algo.Interpolation as Interpolation
 
@@ -65,14 +66,17 @@ def differenceProfile(track1, track2, mode: Literal["NN", "DTW", "FDTW"] = "NN",
     :param ends: TODO
     :param p: TODO
     :param verbose: Verbose mode
+    
     :return: A track objet, with an analytical feature diff containing shortest distance
              of each point of track t1, to the points of track t2. We may get profile as
              a list with :func:`output.getAbsCurv()` and
-             :func:`output.getAnalyticalFeature("diff")` The selected candidate in
-             registerd in AF "pair" Set "ends" parameter to True to force end points to
+             :func:`output.getAnalyticalFeature("diff")` 
+             The selected candidate in registerd in AF "pair" 
+             Set "ends" parameter to True to force end points to
              meet p is Minkowski's exponent for distance computation. Default value is
-             1 for summation of distances, 2 for least squares solution and 10 for an
-             approximation of Frechet solution.
+             - 1 for summation of distances, 
+             - 2 for least squares solution 
+             - and 10 for an approximation of Frechet solution.
     """
 
     output = track1.copy()
@@ -180,7 +184,7 @@ def differenceProfile(track1, track2, mode: Literal["NN", "DTW", "FDTW"] = "NN",
 
         __fillAFProfile(track1, track2, output, output["hmm_inference"])
 
-    output.compute_abscurv()
+    Cinematics.computeAbsCurv(output)
     return output
 
 
@@ -367,3 +371,36 @@ def discreteFrechetCouplingMeasure(track1, track2, i, j, ca):
     return ca[i][j]
 
 
+def medoid (tracks: Union[TrackCollection, Iterable[Track]], 
+                 mode: Literal["Hausdorff"] = "Hausdorff", verbose: bool = True) -> Track: 
+    
+    tracks = tracks.copy()
+
+    if isinstance(tracks, list):
+        tracks = TrackCollection(tracks)
+    base = tracks.toENUCoordsIfNeeded()
+    medoid = tracks[0].copy() 
+    
+    for i in range(1, len(tracks)):
+        
+        for j in range(len(medoid)):
+            d = 0
+            
+        #diff = differenceProfile(tracks[0], tracks[i], mode=mode, verbose=verbose)
+
+        #for j in range(len(medoid)):
+            #dx = tracks[i][diff["pair", j]].position.getX()
+            #dy = tracks[i][diff["pair", j]].position.getY()
+            #dz = tracks[i][diff["pair", j]].position.getZ()
+            #medoid[j].position.translate(dx, dy, dz)
+
+    #for j in range(len(medoid)):
+    #    medoid[j].position.scale(1.0 / len(tracks))
+        
+    
+    
+    if not base is None:
+        medoid.toGeoCoords(base)
+    
+    return medoid
+    

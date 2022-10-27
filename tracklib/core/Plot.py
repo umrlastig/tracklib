@@ -280,7 +280,8 @@ class Plot:
 
         axe1 = nomaxes[0]
         if axe1 == "SPATIAL":
-            X = self.track.compute_abscurv()
+            computeAbsCurv(self.track)
+            X = self.track.getAbsCurv()
             xmin = self.track.operate(Operator.Operator.MIN, "abs_curv")
             xmax = self.track.operate(Operator.Operator.MAX, "abs_curv")
             xtitle = "curvilinear abscissa"

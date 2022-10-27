@@ -661,8 +661,9 @@ class Track:
     # positions. Timestamps are reinterpolated
     # -----------------------------------------------------
     def removeTpsDup(self, et = 1e-3):
-
-        self.compute_abscurv()
+        from tracklib.algo.Cinematics import computeAbsCurv
+        
+        computeAbsCurv(self)
         new_track = Track()
         for i in range(len(self)):
             enu = ENUCoords(self["t", i], 0, 0)
@@ -1453,13 +1454,13 @@ class Track:
             sys.exit("Error: 'estimate_speed' has not been called yet")
 
     # DEPRECATED
-    def compute_abscurv(self):
-        """
-        Compute and return curvilinear abscissa for each points
-        """
-        from tracklib.algo.Cinematics import computeAbsCurv
+    # def compute_abscurv(self):
+    #     """
+    #     Compute and return curvilinear abscissa for each points
+    #     """
+    #     from tracklib.algo.Cinematics import computeAbsCurv
 
-        return computeAbsCurv(self)
+    #     return computeAbsCurv(self)
 
     def getAbsCurv(self):
         """TODO"""

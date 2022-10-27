@@ -136,23 +136,6 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         self.assertLessEqual(abs(a - 4.0280), self.__epsilon, "Comparaison")
 
 
-    def testCentralTrack(self):
-        TRACES = []
-        TRACES.append(self.trace1)
-        TRACES.append(self.trace2)
-        collection = TrackCollection.TrackCollection(TRACES)
-        self.plot()
-        
-        central = Comparison.centralTrack(collection)
-        
-        central.plot()
-        central.plotAsMarkers(frg="k", bkg="w", sym_frg=" ", sym_bkg="o")
-        
-        plt.xlim([0, 14])
-        plt.ylim([-1, 7])
-        plt.show()        
-        
-        
     def testDifference21ProfileNN(self):
         profile = Comparison.differenceProfile(self.trace2, self.trace1, 
                                                mode = "NN", p=2)
@@ -262,19 +245,65 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
 
         self.assertEqual(Comparison.discreteFrechet(trackA, trackB), 2.0)
         
+    
+    def testCentralNNTrack(self):
+        TRACES = []
+        TRACES.append(self.trace1)
+        TRACES.append(self.trace2)
+        collection = TrackCollection.TrackCollection(TRACES)
+        self.plot()
+        
+        central = Comparison.centralTrack(collection)
+        
+        central.plot()
+        central.plotAsMarkers(frg="k", bkg="w", sym_frg=" ", sym_bkg="o")
+        
+        plt.title('central NN')
+        plt.xlim([0, 14])
+        plt.ylim([-1, 7])
+        plt.show()        
+        
+        
+    def testCentralDTWTrack(self):
+        TRACES = []
+        TRACES.append(self.trace1)
+        TRACES.append(self.trace2)
+        collection = TrackCollection.TrackCollection(TRACES)
+        self.plot()
+        
+        central = Comparison.centralTrack(collection, mode = "DTW")
+        
+        central.plot()
+        central.plotAsMarkers(frg="k", bkg="w", sym_frg=" ", sym_bkg="o")
+        
+        plt.title('central DTW')
+        plt.xlim([0, 14])
+        plt.ylim([-1, 7])
+        plt.show()   
 
+    
+    def testMedoidHausdorffTrack(self):
+        TRACES = []
+        TRACES.append(self.trace1)
+        TRACES.append(self.trace2)
+        collection = TrackCollection.TrackCollection(TRACES)
+        self.plot()
+        
+        medoid = Comparison.medoid(collection, mode = "Hausdorff")
 
     
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    suite.addTest(TestAlgoComparaisonMethods("testCompare"))
-    suite.addTest(TestAlgoComparaisonMethods("testCentralTrack"))
-    suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileNN"))
-    suite.addTest(TestAlgoComparaisonMethods("testDifference12ProfileNN"))
-    suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileDTW"))
-    suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileFDTW"))
-    suite.addTest(TestAlgoComparaisonMethods("testHausdorffSimilarity"))
-    suite.addTest(TestAlgoComparaisonMethods("testFrechetSimilarity"))
+    #suite.addTest(TestAlgoComparaisonMethods("testCompare"))
+    #suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileNN"))
+    #suite.addTest(TestAlgoComparaisonMethods("testDifference12ProfileNN"))
+    #suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileDTW"))
+    #suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileFDTW"))
+    #suite.addTest(TestAlgoComparaisonMethods("testHausdorffSimilarity"))
+    #suite.addTest(TestAlgoComparaisonMethods("testFrechetSimilarity"))
+    suite.addTest(TestAlgoComparaisonMethods("testCentralNNTrack"))
+    suite.addTest(TestAlgoComparaisonMethods("testCentralDTWTrack"))
+    #suite.addTest(TestAlgoComparaisonMethods("testMedoidHausdorffTrack"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
