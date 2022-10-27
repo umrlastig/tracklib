@@ -1453,12 +1453,13 @@ class Track:
             sys.exit("Error: 'estimate_speed' has not been called yet")
 
     # DEPRECATED
-    # def compute_abscurv(self):
-    #     """
-    #     Compute and return curvilinear abscissa for each points
-    #     """
-    #     from tracklib.algo.Cinematics import computeAbsCurv
-    #     return computeAbsCurv(self)
+    def compute_abscurv(self):
+        """
+        Compute and return curvilinear abscissa for each points
+        """
+        from tracklib.algo.Cinematics import computeAbsCurv
+
+        return computeAbsCurv(self)
 
     def getAbsCurv(self):
         """TODO"""

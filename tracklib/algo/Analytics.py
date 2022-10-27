@@ -41,9 +41,9 @@ def abs_curv(track, i):
     Parameters
     ----------
     track : Track
-        curvilinear abscissa.
+        trace on which the computation of curvilinear abscissa is done
     i : int
-        th observation.
+        i-th observation
 
     Returns
     -------
@@ -60,7 +60,23 @@ def abs_curv(track, i):
 
 
 def heading(track, i):
-    """TODO"""
+    """
+    Heading is the direction track is pointed in
+
+    Parameters
+    ----------
+    track : Track
+        trace on which the computation of heading is done.
+    i : int
+        i-th observation
+
+    Returns
+    -------
+    float
+        heading of the i-th observation of the track.
+
+    """
+    
     if i == len(track):
         return heading(track, i - 1)
     return track.getObs(i).position.azimuthTo(track.getObs(i - 1).position)

@@ -4,6 +4,7 @@
 import unittest
 
 import math
+
 from tracklib.core import (Coords, Obs, Track, GPSTime)
 import tracklib.algo.Analytics as Analytics
 import tracklib.core.Utils as utils
@@ -75,6 +76,20 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
 		
     def testDS(self):
         self.assertLessEqual(3, 5)
+        
+    def testHeading(self):
+        self.trace1.addAnalyticalFeature(Analytics.heading)
+        
+        s0 = self.trace1.getObsAnalyticalFeature('heading', 0)
+        self.assertTrue(math.isnan(s0), 's0 is nan')
+        
+        s1 = self.trace1.getObsAnalyticalFeature('heading', 1)
+        self.assertTrue(s1, math.atan2(10-0, 0-0))
+        
+        s6 = self.trace1.getObsAnalyticalFeature('heading', 6)
+        self.assertTrue(s1, math.atan2(0, 10))
+        s7 = self.trace1.getObsAnalyticalFeature('heading', 7)
+        self.assertTrue(s7, s6)
     
     def testAbsCurv(self):
         
@@ -229,11 +244,12 @@ if __name__ == '__main__':
     suite = unittest.TestSuite()
     #suite.addTest(TestAlgoAnalyticsMethods("testDS"))
     suite.addTest(TestAlgoAnalyticsMethods("testAbsCurv"))
-#    suite.addTest(TestAlgoAnalyticsMethods("testSpeed"))
-#    suite.addTest(TestAlgoAnalyticsMethods("testAcceleration"))
-#    suite.addTest(TestAlgoAnalyticsMethods("testAngleGeom"))
-#    suite.addTest(TestAlgoAnalyticsMethods("testCalculAngleOriente"))
-#    suite.addTest(TestAlgoAnalyticsMethods("testOrientation"))
+    suite.addTest(TestAlgoAnalyticsMethods("testHeading"))
+    suite.addTest(TestAlgoAnalyticsMethods("testSpeed"))
+    suite.addTest(TestAlgoAnalyticsMethods("testAcceleration"))
+    suite.addTest(TestAlgoAnalyticsMethods("testAngleGeom"))
+    suite.addTest(TestAlgoAnalyticsMethods("testCalculAngleOriente"))
+    suite.addTest(TestAlgoAnalyticsMethods("testOrientation"))
     #suite.addTest(TestAlgoAnalyticsMethods("testStopPointWithAccelerationCriteria"))
     #suite.addTest(TestAlgoAnalyticsMethods("testStopPointWithTimeWindowCriteria"))
     
