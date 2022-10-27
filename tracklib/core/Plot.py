@@ -11,8 +11,8 @@ from PIL import Image
 import sys
 
 from tracklib.algo.Analytics import BIAF_ABS_CURV
+from tracklib.algo.Cinematics import computeAbsCurv
 import tracklib.core.Utils as utils
-
 
 # MODE_REPRESENT_TRACK2D = 1
 # MODE_REPRESENT_SPEED_PROFIL = 2
@@ -36,7 +36,9 @@ MARKERS_TYPE_INTERDICTION = 6
 
 
 class Plot:
-    """TODO"""
+    """
+    This module contains the class to plot GPS tracks and its AF
+    """
 
     def __init__(self, track):
         """TODO"""
@@ -181,17 +183,18 @@ class Plot:
 
 
     def plotAnalyticalFeature(self, af_name, template="BOXPLOT"):
-        """TODO
-
+        """
         Plot AF values by abcisse curvilign.
         """
+        
         if not self.track.hasAnalyticalFeature(BIAF_ABS_CURV):
-            self.track.compute_abscurv()
+            computeAbsCurv(self.track)
 
         if template == 'BOXPLOT':
             self.__plotBoxplot(af_name)
         else:
             self.__plotAF(af_name)
+            
 
     def __plotBoxplot(self, af_name):
         """TODO"""
@@ -370,6 +373,7 @@ class Plot:
             "b-",
             markersize=2.5,
         )
+
 
 
 def plotOnImage(track, image_path, sym="r.", markersize=1):
