@@ -42,13 +42,13 @@ def abs_curv(track, i):
     ----------
     track : Track
         curvilinear abscissa.
-    i : TYPE
-        DESCRIPTION.
+    i : int
+        th observation.
 
     Returns
     -------
-    S : TYPE
-        DESCRIPTION.
+    S : list
+        curvilinear abscissa for each observations.
 
     """
     

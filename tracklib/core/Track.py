@@ -1458,7 +1458,6 @@ class Track:
     #     Compute and return curvilinear abscissa for each points
     #     """
     #     from tracklib.algo.Cinematics import computeAbsCurv
-
     #     return computeAbsCurv(self)
 
     def getAbsCurv(self):

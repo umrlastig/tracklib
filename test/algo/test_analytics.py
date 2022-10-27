@@ -77,6 +77,7 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
         self.assertLessEqual(3, 5)
     
     def testAbsCurv(self):
+        
         self.trace1.addAnalyticalFeature(Analytics.abs_curv)
         s1 = self.trace1.getObsAnalyticalFeature('abs_curv', 3)
         self.assertEqual(s1, [0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 65.0])
