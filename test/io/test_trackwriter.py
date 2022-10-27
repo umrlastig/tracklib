@@ -9,6 +9,7 @@ from tracklib.core.Track import Track
 from tracklib.core.GPSTime import GPSTime
 from tracklib.io.TrackWriter import TrackWriter
 from tracklib.algo import Analytics
+import tracklib.algo.Cinematics as Cinematics
 
 
 class TestTrackWriter(TestCase):
@@ -52,7 +53,7 @@ class TestTrackWriter(TestCase):
         track.addObs(p5)
         
         track.addAnalyticalFeature(Analytics.speed)
-        track.compute_abscurv()
+        Cinematics.computeAbsCurv(track)
         
         csvpath = os.path.join(self.resource_path, 'data/test/test_write_csv_2AF.wkt')
         af_names = ['speed', 'abs_curv']
@@ -86,7 +87,7 @@ class TestTrackWriter(TestCase):
         track.addObs(p5)
         
         track.addAnalyticalFeature(Analytics.speed)
-        track.compute_abscurv()
+        Cinematics.computeAbsCurv(track)
         
         csvpath = os.path.join(self.resource_path, 'data/test/test_write_csv_2AF_desordre.wkt')
         af_names = ['speed', 'abs_curv']

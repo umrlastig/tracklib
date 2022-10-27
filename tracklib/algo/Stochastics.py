@@ -209,7 +209,6 @@ def noise(
         )
 
     N = track.size()
-    #track.compute_abscurv()
     Cinematics.computeAbsCurv(track)
 
     noised_track = track.copy()

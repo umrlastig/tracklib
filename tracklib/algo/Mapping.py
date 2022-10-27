@@ -275,9 +275,7 @@ def mapOn(
 
             # Match data by rough scale factor
             Cinematics.computeAbsCurv(track_copy)
-            #track_copy.compute_abscurv()
             Cinematics.computeAbsCurv(reference)
-            #reference.compute_abscurv()
             track_copy.operate(Operator.DIFFERENTIATOR, "abs_curv", "ds")
             reference.operate(Operator.DIFFERENTIATOR, "abs_curv", "ds")
             f = reference.operate(Operator.AVERAGER, "ds") / track_copy.operate(

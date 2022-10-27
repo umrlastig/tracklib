@@ -4,6 +4,7 @@
 import unittest
 
 from tracklib.core import (GPSTime, Coords, Obs, Track)
+import tracklib.algo.Cinematics as Cinematics
 import tracklib.core.Utils as Utils
 
 class TestUtils(unittest.TestCase):
@@ -24,7 +25,7 @@ class TestUtils(unittest.TestCase):
         p3 = Obs.Obs(c3, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:10"))
         self.trace1.addObs(p3)
         
-        self.trace1.compute_abscurv()
+        Cinematics.computeAbsCurv(self.trace1)
     
     
     def testMakeDistanceMatrixModeLinear(self):

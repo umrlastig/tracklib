@@ -10,6 +10,7 @@ import random
 import unittest
 
 import tracklib.algo.Analytics as algo
+import tracklib.algo.Cinematics as Cinematics
 from tracklib.core.GPSTime import GPSTime
 from tracklib.core.Operator import Operator
 from tracklib.core.Kernel import GaussianKernel
@@ -60,10 +61,11 @@ class TestOperateurMethods(unittest.TestCase):
         if len(TRACES) > 0:
             trace = TRACES[1]
             # trace.summary()
-            trace.compute_abscurv()
+            Cinematics.computeAbsCurv(trace)
             
             trace.resample(3, interpolation.MODE_SPATIAL)
-            Sigma = trace.compute_abscurv()
+            Cinematics.computeAbsCurv(trace)
+            Sigma = trace.getAbsCurv()
             trace.estimate_speed()
             Speed = trace.getAnalyticalFeature('speed')
             #print (Speed)
