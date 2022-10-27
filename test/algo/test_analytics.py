@@ -77,7 +77,13 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
         self.assertLessEqual(3, 5)
     
     def testAbsCurv(self):
-        self.assertLessEqual(3, 5)
+        self.trace1.addAnalyticalFeature(Analytics.abs_curv)
+        s1 = self.trace1.getObsAnalyticalFeature('abs_curv', 3)
+        self.assertEqual(s1, [0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 65.0])
+        
+        self.trace2.addAnalyticalFeature(Analytics.abs_curv)
+        s2 = self.trace2.getObsAnalyticalFeature('abs_curv', 3)
+        self.assertEqual(s2, [0, 10.0, 10.0, 30.0])
         
     def testSpeed(self):
         
@@ -221,12 +227,12 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     #suite.addTest(TestAlgoAnalyticsMethods("testDS"))
-    #suite.addTest(TestAlgoAnalyticsMethods("testAbsCurv"))
-    suite.addTest(TestAlgoAnalyticsMethods("testSpeed"))
-    suite.addTest(TestAlgoAnalyticsMethods("testAcceleration"))
-    suite.addTest(TestAlgoAnalyticsMethods("testAngleGeom"))
-    suite.addTest(TestAlgoAnalyticsMethods("testCalculAngleOriente"))
-    suite.addTest(TestAlgoAnalyticsMethods("testOrientation"))
+    suite.addTest(TestAlgoAnalyticsMethods("testAbsCurv"))
+#    suite.addTest(TestAlgoAnalyticsMethods("testSpeed"))
+#    suite.addTest(TestAlgoAnalyticsMethods("testAcceleration"))
+#    suite.addTest(TestAlgoAnalyticsMethods("testAngleGeom"))
+#    suite.addTest(TestAlgoAnalyticsMethods("testCalculAngleOriente"))
+#    suite.addTest(TestAlgoAnalyticsMethods("testOrientation"))
     #suite.addTest(TestAlgoAnalyticsMethods("testStopPointWithAccelerationCriteria"))
     #suite.addTest(TestAlgoAnalyticsMethods("testStopPointWithTimeWindowCriteria"))
     

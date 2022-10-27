@@ -1,8 +1,11 @@
-﻿"""ds, speed, abs_curv
-Algorithms to detect stop
+﻿"""
+Algorithm to create Analytical features: ds, speed, abs_curv
 """
 
 import math
+#from typing import Iterable, Literal, Union   
+
+#from tracklib.core.Track import Track
 import tracklib.core.Utils as utils
 
 
@@ -32,7 +35,23 @@ def ds(track, i):
 
 
 def abs_curv(track, i):
-    """TODO"""
+    """
+    curvilinear abscissa
+
+    Parameters
+    ----------
+    track : Track
+        curvilinear abscissa.
+    i : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    S : TYPE
+        DESCRIPTION.
+
+    """
+    
     S = [0]
     for i in range(1, track.size()):
         ds = track.getObs(i - 1).position.distance2DTo(track.getObs(i).position)

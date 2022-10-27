@@ -1452,31 +1452,14 @@ class Track:
         else:
             sys.exit("Error: 'estimate_speed' has not been called yet")
 
-    # # DEPRECATED
-    # def computeAvgSpeed(self, id_ini=0, id_fin=None):
-    #     '''Computes mean speed (m/s) between two points'''
-    #     if id_fin is None:
-    #         id_fin = self.size()-1
-    #     return Cinematics.computeAvgSpeed(self, id_ini, id_fin)
-
-    # # DEPRECATED
-    # def computeAvgAscSpeed(self, id_ini=0, id_fin=None):
-    #     '''
-    #     Computes average ascending speed (m/s)
-    #     TODO : à adapter
-    #     '''
-    #     if id_fin is None:
-    #         id_fin = self.size()-1
-    #     return Cinematics.computeAvgAscSpeed(self, id_ini, id_fin)
-
     # DEPRECATED
-    def compute_abscurv(self):
-        """
-        Compute and return curvilinear abscissa for each points
-        """
-        from tracklib.algo.Cinematics import computeAbsCurv
+    # def compute_abscurv(self):
+    #     """
+    #     Compute and return curvilinear abscissa for each points
+    #     """
+    #     from tracklib.algo.Cinematics import computeAbsCurv
 
-        return computeAbsCurv(self)
+    #     return computeAbsCurv(self)
 
     def getAbsCurv(self):
         """TODO"""
