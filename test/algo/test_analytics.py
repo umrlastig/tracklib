@@ -17,6 +17,7 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
         GPSTime.GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         self.trace1 = Track.Track([], 1)
         self.trace2 = Track.Track([], 1)
+        self.trace3 = Track.Track([], 1)
 
         # ---------------------------------------------------------------------
 		
@@ -72,25 +73,65 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
 		
         self.trace2.addAnalyticalFeature(Analytics.speed)
         self.trace2.addAnalyticalFeature(Analytics.acceleration)
+        
+        
+        # ---------------------------------------------------------------------		
+		
+        c1 = Coords.ENUCoords(0, 0, 0)
+        p1 = Obs.Obs(c1, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
+        self.trace3.addObs(p1)
+		
+        c2 = Coords.ENUCoords(0, 10, 0)
+        p2 = Obs.Obs(c2, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
+        self.trace3.addObs(p2)
+		
+        c3 = Coords.ENUCoords(0, 10, 0)
+        p3 = Obs.Obs(c3, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
+        self.trace3.addObs(p3)
+		
+        c4 = Coords.ENUCoords(0, 30, 0)
+        p4 = Obs.Obs(c4, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
+        self.trace3.addObs(p4)
+		
+        self.trace3.addAnalyticalFeature(Analytics.speed)
+        self.trace3.addAnalyticalFeature(Analytics.acceleration)
 		
 		
     def testDS(self):
-        self.assertLessEqual(3, 5)
+        self.trace3.addAnalyticalFeature(Analytics.ds)
+        ds30 = self.trace3.getObsAnalyticalFeature('ds', 0)
+        self.assertEqual(ds30, 0)
+        
+        ds31 = self.trace3.getObsAnalyticalFeature('ds', 1)
+        self.assertEqual(ds31, self.trace3.getObs(1).distanceTo(self.trace3.getObs(0)))
+        
+        ds32 = self.trace3.getObsAnalyticalFeature('ds', 2)
+        self.assertEqual(ds32, self.trace3.getObs(2).distanceTo(self.trace3.getObs(1)))
+        
+        ds33 = self.trace3.getObsAnalyticalFeature('ds', 3)
+        self.assertEqual(ds33, self.trace3.getObs(3).distanceTo(self.trace3.getObs(2)))
         
     def testHeading(self):
         self.trace1.addAnalyticalFeature(Analytics.heading)
         
         s0 = self.trace1.getObsAnalyticalFeature('heading', 0)
-        self.assertTrue(math.isnan(s0), 's0 is nan')
-        
         s1 = self.trace1.getObsAnalyticalFeature('heading', 1)
-        self.assertTrue(s1, math.atan2(10-0, 0-0))
-        
+        s2 = self.trace1.getObsAnalyticalFeature('heading', 2)
+        s3 = self.trace1.getObsAnalyticalFeature('heading', 3)
+        s4 = self.trace1.getObsAnalyticalFeature('heading', 4)
+        s5 = self.trace1.getObsAnalyticalFeature('heading', 5)
         s6 = self.trace1.getObsAnalyticalFeature('heading', 6)
-        self.assertTrue(s1, math.atan2(0, 10))
         s7 = self.trace1.getObsAnalyticalFeature('heading', 7)
-        self.assertTrue(s7, s6)
-    
+        
+        self.assertEqual(s0, s1)
+        self.assertEqual(s1, math.atan2(10, 0))
+        self.assertEqual(s2, math.atan2(0, 10))
+        self.assertEqual(s3, math.atan2(0, 10))
+        self.assertEqual(s4, math.atan2(-10, 0))
+        self.assertEqual(s5, math.atan2(0, -10))
+        self.assertEqual(s6, math.atan2(0, 10))
+        self.assertEqual(s7, math.atan2(5, 0))
+        
     def testAbsCurv(self):
         
         self.trace1.addAnalyticalFeature(Analytics.abs_curv)
@@ -114,6 +155,15 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
     
         v3 = self.trace2.getObsAnalyticalFeature('speed', 3)
         self.assertTrue(abs(v3 - 20 / 10) < 0.000001)
+        
+        v30 = self.trace3.getObsAnalyticalFeature('speed', 0)
+        self.assertTrue(math.isnan(v30))
+        v31 = self.trace3.getObsAnalyticalFeature('speed', 1)
+        self.assertTrue(math.isnan(v31))
+        v32 = self.trace3.getObsAnalyticalFeature('speed', 2)
+        self.assertTrue(math.isnan(v32))
+        v33 = self.trace3.getObsAnalyticalFeature('speed', 3)
+        self.assertTrue(math.isnan(v33))
 
 
     def testAcceleration(self):
@@ -134,6 +184,15 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
 		
         a3 = self.trace2.getObsAnalyticalFeature('acceleration', 3)
         self.assertTrue(abs(a3 - (v3-v2)/10) < 0.000001)
+        
+        v30 = self.trace3.getObsAnalyticalFeature('acceleration', 0)
+        self.assertTrue(math.isnan(v30))
+        v31 = self.trace3.getObsAnalyticalFeature('acceleration', 1)
+        self.assertTrue(math.isnan(v31))
+        v32 = self.trace3.getObsAnalyticalFeature('acceleration', 2)
+        self.assertTrue(math.isnan(v32))
+        v33 = self.trace3.getObsAnalyticalFeature('acceleration', 3)
+        self.assertTrue(math.isnan(v33))
 		
 		
     def testAngleGeom(self):
@@ -242,7 +301,7 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
 	
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    #suite.addTest(TestAlgoAnalyticsMethods("testDS"))
+    suite.addTest(TestAlgoAnalyticsMethods("testDS"))
     suite.addTest(TestAlgoAnalyticsMethods("testAbsCurv"))
     suite.addTest(TestAlgoAnalyticsMethods("testHeading"))
     suite.addTest(TestAlgoAnalyticsMethods("testSpeed"))
@@ -250,6 +309,7 @@ if __name__ == '__main__':
     suite.addTest(TestAlgoAnalyticsMethods("testAngleGeom"))
     suite.addTest(TestAlgoAnalyticsMethods("testCalculAngleOriente"))
     suite.addTest(TestAlgoAnalyticsMethods("testOrientation"))
+    
     #suite.addTest(TestAlgoAnalyticsMethods("testStopPointWithAccelerationCriteria"))
     #suite.addTest(TestAlgoAnalyticsMethods("testStopPointWithTimeWindowCriteria"))
     

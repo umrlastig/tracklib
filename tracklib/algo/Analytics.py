@@ -77,8 +77,8 @@ def heading(track, i):
 
     """
     
-    if i == len(track):
-        return heading(track, i - 1)
+    if i == 0:
+        return heading(track, 1)
     return track.getObs(i).position.azimuthTo(track.getObs(i - 1).position)
 
 
