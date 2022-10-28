@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import math
 import unittest
 import matplotlib.pyplot as plt
 
@@ -89,25 +90,98 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         
     
     def testCircle(self):
-        circle = Geometrics.Circle(ENUCoords(3.55, 48.2), 10)
+        
+        circle = Geometrics.Circle(ENUCoords(3.55, 2.2), 3)
         circle.plot()
+        self.trace3.plot()
+        
+        t = circle.select(self.trace3)
+        self.assertEqual(t.size(), 5)
+        
         circle.translate(5, 2)
         circle.plot()
         
-        circlebis = Geometrics.Circle(ENUCoords(3.55, 48.2), 8)
+        circlebis = Geometrics.Circle(ENUCoords(3.55, 2.2), 8)
         circlebis.plot('b:', append=True)
         
-        circleter = Geometrics.Circle(ENUCoords(3.55, 48.2), 3)
+        circlebis = Geometrics.Circle(ENUCoords(3.55, 2.2), 7)
+        circlebis.plot('b:', append=False)
+        
+        circleter = Geometrics.Circle(ENUCoords(3.55, 2.2), 3)
         circleter.translate(2, 3)
         circleter.plot('g--', append=plt)
-        
-        plt.show()
         
         circle3 = circlebis.copy()
         self.assertEqual(circle3.radius, circlebis.radius)
         self.assertEqual(circle3.center.E, circlebis.center.E)
         self.assertEqual(circle3.center.N, circlebis.center.N)
         self.assertEqual(circle3.center.U, circlebis.center.U)
+        
+        plt.show()
+
+
+    def testRectangle (self):
+        
+        ll = ENUCoords(0, 0)
+        ur = ENUCoords(10, 20)
+        bbox = Geometrics.Rectangle(ll, ur)
+        bbox.plot()
+        self.trace3.plot()
+        plt.plot([0], [0], 'ro', markersize=10)
+        
+        t = bbox.select(self.trace3)
+        self.assertEqual(t.size(), 4)
+        
+        r = bbox.copy()
+        self.assertIsInstance(r, Geometrics.Rectangle)
+        self.assertEqual(r.pmin.E, bbox.pmin.E)
+        self.assertEqual(r.pmin.N, bbox.pmin.N)
+        self.assertEqual(r.pmax.E, bbox.pmax.E)
+        self.assertEqual(r.pmax.N, bbox.pmax.N)
+        
+        r.translate(10, 20)
+        self.assertIsInstance(r, Geometrics.Rectangle)
+        self.assertEqual(r.pmin.E, 10)
+        self.assertEqual(r.pmin.N, 20)
+        self.assertEqual(r.pmax.E, 20)
+        self.assertEqual(r.pmax.N, 40)
+        
+        r.rotate(math.pi/2)
+        self.assertIsInstance(r, Geometrics.Rectangle)
+        self.assertEqual(round(r.pmin.E), float(-20))
+        self.assertEqual(round(r.pmin.N), float(10))
+        self.assertEqual(round(r.pmax.E), float(-40))
+        self.assertEqual(round(r.pmax.N), float(20))
+        r.plot('g--')
+        
+        r.scale(1.5)
+        self.assertIsInstance(r, Geometrics.Rectangle)
+        self.assertEqual(round(r.pmin.E), float(-30))
+        self.assertEqual(round(r.pmin.N), float(15))
+        self.assertEqual(round(r.pmax.E), float(-60))
+        self.assertEqual(round(r.pmax.N), float(30))
+        r.plot('b:')
+        
+        self.assertEqual(0, bbox.pmin.E)
+        self.assertEqual(0, bbox.pmin.N)
+        self.assertEqual(10, bbox.pmax.E)
+        self.assertEqual(20, bbox.pmax.N)
+        
+        plt.xlim([-75, 15])
+        plt.ylim([-5, 35])
+        plt.show()
+        
+        
+    def testPolygon(self):
+        poly = Geometrics.Polygon([0,0,10,10], [0,10,10,0])
+        poly.plot()
+        
+        
+        
+        plt.xlim([-75, 15])
+        plt.ylim([-5, 35])
+        plt.show()
+
 
     def testCircleTrigo(self):
         
@@ -128,7 +202,7 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         self.assertLessEqual(abs(0 - C2.center.getY()), self.__epsilon, "coord y du centre cercle")
 
         plt.show()
-
+        
 
     def testCircles(self):
         
@@ -220,10 +294,12 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     suite.addTest(TestAlgoGeometricsMethods("testCircle"))
-#    suite.addTest(TestAlgoGeometricsMethods("testCircleTrigo"))
-#    suite.addTest(TestAlgoGeometricsMethods("testCircles"))
-#    suite.addTest(TestAlgoGeometricsMethods("testDiameter"))
-#    suite.addTest(TestAlgoGeometricsMethods("testConvexHull"))
-#    suite.addTest(TestAlgoGeometricsMethods("testminimumBoundingRectangle"))
+    suite.addTest(TestAlgoGeometricsMethods("testRectangle"))
+    suite.addTest(TestAlgoGeometricsMethods("testPolygon"))
+    suite.addTest(TestAlgoGeometricsMethods("testCircleTrigo"))
+    suite.addTest(TestAlgoGeometricsMethods("testCircles"))
+    suite.addTest(TestAlgoGeometricsMethods("testDiameter"))
+    suite.addTest(TestAlgoGeometricsMethods("testConvexHull"))
+    suite.addTest(TestAlgoGeometricsMethods("testminimumBoundingRectangle"))
     runner = unittest.TextTestRunner()
     runner.run(suite)

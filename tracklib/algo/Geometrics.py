@@ -32,29 +32,42 @@ logger = logging.getLogger()
 
 class Circle:
     """
+    A circle is defined by a center point with a radius
     
-    .. figure:: ../../_images/DC_Circle.png
-       :width: 450px
-       :align: center
+    .. code-block:: python
     
-       Figure 1 : Class diagram of the class Circle
-
-    
+       moncircle = Geometrics.Circle(ENUCoords(3.55, 48.2), 3)
     """
 
     def __init__(self, center, radius):
-        """TODO"""
+        """
+        Constructs a circle by defining the center and the radius.
+
+        Parameters
+        ----------
+        center : Coords
+            The center of the circle
+            
+        radius : float
+            The radius of the circle
+
+        """
+        
+        
+        
         self.center = center
         self.radius = radius
 
     def plot(self, sym="r-", append=plt):
-        """TODO"""
+        """
+        Draw the circle
+        """
 
         if isinstance(append, bool):
             if append:
                 ax1 = plt.gca()
             else:
-                fig, ax1 = plt.subplots(figsize=(self.w, self.h))
+                fig, ax1 = plt.subplots(figsize=(12, 6))
         else:
             ax1 = append
 
@@ -70,11 +83,44 @@ class Circle:
         return ax1
 
     def contains(self, point):
-        """return true if the point is in the cercle, 
-        false otherwise. """
+        """
+        Returns true if the point is in the cercle, false otherwise. 
+        
+        Parameters
+        ----------
+        point: ENUCoords
+            The point to test
+            
+        Return
+        ------
+        
+        type: bool
+        """
+        
         return (point.getX() - self.center.getX()) ** 2 + (
-            point.getY() - self.center.getY()
-        ) ** 2 <= self.radius ** 2
+            point.getY() - self.center.getY() ) ** 2 <= self.radius ** 2
+
+    def select(self, track):
+        """
+        TODO
+
+        Parameters
+        ----------
+        track : TYPE
+            DESCRIPTION.
+
+        Returns
+        -------
+        t : TYPE
+            DESCRIPTION.
+
+        """
+        from tracklib.core.Track import Track
+        t = Track()
+        for obs in track:
+            if self.contains(obs.position):
+                t.addObs(obs)
+        return t
 
     def copy(self):
         """TODO"""
@@ -86,15 +132,37 @@ class Circle:
 
 
 class Rectangle:
-    """TODO"""
+    """
+    A rectangle is defined by two points
+    
+    .. code-block:: python
+    
+       ll = ENUCoords(Xmin, Ymin)
+       ur = ENUCoords(Xmax, Ymax)
+       bbox = Geometrics.Rectangle(ll, ur)
+       
+    """
 
     def __init__(self, pmin, pmax):
-        """TODO"""
+        """
+        Construct a rectangle from two points.
+
+        Parameters
+        ----------
+        pmin : ENUCoords
+            first point, for example the left lower point of the rectangle
+        pmax : ENUCoords
+            second point, for example the right upper point of the rectangle
+
+        """
+        
         self.pmin = pmin
         self.pmax = pmax
 
     def plot(self, sym="r-"):
-        """TODO"""
+        """
+        Draw the rectangle
+        """
         XR = [
             self.pmin.getX(),
             self.pmax.getX(),
@@ -112,7 +180,19 @@ class Rectangle:
         plt.plot(XR, YR, sym)
 
     def contains(self, point):
-        """TODO"""
+        """
+        Returns true if the point is in the rectangle, false otherwise. 
+        
+        Parameters
+        ----------
+        point: ENUCoords
+            The point to test
+            
+        Return
+        ------
+        
+        type: bool
+        """
         inside_x = (self.pmin.getX() < point.getX()) and (
             point.getX() < self.pmax.getX()
         )
@@ -173,7 +253,16 @@ class Rectangle:
         
 
 class Polygon:
-    """TODO"""
+    """
+    A polygon is defined by two list of 
+    
+    .. code-block:: python
+    
+       ll = ENUCoords(Xmin, Ymin)
+       ur = ENUCoords(Xmax, Ymax)
+       bbox = Geometrics.Rectangle(ll, ur)
+       
+    """
 
     def __init__(self, X, Y):
         """TODO"""
