@@ -173,14 +173,65 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         
         
     def testPolygon(self):
-        poly = Geometrics.Polygon([0,0,10,10], [0,10,10,0])
+        
+        poly = Geometrics.Polygon([0, 10, 10, 0, -10, -10], [0, 10, 30, 40, 30, 10])
         poly.plot()
         
+        self.trace2.plot()
         
+        P2 = poly.copy()
+        self.assertIsInstance(P2, Geometrics.Polygon)
+        self.assertEqual(P2.X, poly.X)
+        self.assertEqual(P2.Y, poly.Y)
         
-        plt.xlim([-75, 15])
-        plt.ylim([-5, 35])
+        t = P2.select(self.trace2)
+        self.assertEqual(t.size(), 11)
+        
+        P2.translate(10, 5)
+        P2.plot('g--')
+        self.assertIsInstance(P2, Geometrics.Polygon)
+        self.assertEqual(P2.X, [10, 20, 20, 10, 0, 0, 10])
+        self.assertEqual(P2.Y, [5, 15, 35, 45, 35, 15, 5])
+        
+        P2.rotate(math.pi)
+        P2.plot('b:')
+        self.assertIsInstance(P2, Geometrics.Polygon)
+        self.assertEqual(int(P2.X[0]), -10)
+        self.assertEqual(int(P2.X[1]), -20)
+        self.assertEqual(int(P2.X[2]), -20)
+        self.assertEqual(int(P2.X[3]), -10)
+        self.assertEqual(int(P2.X[4]), 0)
+        self.assertEqual(int(P2.X[5]), 0)
+        self.assertEqual(int(P2.X[6]), -10)
+        self.assertEqual(int(P2.Y[0]), -4)
+        self.assertEqual(int(P2.Y[1]), -14)
+        self.assertEqual(int(P2.Y[2]), -35)
+        self.assertEqual(int(P2.Y[3]), -45)
+        self.assertEqual(int(P2.Y[4]), -35)
+        self.assertEqual(int(P2.Y[5]), -15)
+        self.assertEqual(int(P2.Y[6]), -4)
+        
+        P2.scale(0.2)
+        P2.plot('b:')
+        self.assertIsInstance(P2, Geometrics.Polygon)
+        
+        s = P2.area()
+        self.assertEqual(s, 24.0)
+        
+        centre = P2.centroid()
+        self.assertEqual(int(centre[0]), -2)
+        self.assertEqual(int(centre[1]), -5)
+        
+        plt.xlim([-30, 25])
+        plt.ylim([-50, 55])
         plt.show()
+        
+        self.assertTrue(P2.isStarShaped())
+        
+        t = P2.starShapedRatio()
+        
+        [S, R] = P2.signature()
+        plt.plot(S, R)
 
 
     def testCircleTrigo(self):

@@ -265,7 +265,8 @@ class Polygon:
     """
 
     def __init__(self, X, Y):
-        """TODO"""
+        """
+        """
         self.X = X
         self.Y = Y
         if not ((self.X[-1] == self.X[0]) and (self.Y[-1] == self.Y[0])):
@@ -280,6 +281,28 @@ class Polygon:
         """TODO"""
         return inclusion(self.X, self.Y, point.getX(), point.getY())
 
+    def select(self, track):
+        """
+        TODO
+
+        Parameters
+        ----------
+        track : TYPE
+            DESCRIPTION.
+
+        Returns
+        -------
+        t : TYPE
+            DESCRIPTION.
+
+        """
+        from tracklib.core.Track import Track
+        t = Track()
+        for obs in track:
+            if self.contains(obs.position):
+                t.addObs(obs)
+        return t
+    
     def copy(self):
         """TODO"""
         return copy.deepcopy(self)
@@ -329,7 +352,16 @@ class Polygon:
     # Polygon centroid
     # --------------------------------------------------
     def centroid(self):
-        """TODO"""
+        """
+        
+
+        Returns
+        -------
+        center : array[2]
+            DESCRIPTION.
+
+        """
+        
         aire = 0
         center = [0, 0]
         dx = self.X[0]
