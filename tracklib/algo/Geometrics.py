@@ -19,7 +19,6 @@ import matplotlib.pyplot as plt
 import logging
 
 from tracklib.core.Coords import ENUCoords
-# cartesienne
 from tracklib.util.Geometry import right, inclusion, collinear, isSegmentIntersects
 from tracklib.util.Geometry import transform, transform_inverse
 
@@ -113,6 +112,28 @@ class Rectangle:
             point.getY() < self.pmax.getY()
         )
         return inside_x and inside_y
+    
+    def select(self, track):
+        """
+        TODO
+
+        Parameters
+        ----------
+        track : TYPE
+            DESCRIPTION.
+
+        Returns
+        -------
+        t : TYPE
+            DESCRIPTION.
+
+        """
+        from tracklib.core.Track import Track
+        t = Track()
+        for obs in track:
+            if self.contains(obs.position):
+                t.addObs(obs)
+        return t
 
     def copy(self):
         """TODO"""
@@ -141,7 +162,7 @@ class Rectangle:
         """TODO"""
         self.pmin.scale(h)
         self.pmax.scale(h)
-
+        
 
 class Polygon:
     """TODO"""

@@ -222,7 +222,7 @@ def example2():
     trace1.addObs(p1)
 
     
-    #plt.plot(trace1.getX(), trace1.getY(), 'ro')
+    plt.plot(trace1.getX(), trace1.getY(), 'ro')
 
     cercle = minCircle(trace1)
     if cercle != None:

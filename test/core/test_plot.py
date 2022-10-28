@@ -27,6 +27,9 @@ class TestPlot(unittest.TestCase):
         plot = Plot(self.trace)
         plot.plotProfil('SPATIAL_SPEED_PROFIL')
         
+    def testPlotProfil(self):
+        plot = Plot(self.trace)
+        plot.plotProfil('SPATIAL_SPEED_PROFIL')
         
 
 if __name__ == '__main__':

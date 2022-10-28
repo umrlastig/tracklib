@@ -217,14 +217,22 @@ class TrackConstraint:
 
     def select(self, tracks):
         """TODO"""
+        
         if self.type == TYPE_SELECT:
             output = TrackCollection()
             for track in tracks:
                 if self.contains(track):
                     output.addTrack(track)
             return output
+        
         if self.type == TYPE_CUT_AND_SELECT:
-            return tracks
+            output = TrackCollection()
+            for track in tracks:
+                t = self.shape.select(track)
+                if t.size() > 0:
+                    output.addTrack(t)
+            return output
+
 
 
 # -------------------------------------------------
@@ -337,8 +345,14 @@ class Constraint:
                 if self.contains(track):
                     output.addTrack(track)
             return output
+        
         if self.type == TYPE_CUT_AND_SELECT:
-            return tracks
+            output = TrackCollection()
+            for track in tracks:
+                t = self.shape.select(track)
+                if t.size() > 0:
+                    output.addTrack(t)
+            return output
 
     def plot(self, sym):
         """TODO"""
