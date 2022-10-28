@@ -87,6 +87,27 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         p8 = Obs(ENUCoords(1, -3), GPSTime.readTimestamp('2020-01-01 10:00:00'))
         self.trace3.addObs(p8)
         
+    
+    def testCircle(self):
+        circle = Geometrics.Circle(ENUCoords(3.55, 48.2), 10)
+        circle.plot()
+        circle.translate(5, 2)
+        circle.plot()
+        
+        circlebis = Geometrics.Circle(ENUCoords(3.55, 48.2), 8)
+        circlebis.plot('b:', append=True)
+        
+        circleter = Geometrics.Circle(ENUCoords(3.55, 48.2), 3)
+        circleter.translate(2, 3)
+        circleter.plot('g--', append=plt)
+        
+        plt.show()
+        
+        circle3 = circlebis.copy()
+        self.assertEqual(circle3.radius, circlebis.radius)
+        self.assertEqual(circle3.center.E, circlebis.center.E)
+        self.assertEqual(circle3.center.N, circlebis.center.N)
+        self.assertEqual(circle3.center.U, circlebis.center.U)
 
     def testCircleTrigo(self):
         
@@ -198,10 +219,11 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    suite.addTest(TestAlgoGeometricsMethods("testCircleTrigo"))
-    suite.addTest(TestAlgoGeometricsMethods("testCircles"))
-    suite.addTest(TestAlgoGeometricsMethods("testDiameter"))
-    suite.addTest(TestAlgoGeometricsMethods("testConvexHull"))
-    suite.addTest(TestAlgoGeometricsMethods("testminimumBoundingRectangle"))
+    suite.addTest(TestAlgoGeometricsMethods("testCircle"))
+#    suite.addTest(TestAlgoGeometricsMethods("testCircleTrigo"))
+#    suite.addTest(TestAlgoGeometricsMethods("testCircles"))
+#    suite.addTest(TestAlgoGeometricsMethods("testDiameter"))
+#    suite.addTest(TestAlgoGeometricsMethods("testConvexHull"))
+#    suite.addTest(TestAlgoGeometricsMethods("testminimumBoundingRectangle"))
     runner = unittest.TextTestRunner()
     runner.run(suite)

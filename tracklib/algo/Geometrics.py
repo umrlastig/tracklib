@@ -32,6 +32,14 @@ logger = logging.getLogger()
 
 class Circle:
     """
+    
+    .. figure:: ../../_images/DC_Circle.png
+       :width: 450px
+       :align: center
+    
+       Figure 1 : Class diagram of the class Circle
+
+    
     """
 
     def __init__(self, center, radius):
