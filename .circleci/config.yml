@@ -44,7 +44,9 @@ jobs:
       - run: 
           name: Run tests
           command: |
-            mkdir /home/circleci/project/data/test
+            mkdir /home/circleci/project/data/test/gpx1
+            mkdir /home/circleci/project/data/test/gpx2
+            mkdir /home/circleci/project/data/test/gpx3
             chmod 777 -R /home/circleci/project/data/test
             pytest test/
             coverage run -m --source=tracklib/ pytest test/
