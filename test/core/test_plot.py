@@ -8,8 +8,6 @@ import os.path
 from tracklib.core.GPSTime import GPSTime
 from tracklib.io.TrackReader import TrackReader
 from tracklib.core.Plot import Plot
-import tracklib.algo.Analytics as stop
-from tracklib.algo.Segmentation import findStopsGlobal
 
 
 class TestPlot(unittest.TestCase):
