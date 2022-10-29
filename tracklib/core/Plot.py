@@ -320,8 +320,8 @@ class Plot:
         limit = ymax + 0.5
         for (indice, af_name) in enumerate(afs):
 
-            #if self.__isAFTransition(self.track, af_name):
-            if 1 == 1:
+            if self.__isAFTransition(self.track, af_name):
+            #if 1 == 1:
                 tabmarqueurs = self.track.getAnalyticalFeature(af_name)
                 marqueurs = set(tabmarqueurs)
                 if utils.NAN in marqueurs:
