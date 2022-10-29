@@ -1,9 +1,9 @@
 """
-This module contains the class to manage bounding box and to manage bounding box
+This module contains the class to manage bounding box
 """
 
 # For type annotation
-from __future__ import annotations   
+from __future__ import annotations
 from typing import Union
 import sys
 import copy
@@ -25,7 +25,7 @@ class Bbox:
         self.ll = ll
         self.ur = ur
 
-    def __str__(self) -> str:   
+    def __str__(self) -> str:
         """String representation of :class:`Bbox`
 
         :return: String representation of bbox
@@ -35,7 +35,7 @@ class Bbox:
         output += " Upper right corner: " + str(self.ur)
         return output
 
-    def copy(self) -> Bbox:   
+    def copy(self) -> Bbox:
         """Copy the current object
 
         :return: Copy of bbox
@@ -44,7 +44,7 @@ class Bbox:
 
     def getLowerLeft(
         self,
-    ) -> Union[Coords.ENUCoords, Coords.ENUCoords, Coords.GeoCoords]:   
+    ) -> Union[Coords.ENUCoords, Coords.ENUCoords, Coords.GeoCoords]:
         """Return the lower-left coordinates of :class:`Bbox`
 
         :return: Lower-left coordinates
@@ -53,66 +53,66 @@ class Bbox:
 
     def getUpperRight(
         self,
-    ) -> Union[Coords.ENUCoords, Coords.ENUCoords, Coords.GeoCoords]:   
+    ) -> Union[Coords.ENUCoords, Coords.ENUCoords, Coords.GeoCoords]:
         """Return the upper-right coordinates of :class:`Bbox`
 
         :return: Upper-right coordinates
         """
         return self.ur
 
-    def getXmin(self) -> float:   
+    def getXmin(self) -> float:
         """Return the min X coordinate"""
         return self.ll.getX()
 
-    def getYmin(self) -> float:   
+    def getYmin(self) -> float:
         """Return the min Y coordinate"""
         return self.ll.getY()
 
-    def getXmax(self) -> float:   
+    def getXmax(self) -> float:
         """Return the max X coordinate"""
         return self.ur.getX()
 
-    def getYmax(self) -> float:   
+    def getYmax(self) -> float:
         """Return the max Y coordinate"""
         return self.ur.getY()
 
-    def getDx(self) -> float:   
+    def getDx(self) -> float:
         """Return the difference of X coordinates"""
         return self.getXmax() - self.getXmin()
 
-    def getDy(self) -> float:   
+    def getDy(self) -> float:
         """Return the difference of Y coordinates"""
         return self.getYmax() - self.getYmin()
 
-    def getDimensions(self) -> tuple[float, float]:   
+    def getDimensions(self) -> tuple[float, float]:
         """Return Dx and Dy
 
         :return: Tuple with structure : (Dx, Dy)
         """
         return (self.getDx(), self.getDy())
 
-    def setXmin(self, xmin: float):   
+    def setXmin(self, xmin: float):
         """Set Xmin coordinate
 
         :param xmin: Xmin coordinate
         """
         self.ll.setX(xmin)
 
-    def setYmin(self, ymin: float):   
+    def setYmin(self, ymin: float):
         """Set Ymin coordinate
 
         :param ymin: Ymin coordinate
         """
         return self.ll.setY(ymin)
 
-    def setXmax(self, xmax: float):   
+    def setXmax(self, xmax: float):
         """Set Xmax coordinate
 
         :param xmax: Xmax coordinate
         """
         return self.ur.setX(xmax)
 
-    def setYmax(self, ymax: float):   
+    def setYmax(self, ymax: float):
         """Set Ymax coordinate
 
         :param ymax: Ymax coordinate
@@ -137,7 +137,7 @@ class Bbox:
         ]
         plt.plot(X, Y, sym)
 
-    def __add__(self, bbox: Bbox) -> Bbox:   
+    def __add__(self, bbox: Bbox) -> Bbox:
         """Bounding boxes combination
 
         :param bbox: Bbox 2
@@ -158,18 +158,11 @@ class Bbox:
         """TODO"""
         return None  # TO DO
 
-    def contains(self, point) -> bool:   
+    def contains(self, point) -> bool:
         """Check if a point is in the bbox"""
         return self.geom().contains(point)
 
-    def copy(self) -> Bbox:   
-        """Copy the current object
-
-        :retrun: Copu of the current object
-        """
-        return copy.deepcopy(self)
-
-    def translate(self, dx: float, dy: float):   
+    def translate(self, dx: float, dy: float):
         """Translation (2D) of shape
 
         :param dx: dx in ground units
@@ -178,7 +171,7 @@ class Bbox:
         self.ll.translate(dx, dy)
         self.ur.translate(dx, dy)
 
-    def rotate(self, theta: float):   
+    def rotate(self, theta: float):
         """Rotation (2D) of shape
 
         :param theta: angle in radians
@@ -186,7 +179,7 @@ class Bbox:
         self.ll.rotate(theta)
         self.ur.rotate(theta)
 
-    def scale(self, h: float):   
+    def scale(self, h: float):
         """Homothetic transformation (2D) of shape
 
         :param h: factor
@@ -194,7 +187,7 @@ class Bbox:
         self.ll.scale(h)
         self.ur.scale(h)
 
-    def geom(self) -> Polygon:   
+    def geom(self) -> Polygon:
         """Convert to Geometrics (Polygon)
 
         :return: Polygon
@@ -239,7 +232,7 @@ class Bbox:
         self.ll.toENUCoords(base)
         self.ur.toENUCoords(base)
 
-    def addMargin(self, margin: float = 0.05):   
+    def addMargin(self, margin: float = 0.05):
         """Adding margin (relative float) to bounding box
 
         :param margin: margin, defaults to 0.05
@@ -250,7 +243,7 @@ class Bbox:
         self.setYmin(self.getYmin() - margin * dy)
         self.setYmax(self.getYmax() + margin * dy)
 
-    def __getitem__(self, index: int) -> float:   
+    def __getitem__(self, index: int) -> float:
         """Get value by index
 
         - 0: xmin
@@ -270,7 +263,7 @@ class Bbox:
         if (index == 3) or (index == "ymax"):
             return self.getYmax()
 
-    def __setitem__(self, index: int, value: float):   
+    def __setitem__(self, index: int, value: float):
         """Set value by index
 
         :param index: index of value
@@ -285,7 +278,7 @@ class Bbox:
         if (index == 3) or (index == "ymax"):
             self.setYmax(value)
 
-    def asTuple(self) -> tuple[float, float, float, float]:   
+    def asTuple(self) -> tuple[float, float, float, float]:
         """Transform the Bbox object in a tuple of coordinates
 
         :return: Tuple of coordinates with this structure (x min, x max, y min, y max)
