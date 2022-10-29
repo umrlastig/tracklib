@@ -1,6 +1,6 @@
 	
     
-Module IO
+Module io
 -----------
 
 .. toctree::
