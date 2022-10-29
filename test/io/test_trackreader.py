@@ -83,7 +83,7 @@ class TestTrackReader(TestCase):
     def testReadGpxWithAF(self):
         path = os.path.join(self.resource_path, 'data/test/12.gpx')
         GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
-        tracks = TrackReader.readFromGpx(path, srid='ENU', type='trk')
+        tracks = TrackReader.readFromGpx(path, srid='ENU', type='trk', read_all=True)
         
         self.assertEqual(1, tracks.size())
         self.assertIsInstance(tracks, TrackCollection)
@@ -91,7 +91,12 @@ class TestTrackReader(TestCase):
         trace = tracks.getTrack(0)
         self.assertEqual(13, trace.size())
         
-        print (trace.getListAnalyticalFeatures())
+        self.assertEqual(trace.getListAnalyticalFeatures(), ['speed', 'abs_curv'])
+        self.assertEqual(trace.getObsAnalyticalFeature('speed', 0), 0.25)
+        v1 = trace.getObsAnalyticalFeature('speed', 1)
+        self.assertTrue(abs(v1 - 0.1285) < 0.001)
+        self.assertEqual(trace.getObsAnalyticalFeature('abs_curv', 0), 
+                [0, 1.0, 2.0, 3.0, 5.0, 6.0, 9.0, 10.0, 14.0, 15.0, 20.0, 21.0, 27.0])
 
 
 if __name__ == '__main__':
@@ -111,10 +116,7 @@ if __name__ == '__main__':
     suite.addTest(TestTrackReader("test_read_gpx_geo_trk"))
     suite.addTest(TestTrackReader("test_read_gpx_geo_rte"))
     suite.addTest(TestTrackReader("test_read_gpx_dir"))
-
     suite.addTest(TestTrackReader("testReadGpxWithAF"))
-    
-    
     
     runner = TextTestRunner()
     runner.run(suite)

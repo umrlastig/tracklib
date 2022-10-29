@@ -531,6 +531,7 @@ class TrackReader:
                 else:
                     trace = Track()
                 
+                extensions = dict()
                 trkpts = trk.getElementsByTagName(type + "pt")
                 for trkpt in trkpts:
                     lon = float(trkpt.attributes["lon"].value)
@@ -551,9 +552,31 @@ class TrackReader:
                     point = Obs(utils.makeCoords(lon, lat, hgt, srid), time)
                     trace.addObs(point)
                     
+                    if read_all:
+                        tagextentions = trkpt.getElementsByTagName("extensions")
+                        for tagextention in tagextentions:
+                            for ext in tagextention.childNodes:
+                                if ext.nodeType == minidom.Node.ELEMENT_NODE: 
+                                    if ext.tagName not in extensions:
+                                        extensions[ext.tagName] = []
+                                    val = ext.firstChild.nodeValue
+                                    if utils.isfloat(val):
+                                        extensions[ext.tagName].append(float(val))
+                                    elif utils.islist(val):
+                                        import json
+                                        extensions[ext.tagName].append(json.loads(val))
+                                    else:
+                                        extensions[ext.tagName].append(val)
+                    
                     # ..
-                    # track.createAnalyticalFeature(name_non_special[i])
+                    # 
     
+                if read_all:
+                    for key in extensions.keys():
+                        trace.createAnalyticalFeature(key)
+                        for i in range(trace.size()):
+                            trace.setObsAnalyticalFeature(key, i, extensions[key][i])
+                        
                 TRACES.addTrack(trace)
 
             # pourquoi ?
