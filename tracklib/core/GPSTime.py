@@ -219,6 +219,16 @@ class GPSTime:
         t0 = GPSTime(2050, 1, 1, 0, 0, 0, 0)
         s0 = t0.toAbsTime()
         return GPSTime.readUnixTime(random.random() * s0)
+    
+    @staticmethod
+    def now() -> GPSTime:   
+        """Get Current Date and Time"""
+        from datetime import datetime
+        nowobj = datetime.now()
+        
+        tps = GPSTime(nowobj.year, nowobj.month, nowobj.day, 
+                     nowobj.hour, nowobj.minute, nowobj.second, 0)
+        return tps
 
     def printZone(self) -> str:   
         """Print zone code (Z if greenwhich) ISO 8601"""
