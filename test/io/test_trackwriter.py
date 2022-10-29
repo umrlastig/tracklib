@@ -6,6 +6,7 @@ from unittest import TestCase, TestSuite, TextTestRunner
 from tracklib.core.Coords import ENUCoords
 from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
+from tracklib.core.TrackCollection import TrackCollection
 from tracklib.core.GPSTime import GPSTime
 from tracklib.io.TrackWriter import TrackWriter
 from tracklib.algo import Analytics
@@ -16,6 +17,56 @@ class TestTrackWriter(TestCase):
     
     def setUp (self):
         self.resource_path = os.path.join(os.path.split(__file__)[0], "../..")
+        
+        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        
+        self.trace1 = Track(track_id = '11')
+        p1 = Obs(ENUCoords(0, 0), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        self.trace1.addObs(p1)
+        p2 = Obs(ENUCoords(0, 1), GPSTime.readTimestamp('2020-01-01 10:00:01'))
+        self.trace1.addObs(p2)
+        p3 = Obs(ENUCoords(1, 1), GPSTime.readTimestamp('2020-01-01 10:00:02'))
+        self.trace1.addObs(p3)
+        p4 = Obs(ENUCoords(1, 2), GPSTime.readTimestamp('2020-01-01 10:00:03'))
+        self.trace1.addObs(p4)
+        p5 = Obs(ENUCoords(2, 2), GPSTime.readTimestamp('2020-01-01 10:00:04'))
+        self.trace1.addObs(p5)
+        
+        self.trace2 = Track()
+        self.trace2.tid = '12'
+        pm3 = Obs(ENUCoords(-2, -1), GPSTime.readTimestamp('2020-01-01 09:59:44'))
+        self.trace2.addObs(pm3)
+        pm2 = Obs(ENUCoords(-1, -1), GPSTime.readTimestamp('2020-01-01 09:59:48'))
+        self.trace2.addObs(pm2)
+        pm1 = Obs(ENUCoords(-1, 0), GPSTime.readTimestamp('2020-01-01 09:59:55'))
+        self.trace2.addObs(pm1)
+        p1 = Obs(ENUCoords(0, 0), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        self.trace2.addObs(p1)
+        p2 = Obs(ENUCoords(0, 2), GPSTime.readTimestamp('2020-01-01 10:00:01'))
+        self.trace2.addObs(p2)
+        p3 = Obs(ENUCoords(1, 2), GPSTime.readTimestamp('2020-01-01 10:00:02'))
+        self.trace2.addObs(p3)
+        p4 = Obs(ENUCoords(1, 5), GPSTime.readTimestamp('2020-01-01 10:00:03'))
+        self.trace2.addObs(p4)
+        p5 = Obs(ENUCoords(2, 5), GPSTime.readTimestamp('2020-01-01 10:00:04'))
+        self.trace2.addObs(p5)
+        p6 = Obs(ENUCoords(2, 9), GPSTime.readTimestamp('2020-01-01 10:00:06'))
+        self.trace2.addObs(p6)
+        p7 = Obs(ENUCoords(3, 9), GPSTime.readTimestamp('2020-01-01 10:00:08'))
+        self.trace2.addObs(p7)
+        p8 = Obs(ENUCoords(3, 14), GPSTime.readTimestamp('2020-01-01 10:00:10'))
+        self.trace2.addObs(p8)
+        p9 = Obs(ENUCoords(4, 14), GPSTime.readTimestamp('2020-01-01 10:00:12'))
+        self.trace2.addObs(p9)
+        p10 = Obs(ENUCoords(4, 20), GPSTime.readTimestamp('2020-01-01 10:00:15'))
+        self.trace2.addObs(p10)
+        
+        self.trace1.addAnalyticalFeature(Analytics.speed)
+        self.trace2.addAnalyticalFeature(Analytics.speed)
+        
+        self.collection = TrackCollection()
+        self.collection.addTrack(self.trace1)
+        self.collection.addTrack(self.trace2)
 
     def test_write_csv_minim(self):
         
@@ -130,14 +181,105 @@ class TestTrackWriter(TestCase):
         txt += "1.000,2.000,0.000,01/01/2020 10:00:03.000\n"
         txt += "2.000,2.000,0.000,01/01/2020 10:00:04.000\n"
         self.assertEqual(contents.strip(), txt.strip())
+        
+        
+    def testWriteKml(self):
+        
+        from tracklib.io.TrackReader import TrackReader
+        
+        resource_path = os.path.join(os.path.split(__file__)[0], "../..")
+        GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
+        gpxpath = os.path.join(resource_path, 'data/gpx/activity_5807084803.gpx')
+        tracks = TrackReader.readFromGpxFiles(gpxpath)
+        trace = tracks.getTrack(0)
+        
+        trace.addAnalyticalFeature(Analytics.speed)
+        print (trace.getAnalyticalFeature('speed'))
+        
+        kmlpath = os.path.join(self.resource_path, 'data/test/couplage.kml')
+        TrackWriter.writeToKml(trace, path=kmlpath, type="LINE", af='speed')
+
+
+    def writeOneTrackToOneGpx0AF(self):
+        #gpxpath = os.path.join(self.resource_path, 'data/test/gpx1.csv')
+        #TrackWriter.writeToGpx(track, path=gpxpath, af=False, oneFile=True)
+        
+        gpxpath = os.path.join(self.resource_path, 'data/test/gpx1.gpx')
+        TrackWriter.writeToGpx(self.trace1, path=gpxpath, af=False, oneFile=True)
+
+        
+    def writeOneTrackToOneGpx1AF(self):
+        gpxpath = os.path.join(self.resource_path, 'data/test/gpx2.gpx')
+        TrackWriter.writeToGpx(self.trace1, path=gpxpath, af=True, oneFile=True)
+        
+    def writeOneTrackToOneGpx2AF(self):
+        self.trace1.addAnalyticalFeature(Analytics.abs_curv)
+        gpxpath = os.path.join(self.resource_path, 'data/test/gpx3.gpx')
+        TrackWriter.writeToGpx(self.trace1, path=gpxpath, af=True, oneFile=True)
+
+    def writeTwoTrackToOneGpx0AF(self):
+        self.trace1.addAnalyticalFeature(Analytics.abs_curv)
+        self.trace2.addAnalyticalFeature(Analytics.abs_curv)
+        
+        gpxpath = os.path.join(self.resource_path, 'data/test/gpx5.gpx')
+        TrackWriter.writeToGpx(self.collection, path=gpxpath, af=False, oneFile=True)
+        
+    def writeTwoTrackToOneGpx1AF(self):
+        gpxpath = os.path.join(self.resource_path, 'data/test/gpx6.gpx')
+        TrackWriter.writeToGpx(self.collection, path=gpxpath, af=True, oneFile=True)
+        
+    def writeTwoTrackToOneGpx2AF(self):
+        self.trace1.addAnalyticalFeature(Analytics.abs_curv)
+        self.trace2.addAnalyticalFeature(Analytics.abs_curv)
+        
+        gpxpath = os.path.join(self.resource_path, 'data/test/gpx7.gpx')
+        TrackWriter.writeToGpx(self.collection, path=gpxpath, af=True, oneFile=True)
+        
+    def writeTwoTrackToManyGpx0AF(self):
+        self.trace1.addAnalyticalFeature(Analytics.abs_curv)
+        self.trace2.addAnalyticalFeature(Analytics.abs_curv)
+        
+        gpxpath = os.path.join(self.resource_path, 'data/test/gpx1')
+        TrackWriter.writeToGpx(self.collection, path=gpxpath, af=False, oneFile=False)
+        
+    def writeTwoTrackToManyGpx1AF(self):
+        gpxpath = os.path.join(self.resource_path, 'data/test/gpx2')
+        TrackWriter.writeToGpx(self.collection, path=gpxpath, af=True, oneFile=False)
+        
+    def writeTwoTrackToManyGpx2AF(self):
+        self.trace1.addAnalyticalFeature(Analytics.abs_curv)
+        self.trace2.addAnalyticalFeature(Analytics.abs_curv)
+        
+        gpxpath = os.path.join(self.resource_path, 'data/test/gpx3')
+        TrackWriter.writeToGpx(self.collection, path=gpxpath, af=True, oneFile=False)
 
 
 if __name__ == '__main__':
+    
     suite = TestSuite()
-    suite.addTest(TestTrackWriter("test_write_csv_path"))
-    suite.addTest(TestTrackWriter("test_write_csv_minim"))
-    suite.addTest(TestTrackWriter("test_write_csv_2AF"))
-    suite.addTest(TestTrackWriter("test_write_csv_2AF_desordre"))
+    
+    #suite.addTest(TestTrackWriter("test_write_csv_path"))
+    #suite.addTest(TestTrackWriter("test_write_csv_minim"))
+    #suite.addTest(TestTrackWriter("test_write_csv_2AF"))
+    #suite.addTest(TestTrackWriter("test_write_csv_2AF_desordre"))
+    
+    #suite.addTest(TestTrackWriter("testWriteKml"))
+    
+    # 1 track - 1 gpx
+    suite.addTest(TestTrackWriter("writeOneTrackToOneGpx0AF"))
+    suite.addTest(TestTrackWriter("writeOneTrackToOneGpx1AF"))
+    suite.addTest(TestTrackWriter("writeOneTrackToOneGpx2AF"))
+    
+    # 2 tracks - gpx
+    suite.addTest(TestTrackWriter("writeTwoTrackToOneGpx0AF"))
+    suite.addTest(TestTrackWriter("writeTwoTrackToOneGpx1AF"))
+    suite.addTest(TestTrackWriter("writeTwoTrackToOneGpx2AF"))
+    
+    #tracks - many gpx
+    suite.addTest(TestTrackWriter("writeTwoTrackToManyGpx0AF"))
+    suite.addTest(TestTrackWriter("writeTwoTrackToManyGpx1AF"))
+    suite.addTest(TestTrackWriter("writeTwoTrackToManyGpx2AF"))
+    
     runner = TextTestRunner()
     runner.run(suite)
 
