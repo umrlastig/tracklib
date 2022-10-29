@@ -27,7 +27,7 @@ class TestAlgoSegmentationMethods(unittest.TestCase):
         resource_path = os.path.join(os.path.split(__file__)[0], "../..")
         gpxpath = os.path.join(resource_path, 'data/gpx/vincennes.gpx')
         GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
-        tracks = TrackReader.readFromGpxFiles(gpxpath, srid='ENU')
+        tracks = TrackReader.readFromGpx(gpxpath, srid='ENU')
         trace = tracks.getTrack(0)
         #trace = trace.extract(1150, 2500)
         print (trace.size())

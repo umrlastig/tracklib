@@ -465,7 +465,7 @@ class TrackReader:
     
     
     @staticmethod
-    def readFromGpxFiles(path: IO, 
+    def readFromGpx(path: IO, 
                          srid:Literal["GEO", "ENU"] ="GEO", 
                          type: Literal["trk", "rte"]="trk"):
         """
@@ -495,7 +495,7 @@ class TrackReader:
    
            GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2s1Z")
 
-           tracks = TrackReader.readFromGpxFiles('../../../data/activity_5807084803.gpx')
+           tracks = TrackReader.readFromGpx('../../../data/activity_5807084803.gpx')
            trace = tracks.getTrack(0)
         
         """
@@ -506,9 +506,9 @@ class TrackReader:
             LISTFILE = os.listdir(path)
             for f in LISTFILE:
                 if path[len(path)-1:] == '/':
-                    collection = TrackReader.readFromGpxFiles(path + f)
+                    collection = TrackReader.readFromGpx(path + f)
                 else:
-                    collection = TrackReader.readFromGpxFiles(path + '/' + f)
+                    collection = TrackReader.readFromGpx(path + '/' + f)
                 TRACES.addTrack(collection.getTrack(0))
             return TRACES
         

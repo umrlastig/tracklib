@@ -16,7 +16,7 @@ class TestPlot(unittest.TestCase):
         self.resource_path = os.path.join(os.path.split(__file__)[0], "../..")
         GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
         gpxpath = os.path.join(self.resource_path, 'data/gpx/activity_5807084803.gpx')
-        tracks = TrackReader.readFromGpxFiles(gpxpath)
+        tracks = TrackReader.readFromGpx(gpxpath)
         self.trace = tracks.getTrack(0)
         self.trace.estimate_speed()
     

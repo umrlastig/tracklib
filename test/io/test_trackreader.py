@@ -33,7 +33,7 @@ class TestTrackReader(TestCase):
     def test_read_gpx_enu_trk(self):
         path = os.path.join(self.resource_path, 'data/gpx/vincennes.gpx')
         GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
-        tracks = TrackReader.readFromGpxFiles(path, srid='ENU', type="trk")
+        tracks = TrackReader.readFromGpx(path, srid='ENU', type="trk")
         trace = tracks[0]
         self.assertEqual(5370, trace.size())
         self.assertIsInstance(trace, Track)
@@ -42,7 +42,7 @@ class TestTrackReader(TestCase):
     def test_read_default_gpx(self):
         path = os.path.join(self.resource_path, 'data/gpx/activity_5807084803.gpx')
         GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
-        tracks = TrackReader.readFromGpxFiles(path)
+        tracks = TrackReader.readFromGpx(path)
         trace = tracks[0]
         self.assertEqual(190, trace.size())
         self.assertIsInstance(trace, Track)
@@ -51,7 +51,7 @@ class TestTrackReader(TestCase):
     def test_read_gpx_geo_trk(self):
         path = os.path.join(self.resource_path, 'data/gpx/activity_5807084803.gpx')
         GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
-        tracks = TrackReader.readFromGpxFiles(path, srid='GEO', type="trk")
+        tracks = TrackReader.readFromGpx(path, srid='GEO', type="trk")
         trace = tracks[0]
         self.assertEqual(190, trace.size())
         self.assertIsInstance(trace, Track)
@@ -60,7 +60,7 @@ class TestTrackReader(TestCase):
     def test_read_gpx_geo_rte(self):
         path = os.path.join(self.resource_path, 'data/gpx/903313.gpx')
         GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
-        tracks = TrackReader.readFromGpxFiles(path, srid='GEO', type='rte')
+        tracks = TrackReader.readFromGpx(path, srid='GEO', type='rte')
         trace = tracks[0]
         self.assertEqual(1275, trace.size())
         self.assertIsInstance(trace, Track)
@@ -69,13 +69,13 @@ class TestTrackReader(TestCase):
     def test_read_gpx_dir(self):
         path = os.path.join(self.resource_path, 'data/gpx/geo')
         GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
-        tracks = TrackReader.readFromGpxFiles(path, srid='GEO', type='trk')
+        tracks = TrackReader.readFromGpx(path, srid='GEO', type='trk')
         self.assertEqual(2, tracks.size())
         self.assertIsInstance(tracks, TrackCollection)
         
         path = os.path.join(self.resource_path, 'data/gpx/geo/')
         GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
-        tracks = TrackReader.readFromGpxFiles(path, srid='GEO', type='trk')
+        tracks = TrackReader.readFromGpx(path, srid='GEO', type='trk')
         self.assertEqual(2, tracks.size())
         self.assertIsInstance(tracks, TrackCollection)
         
