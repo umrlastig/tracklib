@@ -257,24 +257,23 @@ class TestTrackWriter(TestCase):
         TrackWriter.writeToGpx(self.collection, path=gpxpath, af=True, oneFile=False)
         
         gpxpath = os.path.join(self.resource_path, 'data/test/gpx3/11.gpx')
-        tracks = TrackReader.readFromGpx(gpxpath, srid='ENU', type="trk")
-        # read_all=True
+        tracks = TrackReader.readFromGpx(gpxpath, srid='ENU', type="trk", read_all=True)
         trace = tracks[0]
         self.assertEqual(5, trace.size())
         self.assertIsInstance(trace, Track)
         self.assertEqual(0, int(trace.getObs(0).position.E))
-        self.assertFalse(trace.hasAnalyticalFeature('speed'))
-        
+        self.assertTrue(trace.hasAnalyticalFeature('speed'))
+        self.assertEqual(trace.getObsAnalyticalFeature('speed', 0), 1.0)
 
 
 if __name__ == '__main__':
     
     suite = TestSuite()
     
-    #suite.addTest(TestTrackWriter("test_write_csv_path"))
-    #suite.addTest(TestTrackWriter("test_write_csv_minim"))
-    #suite.addTest(TestTrackWriter("test_write_csv_2AF"))
-    #suite.addTest(TestTrackWriter("test_write_csv_2AF_desordre"))
+    suite.addTest(TestTrackWriter("test_write_csv_path"))
+    suite.addTest(TestTrackWriter("test_write_csv_minim"))
+    suite.addTest(TestTrackWriter("test_write_csv_2AF"))
+    suite.addTest(TestTrackWriter("test_write_csv_2AF_desordre"))
     
     #suite.addTest(TestTrackWriter("testWriteKml"))
     
