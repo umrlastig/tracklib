@@ -8,6 +8,7 @@ some utility functions.
 from __future__ import annotations   
 from typing import Any, Iterable, Optional, Union
 
+import json
 import sys
 import numpy as np
 
@@ -31,12 +32,19 @@ def isnan(number: Union[int, float]) -> bool:
     """Check if two numbers are different"""
     return number != number
 
-
 def isfloat(value: Any) -> bool:   
     """Check is a value is a float"""
     try:
         float(value)
         return True
+    except ValueError:
+        return False
+    
+def islist(value: Any) -> bool:   
+    """Check is a value is a list"""
+    try:
+        tab = json.loads(value)
+        return type(tab) == list
     except ValueError:
         return False
 
