@@ -79,7 +79,19 @@ class TestTrackReader(TestCase):
         self.assertEqual(2, tracks.size())
         self.assertIsInstance(tracks, TrackCollection)
         
+        
+    def testReadGpxWithAF(self):
+        path = os.path.join(self.resource_path, 'data/test/12.gpx')
+        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        tracks = TrackReader.readFromGpx(path, srid='ENU', type='trk')
+        
+        self.assertEqual(1, tracks.size())
+        self.assertIsInstance(tracks, TrackCollection)
     
+        trace = tracks.getTrack(0)
+        self.assertEqual(13, trace.size())
+        
+        print (trace.getListAnalyticalFeatures())
 
 
 if __name__ == '__main__':
@@ -99,6 +111,10 @@ if __name__ == '__main__':
     suite.addTest(TestTrackReader("test_read_gpx_geo_trk"))
     suite.addTest(TestTrackReader("test_read_gpx_geo_rte"))
     suite.addTest(TestTrackReader("test_read_gpx_dir"))
+
+    suite.addTest(TestTrackReader("testReadGpxWithAF"))
+    
+    
     
     runner = TextTestRunner()
     runner.run(suite)

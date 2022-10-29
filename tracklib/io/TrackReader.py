@@ -76,7 +76,7 @@ class TrackReader:
         srid str
             coordinate system of points ("ENU", "Geo" or "ECEF") 
         read_all bool
-            ?
+            if flag read_all is True, read AF in the tag extension 
         selector xx
             ?
             
@@ -463,11 +463,14 @@ class TrackReader:
 
         return TRACES
     
-    
+    # =========================================================================
+    #   GPX
+    #
     @staticmethod
     def readFromGpx(path: IO, 
                          srid:Literal["GEO", "ENU"] ="GEO", 
-                         type: Literal["trk", "rte"]="trk"):
+                         type: Literal["trk", "rte"]="trk",
+                         read_all=False):
         """
         Reads (multiple) tracks or routes from gpx file(s).
         
@@ -481,6 +484,8 @@ class TrackReader:
         type str
             may be “trk” to load track points or 
                    “rte” to load vertex from the route
+        read_all bool
+            if flag read_all is True, read AF in the tag extension 
                    
         Returns
         --------
@@ -545,11 +550,14 @@ class TrackReader:
     
                     point = Obs(utils.makeCoords(lon, lat, hgt, srid), time)
                     trace.addObs(point)
+                    
+                    # ..
+                    # track.createAnalyticalFeature(name_non_special[i])
     
                 TRACES.addTrack(trace)
 
             # pourquoi ?
-            # --> pour remettre le format comme il etait avant la lectre :)   
+            # --> pour remettre le format comme il etait avant la lecture :)   
             GPSTime.setReadFormat(format_old)
     
             collection = TrackCollection(TRACES)
