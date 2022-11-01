@@ -103,6 +103,26 @@ class TestTrackReader(TestCase):
         self.assertTrue(abs(v1 - 0.1285) < 0.001)
         self.assertEqual(trace.getObsAnalyticalFeature('abs_curv', 0), 
                 [0, 1.0, 2.0, 3.0, 5.0, 6.0, 9.0, 10.0, 14.0, 15.0, 20.0, 21.0, 27.0])
+        
+        
+    def testReadCsvWithAFTrack(self):
+        GPSTime.setReadFormat("2D/2M/4Y 2h:2m:2s")
+        chemin = os.path.join(self.resource_path, 'data/test/ecrins_interpol4.csv')
+        track = TrackReader.readFromCsvFiles(chemin, 0, 1, 2, 3, separator=";",read_all=True)
+        
+        self.assertIsInstance(track, Track)
+        self.assertEqual(1593, track.size())
+        self.assertEqual(track.getListAnalyticalFeatures(), 
+                ['anglegeom', 'angledeg', 'sommet', 'sommet2', 'virage', 'serie'])
+        
+    
+    def testReadCsvDir(self):
+        GPSTime.setReadFormat("2D/2M/4Y 2h:2m:2s")
+        chemin = os.path.join(self.resource_path, 'data/test/csv')
+        collection = TrackReader.readFromCsvFiles(chemin, 1, 2, -1, -1, separator=",")
+        
+        self.assertIsInstance(collection, TrackCollection)
+        self.assertEqual(collection.size(), 2)
 
 
 if __name__ == '__main__':
@@ -110,7 +130,8 @@ if __name__ == '__main__':
     suite = TestSuite()
     
     # CSV
-    
+    suite.addTest(TestTrackReader("testReadCsvWithAFTrack"))
+    suite.addTest(TestTrackReader("testReadCsvDir"))
     
     # WKT
     suite.addTest(TestTrackReader("test_read_wkt_polygon"))
