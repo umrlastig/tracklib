@@ -30,7 +30,7 @@ def prob():
 class TestOperateurMethods(unittest.TestCase):
     
     def setUp (self):
-        self.resource_path = os.path.join(os.path.split(__file__)[0], "..")
+        self.resource_path = os.path.join(os.path.split(__file__)[0], "../..")
     
     def mafonct(self, track, af_name):
         
