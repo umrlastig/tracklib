@@ -21,6 +21,12 @@ class TestTrackReader(TestCase):
         TRACES = TrackReader.readFromWKTFile(csvpath, 0)
         self.assertIsInstance(TRACES, TrackCollection)
         self.assertEqual(2312, TRACES.size())
+        
+        bbox = [655791, 6868715, 656055, 6868856]
+        TRACES = TrackReader.readFromWKTFile(csvpath, 0, bboxFilter=bbox)
+        self.assertIsInstance(TRACES, TrackCollection)
+        self.assertEqual(109, TRACES.size())
+        
 
     def test_read_wkt_linestring(self):
         csvpath = os.path.join(self.resource_path, 'data/wkt/iti.wkt')
