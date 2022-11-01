@@ -7,7 +7,9 @@ import unittest
 #import math
 from tracklib.core import (Coords, Obs, Track, GPSTime)
 import tracklib.algo.Analytics as Analytics
+from tracklib.algo.Analytics import BIAF_ABS_CURV
 import tracklib.algo.Cinematics as Cinematics
+
 #import tracklib.core.Utils as utils
 
 
@@ -99,12 +101,23 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         err = abs(speeds[6] - ds/dt)
         self.assertLessEqual(err, self.__epsilon, 'erreur pour 6')
         
+        
+    def testCompareAbsCurv(self):
+        speeds1 = Cinematics.computeAbsCurv(self.trace1)
+        #print (speeds1)
+        
+        self.trace1.addAnalyticalFeature(Analytics.abs_curv)
+        for i in range(self.trace1.size()):
+            self.assertEqual(speeds1, 
+                self.trace1.getObsAnalyticalFeature(BIAF_ABS_CURV, i))
+        
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     suite.addTest(TestAlgoCinematicsMethods("testAFInflexion"))
     suite.addTest(TestAlgoCinematicsMethods("testAFvertex"))
     suite.addTest(TestAlgoCinematicsMethods("testSmoothedSpeedCalculation"))
+    suite.addTest(TestAlgoCinematicsMethods("testCompareAbsCurv"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

@@ -6,8 +6,8 @@ import unittest
 import math
 
 from tracklib.core import (Coords, Obs, Track, GPSTime)
-import tracklib.algo.Analytics as Analytics
 import tracklib.core.Utils as utils
+import tracklib.algo.Analytics as Analytics
 
 
 class TestAlgoAnalyticsMethods(unittest.TestCase):
