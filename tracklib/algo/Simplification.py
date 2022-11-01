@@ -1,28 +1,5 @@
 '''
 **Simplification of GPS tracks**
-
-We present on this page four filtering algorithms for track by using 
-Douglas & Peucker simplification, Visvalingram simplification, squaring algorithms
-and ...
-
-The process "Track simplification" generally returns a new simplified track. 
-Tolerance is in the unit of track observation coordinates.
-
-We use the same sample track in the different examples. For loading the data:
-
-.. code-block:: python
-
-  from tracklib.io.TrackReader import TrackReader
-  import tracklib.algo.Simplification as Simplification
-
-  chemin = './data/lacet/ecrins.csv'
-  tracks = TrackReader.readFromWKTFile(chemin, 0, 1, 2, ",", 1, 
-                                    "ENUCoords", None, True)
-  trace = tracks["903959","%"][0]
-  trace = trace.extract(70,120)
-
-  trace.summary()
-
 '''
 
 import sys
@@ -55,30 +32,31 @@ MODE_SIMPLIFY_FREE_MAXIMIZE = 8
 
 SQUARING_RECALL = 0.1
 
-# --------------------------------------------------------------------------
-# Generic method to simplify a track
-# Tolerance is in the unit of track observation coordinates
-#     MODE_SIMPLIFY_DOUGLAS_PEUCKER (1)*
-#       - tolerance is max allowed deviation with respect to straight line
-#   MODE_SIMPLIFY_VISVALINGAM (2)
-#       - tolerance is maximal triangle area of 3 consecutive points
-#   MODE_SIMPLIFY_SQUARING (3)
-#       - tolerance is threshold on flat and right angles
-#   MODE_SIMPLIFY_MINIMIZE_LARGEST_DEVIATION (4)
-#       - tolerance is typical max deviation with respect to straight line
-#   MODE_SIMPLIFY_MINIMIZE_ELONGATION_RATIO (5)
-#       - tolerance is typical elongation ratio of min bounding rectangle
-#   MODE_SIMPLIFY_PRECLUDE_LARGE_DEVIATION (6)
-#       - tolerance is max allowed deviation with respect to straight line
-#   MODE_SIMPLIFY_FREE (7)
-#       - tolerance is a customed function to minimize
-#   MODE_SIMPLIFY_FREE_MAXIMIZE (8)
-#       - tolerance is a customed function to maximize
-# --------------------------------------------------------------------------
+
 def simplify(track, tolerance, mode=MODE_SIMPLIFY_DOUGLAS_PEUCKER, verbose=True):
     """
-    The process "Track simplification" generally returns a new simplified track. 
-    Tolerance is in the unit of track observation coordinates.
+    Generic method to simplify a track. The process "Track simplification" 
+    generally returns a new simplified track. Tolerance is in the unit 
+    of track observation coordinates.
+    
+    Differents modes of simplification are implemented in tracklib:
+        
+    - MODE_SIMPLIFY_DOUGLAS_PEUCKER (1)
+          tolerance is max allowed deviation with respect to straight line
+    - MODE_SIMPLIFY_VISVALINGAM (2)
+          tolerance is maximal triangle area of 3 consecutive points
+    - MODE_SIMPLIFY_SQUARING (3)
+          tolerance is threshold on flat and right angles
+    - MODE_SIMPLIFY_MINIMIZE_LARGEST_DEVIATION (4)
+          tolerance is typical max deviation with respect to straight line
+    - MODE_SIMPLIFY_MINIMIZE_ELONGATION_RATIO (5)
+          tolerance is typical elongation ratio of min bounding rectangle
+    - MODE_SIMPLIFY_PRECLUDE_LARGE_DEVIATION (6)
+          tolerance is max allowed deviation with respect to straight line
+    - MODE_SIMPLIFY_FREE (7)
+          tolerance is a customed function to minimize
+    - MODE_SIMPLIFY_FREE_MAXIMIZE (8)
+          tolerance is a customed function to maximize
 
     """
     if mode == MODE_SIMPLIFY_DOUGLAS_PEUCKER:
@@ -109,33 +87,11 @@ def simplify(track, tolerance, mode=MODE_SIMPLIFY_DOUGLAS_PEUCKER, verbose=True)
 def visvalingam (track, eps):
     """
     Function to simplify a GPS track with Visvalingam algorithm.
-    
-    The Visvalingram algorithm simplify the geometry of the track by reducing 
-    the number of points but the result presents less angular results than 
+
+    The Visvalingram algorithm simplify the geometry of the track by reducing
+    the number of points but the result presents less angular results than
     the Douglas-Peucker algorithm.
-    
-    Example:
 
-    .. code-block:: python
-    
-      tolerance = 50
-      trace3 = Simplification.simplify(trace, tolerance, 
-    			 Simplification.MODE_SIMPLIFY_VISVALINGAM)
-      trace.plot(append = False, sym='g-', label='original track')
-      trace3.plot(append = True, sym='b-', label='simplify:visvalingam')
-      plt.legend()
-
-
-    .. figure:: ../../_images/simplify_visvalingam.png
-       :width: 450px
-       :align: center
-    
-       Figure 1 : Simplification with Visvalingram
-
-    .. note:: Reference: M. Visvalingam & J. D. Whyatt (1993) Line generalisation by repeated elimination of points, The Cartographic Journal, 30:1, 46-51, DOI: 
-              `10.1179/000870493786962263 <10.1179/000870493786962263>`_
-    
-    
     Parameters
     ----------
     :param track Track: GPS track
@@ -167,41 +123,16 @@ def visvalingam (track, eps):
 def douglas_peucker (track, eps):
     """
     Function to simplify a GPS track with Douglas-Peucker algorithm.
-    
-    The Douglas-Peucker algorithm reduce the number of a line by reducing 
+
+    The Douglas-Peucker algorithm reduce the number of a line by reducing
     the number of points. The result should keep the original shape.
-    
-    Example:
 
-    .. code-block:: python
-    
-      tolerance = 20
-      trace2 = Simplification.simplify(trace, tolerance, 
-    			 Simplification.MODE_SIMPLIFY_DOUGLAS_PEUCKER)
-      trace.plot(append = False, sym='g-')
-      trace2.plot(append = True, sym='b-')
-
-
-    .. figure:: ../../../../_images/simplify_douglaspeucker.png
-       :width: 450px
-       :align: center
-    
-       Figure 2 : Simplification with Douglas Peucker
-
-
-    .. note:: Reference: David Douglas, Thomas Peucker: Algorithms for the 
-            reduction of the number of points required to represent a digitized 
-            line or its caricature. In Cartographica: The International Journal 
-            for Geographic Information and Geovisualization. 
-            Volume 10, Issue 2, Pages 112–122, 1973, 
-            `https://utpjournals.press/doi/10.3138/FM57-6770-U75U-7727 <https://utpjournals.press/doi/10.3138/FM57-6770-U75U-7727>`_
-    		
     Parameters
     ----------
     :param track Track: GPS track
     :param eps float: length threshold epsilon (sqrt of triangle area)
     :return Track: simplified track
-    
+
     """
 
     L = track.getObsList()
@@ -236,7 +167,7 @@ def douglas_peucker (track, eps):
 
 
 # --------------------------------------------------------------------------
-# 
+#
 # --------------------------------------------------------------------------
 # Input :
 #   - track ::     GPS track
@@ -249,7 +180,7 @@ def douglas_peucker (track, eps):
 def optimalSimplification(track, cost, eps, mode=MODE_SEGMENTATION_MINIMIZE):
     """
     Function to simplify a GPS track with dynamic programming.
-    
+
     """
 
     simplified = Track(user_id=track.uid, track_id=track.tid, base=track.base)
@@ -311,37 +242,13 @@ def __cost_largest_deviation_strict(track, i, j, offset):
 def squaring (track, eps):
     '''
     Function to simplify a GPS track with squaring algorithm.
-    
-    Example:
-    
-    .. code-block:: python
-
-      tolerance = 3
-      trace1 = Simplification.simplify(trace, tolerance, 
-    			 Simplification.MODE_SIMPLIFY_SQUARING)
-      trace.plot(append = False, sym='g-')
-      trace1.plot(append = True, sym='b-')
-
-
-    .. figure:: ../../../../_images/simplify_squaring.png
-       :width: 450px
-       :align: center
-    
-       Figure 3 : Simplification with squaring algorithm
-    
-    
-    .. note:: Reference: Lokhat, Imran & Touya, Guillaume. (2016). 
-              Enhancing building footprints with squaring operations. 
-              Journal of Spatial Information Science. 13. 
-              `10.5311/JOSIS.2016.13.276 <http://dx.doi.org/10.5311/JOSIS.2016.13.276>`_
-
 
     Parameters
     ----------
     :param track Track: GPS track
     :param eps float: angle threshold on right and flat angles (radians)
     :return Track: simplified track
-    
+
     '''
 
     N = len(track)
@@ -358,18 +265,18 @@ def squaring (track, eps):
         ux = x1-x0; uy = y1-y0
         vx = x2-x1; vy = y2-y1
         if du*dv != 0:
-	        arg = max(min((ux*vx + uy*vy)/(du*dv), 1), -1)
-	        angle = math.acos(arg)
-	        #if abs(angle) < eps:
-	            #p1.plot('go')
-	            #print(i, "FLAT")
-	        if abs(angle-math.pi/2) < eps:
-	            #p1.plot('ro')
-	            CR.append(i)
+            arg = max(min((ux*vx + uy*vy)/(du*dv), 1), -1)
+            angle = math.acos(arg)
+            #if abs(angle) < eps:
+                #p1.plot('go')
+                #print(i, "FLAT")
+            if abs(angle-math.pi/2) < eps:
+                #p1.plot('ro')
+                CR.append(i)
         else:  # on a que 2 points
             print("Warning: identical points")
 
-    X = [v for pair in zip(track.getX(), track.getY()) for v in pair]			
+    X = [v for pair in zip(track.getX(), track.getY()) for v in pair]
 
     for iter in range(5):
         J = SQUARING_RECALL*np.eye(2*N)

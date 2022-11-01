@@ -17,7 +17,7 @@ of the description of the four packages that make up Tracklib Framework.
    Package diagram of Tracklib framework
 
 
-Core 
+core 
 ------
 
 	Definition and implementation of central classes of Tracklib framework: Track, TrackCollection, etc. 
@@ -41,38 +41,107 @@ Core
 	=================== ====================================================================
 
 
-IO
+io
 ----
 	Implements for reading and/or writting tracks and networks in CSV, GPX, KML, ASCII file.
 
 
-Algo
+algo
 ------
 
 	Algorithms implementation for manipulate track like: interpolate, smoothing, segmentation, 
 	filtering, simplify, compare, mapping on another track or on network
 	
-	================== ====================================================================
-	Module                Purpose
-	================== ====================================================================
-	``Analytics``       Functions to compute Analytical Features like speed, ds, abs_curv, orientation, curve, etc.
-	``Cinematics``      Functions to manage cinematic computations on GPS tracks
-	``Comparison``	    Functions to manage comparisons of GPS tracks
-	``Dynamics``	    Functions to manage cinematic computations on GPS tracks
-	``Filtering``	    Functions to manage filtering of GPS tracks
-	``Geometrics``	    Functions to manage general operations on a track
-	``Interpolation``	   
-	``Mapping``	   	    Functions to transfer information between track and raster or between track and network
-	``Segmentation``    Functions to manage segmentation of GPS tracks
-	``Selection``
-	``Simplification``  Functions to manage simplification of GPS tracks
-	``Stochastics``
-	``Summarising``
-	``Synthetics``
-	================== ====================================================================
-
-
-Util
+    .. raw:: html
+	
+	    <table border="2" style='width:650px;' cellspacing="0" cellpadding="10">
+	    <caption>Algorithms implementation to manage track</caption>
+	    <thead>
+            <colgroup>
+              <col width="120px" />
+              <col span="1" />
+            </colgroup>
+            <tr>
+              <th align="left" style="font-weight:bold;background-color:#f1f1f1;">Module</th>
+              <th align="center" style="background-color:#f1f1f1;">Purpose</th>
+              <th align="center" style="background-color:#f1f1f1;">Functions available</th>
+            </tr>
+        </thead>
+	    <tr>
+    	    <td><span style='color:red;background-color:white;'>Analytics</span></td>
+	        <td>Functions to compute Analytical Features like 
+   	                    speed, ds, abs_curv, orientation, curve, etc.</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><span style='color:red;background-color:white;'>Cinematics</span></td>
+            <td>Functions to manage cinematic computations on GPS tracks</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><span style='color:red;background-color:white;'>Comparison</span></td>
+            <td>Functions to manage comparisons of GPS tracks</td>
+            <td>centralTrack, compare, differenceProfile</td>
+        </tr>
+        <tr>
+            <td><span style='color:red;background-color:white;'>Dynamics</span></td>
+            <td>Functions to manage cinematic computations on GPS tracks</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><span style='color:red;background-color:white;'>Filtering</span></td>
+            <td>Functions to manage filtering of GPS tracks</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><span style='color:red;background-color:white;'>Geometrics</span></td>
+            <td>Functions to manage general operations on a track</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><span style='color:red;background-color:white;'>Interpolation</span></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><span style='color:red;background-color:white;'>Mapping</span></td>
+            <td>Functions to transfer information between track and 
+            raster or between track and network</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><span style='color:red;background-color:white;'>Segmentation</span></td>
+            <td>Functions to manage segmentation of GPS tracks</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><span style='color:red;background-color:white;'>Selection</span></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><span style='color:red;background-color:white;'>Simplification</span></td>
+            <td>Functions to manage simplification of GPS tracks</td>
+            <td>simplify</td>
+        </tr>
+        <tr>
+            <td><span style='color:red;background-color:white;'>Stochastics</span></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><span style='color:red;background-color:white;'>Summarising</span></td>
+            <td></td>
+            <td>summarize</td>
+        </tr>
+        <tr>
+            <td><span style='color:red;background-color:white;'>Synthetics</span></td>
+            <td></td>
+            <td></td>
+        </tr>
+        </table>
+	
+	
+util
 ------
 
 	Tools like geometry functions or color function for the visualization
