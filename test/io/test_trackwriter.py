@@ -199,13 +199,13 @@ class TestTrackWriter(TestCase):
         TrackWriter.writeToGpx(self.trace1, path=gpxpath, af=True, oneFile=True)
         
     def testWriteOneTrackToOneGpx2AF(self):
-        self.trace1.addAnalyticalFeature(Analytics.abs_curv)
+        Cinematics.computeAbsCurv(self.trace1)
         gpxpath = os.path.join(self.resource_path, 'data/test/gpx3.gpx')
         TrackWriter.writeToGpx(self.trace1, path=gpxpath, af=True, oneFile=True)
 
     def testWriteTwoTrackToOneGpx0AF(self):
-        self.trace1.addAnalyticalFeature(Analytics.abs_curv)
-        self.trace2.addAnalyticalFeature(Analytics.abs_curv)
+        Cinematics.computeAbsCurv(self.trace1)
+        Cinematics.computeAbsCurv(self.trace2)
         
         gpxpath = os.path.join(self.resource_path, 'data/test/gpx5.gpx')
         TrackWriter.writeToGpx(self.collection, path=gpxpath, af=False, oneFile=True)
@@ -215,15 +215,15 @@ class TestTrackWriter(TestCase):
         TrackWriter.writeToGpx(self.collection, path=gpxpath, af=True, oneFile=True)
         
     def testWriteTwoTrackToOneGpx2AF(self):
-        self.trace1.addAnalyticalFeature(Analytics.abs_curv)
-        self.trace2.addAnalyticalFeature(Analytics.abs_curv)
+        Cinematics.computeAbsCurv(self.trace1)
+        Cinematics.computeAbsCurv(self.trace2)
         
         gpxpath = os.path.join(self.resource_path, 'data/test/gpx7.gpx')
         TrackWriter.writeToGpx(self.collection, path=gpxpath, af=True, oneFile=True)
         
     def testWriteTwoTrackToManyGpx0AF(self):
-        self.trace1.addAnalyticalFeature(Analytics.abs_curv)
-        self.trace2.addAnalyticalFeature(Analytics.abs_curv)
+        Cinematics.computeAbsCurv(self.trace1)
+        Cinematics.computeAbsCurv(self.trace2)
         
         gpxpath = os.path.join(self.resource_path, 'data/test/gpx1')
         TrackWriter.writeToGpx(self.collection, path=gpxpath, af=False, oneFile=False)
@@ -233,8 +233,8 @@ class TestTrackWriter(TestCase):
         TrackWriter.writeToGpx(self.collection, path=gpxpath, af=True, oneFile=False)
         
     def testWriteTwoTrackToManyGpx2AF(self):
-        self.trace1.addAnalyticalFeature(Analytics.abs_curv)
-        self.trace2.addAnalyticalFeature(Analytics.abs_curv)
+        Cinematics.computeAbsCurv(self.trace1)
+        Cinematics.computeAbsCurv(self.trace2)
         
         gpxpath = os.path.join(self.resource_path, 'data/test/gpx3')
         TrackWriter.writeToGpx(self.collection, path=gpxpath, af=True, oneFile=False)
@@ -270,25 +270,25 @@ if __name__ == '__main__':
     
     suite = TestSuite()
     
-#    suite.addTest(TestTrackWriter("test_write_csv_path"))
-#    suite.addTest(TestTrackWriter("test_write_csv_minim"))
-#    suite.addTest(TestTrackWriter("test_write_csv_2AF"))
-#    suite.addTest(TestTrackWriter("test_write_csv_2AF_desordre"))
+    suite.addTest(TestTrackWriter("test_write_csv_path"))
+    suite.addTest(TestTrackWriter("test_write_csv_minim"))
+    suite.addTest(TestTrackWriter("test_write_csv_2AF"))
+    suite.addTest(TestTrackWriter("test_write_csv_2AF_desordre"))
     
     # 1 track - 1 gpx
-#    suite.addTest(TestTrackWriter("testWriteOneTrackToOneGpx0AF"))
-#    suite.addTest(TestTrackWriter("testWriteOneTrackToOneGpx1AF"))
-#    suite.addTest(TestTrackWriter("testWriteOneTrackToOneGpx2AF"))
+    suite.addTest(TestTrackWriter("testWriteOneTrackToOneGpx0AF"))
+    suite.addTest(TestTrackWriter("testWriteOneTrackToOneGpx1AF"))
+    suite.addTest(TestTrackWriter("testWriteOneTrackToOneGpx2AF"))
     
     # 2 tracks - gpx
-#    suite.addTest(TestTrackWriter("testWriteTwoTrackToOneGpx0AF"))
-#    suite.addTest(TestTrackWriter("testWriteTwoTrackToOneGpx1AF"))
-#    suite.addTest(TestTrackWriter("testWriteTwoTrackToOneGpx2AF"))
+    suite.addTest(TestTrackWriter("testWriteTwoTrackToOneGpx0AF"))
+    suite.addTest(TestTrackWriter("testWriteTwoTrackToOneGpx1AF"))
+    suite.addTest(TestTrackWriter("testWriteTwoTrackToOneGpx2AF"))
     
     #tracks - many gpx
-#    suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx0AF"))
-#    suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx1AF"))
-#    suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx2AF"))
+    suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx0AF"))
+    suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx1AF"))
+    suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx2AF"))
     
     suite.addTest(TestTrackWriter("testWriteKml"))
     
