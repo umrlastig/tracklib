@@ -41,7 +41,9 @@ class TrackWriter:
         output += headerAF
         return output
 
-
+    # =========================================================================
+    #   CSV
+    #
     @staticmethod
     def writeToFile (track, path, id_E=-1, id_N=-1, id_U=-1, id_T=-1, 
                      separator=",", h=0, af_names=[]):

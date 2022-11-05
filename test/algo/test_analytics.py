@@ -132,16 +132,6 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
         self.assertEqual(s6, math.atan2(0, 10))
         self.assertEqual(s7, math.atan2(5, 0))
         
-    def testAbsCurv(self):
-        
-        self.trace1.addAnalyticalFeature(Analytics.abs_curv)
-        s1 = self.trace1.getObsAnalyticalFeature('abs_curv', 3)
-        self.assertEqual(s1, [0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 65.0])
-        
-        self.trace2.addAnalyticalFeature(Analytics.abs_curv)
-        s2 = self.trace2.getObsAnalyticalFeature('abs_curv', 3)
-        self.assertEqual(s2, [0, 10.0, 10.0, 30.0])
-        
     def testSpeed(self):
         
         v0 = self.trace2.getObsAnalyticalFeature('speed', 0)
@@ -302,7 +292,6 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     suite.addTest(TestAlgoAnalyticsMethods("testDS"))
-    suite.addTest(TestAlgoAnalyticsMethods("testAbsCurv"))
     suite.addTest(TestAlgoAnalyticsMethods("testHeading"))
     suite.addTest(TestAlgoAnalyticsMethods("testSpeed"))
     suite.addTest(TestAlgoAnalyticsMethods("testAcceleration"))

@@ -16,8 +16,6 @@ BIAF_HEADING = "heading"
 BIAF_ABS_CURV = "abs_curv"
 BUILT_IN_AF = [BIAF_DS, BIAF_SPEED, BIAF_ABS_CURV, BIAF_HEADING]
 
-# __all__ = ["BIAF_DS", "BIAF_SPEED", "BIAF_HEADING", "BIAF_ABS_CURV", "BUILT_IN_AF"]
-
 
 def addListToAF(track, af_name, array):
     """TODO"""
@@ -32,31 +30,6 @@ def ds(track, i):
     if i == 0:
         return 0
     return track.getObs(i).distance2DTo(track.getObs(i - 1))
-
-
-def abs_curv(track, i):
-    """
-    curvilinear abscissa
-
-    Parameters
-    ----------
-    track : Track
-        trace on which the computation of curvilinear abscissa is done
-    i : int
-        i-th observation
-
-    Returns
-    -------
-    S : list
-        curvilinear abscissa for each observations.
-
-    """
-    
-    S = [0]
-    for i in range(1, track.size()):
-        ds = track.getObs(i - 1).position.distance2DTo(track.getObs(i).position)
-        S.append(S[i - 1] + ds)
-    return S
 
 
 def heading(track, i):

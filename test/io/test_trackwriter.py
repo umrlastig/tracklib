@@ -185,23 +185,6 @@ class TestTrackWriter(TestCase):
         txt += "2.000,2.000,0.000,01/01/2020 10:00:04.000\n"
         self.assertEqual(contents.strip(), txt.strip())
         
-        
-    def testWriteKml(self):
-        
-        from tracklib.io.TrackReader import TrackReader
-        
-        resource_path = os.path.join(os.path.split(__file__)[0], "../..")
-        GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
-        gpxpath = os.path.join(resource_path, 'data/gpx/activity_5807084803.gpx')
-        tracks = TrackReader.readFromGpx(gpxpath)
-        trace = tracks.getTrack(0)
-        
-        trace.addAnalyticalFeature(Analytics.speed)
-        print (trace.getAnalyticalFeature('speed'))
-        
-        kmlpath = os.path.join(self.resource_path, 'data/test/couplage.kml')
-        TrackWriter.writeToKml(trace, path=kmlpath, type="LINE", af='speed')
-
 
     def testWriteOneTrackToOneGpx0AF(self):
         #gpxpath = os.path.join(self.resource_path, 'data/test/gpx1.csv')
@@ -264,33 +247,52 @@ class TestTrackWriter(TestCase):
         self.assertEqual(0, int(trace.getObs(0).position.E))
         self.assertTrue(trace.hasAnalyticalFeature('speed'))
         self.assertEqual(trace.getObsAnalyticalFeature('speed', 0), 1.0)
+        
+        
+    def testWriteKml(self):
+        
+        from tracklib.io.TrackReader import TrackReader
+        
+        resource_path = os.path.join(os.path.split(__file__)[0], "../..")
+        GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
+        gpxpath = os.path.join(resource_path, 'data/gpx/activity_5807084803.gpx')
+        tracks = TrackReader.readFromGpx(gpxpath)
+        trace = tracks.getTrack(0)
+        
+        trace.addAnalyticalFeature(Analytics.speed)
+        print (trace.getAnalyticalFeature('speed'))
+        
+        kmlpath = os.path.join(self.resource_path, 'data/test/couplage.kml')
+        TrackWriter.writeToKml(trace, path=kmlpath, type="LINE", af='speed')
 
 
 if __name__ == '__main__':
     
     suite = TestSuite()
     
-    suite.addTest(TestTrackWriter("test_write_csv_path"))
-    suite.addTest(TestTrackWriter("test_write_csv_minim"))
-    suite.addTest(TestTrackWriter("test_write_csv_2AF"))
-    suite.addTest(TestTrackWriter("test_write_csv_2AF_desordre"))
-    
-    #suite.addTest(TestTrackWriter("testWriteKml"))
+#    suite.addTest(TestTrackWriter("test_write_csv_path"))
+#    suite.addTest(TestTrackWriter("test_write_csv_minim"))
+#    suite.addTest(TestTrackWriter("test_write_csv_2AF"))
+#    suite.addTest(TestTrackWriter("test_write_csv_2AF_desordre"))
     
     # 1 track - 1 gpx
-    suite.addTest(TestTrackWriter("testWriteOneTrackToOneGpx0AF"))
-    suite.addTest(TestTrackWriter("testWriteOneTrackToOneGpx1AF"))
-    suite.addTest(TestTrackWriter("testWriteOneTrackToOneGpx2AF"))
+#    suite.addTest(TestTrackWriter("testWriteOneTrackToOneGpx0AF"))
+#    suite.addTest(TestTrackWriter("testWriteOneTrackToOneGpx1AF"))
+#    suite.addTest(TestTrackWriter("testWriteOneTrackToOneGpx2AF"))
     
     # 2 tracks - gpx
-    suite.addTest(TestTrackWriter("testWriteTwoTrackToOneGpx0AF"))
-    suite.addTest(TestTrackWriter("testWriteTwoTrackToOneGpx1AF"))
-    suite.addTest(TestTrackWriter("testWriteTwoTrackToOneGpx2AF"))
+#    suite.addTest(TestTrackWriter("testWriteTwoTrackToOneGpx0AF"))
+#    suite.addTest(TestTrackWriter("testWriteTwoTrackToOneGpx1AF"))
+#    suite.addTest(TestTrackWriter("testWriteTwoTrackToOneGpx2AF"))
     
     #tracks - many gpx
-    suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx0AF"))
-    suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx1AF"))
-    suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx2AF"))
+#    suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx0AF"))
+#    suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx1AF"))
+#    suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx2AF"))
+    
+    suite.addTest(TestTrackWriter("testWriteKml"))
+    
+    
     
     runner = TextTestRunner()
     runner.run(suite)

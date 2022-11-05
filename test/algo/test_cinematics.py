@@ -92,10 +92,11 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
     def testSmoothedSpeedCalculation(self):
         Cinematics.smoothed_speed_calculation(self.trace1, 2)
         speeds = self.trace1.getAnalyticalFeature('speed')
-        self.trace1.addAnalyticalFeature(Analytics.abs_curv)
+        Cinematics.computeAbsCurv(self.trace1)
         
-        ds = self.trace1.getObsAnalyticalFeature('abs_curv', 8)
-        ds = ds[8] - ds[4]
+        ds8 = self.trace1.getObsAnalyticalFeature('abs_curv', 8)
+        ds4 = self.trace1.getObsAnalyticalFeature('abs_curv', 4)
+        ds = ds8 - ds4
         dt = self.trace1.getObs(8).timestamp - self.trace1.getObs(4).timestamp
 
         err = abs(speeds[6] - ds/dt)
@@ -106,9 +107,9 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         speeds1 = Cinematics.computeAbsCurv(self.trace1)
         #print (speeds1)
         
-        self.trace1.addAnalyticalFeature(Analytics.abs_curv)
+        Cinematics.computeAbsCurv(self.trace1)
         for i in range(self.trace1.size()):
-            self.assertEqual(speeds1, 
+            self.assertEqual(speeds1[i], 
                 self.trace1.getObsAnalyticalFeature(BIAF_ABS_CURV, i))
         
 
