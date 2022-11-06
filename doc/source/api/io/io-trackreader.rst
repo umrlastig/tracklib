@@ -13,7 +13,7 @@ CSV files
 Read from a CSV files with lon/lat coordinates
 
 
-.. autofunction:: tracklib.io.TrackReader.readFromCsvFiles
+.. automethod:: tracklib.io.TrackReader.readFromCsvFiles
 
 
 WKT files
@@ -22,7 +22,7 @@ WKT files
 Read from a CSV files with a wkt geometry
 
 
-.. autofunction:: tracklib.io.TrackReader.readFromWKTFile
+.. automethod:: tracklib.io.TrackReader.readFromWKTFile
 
 
 GPX files
@@ -31,14 +31,14 @@ GPX files
 Read from a GPX files
 
 
-.. autofunction:: tracklib.io.TrackReader.readFromGpx
+.. automethod:: tracklib.io.TrackReader.readFromGpx
 
 
 
 NMA files
 ----------
 
-.. autofunction:: tracklib.io.TrackReader.readFromNMEAFile
+.. automethod:: tracklib.io.TrackReader.readFromNMEAFile
 
 
 
