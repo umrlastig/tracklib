@@ -138,11 +138,20 @@ class GPSTime:
         :param elapsed_seconds: Elapsed seconds
         :return: Coverted time
         """
+        
+        # elapsed is in second or in millisecond ?
+        from datetime import datetime
+        from calendar import timegm
+        nowobj = datetime.now()
+        t = datetime(nowobj.year, nowobj.month, nowobj.day, 0, 0, 0)
+        tps = timegm(t.timetuple())
+        if elapsed_seconds > tps:
+            elapsed_seconds = elapsed_seconds / 1000
 
         time = GPSTime()
 
         SECOND_PER_YEAR = 86400 * 365
-        SECOND_PER_MONTH = 86400 * 28
+        # SECOND_PER_MONTH = 86400 * 28
 
         # Year
         sec = 0

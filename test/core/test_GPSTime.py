@@ -40,10 +40,25 @@ class TestGPSTime(unittest.TestCase):
         self.assertEqual(18, d.sec)
         
         
+        d = GPSTime.readUnixTime(1334665563298)
+        print (d)
+        self.assertIsInstance(d, GPSTime)
+        self.assertEqual('17/04/2012 12:26:03', str(d)[0:19])
+        self.assertEqual(17, d.day)
+        self.assertEqual(4, d.month)
+        self.assertEqual(2012, d.year)
+        self.assertEqual(12, d.hour)
+        self.assertEqual(26, d.min)
+        self.assertEqual(3, d.sec)
+        
+        
 if __name__ == '__main__':
     #unittest.main()
     suite = unittest.TestSuite()
-    suite.addTest(TestGPSTime("test_format_time"))
+    #suite.addTest(TestGPSTime("test_format_time"))
     suite.addTest(TestGPSTime("test_readunixtime"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
+    
+    
+    
