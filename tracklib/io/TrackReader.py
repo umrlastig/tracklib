@@ -200,7 +200,6 @@ class TrackReader:
                         time = GPSTime.readTimestamp(fields[fmt.id_T])
                     else:
                         time = fmt.DateIni.addSec((float)(fields[fmt.id_T]))
-                        print (time)
                 else:
                     time = GPSTime()
 
