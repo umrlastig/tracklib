@@ -7,7 +7,7 @@ Module io
    :maxdepth: 1
    :caption: Load/Export Track
    	
-   ./io/io-trackformat
+..   ./io/io-trackformat
    ./io/io-trackreader
    ./io/io-trackwriter
 
@@ -15,7 +15,7 @@ Module io
    :maxdepth: 1
    :caption: Load/Export Network
 
-   ./io/io-networkformat
+..   ./io/io-networkformat
    ./io/io-networkreader
    ./io/io-networkwriter
    
