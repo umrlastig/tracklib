@@ -114,23 +114,26 @@ class TrackReader:
                 trace = TrackReader.readFromCsvFiles(
                     p, id_E, id_N, id_U, id_T,
                     separator, DateIni, h, com, no_data_value,
-                    srid, read_all, verbose=False,
+                    srid, read_all, selector, verbose,
                 )
                 if not selector is None:
                     if not selector.contains(trace):
                         continue
                 TRACES.addTrack(trace)
-                if verbose:
-                    print("File " + p
-                        + " loaded: \n"
-                        + (str)(trace.size())
-                        + " point(s) registered"
-                    )
+                # if verbose:
+                #     print("File " + p
+                #         + " loaded: \n"
+                #         + (str)(trace.size())
+                #         + " point(s) registered"
+                #     )
 
             return TRACES
             
         elif not os.path.isfile(path):
             return None
+        
+        if verbose:
+            print("Loading file " + path)
 
         # -------------------------------------------------------
         # Infering file format from extension or name
@@ -197,6 +200,7 @@ class TrackReader:
                         time = GPSTime.readTimestamp(fields[fmt.id_T])
                     else:
                         time = fmt.DateIni.addSec((float)(fields[fmt.id_T]))
+                        print (time)
                 else:
                     time = GPSTime()
 
@@ -268,6 +272,7 @@ class TrackReader:
                                     val = float(val)
                                 except ValueError:
                                     val = str(val).replace('"', "")
+                            print ('??')
                             track.setObsAnalyticalFeature(
                                 name_non_special[i], counter, val
                             )
@@ -281,9 +286,9 @@ class TrackReader:
 
         if verbose:
             print(
-                "File "
+                "  File "
                 + path
-                + " loaded: \n"
+                + " loaded: "
                 + (str)(track.size())
                 + " point(s) registered"
             )
