@@ -52,6 +52,13 @@ Examples
                                       separator = ' ', verbose = True)
 
 
+GPX files
+----------
+
+Read from a GPX files
+
+.. automethod:: tracklib.io.TrackReader.readFromGpx
+
 
 WKT files
 ----------
@@ -60,15 +67,6 @@ Read from a CSV files with a wkt geometry
 
 
 .. automethod:: tracklib.io.TrackReader.TrackReader.readFromWKTFile
-
-
-GPX files
-----------
-
-Read from a GPX files
-
-
-.. automethod:: tracklib.io.TrackReader.readFromGpx
 
 
 
