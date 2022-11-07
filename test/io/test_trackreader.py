@@ -8,6 +8,12 @@ from tracklib.core.Track import Track
 from tracklib.core.TrackCollection import TrackCollection
 from tracklib.io.TrackReader import TrackReader
 
+from tracklib.core.Coords import ENUCoords
+import tracklib.algo.Geometrics as Geometrics
+from tracklib.algo.Selection import Constraint
+from tracklib.algo.Selection import TYPE_CUT_AND_SELECT, MODE_INSIDE
+from tracklib.algo.Selection import Selector
+
 
 class TestTrackReader(TestCase):
     
@@ -122,7 +128,31 @@ class TestTrackReader(TestCase):
         
         self.assertIsInstance(collection, TrackCollection)
         self.assertEqual(collection.size(), 2)
-
+        
+        
+    def testReadCsvSelect(self):
+        Xmin = 29.72
+        Xmax = 29.77
+        Ymin = 62.585
+        Ymax = 62.615
+        ll = ENUCoords(Xmin, Ymin)
+        ur = ENUCoords(Xmax, Ymax)
+        bbox = Geometrics.Rectangle(ll, ur)
+        constraintBBox = Constraint(shape = bbox, mode = MODE_INSIDE, type=TYPE_CUT_AND_SELECT)
+        s = Selector([constraintBBox])
+        
+        chemin = os.path.join(self.resource_path, 'data/mopsi')
+        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        dateInitiale = '1970-01-01 00:00:00'
+        collection = TrackReader.readFromCsv(path=chemin, id_E=1, id_N=0, id_T=2, 
+                                             srid="GeoCoords",
+                                             DateIni = GPSTime.readTimestamp(dateInitiale),
+                                             selector=s,
+                                             separator= ' ', verbose = True)
+        # 
+        self.assertIsInstance(collection, TrackCollection)
+        self.assertEqual(collection.size(), 23)
+        
 
 if __name__ == '__main__':
     #unittest.main()
@@ -131,6 +161,7 @@ if __name__ == '__main__':
     # CSV
     suite.addTest(TestTrackReader("testReadCsvWithAFTrack"))
     suite.addTest(TestTrackReader("testReadCsvDir"))
+    suite.addTest(TestTrackReader("testReadCsvSelect"))
     
     # WKT
     suite.addTest(TestTrackReader("test_read_wkt_polygon"))

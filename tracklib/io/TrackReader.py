@@ -252,7 +252,6 @@ class TrackReader:
                                     val = float(val)
                                 except ValueError:
                                     val = str(val).replace('"', "")
-                            print ('??')
                             track.setObsAnalyticalFeature(
                                 name_non_special[i], counter, val
                             )
