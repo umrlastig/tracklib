@@ -8,7 +8,7 @@ from tracklib.core.Kernel import GaussianKernel
 from tracklib.core.Operator import Operator
 
 chemin = './data/lacet/ecrins.csv'
-tracks = FileReader.readFromWKTFile(chemin, 0, 1, 2, ",", 1, 
+tracks = FileReader.readFromWkt(chemin, 0, 1, 2, ",", 1, 
                                     "ENUCoords", None, True)
 trace = tracks["903959","%"][0]
 #print (trace.size())

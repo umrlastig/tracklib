@@ -24,18 +24,18 @@ class TestTrackReader(TestCase):
 
     def test_read_wkt_polygon(self):
         csvpath = os.path.join(self.resource_path, 'data/wkt/bati.wkt')
-        TRACES = TrackReader.readFromWKTFile(csvpath, 0)
+        TRACES = TrackReader.readFromWkt(csvpath, 0)
         self.assertIsInstance(TRACES, TrackCollection)
         self.assertEqual(2312, TRACES.size())
         
         bbox = [655791, 6868715, 656055, 6868856]
-        TRACES = TrackReader.readFromWKTFile(csvpath, 0, bboxFilter=bbox)
+        TRACES = TrackReader.readFromWkt(csvpath, 0, bboxFilter=bbox)
         self.assertIsInstance(TRACES, TrackCollection)
         self.assertEqual(109, TRACES.size())
 
     def test_read_wkt_linestring(self):
         csvpath = os.path.join(self.resource_path, 'data/wkt/iti.wkt')
-        TRACES = TrackReader.readFromWKTFile(csvpath, 0, -1, -1, "#", 1, "ENUCoords", None, True)
+        TRACES = TrackReader.readFromWkt(csvpath, 0, -1, -1, "#", 1, "ENUCoords", None, True)
         # id_user=-1, id_track=-1, separator=";", h=0, srid="ENUCoords", bboxFilter=None
         self.assertIsInstance(TRACES, TrackCollection)
         self.assertEqual(3, TRACES.size())

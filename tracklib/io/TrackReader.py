@@ -79,10 +79,7 @@ class TrackReader:
         :param Selector selector: to select track with a Selection which combine 
                                   different constraint
                                   
-        Returns:
-            :rtype: Track or TrackCollection contains in wkt file(s).
-
-            
+        :return: a track or a collection of tracks contains in wkt files.
         """
         
         if os.path.isdir(path):
@@ -286,7 +283,7 @@ class TrackReader:
     NMEA_GNRMC = "GNRMC"
 
     @staticmethod
-    def readFromNMEAFile(path, frame=NMEA_GGA):
+    def readFromNMEA(path, frame=NMEA_GGA):
         """The method assumes a single track in file."""
 
         track = Track()
@@ -340,40 +337,31 @@ class TrackReader:
     
     
     @staticmethod
-    def readFromWKTFile(path, 
+    def readFromWkt(path:str, 
                         id_geom, id_user=-1, id_track=-1,
                         separator=";", h=0, srid="ENUCoords",
-                        bboxFilter=None, doublequote=False, verbose=False):
+                        bboxFilter=None, 
+                        doublequote:bool=False, 
+                        verbose=False) -> TrackCollection:
         """
-        Reads multiple tracks (one per line) from a csv file.
+        Read track(s) (one per line) from a CSV file, with geometry provided in wkt.
         
         Parameters
         -----------
         
-        path str
-            file or directory
-        id_geom int
-            index of the column that contains the geometry
-        id_user int
-            index of the column that contains the id of the user of the track
-        id_track int
-            index of the column that contains the id of the track
-        separator car
-            separating characters
-        h int
-            number of heading line
-        srid str
-            coordinate system of points ("ENU", "Geo" or "ECEF") 
-        bboxFilter
+        :param str path: csv file
+        :param int id_geom: index of the column that contains the geometry
+        :param int id_user: index of the column that contains the id of the user of the track
+        :param int id_track: index of the column that contains the id of the track
+        :param str separator: separating characters (can be multiple characters). 
+                              Can be c (comma), b (blankspace), s (semi-column)
+        :param int h: number of heading line
+        :param str srid: coordinate system of points ("ENU", "Geo" or "ECEF") 
+        :param ?? bboxFilter: 
+        :param bool doublequote: when True, quotechar is doubled. 
+                                 When False, the escapechar is used as a prefix to the quotechar
         
-        doublequote
-        
-        Returns
-        --------
-        
-        TrackCollection
-            collection of tracks contains in wkt file.
-        
+        :return: collection of tracks contains in wkt files.
         """
 
         if separator == " ":
@@ -454,42 +442,23 @@ class TrackReader:
     #   GPX
     #
     @staticmethod
-    def readFromGpx(path: IO, 
-                         srid:Literal["GEO", "ENU"] ="GEO", 
-                         type: Literal["trk", "rte"]="trk",
-                         read_all=False):
+    def readFromGpx(path:str, 
+                    srid:Literal["GEO", "ENU"] ="GEO", 
+                    type: Literal["trk", "rte"]="trk",
+                    read_all=False) -> TrackCollection:
         """
         Reads (multiple) tracks or routes from gpx file(s).
         
         Parameters
         -----------
         
-        path str
-            file or directory
-        srid str
-            coordinate system of points ("ENU", "Geo" or "ECEF") 
-        type str
-            may be “trk” to load track points or 
-                   “rte” to load vertex from the route
-        read_all bool
-            if flag read_all is True, read AF in the tag extension 
+        :param str path: file or directory
+        :param str srid: coordinate system of points ("ENU", "Geo" or "ECEF") 
+        :param str type: may be “trk” to load track points or 
+                         “rte” to load vertex from the route
+        :param bool read_all: if flag read_all is True, read AF in the tag extension 
                    
-        Returns
-        --------
-        
-        TrackCollection
-            collection of tracks contains in Gps files.
-
-        .. code-block:: python
-        
-           from tracklib.io.TrackReader import TrackReader
-           from tracklib.core.GPSTime import GPSTime
-   
-           GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2s1Z")
-
-           tracks = TrackReader.readFromGpx('../../../data/activity_5807084803.gpx')
-           trace = tracks.getTrack(0)
-        
+        :return: collection of tracks contains in Gpx files.
         """
              
         TRACES = TrackCollection()

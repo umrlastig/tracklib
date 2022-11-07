@@ -1,22 +1,32 @@
 :Author: Marie-Dominique Van Damme
 :Version: 1.0
 :License: --
-:Date: 11/11/2022
+:Date: 07/11/2022
 
 TrackReader
 =============
+
+TrackReader class offers static methods to load track or track collection
+from GPX, CSV or NMEA files. 
+Geometry can be structured in coordinates or in a wkt.
 
 
 CSV files
 ----------
 
-.. automethod:: tracklib.io.TrackReader.TrackReader.readFromCsv
+Examples:
 
-
-Examples
-^^^^^^^^
+1. Load a track 
+ 
+   .. code-block:: python
+   
+      from tracklib.core.GPSTime import GPSTime
+      from tracklib.io.TrackReader import TrackReader as reader
+      
+      GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+      track = FileReader.readFromFile('./data/trace1.dat', 2, 3, -1, 4, srid="ENUCoords")
         
-1. Load a track collection by specifying a directory in the variable 'path'.
+2. Load a track collection by specifying a directory in the variable 'path'.
    Timestamp is in milliseconds.
    Select only tracks inside a defined bounding box.
    
@@ -52,35 +62,60 @@ Examples
                                       separator = ' ', verbose = True)
 
 
+API documentation:
+
+.. automethod:: tracklib.io.TrackReader.TrackReader.readFromCsv
+
+
+
+
 GPX files
 ----------
 
-Read from a GPX files
+Example:
 
-.. automethod:: tracklib.io.TrackReader.readFromGpx
+.. code-block:: python
+        
+   from tracklib.io.TrackReader import TrackReader
+   from tracklib.core.GPSTime import GPSTime
+   
+   GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2s1Z")
+
+   tracks = TrackReader.readFromGpx('../../../data/activity_5807084803.gpx')
+   trace = tracks.getTrack(0)
+
+
+API documentation:
+
+.. automethod:: tracklib.io.TrackReader.TrackReader.readFromGpx
+
 
 
 WKT files
 ----------
 
-Read from a CSV files with a wkt geometry
+Example:
+
+.. code-block:: python
+
+   csvpath = os.path.join(self.resource_path, 'data/wkt/iti.wkt')
+   TRACES = TrackReader.readFromWkt(csvpath, 0, -1, -1, "#", 1, "ENUCoords", None, True)
 
 
-.. automethod:: tracklib.io.TrackReader.TrackReader.readFromWKTFile
+API documentation:
+
+.. automethod:: tracklib.io.TrackReader.TrackReader.readFromWkt
 
 
 
 NMA files
 ----------
 
-.. automethod:: tracklib.io.TrackReader.readFromNMEAFile
+API documentation:
+
+.. automethod:: tracklib.io.TrackReader.TrackReader.readFromNMEA
 
 
 
 
 
-Ancien
---------
-
-.. automodule:: tracklib.io.TrackReader
-    :members:

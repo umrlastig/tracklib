@@ -13,7 +13,7 @@ import tracklib.algo.Filtering as flt
 # =============================================================================
 resource_path = os.path.join(os.path.split(__file__)[0], "..")
 csvpath = os.path.join(resource_path, 'data/lacet/ecrins.csv')
-tracks = FileReader.readFromWKTFile(csvpath, 0, 1, 2, ",", 1, 
+tracks = FileReader.readFromWkt(csvpath, 0, 1, 2, ",", 1, 
                                     "ENUCoords", None, True)
 
 trace = tracks["903959","%"][0]
