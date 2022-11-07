@@ -26,10 +26,9 @@ class TrackReader:
     """
 
     @staticmethod
-    def readFromCsvFiles(
-        path,
-        id_E=-1, id_N=-1, id_U=-1, id_T=-1,
-        separator=",",
+    def readFromCsv (path: str,
+        id_E:int=-1, id_N:int=-1, id_U:int=-1, id_T:int=-1,
+        separator:str=",",
         DateIni=-1,
         h=0,
         com="#",
@@ -38,94 +37,75 @@ class TrackReader:
         read_all=False,
         selector=None,
         verbose=False,
-    ):
+    ) -> Union(Track, TrackCollection):
         """
-        - The method assumes a single track in file.
-        - If only path is provided as input parameters: file format is infered 
-          from extension according to file track_file_format
-        - If only path and a string s parameters are provied, 
-          the name of file format is set equal to s.
+        Read track(s) from CSV file(s) with geometry structured in coordinates.
+        
+        The method assumes a single track in file.
+        
+        If only path is provided as input parameters: file format is infered 
+        from extension according to file track_file_format
+        
+        If only path and a string s parameters are provied, the name of file format 
+        is set equal to s.
         
         Parameters
         -----------
         
-        path str
-            file or directory
-        id_E int
-            index (starts from 0) of column containing coordinate X (for ECEF), longitude (GEO) or E (ENU)
-            -1 if file format is used
-        id_N int
-            index (starts from 0) of column containing coordinate Y (for ECEF), latitude (GEO) or N (ENU)
-            -1 if file format is used
-        id_U int
-            index (starts from 0) of column containing Z (for ECEF), height or altitude (GEO/ENU)
-            -1 if file format is used
-        id_T int
-            index (starts from 0) of column containing timestamp (in seconds or in time_fmt format)
-            -1 if file format is used
-        separator car
-            separating characters
-        DateIni str
-            initial date (in time_fmt format) if timestamps are provided in seconds (-1 if not used)
-        h int
-            number of heading line
-        com str
-            comment character (lines starting with cmt on the top left are skipped)
-        no_data_value int
-            a special float or integer indicating that record is non-valid and should be skipped
-        srid str
-            coordinate system of points ("ENU", "Geo" or "ECEF") 
-        read_all bool
-            if flag read_all is True, read AF in the tag extension 
-        selector xx
-            ?
-            
-        Returns
-        --------
-        TrackCollection
-            collection of tracks contains in wkt file.
+        :param str path: file or directory
+        :param int id_E: index (starts from 0) of column containing coordinate X (for ECEF), 
+                         longitude (GEO) or E (ENU)
+                         -1 if file format is used
+        :param int id_N: index (starts from 0) of column containing coordinate Y (for ECEF), 
+                         latitude (GEO) or N (ENU)
+                         -1 if file format is used
+        :param int id_U: index (starts from 0) of column containing Z (for ECEF), 
+                         height or altitude (GEO/ENU)
+                         -1 if file format is used
+        :param int id_T: index (starts from 0) of column containing timestamp 
+                         (in seconds or in time_fmt format)
+                         -1 if file format is used
+        :param str separator: separating characters (can be multiple characters). 
+                              Can be c (comma), b (blankspace), s (semi-column)
+        :param GPSTime DateIni: initial date (in time_fmt format) if timestamps 
+                                are provided in seconds (-1 if not used)
+        :param int h: number of heading line
+        :param str com: comment character (lines starting with cmt on the top left 
+                        are skipped)
+        :param int no_data_value: a special float or integer indicating 
+                                  that record is non-valid and should be skipped
+        :param str srid: coordinate system of points ("ENU", "Geo" or "ECEF") 
+        :param bool read_all: if flag read_all is True, read AF in the tag extension 
+        :param Selector selector: to select track with a Selection which combine 
+                                  different constraint
+                                  
+        Returns:
+            :rtype: Track or TrackCollection contains in wkt file(s).
 
             
-        Examples
-        ---------
-        
-        1. Timestamp is in seconds
-        
-        .. code-block:: python
-        
-           PATH = '/home/marie-dominique/tracklib/cotation/mopsi/routes/4'
-           GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
-           date = '1970-01-01 00:00:00'
-           collection = reader.readFromCsvFiles(path=PATH, id_E=1, id_N=0, id_T=2, 
-                                                DateIni = GPSTime.readTimestamp(madate),
-                                                separator= ' ')
-           print ('Number of tracks: ' + str(collection.size()))
-        
-        2. xxx
-        
         """
         
-        TRACES = TrackCollection()
-        
         if os.path.isdir(path):
+            TRACES = TrackCollection()
+            
             LISTFILE = os.listdir(path)
             for f in LISTFILE:
+                
                 p = path + "/" + f
-                trace = TrackReader.readFromCsvFiles(
+                trace = TrackReader.readFromCsv(
                     p, id_E, id_N, id_U, id_T,
                     separator, DateIni, h, com, no_data_value,
                     srid, read_all, selector, verbose,
                 )
+                
+                if trace is None:
+                    continue
+                
                 if not selector is None:
                     if not selector.contains(trace):
                         continue
+                    
                 TRACES.addTrack(trace)
-                # if verbose:
-                #     print("File " + p
-                #         + " loaded: \n"
-                #         + (str)(trace.size())
-                #         + " point(s) registered"
-                #     )
 
             return TRACES
             
@@ -185,6 +165,7 @@ class TrackReader:
 
             line = fp.readline().strip()
 
+            # Obs per line
             while line:
 
                 if line.strip()[0] == fmt.com:
@@ -282,16 +263,19 @@ class TrackReader:
             fp.close()
 
         GPSTime.setReadFormat(time_fmt_save)
+        
+        if track is None:
+            return None
+
+        if not selector is None:
+            if not selector.contains(track):
+                return None
 
         if verbose:
-            print(
-                "  File "
-                + path
-                + " loaded: "
+            print ("  File " + path + " loaded: "
                 + (str)(track.size())
-                + " point(s) registered"
-            )
-
+                + " point(s) registered")
+        
         return track
 
 

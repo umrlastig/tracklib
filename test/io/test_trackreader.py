@@ -26,7 +26,6 @@ class TestTrackReader(TestCase):
         TRACES = TrackReader.readFromWKTFile(csvpath, 0, bboxFilter=bbox)
         self.assertIsInstance(TRACES, TrackCollection)
         self.assertEqual(109, TRACES.size())
-        
 
     def test_read_wkt_linestring(self):
         csvpath = os.path.join(self.resource_path, 'data/wkt/iti.wkt')
@@ -108,7 +107,7 @@ class TestTrackReader(TestCase):
     def testReadCsvWithAFTrack(self):
         GPSTime.setReadFormat("2D/2M/4Y 2h:2m:2s")
         chemin = os.path.join(self.resource_path, 'data/test/ecrins_interpol4.csv')
-        track = TrackReader.readFromCsvFiles(chemin, 0, 1, 2, 3, separator=";",read_all=True)
+        track = TrackReader.readFromCsv(chemin, 0, 1, 2, 3, separator=";",read_all=True)
         
         self.assertIsInstance(track, Track)
         self.assertEqual(1593, track.size())
@@ -119,7 +118,7 @@ class TestTrackReader(TestCase):
     def testReadCsvDir(self):
         GPSTime.setReadFormat("2D/2M/4Y 2h:2m:2s")
         chemin = os.path.join(self.resource_path, 'data/test/csv')
-        collection = TrackReader.readFromCsvFiles(chemin, 1, 2, -1, -1, separator=",")
+        collection = TrackReader.readFromCsv(chemin, 1, 2, -1, -1, separator=",")
         
         self.assertIsInstance(collection, TrackCollection)
         self.assertEqual(collection.size(), 2)

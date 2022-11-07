@@ -28,7 +28,7 @@ class TestSelection(TestCase):
     def test_selection_one_timestamp_constraint(self):
         GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, './data/trace1.dat')
-        trace = TrackReader.readFromCsvFiles(chemin, 2, 3, -1, 4, separator=",")
+        trace = TrackReader.readFromCsv(chemin, 2, 3, -1, 4, separator=",")
 
         t1 = TimeConstraint(begin=GPSTime('2018-07-31 14:00:00'))
         c = Constraint(time = t1)
@@ -98,7 +98,7 @@ class TestSelection(TestCase):
         
         GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, './data/trace1.dat')
-        trace = TrackReader.readFromCsvFiles(chemin, 2, 3, -1, 4, separator=",")
+        trace = TrackReader.readFromCsv(chemin, 2, 3, -1, 4, separator=",")
         trace.plot()
 
         center = trace.getObs(int(trace.size()/2)).position
@@ -233,7 +233,7 @@ class TestSelection(TestCase):
         
         GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, './data/trace1.dat')
-        trace = TrackReader.readFromCsvFiles(chemin, 2, 3, -1, 4, separator=",")
+        trace = TrackReader.readFromCsv(chemin, 2, 3, -1, 4, separator=",")
         trace.plot()
         
         t1 = TimeConstraint(begin=GPSTime('2018-07-31 14:00:00'))
@@ -284,7 +284,7 @@ class TestSelection(TestCase):
         
         GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, './data/trace1.dat')
-        trace = TrackReader.readFromCsvFiles(chemin, 2, 3, -1, 4, separator=",")
+        trace = TrackReader.readFromCsv(chemin, 2, 3, -1, 4, separator=",")
         trace.plot()
         
         # =====================================================================
@@ -345,7 +345,7 @@ class TestSelection(TestCase):
         
         GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, './data/trace1.dat')
-        trace = TrackReader.readFromCsvFiles(chemin, 2, 3, -1, 4, separator=",")
+        trace = TrackReader.readFromCsv(chemin, 2, 3, -1, 4, separator=",")
         trace.plot()
         
         t1 = TimeConstraint(begin=GPSTime('2018-07-31 14:00:00'))

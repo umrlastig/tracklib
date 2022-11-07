@@ -408,7 +408,7 @@ class TestSpatialIndex(TestCase):
        
     #     GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
     #     chemindata = os.path.join(self.resource_path, "test/data/CSV_L93_VERCORS/")
-    #     collection = FileReader.readFromCsvFiles(chemindata, 3, 4, 5, 6)
+    #     collection = FileReader.readFromCsv(chemindata, 3, 4, 5, 6)
         
     #     collection.addAnalyticalFeature(Analytics.speed)
         

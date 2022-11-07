@@ -242,8 +242,8 @@ class TrackCollection:
         """Resampling tracks with linear interpolation
 
 
-        :parm delta: interpolation interval (time in sec if temporal mode is selected,
-        space in meters if spatial).
+        :param delta: interpolation interval (time in sec if temporal mode is selected,
+                     space in meters if spatial).
 
         :param mode: Mode of interpolation.
             Available modes are:

@@ -16,7 +16,8 @@ from tracklib.core import Coords
 class Bbox:
     """Class to represent a boundary box"""
 
-    def __init__(self, ll: Union[Coords.ENUCoords, Coords.ENUCoords, Coords.GeoCoords], ur: Union[Coords.ENUCoords, Coords.ENUCoords, Coords.GeoCoords]):
+    def __init__(self, ll: Union[Coords.ENUCoords, Coords.ENUCoords, Coords.GeoCoords], 
+                 ur: Union[Coords.ENUCoords, Coords.ENUCoords, Coords.GeoCoords]):
         """Constructor of :class:`Bbox`
 
         :param ll: lower left point

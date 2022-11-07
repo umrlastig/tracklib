@@ -67,7 +67,7 @@ class TestInterpolation(TestCase):
         self.csvpath = os.path.join(self.resource_path, 'data/trace0.gps')
         
         GPSTime.setPrintFormat("2D/2M/4Y 2h:2m:2s.3z")
-        self.track = TrackReader.readFromCsvFiles(self.csvpath) % 10
+        self.track = TrackReader.readFromCsv(self.csvpath) % 10
         self.track.plot('kx')
         
 
