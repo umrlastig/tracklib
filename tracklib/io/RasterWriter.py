@@ -17,12 +17,14 @@ The header data includes the following keywords and values:
 """
 
 from datetime import datetime
-
+import math
+#import tracklib.core.Utils as utils
+from tracklib.core.Raster import NO_DATA_VALUE
 
 class RasterWriter:
     
     @staticmethod
-    def writeToFile(path, grid, af, aggregate):
+    def writeToFile(path, grid, name, no_data_values = None):
         """Write to Ascii File
 
         :param path: File path
@@ -30,40 +32,34 @@ class RasterWriter:
         :param af: TODO
         :param aggregate: TODO
         """
-        name = af.__name__ + "#" + aggregate.__name__
-        filepath = (
-            path + name + "_" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".asc"
-        )
+        filepath = path + name 
+        #filepath += "_" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") 
+        filepath += ".asc"
 
-        #        k = self.__summarizeFieldDico[name]
+        ascContent = 'ncols\t\t' + str(grid.ncol) + '\n'
+        ascContent = ascContent + 'nrows\t\t' + str(grid.nrow) + '\n'
+        ascContent = ascContent + 'xllcorner\t' + str(grid.xmin) + '\n'
+        ascContent = ascContent + 'yllcorner\t' + str(grid.ymin) + '\n'
+        ascContent = ascContent + 'cellsize\t' + str(math.floor(grid.XPixelSize)) + '\n'
+        ascContent = ascContent + 'NODATA_value\t' + str(NO_DATA_VALUE) + '\n'
+        
+        if no_data_values != None:
+            grid.grid[grid.grid == grid.NO_DATA_VALUE] = no_data_values
 
+        for i in range(grid.nrow):
+            for j in range(grid.ncol):
+                if j > 0:
+                    ascContent = ascContent + '\t'
+                val = grid.grid[i][j]
+                ascContent = ascContent + str(val)
+            ascContent = ascContent + '\n'
 
-#
-#        ascContent = 'ncols\t\t' + str(self.ncol) + '\n'
-#        ascContent = ascContent + 'nrows\t\t' + str(self.nrow) + '\n'
-#        ascContent = ascContent + 'xllcorner\t' + str(self.XOrigin) + '\n'
-#        ascContent = ascContent + 'yllcorner\t' + str(self.YOrigin) + '\n'
-#        ascContent = ascContent + 'cellsize\t' + str(self.XPixelSize) + '\n'
-#        ascContent = ascContent + 'NODATA_value\t' + str(Grid.NO_DATA_VALUE) + '\n'
-#
-#        for i in range(self.nrow):
-#            for j in range(self.ncol):
-#                if j > 0:
-#                    ascContent = ascContent + '\t'
-#                val = self.sum[i][j][k]
-#                if utils.isnan(val):
-#                    val = Grid.NO_DATA_VALUE
-#                ascContent = ascContent + str(val)
-#            ascContent = ascContent + '\n'
-#
-#        try:
-#            f = open(filepath, "a")
-#            f.write(ascContent)
-#            f.close()
-#        except:
-#            raise Warning("impossible d'écrire le fichier asc")
+        try:
+            f = open(filepath, "w")
+            f.write(ascContent)
+            f.close()
+        except:
+            raise Warning("Error when trying to write in raster file")
 
 
-# f = open(path, "w")
-# f.write(FileWriter.__printInOrder(x,y,z,t,O,fmt.separator) + "\n")
-# f.close()
+

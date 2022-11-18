@@ -9,7 +9,6 @@ from tracklib.core import (GPSTime, Coords, Obs, Track, TrackCollection)
 import tracklib.algo.Comparison as Comparison
 
 
-
 class TestAlgoComparaisonMethods(unittest.TestCase):
     
     __epsilon = 0.001

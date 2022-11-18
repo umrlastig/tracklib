@@ -114,7 +114,6 @@ class RasterBand:
     
     
     def __str__(self):
-        
         output  = "-------------------------------------\n"
         output += "Grid '" + self.name + "':\n"
         output += "       nrows = " + str(self.nrow) + "\n"
