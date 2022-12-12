@@ -221,32 +221,32 @@ class TestTrackWriter(TestCase):
         gpxpath = os.path.join(self.resource_path, 'data/test/gpx7.gpx')
         TrackWriter.writeToGpx(self.collection, path=gpxpath, af=True, oneFile=True)
         
-    def testWriteTwoTrackToManyGpx0AF(self):
-        Cinematics.computeAbsCurv(self.trace1)
-        Cinematics.computeAbsCurv(self.trace2)
+    # def testWriteTwoTrackToManyGpx0AF(self):
+    #     Cinematics.computeAbsCurv(self.trace1)
+    #     Cinematics.computeAbsCurv(self.trace2)
         
-        gpxpath = os.path.join(self.resource_path, 'data/test/gpx1')
-        TrackWriter.writeToGpx(self.collection, path=gpxpath, af=False, oneFile=False)
+    #     gpxpath = os.path.join(self.resource_path, 'data/test/gpx1')
+    #     TrackWriter.writeToGpx(self.collection, path=gpxpath, af=False, oneFile=False)
         
-    def testWriteTwoTrackToManyGpx1AF(self):
-        gpxpath = os.path.join(self.resource_path, 'data/test/gpx2')
-        TrackWriter.writeToGpx(self.collection, path=gpxpath, af=True, oneFile=False)
+    # def testWriteTwoTrackToManyGpx1AF(self):
+    #     gpxpath = os.path.join(self.resource_path, 'data/test/gpx2')
+    #     TrackWriter.writeToGpx(self.collection, path=gpxpath, af=True, oneFile=False)
         
-    def testWriteTwoTrackToManyGpx2AF(self):
-        Cinematics.computeAbsCurv(self.trace1)
-        Cinematics.computeAbsCurv(self.trace2)
+    # def testWriteTwoTrackToManyGpx2AF(self):
+    #     Cinematics.computeAbsCurv(self.trace1)
+    #     Cinematics.computeAbsCurv(self.trace2)
         
-        gpxpath = os.path.join(self.resource_path, 'data/test/gpx3')
-        TrackWriter.writeToGpx(self.collection, path=gpxpath, af=True, oneFile=False)
+    #     gpxpath = os.path.join(self.resource_path, 'data/test/gpx3')
+    #     TrackWriter.writeToGpx(self.collection, path=gpxpath, af=True, oneFile=False)
         
-        gpxpath = os.path.join(self.resource_path, 'data/test/gpx3/11.gpx')
-        tracks = TrackReader.readFromGpx(gpxpath, srid='ENU', type="trk", read_all=True)
-        trace = tracks[0]
-        self.assertEqual(5, trace.size())
-        self.assertIsInstance(trace, Track)
-        self.assertEqual(0, int(trace.getObs(0).position.E))
-        self.assertTrue(trace.hasAnalyticalFeature('speed'))
-        self.assertEqual(trace.getObsAnalyticalFeature('speed', 0), 1.0)
+    #     gpxpath = os.path.join(self.resource_path, 'data/test/gpx3/11.gpx')
+    #     tracks = TrackReader.readFromGpx(gpxpath, srid='ENU', type="trk", read_all=True)
+    #     trace = tracks[0]
+    #     self.assertEqual(5, trace.size())
+    #     self.assertIsInstance(trace, Track)
+    #     self.assertEqual(0, int(trace.getObs(0).position.E))
+    #     self.assertTrue(trace.hasAnalyticalFeature('speed'))
+    #     self.assertEqual(trace.getObsAnalyticalFeature('speed', 0), 1.0)
         
         
     def testWriteKml(self):
@@ -286,9 +286,9 @@ if __name__ == '__main__':
     suite.addTest(TestTrackWriter("testWriteTwoTrackToOneGpx2AF"))
     
     #tracks - many gpx
-    suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx0AF"))
-    suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx1AF"))
-    suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx2AF"))
+    #suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx0AF"))
+    #suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx1AF"))
+    #suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx2AF"))
     
     suite.addTest(TestTrackWriter("testWriteKml"))
     

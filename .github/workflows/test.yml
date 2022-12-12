@@ -26,6 +26,6 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Test with pytest
       run: |
-        mkdir -p data/test
-        chmod 777 -R data/test
+        mkdir -p ${{ github.workspace }}/data/test
+        chmod 777 -R ${{ github.workspace }}/data/test
         pytest test/
