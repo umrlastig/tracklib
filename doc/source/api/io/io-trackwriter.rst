@@ -1,7 +1,7 @@
 :Author: Marie-Dominique Van Damme
 :Version: 1.0
 :License: --
-:Date: 11/11/2022
+:Date: 07/11/2022
 
 
 TrackWriter
@@ -20,9 +20,5 @@ GPX files
 
 
 
-Ancien 
---------
 
- .. automodule:: tracklib.io.TrackWriter
-    :members:
 	
