@@ -6,7 +6,7 @@ current_path = os.path.abspath(os.path.dirname(__file__))
 
 requirements = ("numpy", "matplotlib", "scikit-image", "progressbar2")
 
-dev_requirements = ("pytest", "pytest-runner")
+dev_requirements = ("pytest", "pytest-runner", "pytest-cov")
 
 doc_requirements = (
     "sphinx",
