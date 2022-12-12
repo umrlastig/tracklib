@@ -27,5 +27,5 @@ jobs:
     - name: Test with pytest
       run: |
         mkdir -p data/test
-		chmod 777 -R data/test
+        chmod 777 -R data/test
         pytest test/
