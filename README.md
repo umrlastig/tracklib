@@ -7,7 +7,6 @@
 	</tr></table>
 </p>
 
-<p align="center">
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Tracklib build](https://github.com/mdvandamme/tracklib/actions/workflows/ci.yml/badge.svg)](https://github.com/mdvandamme/tracklib/actions/workflows/ci.yml)
 [![Tracklib test](https://github.com/mdvandamme/tracklib/actions/workflows/test.yml/badge.svg)](https://github.com/mdvandamme/tracklib/actions/workflows/test.yml)
@@ -15,7 +14,7 @@
 <br/>
 [![Documentation Status](https://readthedocs.org/projects/tracklib/badge/?version=latest)](https://tracklib.readthedocs.io/en/latest/?badge=latest)
 [![Software License](https://img.shields.io/badge/Licence-Cecill--C-blue.svg?style=flat)](https://github.com/umrlastig/tracklib/blob/main/LICENCE)
-</p>
+
 
 More and more datasets of GPS trajectories are now available and they are studied very frequently in many scientific domains. 
 Python libraries for trajectories are available to load, simplify, interpolate, summarize and visualize them. 
