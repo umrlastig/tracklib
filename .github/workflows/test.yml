@@ -8,8 +8,8 @@ on:
 
 
 jobs:
-  build:
 
+  build:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -34,22 +34,5 @@ jobs:
         mkdir -p ${{ github.workspace }}/data/test
         chmod 777 -R ${{ github.workspace }}/data/test
         pytest test/
-    
-    - name: Coverage comment
-      id: coverage_comment
-      uses: py-cov-action/python-coverage-comment-action@v3
-      env:
-        GITHUB_PR_RUN_ID: ${{ github.run_id }}
-      with:
-        GITHUB_TOKEN: ${{ github.token }}
-        VERBOSE: true
-    
-    - name: Store Pull Request comment to be posted
-      uses: actions/upload-artifact@v2
-      if: steps.coverage_comment.outputs.COMMENT_FILE_WRITTEN == 'true'
-      with:
-        # If you use a different name, update COMMENT_ARTIFACT_NAME accordingly
-        name: python-coverage-comment-action
-        # If you use a different name, update COMMENT_FILENAME accordingly
-        path: python-coverage-comment-action.txt
-
+        coverage run -m --source=tracklib/ pytest test/
+        coverage xml

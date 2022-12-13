@@ -4,7 +4,7 @@ scikit-image
 progressbar2
 pytest
 pytest-runner
-pytest-cov
+coverage
 sphinx
 recommonmark
 sphinx_rtd_theme
