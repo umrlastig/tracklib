@@ -11,7 +11,9 @@
 [![Tracklib build](https://github.com/mdvandamme/tracklib/actions/workflows/ci.yml/badge.svg)](https://github.com/mdvandamme/tracklib/actions/workflows/ci.yml)
 [![Tracklib test](https://github.com/mdvandamme/tracklib/actions/workflows/test.yml/badge.svg)](https://github.com/mdvandamme/tracklib/actions/workflows/test.yml)
 [![Tracklib coverage](https://github.com/mdvandamme/tracklib/actions/workflows/coverage.yml/badge.svg)](https://github.com/mdvandamme/tracklib/actions/workflows/coverage.yml)
+
 <br/>
+
 [![Documentation Status](https://readthedocs.org/projects/tracklib/badge/?version=latest)](https://tracklib.readthedocs.io/en/latest/?badge=latest)
 [![Software License](https://img.shields.io/badge/Licence-Cecill--C-blue.svg?style=flat)](https://github.com/umrlastig/tracklib/blob/main/LICENCE)
 
