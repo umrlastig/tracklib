@@ -17,10 +17,10 @@ jobs:
         python-version: ["3.8"]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
     
@@ -38,7 +38,7 @@ jobs:
     - name: Coverage comment
       id: coverage_comment
       uses: py-cov-action/python-coverage-comment-action@v3
-	  env:
+      env:
         GITHUB_PR_RUN_ID: ${{ github.run_id }}
       with:
         GITHUB_TOKEN: ${{ github.token }}
