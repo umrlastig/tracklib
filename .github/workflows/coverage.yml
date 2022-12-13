@@ -33,6 +33,9 @@ jobs:
         chmod 777 -R ${{ github.workspace }}/data/test
         coverage run -m --source=tracklib/ pytest test/
         coverage xml
+    
+    - name: Upload coverage reports to Codecov with GitHub Action
+      uses: codecov/codecov-action@v3
       
     
 
