@@ -38,6 +38,8 @@ jobs:
     - name: Coverage comment
       id: coverage_comment
       uses: py-cov-action/python-coverage-comment-action@v3
+	  env:
+        GITHUB_PR_RUN_ID: ${{ github.run_id }}
       with:
         GITHUB_TOKEN: ${{ github.token }}
         VERBOSE: true
