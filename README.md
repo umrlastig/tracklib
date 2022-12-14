@@ -32,23 +32,23 @@ and functions to simplify the creation of analytical features on a GPS tracks.
 The official documentation is available at **[ReadTheDocs](https://tracklib.readthedocs.io)**
 
 
-### Dependencies
+## Dependencies
 
 Minimal requirements:
 - Python 3.8+
 
 
-### License
+## License
 - [Cecill-C](http://www.cecill.info/)
 
-### Authors
+## Authors
 - Yann Méneroux
 - Marie-Dominique Van Damme
 - Nisar Hakam
 - [Lâmân LELÉGARD](https://www.umr-lastig.fr/laman-lelegard/) 
 
 
-### Institute
+## Institute
 - LASTIG, Univ Gustave Eiffel, ENSG, IGN
 
 
