@@ -249,21 +249,21 @@ class TestTrackWriter(TestCase):
     #     self.assertEqual(trace.getObsAnalyticalFeature('speed', 0), 1.0)
         
         
-    def testWriteKml(self):
+    # def testWriteKml(self):
         
-        from tracklib.io.TrackReader import TrackReader
+    #     from tracklib.io.TrackReader import TrackReader
         
-        resource_path = os.path.join(os.path.split(__file__)[0], "../..")
-        GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
-        gpxpath = os.path.join(resource_path, 'data/gpx/activity_5807084803.gpx')
-        tracks = TrackReader.readFromGpx(gpxpath)
-        trace = tracks.getTrack(0)
+    #     resource_path = os.path.join(os.path.split(__file__)[0], "../..")
+    #     GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
+    #     gpxpath = os.path.join(resource_path, 'data/gpx/activity_5807084803.gpx')
+    #     tracks = TrackReader.readFromGpx(gpxpath)
+    #     trace = tracks.getTrack(0)
         
-        trace.addAnalyticalFeature(Analytics.speed)
-        print (trace.getAnalyticalFeature('speed'))
+    #     trace.addAnalyticalFeature(Analytics.speed)
+    #     print (trace.getAnalyticalFeature('speed'))
         
-        kmlpath = os.path.join(self.resource_path, 'data/test/couplage.kml')
-        TrackWriter.writeToKml(trace, path=kmlpath, type="LINE", af='speed')
+    #     kmlpath = os.path.join(self.resource_path, 'data/test/couplage.kml')
+    #     TrackWriter.writeToKml(trace, path=kmlpath, type="LINE", af='speed')
 
 
 if __name__ == '__main__':
@@ -290,9 +290,7 @@ if __name__ == '__main__':
     #suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx1AF"))
     #suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx2AF"))
     
-    suite.addTest(TestTrackWriter("testWriteKml"))
-    
-    
+    #suite.addTest(TestTrackWriter("testWriteKml"))
     
     runner = TextTestRunner()
     runner.run(suite)
