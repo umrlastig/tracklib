@@ -80,18 +80,22 @@ class Track:
         """TODO"""
         return self.getLastObs().timestamp - self.getFirstObs().timestamp
 
-    # Average frequency    in Hz (resp. m/pt) for temporal (resp. spatial) mode
     def frequency(self, mode: Literal["temporal", "spatial"] = "temporal") -> float:
-        """TODO"""
+        """
+        Average frequency in Hz (resp. m/pt) for temporal (resp. spatial) mode
+        """
         if (mode == "spatial") or (mode == 1):
             return self.size() / self.length()
         if (mode == "temporal") or (mode == 0):
             return self.size() / self.duration()
 
-    # Inverse of average frequency in pt/sec (resp. pt/m) for temporal (resp. spatial) mode
     def interval(self, mode: Literal["temporal", "spatial"] = "temporal") -> float:
-        """TODO"""
+        """
+        Inverse of average frequency in pt/sec (resp. pt/m) 
+        for temporal (resp. spatial) mode
+        """
         return 1.0 / self.frequency(mode)
+
 
     # =========================================================================
     # Track coordinate transformation
@@ -178,11 +182,12 @@ class Track:
             self.getObs(i).position = self.getObs(i).position.toProjCoords(srid)
         self.base = srid
 
-    # Function to convert 2D coordinates (GEO or ENU) into image local coordinates
-    # Input: two points p1, p2 (image coordinates), P1, P2 (track coordinate system)
-    # p1 and p2 are provided as lists. P1 and P2 are GeoCoords or ENUCoords.
     def toImageCoords(self, P1, P2, p1, p2):
-        """TODO"""
+        """
+        Function to convert 2D coordinates (GEO or ENU) into image local coordinates
+        Input: two points p1, p2 (image coordinates), P1, P2 (track coordinate system)
+        p1 and p2 are provided as lists. P1 and P2 are GeoCoords or ENUCoords.
+        """
         if not (self.getSRID() in ["Geo", "ENU"]):
             print(
                 "Error: track coordinate system must be GEO or ENU for image projection"
@@ -197,10 +202,11 @@ class Track:
             yi = (self[i].position.getY() - P1.getY()) * sy + p1[1]
             self[i].position = ENUCoords(xi, yi, self[i].position.getZ())
 
-    # Function to convert track to ENUCoords if it is in GeoCoords. Returns None
-    # if no transformation operated, and returns used reference point otherwise
     def toENUCoordsIfNeeded(self):
-        """TODO"""
+        """
+        Function to convert track to ENUCoords if it is in GeoCoords. Returns None
+        if no transformation operated, and returns used reference point otherwise
+        """
         base = None
         if self.getSRID() in ["GEO", "Geo"]:
             base = self.getObs(0).position.copy()

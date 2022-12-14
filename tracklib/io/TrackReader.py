@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Union, IO, Literal
 
 import csv
+import io
 import os
 from xml.dom import minidom
 
@@ -473,8 +474,7 @@ class TrackReader:
                 TRACES.addTrack(collection.getTrack(0))
             return TRACES
         
-        elif os.path.isfile(path):
-        
+        elif os.path.isfile(path) or isinstance(io.StringIO(path), io.IOBase):
             format_old = GPSTime.getReadFormat()
             GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
     
@@ -543,6 +543,7 @@ class TrackReader:
             return collection
         
         else:
+            print ('path is not a file, not a dir')
             return None
     
     
