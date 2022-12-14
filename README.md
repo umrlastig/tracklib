@@ -41,15 +41,15 @@ Minimal requirements:
 ## License
 - [Cecill-C](http://www.cecill.info/)
 
+## Institute
+- LASTIG, Univ Gustave Eiffel, ENSG, IGN
+
 ## Authors
 - Yann Méneroux
 - Marie-Dominique Van Damme
 - Nisar Hakam
 - [Lâmân LELÉGARD](https://www.umr-lastig.fr/laman-lelegard/) 
 
-
-## Institute
-- LASTIG, Univ Gustave Eiffel, ENSG, IGN
 
 
 
