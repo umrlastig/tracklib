@@ -26,29 +26,22 @@ Furthermore, adding analytical features on a observation or on all observation o
 is, in general, a complex and a boring task. So, to make it easier, *Tracklib* module offers a multitude of operators 
 and functions to simplify the creation of analytical features on a GPS tracks. 
 
-
-## Documentation
-
 The official documentation is available at **[ReadTheDocs](https://tracklib.readthedocs.io)**
 
+Institute: LASTIG, Univ Gustave Eiffel, ENSG, IGN
+
+License: [Cecill-C](http://www.cecill.info/)
+
+Authors
+- Yann Méneroux
+- Marie-Dominique Van Damme
+- Nisar Hakam
+- [Lâmân LELÉGARD](https://www.umr-lastig.fr/laman-lelegard/) 
 
 ## Dependencies
 
 Minimal requirements:
 - Python 3.8+
-
-
-## License
-- [Cecill-C](http://www.cecill.info/)
-
-## Institute
-- LASTIG, Univ Gustave Eiffel, ENSG, IGN
-
-## Authors
-- Yann Méneroux
-- Marie-Dominique Van Damme
-- Nisar Hakam
-- [Lâmân LELÉGARD](https://www.umr-lastig.fr/laman-lelegard/) 
 
 
 
