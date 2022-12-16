@@ -81,7 +81,7 @@ class TestTrack(TestCase):
         self.assertEqual(self.trace1.getT(), [1514800800.0])
         self.assertEqual(self.trace1.getT(0), 1514800800.0)
         
-        self.assertEqual(str(self.trace1.getTimestamps(0)), "01/01/2018 10:00:00")
+        self.assertEqual(str(self.trace1.getTimestamps(0)).strip()[0:19], "01/01/2018 10:00:00")
         tab = self.trace1.getTimestamps()
         self.assertEqual(len(tab), 1)
         self.assertEqual(tab[0], GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
