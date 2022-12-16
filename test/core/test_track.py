@@ -2,6 +2,8 @@
 from unittest import TestCase, TestSuite, TextTestRunner
 
 from tracklib.core import (Track, Obs, Coords, GPSTime)
+from tracklib.algo.Geometrics import Polygon
+
 
 class TestTrack(TestCase):
     '''
@@ -65,11 +67,39 @@ class TestTrack(TestCase):
         f = self.trace2.interval(mode='spatial')
         self.assertEqual(f, 1.0)
         
+        
+    def test_coord(self):
+        self.assertEqual(self.trace1.getX(), [1.0])
+        self.assertEqual(self.trace1.getX(0), 1.0)
+        
+        self.assertEqual(self.trace1.getY(), [5.0])
+        self.assertEqual(self.trace1.getY(0), 5.0)
+        
+        self.assertEqual(self.trace1.getZ(), [0.0])
+        self.assertEqual(self.trace1.getZ(0), 0.0)
+        
+        self.assertEqual(self.trace1.getT(), [1514800800.0])
+        self.assertEqual(self.trace1.getT(0), 1514800800.0)
+        
+        self.assertEqual(str(self.trace1.getTimestamps(0)), "01/01/2018 10:00:00")
+        tab = self.trace1.getTimestamps()
+        self.assertEqual(len(tab), 1)
+        self.assertEqual(tab[0], GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
+        
+        
+    def test_enclosed_polygon(self):
+        poly = self.trace2.getEnclosedPolygon()
+        self.assertIsInstance(poly, Polygon)
+        self.assertEqual(poly.X, [1.0, 2.0, 3.0, 5.0, 1.0])
+        self.assertEqual(poly.Y, [5.0, 5.0, 5.0, 5.0, 5.0])
+        
 
 if __name__ == '__main__':
     suite = TestSuite()
     suite.addTest(TestTrack("test_str"))
     suite.addTest(TestTrack("test_timezone"))
     suite.addTest(TestTrack("test_interval"))
+    suite.addTest(TestTrack("test_coord"))
+    suite.addTest(TestTrack("test_enclosed_polygon"))
     runner = TextTestRunner()
     runner.run(suite)
