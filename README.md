@@ -40,7 +40,7 @@ Authors
 
 
 Minimal python version:
-- Python 3.5+
+- Python 3.7+
 
 Minimal requirements:
 - numpy
