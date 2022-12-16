@@ -310,7 +310,8 @@ class ENUCoords:
         :param p: An ENU coordinate
         :return: An ENU coordinate
         """
-        return ENUCoords(p.E - self.E, p.N - self.N, p.U - self.U)
+        #return ENUCoords(p.E - self.E, p.N - self.N, p.U - self.U)
+        return ENUCoords(self.E - p.E, self.N - p.N, self.U - p.U)
 
     def __add__(self, p: ENUCoords) -> ENUCoords:   
         """Vector addition between two ENU coordinates
