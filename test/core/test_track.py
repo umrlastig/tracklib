@@ -93,6 +93,12 @@ class TestTrack(TestCase):
         self.assertEqual(poly.X, [1.0, 2.0, 3.0, 5.0, 1.0])
         self.assertEqual(poly.Y, [5.0, 5.0, 5.0, 5.0, 5.0])
         
+        
+    def test_shift_to(self):
+        #pos = Coords.ENUCoords(3.0, 5.0, 0.0)
+        self.trace2.shiftTo(2)
+        print (self.trace2)
+        
 
 if __name__ == '__main__':
     suite = TestSuite()
@@ -101,5 +107,6 @@ if __name__ == '__main__':
     suite.addTest(TestTrack("test_interval"))
     suite.addTest(TestTrack("test_coord"))
     suite.addTest(TestTrack("test_enclosed_polygon"))
+    suite.addTest(TestTrack("test_shift_to"))
     runner = TextTestRunner()
     runner.run(suite)

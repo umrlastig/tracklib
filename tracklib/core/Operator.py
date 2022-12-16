@@ -1202,7 +1202,8 @@ class Shift(ScalarVoidOperator):
             temp[i] = track.getObsAnalyticalFeature(af_input, int(i - number))
         algoAF.addListToAF(track, af_output, temp)
         return temp
-		
+
+
 class ShiftCircular(ScalarVoidOperator):
     """TODO"""
 

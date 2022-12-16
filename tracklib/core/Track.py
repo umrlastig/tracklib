@@ -346,11 +346,17 @@ class Track:
         return Bbox(self.getLowerLeftPoint(), self.getUpperRightPoint())
 
     def shiftTo(self, idx_point, new_coords=ENUCoords(0, 0, 0)):
-        """TODO"""
+        """
+        Cet opérateur décale les obs de la trace vers la gauche, 
+        d'autant que le nombre indiqué par le second opérande. 
+        Les bits qui dépassent à gauche sont abandonnés et des zéros 
+        sont introduits à droite.
+        """
         if self.getSRID() != "ENU":
             print("Error: shift may be applied only to ENU coords")
             exit()
-        delta = self.getObs(idx_point).position - new_coords
+        
+        delta = new_coords - self.getObs(idx_point).position
         for i in range(self.size()):
             self.getObs(i).position = delta + self.getObs(i).position
 
