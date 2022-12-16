@@ -38,7 +38,7 @@ Authors
 - Nisar Hakam
 - [Lâmân LELÉGARD](https://www.umr-lastig.fr/laman-lelegard/) 
 
-## Dependencies
+### Dependencies
 
 Minimal requirements:
 - Python 3.8+
