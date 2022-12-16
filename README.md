@@ -38,10 +38,14 @@ Authors
 - Nisar Hakam
 - [Lâmân LELÉGARD](https://www.umr-lastig.fr/laman-lelegard/) 
 
-### Dependencies
+
+Minimal python version:
+- Python 3.8+
 
 Minimal requirements:
-- Python 3.8+
+- numpy
+- progressbar2
+- scikit-image
 
 
 
