@@ -8,7 +8,6 @@ class TestTrack(TestCase):
     '''
     
     def setUp (self):
-        
         GPSTime.GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         
         # ---------------------------------------------------------------------
@@ -17,9 +16,13 @@ class TestTrack(TestCase):
         p1 = Obs.Obs(c1, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace1.addObs(p1)
         
+        
     def test_str(self):
-        txt = '01/01/2018 10:00:00  [E=       1.000, N=       5.000, U=       0.000]'
-        self.assertEqual(txt.strip(), str(self.trace1).strip())
+        obs = self.trace1.getFirstObs()
+        self.assertEqual('01/01/2018 10:00:00', str(obs.timestamp).strip()[0:19])
+        self.assertEqual(1.000, obs.position.getX())
+        self.assertEqual(5.000, obs.position.getY())
+        self.assertEqual(0.000, obs.position.getZ())
         
         
     def test_timezone(self):
@@ -31,7 +34,7 @@ class TestTrack(TestCase):
         self.trace1.convertToTimeZone(2)
         self.assertEqual(2, self.trace1.getTimeZone())
         #self.assertEqual(self.trace1.getFirstObs().timestamp, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
-        self.assertEqual("01/01/2018 11:00:00", str(self.trace1.getFirstObs().timestamp).strip())
+        self.assertEqual("01/01/2018 11:00:00", str(self.trace1.getFirstObs().timestamp).strip()[0:19])
         
 
 if __name__ == '__main__':
