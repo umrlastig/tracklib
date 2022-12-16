@@ -27,8 +27,13 @@ class TestTrack(TestCase):
         
         self.trace1.setTimeZone(1)
         self.assertEqual(1, self.trace1.getTimeZone())
-
         
+        self.trace1.convertToTimeZone(2)
+        self.assertEqual(2, self.trace1.getTimeZone())
+        #self.assertEqual(self.trace1.getFirstObs().timestamp, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
+        self.assertEqual("01/01/2018 11:00:00", str(self.trace1.getFirstObs().timestamp).strip())
+        
+
 if __name__ == '__main__':
     suite = TestSuite()
     suite.addTest(TestTrack("test_str"))
