@@ -1,4 +1,4 @@
-name: Tracklib build
+name: Tracklib build and test
 
 on:
   push:
