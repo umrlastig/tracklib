@@ -9,6 +9,8 @@ class TestTrack(TestCase):
     '''
     '''
     
+    __epsilon = 0.001
+    
     def setUp (self):
         GPSTime.GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         
@@ -32,7 +34,7 @@ class TestTrack(TestCase):
         p3 = Obs.Obs(c3, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:10"))
         self.trace2.addObs(p3)
         
-        c4 = Coords.ENUCoords(5.0, 5.0, 0)
+        c4 = Coords.ENUCoords(5.0, 5.0, 0.4)
         p4 = Obs.Obs(c4, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:20"))
         self.trace2.addObs(p4)
         
@@ -76,7 +78,7 @@ class TestTrack(TestCase):
         self.assertEqual(f, 5.00)
 
         f = self.trace2.interval(mode='spatial')
-        self.assertEqual(f, 1.0)
+        self.assertLessEqual(abs(1.009 - f), self.__epsilon)
         
         
     def test_coord(self):
@@ -213,6 +215,22 @@ class TestTrack(TestCase):
         self.assertListEqual(T[1], [0.0, 1.0, 1.0, 2.0])
 
 
+    def test_af_xyztidx(self):
+        Z = self.trace2.getAnalyticalFeature("z")
+        self.assertListEqual(Z, [0, 0, 0, 0.4])
+        
+        T = self.trace2.getAnalyticalFeature("t")
+        self.assertListEqual(T, [1514800800.0, 1514800805.0, 1514800810.0, 1514800820.0])
+        
+        TPS = self.trace2.getAnalyticalFeature("timestamp")
+        self.assertEqual(str(TPS[0]).strip()[0:19], "01/01/2018 10:00:00")
+        self.assertEqual(str(TPS[1]).strip()[0:19], "01/01/2018 10:00:05")
+        self.assertEqual(str(TPS[2]).strip()[0:19], "01/01/2018 10:00:10")
+        self.assertEqual(str(TPS[3]).strip()[0:19], "01/01/2018 10:00:20")
+        
+        IDX = self.trace2.getAnalyticalFeature("idx")
+        self.assertListEqual(IDX, [0, 1, 2, 3])
+        
 
 if __name__ == '__main__':
     suite = TestSuite()
@@ -228,6 +246,7 @@ if __name__ == '__main__':
     suite.addTest(TestTrack("test_loop"))
     
     suite.addTest(TestTrack("test_afs"))
+    suite.addTest(TestTrack("test_af_xyztidx"))
     
     runner = TextTestRunner()
     runner.run(suite)

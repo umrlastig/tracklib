@@ -37,5 +37,8 @@ setup (
     packages=find_packages(include=["test", "resources"]),
     install_requires=requirements,
     test_suite="tests",
-    extras_require={"dev": dev_requirements, "doc": doc_requirements},
+    extras_require={
+            "dev": dev_requirements, 
+            "doc": doc_requirements
+    },
 )
