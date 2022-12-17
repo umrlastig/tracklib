@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import io
 import os.path
+
+import filecmp
 from unittest import TestCase, TestSuite, TextTestRunner
 
 from tracklib.core.Coords import ENUCoords
@@ -76,6 +77,7 @@ class TestTrackWriter(TestCase):
     def test_write_csv_minim(self):
         
         GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        GPSTime.setPrintFormat("2D/2M/4Y 2h:2m:2s")
         track = Track()
         p1 = Obs(ENUCoords(0, 0), GPSTime.readTimestamp('2020-01-01 10:00:00'))
         track.addObs(p1)
@@ -84,11 +86,11 @@ class TestTrackWriter(TestCase):
         
         csvpath = os.path.join(self.resource_path, 'data/test/test_write_csv_minim.wkt')
         TrackWriter.writeToFile(track, csvpath, id_E=0,id_N=1,id_U=2,id_T=3,h=1, separator=";")
-        contents = open(csvpath).read()
         
-        gt = open(os.path.join(self.resource_path, 'data/test/gt/test_write_csv_minim.csv')).read()
-        self.assertEqual(contents.strip(), gt.strip())
-       
+        vtpath = os.path.join(self.resource_path, 'data/test/gt/test_write_csv_minim.csv')
+        
+        filecmp.cmp(csvpath, vtpath)
+        
         
 #    def test_write_csv_2AF(self):
 #        
