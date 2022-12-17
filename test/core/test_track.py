@@ -321,6 +321,23 @@ class TestTrack(TestCase):
         self.trace2.sortRadix()
         # TODO
         
+        
+    def test_remove_tpsDup(self):
+        pass
+    
+    
+    def test_export(self):
+        import tracklib.algo.Analytics as Analytics
+        self.trace2.addAnalyticalFeature(Analytics.ds)
+        self.trace2.addAnalyticalFeature(Analytics.heading)
+        self.trace2.addAnalyticalFeature(Analytics.speed)
+        self.trace2.print(['speed'])
+        
+        self.trace2.summary()
+        
+        wkt = self.trace1.toWKT()
+        self.assertEquals(wkt, "LINESTRING(1.0 5.0)")
+        
 
 if __name__ == '__main__':
     suite = TestSuite()
@@ -344,6 +361,9 @@ if __name__ == '__main__':
     suite.addTest(TestTrack("test_remove_obs"))
     suite.addTest(TestTrack("test_tid"))
     suite.addTest(TestTrack("test_sort_radix"))
+    
+    suite.addTest(TestTrack("test_remove_tpsDup"))
+    suite.addTest(TestTrack("test_export"))
     
     runner = TextTestRunner()
     runner.run(suite)
