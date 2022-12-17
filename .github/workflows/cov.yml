@@ -1,4 +1,4 @@
-name: Tracklib coverage
+name: Tracklib test
 
 on:
   pull_request:

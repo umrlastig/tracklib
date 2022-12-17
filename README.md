@@ -9,7 +9,7 @@
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Tracklib build](https://github.com/mdvandamme/tracklib/actions/workflows/ci.yml/badge.svg)](https://github.com/mdvandamme/tracklib/actions/workflows/ci.yml)
-[![Tracklib test](https://github.com/mdvandamme/tracklib/actions/workflows/test.yml/badge.svg)](https://github.com/mdvandamme/tracklib/actions/workflows/test.yml)
+[![Tracklib test](https://github.com/mdvandamme/tracklib/actions/workflows/cov.yml/badge.svg)](https://github.com/mdvandamme/tracklib/actions/workflows/cov.yml)
 [![codecov](https://codecov.io/gh/mdvandamme/tracklib/branch/main/graph/badge.svg?token=pHLaV21j2O)](https://codecov.io/gh/mdvandamme/tracklib)
 
 <br/>
