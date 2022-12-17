@@ -36,6 +36,17 @@ class TestTrack(TestCase):
         p4 = Obs.Obs(c4, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:20"))
         self.trace2.addObs(p4)
         
+        # ---------------------------------------------------------------------
+        self.trace3 = Track.Track([], 1)
+        self.trace3.addObs(p1)
+        self.trace3.addObs(p2)
+        self.trace3.addObs(p3)
+        self.trace3.addObs(p4)
+        
+        c5 = Coords.ENUCoords(7.0, 5.0, 0)
+        p5 = Obs.Obs(c5, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:45"))
+        self.trace3.addObs(p5)
+        
         
         
     def test_str(self):
@@ -97,8 +108,64 @@ class TestTrack(TestCase):
     def test_shift_to(self):
         #pos = Coords.ENUCoords(3.0, 5.0, 0.0)
         self.trace2.shiftTo(2)
-        print (self.trace2)
+        #print (self.trace2)
         
+        
+    def test_make_odd(self):
+        self.trace2.makeOdd()
+        self.trace3.makeOdd()
+        
+        self.assertEqual(self.trace2.size(), 3)
+        self.assertEqual(self.trace3.size(), 5)
+        
+        self.assertEqual(self.trace2.getObs(0).position.getX(), 1.0)
+        self.assertEqual(self.trace2.getObs(0).position.getY(), 5.0)
+        self.assertEqual(self.trace2.getObs(1).position.getX(), 2.0)
+        self.assertEqual(self.trace2.getObs(1).position.getY(), 5.0)
+        self.assertEqual(self.trace2.getObs(2).position.getX(), 3.0)
+        self.assertEqual(self.trace2.getObs(2).position.getY(), 5.0)
+        
+        self.assertEqual(self.trace3.getObs(0).position.getX(), 1.0)
+        self.assertEqual(self.trace3.getObs(0).position.getY(), 5.0)
+        self.assertEqual(self.trace3.getObs(1).position.getX(), 2.0)
+        self.assertEqual(self.trace3.getObs(1).position.getY(), 5.0)
+        self.assertEqual(self.trace3.getObs(2).position.getX(), 3.0)
+        self.assertEqual(self.trace3.getObs(2).position.getY(), 5.0)
+        self.assertEqual(self.trace3.getObs(3).position.getX(), 5.0)
+        self.assertEqual(self.trace3.getObs(3).position.getY(), 5.0)
+        self.assertEqual(self.trace3.getObs(4).position.getX(), 7.0)
+        self.assertEqual(self.trace3.getObs(4).position.getY(), 5.0)
+        
+    def test_make_even(self):
+        self.trace2.makeEven()
+        self.trace3.makeEven()
+        
+        self.assertEqual(self.trace2.size(), 4)
+        self.assertEqual(self.trace3.size(), 4)
+        
+        self.assertEqual(self.trace2.getObs(0).position.getX(), 1.0)
+        self.assertEqual(self.trace2.getObs(0).position.getY(), 5.0)
+        self.assertEqual(self.trace2.getObs(1).position.getX(), 2.0)
+        self.assertEqual(self.trace2.getObs(1).position.getY(), 5.0)
+        self.assertEqual(self.trace2.getObs(2).position.getX(), 3.0)
+        self.assertEqual(self.trace2.getObs(2).position.getY(), 5.0)
+        self.assertEqual(self.trace2.getObs(3).position.getX(), 5.0)
+        self.assertEqual(self.trace2.getObs(3).position.getY(), 5.0)
+        
+        self.assertEqual(self.trace3.getObs(0).position.getX(), 1.0)
+        self.assertEqual(self.trace3.getObs(0).position.getY(), 5.0)
+        self.assertEqual(self.trace3.getObs(1).position.getX(), 2.0)
+        self.assertEqual(self.trace3.getObs(1).position.getY(), 5.0)
+        self.assertEqual(self.trace3.getObs(2).position.getX(), 3.0)
+        self.assertEqual(self.trace3.getObs(2).position.getY(), 5.0)
+        self.assertEqual(self.trace3.getObs(3).position.getX(), 5.0)
+        self.assertEqual(self.trace3.getObs(3).position.getY(), 5.0)
+
+    
+    #def test_loop(self):
+        #print ("aa")
+
+
 
 if __name__ == '__main__':
     suite = TestSuite()
@@ -108,5 +175,8 @@ if __name__ == '__main__':
     suite.addTest(TestTrack("test_coord"))
     suite.addTest(TestTrack("test_enclosed_polygon"))
     suite.addTest(TestTrack("test_shift_to"))
+    suite.addTest(TestTrack("test_make_odd"))
+    suite.addTest(TestTrack("test_make_even"))
+    #suite.addTest(TestTrack("test_loop"))
     runner = TextTestRunner()
     runner.run(suite)

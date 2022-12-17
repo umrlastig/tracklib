@@ -112,6 +112,7 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
         self.assertEqual(ds33, self.trace3.getObs(3).distanceTo(self.trace3.getObs(2)))
         
     def testHeading(self):
+        
         self.trace1.addAnalyticalFeature(Analytics.heading)
         
         s0 = self.trace1.getObsAnalyticalFeature('heading', 0)

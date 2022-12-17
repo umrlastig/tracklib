@@ -295,7 +295,7 @@ class ENUCoords:
         visee = point - self
         return math.atan2(visee.U, visee.norm2D())
 
-    def azimuthTo(self, point: ENUCoords) -> float:   
+    def azimuthTo(self, point: ENUCoords) -> float:
         """Azimut between two ENU coordinates
 
         :param point: A ENUCoordinate
@@ -305,12 +305,13 @@ class ENUCoords:
         return math.atan2(visee.E, visee.N)
 
     def __sub__(self, p: ENUCoords) -> ENUCoords:   
-        """Vector difference between two ENU coordinates
+        """
+        Vector difference between two ENU coordinates (AB: B-A).
 
         :param p: An ENU coordinate
         :return: An ENU coordinate
         """
-        #return ENUCoords(p.E - self.E, p.N - self.N, p.U - self.U)
+        # return ENUCoords(p.E - self.E, p.N - self.N, p.U - self.U)
         return ENUCoords(self.E - p.E, self.N - p.N, self.U - p.U)
 
     def __add__(self, p: ENUCoords) -> ENUCoords:   

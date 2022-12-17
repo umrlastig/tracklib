@@ -1,5 +1,5 @@
-﻿"""
-Algorithm to create Analytical features: ds, speed, abs_curv
+"""
+Algorithm to create Analytical features: ds, speed, abs_curv.
 """
 
 import math
@@ -52,7 +52,8 @@ def heading(track, i):
     
     if i == 0:
         return heading(track, 1)
-    return track.getObs(i).position.azimuthTo(track.getObs(i - 1).position)
+    
+    return track.getObs(i-1).position.azimuthTo(track.getObs(i).position)
 
 
 def speed(track, i):

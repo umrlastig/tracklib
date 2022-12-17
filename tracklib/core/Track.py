@@ -32,7 +32,9 @@ from tracklib.algo.Analytics import BIAF_SPEED, BIAF_ABS_CURV
 
 
 class Track:
-    """Representation of a GPS track"""
+    """
+    Representation of a GPS track.
+    """
 
     def __init__(self, list_of_obs=None, user_id=0, track_id=0, base=None):
         """Takes a (possibly empty) list of points as input"""
@@ -100,7 +102,6 @@ class Track:
     # =========================================================================
     # Track coordinate transformation
     # =========================================================================
-
     def toECEFCoords(self, base=None):
         """TODO"""
         if self.getSRID() == "Geo":
@@ -212,6 +213,7 @@ class Track:
             base = self.getObs(0).position.copy()
             self.toENUCoords(base)
         return base
+
 
     # =========================================================================
     # Basic methods to get metadata and/or data
@@ -378,7 +380,10 @@ class Track:
             self[0].position.setY(self[-1].position.getY())
             self[0].position.setZ(self[-1].position.getZ())
 
-    # Internal methods
+
+    # =========================================================================
+    #  Analytical features
+    # =========================================================================
     def __transmitAF(self, track):
         """TODO"""
         self.__analyticalFeaturesDico = track.__analyticalFeaturesDico.copy()
