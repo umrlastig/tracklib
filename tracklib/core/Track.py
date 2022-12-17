@@ -349,10 +349,6 @@ class Track:
 
     def shiftTo(self, idx_point, new_coords=ENUCoords(0, 0, 0)):
         """
-        Cet opérateur décale les obs de la trace vers la gauche, 
-        d'autant que le nombre indiqué par le second opérande. 
-        Les bits qui dépassent à gauche sont abandonnés et des zéros 
-        sont introduits à droite.
         """
         if self.getSRID() != "ENU":
             print("Error: shift may be applied only to ENU coords")
