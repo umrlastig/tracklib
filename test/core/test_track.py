@@ -257,6 +257,70 @@ class TestTrack(TestCase):
         self.assertEqual(self.trace2.getObsAnalyticalFeature("z", 2), 1)
 
 
+    def test_sort(self):
+        self.assertTrue(self.trace2.isSorted())
+        c1 = Coords.ENUCoords(0.0, 5.0, 0.5)
+        p1 = Obs.Obs(c1, GPSTime.GPSTime.readTimestamp("2018-01-01 09:59:55"))
+        self.trace2.addObs(p1)
+        self.assertFalse(self.trace2.isSorted())
+        self.trace2.sort()
+        
+        self.assertEqual(self.trace2.getX(), [0.0, 1.0, 2.0, 3.0, 5.0])
+        self.assertEqual(self.trace2.getY(), [5.0, 5.0, 5.0, 5.0, 5.0])
+        self.assertEqual(self.trace2.getZ(), [0.5, 0.0, 0.0, 0.0, 0.4])
+        
+        self.assertEqual(str(self.trace2.getTimestamps(0)).strip()[0:19], 
+                         "01/01/2018 09:59:55")
+        self.assertEqual(str(self.trace2.getTimestamps(1)).strip()[0:19], 
+                         "01/01/2018 10:00:00")
+        self.assertEqual(str(self.trace2.getTimestamps(2)).strip()[0:19], 
+                         "01/01/2018 10:00:05")
+        self.assertEqual(str(self.trace2.getTimestamps(3)).strip()[0:19], 
+                         "01/01/2018 10:00:10")
+        self.assertEqual(str(self.trace2.getTimestamps(4)).strip()[0:19], 
+                         "01/01/2018 10:00:20")
+        
+        
+        self.assertTrue(self.trace2.isSorted())
+        
+        
+    def test_remove_obs(self):
+        
+        self.trace2.removeObsList([])
+        self.assertEqual(self.trace2.size(), 4)
+        
+        self.trace2.removeObsList([1,3])
+        self.assertEqual(self.trace2.size(), 2)
+        self.assertEqual(self.trace2.getX(), [1.0, 3.0])
+        self.assertEqual(self.trace2.getY(), [5.0, 5.0])
+        self.assertEqual(self.trace2.getZ(), [0.0, 0.0])
+        self.assertEqual(str(self.trace2.getTimestamps(0)).strip()[0:19], 
+                         "01/01/2018 10:00:00")
+        self.assertEqual(str(self.trace2.getTimestamps(1)).strip()[0:19], 
+                         "01/01/2018 10:00:10")
+        
+        self.trace2.removeObsList([GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:00")])
+        self.assertEqual(self.trace2.size(), 1)
+        self.assertEqual(self.trace2.getX(), [3.0])
+        self.assertEqual(self.trace2.getY(), [5.0])
+        self.assertEqual(self.trace2.getZ(), [0.0])
+        self.assertEqual(str(self.trace2.getTimestamps(0)).strip()[0:19], 
+                         "01/01/2018 10:00:10")
+        
+        self.trace2.popObs(0)
+        self.assertEqual(self.trace2.size(), 0)
+        
+        
+    def test_tid(self):
+        self.assertEqual (self.trace2.tid, 0)
+        self.trace2.setTid(10)
+        self.assertEqual (self.trace2.tid, 10)
+        
+        
+    def test_sort_radix(self):
+        self.trace2.sortRadix()
+        # TODO
+        
 
 if __name__ == '__main__':
     suite = TestSuite()
@@ -275,6 +339,11 @@ if __name__ == '__main__':
     suite.addTest(TestTrack("test_af_xyztidx"))
     suite.addTest(TestTrack("test_obs_af"))
     suite.addTest(TestTrack("test_set_obs_af"))
+    
+    suite.addTest(TestTrack("test_sort"))
+    suite.addTest(TestTrack("test_remove_obs"))
+    suite.addTest(TestTrack("test_tid"))
+    suite.addTest(TestTrack("test_sort_radix"))
     
     runner = TextTestRunner()
     runner.run(suite)
