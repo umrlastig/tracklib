@@ -196,6 +196,24 @@ class TestTrack(TestCase):
         self.assertEqual(self.trace2.getObs(0).position.getZ(), self.trace2.getObs(4).position.getZ())
 
 
+    def test_afs(self):
+        import tracklib.algo.Analytics as Analytics
+        self.trace2.addAnalyticalFeature(Analytics.ds)
+        self.trace2.addAnalyticalFeature(Analytics.heading)
+        self.trace2.addAnalyticalFeature(Analytics.speed)
+        
+        T = self.trace2.getAnalyticalFeatures('speed')
+        self.assertListEqual(T[0], [0.2, 0.2, 0.2, 0.2])
+        
+        T = self.trace2.getAnalyticalFeatures(['speed'])
+        self.assertListEqual(T[0], [0.2, 0.2, 0.2, 0.2])
+        
+        T = self.trace2.getAnalyticalFeatures(['speed', 'ds'])
+        self.assertListEqual(T[0], [0.2, 0.2, 0.2, 0.2])
+        self.assertListEqual(T[1], [0.0, 1.0, 1.0, 2.0])
+
+
+
 if __name__ == '__main__':
     suite = TestSuite()
     
@@ -209,7 +227,7 @@ if __name__ == '__main__':
     suite.addTest(TestTrack("test_make_even"))
     suite.addTest(TestTrack("test_loop"))
     
-    
+    suite.addTest(TestTrack("test_afs"))
     
     runner = TextTestRunner()
     runner.run(suite)
