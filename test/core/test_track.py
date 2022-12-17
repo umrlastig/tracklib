@@ -67,8 +67,8 @@ class TestTrack(TestCase):
         
         self.trace1.convertToTimeZone(2)
         self.assertEqual(2, self.trace1.getTimeZone())
-        #self.assertEqual(self.trace1.getFirstObs().timestamp, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
-        self.assertEqual("01/01/2018 11:00:00", str(self.trace1.getFirstObs().timestamp).strip()[0:19])
+        self.assertEqual("01/01/2018 11:00:00", 
+                         str(self.trace1.getFirstObs().timestamp).strip()[0:19])
         
         
     def test_interval(self):
@@ -92,10 +92,12 @@ class TestTrack(TestCase):
         self.assertEqual(self.trace1.getT(), [1514800800.0])
         self.assertEqual(self.trace1.getT(0), 1514800800.0)
         
-        self.assertEqual(str(self.trace1.getTimestamps(0)).strip()[0:19], "01/01/2018 10:00:00")
+        self.assertEqual(str(self.trace1.getTimestamps(0)).strip()[0:19], 
+                         "01/01/2018 10:00:00")
         tab = self.trace1.getTimestamps()
         self.assertEqual(len(tab), 1)
-        self.assertEqual(tab[0], GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
+        self.assertEqual(tab[0], 
+                         GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
         
         
     def test_enclosed_polygon(self):
@@ -106,9 +108,25 @@ class TestTrack(TestCase):
         
         
     def test_shift_to(self):
-        #pos = Coords.ENUCoords(3.0, 5.0, 0.0)
-        self.trace2.shiftTo(2)
-        #print (self.trace2)
+        t1 = self.trace2.copy()
+        
+        t1.shiftTo(0)
+        self.assertEqual(t1.getObs(0).position.getX(), 0.0)
+        self.assertEqual(t1.getObs(1).position.getX(), 1.0)
+        self.assertEqual(t1.getObs(2).position.getX(), 2.0)
+        self.assertEqual(t1.getObs(3).position.getX(), 4.0)
+        
+        t2 = self.trace2.copy()
+        pos = Coords.ENUCoords(3.0, 4.0, 0.0)
+        t2.shiftTo(1, pos)
+        self.assertEqual(t2.getObs(0).position.getX(), 2.0)
+        self.assertEqual(t2.getObs(0).position.getY(), 4.0)
+        self.assertEqual(t2.getObs(1).position.getX(), 3.0)
+        self.assertEqual(t2.getObs(1).position.getY(), 4.0)
+        self.assertEqual(t2.getObs(2).position.getX(), 4.0)
+        self.assertEqual(t2.getObs(2).position.getY(), 4.0)
+        self.assertEqual(t2.getObs(3).position.getX(), 6.0)
+        self.assertEqual(t2.getObs(3).position.getY(), 4.0)
         
         
     def test_make_odd(self):
@@ -162,13 +180,25 @@ class TestTrack(TestCase):
         self.assertEqual(self.trace3.getObs(3).position.getY(), 5.0)
 
     
-    #def test_loop(self):
-        #print ("aa")
-
+    def test_loop(self):
+        t1 = self.trace2.copy()
+        
+        t1.loop(add=False)
+        self.assertEqual(t1.size(), 4)
+        self.assertEqual(t1.getObs(0).position.getX(), t1.getObs(3).position.getX())
+        self.assertEqual(t1.getObs(0).position.getY(), t1.getObs(3).position.getY())
+        self.assertEqual(t1.getObs(0).position.getZ(), t1.getObs(3).position.getZ())
+        
+        self.trace2.loop(add=True)
+        self.assertEqual(self.trace2.size(), 5)
+        self.assertEqual(self.trace2.getObs(0).position.getX(), self.trace2.getObs(4).position.getX())
+        self.assertEqual(self.trace2.getObs(0).position.getY(), self.trace2.getObs(4).position.getY())
+        self.assertEqual(self.trace2.getObs(0).position.getZ(), self.trace2.getObs(4).position.getZ())
 
 
 if __name__ == '__main__':
     suite = TestSuite()
+    
     suite.addTest(TestTrack("test_str"))
     suite.addTest(TestTrack("test_timezone"))
     suite.addTest(TestTrack("test_interval"))
@@ -177,6 +207,9 @@ if __name__ == '__main__':
     suite.addTest(TestTrack("test_shift_to"))
     suite.addTest(TestTrack("test_make_odd"))
     suite.addTest(TestTrack("test_make_even"))
-    #suite.addTest(TestTrack("test_loop"))
+    suite.addTest(TestTrack("test_loop"))
+    
+    
+    
     runner = TextTestRunner()
     runner.run(suite)
