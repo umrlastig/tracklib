@@ -323,7 +323,7 @@ class TestTrack(TestCase):
         
         
     def test_remove_tpsDup(self):
-        pass
+        self.trace2.removeTpsDup()
     
     
     def test_export(self):
