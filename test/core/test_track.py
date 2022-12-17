@@ -231,6 +231,32 @@ class TestTrack(TestCase):
         IDX = self.trace2.getAnalyticalFeature("idx")
         self.assertListEqual(IDX, [0, 1, 2, 3])
         
+        
+    def test_obs_af(self):
+        tps = self.trace2.getObsAnalyticalFeature('timestamp', 0)
+        self.assertEqual(str(tps).strip()[0:19], "01/01/2018 10:00:00")
+        tps = self.trace2.getObsAnalyticalFeature('timestamp', 1)
+        self.assertEqual(str(tps).strip()[0:19], "01/01/2018 10:00:05")
+        tps = self.trace2.getObsAnalyticalFeature('timestamp', 2)
+        self.assertEqual(str(tps).strip()[0:19], "01/01/2018 10:00:10")
+        tps = self.trace2.getObsAnalyticalFeature('timestamp', 3)
+        self.assertEqual(str(tps).strip()[0:19], "01/01/2018 10:00:20")
+        
+        idx = self.trace2.getObsAnalyticalFeature('idx', 0)
+        self.assertEqual(idx, 0)
+        idx = self.trace2.getObsAnalyticalFeature('idx', 1)
+        self.assertEqual(idx, 1)
+        idx = self.trace2.getObsAnalyticalFeature('idx', 2)
+        self.assertEqual(idx, 2)
+        idx = self.trace2.getObsAnalyticalFeature('idx', 3)
+        self.assertEqual(idx, 3)
+        
+        
+    def test_set_obs_af(self):
+        self.trace2.setObsAnalyticalFeature("z", 2, 1)
+        self.assertEqual(self.trace2.getObsAnalyticalFeature("z", 2), 1)
+
+
 
 if __name__ == '__main__':
     suite = TestSuite()
@@ -247,6 +273,8 @@ if __name__ == '__main__':
     
     suite.addTest(TestTrack("test_afs"))
     suite.addTest(TestTrack("test_af_xyztidx"))
+    suite.addTest(TestTrack("test_obs_af"))
+    suite.addTest(TestTrack("test_set_obs_af"))
     
     runner = TextTestRunner()
     runner.run(suite)

@@ -27,8 +27,6 @@ The official documentation is available at **[ReadTheDocs](https://tracklib.read
 
 Institute: LASTIG, Univ Gustave Eiffel, ENSG, IGN
 
-License: [Cecill-C](http://www.cecill.info/)
-
 Authors
 - Yann Méneroux
 - Marie-Dominique Van Damme
@@ -39,10 +37,7 @@ Authors
 Minimal python version:
 - Python 3.6+
 
-Minimal requirements:
-- numpy
-- progressbar2
-- scikit-image
+
 
 
 
