@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from unittest import TestCase, TestSuite, TextTestRunner
 
-from tracklib.core import (Track, Obs, Coords, GPSTime)
+from tracklib.core import (Track, Obs, GPSTime)
+from tracklib.core import ObsCoords as Coords
 from tracklib.algo.Geometrics import Polygon
 
 
