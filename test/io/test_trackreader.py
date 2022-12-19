@@ -141,7 +141,7 @@ class TestTrackReader(TestCase):
         constraintBBox = Constraint(shape = bbox, mode = MODE_INSIDE, type=TYPE_CUT_AND_SELECT)
         s = Selector([constraintBBox])
         
-        chemin = os.path.join(self.resource_path, 'data/mopsi')
+        chemin = os.path.join(self.resource_path, 'data/mopsi/wgs84')
         GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         dateInitiale = '1970-01-01 00:00:00'
         collection = TrackReader.readFromCsv(path=chemin, id_E=1, id_N=0, id_T=2, 
