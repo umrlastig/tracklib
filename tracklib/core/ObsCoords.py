@@ -15,7 +15,6 @@ import math
 import copy
 import matplotlib.pyplot as plt
 
-
 # The current constants are used in this module : 
 Re: float = 6378137.0  #: Earth equatorial radius
 Fe: float = 1.0 / 298.257223563  #: Earth eccentricity
