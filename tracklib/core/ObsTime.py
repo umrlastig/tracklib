@@ -9,7 +9,7 @@ import copy
 import random
 
 
-class GPSTime:
+class ObsTime:
     """Class to represent a GPS time"""
 
     BASE_YEAR = 2000
@@ -66,7 +66,7 @@ class GPSTime:
 
         if isinstance(year, str):
 
-            time = GPSTime.readTimestamp(year)
+            time = ObsTime.readTimestamp(year)
             self.day = time.day
             self.month = time.month
             self.year = time.year
@@ -87,7 +87,7 @@ class GPSTime:
             self.ms = ms
             self.zone = zone
 
-    def copy(self) -> GPSTime:   
+    def copy(self) -> ObsTime:   
         """Copy the object
 
         :return: copy of current object
@@ -102,7 +102,7 @@ class GPSTime:
 
         :param format: Format for printing GPSTime
         """
-        GPSTime.__PRINT_FMT = format
+        ObsTime.__PRINT_FMT = format
 
     @staticmethod
     def setReadFormat(format: str):   
@@ -110,8 +110,8 @@ class GPSTime:
 
         :param format: Format for reading
         """
-        GPSTime.__READ_FMT = format
-        GPSTime.__PRECOMPILED_READ_FMT = GPSTime.__precompileReadFmt(GPSTime.__READ_FMT)
+        ObsTime.__READ_FMT = format
+        ObsTime.__PRECOMPILED_READ_FMT = ObsTime.__precompileReadFmt(ObsTime.__READ_FMT)
 
     @staticmethod
     def getPrintFormat() -> str:   
@@ -119,7 +119,7 @@ class GPSTime:
 
         :return: The print format
         """
-        return GPSTime.__PRINT_FMT
+        return ObsTime.__PRINT_FMT
 
     @staticmethod
     def getReadFormat() -> str:   
@@ -127,10 +127,10 @@ class GPSTime:
 
         :return: The read format
         """
-        return GPSTime.__READ_FMT
+        return ObsTime.__READ_FMT
 
     @staticmethod
-    def readUnixTime(elapsed_seconds: float) -> GPSTime:   
+    def readUnixTime(elapsed_seconds: float) -> ObsTime:   
         """Converting elapsed float seconds since 01/01/1970 in GPSTime
 
         **Warning:** does not consider leap seconds (31 since 1970)
@@ -148,7 +148,7 @@ class GPSTime:
         if elapsed_seconds > tps:
             elapsed_seconds = elapsed_seconds / 1000
 
-        time = GPSTime()
+        time = ObsTime()
 
         SECOND_PER_YEAR = 86400 * 365
         # SECOND_PER_MONTH = 86400 * 28
@@ -167,7 +167,7 @@ class GPSTime:
         # Month
         month = 0
         for i in range(12):
-            sec_on_month = GPSTime.__day_per_month[month] * 86400
+            sec_on_month = ObsTime.__day_per_month[month] * 86400
             if (month == 1) and (year % 4 == 0):
                 sec_on_month += 86400
             if elapsed_seconds < sec_on_month:
@@ -211,7 +211,7 @@ class GPSTime:
             if y % 4 == 0:
                 seconds += 86400
         for m in range(1, self.month):
-            seconds += GPSTime.__day_per_month[m - 1] * 86400
+            seconds += ObsTime.__day_per_month[m - 1] * 86400
             if (m == 2) and (self.year % 4 == 0):
                 seconds += 86400
         seconds += (self.day - 1) * 86400
@@ -223,19 +223,19 @@ class GPSTime:
         return seconds
 
     @staticmethod
-    def random() -> GPSTime:   
+    def random() -> ObsTime:   
         """Generate random date between 01/01/1970 and 01/01/2050"""
-        t0 = GPSTime(2050, 1, 1, 0, 0, 0, 0)
+        t0 = ObsTime(2050, 1, 1, 0, 0, 0, 0)
         s0 = t0.toAbsTime()
-        return GPSTime.readUnixTime(random.random() * s0)
+        return ObsTime.readUnixTime(random.random() * s0)
     
     @staticmethod
-    def now() -> GPSTime:   
+    def now() -> ObsTime:   
         """Get Current Date and Time"""
         from datetime import datetime
         nowobj = datetime.now()
         
-        tps = GPSTime(nowobj.year, nowobj.month, nowobj.day, 
+        tps = ObsTime(nowobj.year, nowobj.month, nowobj.day, 
                      nowobj.hour, nowobj.minute, nowobj.second, 0)
         return tps
 
@@ -251,28 +251,28 @@ class GPSTime:
 
     def timeWithZone(self) -> str:   
         """Print as Gpx time"""
-        fmt_save = GPSTime.getPrintFormat()
-        GPSTime.setPrintFormat("4Y-2M-2DT2h:2m:2s")
+        fmt_save = ObsTime.getPrintFormat()
+        ObsTime.setPrintFormat("4Y-2M-2DT2h:2m:2s")
         output = str(self) + self.printZone()
-        GPSTime.setPrintFormat(fmt_save)
+        ObsTime.setPrintFormat(fmt_save)
         return output
 
-    def convertToZone(self, zone: int) -> GPSTime:   
+    def convertToZone(self, zone: int) -> ObsTime:   
         """Zone conversion
 
         :param zone: Time zone
         :return: Time for the set time zone
         """
         shift = zone - self.zone
-        new_time = GPSTime.readUnixTime(self.toAbsTime() + 3600 * shift)
+        new_time = ObsTime.readUnixTime(self.toAbsTime() + 3600 * shift)
         new_time.zone = zone
         return new_time
 
     def getDayOfWeek(self) -> str:   
         """Return the current day of week"""
         seconds = self.toAbsTime()
-        return GPSTime.__day_names[
-            ((int)(seconds / 86400) + GPSTime.__day_of_base_date) % 7
+        return ObsTime.__day_names[
+            ((int)(seconds / 86400) + ObsTime.__day_of_base_date) % 7
         ]
 
     def __fillMember(self, value, code):
@@ -288,7 +288,7 @@ class GPSTime:
         if code[1] == "s":
             self.sec = (int)(value)
         if code == "2Y":
-            self.year = (int)(value) + GPSTime.BASE_YEAR
+            self.year = (int)(value) + ObsTime.BASE_YEAR
         if code == "4Y":
             self.year = (int)(value)
         if code[1] == "z":
@@ -327,17 +327,17 @@ class GPSTime:
         index = format.find("*")
         while index >= 0:
             n = (int)(format[index - 1])
-            format = format[: index - 1] + GPSTime.__rep("x", n) + format[index + 1 :]
+            format = format[: index - 1] + ObsTime.__rep("x", n) + format[index + 1 :]
             index = format.find("*")
 
         # Filling preccompiled list
-        for i in range(len(GPSTime.__codes)):
-            code = GPSTime.__codes[i]
+        for i in range(len(ObsTime.__codes)):
+            code = ObsTime.__codes[i]
             index = format.find(code)
             if index < 0:
                 continue
             PRECOMPILED_LIST.append((code, index))
-        PRECOMPILED_LIST.sort(key=GPSTime.__takeSecond)
+        PRECOMPILED_LIST.sort(key=ObsTime.__takeSecond)
 
         # Shift to manage '4Y', '1X' and '3z' symbols
         for i in range(len(PRECOMPILED_LIST)):
@@ -350,14 +350,14 @@ class GPSTime:
         return PRECOMPILED_LIST
 
     @staticmethod
-    def readTimestamp(timeAsString: str) -> GPSTime:   
+    def readTimestamp(timeAsString: str) -> ObsTime:   
         """Build timestamp from string according to READ_FMT
 
         :param timeAsString: Timestamp in string format
         """
 
-        time = GPSTime()
-        PCL = GPSTime.__PRECOMPILED_READ_FMT
+        time = ObsTime()
+        PCL = ObsTime.__PRECOMPILED_READ_FMT
 
         for i in range(len(PCL)):
             index = PCL[i][1]
@@ -408,41 +408,41 @@ class GPSTime:
             self.ms,
         ]
 
-        output = GPSTime.__PRINT_FMT
+        output = ObsTime.__PRINT_FMT
 
-        for i in range(len(GPSTime.__codes)):
-            code = GPSTime.__codes[i]
+        for i in range(len(ObsTime.__codes)):
+            code = ObsTime.__codes[i]
             index = output.find(code)
             while index >= 0:
                 value = (int)(code[0])
-                output = GPSTime.__replace(
-                    output, index, 2, GPSTime.__fmt_nd[value - 1].format(subst[i])
+                output = ObsTime.__replace(
+                    output, index, 2, ObsTime.__fmt_nd[value - 1].format(subst[i])
                 )
                 index = output.find(code)
         index = output.find("\\")
         while index >= 0:
-            output = GPSTime.__replace(output, index, 1, "")
+            output = ObsTime.__replace(output, index, 1, "")
             index = output.find("@")
 
         return output
 
-    def addSec(self, nb: int) -> GPSTime:   
+    def addSec(self, nb: int) -> ObsTime:   
         """Add `nb` seconds to current time
 
         :param nb: Number of seconds to add
         :return: A :class:`GPSTime` incremented of `nb` second(s)
         """
         sec = self.toAbsTime() + nb
-        return GPSTime.readUnixTime(sec)
+        return ObsTime.readUnixTime(sec)
 
-    def addMin(self, nb: int) -> GPSTime:   
+    def addMin(self, nb: int) -> ObsTime:   
         """Add `nb` minutes to current time
 
         :param nb: Number of minutes to add
         :return: A :class:`GPSTime` incremented of `nb` minute(s)
         """
         sec = self.toAbsTime() + nb * 60
-        return GPSTime.readUnixTime(sec)
+        return ObsTime.readUnixTime(sec)
 
     def addHour(self, nb):
         """Add `nb` hours to current time
@@ -451,7 +451,7 @@ class GPSTime:
         :return: A :class:`GPSTime` incremented of `nb` hour(s)
         """
         sec = self.toAbsTime() + nb * 3600
-        return GPSTime.readUnixTime(sec)
+        return ObsTime.readUnixTime(sec)
 
     def addDay(self, nb):
         """Add `nb` days to current time
@@ -460,9 +460,9 @@ class GPSTime:
         :return: A :class:`GPSTime` incremented of `nb` day(s)
         """
         sec = self.toAbsTime() + nb * 86400
-        return GPSTime.readUnixTime(sec)
+        return ObsTime.readUnixTime(sec)
 
-    def __sub__(self, time: GPSTime) -> float:   
+    def __sub__(self, time: ObsTime) -> float:   
         """Difference between 2 dates
 
         :param time: :class:`GPSTime` to substract
@@ -470,7 +470,7 @@ class GPSTime:
         """
         return self.toAbsTime() - time.toAbsTime()
 
-    def __eq__(self, time: GPSTime) -> bool:   
+    def __eq__(self, time: ObsTime) -> bool:   
         """Tests if two timestamps are strictly equal (up to 1 ms)
 
         :param time: :class:`GPSTime` to compare
@@ -491,14 +491,14 @@ class GPSTime:
             return False
         return True
 
-    def __ne__(self, time: GPSTime) -> bool:   
+    def __ne__(self, time: ObsTime) -> bool:   
         """Test if two timestamps are different
 
         :param time: :class:`GPSTime` to compare
         """
         return not (time == self)
 
-    def __gt__(self, time: GPSTime) -> bool:   
+    def __gt__(self, time: ObsTime) -> bool:   
         """Tests chronological order of two timestamps
 
         :param time: :class:`GPSTime` to compare
@@ -517,7 +517,7 @@ class GPSTime:
             return self.sec > time.sec
         return self.ms > time.ms
 
-    def __lt__(self, time: GPSTime) -> bool:   
+    def __lt__(self, time: ObsTime) -> bool:   
         """Tests chronological order of two timestamps
 
         :param time: :class:`GPSTime` to compare
@@ -536,7 +536,7 @@ class GPSTime:
             return self.sec < time.sec
         return self.ms < time.ms
 
-    def __ge__(self, time: GPSTime) -> bool:   
+    def __ge__(self, time: ObsTime) -> bool:   
         """Inverse of :method:`__gt__`
 
         :param time: :class:`GPSTime` to compare
@@ -544,7 +544,7 @@ class GPSTime:
 
         return not (self < time)
 
-    def __le__(self, time: GPSTime) -> bool:   
+    def __le__(self, time: ObsTime) -> bool:   
         """Inverse of :method:`__lt__`
 
         :param time: :class:`GPSTime` to compare

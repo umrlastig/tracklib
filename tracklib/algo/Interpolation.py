@@ -12,7 +12,7 @@ import tracklib.core.Utils as utils
 
 from tracklib.core.Obs import Obs
 from tracklib.core.ObsCoords import ENUCoords
-from tracklib.core.ObsTime import GPSTime
+from tracklib.core.ObsTime import ObsTime
 
 MODE_SPATIAL = 1
 MODE_TEMPORAL = 2
@@ -134,7 +134,7 @@ def __resampleSpatial(track, ds):
         Z = wbwd * pt_bwd.position.getZ() + wfwd * pt_fwd.position.getZ()
         T = wbwd * pt_bwd.timestamp.toAbsTime() + wfwd * pt_fwd.timestamp.toAbsTime()
 
-        pi = Obs(ENUCoords(X, Y, Z), GPSTime.readUnixTime(T))
+        pi = Obs(ENUCoords(X, Y, Z), ObsTime.readUnixTime(T))
 
         interp_points.append(pi)
 
@@ -185,7 +185,7 @@ def __resampleTemporal(track, reference):
         Y = wbwd * pt_bwd.position.getY() + wfwd * pt_fwd.position.getY()
         Z = wbwd * pt_bwd.position.getZ() + wfwd * pt_fwd.position.getZ()
 
-        pi = Obs(ENUCoords(X, Y, Z), GPSTime.readUnixTime(t))
+        pi = Obs(ENUCoords(X, Y, Z), ObsTime.readUnixTime(t))
 
         interp_points.append(pi)
 
@@ -279,7 +279,7 @@ def __gaussian_process(track, TO, TU, kernel, factor, sigma, cp_var):
     # Filling track
     for i in range(MUX.shape[0]):
         coords = ENUCoords(MUX[i] + bx, MUY[i] + by, MUZ[i] + bz)
-        obs = Obs(coords, GPSTime.readUnixTime(TU[i]))
+        obs = Obs(coords, ObsTime.readUnixTime(TU[i]))
         new_track.addObs(obs)
 
     if cp_var:
@@ -453,7 +453,7 @@ def __smooth_resample_spatial(track, ds):
 
     OBS = []
     for i in range(len(Si)):
-        OBS.append(Obs(ENUCoords(Xi[i], Yi[i], Zi[i]), GPSTime.readUnixTime(Ti[i])))
+        OBS.append(Obs(ENUCoords(Xi[i], Yi[i], Zi[i]), ObsTime.readUnixTime(Ti[i])))
 
     track.setObsList(OBS)
 
@@ -544,7 +544,7 @@ def __smooth_resample_temporal(track, reference):
     OBS = []
     for i in range(len(REF)):
         OBS.append(
-            Obs(ENUCoords(Xi[i], Yi[i], Zi[i]), GPSTime.readUnixTime(REF[i] + M))
+            Obs(ENUCoords(Xi[i], Yi[i], Zi[i]), ObsTime.readUnixTime(REF[i] + M))
         )
 
     track.setObsList(OBS)
@@ -635,7 +635,7 @@ def __bsplines_temporal(track, reference, degree=3, knots_nb=None):
         y = XYZi[1, i] + My
         z = XYZi[2, i] + Mz
         t = REF[i] + Mt
-        OBS.append(Obs(ENUCoords(x, y, z), GPSTime.readUnixTime(t)))
+        OBS.append(Obs(ENUCoords(x, y, z), ObsTime.readUnixTime(t)))
 
     track.setObsList(OBS)
 
@@ -732,7 +732,7 @@ def __bsplines_spatial(track, ds, degree=3, knots_nb=None):
         y = XYZi[1, i] + My
         z = XYZi[2, i] + Mz
         t = XYZi[3, i] + Mt
-        OBS.append(Obs(ENUCoords(x, y, z), GPSTime.readUnixTime(t)))
+        OBS.append(Obs(ENUCoords(x, y, z), ObsTime.readUnixTime(t)))
 
     track.setObsList(OBS)
 

@@ -2,7 +2,7 @@
 
 import os.path
 
-from tracklib.core.ObsTime import GPSTime
+from tracklib.core.ObsTime import ObsTime
 
 
 class TrackFormat:
@@ -78,10 +78,10 @@ class TrackFormat:
             if self.DateIni == "-1":
                 self.DateIni = -1
             else:
-                fmt_temp = GPSTime.getReadFormat()
-                GPSTime.setReadFormat(self.time_fmt)
-                self.DateIni = GPSTime(self.DateIni)
-                GPSTime.setReadFormat(fmt_temp)
+                fmt_temp = ObsTime.getReadFormat()
+                ObsTime.setReadFormat(self.time_fmt)
+                self.DateIni = ObsTime(self.DateIni)
+                ObsTime.setReadFormat(fmt_temp)
         else:
 
             self.id_E = -1
@@ -96,4 +96,4 @@ class TrackFormat:
             self.srid = "ENUCoords"
             self.read_all = False
 
-            self.time_fmt = GPSTime.getReadFormat()
+            self.time_fmt = ObsTime.getReadFormat()

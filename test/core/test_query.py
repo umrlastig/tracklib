@@ -5,7 +5,7 @@ from unittest import TestCase, TestSuite, TextTestRunner
 from tracklib.core.ObsCoords import ENUCoords
 from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
-from tracklib.core.ObsTime import GPSTime
+from tracklib.core.ObsTime import ObsTime
 
 from tracklib.algo import (Analytics)
 
@@ -15,26 +15,26 @@ class TestQuery(TestCase):
     
     def setUp(self):
         
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         
         self.track = Track()
-        p1 = Obs(ENUCoords(0, 0), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        p1 = Obs(ENUCoords(0, 0), ObsTime.readTimestamp('2020-01-01 10:00:00'))
         self.track.addObs(p1)
-        p2 = Obs(ENUCoords(0, 1), GPSTime.readTimestamp('2020-01-01 10:00:01'))
+        p2 = Obs(ENUCoords(0, 1), ObsTime.readTimestamp('2020-01-01 10:00:01'))
         self.track.addObs(p2)
-        p3 = Obs(ENUCoords(1, 1), GPSTime.readTimestamp('2020-01-01 10:00:02'))
+        p3 = Obs(ENUCoords(1, 1), ObsTime.readTimestamp('2020-01-01 10:00:02'))
         self.track.addObs(p3)
-        p4 = Obs(ENUCoords(1, 2), GPSTime.readTimestamp('2020-01-01 10:00:03'))
+        p4 = Obs(ENUCoords(1, 2), ObsTime.readTimestamp('2020-01-01 10:00:03'))
         self.track.addObs(p4)
-        p5 = Obs(ENUCoords(2, 2), GPSTime.readTimestamp('2020-01-01 10:00:04'))
+        p5 = Obs(ENUCoords(2, 2), ObsTime.readTimestamp('2020-01-01 10:00:04'))
         self.track.addObs(p5)
-        p6 = Obs(ENUCoords(2, 3), GPSTime.readTimestamp('2020-01-01 10:00:06'))
+        p6 = Obs(ENUCoords(2, 3), ObsTime.readTimestamp('2020-01-01 10:00:06'))
         self.track.addObs(p6)
-        p7 = Obs(ENUCoords(3, 3), GPSTime.readTimestamp('2020-01-01 10:00:08'))
+        p7 = Obs(ENUCoords(3, 3), ObsTime.readTimestamp('2020-01-01 10:00:08'))
         self.track.addObs(p7)
-        p8 = Obs(ENUCoords(3, 4), GPSTime.readTimestamp('2020-01-01 10:00:10'))
+        p8 = Obs(ENUCoords(3, 4), ObsTime.readTimestamp('2020-01-01 10:00:10'))
         self.track.addObs(p8)
-        p9 = Obs(ENUCoords(4, 4), GPSTime.readTimestamp('2020-01-01 10:00:12'))
+        p9 = Obs(ENUCoords(4, 4), ObsTime.readTimestamp('2020-01-01 10:00:12'))
         self.track.addObs(p9)
         
         # self.track.plotAsMarkers()

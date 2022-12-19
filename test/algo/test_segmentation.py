@@ -4,7 +4,7 @@ import os.path
 import unittest
 #import matplotlib.pyplot as plt
 
-from tracklib.core.ObsTime import GPSTime
+from tracklib.core.ObsTime import ObsTime
 from tracklib.io.TrackReader import TrackReader
 #from tracklib.io.FileReader import FileReader
 #from tracklib.core.Plot import Plot
@@ -18,7 +18,7 @@ class TestAlgoSegmentationMethods(unittest.TestCase):
 
 
     def testStopsAFaire(self):
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         #chemin = os.path.join(self.resource_path, './data/trace1.dat')
         #trace = FileReader.readFromCsv(chemin, 2, 3, -1, 4, separator=",")
         
@@ -26,7 +26,7 @@ class TestAlgoSegmentationMethods(unittest.TestCase):
     def testFindStopsLocal(self):
         resource_path = os.path.join(os.path.split(__file__)[0], "../..")
         gpxpath = os.path.join(resource_path, 'data/gpx/vincennes.gpx')
-        GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
+        ObsTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
         tracks = TrackReader.readFromGpx(gpxpath, srid='ENU')
         trace = tracks.getTrack(0)
         #trace = trace.extract(1150, 2500)

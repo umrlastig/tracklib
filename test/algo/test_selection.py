@@ -13,7 +13,7 @@ from tracklib.algo.Selection import MODE_INSIDE, MODE_CROSSES, MODE_GETS_IN, MOD
 from tracklib.algo.Selection import MODE_PARALLEL
 from tracklib.algo.Selection import COMBINATION_OR
 import tracklib.algo.Geometrics as Geometrics
-from tracklib.core.ObsTime import GPSTime
+from tracklib.core.ObsTime import ObsTime
 from tracklib.io.TrackReader import TrackReader
 
 
@@ -26,67 +26,67 @@ class TestSelection(TestCase):
     # 31/07/2018 11:36:55
     # 31/07/2018 17:57:41
     def test_selection_one_timestamp_constraint(self):
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, './data/trace1.dat')
         trace = TrackReader.readFromCsv(chemin, 2, 3, -1, 4, separator=",")
 
-        t1 = TimeConstraint(begin=GPSTime('2018-07-31 14:00:00'))
+        t1 = TimeConstraint(begin=ObsTime('2018-07-31 14:00:00'))
         c = Constraint(time = t1)
         s = Selector([c])
         selector = GlobalSelector([s])
         isSelection = selector.contains(trace)
         self.assertTrue(isSelection)
 
-        t2 = TimeConstraint(begin=GPSTime('2018-07-31 18:00:00'))
+        t2 = TimeConstraint(begin=ObsTime('2018-07-31 18:00:00'))
         c = Constraint(time = t2)
         s = Selector([c])
         selector = GlobalSelector([s])
         isSelection = selector.contains(trace)
         self.assertFalse(isSelection)
         
-        t3 = TimeConstraint(begin=GPSTime('2018-07-31 11:35:00'), end=GPSTime('2018-07-31 17:55:00'))
+        t3 = TimeConstraint(begin=ObsTime('2018-07-31 11:35:00'), end=ObsTime('2018-07-31 17:55:00'))
         c = Constraint(time = t3)
         s = Selector([c])
         selector = GlobalSelector([s])
         isSelection = selector.contains(trace)
         self.assertTrue(isSelection)
         
-        t4 = TimeConstraint(begin=GPSTime('2018-07-31 12:13:58'), end=GPSTime('2018-07-31 14:03:41'))
+        t4 = TimeConstraint(begin=ObsTime('2018-07-31 12:13:58'), end=ObsTime('2018-07-31 14:03:41'))
         c = Constraint(time = t4)
         s = Selector([c])
         selector = GlobalSelector([s])
         isSelection = selector.contains(trace)
         self.assertTrue(isSelection)
         
-        t5 = TimeConstraint(begin=GPSTime('2018-07-31 18:01:58'), end=GPSTime('2018-07-31 18:03:41'))
+        t5 = TimeConstraint(begin=ObsTime('2018-07-31 18:01:58'), end=ObsTime('2018-07-31 18:03:41'))
         c = Constraint(time = t5)
         s = Selector([c])
         selector = GlobalSelector([s])
         isSelection = selector.contains(trace)
         self.assertFalse(isSelection)
         
-        t6 = TimeConstraint(begin=GPSTime('2015-07-31 18:01:58'), end=GPSTime('2018-06-28 14:03:41'))
+        t6 = TimeConstraint(begin=ObsTime('2015-07-31 18:01:58'), end=ObsTime('2018-06-28 14:03:41'))
         c = Constraint(time = t6)
         s = Selector([c])
         selector = GlobalSelector([s])
         isSelection = selector.contains(trace)
         self.assertFalse(isSelection)
         
-        t7 = TimeConstraint(begin=GPSTime('2018-07-31 18:01:58'), end=GPSTime('2018-07-31 18:03:41'))
+        t7 = TimeConstraint(begin=ObsTime('2018-07-31 18:01:58'), end=ObsTime('2018-07-31 18:03:41'))
         c = Constraint(time = t7)
         s = Selector([c])
         selector = GlobalSelector([s])
         isSelection = selector.contains(trace)
         self.assertFalse(isSelection)
 
-        t8 = TimeConstraint(begin=GPSTime('2018-07-31 05:03:04'), end=GPSTime('2018-07-31 05:45:09'))
+        t8 = TimeConstraint(begin=ObsTime('2018-07-31 05:03:04'), end=ObsTime('2018-07-31 05:45:09'))
         c = Constraint(time = t8)
         s = Selector([c])
         selector = GlobalSelector([s])
         isSelection = selector.contains(trace)
         self.assertFalse(isSelection)
         
-        t9 = TimeConstraint(begin=GPSTime('2018-07-31 17:57:59'), end=GPSTime('2018-07-31 18:12:01'))
+        t9 = TimeConstraint(begin=ObsTime('2018-07-31 17:57:59'), end=ObsTime('2018-07-31 18:12:01'))
         c = Constraint(time = t9)
         s = Selector([c])
         selector = GlobalSelector([s])
@@ -96,7 +96,7 @@ class TestSelection(TestCase):
 
     def test_selection_one_shape_constraint(self):
         
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, './data/trace1.dat')
         trace = TrackReader.readFromCsv(chemin, 2, 3, -1, 4, separator=",")
         trace.plot()
@@ -231,14 +231,14 @@ class TestSelection(TestCase):
 
     def test_selection_one_shape_time_constraint(self):
         
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, './data/trace1.dat')
         trace = TrackReader.readFromCsv(chemin, 2, 3, -1, 4, separator=",")
         trace.plot()
         
-        t1 = TimeConstraint(begin=GPSTime('2018-07-31 14:00:00'))
-        t2 = TimeConstraint(begin=GPSTime('2019-07-31 14:00:00'))
-        t3 = TimeConstraint(begin=GPSTime('2018-07-25 14:00:00'))
+        t1 = TimeConstraint(begin=ObsTime('2018-07-31 14:00:00'))
+        t2 = TimeConstraint(begin=ObsTime('2019-07-31 14:00:00'))
+        t3 = TimeConstraint(begin=ObsTime('2018-07-25 14:00:00'))
         
         center = trace.getObs(int(trace.size()/2)).position
         radius = 91000
@@ -282,7 +282,7 @@ class TestSelection(TestCase):
 
     def test_selection_track_constraint(self):
         
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, './data/trace1.dat')
         trace = TrackReader.readFromCsv(chemin, 2, 3, -1, 4, separator=",")
         trace.plot()
@@ -292,9 +292,9 @@ class TestSelection(TestCase):
         c1 = trace.getObs(1350).position
         c0 = ENUCoords(c1.getX() + 5000, c1.getY())
         c2 = ENUCoords(c1.getX() - 5000, c1.getY())
-        p1 = Obs(c0, GPSTime.readTimestamp("2018-07-31 14:00:00"))
-        p2 = Obs(c1, GPSTime.readTimestamp("2018-07-31 14:01:00"))
-        p3 = Obs(c2, GPSTime.readTimestamp("2018-07-31 14:02:00"))
+        p1 = Obs(c0, ObsTime.readTimestamp("2018-07-31 14:00:00"))
+        p2 = Obs(c1, ObsTime.readTimestamp("2018-07-31 14:01:00"))
+        p3 = Obs(c2, ObsTime.readTimestamp("2018-07-31 14:02:00"))
         trace1.addObs(p1)
         trace1.addObs(p2)
         trace1.addObs(p3)
@@ -318,9 +318,9 @@ class TestSelection(TestCase):
         c0 = ENUCoords(trace.getObs(1349).position.getX(), trace.getObs(1349).position.getY())
         c1 = ENUCoords(trace.getObs(1350).position.getX(), trace.getObs(1350).position.getY())
         c2 = ENUCoords(trace.getObs(1351).position.getX(), trace.getObs(1351).position.getY())
-        p1 = Obs(c0, GPSTime.readTimestamp("2018-07-31 14:00:00"))
-        p2 = Obs(c1, GPSTime.readTimestamp("2018-07-31 14:01:00"))
-        p3 = Obs(c2, GPSTime.readTimestamp("2018-07-31 14:02:00"))
+        p1 = Obs(c0, ObsTime.readTimestamp("2018-07-31 14:00:00"))
+        p2 = Obs(c1, ObsTime.readTimestamp("2018-07-31 14:01:00"))
+        p3 = Obs(c2, ObsTime.readTimestamp("2018-07-31 14:02:00"))
         trace1.addObs(p1)
         trace1.addObs(p2)
         trace1.addObs(p3)
@@ -343,13 +343,13 @@ class TestSelection(TestCase):
 
     def test_selection_combinaison_constraint(self):
         
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, './data/trace1.dat')
         trace = TrackReader.readFromCsv(chemin, 2, 3, -1, 4, separator=",")
         trace.plot()
         
-        t1 = TimeConstraint(begin=GPSTime('2018-07-31 14:00:00'))
-        t3 = TimeConstraint(begin=GPSTime('2018-07-25 14:00:00'))
+        t1 = TimeConstraint(begin=ObsTime('2018-07-31 14:00:00'))
+        t3 = TimeConstraint(begin=ObsTime('2018-07-25 14:00:00'))
         
         center = trace.getObs(int(trace.size()/2)).position
         radius = 91000

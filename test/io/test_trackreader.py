@@ -3,7 +3,7 @@
 import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
 
-from tracklib.core.ObsTime import GPSTime
+from tracklib.core.ObsTime import ObsTime
 from tracklib.core.Track import Track
 from tracklib.core.TrackCollection import TrackCollection
 from tracklib.io.TrackReader import TrackReader
@@ -43,7 +43,7 @@ class TestTrackReader(TestCase):
 
     def test_read_gpx_enu_trk(self):
         path = os.path.join(self.resource_path, 'data/gpx/vincennes.gpx')
-        GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
+        ObsTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
         tracks = TrackReader.readFromGpx(path, srid='ENU', type="trk")
         trace = tracks[0]
         self.assertEqual(5370, trace.size())
@@ -52,7 +52,7 @@ class TestTrackReader(TestCase):
         
     def test_read_default_gpx(self):
         path = os.path.join(self.resource_path, 'data/gpx/activity_5807084803.gpx')
-        GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
+        ObsTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
         tracks = TrackReader.readFromGpx(path)
         trace = tracks[0]
         self.assertEqual(190, trace.size())
@@ -61,7 +61,7 @@ class TestTrackReader(TestCase):
         
     def test_read_gpx_geo_trk(self):
         path = os.path.join(self.resource_path, 'data/gpx/activity_5807084803.gpx')
-        GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
+        ObsTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
         tracks = TrackReader.readFromGpx(path, srid='GEO', type="trk")
         trace = tracks[0]
         self.assertEqual(190, trace.size())
@@ -70,7 +70,7 @@ class TestTrackReader(TestCase):
 
     def test_read_gpx_geo_rte(self):
         path = os.path.join(self.resource_path, 'data/gpx/903313.gpx')
-        GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
+        ObsTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
         tracks = TrackReader.readFromGpx(path, srid='GEO', type='rte')
         trace = tracks[0]
         self.assertEqual(1275, trace.size())
@@ -79,13 +79,13 @@ class TestTrackReader(TestCase):
         
     def test_read_gpx_dir(self):
         path = os.path.join(self.resource_path, 'data/gpx/geo')
-        GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
+        ObsTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
         tracks = TrackReader.readFromGpx(path, srid='GEO', type='trk')
         self.assertEqual(2, tracks.size())
         self.assertIsInstance(tracks, TrackCollection)
         
         path = os.path.join(self.resource_path, 'data/gpx/geo/')
-        GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
+        ObsTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
         tracks = TrackReader.readFromGpx(path, srid='GEO', type='trk')
         self.assertEqual(2, tracks.size())
         self.assertIsInstance(tracks, TrackCollection)
@@ -93,7 +93,7 @@ class TestTrackReader(TestCase):
         
     def testReadGpxWithAF(self):
         path = os.path.join(self.resource_path, 'data/test/12.gpx')
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         tracks = TrackReader.readFromGpx(path, srid='ENU', type='trk', read_all=True)
         
         self.assertEqual(1, tracks.size())
@@ -111,7 +111,7 @@ class TestTrackReader(TestCase):
         
         
     def testReadCsvWithAFTrack(self):
-        GPSTime.setReadFormat("2D/2M/4Y 2h:2m:2s")
+        ObsTime.setReadFormat("2D/2M/4Y 2h:2m:2s")
         chemin = os.path.join(self.resource_path, 'data/test/ecrins_interpol4.csv')
         track = TrackReader.readFromCsv(chemin, 0, 1, 2, 3, separator=";",read_all=True)
         
@@ -122,7 +122,7 @@ class TestTrackReader(TestCase):
         
     
     def testReadCsvDir(self):
-        GPSTime.setReadFormat("2D/2M/4Y 2h:2m:2s")
+        ObsTime.setReadFormat("2D/2M/4Y 2h:2m:2s")
         chemin = os.path.join(self.resource_path, 'data/test/csv')
         collection = TrackReader.readFromCsv(chemin, 1, 2, -1, -1, separator=",")
         
@@ -142,11 +142,11 @@ class TestTrackReader(TestCase):
         s = Selector([constraintBBox])
         
         chemin = os.path.join(self.resource_path, 'data/mopsi/wgs84')
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         dateInitiale = '1970-01-01 00:00:00'
         collection = TrackReader.readFromCsv(path=chemin, id_E=1, id_N=0, id_T=2, 
                                              srid="GeoCoords",
-                                             DateIni = GPSTime.readTimestamp(dateInitiale),
+                                             DateIni = ObsTime.readTimestamp(dateInitiale),
                                              selector=s,
                                              separator= ' ', verbose = True)
         # 

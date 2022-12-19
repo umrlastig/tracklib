@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 from tracklib.core.Obs import Obs
 from tracklib.core.ObsCoords import ENUCoords
-from tracklib.core.ObsTime import GPSTime
+from tracklib.core.ObsTime import ObsTime
 from tracklib.algo.Geometrics import Polygon
 from tracklib.core.TrackCollection import TrackCollection
 
@@ -581,7 +581,7 @@ class Track:
                 return 0
         if isinstance(tab[0], int):
             return self.__removeObsListById(tab)
-        if isinstance(tab[0], GPSTime):
+        if isinstance(tab[0], ObsTime):
             return self.__removeObsListByTimestamp(tab)
         print("Error: 'removePoint' is not implemented for type", type(tab[0]))
         return 0
@@ -680,7 +680,7 @@ class Track:
         new_track = Track()
         for i in range(len(self)):
             enu = ENUCoords(self["t", i], 0, 0)
-            new_track.addObs(Obs(enu, GPSTime.readUnixTime(self["abs_curv",i])))
+            new_track.addObs(Obs(enu, ObsTime.readUnixTime(self["abs_curv",i])))
 
         new_track["dx = D{x} < 0.01"]
 
@@ -707,7 +707,7 @@ class Track:
         new_track2 = Track()
         for i in range(len(new_track)):
             enu = ENUCoords(self["x", i], self["y", i], self["z", i])
-            new_track2.addObs(Obs(enu, GPSTime.readUnixTime(new_track["x",i])))
+            new_track2.addObs(Obs(enu, ObsTime.readUnixTime(new_track["x",i])))
 
         new_track2.uid = self.uid
         new_track2.tid = self.tid
@@ -905,7 +905,7 @@ class Track:
         for i in range(self.size()):
             self.getObs(i).timestamp = self.getObs(i).timestamp.addSec(sec_number)
 
-    def roundTimestamps(self, unit = GPSTime.ROUND_TO_SEC):
+    def roundTimestamps(self, unit = ObsTime.ROUND_TO_SEC):
         """Rounds timestamps in a track
         unit: round timestamps up to unit seconds (default = 1)"""
         for obs in self:
@@ -1502,8 +1502,8 @@ class Track:
             val2 = int(val2)
         if isinstance(val1, float):
             val2 = float(val2)
-        if isinstance(val1, GPSTime):
-            val2 = GPSTime.readTimestamp(val2)
+        if isinstance(val1, ObsTime):
+            val2 = ObsTime.readTimestamp(val2)
         if isinstance(val1, bool):
             val2 = (val2.upper == "TRUE") or (val2.upper == "T") or (val2 == "1")
 

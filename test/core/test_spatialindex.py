@@ -3,7 +3,7 @@
 from unittest import TestCase, TestSuite, TextTestRunner
 import os.path
 
-from tracklib.core.ObsTime import GPSTime
+from tracklib.core.ObsTime import ObsTime
 from tracklib.core.ObsCoords import ENUCoords
 from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
@@ -21,18 +21,18 @@ class TestSpatialIndex(TestCase):
     
     def test_create_index_collection1(self):
         
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
                 
         track = Track()
-        p1 = Obs(ENUCoords(0, 0), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        p1 = Obs(ENUCoords(0, 0), ObsTime.readTimestamp('2020-01-01 10:00:00'))
         track.addObs(p1)
-        p2 = Obs(ENUCoords(2.5, 3), GPSTime.readTimestamp('2020-01-01 10:08:00'))
+        p2 = Obs(ENUCoords(2.5, 3), ObsTime.readTimestamp('2020-01-01 10:08:00'))
         track.addObs(p2)
-        p3 = Obs(ENUCoords(2.5, 5), GPSTime.readTimestamp('2020-01-01 10:17:00'))
+        p3 = Obs(ENUCoords(2.5, 5), ObsTime.readTimestamp('2020-01-01 10:17:00'))
         track.addObs(p3)
-        p4 = Obs(ENUCoords(7, 5), GPSTime.readTimestamp('2020-01-01 10:21:00'))
+        p4 = Obs(ENUCoords(7, 5), ObsTime.readTimestamp('2020-01-01 10:21:00'))
         track.addObs(p4)
-        p5 = Obs(ENUCoords(10, 10), GPSTime.readTimestamp('2020-01-01 10:25:00'))
+        p5 = Obs(ENUCoords(10, 10), ObsTime.readTimestamp('2020-01-01 10:25:00'))
         track.addObs(p5)
                 #track.plot()
                 #track.plotAsMarkers()
@@ -80,21 +80,21 @@ class TestSpatialIndex(TestCase):
         self.assertEqual(index.request(track), [0])
  
         track2 = Track()
-        p6 = Obs(ENUCoords(2.2, 0), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        p6 = Obs(ENUCoords(2.2, 0), ObsTime.readTimestamp('2020-01-01 10:00:00'))
         track2.addObs(p6)
-        p7 = Obs(ENUCoords(2.2, 3.8), GPSTime.readTimestamp('2020-01-01 10:08:00'))
+        p7 = Obs(ENUCoords(2.2, 3.8), ObsTime.readTimestamp('2020-01-01 10:08:00'))
         track2.addObs(p7)
-        p8 = Obs(ENUCoords(6.5, 3.8), GPSTime.readTimestamp('2020-01-01 10:08:00'))
+        p8 = Obs(ENUCoords(6.5, 3.8), ObsTime.readTimestamp('2020-01-01 10:08:00'))
         track2.addObs(p8)
         self.assertEqual(index.request(track2), [0])
         
         
         track3 = Track()
-        p9 = Obs(ENUCoords(6.5, 3.8), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        p9 = Obs(ENUCoords(6.5, 3.8), ObsTime.readTimestamp('2020-01-01 10:00:00'))
         track3.addObs(p9)
-        p10 = Obs(ENUCoords(6.5, 7), GPSTime.readTimestamp('2020-01-01 10:08:00'))
+        p10 = Obs(ENUCoords(6.5, 7), ObsTime.readTimestamp('2020-01-01 10:08:00'))
         track3.addObs(p10)
-        p11 = Obs(ENUCoords(10, 7), GPSTime.readTimestamp('2020-01-01 10:08:00'))
+        p11 = Obs(ENUCoords(10, 7), ObsTime.readTimestamp('2020-01-01 10:08:00'))
         track3.addObs(p11)
         self.assertEqual(index.request(track3), [0])
 
@@ -199,26 +199,26 @@ class TestSpatialIndex(TestCase):
     
     def test_create_index_collection2(self):
         
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
                 
         track = Track()
-        p1 = Obs(ENUCoords(0, 0), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        p1 = Obs(ENUCoords(0, 0), ObsTime.readTimestamp('2020-01-01 10:00:00'))
         track.addObs(p1)
-        p2 = Obs(ENUCoords(3.1, 3), GPSTime.readTimestamp('2020-01-01 10:08:00'))
+        p2 = Obs(ENUCoords(3.1, 3), ObsTime.readTimestamp('2020-01-01 10:08:00'))
         track.addObs(p2)
-        p3 = Obs(ENUCoords(3.1, 4.5), GPSTime.readTimestamp('2020-01-01 10:17:00'))
+        p3 = Obs(ENUCoords(3.1, 4.5), ObsTime.readTimestamp('2020-01-01 10:17:00'))
         track.addObs(p3)
         
-        p4 = Obs(ENUCoords(4.5, 4.5), GPSTime.readTimestamp('2020-01-01 10:21:00'))
+        p4 = Obs(ENUCoords(4.5, 4.5), ObsTime.readTimestamp('2020-01-01 10:21:00'))
         track.addObs(p4)
-        p5 = Obs(ENUCoords(6, 5.5), GPSTime.readTimestamp('2020-01-01 10:21:00'))
+        p5 = Obs(ENUCoords(6, 5.5), ObsTime.readTimestamp('2020-01-01 10:21:00'))
         track.addObs(p5)
         
-        p6 = Obs(ENUCoords(7, 4.5), GPSTime.readTimestamp('2020-01-01 10:21:00'))
+        p6 = Obs(ENUCoords(7, 4.5), ObsTime.readTimestamp('2020-01-01 10:21:00'))
         track.addObs(p6)
-        p7 = Obs(ENUCoords(11, 5.5), GPSTime.readTimestamp('2020-01-01 10:21:00'))
+        p7 = Obs(ENUCoords(11, 5.5), ObsTime.readTimestamp('2020-01-01 10:21:00'))
         track.addObs(p7)
-        p8 = Obs(ENUCoords(13, 10), GPSTime.readTimestamp('2020-01-01 10:25:00'))
+        p8 = Obs(ENUCoords(13, 10), ObsTime.readTimestamp('2020-01-01 10:25:00'))
         track.addObs(p8)
                 #track.plot()
                 #track.plotAsMarkers()
@@ -252,18 +252,18 @@ class TestSpatialIndex(TestCase):
         
     def test_create_index(self):
         
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         
         track = Track()
-        p1 = Obs(ENUCoords(550, 320), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        p1 = Obs(ENUCoords(550, 320), ObsTime.readTimestamp('2020-01-01 10:00:00'))
         track.addObs(p1)
-        p2 = Obs(ENUCoords(610, 325), GPSTime.readTimestamp('2020-01-01 10:08:00'))
+        p2 = Obs(ENUCoords(610, 325), ObsTime.readTimestamp('2020-01-01 10:08:00'))
         track.addObs(p2)
-        p3 = Obs(ENUCoords(610, 330), GPSTime.readTimestamp('2020-01-01 10:17:00'))
+        p3 = Obs(ENUCoords(610, 330), ObsTime.readTimestamp('2020-01-01 10:17:00'))
         track.addObs(p3)
-        p4 = Obs(ENUCoords(650, 330), GPSTime.readTimestamp('2020-01-01 10:21:00'))
+        p4 = Obs(ENUCoords(650, 330), ObsTime.readTimestamp('2020-01-01 10:21:00'))
         track.addObs(p4)
-        p5 = Obs(ENUCoords(675, 340), GPSTime.readTimestamp('2020-01-01 10:25:00'))
+        p5 = Obs(ENUCoords(675, 340), ObsTime.readTimestamp('2020-01-01 10:25:00'))
         track.addObs(p5)
         #track.plot()
         #track.plotAsMarkers()

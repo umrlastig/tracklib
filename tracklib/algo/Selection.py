@@ -70,7 +70,7 @@ from tracklib.core.Obs import Obs
 import tracklib.core.Utils as utils
 import tracklib.util.Geometry as Geometry
 
-from tracklib.core.ObsTime import GPSTime
+from tracklib.core.ObsTime import ObsTime
 from tracklib.algo.Geometrics import Rectangle
 
 
@@ -109,11 +109,11 @@ class TimeConstraint:
     def __init__(self, begin=None, end=None, pattern=None):
         """TODO"""
         if begin is None:
-            self.minTimestamp = GPSTime(0, 0, 0, 0, 0, 0)
+            self.minTimestamp = ObsTime(0, 0, 0, 0, 0, 0)
         else:
             self.minTimestamp = begin
         if end is None:
-            self.maxTimestamp = GPSTime(2100, 0, 0, 0, 0, 0)
+            self.maxTimestamp = ObsTime(2100, 0, 0, 0, 0, 0)
         else:
             self.maxTimestamp = end
         self.pattern = pattern
@@ -121,8 +121,8 @@ class TimeConstraint:
     def __str__(self):
         """TODO"""
         output = "Temporal constraint: \n"
-        if self.minTimestamp - GPSTime(0, 0, 0, 0, 0, 0) != 0:
-            if self.maxTimestamp - GPSTime(2100, 0, 0, 0, 0, 0) != 0:
+        if self.minTimestamp - ObsTime(0, 0, 0, 0, 0, 0) != 0:
+            if self.maxTimestamp - ObsTime(2100, 0, 0, 0, 0, 0) != 0:
                 output += "    -" + str(self.minTimestamp) + " <= t <= "
                 output += str(self.maxTimestamp) + "\n"
         if not self.pattern is None:

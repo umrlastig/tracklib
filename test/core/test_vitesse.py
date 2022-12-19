@@ -7,7 +7,7 @@ import math
 import os.path
 import unittest
 
-from tracklib.core.ObsTime import GPSTime
+from tracklib.core.ObsTime import ObsTime
 from tracklib.core.Operator import Operator
 from tracklib.io.TrackReader import TrackReader
 
@@ -18,7 +18,7 @@ class TestVitesseMethods(unittest.TestCase):
 
     def test_tableau_af_rmse_1(self):
 
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, './data/trace1.dat')
         track = TrackReader.readFromCsv(chemin, 2, 3, -1, 4, separator=",")
 
@@ -52,7 +52,7 @@ class TestVitesseMethods(unittest.TestCase):
 
     def test_tableau_af_rmse_2(self):
 
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, './data/trace0.gps')
         track = TrackReader.readFromCsv(chemin, 2, 3, -1, 1, separator=",")
 
@@ -91,7 +91,7 @@ class TestVitesseMethods(unittest.TestCase):
         '''
         '''
         
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, './data/trace0.gps')
         track = TrackReader.readFromCsv(chemin, 2, 3, -1, 1, separator=",")
         

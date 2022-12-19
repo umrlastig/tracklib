@@ -7,7 +7,7 @@ from tracklib.core.ObsCoords import ENUCoords
 from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
 from tracklib.core.TrackCollection import TrackCollection
-from tracklib.core.ObsTime import GPSTime
+from tracklib.core.ObsTime import ObsTime
 
 import tracklib.core.Kernel as Kernel
 
@@ -41,7 +41,7 @@ def generate(
         x_t = lambda t: x1 * (1 - t) + x2 * t
         y_t = lambda t: y1 * (1 - t) + y2 * t
     if date_ini == None:
-        date_ini = GPSTime.random()
+        date_ini = ObsTime.random()
     if date_fin == None:
         date_fin = date_ini.addHour(1)
     if dt == None:
@@ -76,7 +76,7 @@ def generateDataSet(vx, vy, N=100, pmin=(0, 0), pmax=(100, 100), Nbmax=1000):
         track = Track()
         xini = random.random() * (pmax[0] - pmin[0]) + pmin[0]
         yini = random.random() * (pmax[1] - pmin[1]) + pmin[1]
-        date_ini = GPSTime.random()
+        date_ini = ObsTime.random()
 
         xi = xini
         yi = yini

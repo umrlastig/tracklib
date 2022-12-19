@@ -15,7 +15,7 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
     
     def setUp (self):
         
-        ObsTime.GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         self.trace1 = Track.Track([], 1)
         self.trace2 = Track.Track([], 1)
         self.trace3 = Track.Track([], 1)
@@ -23,53 +23,53 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
         # ---------------------------------------------------------------------
 		
         c1 = Coords.ENUCoords(0, 0, 0)
-        p1 = Obs.Obs(c1, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
+        p1 = Obs.Obs(c1, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace1.addObs(p1)
         
         c2 = Coords.ENUCoords(10, 0, 0)
-        p2 = Obs.Obs(c2, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:12"))
+        p2 = Obs.Obs(c2, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:12"))
         self.trace1.addObs(p2)
         
         c3 = Coords.ENUCoords(10, 10, 0)
-        p3 = Obs.Obs(c3, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:40"))
+        p3 = Obs.Obs(c3, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:40"))
         self.trace1.addObs(p3)
         
         c4 = Coords.ENUCoords(10, 20, 0)
-        p4 = Obs.Obs(c4, ObsTime.GPSTime.readTimestamp("2018-01-01 10:01:50"))
+        p4 = Obs.Obs(c4, ObsTime.ObsTime.readTimestamp("2018-01-01 10:01:50"))
         self.trace1.addObs(p4)
 		
         c5 = Coords.ENUCoords(0, 20, 0)
-        p5 = Obs.Obs(c5, ObsTime.GPSTime.readTimestamp("2018-01-01 10:02:10"))
+        p5 = Obs.Obs(c5, ObsTime.ObsTime.readTimestamp("2018-01-01 10:02:10"))
         self.trace1.addObs(p5)
 		
         c6 = Coords.ENUCoords(0, 10, 0)
-        p6 = Obs.Obs(c6, ObsTime.GPSTime.readTimestamp("2018-01-01 10:02:15"))
+        p6 = Obs.Obs(c6, ObsTime.ObsTime.readTimestamp("2018-01-01 10:02:15"))
         self.trace1.addObs(p6)
 		
         c7 = Coords.ENUCoords(0, 20, 0)
-        p7 = Obs.Obs(c7, ObsTime.GPSTime.readTimestamp("2018-01-01 10:02:35"))
+        p7 = Obs.Obs(c7, ObsTime.ObsTime.readTimestamp("2018-01-01 10:02:35"))
         self.trace1.addObs(p7)
 		
         c8 = Coords.ENUCoords(5, 20, 0)
-        p8 = Obs.Obs(c8, ObsTime.GPSTime.readTimestamp("2018-01-01 10:02:35"))
+        p8 = Obs.Obs(c8, ObsTime.ObsTime.readTimestamp("2018-01-01 10:02:35"))
         self.trace1.addObs(p8)
 		
         # ---------------------------------------------------------------------		
 		
         c1 = Coords.ENUCoords(0, 0, 0)
-        p1 = Obs.Obs(c1, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
+        p1 = Obs.Obs(c1, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace2.addObs(p1)
 		
         c2 = Coords.ENUCoords(0, 10, 0)
-        p2 = Obs.Obs(c2, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:10"))
+        p2 = Obs.Obs(c2, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:10"))
         self.trace2.addObs(p2)
 		
         c3 = Coords.ENUCoords(0, 10, 0)
-        p3 = Obs.Obs(c3, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:20"))
+        p3 = Obs.Obs(c3, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:20"))
         self.trace2.addObs(p3)
 		
         c4 = Coords.ENUCoords(0, 30, 0)
-        p4 = Obs.Obs(c4, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:30"))
+        p4 = Obs.Obs(c4, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:30"))
         self.trace2.addObs(p4)
 		
         self.trace2.addAnalyticalFeature(Analytics.speed)
@@ -79,19 +79,19 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
         # ---------------------------------------------------------------------		
 		
         c1 = Coords.ENUCoords(0, 0, 0)
-        p1 = Obs.Obs(c1, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
+        p1 = Obs.Obs(c1, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace3.addObs(p1)
 		
         c2 = Coords.ENUCoords(0, 10, 0)
-        p2 = Obs.Obs(c2, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
+        p2 = Obs.Obs(c2, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace3.addObs(p2)
 		
         c3 = Coords.ENUCoords(0, 10, 0)
-        p3 = Obs.Obs(c3, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
+        p3 = Obs.Obs(c3, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace3.addObs(p3)
 		
         c4 = Coords.ENUCoords(0, 30, 0)
-        p4 = Obs.Obs(c4, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
+        p4 = Obs.Obs(c4, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace3.addObs(p4)
 		
         self.trace3.addAnalyticalFeature(Analytics.speed)

@@ -9,7 +9,7 @@ from tracklib.core.ObsCoords import ENUCoords
 from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
 from tracklib.core.TrackCollection import TrackCollection
-from tracklib.core.ObsTime import GPSTime
+from tracklib.core.ObsTime import ObsTime
 
 from tracklib.io.TrackWriter import TrackWriter
 from tracklib.io.TrackReader import TrackReader
@@ -23,47 +23,47 @@ class TestTrackWriter(TestCase):
     def setUp (self):
         self.resource_path = os.path.join(os.path.split(__file__)[0], "../..")
         
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         
         self.trace1 = Track(track_id = '11')
-        p1 = Obs(ENUCoords(0, 0), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        p1 = Obs(ENUCoords(0, 0), ObsTime.readTimestamp('2020-01-01 10:00:00'))
         self.trace1.addObs(p1)
-        p2 = Obs(ENUCoords(0, 1), GPSTime.readTimestamp('2020-01-01 10:00:01'))
+        p2 = Obs(ENUCoords(0, 1), ObsTime.readTimestamp('2020-01-01 10:00:01'))
         self.trace1.addObs(p2)
-        p3 = Obs(ENUCoords(1, 1), GPSTime.readTimestamp('2020-01-01 10:00:02'))
+        p3 = Obs(ENUCoords(1, 1), ObsTime.readTimestamp('2020-01-01 10:00:02'))
         self.trace1.addObs(p3)
-        p4 = Obs(ENUCoords(1, 2), GPSTime.readTimestamp('2020-01-01 10:00:03'))
+        p4 = Obs(ENUCoords(1, 2), ObsTime.readTimestamp('2020-01-01 10:00:03'))
         self.trace1.addObs(p4)
-        p5 = Obs(ENUCoords(2, 2), GPSTime.readTimestamp('2020-01-01 10:00:04'))
+        p5 = Obs(ENUCoords(2, 2), ObsTime.readTimestamp('2020-01-01 10:00:04'))
         self.trace1.addObs(p5)
         
         self.trace2 = Track()
         self.trace2.tid = '12'
-        pm3 = Obs(ENUCoords(-2, -1), GPSTime.readTimestamp('2020-01-01 09:59:44'))
+        pm3 = Obs(ENUCoords(-2, -1), ObsTime.readTimestamp('2020-01-01 09:59:44'))
         self.trace2.addObs(pm3)
-        pm2 = Obs(ENUCoords(-1, -1), GPSTime.readTimestamp('2020-01-01 09:59:48'))
+        pm2 = Obs(ENUCoords(-1, -1), ObsTime.readTimestamp('2020-01-01 09:59:48'))
         self.trace2.addObs(pm2)
-        pm1 = Obs(ENUCoords(-1, 0), GPSTime.readTimestamp('2020-01-01 09:59:55'))
+        pm1 = Obs(ENUCoords(-1, 0), ObsTime.readTimestamp('2020-01-01 09:59:55'))
         self.trace2.addObs(pm1)
-        p1 = Obs(ENUCoords(0, 0), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        p1 = Obs(ENUCoords(0, 0), ObsTime.readTimestamp('2020-01-01 10:00:00'))
         self.trace2.addObs(p1)
-        p2 = Obs(ENUCoords(0, 2), GPSTime.readTimestamp('2020-01-01 10:00:01'))
+        p2 = Obs(ENUCoords(0, 2), ObsTime.readTimestamp('2020-01-01 10:00:01'))
         self.trace2.addObs(p2)
-        p3 = Obs(ENUCoords(1, 2), GPSTime.readTimestamp('2020-01-01 10:00:02'))
+        p3 = Obs(ENUCoords(1, 2), ObsTime.readTimestamp('2020-01-01 10:00:02'))
         self.trace2.addObs(p3)
-        p4 = Obs(ENUCoords(1, 5), GPSTime.readTimestamp('2020-01-01 10:00:03'))
+        p4 = Obs(ENUCoords(1, 5), ObsTime.readTimestamp('2020-01-01 10:00:03'))
         self.trace2.addObs(p4)
-        p5 = Obs(ENUCoords(2, 5), GPSTime.readTimestamp('2020-01-01 10:00:04'))
+        p5 = Obs(ENUCoords(2, 5), ObsTime.readTimestamp('2020-01-01 10:00:04'))
         self.trace2.addObs(p5)
-        p6 = Obs(ENUCoords(2, 9), GPSTime.readTimestamp('2020-01-01 10:00:06'))
+        p6 = Obs(ENUCoords(2, 9), ObsTime.readTimestamp('2020-01-01 10:00:06'))
         self.trace2.addObs(p6)
-        p7 = Obs(ENUCoords(3, 9), GPSTime.readTimestamp('2020-01-01 10:00:08'))
+        p7 = Obs(ENUCoords(3, 9), ObsTime.readTimestamp('2020-01-01 10:00:08'))
         self.trace2.addObs(p7)
-        p8 = Obs(ENUCoords(3, 14), GPSTime.readTimestamp('2020-01-01 10:00:10'))
+        p8 = Obs(ENUCoords(3, 14), ObsTime.readTimestamp('2020-01-01 10:00:10'))
         self.trace2.addObs(p8)
-        p9 = Obs(ENUCoords(4, 14), GPSTime.readTimestamp('2020-01-01 10:00:12'))
+        p9 = Obs(ENUCoords(4, 14), ObsTime.readTimestamp('2020-01-01 10:00:12'))
         self.trace2.addObs(p9)
-        p10 = Obs(ENUCoords(4, 20), GPSTime.readTimestamp('2020-01-01 10:00:15'))
+        p10 = Obs(ENUCoords(4, 20), ObsTime.readTimestamp('2020-01-01 10:00:15'))
         self.trace2.addObs(p10)
         
         self.trace1.addAnalyticalFeature(Analytics.speed)
@@ -76,12 +76,12 @@ class TestTrackWriter(TestCase):
     
     def test_write_csv_minim(self):
         
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
-        GPSTime.setPrintFormat("2D/2M/4Y 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setPrintFormat("2D/2M/4Y 2h:2m:2s")
         track = Track()
-        p1 = Obs(ENUCoords(0, 0), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        p1 = Obs(ENUCoords(0, 0), ObsTime.readTimestamp('2020-01-01 10:00:00'))
         track.addObs(p1)
-        p2 = Obs(ENUCoords(0, 1), GPSTime.readTimestamp('2020-01-01 10:00:01'))
+        p2 = Obs(ENUCoords(0, 1), ObsTime.readTimestamp('2020-01-01 10:00:01'))
         track.addObs(p2)
         
         csvpath = os.path.join(self.resource_path, 'data/test/test_write_csv_minim.wkt')
@@ -93,17 +93,17 @@ class TestTrackWriter(TestCase):
         
     def test_write_csv_2AF(self):
         
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         track = Track()
-        p1 = Obs(ENUCoords(0, 0), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        p1 = Obs(ENUCoords(0, 0), ObsTime.readTimestamp('2020-01-01 10:00:00'))
         track.addObs(p1)
-        p2 = Obs(ENUCoords(0, 1), GPSTime.readTimestamp('2020-01-01 10:00:01'))
+        p2 = Obs(ENUCoords(0, 1), ObsTime.readTimestamp('2020-01-01 10:00:01'))
         track.addObs(p2)
-        p3 = Obs(ENUCoords(1, 1), GPSTime.readTimestamp('2020-01-01 10:00:02'))
+        p3 = Obs(ENUCoords(1, 1), ObsTime.readTimestamp('2020-01-01 10:00:02'))
         track.addObs(p3)
-        p4 = Obs(ENUCoords(1, 2), GPSTime.readTimestamp('2020-01-01 10:00:03'))
+        p4 = Obs(ENUCoords(1, 2), ObsTime.readTimestamp('2020-01-01 10:00:03'))
         track.addObs(p4)
-        p5 = Obs(ENUCoords(2, 2), GPSTime.readTimestamp('2020-01-01 10:00:04'))
+        p5 = Obs(ENUCoords(2, 2), ObsTime.readTimestamp('2020-01-01 10:00:04'))
         track.addObs(p5)
        
         track.addAnalyticalFeature(Analytics.speed)
@@ -122,17 +122,17 @@ class TestTrackWriter(TestCase):
         
     def test_write_csv_2AF_desordre(self):
         
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         track = Track()
-        p1 = Obs(ENUCoords(0, 0), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        p1 = Obs(ENUCoords(0, 0), ObsTime.readTimestamp('2020-01-01 10:00:00'))
         track.addObs(p1)
-        p2 = Obs(ENUCoords(0, 1), GPSTime.readTimestamp('2020-01-01 10:00:01'))
+        p2 = Obs(ENUCoords(0, 1), ObsTime.readTimestamp('2020-01-01 10:00:01'))
         track.addObs(p2)
-        p3 = Obs(ENUCoords(1, 1), GPSTime.readTimestamp('2020-01-01 10:00:02'))
+        p3 = Obs(ENUCoords(1, 1), ObsTime.readTimestamp('2020-01-01 10:00:02'))
         track.addObs(p3)
-        p4 = Obs(ENUCoords(1, 2), GPSTime.readTimestamp('2020-01-01 10:00:03'))
+        p4 = Obs(ENUCoords(1, 2), ObsTime.readTimestamp('2020-01-01 10:00:03'))
         track.addObs(p4)
-        p5 = Obs(ENUCoords(2, 2), GPSTime.readTimestamp('2020-01-01 10:00:04'))
+        p5 = Obs(ENUCoords(2, 2), ObsTime.readTimestamp('2020-01-01 10:00:04'))
         track.addObs(p5)
        
         track.addAnalyticalFeature(Analytics.speed)
@@ -151,17 +151,17 @@ class TestTrackWriter(TestCase):
         
     def test_write_csv_path(self):
         
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         track = Track()
-        p1 = Obs(ENUCoords(0, 0), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        p1 = Obs(ENUCoords(0, 0), ObsTime.readTimestamp('2020-01-01 10:00:00'))
         track.addObs(p1)
-        p2 = Obs(ENUCoords(0, 1), GPSTime.readTimestamp('2020-01-01 10:00:01'))
+        p2 = Obs(ENUCoords(0, 1), ObsTime.readTimestamp('2020-01-01 10:00:01'))
         track.addObs(p2)
-        p3 = Obs(ENUCoords(1, 1), GPSTime.readTimestamp('2020-01-01 10:00:02'))
+        p3 = Obs(ENUCoords(1, 1), ObsTime.readTimestamp('2020-01-01 10:00:02'))
         track.addObs(p3)
-        p4 = Obs(ENUCoords(1, 2), GPSTime.readTimestamp('2020-01-01 10:00:03'))
+        p4 = Obs(ENUCoords(1, 2), ObsTime.readTimestamp('2020-01-01 10:00:03'))
         track.addObs(p4)
-        p5 = Obs(ENUCoords(2, 2), GPSTime.readTimestamp('2020-01-01 10:00:04'))
+        p5 = Obs(ENUCoords(2, 2), ObsTime.readTimestamp('2020-01-01 10:00:04'))
         track.addObs(p5)
         
         csvpath = os.path.join(self.resource_path, 'data/test/test_write_csv_path.wkt')
@@ -237,7 +237,7 @@ class TestTrackWriter(TestCase):
         
     def testWriteKml(self):
         resource_path = os.path.join(os.path.split(__file__)[0], "../..")
-        GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
+        ObsTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
         gpxpath = os.path.join(resource_path, 'data/gpx/activity_5807084803.gpx')
         tracks = TrackReader.readFromGpx(gpxpath)
         trace = tracks.getTrack(0)

@@ -4,7 +4,7 @@ import math
 import unittest
 import matplotlib.pyplot as plt
 
-from tracklib.core.ObsTime import GPSTime
+from tracklib.core.ObsTime import ObsTime
 from tracklib.core.ObsCoords import ENUCoords
 from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
@@ -21,71 +21,71 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         
         #----------------------------------------------------------------------
         #   4 sommets sur axes du cercle trigonométrique
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         
         self.trace1 = Track()
         c1 = ENUCoords(1,  0, 0)
-        p1 = Obs(c1, GPSTime.readTimestamp("2018-01-01 10:00:00"))
+        p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace1.addObs(p1)
         c2 = ENUCoords(0, 1, 0)
-        p2 = Obs(c2, GPSTime.readTimestamp("2018-01-01 10:00:12"))
+        p2 = Obs(c2, ObsTime.readTimestamp("2018-01-01 10:00:12"))
         self.trace1.addObs(p2)
         c3 = ENUCoords(-1, 0, 0)
-        p3 = Obs(c3, GPSTime.readTimestamp("2018-01-01 10:00:40"))
+        p3 = Obs(c3, ObsTime.readTimestamp("2018-01-01 10:00:40"))
         self.trace1.addObs(p3)
         c4 = ENUCoords(0, -1, 0)
-        p4 = Obs(c4, GPSTime.readTimestamp("2018-01-01 10:01:50"))
+        p4 = Obs(c4, ObsTime.readTimestamp("2018-01-01 10:01:50"))
         self.trace1.addObs(p4)
         self.trace1.addObs(p1)
         
         # ---------------------------------------------------------------------
         # Un escalier
         self.trace2 = Track()
-        pm3 = Obs(ENUCoords(-2, -1), GPSTime.readTimestamp('2020-01-01 09:59:44'))
+        pm3 = Obs(ENUCoords(-2, -1), ObsTime.readTimestamp('2020-01-01 09:59:44'))
         self.trace2.addObs(pm3)
-        pm2 = Obs(ENUCoords(-1, -1), GPSTime.readTimestamp('2020-01-01 09:59:48'))
+        pm2 = Obs(ENUCoords(-1, -1), ObsTime.readTimestamp('2020-01-01 09:59:48'))
         self.trace2.addObs(pm2)
-        pm1 = Obs(ENUCoords(-1, 0), GPSTime.readTimestamp('2020-01-01 09:59:55'))
+        pm1 = Obs(ENUCoords(-1, 0), ObsTime.readTimestamp('2020-01-01 09:59:55'))
         self.trace2.addObs(pm1)
-        p1 = Obs(ENUCoords(0, 0), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        p1 = Obs(ENUCoords(0, 0), ObsTime.readTimestamp('2020-01-01 10:00:00'))
         self.trace2.addObs(p1)
-        p2 = Obs(ENUCoords(0, 2), GPSTime.readTimestamp('2020-01-01 10:00:01'))
+        p2 = Obs(ENUCoords(0, 2), ObsTime.readTimestamp('2020-01-01 10:00:01'))
         self.trace2.addObs(p2)
-        p3 = Obs(ENUCoords(1, 2), GPSTime.readTimestamp('2020-01-01 10:00:02'))
+        p3 = Obs(ENUCoords(1, 2), ObsTime.readTimestamp('2020-01-01 10:00:02'))
         self.trace2.addObs(p3)
-        p4 = Obs(ENUCoords(1, 5), GPSTime.readTimestamp('2020-01-01 10:00:03'))
+        p4 = Obs(ENUCoords(1, 5), ObsTime.readTimestamp('2020-01-01 10:00:03'))
         self.trace2.addObs(p4)
-        p5 = Obs(ENUCoords(2, 5), GPSTime.readTimestamp('2020-01-01 10:00:04'))
+        p5 = Obs(ENUCoords(2, 5), ObsTime.readTimestamp('2020-01-01 10:00:04'))
         self.trace2.addObs(p5)
-        p6 = Obs(ENUCoords(2, 9), GPSTime.readTimestamp('2020-01-01 10:00:06'))
+        p6 = Obs(ENUCoords(2, 9), ObsTime.readTimestamp('2020-01-01 10:00:06'))
         self.trace2.addObs(p6)
-        p7 = Obs(ENUCoords(3, 9), GPSTime.readTimestamp('2020-01-01 10:00:08'))
+        p7 = Obs(ENUCoords(3, 9), ObsTime.readTimestamp('2020-01-01 10:00:08'))
         self.trace2.addObs(p7)
-        p8 = Obs(ENUCoords(3, 14), GPSTime.readTimestamp('2020-01-01 10:00:10'))
+        p8 = Obs(ENUCoords(3, 14), ObsTime.readTimestamp('2020-01-01 10:00:10'))
         self.trace2.addObs(p8)
-        p9 = Obs(ENUCoords(4, 14), GPSTime.readTimestamp('2020-01-01 10:00:12'))
+        p9 = Obs(ENUCoords(4, 14), ObsTime.readTimestamp('2020-01-01 10:00:12'))
         self.trace2.addObs(p9)
-        p10 = Obs(ENUCoords(4, 20), GPSTime.readTimestamp('2020-01-01 10:00:15'))
+        p10 = Obs(ENUCoords(4, 20), ObsTime.readTimestamp('2020-01-01 10:00:15'))
         self.trace2.addObs(p10)
         
         # ---------------------------------------------------------------------
         #
         self.trace3 = Track()
-        p1 = Obs(ENUCoords(0, 0), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        p1 = Obs(ENUCoords(0, 0), ObsTime.readTimestamp('2020-01-01 10:00:00'))
         self.trace3.addObs(p1)
-        p2 = Obs(ENUCoords(1.5, 0.5), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        p2 = Obs(ENUCoords(1.5, 0.5), ObsTime.readTimestamp('2020-01-01 10:00:00'))
         self.trace3.addObs(p2)
-        p3 = Obs(ENUCoords(2, 2), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        p3 = Obs(ENUCoords(2, 2), ObsTime.readTimestamp('2020-01-01 10:00:00'))
         self.trace3.addObs(p3)
-        p4 = Obs(ENUCoords(3.75, 0.6), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        p4 = Obs(ENUCoords(3.75, 0.6), ObsTime.readTimestamp('2020-01-01 10:00:00'))
         self.trace3.addObs(p4)
-        p5 = Obs(ENUCoords(5, 0.5), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        p5 = Obs(ENUCoords(5, 0.5), ObsTime.readTimestamp('2020-01-01 10:00:00'))
         self.trace3.addObs(p5)
-        p6 = Obs(ENUCoords(3.55, -0.5), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        p6 = Obs(ENUCoords(3.55, -0.5), ObsTime.readTimestamp('2020-01-01 10:00:00'))
         self.trace3.addObs(p6)
-        p7 = Obs(ENUCoords(1.8, -1.2), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        p7 = Obs(ENUCoords(1.8, -1.2), ObsTime.readTimestamp('2020-01-01 10:00:00'))
         self.trace3.addObs(p7)
-        p8 = Obs(ENUCoords(1, -3), GPSTime.readTimestamp('2020-01-01 10:00:00'))
+        p8 = Obs(ENUCoords(1, -3), ObsTime.readTimestamp('2020-01-01 10:00:00'))
         self.trace3.addObs(p8)
         
     

@@ -27,7 +27,7 @@ from unittest import TestCase, TestSuite, TextTestRunner
 #import sys
 #sys.path.append('~/Bureau/KitYann/2-Tracklib/tracklib/tracklib')
 
-from tracklib.core.ObsTime import GPSTime
+from tracklib.core.ObsTime import ObsTime
 from tracklib.io.TrackReader import TrackReader
 from tracklib.core.Kernel import GaussianKernel
 
@@ -66,7 +66,7 @@ class TestInterpolation(TestCase):
         self.resource_path = os.path.join(os.path.split(__file__)[0], "../..")
         self.csvpath = os.path.join(self.resource_path, 'data/trace0.gps')
         
-        GPSTime.setPrintFormat("2D/2M/4Y 2h:2m:2s.3z")
+        ObsTime.setPrintFormat("2D/2M/4Y 2h:2m:2s.3z")
         self.track = TrackReader.readFromCsv(self.csvpath) % 10
         self.track.plot('kx')
         

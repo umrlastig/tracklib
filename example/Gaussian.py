@@ -3,7 +3,7 @@
 #import matplotlib.pyplot as plt
 import os.path
 
-from tracklib.core.ObsTime import GPSTime
+from tracklib.core.ObsTime import ObsTime
 from tracklib.io.FileReader import FileReader
 from tracklib.core.Kernel import GaussianKernel
 
@@ -13,7 +13,7 @@ import tracklib.algo.Interpolation as itp
 
 resource_path = os.path.join(os.path.split(__file__)[0], "..")
 csvpath = os.path.join(resource_path, 'data/trace0.gps')
-GPSTime.setPrintFormat("2D/2M/4Y 2h:2m:2s.3z")
+ObsTime.setPrintFormat("2D/2M/4Y 2h:2m:2s.3z")
 track = FileReader.readFromFile(csvpath)%10
 track = track.extract(20, 45)
 track.plot('kx')

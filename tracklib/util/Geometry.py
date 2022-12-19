@@ -37,7 +37,7 @@ import numpy as np
 # Circular import (not satisfying solution)
 # --------------------------------------------------------------------------
 from tracklib.core.Obs import Obs
-from tracklib.core.ObsTime import GPSTime
+from tracklib.core.ObsTime import ObsTime
 import tracklib.core.Utils as Utils
 
 
@@ -421,8 +421,8 @@ def intersection(track1, track2, withTime=-1):
 
                 # Add intersection
                 if (withTime == -1) or (abs(tb - ta) < withTime):
-                    I.addObs(Obs(p, GPSTime.readUnixTime(ta)))
-                    TMP_TPS2.append(GPSTime.readUnixTime(tb))
+                    I.addObs(Obs(p, ObsTime.readUnixTime(ta)))
+                    TMP_TPS2.append(ObsTime.readUnixTime(tb))
                     TMP_I.append(i)
                     TMP_J.append(j)
 

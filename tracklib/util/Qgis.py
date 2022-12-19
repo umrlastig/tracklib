@@ -2,7 +2,7 @@
 from __future__ import annotations 
 from typing import Literal   
 
-from tracklib.core.ObsTime import GPSTime
+from tracklib.core.ObsTime import ObsTime
 from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
 from tracklib.core.TrackCollection import TrackCollection
@@ -260,7 +260,7 @@ class Qgis:
                 geom = QgsGeometry.fromPointXY(pt)
                 geom.transform(xform)
                 
-                time = GPSTime()
+                time = ObsTime()
                 obs = Obs(utils.makeCoords(geom.asPoint().x(), geom.asPoint().y(), 0, "ENUCoords"), time)
                 track.setObs(j, obs)
             

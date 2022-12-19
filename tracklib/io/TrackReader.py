@@ -9,7 +9,7 @@ import io
 import os
 from xml.dom import minidom
 
-from tracklib.core.ObsTime import GPSTime
+from tracklib.core.ObsTime import ObsTime
 from tracklib.core.ObsCoords import ENUCoords, GeoCoords, ECEFCoords
 from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
@@ -141,8 +141,8 @@ class TrackReader:
         else:
             track = Track()
 
-        time_fmt_save = GPSTime.getReadFormat()
-        GPSTime.setReadFormat(fmt.time_fmt)
+        time_fmt_save = ObsTime.getReadFormat()
+        ObsTime.setReadFormat(fmt.time_fmt)
 
         id_special = [fmt.id_E, fmt.id_N]
         if fmt.id_U >= 0:
@@ -174,11 +174,11 @@ class TrackReader:
 
                 if fmt.id_T != -1:
                     if isinstance(fmt.DateIni, int):
-                        time = GPSTime.readTimestamp(fields[fmt.id_T])
+                        time = ObsTime.readTimestamp(fields[fmt.id_T])
                     else:
                         time = fmt.DateIni.addSec((float)(fields[fmt.id_T]))
                 else:
-                    time = GPSTime()
+                    time = ObsTime()
 
                 E = (float)(fields[fmt.id_E])
                 N = (float)(fields[fmt.id_N])
@@ -257,7 +257,7 @@ class TrackReader:
 
             fp.close()
 
-        GPSTime.setReadFormat(time_fmt_save)
+        ObsTime.setReadFormat(time_fmt_save)
         
         if track is None:
             return None
@@ -302,7 +302,7 @@ class TrackReader:
                         m = int(fields[1][2:4])
                         s = int(fields[1][4:6])
                         ms = int(fields[1][7:9])
-                        time = GPSTime(hour=h, min=m, sec=s, ms=ms)
+                        time = ObsTime(hour=h, min=m, sec=s, ms=ms)
                         if fields[4] == "":
                             line = str(fp.readline())
                             continue
@@ -411,7 +411,7 @@ class TrackReader:
                     else:
                         z = 0.0
                         
-                    point = Obs(utils.makeCoords(x, y, z, srid.upper()), GPSTime())   
+                    point = Obs(utils.makeCoords(x, y, z, srid.upper()), ObsTime())   
                     track.addObs(point)
                     
 
@@ -473,8 +473,8 @@ class TrackReader:
             return TRACES
         
         elif os.path.isfile(path) or isinstance(io.StringIO(path), io.IOBase):
-            format_old = GPSTime.getReadFormat()
-            GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+            format_old = ObsTime.getReadFormat()
+            ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
     
             doc = minidom.parse(path)
             trks = doc.getElementsByTagName(type)
@@ -499,9 +499,9 @@ class TrackReader:
                     time = ""
                     times = trkpt.getElementsByTagName("time")
                     if times.length > 0:
-                        time = GPSTime(times[0].firstChild.data)
+                        time = ObsTime(times[0].firstChild.data)
                     else:
-                        time = GPSTime()
+                        time = ObsTime()
     
                     point = Obs(utils.makeCoords(lon, lat, hgt, srid), time)
                     trace.addObs(point)
@@ -535,7 +535,7 @@ class TrackReader:
 
             # pourquoi ?
             # --> pour remettre le format comme il etait avant la lecture :)   
-            GPSTime.setReadFormat(format_old)
+            ObsTime.setReadFormat(format_old)
     
             collection = TrackCollection(TRACES)
             return collection

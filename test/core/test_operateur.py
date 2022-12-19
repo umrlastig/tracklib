@@ -11,7 +11,7 @@ import unittest
 
 import tracklib.algo.Analytics as algo
 import tracklib.algo.Cinematics as Cinematics
-from tracklib.core.ObsTime import GPSTime
+from tracklib.core.ObsTime import ObsTime
 from tracklib.core.Operator import Operator
 from tracklib.core.Kernel import GaussianKernel
 import tracklib.algo.Interpolation as interpolation
@@ -42,7 +42,7 @@ class TestOperateurMethods(unittest.TestCase):
                 track.setObsAnalyticalFeature(af_name, i, 0)
 
     def test_abs_curv1(self):
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, 'data/trace1.dat')
         
         track = TrackReader.readFromCsv(chemin, 2, 3, -1, 4, separator=",", DateIni=-1, h=0, com="#", no_data_value=-999999, srid="ENUCoords")
@@ -88,7 +88,7 @@ class TestOperateurMethods(unittest.TestCase):
     
         
     def test_random(self):
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         #track = core_Track.Track.generate(TestOperateurMethods.x, TestOperateurMethods.y)
         track = synth.generate(x, y)
 
@@ -116,7 +116,7 @@ class TestOperateurMethods(unittest.TestCase):
         return 10*math.sin(2*math.pi*t)*(1+math.cos(2*math.pi*t))    
 
     def test_generate(self):
-        GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         #track = core_Track.Track.generate(TestOperateurMethods.x2, TestOperateurMethods.y2)
         track = synth.generate(TestOperateurMethods.x2, TestOperateurMethods.y2)
         

@@ -8,7 +8,7 @@ import requests
 from xml.dom import minidom
 
 
-from tracklib.core.ObsTime import GPSTime
+from tracklib.core.ObsTime import ObsTime
 from tracklib.core.ObsCoords import ENUCoords, ECEFCoords, GeoCoords
 from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
@@ -370,7 +370,7 @@ def wktLineStringToObs(wkt, srid):
         if srid.upper() in ["ECEFCOORDS", "ECEF"]:
             point = ECEFCoords(x, y, z)
 
-        TAB_OBS.append(Obs(point, GPSTime()))
+        TAB_OBS.append(Obs(point, ObsTime()))
 
     return TAB_OBS
 

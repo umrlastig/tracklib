@@ -1,7 +1,7 @@
 import math
 import matplotlib.pyplot as plt
 
-from tracklib.core.ObsTime import GPSTime
+from tracklib.core.ObsTime import ObsTime
 from tracklib.core.ObsCoords import ENUCoords
 from tracklib.core.Track import Track
 from tracklib.core.Obs import Obs
@@ -38,7 +38,7 @@ def example0():
 
 def example1():
     trace1 = Track()
-    time = GPSTime()
+    time = ObsTime()
     
     p1 = Obs(ENUCoords(659007.266, 6860734.006, 53.500), time)
     trace1.addObs(p1)
@@ -52,7 +52,7 @@ def example1():
 
 def example2():
     trace1 = Track()
-    time = GPSTime()
+    time = ObsTime()
     
     p1 = Obs(ENUCoords(659002.120, 6860722.478, 53.400), time)
     trace1.addObs(p1)

@@ -10,13 +10,13 @@ import sys
 import copy
 
 from tracklib.core.ObsCoords import ECEFCoords, ENUCoords
-from tracklib.core.ObsTime import GPSTime
+from tracklib.core.ObsTime import ObsTime
 
 
 class Obs:
     """Class to define an observation"""
 
-    def __init__(self, position: ENUCoords, timestamp: GPSTime = None):
+    def __init__(self, position: ENUCoords, timestamp: ObsTime = None):
         """Constructor of :class:`Obs` class
 
         :param position: A point coordinate
@@ -24,7 +24,7 @@ class Obs:
         """
 
         if timestamp is None:
-            timestamp = GPSTime()
+            timestamp = ObsTime()
 
         self.position = position
         self.timestamp = timestamp
