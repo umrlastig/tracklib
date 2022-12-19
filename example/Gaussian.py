@@ -3,7 +3,7 @@
 #import matplotlib.pyplot as plt
 import os.path
 
-from tracklib.core.GPSTime import GPSTime
+from tracklib.core.ObsTime import GPSTime
 from tracklib.io.FileReader import FileReader
 from tracklib.core.Kernel import GaussianKernel
 

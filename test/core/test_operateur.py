@@ -11,7 +11,7 @@ import unittest
 
 import tracklib.algo.Analytics as algo
 import tracklib.algo.Cinematics as Cinematics
-from tracklib.core.GPSTime import GPSTime
+from tracklib.core.ObsTime import GPSTime
 from tracklib.core.Operator import Operator
 from tracklib.core.Kernel import GaussianKernel
 import tracklib.algo.Interpolation as interpolation

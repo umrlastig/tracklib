@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from tracklib.core.GPSTime import GPSTime
+from tracklib.core.ObsTime import GPSTime
 from tracklib.io.RasterReader import RasterReader
 from tracklib.io.FileReader import FileReader
 import tracklib.algo.Mapping as mapping

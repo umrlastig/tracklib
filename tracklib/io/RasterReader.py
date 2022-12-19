@@ -131,5 +131,7 @@ class RasterReader:
 #    def getAltitude(bbox, proj=None, nomproxy=None):
 #        URL_ELEVATION = ''
 #        # https://wxs.ign.fr/altimetrie/geoportail/r/wms?LAYERS=ELEVATION.ELEVATIONGRIDCOVERAGE.HIGHRES&EXCEPTIONS=text/xml&FORMAT=image%2Fgeotiff&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&STYLES=&CRS=EPSG:2154&BBOX=660034.3692562445,6859000.245020923,660169.3953205446,6859140.163403969&WIDTH=2048&HEIGHT=2048
-     
-    
+
+        
+        
+        

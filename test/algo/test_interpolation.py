@@ -27,7 +27,7 @@ from unittest import TestCase, TestSuite, TextTestRunner
 #import sys
 #sys.path.append('~/Bureau/KitYann/2-Tracklib/tracklib/tracklib')
 
-from tracklib.core.GPSTime import GPSTime
+from tracklib.core.ObsTime import GPSTime
 from tracklib.io.TrackReader import TrackReader
 from tracklib.core.Kernel import GaussianKernel
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from unittest import TestCase, TestSuite, TextTestRunner
 
-from tracklib.core import (Track, Obs, GPSTime)
+from tracklib.core import (Track, Obs, ObsTime)
 from tracklib.core import ObsCoords as Coords
 from tracklib.algo.Geometrics import Polygon
 
@@ -13,30 +13,30 @@ class TestTrack(TestCase):
     __epsilon = 0.001
     
     def setUp (self):
-        GPSTime.GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         
         # ---------------------------------------------------------------------
         self.trace1 = Track.Track([], 1)
         c1 = Coords.ENUCoords(1.0, 5.0, 0)
-        p1 = Obs.Obs(c1, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
+        p1 = Obs.Obs(c1, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace1.addObs(p1)
         
         # ---------------------------------------------------------------------
         self.trace2 = Track.Track([], 1)
         c1 = Coords.ENUCoords(1.0, 5.0, 0)
-        p1 = Obs.Obs(c1, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
+        p1 = Obs.Obs(c1, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace2.addObs(p1)
         
         c2 = Coords.ENUCoords(2.0, 5.0, 0)
-        p2 = Obs.Obs(c2, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:05"))
+        p2 = Obs.Obs(c2, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:05"))
         self.trace2.addObs(p2)
         
         c3 = Coords.ENUCoords(3.0, 5.0, 0)
-        p3 = Obs.Obs(c3, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:10"))
+        p3 = Obs.Obs(c3, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:10"))
         self.trace2.addObs(p3)
         
         c4 = Coords.ENUCoords(5.0, 5.0, 0.4)
-        p4 = Obs.Obs(c4, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:20"))
+        p4 = Obs.Obs(c4, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:20"))
         self.trace2.addObs(p4)
         
         # ---------------------------------------------------------------------
@@ -47,7 +47,7 @@ class TestTrack(TestCase):
         self.trace3.addObs(p4)
         
         c5 = Coords.ENUCoords(7.0, 5.0, 0)
-        p5 = Obs.Obs(c5, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:45"))
+        p5 = Obs.Obs(c5, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:45"))
         self.trace3.addObs(p5)
         
         
@@ -100,7 +100,7 @@ class TestTrack(TestCase):
         tab = self.trace1.getTimestamps()
         self.assertEqual(len(tab), 1)
         self.assertEqual(tab[0], 
-                         GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
+                         ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
         
         
     def test_enclosed_polygon(self):
@@ -261,7 +261,7 @@ class TestTrack(TestCase):
     def test_sort(self):
         self.assertTrue(self.trace2.isSorted())
         c1 = Coords.ENUCoords(0.0, 5.0, 0.5)
-        p1 = Obs.Obs(c1, GPSTime.GPSTime.readTimestamp("2018-01-01 09:59:55"))
+        p1 = Obs.Obs(c1, ObsTime.GPSTime.readTimestamp("2018-01-01 09:59:55"))
         self.trace2.addObs(p1)
         self.assertFalse(self.trace2.isSorted())
         self.trace2.sort()
@@ -300,7 +300,7 @@ class TestTrack(TestCase):
         self.assertEqual(str(self.trace2.getTimestamps(1)).strip()[0:19], 
                          "01/01/2018 10:00:10")
         
-        self.trace2.removeObsList([GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:00")])
+        self.trace2.removeObsList([ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:00")])
         self.assertEqual(self.trace2.size(), 1)
         self.assertEqual(self.trace2.getX(), [3.0])
         self.assertEqual(self.trace2.getY(), [5.0])

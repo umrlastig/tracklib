@@ -5,7 +5,7 @@ from unittest import TestCase, TestSuite, TextTestRunner
 from tracklib.core.ObsCoords import ENUCoords
 from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
-from tracklib.core.GPSTime import GPSTime
+from tracklib.core.ObsTime import GPSTime
 
 from tracklib.algo import (Analytics)
 

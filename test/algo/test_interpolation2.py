@@ -2,7 +2,7 @@
 
 from unittest import TestCase, TestSuite, TextTestRunner
 
-from tracklib.core import (GPSTime, Obs, Track)
+from tracklib.core import (ObsTime, Obs, Track)
 from tracklib.core import ObsCoords as Coords
 import tracklib.algo.Interpolation as itp
 
@@ -14,26 +14,26 @@ class TestInterpolation2(TestCase):
     
     def setUp(self):
         
-        GPSTime.GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         
         # ---------------------------------------------------------------------
         
         self.trace1 = Track.Track([], 1)
         
         c1 = Coords.ENUCoords(0.0, 0.0, 0)
-        p1 = Obs.Obs(c1, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
+        p1 = Obs.Obs(c1, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace1.addObs(p1)
         
         c2 = Coords.ENUCoords(0.0, 2.0, 0)
-        p2 = Obs.Obs(c2, GPSTime.GPSTime.readTimestamp("2018-01-01 10:02:00"))
+        p2 = Obs.Obs(c2, ObsTime.GPSTime.readTimestamp("2018-01-01 10:02:00"))
         self.trace1.addObs(p2)
         
         c3 = Coords.ENUCoords(0.0, 5.0, 0)
-        p3 = Obs.Obs(c3, GPSTime.GPSTime.readTimestamp("2018-01-01 10:05:00"))
+        p3 = Obs.Obs(c3, ObsTime.GPSTime.readTimestamp("2018-01-01 10:05:00"))
         self.trace1.addObs(p3)
         
         c4 = Coords.ENUCoords(0.0, 9.0, 0)
-        p4 = Obs.Obs(c4, GPSTime.GPSTime.readTimestamp("2018-01-01 10:09:00"))
+        p4 = Obs.Obs(c4, ObsTime.GPSTime.readTimestamp("2018-01-01 10:09:00"))
         self.trace1.addObs(p4)
         
         # ---------------------------------------------------------------------
@@ -41,23 +41,23 @@ class TestInterpolation2(TestCase):
         self.trace2 = Track.Track([], 2)
         
         d1 = Coords.ENUCoords(0.0, 1.0, 0)
-        r1 = Obs.Obs(d1, GPSTime.GPSTime.readTimestamp("2018-01-01 10:01:00"))
+        r1 = Obs.Obs(d1, ObsTime.GPSTime.readTimestamp("2018-01-01 10:01:00"))
         self.trace2.addObs(r1)
         
         d2 = Coords.ENUCoords(0.0, 2.0, 0)
-        r2 = Obs.Obs(d2, GPSTime.GPSTime.readTimestamp("2018-01-01 10:02:00"))
+        r2 = Obs.Obs(d2, ObsTime.GPSTime.readTimestamp("2018-01-01 10:02:00"))
         self.trace2.addObs(r2)
         
         d3 = Coords.ENUCoords(0.0, 4.0, 0)
-        r3 = Obs.Obs(d3, GPSTime.GPSTime.readTimestamp("2018-01-01 10:04:00"))
+        r3 = Obs.Obs(d3, ObsTime.GPSTime.readTimestamp("2018-01-01 10:04:00"))
         self.trace2.addObs(r3)
         
         d4 = Coords.ENUCoords(0.0, 6.0, 0)
-        r4 = Obs.Obs(d4, GPSTime.GPSTime.readTimestamp("2018-01-01 10:06:00"))
+        r4 = Obs.Obs(d4, ObsTime.GPSTime.readTimestamp("2018-01-01 10:06:00"))
         self.trace2.addObs(r4)
         
         d5 = Coords.ENUCoords(0.0, 7.0, 0)
-        r5 = Obs.Obs(d5, GPSTime.GPSTime.readTimestamp("2018-01-01 10:07:00"))
+        r5 = Obs.Obs(d5, ObsTime.GPSTime.readTimestamp("2018-01-01 10:07:00"))
         self.trace2.addObs(r5)
         
         

@@ -5,7 +5,7 @@ import unittest
 import matplotlib.pyplot as plt
 #import numpy as np
 
-from tracklib.core import (GPSTime, Obs, Track, TrackCollection)
+from tracklib.core import (ObsTime, Obs, Track, TrackCollection)
 from tracklib.core import ObsCoords as Coords
 import tracklib.algo.Comparison as Comparison
 
@@ -15,54 +15,54 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
     __epsilon = 0.001
     
     def setUp (self):
-        GPSTime.GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         
         # ---------------------------------------------------------------------
         
         self.trace1 = Track.Track([], 1)
         
         c1 = Coords.ENUCoords(1.0, 5.0, 0)
-        p1 = Obs.Obs(c1, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
+        p1 = Obs.Obs(c1, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace1.addObs(p1)
         
         c2 = Coords.ENUCoords(2.0, 5.0, 0)
-        p2 = Obs.Obs(c2, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:05"))
+        p2 = Obs.Obs(c2, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:05"))
         self.trace1.addObs(p2)
         
         c3 = Coords.ENUCoords(3.0, 6.0, 0)
-        p3 = Obs.Obs(c3, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:10"))
+        p3 = Obs.Obs(c3, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:10"))
         self.trace1.addObs(p3)
         
         c4 = Coords.ENUCoords(4.0, 6.0, 0)
-        p4 = Obs.Obs(c4, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:15"))
+        p4 = Obs.Obs(c4, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:15"))
         self.trace1.addObs(p4)
         
         c5 = Coords.ENUCoords(5.0, 5.0, 0)
-        p5 = Obs.Obs(c5, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:20"))
+        p5 = Obs.Obs(c5, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:20"))
         self.trace1.addObs(p5)
         
         c6 = Coords.ENUCoords(6.0, 5.0, 0)
-        p6 = Obs.Obs(c6, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:25"))
+        p6 = Obs.Obs(c6, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:25"))
         self.trace1.addObs(p6)
         
         c7 = Coords.ENUCoords(7.0, 4.0, 0)
-        p7 = Obs.Obs(c7, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:30"))
+        p7 = Obs.Obs(c7, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:30"))
         self.trace1.addObs(p7)
         
         c8 = Coords.ENUCoords(8.0, 5.0, 0)
-        p8 = Obs.Obs(c8, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:35"))
+        p8 = Obs.Obs(c8, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:35"))
         self.trace1.addObs(p8)
         
         c9 = Coords.ENUCoords(9.0, 5.0, 0)
-        p9 = Obs.Obs(c9, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:40"))
+        p9 = Obs.Obs(c9, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:40"))
         self.trace1.addObs(p9)
         
         c10 = Coords.ENUCoords(10.0, 5.0, 0)
-        p10 = Obs.Obs(c10, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:45"))
+        p10 = Obs.Obs(c10, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:45"))
         self.trace1.addObs(p10)
         
         c11 = Coords.ENUCoords(11.0, 5.0, 0)
-        p11 = Obs.Obs(c11, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:50"))
+        p11 = Obs.Obs(c11, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:50"))
         self.trace1.addObs(p11)
         
         # ---------------------------------------------------------------------
@@ -70,55 +70,55 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         self.trace2 = Track.Track([], 2)
         
         d1 = Coords.ENUCoords(1.0, 1.0, 0)
-        r1 = Obs.Obs(d1, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
+        r1 = Obs.Obs(d1, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace2.addObs(r1)
         
         d2 = Coords.ENUCoords(2.0, 1.0, 0)
-        r2 = Obs.Obs(d2, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:05"))
+        r2 = Obs.Obs(d2, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:05"))
         self.trace2.addObs(r2)
         
         d3 = Coords.ENUCoords(3.0, 1.0, 0)
-        r3 = Obs.Obs(d3, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:10"))
+        r3 = Obs.Obs(d3, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:10"))
         self.trace2.addObs(r3)
         
         d4 = Coords.ENUCoords(4.0, 1.0, 0)
-        r4 = Obs.Obs(d4, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:15"))
+        r4 = Obs.Obs(d4, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:15"))
         self.trace2.addObs(r4)
         
         d5 = Coords.ENUCoords(5.0, 2.0, 0)
-        r5 = Obs.Obs(d5, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:20"))
+        r5 = Obs.Obs(d5, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:20"))
         self.trace2.addObs(r5)
         
         d6 = Coords.ENUCoords(6.0, 2.0, 0)
-        r6 = Obs.Obs(d6, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:25"))
+        r6 = Obs.Obs(d6, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:25"))
         self.trace2.addObs(r6)
         
         d7 = Coords.ENUCoords(7.0, 1.0, 0)
-        r7 = Obs.Obs(d7, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:30"))
+        r7 = Obs.Obs(d7, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:30"))
         self.trace2.addObs(r7)
         
         d8 = Coords.ENUCoords(8.0, 1.0, 0)
-        r8 = Obs.Obs(d8, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:35"))
+        r8 = Obs.Obs(d8, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:35"))
         self.trace2.addObs(r8)
         
         d9 = Coords.ENUCoords(9.0, 1.0, 0)
-        r9 = Obs.Obs(d9, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:40"))
+        r9 = Obs.Obs(d9, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:40"))
         self.trace2.addObs(r9)
         
         d10 = Coords.ENUCoords(10.0, 0.0, 0)
-        r10 = Obs.Obs(d10, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:40"))
+        r10 = Obs.Obs(d10, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:40"))
         self.trace2.addObs(r10)
         
         d11 = Coords.ENUCoords(11.0, 0.5, 0)
-        r11 = Obs.Obs(d11, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:45"))
+        r11 = Obs.Obs(d11, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:45"))
         self.trace2.addObs(r11)
         
         d12 = Coords.ENUCoords(12.0, 1.0, 0)
-        r12 = Obs.Obs(d12, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:50"))
+        r12 = Obs.Obs(d12, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:50"))
         self.trace2.addObs(r12)
         
         d13 = Coords.ENUCoords(13.0, 1.0, 0)
-        r13 = Obs.Obs(d13, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:55"))
+        r13 = Obs.Obs(d13, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:55"))
         self.trace2.addObs(r13)
         
     def plot(self):
@@ -175,30 +175,30 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
     def testHausdorffSimilarity(self):
         trackA = Track.Track([], 1)
         c = Coords.ENUCoords(1.0, 0.0, 0)
-        p = Obs.Obs(c, GPSTime.GPSTime())
+        p = Obs.Obs(c, ObsTime.GPSTime())
         trackA.addObs(p)
         c = Coords.ENUCoords(0.0, 1.0, 0)
-        p = Obs.Obs(c, GPSTime.GPSTime())
+        p = Obs.Obs(c, ObsTime.GPSTime())
         trackA.addObs(p)
         c = Coords.ENUCoords(-1.0, 0.0, 0)
-        p = Obs.Obs(c, GPSTime.GPSTime())
+        p = Obs.Obs(c, ObsTime.GPSTime())
         trackA.addObs(p)
         c = Coords.ENUCoords(0.0, -1.0, 0)
-        p = Obs.Obs(c, GPSTime.GPSTime())
+        p = Obs.Obs(c, ObsTime.GPSTime())
         trackA.addObs(p)
 
         trackB = Track.Track([], 1)
         c = Coords.ENUCoords(2.0, 0.0, 0)
-        p = Obs.Obs(c, GPSTime.GPSTime())
+        p = Obs.Obs(c, ObsTime.GPSTime())
         trackB.addObs(p)
         c = Coords.ENUCoords(0.0, 2.0, 0)
-        p = Obs.Obs(c, GPSTime.GPSTime())
+        p = Obs.Obs(c, ObsTime.GPSTime())
         trackB.addObs(p)
         c = Coords.ENUCoords(-2.0, 0.0, 0)
-        p = Obs.Obs(c, GPSTime.GPSTime())
+        p = Obs.Obs(c, ObsTime.GPSTime())
         trackB.addObs(p)
         c = Coords.ENUCoords(0.0, -4.0, 0)
-        p = Obs.Obs(c, GPSTime.GPSTime())
+        p = Obs.Obs(c, ObsTime.GPSTime())
         trackB.addObs(p)
 
         dAB = Comparison.premiereComposanteHausdorff(trackA, trackB)
@@ -220,27 +220,27 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
     def testFrechetSimilarity(self):
         trackA = Track.Track([], 1)
         c = Coords.ENUCoords(2.0, 1.0, 0)
-        p = Obs.Obs(c, GPSTime.GPSTime())
+        p = Obs.Obs(c, ObsTime.GPSTime())
         trackA.addObs(p)
         c = Coords.ENUCoords(3.0, 1.0, 0)
-        p = Obs.Obs(c, GPSTime.GPSTime())
+        p = Obs.Obs(c, ObsTime.GPSTime())
         trackA.addObs(p)
         c = Coords.ENUCoords(4.0, 2.0, 0)
-        p = Obs.Obs(c, GPSTime.GPSTime())
+        p = Obs.Obs(c, ObsTime.GPSTime())
         trackA.addObs(p)
         c = Coords.ENUCoords(5.0, 1.0, 0)
-        p = Obs.Obs(c, GPSTime.GPSTime())
+        p = Obs.Obs(c, ObsTime.GPSTime())
         trackA.addObs(p)
 
         trackB = Track.Track([], 1)
         c = Coords.ENUCoords(2.0, 0.0, 0)
-        p = Obs.Obs(c, GPSTime.GPSTime())
+        p = Obs.Obs(c, ObsTime.GPSTime())
         trackB.addObs(p)
         c = Coords.ENUCoords(3.0, 0.0, 0)
-        p = Obs.Obs(c, GPSTime.GPSTime())
+        p = Obs.Obs(c, ObsTime.GPSTime())
         trackB.addObs(p)
         c = Coords.ENUCoords(4.0, 0.0, 0)
-        p = Obs.Obs(c, GPSTime.GPSTime())
+        p = Obs.Obs(c, ObsTime.GPSTime())
         trackB.addObs(p)
 
         self.assertEqual(Comparison.discreteFrechet(trackA, trackB), 2.0)

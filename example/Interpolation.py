@@ -2,13 +2,13 @@ import matplotlib.pyplot as plt
 
 import tracklib.core.Utils as utils
 import tracklib.algo.Interpolation as interp
-from tracklib.core.GPSTime import GPSTime
+from tracklib.core.ObsTime import GPSTime
 from tracklib.core.Track import Track 
-from tracklib.core.Coords import GeoCoords
+from tracklib.core.ObsCoords import GeoCoords
 from tracklib.core.Obs import Obs
 from tracklib.core.Operator import Operator
 from tracklib.core.Kernel import GaussianKernel
-from tracklib.io.FileReader import FileReader
+from tracklib.io.TrackReader import TrackReader
 
 
 import sys
@@ -29,7 +29,7 @@ chemin = "./data/trace0.gps"
 
 GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
 
-track = FileReader.readFromFile(chemin, 2, 3, -1, 1, separator=",")
+track = TrackReader.readFromFile(chemin, 2, 3, -1, 1, separator=",")
 
 
 track = track.extract(100,300)

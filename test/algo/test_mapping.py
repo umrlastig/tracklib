@@ -4,7 +4,7 @@
 import unittest
 
 import os.path
-from tracklib.core import (GPSTime)
+from tracklib.core import (ObsTime)
 from tracklib.io.TrackReader import TrackReader
 from tracklib.io.RasterReader import RasterReader
 import tracklib.algo.Mapping as mapping
@@ -19,7 +19,7 @@ class TestAlgoMappingMethods(unittest.TestCase):
         print (self.raster.getRasterBand(1))
         self.band = self.raster.getRasterBand(1)
         
-        GPSTime.GPSTime.setReadFormat("4Y/2M/2D 2h:2m:2s")
+        ObsTime.GPSTime.setReadFormat("4Y/2M/2D 2h:2m:2s")
         tracepath = os.path.join(resource_path, 'data/asc/8961191_v3.csv')
         self.trace = TrackReader.readFromCsv(tracepath, 
                                         id_E=0, id_N=1, id_U=3, id_T=4, 

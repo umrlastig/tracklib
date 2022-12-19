@@ -8,7 +8,7 @@ import os
 import progressbar
 import sys 
 
-from tracklib.core.GPSTime import GPSTime
+from tracklib.core.ObsTime import GPSTime
 from tracklib.io.TrackFormat import TrackFormat
 from tracklib.core.Network import Network
 from tracklib.core.Track import Track

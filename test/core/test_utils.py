@@ -3,7 +3,7 @@
 
 import unittest
 
-from tracklib.core import (GPSTime, Obs, Track)
+from tracklib.core import (ObsTime, Obs, Track)
 from tracklib.core import ObsCoords as Coords
 import tracklib.algo.Cinematics as Cinematics
 import tracklib.core.Utils as Utils
@@ -11,19 +11,19 @@ import tracklib.core.Utils as Utils
 class TestUtils(unittest.TestCase):
     
     def setUp (self):
-        GPSTime.GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         self.trace1 = Track.Track([], 1)
         
         c1 = Coords.ENUCoords(1.0, 5.0, 0)
-        p1 = Obs.Obs(c1, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
+        p1 = Obs.Obs(c1, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace1.addObs(p1)
         
         c2 = Coords.ENUCoords(2.0, 5.0, 0)
-        p2 = Obs.Obs(c2, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:05"))
+        p2 = Obs.Obs(c2, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:05"))
         self.trace1.addObs(p2)
         
         c3 = Coords.ENUCoords(3.0, 6.0, 0)
-        p3 = Obs.Obs(c3, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:10"))
+        p3 = Obs.Obs(c3, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:10"))
         self.trace1.addObs(p3)
         
         Cinematics.computeAbsCurv(self.trace1)

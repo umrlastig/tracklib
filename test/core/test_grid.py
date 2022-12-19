@@ -6,7 +6,7 @@ import os.path
 
 from tracklib.io.TrackReader import TrackReader
 
-from tracklib.core import (Track, Obs, GPSTime, RasterBand)
+from tracklib.core import (Track, Obs, ObsTime, RasterBand)
 from tracklib.core import ObsCoords as Coords
 from tracklib.algo import (Analytics)
 from tracklib.algo import (Summarising) 
@@ -19,25 +19,25 @@ class TestGrille(TestCase):
         
         self.resource_path = os.path.join(os.path.split(__file__)[0], "../..")
         
-        GPSTime.GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         self.TRACES = []
         
         # ---------------------------------------------------------------------
         trace1 = Track.Track([], 1)
         c1 = Coords.ENUCoords(10, 10, 0)
-        p1 = Obs.Obs(c1, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
+        p1 = Obs.Obs(c1, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:00"))
         trace1.addObs(p1)
         
         c2 = Coords.ENUCoords(10, 110, 0)
-        p2 = Obs.Obs(c2, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:12"))
+        p2 = Obs.Obs(c2, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:12"))
         trace1.addObs(p2)
         
         c3 = Coords.ENUCoords(270, 110, 0)
-        p3 = Obs.Obs(c3, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:40"))
+        p3 = Obs.Obs(c3, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:40"))
         trace1.addObs(p3)
         
         c4 = Coords.ENUCoords(370, 190, 0)
-        p4 = Obs.Obs(c4, GPSTime.GPSTime.readTimestamp("2018-01-01 10:01:50"))
+        p4 = Obs.Obs(c4, ObsTime.GPSTime.readTimestamp("2018-01-01 10:01:50"))
         trace1.addObs(p4)
         
         self.TRACES.append(trace1)
@@ -45,15 +45,15 @@ class TestGrille(TestCase):
         # ---------------------------------------------------------------------
         trace2 = Track.Track([], 2)
         c7 = Coords.ENUCoords(25, 10, 0)
-        p7 = Obs.Obs(c7, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:15"))
+        p7 = Obs.Obs(c7, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:15"))
         trace2.addObs(p7)
         
         c6 = Coords.ENUCoords(280, 90, 0)
-        p6 = Obs.Obs(c6, GPSTime.GPSTime.readTimestamp("2018-01-01 10:00:45"))
+        p6 = Obs.Obs(c6, ObsTime.GPSTime.readTimestamp("2018-01-01 10:00:45"))
         trace2.addObs(p6)
         
         c5 = Coords.ENUCoords(330, 20, 0)
-        p5 = Obs.Obs(c5, GPSTime.GPSTime.readTimestamp("2018-01-01 10:01:55"))
+        p5 = Obs.Obs(c5, ObsTime.GPSTime.readTimestamp("2018-01-01 10:01:55"))
         trace2.addObs(p5)
         
         self.TRACES.append(trace2)
@@ -229,7 +229,7 @@ class TestGrille(TestCase):
     
     def test_quickstart(self):
 
-        GPSTime.GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
+        ObsTime.GPSTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
         gpxpath = os.path.join(self.resource_path, 'data/gpx/activity_5807084803.gpx')
         tracks = TrackReader.readFromGpx(gpxpath)
         trace = tracks.getTrack(0)

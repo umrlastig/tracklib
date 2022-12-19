@@ -13,7 +13,7 @@ from tracklib.algo.Selection import MODE_INSIDE, MODE_CROSSES, MODE_GETS_IN, MOD
 from tracklib.algo.Selection import MODE_PARALLEL
 from tracklib.algo.Selection import COMBINATION_OR
 import tracklib.algo.Geometrics as Geometrics
-from tracklib.core.GPSTime import GPSTime
+from tracklib.core.ObsTime import GPSTime
 from tracklib.io.TrackReader import TrackReader
 
 

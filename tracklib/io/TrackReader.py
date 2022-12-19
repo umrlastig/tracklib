@@ -9,7 +9,7 @@ import io
 import os
 from xml.dom import minidom
 
-from tracklib.core.GPSTime import GPSTime
+from tracklib.core.ObsTime import GPSTime
 from tracklib.core.ObsCoords import ENUCoords, GeoCoords, ECEFCoords
 from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track

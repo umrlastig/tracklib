@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 from tracklib.core.Obs import Obs
 from tracklib.core.ObsCoords import ENUCoords
-from tracklib.core.GPSTime import GPSTime
+from tracklib.core.ObsTime import GPSTime
 from tracklib.algo.Geometrics import Polygon
 from tracklib.core.TrackCollection import TrackCollection
 

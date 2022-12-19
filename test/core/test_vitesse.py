@@ -7,7 +7,7 @@ import math
 import os.path
 import unittest
 
-from tracklib.core.GPSTime import GPSTime
+from tracklib.core.ObsTime import GPSTime
 from tracklib.core.Operator import Operator
 from tracklib.io.TrackReader import TrackReader
 

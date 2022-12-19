@@ -10,7 +10,7 @@ import sys
 import copy
 
 from tracklib.core.ObsCoords import ECEFCoords, ENUCoords
-from tracklib.core.GPSTime import GPSTime
+from tracklib.core.ObsTime import GPSTime
 
 
 class Obs:

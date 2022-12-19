@@ -70,7 +70,7 @@ from tracklib.core.Obs import Obs
 import tracklib.core.Utils as utils
 import tracklib.util.Geometry as Geometry
 
-from tracklib.core.GPSTime import GPSTime
+from tracklib.core.ObsTime import GPSTime
 from tracklib.algo.Geometrics import Rectangle
 
 

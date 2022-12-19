@@ -2,7 +2,7 @@
 
 import os.path
 
-from tracklib.core.GPSTime import GPSTime
+from tracklib.core.ObsTime import GPSTime
 
 
 class TrackFormat:

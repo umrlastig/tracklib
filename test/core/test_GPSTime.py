@@ -5,7 +5,7 @@
 
 import unittest
 
-from tracklib.core.GPSTime import GPSTime
+from tracklib.core.ObsTime import GPSTime
 
 
 class TestGPSTime(unittest.TestCase):

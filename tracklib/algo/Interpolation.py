@@ -12,7 +12,7 @@ import tracklib.core.Utils as utils
 
 from tracklib.core.Obs import Obs
 from tracklib.core.ObsCoords import ENUCoords
-from tracklib.core.GPSTime import GPSTime
+from tracklib.core.ObsTime import GPSTime
 
 MODE_SPATIAL = 1
 MODE_TEMPORAL = 2
