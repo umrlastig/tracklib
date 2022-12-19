@@ -104,7 +104,7 @@ To use spyder, you have to create a new project with an existing directory.
 
 .. container:: centerside
   
-     .. figure:: ./img/spyder_project.png
+     .. figure:: ../img/spyder_project.png
         :width: 650px
         :align: center
       

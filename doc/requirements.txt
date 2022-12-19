@@ -2,9 +2,12 @@ sphinx
 sphinx_rtd_theme
 recommonmark
 sphinx-autodoc-typehints
+pydata-sphinx-theme
 ipykernel
 nbsphinx
 autodocsumm
+pygments
+nbconvert
 numpy
 matplotlib
 scikit-image

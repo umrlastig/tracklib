@@ -3,24 +3,19 @@
 :License: --
 :Date: 07/03/2021
 
-.. raw:: html
-   
-   <img src="https://raw.githubusercontent.com/umrlastig/tracklib/main/doc/source/TracklibLogo.png" style="width: 40%; display: block; margin-left: auto; margin-right: auto;"/>
-   <p/>
-  
 
-Welcome to TrackLib’s documentation!
+Welcome to tracklib’s documentation!
 =====================================
 
-*tracklib library provide a variety of tools, operators and functions to manipulate GPS trajectories.*
+**tracklib** is a Python library that provides a variety of tools, operators and functions to manipulate GPS trajectories.
 
 :Source Code: https://github.com/umrlastig/tracklib
 
-|CircleCI| |codecov| |rtd| |licence|
+|TracklibBuildTest| |codecov| |rtd| |licence|
 
-.. |CircleCI| image:: https://img.shields.io/circleci/project/github/umrlastig/tracklib/main.svg?style=flat-square&label=CircleCI
-                  :alt: CircleCi build status
-                  :target: https://circleci.com/gh/umrlastig/tracklib
+.. |TracklibBuildTest| image:: https://github.com/mdvandamme/tracklib/actions/workflows/ci.yml/badge.svg
+                  :alt: Tracklib build & test
+                  :target: https://github.com/mdvandamme/tracklib/actions/workflows/ci.yml
 .. |codecov| image:: https://codecov.io/gh/umrlastig/tracklib/branch/main/graph/badge.svg?token=pHLaV21j2O
                    :alt: Code coverage
                    :target: https://codecov.io/gh/umrlastig/tracklib
@@ -30,9 +25,6 @@ Welcome to TrackLib’s documentation!
 .. |licence| image:: https://img.shields.io/badge/Licence-Cecill--C-blue.svg?style=flat
                    :alt Software License
 				   :target https://github.com/umrlastig/tracklib/blob/main/LICENCE
-
-
-
 
 Background
 ***********
@@ -46,8 +38,8 @@ is, in general, a complex and a boring task. So, to make it easier, *Tracklib* m
 and functions to simplify the creation of analytical features on a GPS tracks. 
 
 
-Among tracklib main functionalities
-*************************************
+Main functionalities
+*********************
 
 * Structured data to store GPS data
 * Load GPS data from files (GPX, CSV) 
@@ -55,7 +47,7 @@ Among tracklib main functionalities
 * Propose generic method to simplify a track. For example (Douglas Peucker, Visvalingram algorithms or kernel Filter (Gaussian, Uniform, Dirac, etc.)).
 
     .. figure:: ./img/generate_random.png
-	   :width: 450px
+	   :width: 250px
 	   :align: center
 	   
 	   Figure 1 : Simplify with a gaussian filter
@@ -63,7 +55,7 @@ Among tracklib main functionalities
 * Resample, interpolation and smoothing functions
 
 	.. figure:: ./img/smooth.gif
-	   :width: 450px
+	   :width: 250px
 	   :align: center
 
        Figure 2 : Resample with MODE_SPLINE_SPATIAL
@@ -80,42 +72,19 @@ Among tracklib main functionalities
  	.. figure:: ./img/summarize_mitaka.png
 	   :width: 550px
 	   :align: center
+
+
+
+Documentation
+**************
+
+.. toctree::
+  :maxdepth: 2
   
+  User Guide <userguide/index>
+  Use Cases <notebook/index>
+  API Reference <api/index>
 
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Generalité
-   
-   install
-   overview   
-   
-.. toctree::
-   :maxdepth: 1
-   :caption: User Guide
-
-   ./userguide/1_coreconcept
-   ./userguide/2_operator
-   ./userguide/3_filter
-..   ./userguide/4_mapping
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Use Cases
-
-   ./notebook/Quickstart
-   ./notebook/Summarize
-   ./notebook/Switchbacks
-   ./notebook/StopPoints
-   
-.. toctree::
-   :maxdepth: 1
-   :caption: API Reference
-
-   ./api/algo.rst
-   ./api/core.rst
-   ./api/io.rst
-   ./api/util.rst
 
 
 

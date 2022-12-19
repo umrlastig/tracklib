@@ -77,7 +77,7 @@ Tools to query observations in a track with SQL-like commands
 
 Output depends on the SELECT clause:
 
-If "SELECT *" then output is a copied track of the original track (with all its AF hopefully)
+If ``SELECT *`` then output is a copied track of the original track (with all its AF hopefully)
 
 .. code-block:: python
 

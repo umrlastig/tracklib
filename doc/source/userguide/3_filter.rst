@@ -42,10 +42,8 @@ Filtering
 Toutes les méthodes de lissage qui modifient les points, sans changer les timestamps, sans supprimer, ni créer de nouveau points. 
 Ce sont en général des méthodes locales, qui travaillent avec un voisinage (noyau). La classe comporte :
 - des filtres dynamiques (qui nécessitent des informations sur la dynamique du mobile) : Kalman et Markov
-- des filtres statistiques (qui étudient par "apprentissage" la distribution des données sur un jeu de données d'exemple. 
-  Ici, il y aura Karhunen-Loève (ACP fonctionnelle) qui est au statut de "TO DO"
-- des filtres fréquentiels, qui travaillent dans le domaine spectrale pour modifier la trace. Pour l'instant 
-  il y a les passe-bas et passe-haut de Fourier et il y aura les ondelette en "TO DO".
+- des filtres statistiques (qui étudient par "apprentissage" la distribution des données sur un jeu de données d'exemple. Ici, il y aura Karhunen-Loève (ACP fonctionnelle) qui est au statut de "TO DO"
+- des filtres fréquentiels, qui travaillent dans le domaine spectrale pour modifier la trace. Pour l'instant il y a les passe-bas et passe-haut de Fourier et il y aura les ondelette en "TO DO".
 - des filtres séquentiels (ou filtres à noyaux), qui travaillent directement dans le domaine spatial ou temporel et avec un noyau local. 
 
 
