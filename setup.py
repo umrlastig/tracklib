@@ -11,7 +11,12 @@ requirements = (
         "progressbar2"
 )
 
-dev_requirements = ("pytest", "pytest-runner", "coverage")
+dev_requirements = (
+        "numpy==1.23.5", 
+        "pytest", 
+        "pytest-runner", 
+        "coverage"
+)
 
 doc_requirements = (
     "sphinx",
