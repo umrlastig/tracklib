@@ -13,7 +13,7 @@
 import sys
 import math
 import copy
-import numpy as npy
+import numpy as np
 import random
 import matplotlib.pyplot as plt
 import logging
@@ -595,18 +595,18 @@ def __circle(p1, p2=None, p3=None):
                 argmin = i
         return CANDIDATS[argmin]
 
-    x = npy.complex(p1.getX(), p1.getY())
-    y = npy.complex(p2.getX(), p2.getY())
-    z = npy.complex(p3.getX(), p3.getY())
+    x = np.complex(p1.getX(), p1.getY())
+    y = np.complex(p2.getX(), p2.getY())
+    z = np.complex(p3.getX(), p3.getY())
 
     w = z - x
     w /= y - x
-    c = (x - y) * (w - abs(w) ** 2) / 2j / npy.imag(w) - x
+    c = (x - y) * (w - abs(w) ** 2) / 2j / np.imag(w) - x
     centre = p1.copy()
-    centre.setX(-npy.real(c))
-    centre.setY(-npy.imag(c))
+    centre.setX(-np.real(c))
+    centre.setY(-np.imag(c))
 
-    return Circle(centre, npy.abs(c + x))
+    return Circle(centre, np.abs(c + x))
 
 
 def __welzl(C):
@@ -699,25 +699,25 @@ def minCircleMatrix(track):
     M[i,j] gives the radius of the min circle enclosing
     points in track from obs i to obs j (included)"""
 
-    M = npy.zeros((track.size(), track.size()))
+    M = np.zeros((track.size(), track.size()))
     for i in range(track.size()):
         # print(i, "/", track.size())
         for j in range(i, track.size() - 1):
             M[i, j] = minCircle(track.extract(i, j)).radius
-    M = M + npy.transpose(M)
+    M = M + np.transpose(M)
     return M
 
 
 def fitCircle(track, iter_max=100, epsilon=1e-10):
     """TODO"""
 
-    X = npy.ones((3, 1))
+    X = np.ones((3, 1))
     c = track.getCentroid()
     N = track.size()
     X[0] = c.getX()
     X[1] = c.getY()
-    J = npy.zeros((N, 3))
-    B = npy.zeros((N, 1))
+    J = np.zeros((N, 3))
+    B = np.zeros((N, 1))
 
     for k in range(iter_max):
         for i in range(N):
@@ -730,9 +730,9 @@ def fitCircle(track, iter_max=100, epsilon=1e-10):
             J[i, 2] = -2 * R
             B[i, 0] = X[2] - R
         try:
-            dX = npy.linalg.solve(npy.transpose(J) @ J, npy.transpose(J) @ B)
+            dX = np.linalg.solve(np.transpose(J) @ J, np.transpose(J) @ B)
             X = X + dX
-        except npy.linalg.LinAlgError as err:
+        except np.linalg.LinAlgError as err:
             print(err)
             return Circle(ENUCoords(0, 0), 0)
 

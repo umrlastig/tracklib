@@ -28,7 +28,7 @@ setup (
     author_email="todo@ign.fr",
     keywords=['gps', 'track', 'python'],
     license="Cecill-C",
-    python_requires=">=3.8",
+    python_requires="=3.8",
     classifiers=[
         "Development Status :: 1 - Alpha",
         "Intended Audience :: Developers",
