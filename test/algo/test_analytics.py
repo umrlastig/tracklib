@@ -5,7 +5,8 @@ import unittest
 
 import math
 
-from tracklib.core import (Coords, Obs, Track, GPSTime)
+from tracklib.core import (Obs, Track, GPSTime)
+from tracklib.core import ObsCoords as Coords
 import tracklib.core.Utils as utils
 import tracklib.algo.Analytics as Analytics
 

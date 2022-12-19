@@ -6,7 +6,7 @@ import progressbar
 import numpy as np
 
 from tracklib.core.Obs import Obs
-from tracklib.core.Coords import ENUCoords
+from tracklib.core.ObsCoords import ENUCoords
 from tracklib.algo.Geometrics import Circle, minCircle
 
 import tracklib.core.Utils as utils

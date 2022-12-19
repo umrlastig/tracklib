@@ -284,10 +284,9 @@ def diffJourAnneeTrace(track, i):
 # =============================================================================
 # =============================================================================
 def stop_point_with_acceleration_criteria(track, i):
-    """This algorithm detect stop point.
-    A point is a stop when:
-        - speed is null
-        - acceleration is negative
+    """
+    This algorithm detect stop point.
+    A point is a stop when speed is null and acceleration is negative.
     """
     if i == 0:
         return 0

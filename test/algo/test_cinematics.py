@@ -5,7 +5,8 @@
 import unittest
 
 #import math
-from tracklib.core import (Coords, Obs, Track, GPSTime)
+from tracklib.core import (Obs, Track, GPSTime)
+from tracklib.core import ObsCoords as Coords
 import tracklib.algo.Analytics as Analytics
 from tracklib.algo.Analytics import BIAF_ABS_CURV
 import tracklib.algo.Cinematics as Cinematics

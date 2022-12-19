@@ -5,7 +5,7 @@ import os.path
 import filecmp
 from unittest import TestCase, TestSuite, TextTestRunner
 
-from tracklib.core.Coords import ENUCoords
+from tracklib.core.ObsCoords import ENUCoords
 from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
 from tracklib.core.TrackCollection import TrackCollection

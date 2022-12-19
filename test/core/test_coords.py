@@ -2,7 +2,7 @@
 from unittest import TestCase, TestSuite, TextTestRunner
 
 from math import degrees 
-from tracklib.core import (Coords)
+from tracklib.core import ObsCoords as Coords
 
 
 class TestCoords(TestCase):

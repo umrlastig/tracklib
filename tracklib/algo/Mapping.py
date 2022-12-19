@@ -15,7 +15,7 @@ import tracklib.algo.Cinematics as Cinematics
 import tracklib.algo.Dynamics as Dynamics
 
 from tracklib.core.Obs import Obs
-from tracklib.core.Coords import ENUCoords
+from tracklib.core.ObsCoords import ENUCoords
 from tracklib.core.Operator import Operator
 from tracklib.core.TrackCollection import TrackCollection
 

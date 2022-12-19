@@ -5,7 +5,8 @@ import unittest
 import matplotlib.pyplot as plt
 #import numpy as np
 
-from tracklib.core import (GPSTime, Coords, Obs, Track, TrackCollection)
+from tracklib.core import (GPSTime, Obs, Track, TrackCollection)
+from tracklib.core import ObsCoords as Coords
 import tracklib.algo.Comparison as Comparison
 
 

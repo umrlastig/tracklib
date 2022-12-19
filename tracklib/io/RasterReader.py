@@ -5,8 +5,8 @@
 from __future__ import annotations   
 from typing import Union
 
-from tracklib.core import (Bbox, Coords, RasterBand, Raster)
-from tracklib.core.Coords import (ENUCoords)
+from tracklib.core import (Bbox, RasterBand, Raster)
+from tracklib.core.ObsCoords import (ENUCoords, GeoCoords)
 
 
 class RasterReader:
@@ -18,7 +18,7 @@ class RasterReader:
     
     @staticmethod
     def readFromAscFile(path: str, 
-                        srid: Union[Coords.ENUCoords, Coords.ENUCoords, Coords.GeoCoords] =  ENUCoords,  
+                        srid: Union[ENUCoords, ENUCoords, GeoCoords] =  ENUCoords,  
                         name: str ='')-> Raster:
         '''
         Read grid data from an ASCII file. The first six lines of the file indicate the reference of the grid, 

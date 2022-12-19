@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
 
-from tracklib.core.Coords import ENUCoords
+from tracklib.core.ObsCoords import ENUCoords
 from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
 from tracklib.algo.Selection import Selector, GlobalSelector

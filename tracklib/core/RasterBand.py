@@ -7,7 +7,7 @@ from typing import Union
 import matplotlib.pyplot as plt
 
 from tracklib.core.Bbox import Bbox
-from tracklib.core.Coords import ECEFCoords, ENUCoords, GeoCoords
+from tracklib.core.ObsCoords import ECEFCoords, ENUCoords, GeoCoords
 
 NO_DATA_VALUE = -9999
 DEFAULT_NAME = 'grid'

@@ -10,7 +10,7 @@ import copy
 import matplotlib.pyplot as plt
 
 from tracklib.algo.Geometrics import Polygon
-from tracklib.core import Coords
+from tracklib.core import ObsCoords as Coords
 
 
 class Bbox:

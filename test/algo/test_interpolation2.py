@@ -2,7 +2,8 @@
 
 from unittest import TestCase, TestSuite, TextTestRunner
 
-from tracklib.core import (GPSTime, Coords, Obs, Track)
+from tracklib.core import (GPSTime, Obs, Track)
+from tracklib.core import ObsCoords as Coords
 import tracklib.algo.Interpolation as itp
 
 

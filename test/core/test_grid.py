@@ -6,7 +6,8 @@ import os.path
 
 from tracklib.io.TrackReader import TrackReader
 
-from tracklib.core import (Track, Obs, Coords, GPSTime, RasterBand)
+from tracklib.core import (Track, Obs, GPSTime, RasterBand)
+from tracklib.core import ObsCoords as Coords
 from tracklib.algo import (Analytics)
 from tracklib.algo import (Summarising) 
 from tracklib.core.TrackCollection import TrackCollection

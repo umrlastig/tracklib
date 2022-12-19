@@ -14,7 +14,7 @@ from tracklib.core.Bbox import Bbox
 from tracklib.core.Track import Track
 from tracklib.core.Network import Edge
 from tracklib.core.TrackCollection import TrackCollection
-from tracklib.core.Coords import GeoCoords, ENUCoords, ECEFCoords
+from tracklib.core.ObsCoords import GeoCoords, ENUCoords, ECEFCoords
 
 import tracklib.util.Geometry as Geometry
 

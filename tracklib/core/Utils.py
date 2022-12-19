@@ -1,4 +1,3 @@
-﻿# -*- coding: utf-8 -*-
 """
 This module contains an algorithm of Analytical Features calculation and 
 some utility functions.
@@ -12,9 +11,7 @@ import json
 import sys
 import numpy as np
 
-from tracklib.core.Coords import GeoCoords
-from tracklib.core.Coords import ENUCoords
-from tracklib.core.Coords import ECEFCoords
+from tracklib.core.ObsCoords import GeoCoords, ENUCoords, ECEFCoords
 
 import matplotlib.colors as mcolors
 

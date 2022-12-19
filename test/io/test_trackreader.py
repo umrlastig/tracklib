@@ -8,7 +8,7 @@ from tracklib.core.Track import Track
 from tracklib.core.TrackCollection import TrackCollection
 from tracklib.io.TrackReader import TrackReader
 
-from tracklib.core.Coords import ENUCoords
+from tracklib.core.ObsCoords import ENUCoords
 import tracklib.algo.Geometrics as Geometrics
 from tracklib.algo.Selection import Constraint
 from tracklib.algo.Selection import TYPE_CUT_AND_SELECT, MODE_INSIDE

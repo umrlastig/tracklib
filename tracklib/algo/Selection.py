@@ -62,7 +62,7 @@ General constraint syntax:
 
 import matplotlib.pyplot as plt
 
-from tracklib.core.Coords import ENUCoords, GeoCoords
+from tracklib.core.ObsCoords import ENUCoords, GeoCoords
 from tracklib.core.Track import Track
 from tracklib.core.TrackCollection import TrackCollection
 from tracklib.core.Obs import Obs

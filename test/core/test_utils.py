@@ -3,7 +3,8 @@
 
 import unittest
 
-from tracklib.core import (GPSTime, Coords, Obs, Track)
+from tracklib.core import (GPSTime, Obs, Track)
+from tracklib.core import ObsCoords as Coords
 import tracklib.algo.Cinematics as Cinematics
 import tracklib.core.Utils as Utils
 

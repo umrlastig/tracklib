@@ -9,7 +9,7 @@ from __future__ import annotations
 import sys
 import copy
 
-from tracklib.core.Coords import ECEFCoords, ENUCoords
+from tracklib.core.ObsCoords import ECEFCoords, ENUCoords
 from tracklib.core.GPSTime import GPSTime
 
 

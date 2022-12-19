@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 
 import tracklib.algo.Simplification as Simplification
 from tracklib.core.Bbox import Bbox
-from tracklib.core.Coords import ECEFCoords, ENUCoords, GeoCoords
+from tracklib.core.ObsCoords import ECEFCoords, ENUCoords, GeoCoords
 
 from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track

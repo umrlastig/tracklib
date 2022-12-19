@@ -18,7 +18,7 @@ import random
 import matplotlib.pyplot as plt
 import logging
 
-from tracklib.core.Coords import ENUCoords
+from tracklib.core.ObsCoords import ENUCoords
 from tracklib.util.Geometry import right, inclusion, collinear, isSegmentIntersects
 from tracklib.util.Geometry import transform, transform_inverse
 
