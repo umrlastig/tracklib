@@ -45,7 +45,8 @@ setup (
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 3.8",
     ],
-    packages=find_packages(include=["test", "resources"]),
+    #packages=find_packages(include=["test", "resources"]),
+    packages=find_packages(),
     install_requires=requirements,
     test_suite="tests",
     extras_require={
