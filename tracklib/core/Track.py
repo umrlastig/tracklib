@@ -1564,8 +1564,8 @@ class Track:
                 3. a threshold value which is automatically casted to the type of the AF
                    given in (1). Intended types accepted are: :class:`int`,
                    :class:`float`, :class:`str`, :class:`bool`
-                   and :class:`core.GPSTime.GPSTime`. When
-                   :class:`core.GPSTime.GPSTime` is used as a threshold value,
+                   and :class:`core.ObsTime.ObsTime`. When
+                   :class:`core.ObsTime.ObsTime` is used as a threshold value,
                    eventhough it may contain 2 parts (date and time), it must not be
                    enclosed within quotes. For boolean, "1", "T" and "TRUE" are
                    considered as logical True, all other values are considered as False.

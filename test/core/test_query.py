@@ -60,6 +60,10 @@ class TestQuery(TestCase):
         self.assertLessEqual((0.2070 - trace.getObsAnalyticalFeatures('speed', 1)[0]), self.__epsilon, 'erreur de vitesse 1')
         self.assertLessEqual((0.2070 - trace.getObsAnalyticalFeatures('speed', 2)[0]), self.__epsilon, 'erreur de vitesse 2')
         self.assertLessEqual((0.2070 - trace.getObsAnalyticalFeatures('speed', 3)[0]), self.__epsilon, 'erreur de vitesse 3')
+        
+        self.track.addAnalyticalFeature(Analytics.speed)
+        trace = self.track.query("SELECT * WHERE speed <= 0.5")
+        self.assertEqual(5, trace.size())
 
     def test_selectwhere2(self):
         
@@ -71,6 +75,12 @@ class TestQuery(TestCase):
         self.assertLessEqual((0.7071 - trace.getObsAnalyticalFeatures('speed', 1)[0]), self.__epsilon, 'erreur de vitesse 1')
         self.assertLessEqual((0.7071 - trace.getObsAnalyticalFeatures('speed', 2)[0]), self.__epsilon, 'erreur de vitesse 2')
         self.assertLessEqual((0.7071 - trace.getObsAnalyticalFeatures('speed', 3)[0]), self.__epsilon, 'erreur de vitesse 3')
+        
+        trace = self.track.query("SELECT * WHERE speed == 0.5")
+        self.assertEqual(1, trace.size())
+        
+        trace = self.track.query("SELECT * WHERE speed != 0.5")
+        self.assertEqual(8, trace.size())
         
         
     def test_selectagg(self):
@@ -119,6 +129,7 @@ class TestQuery(TestCase):
     def test_selectcolumn(self):
         self.track.addAnalyticalFeature(Analytics.speed)
         self.track.addAnalyticalFeature(Analytics.heading)
+        self.track.addAnalyticalFeature(Analytics.orientation)
         
         # 
         manymax = self.track.query("SELECT MAX(x), MAX(y), MAX(z), MAX(t)")
@@ -129,8 +140,27 @@ class TestQuery(TestCase):
                           0.7071067811865476, 0.7071067811865476, 0.5])
         self.assertEquals(tab[1], [0.0, 0.0, 
                           1.5707963267948966, 0.0, 1.5707963267948966])
-        
+    
+    
+        query  = " SELECT speed, heading "
+        query += " WHERE speed >= 0.3 AND heading > 1.0 "
+        tab = self.track.query(query)
+        self.assertEquals(tab[0],[0.7071067811865476, 0.47140452079103173, 
+                          0.3535533905932738, 0.5])
+        self.assertEquals(tab[1], [1.5707963267948966, 1.5707963267948966, 
+                          1.5707963267948966, 1.5707963267948966])
+    
+        query  = " SELECT AVG(speed) "
+        query += " WHERE timestamp >= 2020-01-01 10:00:03 "
+        query += "   AND timestamp <= 2020-01-01 10:00:08 "
+        avgspeed = self.track.query(query)
+        self.assertTrue(abs(avgspeed - 0.47140) < 0.0001)
 
+        query  = " SELECT COUNT(speed) "
+        query += " WHERE orientation = 1 "
+        obsOrientation1 = self.track.query(query)
+        self.assertEquals(obsOrientation1, 4)
+        
 
 if __name__ == '__main__':
     suite = TestSuite()
