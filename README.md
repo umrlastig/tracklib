@@ -2,14 +2,14 @@
 
 <p align="center">
 <table style="border:none;border:0;width:60%"><tr>
-  <td align="center" style="width:30%"><img width="200px" src="https://github.com/mdvandamme/tracklib/blob/main/doc/source/img/TracklibLogo.png" /></td>
+  <td align="center" style="width:30%"><img width="200px" src="https://github.com/umrlastig/tracklib/blob/main/doc/source/img/TracklibLogo.png" /></td>
   <td style="padding:16px;"><label>Tracklib</label> library provide a variety of tools, operators and functions to manipulate GPS trajectories</td>
 </tr></table>
 </p>
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![Tracklib build & test](https://github.com/mdvandamme/tracklib/actions/workflows/ci.yml/badge.svg)](https://github.com/mdvandamme/tracklib/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/mdvandamme/tracklib/branch/main/graph/badge.svg?token=pHLaV21j2O)](https://codecov.io/gh/mdvandamme/tracklib)
+[![Tracklib build & test](https://github.com/umrlastig/tracklib/actions/workflows/ci.yml/badge.svg)](https://github.com/umrlastig/tracklib/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/umrlastig/tracklib/branch/main/graph/badge.svg?token=pHLaV21j2O)](https://codecov.io/gh/umrlastig/tracklib)
 [![Documentation Status](https://readthedocs.org/projects/tracklib/badge/?version=latest)](https://tracklib.readthedocs.io/en/latest/?badge=latest)
 [![Software License](https://img.shields.io/badge/Licence-Cecill--C-blue.svg?style=flat)](https://github.com/umrlastig/tracklib/blob/main/LICENCE)
 
