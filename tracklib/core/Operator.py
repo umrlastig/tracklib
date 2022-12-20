@@ -939,7 +939,7 @@ class Median(UnaryOperator):
                 vals[sort_index[(int)(N / 2 - 1)]] + vals[sort_index[(int)(N / 2)]]
             )
         else:
-            return vals[sort_index[(int)(N / 2 - 1)]]
+            return vals[sort_index[(int)(N // 2)]]
 
 
 class Zeros(UnaryOperator):
