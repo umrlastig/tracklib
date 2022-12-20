@@ -23,9 +23,10 @@ Tutorial
 .. toctree::
   :maxdepth: 1
 
-  1. Core concept <1_coreconcept>
   2. Operation for manipulating track <2_operator>
-  3. Simplify, Interpolate & Filter <3_filter>
+
+.. 1. Core concept <1_coreconcept>
+.. 3. Simplify, Interpolate & Filter <3_filter>
  
 
 Examples
