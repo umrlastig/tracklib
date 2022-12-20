@@ -2,7 +2,7 @@
 
 <p align="center">
 <table style="border:none;border:0;width:60%"><tr>
-  <td align="center" style="width:30%"><img width="200px" src="https://github.com/mdvandamme/tracklib/blob/main/doc/source/TracklibLogo.png" /></td>
+  <td align="center" style="width:30%"><img width="200px" src="https://github.com/mdvandamme/tracklib/blob/main/doc/source/img/TracklibLogo.png" /></td>
   <td style="padding:16px;"><label>Tracklib</label> library provide a variety of tools, operators and functions to manipulate GPS trajectories</td>
 </tr></table>
 </p>
