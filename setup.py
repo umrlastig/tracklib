@@ -41,9 +41,9 @@ setup (
     license="Cecill-C",
     python_requires=">=3.8",
     classifiers=[
-        "Development Status :: 1 - Alpha",
-        "Intended Audience :: Developers",
         "Programming Language :: Python :: 3.8",
+        "License :: CeCILL-C Free Software License Agreement (CECILL-C)",
+        "Operating System :: OS Independent",
     ],
     #packages=find_packages(include=["test", "resources"]),
     packages=find_packages(),
