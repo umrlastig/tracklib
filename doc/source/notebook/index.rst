@@ -7,7 +7,7 @@
 Use Cases
 ==========
 
-A few use cases that describe recent application with GPS trajectories have 
+A few use cases that describe application with GPS trajectories have 
 been identified by the developpers Group. Each use case is related to one 
 or more previous research work. Each use case, uses several features 
 of the tracklib library.
@@ -27,6 +27,8 @@ of the tracklib library.
   Quickstart <Quickstart>
   Summarize <Summarize>
   Switchbacks <Switchbacks>
-  StopPoints <StopPoints>
-  Mopsi <Mopsi>
+  
+  
+.. StopPoints <StopPoints>
+.. Mopsi <Mopsi>
 

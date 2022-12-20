@@ -44,35 +44,10 @@ Main functionalities
 * Structured data to store GPS data
 * Load GPS data from files (GPX, CSV) 
 * Operation classes for manipulating track
-* Propose generic method to simplify a track. For example (Douglas Peucker, Visvalingram algorithms or kernel Filter (Gaussian, Uniform, Dirac, etc.)).
-
-    .. figure:: ./img/generate_random.png
-	   :width: 250px
-	   :align: center
-	   
-	   Figure 1 : Simplify with a gaussian filter
-
+* Propose generic method to simplify a track. For example (Douglas Peucker, 
+  Visvalingram algorithms or kernel Filter (Gaussian, Uniform, Dirac, etc.)).
 * Resample, interpolation and smoothing functions
-
-	.. figure:: ./img/smooth.gif
-	   :width: 250px
-	   :align: center
-
-       Figure 2 : Resample with MODE_SPLINE_SPATIAL
-	   
-	   
-* Ploting speed profil
-
-	.. figure:: ./img/Profil_vitesse_spatial_1.png
-	   :width: 550px
-	   :align: center
-
 * Summarize GPS information into a grid
-
- 	.. figure:: ./img/summarize_mitaka.png
-	   :width: 550px
-	   :align: center
-
 
 
 Documentation

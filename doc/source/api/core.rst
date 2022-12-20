@@ -8,11 +8,11 @@ Module core
 
 
    ./core/core-bbox.rst
-   ./core/core-coords.rst
-   ./core/core-gpstime.rst
    ./core/core-kernel.rst
    ./core/core-network.rst
    ./core/core-obs.rst
+   ./core/core-obscoords.rst
+   ./core/core-obstime.rst
    ./core/core-operator.rst
    ./core/core-plot.rst
    ./core/core-raster.rst

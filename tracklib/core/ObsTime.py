@@ -10,7 +10,9 @@ import random
 
 
 class ObsTime:
-    """Class to represent a GPS time"""
+    """
+    Class to represent the phenomenom time of an observation.
+    """
 
     BASE_YEAR = 2000
     
@@ -50,7 +52,7 @@ class ObsTime:
     
 
     def __init__(self, year: int = 1970, month: int = 1, day: int = 1, hour: int = 0, min: int = 0, sec: int = 0, ms: int = 0, zone: int = 0):
-        """__init__ Constructor of :class:`GPSTime` class
+        """__init__ Constructor of :class:`ObsTime` class
 
         Default value : 01/01/1970 00:00:00.000
 
@@ -96,17 +98,17 @@ class ObsTime:
 
     @staticmethod
     def setPrintFormat(format: str):   
-        """Set the format for printing a GPSTime object
+        """Set the format for printing a ObsTime object
 
-        The print format is use by the :func:`GPSTime.__str__` method
+        The print format is use by the :func:`ObsTime.__str__` method
 
-        :param format: Format for printing GPSTime
+        :param format: Format for printing ObsTime
         """
         ObsTime.__PRINT_FMT = format
 
     @staticmethod
     def setReadFormat(format: str):   
-        """Set the format for reading a GPSTime object
+        """Set the format for reading a ObsTime object
 
         :param format: Format for reading
         """
@@ -131,7 +133,7 @@ class ObsTime:
 
     @staticmethod
     def readUnixTime(elapsed_seconds: float) -> ObsTime:   
-        """Converting elapsed float seconds since 01/01/1970 in GPSTime
+        """Converting elapsed float seconds since 01/01/1970 in ObsTime
 
         **Warning:** does not consider leap seconds (31 since 1970)
 
@@ -430,7 +432,7 @@ class ObsTime:
         """Add `nb` seconds to current time
 
         :param nb: Number of seconds to add
-        :return: A :class:`GPSTime` incremented of `nb` second(s)
+        :return: A :class:`ObsTime` incremented of `nb` second(s)
         """
         sec = self.toAbsTime() + nb
         return ObsTime.readUnixTime(sec)
@@ -439,7 +441,7 @@ class ObsTime:
         """Add `nb` minutes to current time
 
         :param nb: Number of minutes to add
-        :return: A :class:`GPSTime` incremented of `nb` minute(s)
+        :return: A :class:`ObsTime` incremented of `nb` minute(s)
         """
         sec = self.toAbsTime() + nb * 60
         return ObsTime.readUnixTime(sec)
@@ -448,7 +450,7 @@ class ObsTime:
         """Add `nb` hours to current time
 
         :param nb: Number of hours to add
-        :return: A :class:`GPSTime` incremented of `nb` hour(s)
+        :return: A :class:`ObsTime` incremented of `nb` hour(s)
         """
         sec = self.toAbsTime() + nb * 3600
         return ObsTime.readUnixTime(sec)
@@ -457,7 +459,7 @@ class ObsTime:
         """Add `nb` days to current time
 
         :param nb: Number of days to add
-        :return: A :class:`GPSTime` incremented of `nb` day(s)
+        :return: A :class:`ObsTime` incremented of `nb` day(s)
         """
         sec = self.toAbsTime() + nb * 86400
         return ObsTime.readUnixTime(sec)
@@ -465,7 +467,7 @@ class ObsTime:
     def __sub__(self, time: ObsTime) -> float:   
         """Difference between 2 dates
 
-        :param time: :class:`GPSTime` to substract
+        :param time: :class:`ObsTime` to substract
         :return: Difference (in floating point seconds) between 2 date
         """
         return self.toAbsTime() - time.toAbsTime()
@@ -473,7 +475,7 @@ class ObsTime:
     def __eq__(self, time: ObsTime) -> bool:   
         """Tests if two timestamps are strictly equal (up to 1 ms)
 
-        :param time: :class:`GPSTime` to compare
+        :param time: :class:`ObsTime` to compare
         """
         if self.ms != time.ms:
             return False
@@ -494,14 +496,14 @@ class ObsTime:
     def __ne__(self, time: ObsTime) -> bool:   
         """Test if two timestamps are different
 
-        :param time: :class:`GPSTime` to compare
+        :param time: :class:`ObsTime` to compare
         """
         return not (time == self)
 
     def __gt__(self, time: ObsTime) -> bool:   
         """Tests chronological order of two timestamps
 
-        :param time: :class:`GPSTime` to compare
+        :param time: :class:`ObsTime` to compare
         """
         if self.year != time.year:
             return self.year > time.year
@@ -520,7 +522,7 @@ class ObsTime:
     def __lt__(self, time: ObsTime) -> bool:   
         """Tests chronological order of two timestamps
 
-        :param time: :class:`GPSTime` to compare
+        :param time: :class:`ObsTime` to compare
         """
         if self.year != time.year:
             return self.year < time.year
@@ -539,7 +541,7 @@ class ObsTime:
     def __ge__(self, time: ObsTime) -> bool:   
         """Inverse of :method:`__gt__`
 
-        :param time: :class:`GPSTime` to compare
+        :param time: :class:`ObsTime` to compare
         """
 
         return not (self < time)
@@ -547,6 +549,6 @@ class ObsTime:
     def __le__(self, time: ObsTime) -> bool:   
         """Inverse of :method:`__lt__`
 
-        :param time: :class:`GPSTime` to compare
+        :param time: :class:`ObsTime` to compare
         """
         return not (self > time)
