@@ -22,6 +22,11 @@ core
 
 	Definition and implementation of central classes of Tracklib framework: Track, TrackCollection, etc. 
 	
+.. container:: button
+
+    :doc:`Getting started <getting_started>` :doc:`Documentation <docs>`
+    :doc:`About GeoPandas <about>` :doc:`Community <community>`
+	
 	=================== ====================================================================
 	Module                Purpose
 	=================== ====================================================================

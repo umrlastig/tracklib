@@ -34,8 +34,6 @@ Ces méthodes ne sont sensées conserver les AF qui pour un sous-échantillonnag
 des méthodes d'interpolation dans Track est la fonction resample. 
 
 
-
-
 Filtering 
 ---------------
 
