@@ -2,6 +2,8 @@
 
 from unittest import TestCase, TestSuite, TextTestRunner
 
+import numpy as np
+
 from tracklib.core.ObsCoords import ENUCoords
 from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
@@ -69,6 +71,65 @@ class TestQuery(TestCase):
         self.assertLessEqual((0.7071 - trace.getObsAnalyticalFeatures('speed', 1)[0]), self.__epsilon, 'erreur de vitesse 1')
         self.assertLessEqual((0.7071 - trace.getObsAnalyticalFeatures('speed', 2)[0]), self.__epsilon, 'erreur de vitesse 2')
         self.assertLessEqual((0.7071 - trace.getObsAnalyticalFeatures('speed', 3)[0]), self.__epsilon, 'erreur de vitesse 3')
+        
+        
+    def test_selectagg(self):
+        
+        self.track.addAnalyticalFeature(Analytics.speed)
+        speeds = self.track.getAnalyticalFeature('speed')
+        
+        # AVG
+        avgspeed = self.track.query("SELECT AVG(speed)")
+        self.assertEquals(avgspeed, np.mean(speeds))
+        
+        # SUM
+        sumspeed = self.track.query("SELECT SUM(speed)")
+        self.assertEquals(sumspeed, np.sum(speeds))
+        
+        # MIN
+        minspeed = self.track.query("SELECT MIN(speed)")
+        self.assertEquals(minspeed, np.min(speeds))
+        
+        # MAX
+        maxspeed = self.track.query("SELECT MAX(speed)")
+        self.assertEquals(maxspeed, np.max(speeds))
+        
+        # COUNT
+        countspeed = self.track.query("SELECT COUNT(speed)")
+        self.assertEquals(countspeed, len(speeds))
+        
+        # VAR
+        varspeed = self.track.query("SELECT VAR(speed)")
+        self.assertEquals(varspeed, np.var(speeds))
+        
+        # MEDIAN
+        meanspeed = self.track.query("SELECT MEDIAN(speed)")
+        self.assertEquals(meanspeed, np.median(speeds))
+        
+        # ARGMIN
+        argminspeed = self.track.query("SELECT ARGMIN(speed)")
+        self.assertEquals(argminspeed, np.argmin(speeds))
+        
+        # ARGMAX
+        argmaxspeed = self.track.query("SELECT ARGMAX(speed)")
+        self.assertEquals(argmaxspeed, np.argmax(speeds))
+        
+        
+        
+    def test_selectcolumn(self):
+        self.track.addAnalyticalFeature(Analytics.speed)
+        self.track.addAnalyticalFeature(Analytics.heading)
+        
+        # 
+        manymax = self.track.query("SELECT MAX(x), MAX(y), MAX(z), MAX(t)")
+        self.assertEquals(manymax, [4, 4, 0, 1577872812.0])
+        
+        tab = self.track.query("SELECT speed, heading WHERE speed >= 0.5")
+        self.assertEquals(tab[0], [1.0, 0.7071067811865476, 
+                          0.7071067811865476, 0.7071067811865476, 0.5])
+        self.assertEquals(tab[1], [0.0, 0.0, 
+                          1.5707963267948966, 0.0, 1.5707963267948966])
+        
 
 
 if __name__ == '__main__':
@@ -76,5 +137,7 @@ if __name__ == '__main__':
     suite.addTest(TestQuery("test_selectstar"))
     suite.addTest(TestQuery("test_selectwhere1"))
     suite.addTest(TestQuery("test_selectwhere2"))
+    suite.addTest(TestQuery("test_selectagg"))
+    suite.addTest(TestQuery("test_selectcolumn"))
     runner = TextTestRunner()
     runner.run(suite)
