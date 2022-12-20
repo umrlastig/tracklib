@@ -34,7 +34,7 @@ setup (
     description="Tracklib library provide a variety of tools, operators and functions to manipulate GPS trajectories",
     long_description="See https://github.com/umrlastig/tracklib",
     url="https://github.com/umrlastig/tracklib",
-    # download_url = 'https://github.com/umrlastig/tracklib/archive/tracklib_0_8.tar.gz',
+    download_url = 'https://github.com/umrlastig/tracklib/releases/download/v0.3/tracklib-0_3.tar.xz',
     author="Yann Méneroux, Marie-Dominique Van Damme",
     author_email="todo@ign.fr",
     keywords=['gps', 'track', 'python'],
