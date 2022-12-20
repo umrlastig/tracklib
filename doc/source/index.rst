@@ -13,9 +13,9 @@ Welcome to tracklib’s documentation!
 
 |TracklibBuildTest| |codecov| |rtd| |licence|
 
-.. |TracklibBuildTest| image:: https://github.com/mdvandamme/tracklib/actions/workflows/ci.yml/badge.svg
+.. |TracklibBuildTest| image:: https://github.com/umrlastig/tracklib/actions/workflows/ci.yml/badge.svg
                   :alt: Tracklib build & test
-                  :target: https://github.com/mdvandamme/tracklib/actions/workflows/ci.yml
+                  :target: https://github.com/umrlastig/tracklib/actions/workflows/ci.yml
 .. |codecov| image:: https://codecov.io/gh/umrlastig/tracklib/branch/main/graph/badge.svg?token=pHLaV21j2O
                    :alt: Code coverage
                    :target: https://codecov.io/gh/umrlastig/tracklib
