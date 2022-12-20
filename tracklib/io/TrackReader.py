@@ -2,7 +2,7 @@
 
 # For type annotation
 from __future__ import annotations   
-from typing import Union, IO, Literal
+from typing import Union, Literal
 
 import csv
 import io
