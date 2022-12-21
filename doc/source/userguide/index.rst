@@ -5,20 +5,22 @@
 
 
 User Guide
-============
+##########
+
 
 Getting Started
----------------
+================
 
 .. toctree::
   :maxdepth: 1
 
   Installation <install>
   Bird's eye view <overview>
+
   
   
 Tutorial
---------
+=========
 
 .. toctree::
   :maxdepth: 1
@@ -29,8 +31,9 @@ Tutorial
 .. 3. Simplify, Interpolate & Filter <3_filter>
  
 
+
 Examples
---------
+=========
 
 .. toctree::
   :maxdepth: 1

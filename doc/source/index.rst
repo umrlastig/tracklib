@@ -58,8 +58,7 @@ Documentation
   
   User Guide <userguide/index>
   Use Cases <notebook/index>
-
-..  API Reference <api/index>
+  API Reference <api/index>
 
 
 
