@@ -35,5 +35,6 @@ Examples
 .. toctree::
   :maxdepth: 1
 
-  1. Read/Write track <4_reader_writer>
+  Read/Write track(s) <reader_writer>
+  
 
