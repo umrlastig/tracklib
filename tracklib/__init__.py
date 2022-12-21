@@ -5,8 +5,8 @@
 
 # -----------------------------------------------------------------------------
 #   LOGGING
-from logging.config import fileConfig
-from os import path
+#from logging.config import fileConfig
+#from os import path
 
 #tracklib_path = path.dirname(path.abspath(__file__))
 #resources_path = path.join(tracklib_path, "../resources/")
