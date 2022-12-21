@@ -10,13 +10,13 @@
 
 """
 
-import sys
-import math
 import copy
+import logging
+import math
+import matplotlib.pyplot as plt
 import numpy as np
 import random
-import matplotlib.pyplot as plt
-#import logging
+import sys
 
 from tracklib.core.ObsCoords import ENUCoords
 from tracklib.util.Geometry import right, inclusion, collinear, isSegmentIntersects
@@ -27,7 +27,7 @@ MODE_ENCLOSING_MBR = 1
 MODE_ENCLOSING_CIRCLE = 2
 MODE_ENCLOSING_CONVEX = 3
 
-#logger = logging.getLogger()
+logger = logging.getLogger()
 
 
 class Circle:
@@ -559,8 +559,7 @@ def __circle(p1, p2=None, p3=None):
     if collinear(
         [p1.getX(), p1.getY()], [p2.getX(), p2.getY()], [p3.getX(), p3.getY()]
     ):
-        #logger.warning(str(p1) + "," + str(p2) + "," + str(p3) + " are collinear")
-        #logger.warning(str(p1) + "," + str(p2) + "," + str(p3) + " are collinear")
+        logger.warning(str(p1) + "," + str(p2) + "," + str(p3) + " are collinear")
         return None
 
     if p1.distance2DTo(p2) == 0:

@@ -28,13 +28,11 @@ Institute: LASTIG, Univ Gustave Eiffel, ENSG, IGN
 
 Authors
 - Yann Méneroux
-- Marie-Dominique Van Damme
+- [Marie-Dominique Van Damme](https://www.umr-lastig.fr/mdvandamme/)
 - Nisar Hakam
 - [Lâmân LELÉGARD](https://www.umr-lastig.fr/laman-lelegard/) 
+- [Mattia Bunel ](https://www.umr-lastig.fr/mattia-bunel/index_fr.html)
 
-
-Minimal python version:
-- Python 3.6+
 
 
 
