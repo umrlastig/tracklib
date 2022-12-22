@@ -67,7 +67,7 @@ trace.estimate_speed()
 ```
 
 <p align="center">
-<img width="200px" src="https://tracklib.readthedocs.io/en/latest/_images/quickstart_5.png" />
+<img width="200px" src="https://raw.githubusercontent.com/umrlastig/tracklib/main/doc/source/img/quickstart_5.png" />
 </p>
 
 
