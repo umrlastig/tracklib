@@ -36,6 +36,59 @@ The official documentation is available at **[ReadTheDocs](https://tracklib.read
 pip install tracklib
 ```
 
+## Features
+
+
+## Quickstart
+
+### Prepare data
+
+Loading data from a GPX file, transform the geographic coordinates in a 
+local projection and display the track. Then computing the local speed
+
+```python
+from tracklib.core.ObsTime import ObsTime
+from tracklib.io.TrackReader import TrackReader
+
+ObsTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
+
+path = '/home/marie-dominique/tracklib/tracklib/data/gpx/activity_5807084803.gpx'
+tracks = TrackReader.readFromGpx(path)
+trace = tracks.getTrack(0)
+
+# Transformation GEO coordinates to ENU
+trace.toENUCoords()
+
+# Display
+trace.plot()
+
+# Compute local speed
+trace.estimate_speed()
+```
+
+.. image:: https://tracklib.readthedocs.io/en/latest/_images/quickstart_5.png
+    :width: 200px
+    :align: center
+    :alt: a GPS track
+
+
+
+### Summarize speed and plot it in a raster images
+
+```python
+`
+```
+
+summarize_quickstart.png
+
+
+
+### Segmentation with speed change
+
+![png](https://tracklib.readthedocs.io/en/latest/_images/quickstart_4.png)
+
+
+
 ## Development
 
 Institute: LASTIG, Univ Gustave Eiffel, ENSG, IGN
