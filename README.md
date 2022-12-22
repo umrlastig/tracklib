@@ -66,10 +66,10 @@ trace.plot()
 trace.estimate_speed()
 ```
 
-.. image:: https://tracklib.readthedocs.io/en/latest/_images/quickstart_5.png
-    :width: 200px
-    :align: center
-    :alt: a GPS track
+<p align="center">
+<img width="200px" src="https://tracklib.readthedocs.io/en/latest/_images/quickstart_5.png" />
+</p>
+
 
 
 
