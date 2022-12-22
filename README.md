@@ -44,7 +44,7 @@ pip install tracklib
 ### Prepare data
 
 Loading data from a GPX file, transform the geographic coordinates in a 
-local projection and display the track. Then computing the local speed
+local projection and display the track. Then computing the local speed.
 
 ```python
 from tracklib.core.ObsTime import ObsTime
@@ -67,21 +67,31 @@ trace.estimate_speed()
 ```
 
 <p align="center">
-<img width="200px" src="https://raw.githubusercontent.com/umrlastig/tracklib/main/doc/source/img/quickstart_5.png" />
+<img width="300px" 
+  src="https://raw.githubusercontent.com/umrlastig/tracklib/main/doc/source/img/quickstart_5.png" />
 </p>
-
-
-
 
 ### Summarize speed and plot it in a raster images
 
 ```python
-`
+from tracklib.core.TrackCollection import TrackCollection
+from tracklib.algo import (Summarising, Analytics)
+
+collection = TrackCollection([trace])
+
+af_algos = [Analytics.speed, Analytics.speed, Analytics.speed]
+cell_operators = [Summarising.co_avg, Summarising.co_min, Summarising.co_max]
+marge = 0.1
+raster = Summarising.summarize(collection, af_algos, cell_operators, (3,3), marge)
+
+raster.setColor((0, 0, 0), (255, 255, 255))
+raster.plot(Analytics.speed, Summarising.co_avg, no_data_values = 0)
 ```
 
-summarize_quickstart.png
-
-
+<p align="center">
+<img width="300px" 
+  src="https://raw.githubusercontent.com/umrlastig/tracklib/main/doc/source/img/summarize_quickstart.png" />
+</p>
 
 ### Segmentation with speed change
 
