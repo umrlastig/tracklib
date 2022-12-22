@@ -9,7 +9,7 @@ User Guide
 
 
 Getting Started
-================
+*****************
 
 .. toctree::
   :maxdepth: 1
@@ -20,7 +20,7 @@ Getting Started
   
   
 Tutorial
-=========
+**********
 
 .. toctree::
   :maxdepth: 1
@@ -33,7 +33,7 @@ Tutorial
 
 
 Examples
-=========
+**********
 
 .. toctree::
   :maxdepth: 1
