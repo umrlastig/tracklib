@@ -28,6 +28,16 @@ and functions to simplify the creation of analytical features on a GPS tracks.
 
 The official documentation is available at **[ReadTheDocs](https://tracklib.readthedocs.io)**
 
+## Installation
+
+#### from pypi (i.e. via pip)
+
+```bash
+pip install tracklib
+```
+
+## Development
+
 Institute: LASTIG, Univ Gustave Eiffel, ENSG, IGN
 
 Authors
