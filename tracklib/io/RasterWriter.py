@@ -16,9 +16,7 @@ The header data includes the following keywords and values:
 
 """
 
-from datetime import datetime
 import math
-#import tracklib.core.Utils as utils
 from tracklib.core.Raster import NO_DATA_VALUE
 
 class RasterWriter:

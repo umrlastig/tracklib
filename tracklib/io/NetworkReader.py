@@ -99,13 +99,14 @@ class NetworkReader:
             For example: 'EPSG:2154' or 'EPSG:4326'
         """
 
-        # Adding margin
         xmin = bbox.getXmin()
         xmax = bbox.getXmax()
         ymin = bbox.getYmin()
         ymax = bbox.getYmax()
         dx = (xmax - xmin) / 2
         dy = (ymax - ymin) / 2
+        
+        # Adding margin
         bbox = (
             xmin - margin * dx,
             xmax + margin * dx,
