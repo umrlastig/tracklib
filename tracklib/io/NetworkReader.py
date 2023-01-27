@@ -14,6 +14,7 @@ from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
 from tracklib.core.Network import Network, Node, Edge
 from tracklib.core.SpatialIndex import SpatialIndex
+from tracklib.core.Bbox import Bbox
 from tracklib.io.NetworkFormat import NetworkFormat
 import tracklib.algo.Cinematics as Cinematics
 
@@ -88,8 +89,8 @@ class NetworkReader:
     # ===========================
     @staticmethod
     def getNetwork(
-        bbox, proj=None, margin=0.0, tolerance=0.1, spatialIndex=True, nomproxy=None
-    ):
+        bbox:Bbox, proj=None, margin=0.0, tolerance=0.1, spatialIndex=True, nomproxy=None
+    ) -> Network:
         """getNetwork
 
         :param bbox: The bounding box of the selected area (The bounding box must
@@ -99,7 +100,10 @@ class NetworkReader:
         """
 
         # Adding margin
-        xmin, xmax, ymin, ymax = bbox
+        xmin = bbox.getXmin()
+        xmax = bbox.getXmax()
+        ymin = bbox.getYmin()
+        ymax = bbox.getYmax()
         dx = (xmax - xmin) / 2
         dy = (ymax - ymin) / 2
         bbox = (
@@ -436,6 +440,6 @@ def tabCoordsLineStringToObs(coords, srid):
         if srid.upper() in ["ECEFCOORDS", "ECEF"]:
             point = ECEFCoords(x, y, z)
 
-        TAB_OBS.append(Obs(point, GPSTime()))
+        TAB_OBS.append(Obs(point, ObsTime()))
 
     return TAB_OBS
