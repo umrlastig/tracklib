@@ -10,13 +10,13 @@ TrackWriter
 CSV files
 ----------
 
-.. automethod:: tracklib.io.TrackReader.writeToFile
+.. automethod:: tracklib.io.TrackWriter.TrackWriter.writeToFile
 
 
 GPX files
 ----------
 
-.. automethod:: tracklib.io.TrackReader.writeToGpx
+.. automethod:: tracklib.io.TrackWriter.TrackWriter.writeToGpx
 
 
 
