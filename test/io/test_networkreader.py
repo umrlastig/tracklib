@@ -6,6 +6,7 @@ from unittest import TestCase, TestSuite, TextTestRunner
 
 #from tracklib.core.Network import Node
 from tracklib.io.NetworkReader import NetworkReader
+from tracklib.io.TrackReader import TrackReader
 
 
 class TestNetworkReader(TestCase):
@@ -27,15 +28,19 @@ class TestNetworkReader(TestCase):
         network.plot('k-', '', 'g-', 'r-', 0.5, plt)
         plt.legend()
         
-    # def test_read_default(self):
-
-    #     xmin = 1.88728
-    #     xmax = 1.89342
-    #     ymin = 47.85971
-    #     ymax = 47.86179
         
-    #     network = NetworkReader.getNetwork((xmin, xmax, ymin, ymax), None, 0.0, 0.1, 
-    #                                    False, nomproxy = self.nomproxy)
+    def test_read_wfs(self):
+        path = os.path.join(self.resource_path, 'data/gpx/utgtrack-22245_light.gpx')
+        tracks = TrackReader.readFromGpx(path)
+        trace = tracks.getTrack(0)
+        trace.summary()
+        emprise = trace.bbox()
+        proj = "EPSG:4326"
+        tolerance=0.0001
+        network = NetworkReader.getNetwork(emprise, proj, margin=0.020, 
+                                   tolerance=tolerance, spatialIndex=False)
+        print ('nb edges=', len(network.EDGES))
+        
     #     self.assertEqual(33, len(network.EDGES))
     #     self.assertEqual(32, len(network.NODES))
         
@@ -70,5 +75,6 @@ if __name__ == '__main__':
     suite = TestSuite()
     suite.addTest(TestNetworkReader("test_read_network_error_path"))
     suite.addTest(TestNetworkReader("test_read_network"))
+    suite.addTest(TestNetworkReader("test_read_wfs"))
     runner = TextTestRunner()
     runner.run(suite)
