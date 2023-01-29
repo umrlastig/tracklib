@@ -7,7 +7,6 @@ import progressbar
 import requests
 from xml.dom import minidom
 
-
 from tracklib.core.ObsTime import ObsTime
 from tracklib.core.ObsCoords import ENUCoords, ECEFCoords, GeoCoords
 from tracklib.core.Obs import Obs
@@ -21,14 +20,26 @@ import tracklib.algo.Cinematics as Cinematics
 
 class NetworkReader:
     """
-        
+    This class offers static methods to load network from file or from a wfs service.
     """
-
-    counter = 0
 
     @staticmethod
     def readFromFile(path, formatfile="DEFAULT", verbose=True):
-        """TODO"""
+        """
+        Read a network from CSV file with geometry structured in coordinates.
+        
+        Parameters
+        -----------
+        
+        :param str path: file or directory
+        :param str name of format which describes metadata of the file (in network_file_format)
+        :return: the network.
+        
+        """
+        
+        if not os.path.isfile(path):
+            print ('Error: file not exists')
+            return None
 
         network = Network()
         fmt = NetworkFormat(formatfile)
@@ -39,7 +50,6 @@ class NetworkReader:
             print("Loading network...")
 
         with open(path, encoding="utf-8") as csvfile:
-
             spamreader = csv.reader(csvfile, delimiter=fmt.separator, doublequote=True)
 
             # Header
@@ -62,6 +72,8 @@ class NetworkReader:
         return network
     
     
+    counter = 0
+
     NB_PER_PAGE = 1000
 
     URL_SERVER = "https://wxs.ign.fr/choisirgeoportail/geoportail/wfs?"

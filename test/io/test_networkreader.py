@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
 
-from tracklib.core.Network import Node
+#from tracklib.core.Network import Node
 from tracklib.io.NetworkReader import NetworkReader
 
 
@@ -14,7 +14,19 @@ class TestNetworkReader(TestCase):
         self.resource_path = os.path.join(os.path.split(__file__)[0], "../..")
         self.nomproxy = None #'ENSG'
         
-
+    def test_read_network_error_path(self):
+        path = os.path.join(self.resource_path, 'network/network_22245.csv')
+        network = NetworkReader.readFromFile(path, formatfile = 'IGN')
+        self.assertIsNone(network)
+        
+    def test_read_network(self):
+        path = os.path.join(self.resource_path, 'data/network/network_22245.csv')
+        network = NetworkReader.readFromFile(path, formatfile = 'IGN')
+        self.assertEqual(8086, len(network.EDGES), 'Edges number')
+        self.assertEqual(5820, len(network.NODES), 'Nodes number')
+        network.plot('k-', '', 'g-', 'r-', 0.5, plt)
+        plt.legend()
+        
     # def test_read_default(self):
 
     #     xmin = 1.88728
@@ -56,6 +68,7 @@ class TestNetworkReader(TestCase):
 
 if __name__ == '__main__':
     suite = TestSuite()
-    #suite.addTest(TestNetworkReader("test_read_default"))
+    suite.addTest(TestNetworkReader("test_read_network_error_path"))
+    suite.addTest(TestNetworkReader("test_read_network"))
     runner = TextTestRunner()
     runner.run(suite)

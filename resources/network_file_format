@@ -23,7 +23,7 @@
 #
 # -----------------------------------------------------------------------------
 DEFAULT, 0, 1, 2, 3, -1, 5, c, 1, True, UTF-8, Geo
-#IGN, 0, 2, 3, 6, -1, 0, c, 1, True, UTF-8, ENU
+IGN, 0, 1, 2, 4, -1, 3, c, 1, True, UTF-8, ENU
 TEST1, 0, 2, 3, 6, -1, 0, c, 1, True, UTF-8, Geo
 TEST2, 1, 2, 3, 0, -1, 4, c, 1, True, UTF-8, ENU
 TEST_UNITAIRE, 0, 1, 2, 5, 4, 3, c, 1, True, UTF-8, ENU
