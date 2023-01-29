@@ -764,7 +764,6 @@ class HMM:
 
             self.printSeparator([1], verbose, 1)
 
-        print (TAB_VAL)
         # -----------------------------------------------
         # Backward step
         # -----------------------------------------------
