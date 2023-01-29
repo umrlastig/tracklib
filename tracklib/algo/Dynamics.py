@@ -530,11 +530,10 @@ class Kalman:
 
 
 class HMM:
-    """TODO
-
+    """
     Hidden Markov Model is designed to estimate discrete
     sequential variables on tracks, given a probabilistic
-    transition model Q and observation model P on S :
+    transition model Q and observation model P on S:
 
         - S is a two-valued function, where S(t, k)
             provides a list of all the possible states of
@@ -736,7 +735,7 @@ class HMM:
                 best_val = 1e300
                 best_ant = 0
                 s2 = STATES[k][l]
-
+                s1 = STATES[k][l] # AJOUT MDVD
                 for m in range(len(TAB_MRK[k - 1])):
 
                     s1 = STATES[k - 1][m]
@@ -765,6 +764,7 @@ class HMM:
 
             self.printSeparator([1], verbose, 1)
 
+        print (TAB_VAL)
         # -----------------------------------------------
         # Backward step
         # -----------------------------------------------
