@@ -24,7 +24,12 @@ class TestAlgoMappingMethods(unittest.TestCase):
         self.trace = TrackReader.readFromCsv(tracepath, 
                                         id_E=0, id_N=1, id_U=3, id_T=4, 
                                         separator=",", h=1)
+        #self.trace.plot()
         
+        
+    def testMapOnNetwork(self):
+        pass
+    
     def testMapOnRaster(self):
         self.assertEqual(self.band.grid[465][1151], 2007.0, 'ele MNT VT')
         self.assertEqual(self.trace.size(), 363, 'track size')
@@ -39,10 +44,10 @@ class TestAlgoMappingMethods(unittest.TestCase):
                 self.assertEqual(2002.007, pos.getZ(), 'ele Z:')
 
 
+
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    
     suite.addTest(TestAlgoMappingMethods("testMapOnRaster"))
-    
+    suite.addTest(TestAlgoMappingMethods("testMapOnNetwork"))
     runner = unittest.TextTestRunner()
     runner.run(suite)

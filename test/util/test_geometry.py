@@ -3,7 +3,8 @@
 import unittest
 
 import tracklib.util.Geometry as Geometry
-
+from tracklib.core import (Obs, Track, ObsTime)
+from tracklib.core import ObsCoords as Coords
 
 class TestGeometry(unittest.TestCase):
     
@@ -79,9 +80,62 @@ class TestGeometry(unittest.TestCase):
         self.assertLessEqual(abs(45 - Geometry.azimut(A[0], A[1], D[0], D[1])), self.__epsilon, "Azimuth")
         
         
+    def testProjSegment(self):
+        
+        segment = [0,0,10,0]
+        distmin, xp, yp = Geometry.proj_segment(segment, 5, 5)
+        self.assertEqual(distmin, 5.0)
+        self.assertEqual(xp, 5)
+        self.assertEqual(yp, 0)
+        
+        segment = [0,0,10,0]
+        distmin, xp, yp = Geometry.proj_segment(segment, 15, 5)
+        self.assertLessEqual(abs(distmin-7.07106), 0.001)
+        self.assertEqual(xp, 10)
+        self.assertEqual(yp, 0)
+        
+    
+    def testProjPolyligne(self):
+         
+        ObsTime.ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        trace1 = Track.Track([], 1)
+
+        c1 = Coords.ENUCoords(0, 0, 0)
+        p1 = Obs.Obs(c1, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        trace1.addObs(p1)
+        
+        c2 = Coords.ENUCoords(10, 0, 0)
+        p2 = Obs.Obs(c2, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:12"))
+        trace1.addObs(p2)
+        
+        c3 = Coords.ENUCoords(20, 0, 0)
+        p3 = Obs.Obs(c3, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:12"))
+        trace1.addObs(p3)
+        
+        distmin, xproj, yproj, iproj = Geometry.proj_polyligne(trace1.getX(), trace1.getY(), 
+                                    p1.position.getX(), p1.position.getY())
+        
+        self.assertEqual(distmin, 0)
+        self.assertEqual(xproj, 0)
+        self.assertEqual(yproj, 0)
+        self.assertEqual(iproj, 0)
+        
+        p  = Coords.ENUCoords(16, 5, 0)
+        distmin, xproj, yproj, iproj = Geometry.proj_polyligne(trace1.getX(), trace1.getY(), 
+                                    p.getX(), p.getY())
+        
+        
+        self.assertEqual(distmin, 5.0)
+        self.assertEqual(xproj, 16)
+        self.assertEqual(yproj, 0)
+        self.assertEqual(iproj, 1)
+    
+        
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    suite.addTest(TestGeometry("testIntersectionCelluleSegment"))
-    suite.addTest(TestGeometry("testAzimuth"))
+    #suite.addTest(TestGeometry("testIntersectionCelluleSegment"))
+    #suite.addTest(TestGeometry("testAzimuth"))
+    #suite.addTest(TestGeometry("testProjPolyligne"))
+    suite.addTest(TestGeometry("testProjSegment"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
