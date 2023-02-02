@@ -143,10 +143,10 @@ class TestGeometry(unittest.TestCase):
         
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    #suite.addTest(TestGeometry("testIntersectionCelluleSegment"))
-    #suite.addTest(TestGeometry("testAzimuth"))
-    #suite.addTest(TestGeometry("testProjPolyligne"))
-    #suite.addTest(TestGeometry("testProjSegment"))
+    suite.addTest(TestGeometry("testIntersectionCelluleSegment"))
+    suite.addTest(TestGeometry("testAzimuth"))
+    suite.addTest(TestGeometry("testProjPolyligne"))
+    suite.addTest(TestGeometry("testProjSegment"))
     suite.addTest(TestGeometry("testDistPointDroite"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
