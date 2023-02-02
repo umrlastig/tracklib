@@ -129,6 +129,16 @@ class TestGeometry(unittest.TestCase):
         self.assertEqual(xproj, 16)
         self.assertEqual(yproj, 0)
         self.assertEqual(iproj, 1)
+        
+        
+    def testDistPointDroite(self):
+        
+        param = [4, 0, 1]
+        d = Geometry.dist_point_droite(param, 0, 0)
+        self.assertEqual(d, 0.25)
+        
+        
+        
     
         
 if __name__ == '__main__':
@@ -136,6 +146,7 @@ if __name__ == '__main__':
     #suite.addTest(TestGeometry("testIntersectionCelluleSegment"))
     #suite.addTest(TestGeometry("testAzimuth"))
     #suite.addTest(TestGeometry("testProjPolyligne"))
-    suite.addTest(TestGeometry("testProjSegment"))
+    #suite.addTest(TestGeometry("testProjSegment"))
+    suite.addTest(TestGeometry("testDistPointDroite"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
