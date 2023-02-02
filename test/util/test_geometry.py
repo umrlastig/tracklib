@@ -94,6 +94,13 @@ class TestGeometry(unittest.TestCase):
         self.assertEqual(xp, 10)
         self.assertEqual(yp, 0)
         
+        
+        segment = [10,0,10,5]
+        distmin, xp, yp = Geometry.proj_segment(segment, 5, 2)
+        self.assertLessEqual(abs(distmin-5.3851), 0.001)
+        self.assertEqual(xp, 10)
+        self.assertEqual(yp, 0)
+        
     
     def testProjPolyligne(self):
          

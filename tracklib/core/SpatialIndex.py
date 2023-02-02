@@ -389,7 +389,10 @@ class SpatialIndex:
             x = coord.getX()
             y = coord.getY()
             c = self.__getCell(ENUCoords(x, y))
-            return self.neighborhood(math.floor(c[0]), math.floor(c[1]), unit)
+            if c != None:
+                return self.neighborhood(math.floor(c[0]), math.floor(c[1]), unit)
+            return None
+            #return self.neighborhood(c, unit)
 
         # --------------------------------------------------------
         # neighborhood([c1, c2], unit)
