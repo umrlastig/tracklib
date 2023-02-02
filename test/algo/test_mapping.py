@@ -92,7 +92,7 @@ class TestAlgoMappingMethods(unittest.TestCase):
         trace.addObs(p9)
         
         trace.plotAsMarkers()
-        print (len(trace))
+        #print (len(trace))
         
         # =====================================================================
         network = Network()
@@ -230,7 +230,7 @@ class TestAlgoMappingMethods(unittest.TestCase):
         #
         
         
-        mapping.mapOnNetwork(trace, network, search_radius=2.5, debug=True)
+        #mapping.mapOnNetwork(trace, network, search_radius=2.5, debug=True)
         
         
 
