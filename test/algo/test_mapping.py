@@ -225,14 +225,13 @@ class TestAlgoMappingMethods(unittest.TestCase):
         plt.xlim([-5, 35])
         plt.ylim([-1, 7])
 
-
         network.prepare()
         
+        
         # =====================================================================
-        #
-        
-        
+
         mapping.mapOnNetwork(trace, network, search_radius=5.5, debug=False)
+        
         
         plt.show()
         
