@@ -585,7 +585,12 @@ class HMM:
         self.P = P
 
     def setTransitionModel(self, Q):
-        """TODO"""
+        """
+        Set the transition model.
+        :param Q: four-valued function, giving the probability function 
+                  Q(s1,s2,k,t) to observe a transition from state s1 to state 
+                  s2, at in track t at epoch k.
+        """
         self.Q = Q
 
     def Qlog(self, s1, s2, k, track):
@@ -682,7 +687,8 @@ class HMM:
         N = len(track)
         STATES = []
         for k in range(N):
-            STATES.append(self.S(track, k))
+            s = self.S(track, k)
+            STATES.append(s)
 
         TAB_MRK = []
         TAB_VAL = []
@@ -702,7 +708,7 @@ class HMM:
         for l in range(len(TAB_MRK[0])):
             TAB_MRK[0][l] = -1
             TAB_VAL[0][l] = -self.Plog(STATES[0][l], OBS[0], 0, track)
-
+        
         # -----------------------------------------------
         # Forward step
         # -----------------------------------------------
@@ -711,6 +717,7 @@ class HMM:
         EPOCHS = range(1, N)
         if verbose == MODE_VERBOSE_PROGRESS:
             EPOCHS = progressbar.progressbar(EPOCHS)
+            
         for k in EPOCHS:
 
             y = OBS[k]

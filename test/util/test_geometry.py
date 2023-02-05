@@ -137,6 +137,38 @@ class TestGeometry(unittest.TestCase):
         self.assertEqual(yproj, 0)
         self.assertEqual(iproj, 1)
         
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # 3eme CAS
+        trace1 = Track.Track([], 1)
+
+        c1 = Coords.ENUCoords(0, 0, 0)
+        p1 = Obs.Obs(c1, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        trace1.addObs(p1)
+        
+        c2 = Coords.ENUCoords(10, 0, 0)
+        p2 = Obs.Obs(c2, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:12"))
+        trace1.addObs(p2)
+        
+        c3 = Coords.ENUCoords(10, 10, 0)
+        p3 = Obs.Obs(c3, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:12"))
+        trace1.addObs(p3)
+        
+        c4 = Coords.ENUCoords(20, 10, 0)
+        p4 = Obs.Obs(c4, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:12"))
+        trace1.addObs(p4)
+        
+        p  = Coords.ENUCoords(18, 8, 0)
+        distmin, xproj, yproj, iproj = Geometry.proj_polyligne(trace1.getX(), trace1.getY(), 
+                                    p.getX(), p.getY())
+        
+        self.assertEqual(distmin, 2)
+        self.assertEqual(xproj, 18)
+        self.assertEqual(yproj, 10)
+        self.assertEqual(iproj, 2)
+        
+        
+        
+        
         
     def testDistPointDroite(self):
         

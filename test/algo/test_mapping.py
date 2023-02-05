@@ -87,11 +87,10 @@ class TestAlgoMappingMethods(unittest.TestCase):
         p8 = Obs.Obs(c8, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:04"))
         trace.addObs(p8)
         
-        c9 = Coords.ENUCoords(27, -1, 0)
+        c9 = Coords.ENUCoords(27, -0.5, 0)
         p9 = Obs.Obs(c9, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:04"))
         trace.addObs(p9)
         
-        trace.plotAsMarkers()
         #print (len(trace))
         
         # =====================================================================
@@ -209,35 +208,38 @@ class TestAlgoMappingMethods(unittest.TestCase):
         
         # =====================================================================
         # Plot
-        network.plot('k-', '', 'g-', 'r-', 0.5, plt)
         
-        #node1 = network.getNode(1)
-        #node2 = network.getNode(5)
         
-        #ppc = network.shortest_path(node1, node2)
-        #ppc.plot('r-')
-        #node1.plot('bs')
-        #node2.plot('bs')
-        plt.xlim([-5, 35])
-        plt.ylim([-5, 10])
-        
-        si = SpatialIndex(network, resolution=[5,1])
+        # =====================================================================
+
+        si = SpatialIndex(network, resolution=[5,1], margin=0.15)
         network.spatial_index = si
-    
+
+
+        # =====================================================================
+        # Plot
+        trace.plotAsMarkers(append=True)
+        network.plot('k-', '', 'g-', 'r-', 0.5, plt)
+        si.plot(base=False, append=True)
+
+        plt.xlim([-5, 35])
+        plt.ylim([-1, 7])
+
+
         network.prepare()
         
         # =====================================================================
         #
         
         
-        #mapping.mapOnNetwork(trace, network, search_radius=2.5, debug=True)
+        mapping.mapOnNetwork(trace, network, search_radius=5.5, debug=False)
         
+        plt.show()
         
-
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    #suite.addTest(TestAlgoMappingMethods("testMapOnRaster"))
+    suite.addTest(TestAlgoMappingMethods("testMapOnRaster"))
     suite.addTest(TestAlgoMappingMethods("testMapOnNetwork"))
     runner = unittest.TextTestRunner()
     runner.run(suite)

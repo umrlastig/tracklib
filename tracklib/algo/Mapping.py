@@ -2,10 +2,8 @@
 
 # For type annotation
 from __future__ import annotations   
-from typing import Union
 
 import math
-import random
 import progressbar
 import numpy as np
 import matplotlib.pyplot as plt
@@ -17,21 +15,19 @@ import tracklib.algo.Dynamics as Dynamics
 from tracklib.core.Obs import Obs
 from tracklib.core.ObsCoords import ENUCoords
 from tracklib.core.Operator import Operator
-from tracklib.core.TrackCollection import TrackCollection
-
-# --------------------------------------------------------------------------
-# Circular import (not satisfying solution)
-# --------------------------------------------------------------------------
 from tracklib.core.Track import Track
+from tracklib.core.TrackCollection import TrackCollection
 
 # --------------------------------------------------------------------------
 # Utils function for map-matching
 # --------------------------------------------------------------------------
 def __projOnTrack(point, track):
     """TODO"""
+    # distmin, xproj, yproj, iproj
     proj = Geometry.proj_polyligne(
         track.getX(), track.getY(), point.getX(), point.getY()
     )
+    # ENUCoords projete, distmin, iproj
     return ENUCoords(proj[1], proj[2], 0), proj[0], proj[3]
 
 
@@ -95,22 +91,26 @@ def __mapOnNetwork (
     
     for i in to_run:
         STATES.append([])
-        E = network.spatial_index.neighborhood(track[i].position, unit=1)
-        for elem in E:
-            eg = network.EDGES[network.getEdgeId(elem)].geom
-            p, d, v = __projOnTrack(track[i].position, eg)
-            if d < search_radius:
-                STATES[-1].append(
-                    (p, elem, __distToNode(eg, p, v, 0), __distToNode(eg, p, v, 1))
-                )
-                if debug:
-                    wkt = Track([Obs(track[i].position), Obs(p)]).toWKT()
-                    f1.write(str(i) + ' "' + wkt + '" ' + str(d) + "\n")
-
+        p = track[i].position
+        E = network.spatial_index.neighborhood(p, unit=1)
+        if E != None:
+            for elem in E:
+                eg = network.EDGES[network.getEdgeId(elem)].geom
+                p, d, v = __projOnTrack(track[i].position, eg)
+                if d < search_radius:
+                    # print (i, elem, d)
+                    STATES[-1].append (
+                        (p, elem, __distToNode(eg, p, v, 0), __distToNode(eg, p, v, 1))
+                    )
+                    if debug:
+                        wkt = Track([Obs(track[i].position), Obs(p)]).toWKT()
+                        f1.write(str(i) + ' "' + wkt + '" ' + str(d) + "\n")
+    
     model = Dynamics.HMM()
     model.setStates(__states)
     model.setTransitionModel(__tst_log)
     model.setObservationModel(__obs_log)
+    
     model.estimate(
         track,
         obs=["x", "y"],
@@ -126,7 +126,7 @@ def __mapOnNetwork (
         track[k].position.setY(track["hmm_inference", k][0].getY())
     
 
-"""
+    """
     for k in range(len(STATES)-1):
         S1 = __states(track, k)
         S2 = __states(track, k+1)
