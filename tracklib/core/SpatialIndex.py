@@ -1,26 +1,25 @@
-"""This module contains the class to manipulate a spatial Index"""
 
 from __future__ import annotations   
 from typing import Any
 
-
-import sys
 import math
 import pickle
 import progressbar
-import matplotlib.pyplot as plt
 
 from tracklib.core.Bbox import Bbox
 from tracklib.core.Track import Track
 from tracklib.core.Network import Edge
 from tracklib.core.TrackCollection import TrackCollection
-from tracklib.core.ObsCoords import GeoCoords, ENUCoords, ECEFCoords
+from tracklib.core.ObsCoords import GeoCoords, ENUCoords
 
+import tracklib.plot.IPlotVisitor as ivisitor
 import tracklib.util.Geometry as Geometry
 
 
 class SpatialIndex:
-    """Definition of a spatial index"""
+    """
+    This module contains the class to manipulate a spatial Index.
+    """
 
     def __init__(self, collection, resolution=None, margin=0.05, verbose=True):
         """Constructor of :class:`SaptialIndex` class
@@ -198,55 +197,19 @@ class SpatialIndex:
         # idy = self.nrow - idy ??
 
         return (idx, idy)
+    
+    def plot(self, v:ivisitor.IPlotVisitor=None):
+        if v == None:
+            import tracklib.plot.MatplotlibVisitor as visitor
+            v = visitor.MatplotlibVisitor()
+        v.plotSpatialIndex(self)
 
-    # ------------------------------------------------------------
-    # Plot spatial index and collection structure together in the
-    # same reference frame (geographic reference frame)
-    #   - base: plot support network or track collection if True
-    # ------------------------------------------------------------
-    def plot(self, base=True):
-        """TODO"""
-
-        fig = plt.figure()
-        ax = fig.add_subplot(
-            111, xlim=(self.xmin, self.xmax), ylim=(self.ymin, self.ymax)
-        )
-
-        for i in range(1, self.csize):
-            xi = i * self.dX + self.xmin
-            ax.plot([xi, xi], [self.ymin, self.ymax], "-", color="lightgray")
-        for j in range(1, self.lsize):
-            yj = j * self.dY + self.ymin
-            ax.plot([self.xmin, self.xmax], [yj, yj], "-", color="lightgray")
-
-        if base:
-            self.collection.plot(append=ax)
-
-        for i in range(self.csize):
-            xi1 = i * self.dX + self.xmin
-            xi2 = xi1 + self.dX
-            for j in range(self.lsize):
-                yj1 = j * self.dY + self.ymin
-                yj2 = yj1 + self.dY
-                if len(self.grid[i][j]) > 0:
-                    polygon = plt.Polygon(
-                        [[xi1, yj1], [xi2, yj1], [xi2, yj2], [xi1, yj2], [xi1, yj1]]
-                    )
-                    ax.add_patch(polygon)
-                    polygon.set_facecolor("lightcyan")
-
-    # ------------------------------------------------------------
-    # Plot a specific cell (i,j)
-    # ------------------------------------------------------------
-    def highlight(self, i, j, sym="r-", size=0.5):
-        """TODO"""
-        x0 = self.xmin + i * self.dX
-        x1 = x0 + self.dX
-        y0 = self.ymin + j * self.dY
-        y1 = y0 + self.dY
-        X = [x0, x1, x1, x0, x0]
-        Y = [y0, y0, y1, y1, y0]
-        plt.plot(X, Y, sym, linewidth=size)
+    def highlight(self, i, j, v:ivisitor.IPlotVisitor=None, sym="r-", size=0.5):
+        if v == None:
+            import tracklib.plot.MatplotlibVisitor as visitor
+            v = visitor.MatplotlibVisitor()
+        v.highlightCellInSpatialIndex(self, i, j, sym, size)
+    
 
     # ------------------------------------------------------------
     # Request function to get data registered in spatial index
