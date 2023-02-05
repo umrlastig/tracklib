@@ -37,7 +37,7 @@ jobs:
         chmod 777 -R ${{ github.workspace }}/data/test/gpx1
         chmod 777 -R ${{ github.workspace }}/data/test/gpx2
         chmod 777 -R ${{ github.workspace }}/data/test/gpx3
-        coverage run -m --source=tracklib/ pytest test/
+        coverage run -m --source=tracklib/ --omit=tracklib/plot pytest test/
         coverage xml
     
     - name: Upload coverage reports to Codecov with GitHub Action
