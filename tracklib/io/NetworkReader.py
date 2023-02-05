@@ -169,6 +169,10 @@ class NetworkReader:
             ffmt.close()
 
         nbRoute = NetworkReader.__getNbRouteEmprise(bbox, proxyDict)
+        
+        if nbRoute == 0:
+            return None
+        
         nbiter = int(nbRoute / NetworkReader.NB_PER_PAGE) + 1
 
         offset = 0
@@ -286,17 +290,28 @@ class NetworkReader:
         URL_HITS += "BBOX=" + str(bbox[2]) + "," + str(bbox[0])
         URL_HITS += "," + str(bbox[3]) + "," + str(bbox[1])
         URL_HITS += "&resulttype=hits"
-        # print (URL_HITS)
+        #print (URL_HITS)
 
-        res = requests.get(URL_HITS, proxies=proxyDict)
+        try:
+            res = requests.get(URL_HITS, proxies=proxyDict)
+            status = res.raise_for_status()
+            print (status, type(status))
+        except requests.exceptions.RequestException: 
+            print("ERROR: Failed to establish connection")
+            return 0
+        
         # x = requests.get(url, proxies = { "https" : "https://1.1.0.1:80"})
+        # print ('---------' + status, type(status))
         dom = minidom.parseString(res.text)
-
+    
         result = dom.getElementsByTagName("wfs:FeatureCollection")
-
+    
         nb = int(result[0].attributes["numberMatched"].value)
-
         return nb
+        
+        
+
+        
 
 
 def readLineAndAddToNetwork(row, fmt):

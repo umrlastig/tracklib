@@ -34,12 +34,14 @@ class TestNetworkReader(TestCase):
         tracks = TrackReader.readFromGpx(path)
         trace = tracks.getTrack(0)
         trace.summary()
+        
         emprise = trace.bbox()
         proj = "EPSG:4326"
         tolerance=0.0001
         network = NetworkReader.getNetwork(emprise, proj, margin=0.020, 
                                    tolerance=tolerance, spatialIndex=False)
-        print ('nb edges=', len(network.EDGES))
+        if network != None:
+            print ('nb edges=', len(network.EDGES))
         
     #     self.assertEqual(33, len(network.EDGES))
     #     self.assertEqual(32, len(network.NODES))
@@ -73,8 +75,8 @@ class TestNetworkReader(TestCase):
 
 if __name__ == '__main__':
     suite = TestSuite()
-    suite.addTest(TestNetworkReader("test_read_network_error_path"))
-    suite.addTest(TestNetworkReader("test_read_network"))
+    #suite.addTest(TestNetworkReader("test_read_network_error_path"))
+    #suite.addTest(TestNetworkReader("test_read_network"))
     suite.addTest(TestNetworkReader("test_read_wfs"))
     runner = TextTestRunner()
     runner.run(suite)
