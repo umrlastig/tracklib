@@ -20,4 +20,5 @@ ignore:
   # Ignore coverage for generated and third party code.
   - "**/Plot_*.py"
   - "plot"
+  - "tracklib/plot"
   
