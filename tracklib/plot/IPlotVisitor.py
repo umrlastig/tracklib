@@ -13,7 +13,7 @@ class IPlotVisitor(ABC):
     """
     
     @abstractmethod
-    def plotSpatialIndex(self, si, base=True):
+    def plotSpatialIndex(self, si, base=True, append=True):
         """
         Plot a spatial index.
         """

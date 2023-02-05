@@ -9,29 +9,37 @@ import tracklib.plot.IPlotVisitor as iplot
 
 class MatplotlibVisitor(iplot.IPlotVisitor):
     
-    def plotSpatialIndex(self, si: index.SpatialIndex, base:bool=True):
+    def plotSpatialIndex(self, si: index.SpatialIndex, base:bool=True, append=True):
         """
         Plot spatial index and collection structure together in the
         same reference frame (geographic reference frame)
             - base: plot support network or track collection if True
         """
-
-        fig = plt.figure()
-        ax = fig.add_subplot(
-            111, xlim=(si.xmin, si.xmax), ylim=(si.ymin, si.ymax)
-        )
+        
+        if isinstance(append, bool):
+            if append:
+                ax1 = plt.gca()
+            else:
+                fig, ax1 = plt.subplots(figsize=(10, 3))
+        else:
+            ax1 = plt
+            
+        #fig = plt.figure()
+        #ax = fig.add_subplot(
+        #    111, xlim=(si.xmin, si.xmax), ylim=(si.ymin, si.ymax)
+        #)
 
         for i in range(0, si.csize):
             xi = i * si.dX + si.xmin
-            ax.plot([xi, xi], [si.ymin, si.ymax], "-", color="blue")
+            ax1.plot([xi, xi], [si.ymin, si.ymax], "-", color="blue")
         
         for j in range(0, si.lsize):
             yj = j * si.dY + si.ymin
-            ax.plot([si.xmin, si.xmax], [yj, yj], "-", color="blue")
+            ax1.plot([si.xmin, si.xmax], [yj, yj], "-", color="blue")
 
 
         if base:
-            si.collection.plot(append=ax)
+            si.collection.plot(append=ax1)
 
         for i in range(si.csize):
             xi1 = i * si.dX + si.xmin
@@ -43,7 +51,7 @@ class MatplotlibVisitor(iplot.IPlotVisitor):
                     polygon = plt.Polygon(
                         [[xi1, yj1], [xi2, yj1], [xi2, yj2], [xi1, yj2], [xi1, yj1]]
                     )
-                    ax.add_patch(polygon)
+                    ax1.add_patch(polygon)
                     polygon.set_facecolor("lightcyan")
                     
                     

@@ -198,11 +198,11 @@ class SpatialIndex:
 
         return (idx, idy)
     
-    def plot(self, base:bool=True, v:ivisitor.IPlotVisitor=None):
+    def plot(self, base:bool=True, append=True, v:ivisitor.IPlotVisitor=None):
         if v == None:
             import tracklib.plot.MatplotlibVisitor as visitor
             v = visitor.MatplotlibVisitor()
-        v.plotSpatialIndex(self, base)
+        v.plotSpatialIndex(self, base, append)
 
     def highlight(self, i, j, v:ivisitor.IPlotVisitor=None, sym="r-", size=0.5):
         if v == None:

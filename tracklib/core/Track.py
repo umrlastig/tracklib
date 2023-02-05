@@ -1342,9 +1342,19 @@ class Track:
     # Graphical methods
     # =========================================================================
     def plotAsMarkers(
-        self, size=8, frg="k", bkg="w", sym_frg="+", sym_bkg="o", type=None
+        self, size=8, frg="k", bkg="w", sym_frg="+", sym_bkg="o", type=None, 
+        append=True
     ):
         """TODO"""
+        
+        if isinstance(append, bool):
+            if append:
+                ax1 = plt.gca()
+            else:
+                fig, ax1 = plt.subplots(figsize=(10, 3))
+        else:
+            ax1 = plt
+        
         if not type is None:
             if type == Plot.MARKERS_TYPE_NO_ENTRY:
                 frg = "w"
@@ -1382,9 +1392,11 @@ class Track:
                 sym_frg = " "
                 sym_bkg = "s"
 
-        plt.plot(self.getX(), self.getY(), frg + sym_bkg, markersize=size)
-        plt.plot(self.getX(), self.getY(), bkg + sym_bkg, markersize=int(0.8 * size))
-        plt.plot(self.getX(), self.getY(), frg + sym_frg, markersize=int(0.8 * size))
+        ax1.plot(self.getX(), self.getY(), frg + sym_bkg, markersize=size)
+        ax1.plot(self.getX(), self.getY(), bkg + sym_bkg, markersize=int(0.8 * size))
+        ax1.plot(self.getX(), self.getY(), frg + sym_frg, markersize=int(0.8 * size))
+        
+        return ax1
 
     # ----------------------------------------------------
     # Method to plot a track (short cut from Plot)
