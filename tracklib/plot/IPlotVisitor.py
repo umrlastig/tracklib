@@ -26,3 +26,12 @@ class IPlotVisitor(ABC):
         """
         pass
     
+    
+    @abstractmethod
+    def plotNetwork(self, network, edges:str="k-", nodes:str="",
+        direct:str="k--", indirect:str="k--", size:float=0.5, append=None):
+        """
+        Plot a network
+        """
+        pass
+    
