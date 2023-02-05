@@ -198,6 +198,7 @@ class SpatialIndex:
 
         return (idx, idy)
     
+    
     def plot(self, base:bool=True, append=True, v:ivisitor.IPlotVisitor=None):
         if v == None:
             import tracklib.plot.MatplotlibVisitor as visitor
@@ -210,27 +211,22 @@ class SpatialIndex:
             v = visitor.MatplotlibVisitor()
         v.highlightCellInSpatialIndex(self, i, j, sym, size)
     
-
-    # ------------------------------------------------------------
-    # Request function to get data registered in spatial index
-    # Inputs:
-    # 	- request(i,j) returns data registered in cell (i,j)
-    #   	- i: row index i of spatial index grid
-    # 		- j: col index j of spatial index grid
-    #   - request(coord) returns data registered in the cell
-    #     containing GeoCoords or ENUCoors object coord
-    #   - request(list) returns data registered in all cells
-    #     crossed by a segment list=[coord1, coord2].
-    # 	- request(track) returns data registered in all cells
-    #     crossed by a track.
-    # ------------------------------------------------------------
+    
     def request(self, obj, j=None) -> list[Any]:   
-        """Request function to get data registered in spatial index
-
-        TODO
-
         """
-        # print (type(obj))
+        Request function to get data registered in spatial index
+        Inputs:
+            - request(i,j) returns data registered in cell (i,j)
+               	- i: row index i of spatial index grid
+     		    - j: col index j of spatial index grid
+            - request(coord) returns data registered in the cell
+              containing GeoCoords or ENUCoors object coord
+            - request(list) returns data registered in all cells
+              crossed by a segment list=[coord1, coord2].
+     	    - request(track) returns data registered in all cells
+              crossed by a track.
+        """
+
         if isinstance(obj, int):
             """dans la cellule (i,j)"""
             i = obj
