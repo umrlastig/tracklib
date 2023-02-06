@@ -8,15 +8,10 @@ import unittest
 from tracklib.io.TrackReader import TrackReader
 from tracklib.io.RasterReader import RasterReader
 import tracklib.algo.Mapping as mapping
-import tracklib.algo.Cinematics as Cinematics
 
-from tracklib.core import ObsCoords as Coords
-from tracklib.core import (Obs, Track, ObsTime)
-from tracklib.core.Network import Network, Node, Edge
+from tracklib.core import (ObsTime)
 from tracklib.core.SpatialIndex import SpatialIndex
 
-import sys
-sys.path.append('../test/')
 from data import Data as Data
 
 class TestAlgoMappingMethods(unittest.TestCase):
