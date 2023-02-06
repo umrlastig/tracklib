@@ -12,7 +12,8 @@ import tracklib.algo.Mapping as mapping
 from tracklib.core import (ObsTime)
 from tracklib.core.SpatialIndex import SpatialIndex
 
-from .data import Data as Data
+from data import Data as Data
+
 
 class TestAlgoMappingMethods(unittest.TestCase):
     
@@ -75,10 +76,42 @@ class TestAlgoMappingMethods(unittest.TestCase):
         
         plt.show()
         
+        
+    def testMapOn(self):
+        
+        resource_path = os.path.join(os.path.split(__file__)[0], "../..")
+        path_cam = os.path.join(resource_path, 'data/hybridation_gnss_camera.dat')
+        path_gps = os.path.join(resource_path, 'data/hybridation_gnss_camera.pos')
+        
+        ObsTime.ObsTime.setReadFormat("2D/2M/4Y-2h:2m:2s.3z")
+        
+        
+        track_cam = TrackReader.readFromCsv(path_cam, 1, 2, 3, 0, " ", srid="ENUCoords")
+        track_gps = TrackReader.readFromCsv(path_gps, 1, 2, 3, 0, " ", srid="ENUCoords")
+        
+        track_cam.incrementTime(0, 18-3600)
+        
+        ini_time = ObsTime.ObsTime("06/06/2021-16:02:00.000")
+        fin_time = ObsTime.ObsTime("06/06/2021-16:12:12.000")
+        
+        
+        track_cam = track_cam.extractSpanTime(ini_time, fin_time)
+        track_gps = track_gps.extractSpanTime(ini_time, fin_time)
+        track_gps = track_gps // track_cam
+        
+        track_cam.rotate(0.2);
+        mapping.mapOn(track_cam, track_gps)
+        
+        track_cam.plot('r-')
+        track_gps.plot('b+')
+        plt.show()
+
+        
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     suite.addTest(TestAlgoMappingMethods("testMapOnRaster"))
     suite.addTest(TestAlgoMappingMethods("testMapOnNetwork"))
+    suite.addTest(TestAlgoMappingMethods("testMapOn"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
