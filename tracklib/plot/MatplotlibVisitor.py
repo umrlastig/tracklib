@@ -5,9 +5,105 @@ import matplotlib.pyplot as plt
 import tracklib.core.Network as network
 import tracklib.core.SpatialIndex as index
 import tracklib.plot.IPlotVisitor as iplot
-
+import tracklib.plot.Plot as Plot
 
 class MatplotlibVisitor(iplot.IPlotVisitor):
+    
+    def plotTrackAsMarkers(
+        self, track, size=8, frg="k", bkg="w", sym_frg="+", sym_bkg="o", type=None, 
+        append=True
+    ):
+        """TODO"""
+        
+        if isinstance(append, bool):
+            if append:
+                ax1 = plt.gca()
+            else:
+                fig, ax1 = plt.subplots(figsize=(10, 3))
+        else:
+            ax1 = plt
+        
+        if not type is None:
+            if type == Plot.MARKERS_TYPE_NO_ENTRY:
+                frg = "w"
+                bkg = "r"
+                sym_frg = "_"
+                sym_bkg = "o"
+            if type == Plot.MARKERS_TYPE_INTERDICTION:
+                frg = "w"
+                bkg = "r"
+                sym_frg = "."
+                sym_bkg = "o"
+            if type == Plot.MARKERS_TYPE_SPOT:
+                frg = "r"
+                bkg = "w"
+                sym_frg = "."
+                sym_bkg = "o"
+            if type == Plot.MARKERS_TYPE_WARNING:
+                frg = "r"
+                bkg = "w"
+                sym_frg = " "
+                sym_bkg = "^"
+            if type == Plot.MARKERS_TYPE_GIVE_WAY:
+                frg = "r"
+                bkg = "w"
+                sym_frg = " "
+                sym_bkg = "v"
+            if type == Plot.MARKERS_TYPE_NO_STOP:
+                frg = "r"
+                bkg = "b"
+                sym_frg = "x"
+                sym_bkg = "o"
+            if type == Plot.MARKERS_TYPE_INFORMATION:
+                frg = "b"
+                bkg = "w"
+                sym_frg = " "
+                sym_bkg = "s"
+
+        ax1.plot(track.getX(), track.getY(), frg + sym_bkg, markersize=size)
+        ax1.plot(track.getX(), track.getY(), bkg + sym_bkg, markersize=int(0.8 * size))
+        ax1.plot(track.getX(), track.getY(), frg + sym_frg, markersize=int(0.8 * size))
+        
+        return ax1
+    
+    def plotTrackEllipses(self, track, sym="r-", factor=3, af=None, append=True):
+        """
+        Plot track uncertainty (as error ellipses)
+        Input track must contain an AF with (at least) a
+        2 x 2 covariance matrix. If this matrix has dim > 2,
+        first two dimensions are arbitrarily considered
+        """
+        plot = Plot.Plot(track)
+        plot.sym = sym
+        plot.w = 6
+        plot.h = 5
+        return plot.plotEllipses(track, sym, factor, af, append)
+    
+    def plotTrack(self, track, sym="k-", type="LINE", af_name="", cmap=-1, append=True, 
+             label=None, pointsize=5):
+        """
+        Method to plot a track (short cut from Plot)
+        Append:
+            - True : append to the current plot
+            - False: create a new plot
+            - Ax   : append to the fiven ax object
+        ----------------------------------------------------
+        Output:
+            Ax object (may be input into append parameter)
+    
+        af_name: test si isAFTransition
+        """
+        plot = Plot.Plot(track)
+        plot.sym = sym
+        if not '-' in sym:
+            type = "POINT"
+            plot.pointsize = 20
+        plot.pointsize = pointsize
+        plot.color = sym[0]
+        plot.marker = sym[1]
+        plot.w = 6
+        plot.h = 5
+        return plot.plot(type, af_name, cmap, append=append, label=label)
     
     def plotSpatialIndex(self, si: index.SpatialIndex, base:bool=True, append=True):
         """

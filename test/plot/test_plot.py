@@ -7,7 +7,7 @@ import os.path
 
 from tracklib.core.ObsTime import ObsTime
 from tracklib.io.TrackReader import TrackReader
-from tracklib.core.Plot import Plot
+from tracklib.plot.Plot import Plot
 
 
 class TestPlot(unittest.TestCase):

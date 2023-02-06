@@ -7,7 +7,6 @@ import unittest
 from tracklib.core.ObsTime import ObsTime
 from tracklib.io.TrackReader import TrackReader
 #from tracklib.io.FileReader import FileReader
-#from tracklib.core.Plot import Plot
 
 from tracklib.algo.Segmentation import findStopsGlobal#, findStopsLocal
 

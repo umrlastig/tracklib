@@ -5,13 +5,13 @@ Points are referenced in geodetic coordinates
 
 # For type annotation
 from __future__ import annotations
-from typing import Any, Literal, Union
+from typing import Any, Literal#, Union
 
 import sys
 import math
 import copy
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 from tracklib.core.Obs import Obs
 from tracklib.core.ObsCoords import ENUCoords
@@ -19,7 +19,7 @@ from tracklib.core.ObsTime import ObsTime
 from tracklib.algo.Geometrics import Polygon
 from tracklib.core.TrackCollection import TrackCollection
 
-import tracklib.core.Plot as Plot
+import tracklib.plot.IPlotVisitor as ivisitor
 import tracklib.core.Utils as Utils
 import tracklib.core.Operator as Operator
 
@@ -1343,103 +1343,51 @@ class Track:
     # =========================================================================
     def plotAsMarkers(
         self, size=8, frg="k", bkg="w", sym_frg="+", sym_bkg="o", type=None, 
-        append=True
+        append=True, v:ivisitor.IPlotVisitor=None
     ):
         """TODO"""
+        if v == None:
+            import tracklib.plot.MatplotlibVisitor as visitor
+            v = visitor.MatplotlibVisitor()
+        return v.plotTrackAsMarkers(self, size, frg, bkg, sym_frg, sym_bkg, type, append)
         
-        if isinstance(append, bool):
-            if append:
-                ax1 = plt.gca()
-            else:
-                fig, ax1 = plt.subplots(figsize=(10, 3))
-        else:
-            ax1 = plt
-        
-        if not type is None:
-            if type == Plot.MARKERS_TYPE_NO_ENTRY:
-                frg = "w"
-                bkg = "r"
-                sym_frg = "_"
-                sym_bkg = "o"
-            if type == Plot.MARKERS_TYPE_INTERDICTION:
-                frg = "w"
-                bkg = "r"
-                sym_frg = "."
-                sym_bkg = "o"
-            if type == Plot.MARKERS_TYPE_SPOT:
-                frg = "r"
-                bkg = "w"
-                sym_frg = "."
-                sym_bkg = "o"
-            if type == Plot.MARKERS_TYPE_WARNING:
-                frg = "r"
-                bkg = "w"
-                sym_frg = " "
-                sym_bkg = "^"
-            if type == Plot.MARKERS_TYPE_GIVE_WAY:
-                frg = "r"
-                bkg = "w"
-                sym_frg = " "
-                sym_bkg = "v"
-            if type == Plot.MARKERS_TYPE_NO_STOP:
-                frg = "r"
-                bkg = "b"
-                sym_frg = "x"
-                sym_bkg = "o"
-            if type == Plot.MARKERS_TYPE_INFORMATION:
-                frg = "b"
-                bkg = "w"
-                sym_frg = " "
-                sym_bkg = "s"
-
-        ax1.plot(self.getX(), self.getY(), frg + sym_bkg, markersize=size)
-        ax1.plot(self.getX(), self.getY(), bkg + sym_bkg, markersize=int(0.8 * size))
-        ax1.plot(self.getX(), self.getY(), frg + sym_frg, markersize=int(0.8 * size))
-        
-        return ax1
-
-    # ----------------------------------------------------
-    # Method to plot a track (short cut from Plot)
-    # Append:
-    #  - True : append to the current plot
-    #  - False: create a new plot
-    #  - Ax   : append to the fiven ax object
-    # ----------------------------------------------------
-    # Output:
-    #  Ax object (may be input into append parameter)
-    # ----------------------------------------------------
-    def plot(self, sym="k-", type="LINE", af_name="", cmap=-1, append=True, label=None, pointsize=5):
+    
+    def plotEllipses(self, sym="r-", factor=3, af=None, append=True,
+                     v:ivisitor.IPlotVisitor=None):
         """
+        Plot track uncertainty (as error ellipses)
+        Input track must contain an AF with (at least) a
+        2 x 2 covariance matrix. If this matrix has dim > 2,
+        first two dimensions are arbitrarily considered
+        """
+        
+        if v == None:
+            import tracklib.plot.MatplotlibVisitor as visitor
+            v = visitor.MatplotlibVisitor()
+        return v.plotTrackAsMarkers(self, sym, factor, af, append)
+    
+
+    def plot(self, sym="k-", type="LINE", af_name="", cmap=-1, append=True, 
+             label=None, pointsize=5, v:ivisitor.IPlotVisitor=None):
+        """
+        Method to plot a track (short cut from Plot)
+        Append:
+            - True : append to the current plot
+            - False: create a new plot
+            - Ax   : append to the fiven ax object
+        # ----------------------------------------------------
+        Output:
+            Ax object (may be input into append parameter)
+    
         af_name: test si isAFTransition
         """
-        plot = Plot.Plot(self)
-        plot.sym = sym
-        if not '-' in sym:
-            type = "POINT"
-            plot.pointsize = 20
-        plot.pointsize = pointsize
-        plot.color = sym[0]
-        plot.marker = sym[1]
-        plot.w = 6
-        plot.h = 5
-        return plot.plot(type, af_name, cmap, append=append, label=label)
-
-    # ----------------------------------------------------
-    # Plot track uncertainty (as error ellipses)
-    # Input track must contain an AF with (at least) a
-    # 2 x 2 covariance matrix. If this matrix has dim > 2,
-    # first two dimensions are arbitrarily considered
-    # ----------------------------------------------------
-    def plotEllipses(self, sym="r-", factor=3, af=None, append=True):
-        """TODO"""
-        plot = Plot.Plot(self)
-        plot.sym = sym
-        plot.w = 6
-        plot.h = 5
-        return plot.plotEllipses(self, sym, factor, af, append)
-
-
-
+        
+        if v == None:
+            import tracklib.plot.MatplotlibVisitor as visitor
+            v = visitor.MatplotlibVisitor()
+        return v.plotTrack(self, sym, type, af_name, cmap, append, 
+             label, pointsize)
+    
 
     # =========================================================================
     #    Built-in Analytical Features

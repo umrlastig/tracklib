@@ -206,12 +206,9 @@ class TestAlgoMappingMethods(unittest.TestCase):
         
         network.addEdge(edge, noeudIni, noeudFin)
         
-        # =====================================================================
-        # Plot
-        
         
         # =====================================================================
-
+        #   Indexation spatiale
         si = SpatialIndex(network, resolution=[5,1], margin=0.15)
         network.spatial_index = si
 
@@ -225,11 +222,14 @@ class TestAlgoMappingMethods(unittest.TestCase):
         plt.xlim([-5, 35])
         plt.ylim([-1, 7])
 
+
+        # =====================================================================
+        # 
         network.prepare()
         
         
         # =====================================================================
-
+        #
         mapping.mapOnNetwork(trace, network, search_radius=5.5, debug=False)
         
         
