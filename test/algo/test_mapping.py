@@ -12,7 +12,7 @@ import tracklib.algo.Mapping as mapping
 from tracklib.core import (ObsTime)
 from tracklib.core.SpatialIndex import SpatialIndex
 
-from data import Data as Data
+from .data import Data as Data
 
 
 class TestAlgoMappingMethods(unittest.TestCase):
