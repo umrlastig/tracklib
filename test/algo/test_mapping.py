@@ -16,7 +16,7 @@ from tracklib.core.Network import Network, Node, Edge
 from tracklib.core.SpatialIndex import SpatialIndex
 
 import sys
-sys.path.append('..')
+sys.path.append('../test/')
 from data import Data as Data
 
 class TestAlgoMappingMethods(unittest.TestCase):
