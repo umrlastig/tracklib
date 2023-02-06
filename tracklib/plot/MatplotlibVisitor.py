@@ -127,11 +127,11 @@ class MatplotlibVisitor(iplot.IPlotVisitor):
 
         for i in range(0, si.csize):
             xi = i * si.dX + si.xmin
-            ax1.plot([xi, xi], [si.ymin, si.ymax], "-", color="blue")
+            ax1.plot([xi, xi], [si.ymin, si.ymax], "-", color="gray")
         
         for j in range(0, si.lsize):
             yj = j * si.dY + si.ymin
-            ax1.plot([si.xmin, si.xmax], [yj, yj], "-", color="blue")
+            ax1.plot([si.xmin, si.xmax], [yj, yj], "-", color="gray")
 
 
         if base:
