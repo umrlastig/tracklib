@@ -28,6 +28,7 @@ of the tracklib library.
   Summarize <Summarize>
   Switchbacks <Switchbacks>
   Map matching on network <MapMatchingOnNetwork>
+  Test <TestMap>
   
   
 .. StopPoints <StopPoints>
