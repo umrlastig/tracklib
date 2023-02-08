@@ -137,10 +137,11 @@ def __mapOnNetwork (
                 if debug:
                     wkt = Track([Obs(s1[0]), Obs(s2[0])]).toWKT()
                     f2.write(str(k) + " \""+wkt+"\" " + str(transition) + "\n")
+    """
     if debug:
         f1.close()
-        f2.close()
-    """
+        #f2.close()
+    
 
 def mapOnNetwork(
     tracks, network, gps_noise=50, transition_cost=10, search_radius=50, debug=False
