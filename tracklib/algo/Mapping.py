@@ -118,12 +118,12 @@ def __mapOnNetwork (
         verbose=verbose * Dynamics.MODE_VERBOSE_PROGRESS,
     )
     
-    for k in progressbar.progressbar(range(len(track))):
-        X = [track[k].position.getX(), track["hmm_inference", k][0].getX()]
-        Y = [track[k].position.getY(), track["hmm_inference", k][0].getY()]
-        plt.plot(X, Y, "r--", linewidth=1.4)
-        track[k].position.setX(track["hmm_inference", k][0].getX())
-        track[k].position.setY(track["hmm_inference", k][0].getY())
+    #for k in progressbar.progressbar(range(len(track))):
+    #    X = [track[k].position.getX(), track["hmm_inference", k][0].getX()]
+    #    Y = [track[k].position.getY(), track["hmm_inference", k][0].getY()]
+    #    plt.plot(X, Y, "r--", linewidth=1.4)
+    #    track[k].position.setX(track["hmm_inference", k][0].getX())
+    #    track[k].position.setY(track["hmm_inference", k][0].getY())
     
 
     """
