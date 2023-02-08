@@ -4,6 +4,7 @@
 from __future__ import annotations   
 from typing import Literal, Union   
 
+import json
 import os
 import progressbar
 import sys 
@@ -177,10 +178,88 @@ class TrackWriter:
 
 
     # =========================================================================
+    #   GeoJSON
+    #
+    @staticmethod
+    def exportToGeojson(track: Union[Track,TrackCollection,Network],
+                        type: Literal["LINE", "POINT"] = "LINE"):
+        
+        """
+        Export GPS track in geojson text.
+        
+        :param track: 
+        :return
+        """
+
+        # Track collection case
+        if not isinstance(track, Track):
+            print("Error: parameter track is not a Track")
+            return None
+        
+        out_str = '{ '
+        out_str += '    "type": "FeatureCollection", '
+        out_str += '    "features": [ '
+        
+        if type == "POINT":
+            
+            for i in range(track.size()):
+                x = "{:15.12f}".format(track.getObs(i).position.getX())
+                y = "{:15.12f}".format(track.getObs(i).position.getY())
+            
+                out_str += '{ '
+                out_str += '    "type": "Feature", '
+                out_str += '    "geometry": { '
+                out_str += '        "type": "Point", '
+                out_str += '        "coordinates": [' + x + ', ' + y + '] '
+                out_str += '    }, '
+                out_str += '    "properties": { '
+                out_str += '        "prop0": "value0" '
+                out_str += '    } '
+                out_str += '}'
+                
+                if i != track.size() - 1:
+                    out_str += ','
+                
+        if type == "LINE":
+            out_str += '{ '
+            out_str += '    "type": "Feature", '
+            out_str += '    "geometry": { '
+            out_str += '        "type": "LineString", '
+                
+            out_str += '        "coordinates": ['
+            for i in range(track.size()):
+                out_str += '['
+                if track.getSRID() == "Geo":
+                    out_str += (str)(track.getObs(i).position.lon) + ", "
+                    out_str += (str)(track.getObs(i).position.lat)
+                elif track.getSRID() == "ENU":
+                    out_str += (str)(track.getObs(i).position.E) + ", "
+                    out_str += (str)(track.getObs(i).position.N)
+                out_str += ']'
+                
+                if i != track.size() - 1:
+                    out_str += ","
+            
+            out_str += '] '
+            
+            out_str += '    } '
+            out_str += '}'
+        
+    
+        out_str += '    ]'
+        out_str += '}'
+        #print (out_str)
+        
+        # parse string to json
+        out = json.loads(out_str)
+        return out
+
+
+    # =========================================================================
     #   KML
     #
     @staticmethod
-    def writeToKml(track, path, 
+    def writeToKml(track: Union[Track,TrackCollection,Network], path, 
                    type: Literal["LINE", "POINT"] = "LINE", 
                    af=None, 
                    c1=[0, 0, 1, 1], c2=[1, 0, 0, 1], name=False):   

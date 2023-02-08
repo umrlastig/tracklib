@@ -247,12 +247,55 @@ class TestTrackWriter(TestCase):
         
         kmlpath = os.path.join(self.resource_path, 'data/test/couplage.kml')
         TrackWriter.writeToKml(trace, path=kmlpath, type="LINE", af='speed')
+        
+        
+    def testExportGeoJson(self):
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        track = Track()
+        p1 = Obs(ENUCoords(0, 0), ObsTime.readTimestamp('2020-01-01 10:00:00'))
+        track.addObs(p1)
+        p2 = Obs(ENUCoords(0, 1), ObsTime.readTimestamp('2020-01-01 10:00:01'))
+        track.addObs(p2)
+        
+        # ---------------------------------------------------------------------
+        txtjson = TrackWriter.exportToGeojson(track, type='POINT')
+        # print (txtjson)
+        
+        txttocompare = '{ '
+        txttocompare += '  "type": "FeatureCollection",  '
+        txttocompare += '  "features": [ '
+        txttocompare += '  { '
+        txttocompare += '      "type": "Feature", '
+        txttocompare += '      "geometry": { '
+        txttocompare += '          "type": "Point",         "coordinates": [ 0.00000,  0.00000] '
+        txttocompare += '      },     "properties": {         "prop0": "value0"     } },{ '
+        txttocompare += '      "type": "Feature", '
+        txttocompare += '      "geometry": { '
+        txttocompare += '          "type": "Point",         "coordinates": [ 0.00000,  1.00000]  '
+        txttocompare += '      },     "properties": {         "prop0": "value0"     } }    ]} '
+    
+        import json
+        out = json.loads(txttocompare)
+        self.assertEqual(out, txtjson)
+        
+        
+        # ---------------------------------------------------------------------
+        txtjson = TrackWriter.exportToGeojson(track, type='LINE')
+        
+        txttocompare = '{     "type": "FeatureCollection", '
+        txttocompare += ' "features": [ {     "type": "Feature",  '
+        txttocompare += ' "geometry": {         "type": "LineString", '
+        txttocompare += ' "coordinates": [[0, 0],[0, 1]]     } }    ]} '
+        
+        import json
+        out = json.loads(txttocompare)
+        self.assertEqual(out, txtjson)
 
 
 if __name__ == '__main__':
     
     suite = TestSuite()
-    
+
     suite.addTest(TestTrackWriter("test_write_csv_path"))
     suite.addTest(TestTrackWriter("test_write_csv_minim"))
     suite.addTest(TestTrackWriter("test_write_csv_2AF"))
@@ -274,6 +317,7 @@ if __name__ == '__main__':
     suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx2AF"))
     
     suite.addTest(TestTrackWriter("testWriteKml"))
+    suite.addTest(TestTrackWriter("testExportGeoJson"))
     
     runner = TextTestRunner()
     runner.run(suite)
