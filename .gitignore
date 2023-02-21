@@ -9,6 +9,7 @@ test/core/__pycache__/
 test/io/__pycache__/
 /tests/__pycache__/
 test/__pycache__/
+test/algo/observation.dat
 doc/source/__pycache__/
 example/__pycache__/
 /tracklib/*.pyc

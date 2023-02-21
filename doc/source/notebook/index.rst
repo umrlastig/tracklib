@@ -27,7 +27,6 @@ of the tracklib library.
   Quickstart <Quickstart>
   Summarize <Summarize>
   Switchbacks <Switchbacks>
-  Map matching on network <MapMatchingOnNetwork>
   
   
 .. StopPoints <StopPoints>

@@ -587,6 +587,7 @@ class HMM:
     def setTransitionModel(self, Q):
         """
         Set the transition model.
+        
         :param Q: four-valued function, giving the probability function 
                   Q(s1,s2,k,t) to observe a transition from state s1 to state 
                   s2, at in track t at epoch k.
