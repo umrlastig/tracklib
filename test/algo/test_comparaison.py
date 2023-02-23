@@ -203,19 +203,10 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
 
         dAB = Comparison.premiereComposanteHausdorff(trackA, trackB)
         dBA = Comparison.premiereComposanteHausdorff(trackB, trackA)
-        
-        import numpy as np
-        from scipy.spatial.distance import directed_hausdorff
-        u = np.array([(1.0, 0.0), (0.0, 1.0), (-1.0, 0.0), (0.0, -1.0)])
-        v = np.array([(2.0, 0.0), (0.0, 2.0), (-2.0, 0.0), (0.0, -4.0)])
-        
-        duv = directed_hausdorff(u, v)[0]
-        dvu = directed_hausdorff(v, u)[0]
-        
-        self.assertEqual(dAB, duv)
-        self.assertEqual(dBA, dvu)
-        self.assertEqual(Comparison.hausdorff(trackA, trackB), 
-                         max(directed_hausdorff(u, v)[0], directed_hausdorff(v, u)[0]))
+        self.assertLessEqual(abs(dBA-2.12132), self.__epsilon)
+        self.assertLessEqual(abs(dAB-1.34164), self.__epsilon)
+        d = Comparison.hausdorff(trackA, trackB)
+        self.assertLessEqual(abs(d - 2.12132), self.__epsilon)
         
     def testFrechetSimilarity(self):
         trackA = Track.Track([], 1)
@@ -244,7 +235,6 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         trackB.addObs(p)
 
         self.assertEqual(Comparison.discreteFrechet(trackA, trackB), 2.0)
-        
     
     def testCentralNNTrack(self):
         TRACES = []
@@ -262,7 +252,6 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         plt.xlim([0, 14])
         plt.ylim([-1, 7])
         plt.show()        
-        
         
     def testCentralDTWTrack(self):
         TRACES = []
@@ -294,16 +283,16 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
     
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    #suite.addTest(TestAlgoComparaisonMethods("testCompare"))
-    #suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileNN"))
-    #suite.addTest(TestAlgoComparaisonMethods("testDifference12ProfileNN"))
-    #suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileDTW"))
-    #suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileFDTW"))
-    #suite.addTest(TestAlgoComparaisonMethods("testHausdorffSimilarity"))
-    #suite.addTest(TestAlgoComparaisonMethods("testFrechetSimilarity"))
+    suite.addTest(TestAlgoComparaisonMethods("testCompare"))
+    suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileNN"))
+    suite.addTest(TestAlgoComparaisonMethods("testDifference12ProfileNN"))
+    suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileDTW"))
+    suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileFDTW"))
+    suite.addTest(TestAlgoComparaisonMethods("testHausdorffSimilarity"))
+    suite.addTest(TestAlgoComparaisonMethods("testFrechetSimilarity"))
     suite.addTest(TestAlgoComparaisonMethods("testCentralNNTrack"))
     suite.addTest(TestAlgoComparaisonMethods("testCentralDTWTrack"))
-    #suite.addTest(TestAlgoComparaisonMethods("testMedoidHausdorffTrack"))
+    suite.addTest(TestAlgoComparaisonMethods("testMedoidHausdorffTrack"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

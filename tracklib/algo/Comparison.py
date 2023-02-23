@@ -15,6 +15,7 @@ import tracklib.algo.Cinematics as Cinematics
 import tracklib.algo.Dynamics as Dynamics
 import tracklib.algo.Interpolation as Interpolation
 
+from tracklib.util.Geometry import dist_point_to_segment
 
 MODE_COMPARAISON_NEAREST_NEIGHBOUR = 1
 MODE_COMPARAISON_DTW = 2
@@ -295,12 +296,12 @@ def premiereComposanteHausdorff(track1, track2):
     for p in range(track1.size()):
         point = track1.getObs(p)
         distmin = track2.getFirstObs().distanceTo(point);
-        for i in range(0, track2.size()): 
+        for i in range(0, track2.size() - 1): 
             obs2i = track2.getObs(i)
-            #obs2ip1 = track2.getObs(i+1)
-            #dist = dist_point_to_segment(point.position, [obs2i.position.getX(), obs2i.position.getY(), 
-            #                                     obs2ip1.position.getX(), obs2ip1.position.getY()])
-            dist = point.distanceTo(obs2i)
+            obs2ip1 = track2.getObs(i+1)
+            dist = dist_point_to_segment(point.position, 
+                        [obs2i.position.getX(), obs2i.position.getY(), 
+                        obs2ip1.position.getX(), obs2ip1.position.getY()])
             distmin = min(dist, distmin)
         result = max(distmin, result)
     return result
