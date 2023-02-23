@@ -72,6 +72,8 @@ def __mapOnNetwork (
     track, network, obs_noise=50, transition_cost=10, search_radius=50, 
     debug=False):
     """TODO"""
+    
+    # print (search_radius, obs_noise, transition_cost)
 
     if debug:
         f1 = open("observation.dat", "a")
@@ -98,7 +100,6 @@ def __mapOnNetwork (
                 eg = network.EDGES[network.getEdgeId(elem)].geom
                 p, d, v = __projOnTrack(track[i].position, eg)
                 if d < search_radius:
-                    # print (i, elem, d)
                     STATES[-1].append (
                         (p, elem, __distToNode(eg, p, v, 0), __distToNode(eg, p, v, 1))
                     )

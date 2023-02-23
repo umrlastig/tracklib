@@ -695,7 +695,7 @@ class HMM:
         TAB_VAL = []
 
         self.printTrace("Cost and marker matrix initialization", [1, 2, 3], verbose)
-
+        
         for k in range(N):
             TAB_MRK.append([0] * len(STATES[k]))
             TAB_VAL.append([0] * len(STATES[k]))
@@ -779,7 +779,11 @@ class HMM:
         track.createAnalyticalFeature("hmm_inference")
         track.createAnalyticalFeature("hmm_cost")
         idk = np.argmin(TAB_VAL[-1])
+        
         for k in range(N - 1, -1, -1):
+            if len(TAB_VAL[k]) == 0:
+                continue
+            
             self.printTrace(
                 "Step "
                 + str(k)
