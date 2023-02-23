@@ -100,10 +100,10 @@ class NetworkReader:
     # tolerance
     # ===========================
     @staticmethod
-    def getNetwork(
+    def requestFromIgnGeoportail(
         bbox:Bbox, proj=None, margin=0.0, tolerance=0.1, spatialIndex=True, nomproxy=None
     ) -> Network:
-        """getNetwork
+        """
 
         :param bbox: The bounding box of the selected area (The bounding box must
             be expressed in WGS84).

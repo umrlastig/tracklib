@@ -38,7 +38,7 @@ class TestNetworkReader(TestCase):
         emprise = trace.bbox()
         proj = "EPSG:4326"
         tolerance=0.0001
-        network = NetworkReader.getNetwork(emprise, proj, margin=0.020, 
+        network = NetworkReader.requestFromIgnGeoportail(emprise, proj, margin=0.020, 
                                    tolerance=tolerance, spatialIndex=False)
         if network != None:
             print ('nb edges=', len(network.EDGES))

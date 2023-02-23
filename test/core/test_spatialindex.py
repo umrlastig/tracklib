@@ -427,7 +427,7 @@ class TestSpatialIndex(TestCase):
     #      xmax = 2.35463
     #      ymin = 48.83896
     #      ymax = 48.84299
-    #      network = IgnReader.getNetwork((xmin, ymin, xmax, ymax), "EPSG:2154")
+    #      network = IgnReader.requestFromIgnGeoportail((xmin, ymin, xmax, ymax), "EPSG:2154")
          
     #      #NetworkReader.writeFromFile("ici.csv", network)
         
