@@ -8,4 +8,3 @@ Module util
    :caption: Load/Export Track
    	
    ./util/util-geometry
-   ./util/util-qgis

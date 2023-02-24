@@ -14,7 +14,6 @@ Module core
    ./core/core-obscoords.rst
    ./core/core-obstime.rst
    ./core/core-operator.rst
-   ./core/core-plot.rst
    ./core/core-raster.rst
    ./core/core-rasterband.rst
    ./core/core-index.rst

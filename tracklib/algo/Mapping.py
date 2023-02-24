@@ -160,7 +160,6 @@ def mapOnNetwork(
 def mapOnRaster(track, raster):
     """
     Raster data transfer to track.
-    
     Add an analytical feature for each grid in the raster. 
     
     :return: void

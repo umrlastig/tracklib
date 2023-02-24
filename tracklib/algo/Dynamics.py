@@ -652,33 +652,29 @@ class HMM:
                 style = "======================================"
             print(style + style)
 
-    # ------------------------------------------------------------
-    # Main function of HMM object, to estimate (decode) the
-    # maximum a posteriori sequence of states given observations
-    # Inputs:
-    #   - track: the track on which estimation is performed
-    #   - obs: the name of an analytical feature (may also a list
-    #     of analytical feature names for multi-dimensional HMM)
-    #     All the analytical features listed must be in the track
-    #   - mode: to specify how observations are used
-    #        - MODE_OBS_AS_SCALAR: list of values (default)
-    #        - MODE_OBS_AS_2D_POSITION: the first two fields
-    #          of  obs are used to make a Coords object.
-    #          Z component is set to 0 as default.
-    #        - MODE_OBS_AS_3D_POSITIONS: the first three fields
-    #          of obs are used to make a Coords object
-    #     For MODE_OBS_AS_2D_POSITIONS / MODE_OBS_AS_3D_POSITIONS
-    #     modes, coordinates SRID is the same as track SRID.
-    # ------------------------------------------------------------
-    def estimate(
-        self,
-        track,
-        obs,
-        log=False,
-        mode=MODE_OBS_AS_SCALAR,
-        verbose=MODE_VERBOSE_PROGRESS_BY_EPOCH,
-    ):
-        """TODO"""
+
+    def estimate (self, track, obs, log=False, mode=MODE_OBS_AS_SCALAR,
+                        verbose=MODE_VERBOSE_PROGRESS_BY_EPOCH):
+        """
+        Main function of HMM object, to estimate (decode) the
+        maximum a posteriori sequence of states given observations
+      
+        Inputs:
+        :param track: the track on which estimation is performed
+        :param obs: the name of an analytical feature (may also a list
+                    of analytical feature names for multi-dimensional HMM)
+                    All the analytical features listed must be in the track
+        :param mode: to specify how observations are used
+                     - MODE_OBS_AS_SCALAR: list of values (default)
+                     - MODE_OBS_AS_2D_POSITION: the first two fields
+                       of  obs are used to make a Coords object.
+                       Z component is set to 0 as default.
+                     - MODE_OBS_AS_3D_POSITIONS: the first three fields
+                       of obs are used to make a Coords object
+                     For MODE_OBS_AS_2D_POSITIONS / MODE_OBS_AS_3D_POSITIONS
+                     modes, coordinates SRID is the same as track SRID.
+        :return: void
+        """
 
         # -----------------------------------------------
         # Preprocessing
@@ -778,8 +774,8 @@ class HMM:
         self.printTrace("Backward reconstruction phase", [1, 2, 3], verbose)
         track.createAnalyticalFeature("hmm_inference")
         track.createAnalyticalFeature("hmm_cost")
-        idk = np.argmin(TAB_VAL[-1])
         
+        idk = np.argmin(TAB_VAL[-1])
         for k in range(N - 1, -1, -1):
             if len(TAB_VAL[k]) == 0:
                 continue
