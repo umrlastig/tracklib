@@ -5,8 +5,10 @@ import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
 
 #from tracklib.core.Network import Node
+from tracklib.core.Bbox import Bbox
+from tracklib.core import ObsCoords as Coords
 from tracklib.io.NetworkReader import NetworkReader
-from tracklib.io.TrackReader import TrackReader
+#from tracklib.io.TrackReader import TrackReader
 
 
 class TestNetworkReader(TestCase):
@@ -30,6 +32,7 @@ class TestNetworkReader(TestCase):
         
         
     def test_read_wfs(self):
+        '''
         path = os.path.join(self.resource_path, 'data/gpx/utgtrack-22245_light.gpx')
         tracks = TrackReader.readFromGpx(path)
         trace = tracks.getTrack(0)
@@ -39,9 +42,32 @@ class TestNetworkReader(TestCase):
         proj = "EPSG:4326"
         tolerance=0.0001
         network = NetworkReader.requestFromIgnGeoportail(emprise, proj, margin=0.020, 
-                                   tolerance=tolerance, spatialIndex=False)
+                                   tolerance=tolerance, spatialIndex=True)
         if network != None:
             print ('nb edges=', len(network.EDGES))
+        else:
+            print ('???')
+        '''
+        
+        xmin = 6.74168
+        xmax = 6.82568
+        ymin = 45.3485
+        ymax = 45.4029
+        emprise = Bbox(Coords.GeoCoords(xmin, ymin), Coords.GeoCoords(xmax, ymax))
+
+        proj = "EPSG:4326"
+
+        tolerance=0.0001
+
+        # nomproxy='ENSG'
+        network = NetworkReader.requestFromIgnGeoportail(emprise, proj, margin=0.020, 
+                                   tolerance=tolerance, spatialIndex=True)
+
+
+        #network.plot('k-', '', 'g-', 'r-', 0.5, plt)
+        self.assertEqual(235, len(network.EDGES))
+        self.assertEqual(185, len(network.NODES))
+
         
     #     self.assertEqual(33, len(network.EDGES))
     #     self.assertEqual(32, len(network.NODES))

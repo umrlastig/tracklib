@@ -119,7 +119,7 @@ class NetworkReader:
         dy = (ymax - ymin) / 2
         
         # Adding margin
-        bbox = (
+        emprise = (
             xmin - margin * dx,
             xmax + margin * dx,
             ymin - margin * dy,
@@ -127,11 +127,6 @@ class NetworkReader:
         )
 
         network = Network()
-        if spatialIndex:
-            network.spatial_index = SpatialIndex(
-                bbox, resolution=(dx / 1e3, dy / 1e3), margin=0.4
-            )
-            network.spatial_index.collection = network
 
         cptNode = 0
 
@@ -168,7 +163,7 @@ class NetworkReader:
                     line = ffmt.readline().strip()
             ffmt.close()
 
-        nbRoute = NetworkReader.__getNbRouteEmprise(bbox, proxyDict)
+        nbRoute = NetworkReader.__getNbRouteEmprise(emprise, proxyDict)
         
         if nbRoute == 0:
             return None
@@ -179,8 +174,8 @@ class NetworkReader:
         for j in range(nbiter):
             print("PAGE " + str(j + 1) + "/" + str(nbiter))
             URL_FEAT = NetworkReader.URL_SERVER
-            URL_FEAT += "BBOX=" + str(bbox[2]) + "," + str(bbox[0])
-            URL_FEAT += "," + str(bbox[3]) + "," + str(bbox[1])
+            URL_FEAT += "BBOX=" + str(emprise[2]) + "," + str(emprise[0])
+            URL_FEAT += "," + str(emprise[3]) + "," + str(emprise[1])
             URL_FEAT += "&count=" + str(NetworkReader.NB_PER_PAGE)
             URL_FEAT += "&startIndex=" + str(offset)
             URL_FEAT += "&RESULTTYPE=results"
@@ -270,6 +265,12 @@ class NetworkReader:
             #
             offset = offset + NetworkReader.NB_PER_PAGE
 
+        if spatialIndex:
+            network.spatial_index = SpatialIndex(
+                network, resolution=(dx / 1e3, dy / 1e3), margin=0.4
+            )
+            
+            
         return network
 
     # --------------------------------------------------------------------------
