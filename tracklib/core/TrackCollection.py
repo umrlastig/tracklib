@@ -79,7 +79,7 @@ class TrackCollection:
     # Spatial index creation, export and import functions
     # =========================================================================
 
-    def createSpatialIndex(self, resolution=(100, 100), verbose=True):
+    def createSpatialIndex(self, resolution=None, verbose=True):
         """TODO"""
         from tracklib.core.SpatialIndex import SpatialIndex
 

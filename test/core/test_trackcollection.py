@@ -45,6 +45,8 @@ class TestTrackCollection(TestCase):
         collection.plot()
         collection.spatial_index.plot()
         
+        collection.summary()
+        
         
 if __name__ == '__main__':
     suite = TestSuite()
