@@ -94,7 +94,11 @@ def __mapOnNetwork (
     for i in to_run:
         STATES.append([])
         p = track[i].position
-        E = network.spatial_index.neighborhood(p, unit=1)
+        #unit = 1
+        cellsize = min(network.spatial_index.csize, network.spatial_index.lsize)
+        newunit = math.ceil(search_radius / cellsize)
+        #print (newunit, search_radius, cellsize)
+        E = network.spatial_index.neighborhood(p, unit=newunit)
         if E != None:
             for elem in E:
                 eg = network.EDGES[network.getEdgeId(elem)].geom
