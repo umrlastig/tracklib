@@ -777,8 +777,8 @@ class HMM:
         
         idk = np.argmin(TAB_VAL[-1])
         for k in range(N - 1, -1, -1):
-            if len(TAB_VAL[k]) == 0:
-                continue
+            #if len(TAB_VAL[k]) == 0:
+            #    continue
             
             self.printTrace(
                 "Step "
