@@ -106,6 +106,10 @@ def __mapOnNetwork (
                     if debug:
                         wkt = Track([Obs(track[i].position), Obs(p)]).toWKT()
                         f1.write(str(i) + ' "' + wkt + '" ' + str(d) + "\n")
+                        
+        # If no candidate link found
+        if (len(STATES[-1]) == 0):
+            STATES[-1].append((track[i].position, -1, -1, -1))
     
     model = Dynamics.HMM()
     model.setStates(__states)
