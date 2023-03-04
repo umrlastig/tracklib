@@ -27,6 +27,7 @@ of the tracklib library.
   Quickstart <Quickstart>
   Summarize <Summarize>
   Switchbacks <Switchbacks>
+  Kalman filter <Kalman1>
   
   
 .. StopPoints <StopPoints>
