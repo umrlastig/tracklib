@@ -7,12 +7,12 @@
 
 
 TrackReader
-=============
+===========
 
 TrackReader class offers static methods to load track or track collection
 from GPX, CSV or NMEA files. Geometry can be structured in coordinates or in a wkt.
 
-See examples in :ref:`examplestrackreader`.
+See examples in :ref:`Read/Write track(s) section <examplestrackreader>`.
 
 
 CSV files

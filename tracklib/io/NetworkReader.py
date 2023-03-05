@@ -24,16 +24,40 @@ class NetworkReader:
     """
 
     @staticmethod
-    def readFromFile(path, formatfile="DEFAULT", verbose=True):
+    def readFromFile(path:str, formatfile:str="DEFAULT", verbose=True)->Network:
         """
         Read a network from CSV file with geometry structured in coordinates.
+        
+        Before to load network data, you need to have a format defined
+        in **network_file_format** (in tracklib/resources directory) which 
+        describes metadata of the file. If it doesn't exists, you need to create one format.
+        
+        For example, let's define a format call 'VTT' in the file *network_file_format*
+        which corresponds to a network associated with mountain bike tracks.
+        So, you add a new line like this:
+        
+            *VTT, 1, 2, 3, 0, -1, 4, c, 1, True, UTF-8, GEO*
+        
+        where:
+            - the first value 'VTT' represents the format name, 
+            - the second value '1' represents the index of column containing edge identifier in the CSV file
+            - the third value '2' represents index of column containing source node identifier in the CSV file
+            - the fourth value '3' represents index of column containing target node identifier in the CSV file
+            - the fifth value '0' represents index of column containing geometry of edge in wkt format in the CSV file. You can specify also optional parameters:
+            - a path cost (arbitrarily set to be proportional to the length of the WKT if unlined (-1))
+            - an orientation index. An integer arbitrarily set to: 0 to indicate two-way, 1 direct way and -1 indirect way
+            - the separating characters (can be multiple characters). Can be: c (comma), b (blankspace), s (semi-column)
+            - the number of heading line in format 
+            - true to manage double quote
+            - the encoding like utf-8
+            - srid: coordinate system of points (ENU, Geo or ECEF) 
         
         Parameters
         -----------
         
-        :param str path: file or directory
-        :param str name of format which describes metadata of the file (in network_file_format)
-        :return: the network.
+        :param path: file or directory
+        :param formatfile: name of format which describes metadata of the file
+        :return: network.
         
         """
         
@@ -104,11 +128,16 @@ class NetworkReader:
         bbox:Bbox, proj=None, margin=0.0, tolerance=0.1, spatialIndex=True, nomproxy=None
     ) -> Network:
         """
+        
+        Parameters
+        -----------
 
         :param bbox: The bounding box of the selected area (The bounding box must
             be expressed in WGS84).
-        :param proj: projection of results, optional.
-            For example: 'EPSG:2154' or 'EPSG:4326'
+        :param proj: projection of results, optional. Only 'EPSG:4326' is implemented
+        :param margin: f
+        :param tolerance: parameter specifies the maximum distance accepted for merging two nodes (edge ends)
+        :param nomproxy: name of proxy which describes parameter connexion defined in the tracklib/resources/proxy file
         """
 
         xmin = bbox.getXmin()
