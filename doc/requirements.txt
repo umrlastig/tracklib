@@ -13,4 +13,4 @@ numpy
 matplotlib
 scikit-image
 progressbar2
-
+jupyter_contrib_nbextensions
