@@ -2,6 +2,7 @@ sphinx
 sphinx_rtd_theme
 recommonmark
 sphinx-autodoc-typehints
+sphinx-mathjax-offline
 pydata-sphinx-theme
 ipykernel
 nbsphinx
@@ -12,3 +13,4 @@ numpy
 matplotlib
 scikit-image
 progressbar2
+
