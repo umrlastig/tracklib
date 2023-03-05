@@ -12,4 +12,3 @@ numpy
 matplotlib
 scikit-image
 progressbar2
-sphinx.ext.mathjax
