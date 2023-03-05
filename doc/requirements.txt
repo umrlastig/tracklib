@@ -8,6 +8,7 @@ ipykernel
 nbsphinx
 autodocsumm
 pygments
+amsmath
 nbconvert
 numpy
 matplotlib

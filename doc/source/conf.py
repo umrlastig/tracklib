@@ -49,7 +49,10 @@ extensions = [
 	"nbsphinx",
     "autodocsumm",
     "IPython.sphinxext.ipython_console_highlighting",
-    "sphinx.ext.mathjax"
+    "sphinx.ext.mathjax",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.graphviz",
+    "sphinx.ext.githubpages"
 ]
 
 #mathjax_path = 'MathJax/MathJax.js'
