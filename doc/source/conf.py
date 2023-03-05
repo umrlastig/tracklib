@@ -33,9 +33,9 @@ release = "1.0"
 
 # -- General configuration ---------------------------------------------------
 
-mathjax3_config = {
-    'tex': {'tags': 'ams', 'useLabelIds': True},
-}
+#mathjax3_config = {
+#    'tex': {'tags': 'ams', 'useLabelIds': True},
+#}
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -48,11 +48,11 @@ extensions = [
     "sphinx_autodoc_typehints",
 	"nbsphinx",
     "autodocsumm",
-    "IPython.sphinxext.ipython_console_highlighting",
-    "sphinx.ext.mathjax",
-    "sphinx.ext.napoleon",
-    "sphinx.ext.graphviz",
-    "sphinx.ext.githubpages"
+    "IPython.sphinxext.ipython_console_highlighting"#,
+#    "sphinx.ext.mathjax",
+#    "sphinx.ext.napoleon",
+#    "sphinx.ext.graphviz",
+#   "sphinx.ext.githubpages"
 ]
 
 #mathjax_path = 'MathJax/MathJax.js'
