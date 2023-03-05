@@ -14,3 +14,9 @@ matplotlib
 scikit-image
 progressbar2
 jupyter_contrib_nbextensions
+sphinxcontrib-jsmath 
+sphinxcontrib-applehelp
+sphinxcontrib-devhelp
+sphinxcontrib-htmlhelp
+sphinxcontrib-qthelp
+sphinxcontrib-serializinghtml
