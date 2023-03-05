@@ -33,10 +33,8 @@ release = "1.0"
 
 # -- General configuration ---------------------------------------------------
 
-mathjax_path = 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
-mathjax3_config = {
-    'tex': {'tags': 'ams', 'useLabelIds': True},
-}
+mathjax_path = 'MathJax/MathJax.js'
+
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -50,11 +48,11 @@ extensions = [
 	"nbsphinx",
     "autodocsumm",
     "IPython.sphinxext.ipython_console_highlighting",
-    "sphinx.ext.mathjax"
+    "sphinx.ext.mathjax",
+    "sphinx-mathjax-offline"
 ]
 
-
-
+mathjax_path = 'MathJax/MathJax.js'
 
 
 # I execute the notebooks manually in advance. If notebooks test the code,
