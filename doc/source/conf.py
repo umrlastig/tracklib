@@ -33,7 +33,7 @@ release = "1.0"
 
 # -- General configuration ---------------------------------------------------
 
-mathjax_path = 'MathJax/MathJax.js'
+#mathjax_path = 'MathJax/MathJax.js'
 
 
 # Add any Sphinx extension module names here, as strings. They can be
@@ -52,7 +52,10 @@ extensions = [
     "sphinx-mathjax-offline"
 ]
 
-mathjax_path = 'MathJax/MathJax.js'
+#mathjax_path = 'MathJax/MathJax.js'
+mathjax3_config = {
+    'tex': {'tags': 'ams', 'useLabelIds': True},
+}
 
 
 # I execute the notebooks manually in advance. If notebooks test the code,
