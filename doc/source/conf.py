@@ -49,6 +49,10 @@ extensions = [
     "sphinx-mathjax-offline"
 ]
 
+# Setting for sphinx.ext.mathjax
+# The path to the JavaScript file to include in the HTML files in order to load MathJax.
+mathjax_path = MathJax/MathJax.js
+
 # I execute the notebooks manually in advance. If notebooks test the code,
 # they should be run at build time.
 #nbsphinx_execute = 'never'
