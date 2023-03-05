@@ -34,6 +34,9 @@ release = "1.0"
 # -- General configuration ---------------------------------------------------
 
 mathjax_path = 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
+mathjax3_config = {
+    'tex': {'tags': 'ams', 'useLabelIds': True},
+}
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
