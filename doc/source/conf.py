@@ -45,7 +45,8 @@ extensions = [
 	"nbsphinx",
     "autodocsumm",
     "IPython.sphinxext.ipython_console_highlighting",
-    "sphinx.ext.mathjax"
+    "sphinx.ext.mathjax",
+    "sphinx-mathjax-offline"
 ]
 
 # I execute the notebooks manually in advance. If notebooks test the code,
