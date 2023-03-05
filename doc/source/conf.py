@@ -33,6 +33,10 @@ release = "1.0"
 
 # -- General configuration ---------------------------------------------------
 
+math_ext = 'sphinx.ext.mathjax'
+mathjax_path = '/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
+
+
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
@@ -45,18 +49,20 @@ extensions = [
 	"nbsphinx",
     "autodocsumm",
     "IPython.sphinxext.ipython_console_highlighting",
-    "sphinx.ext.mathjax",
+    math_ext,
     "sphinx-mathjax-offline"
 ]
 
 # Setting for sphinx.ext.mathjax
 # The path to the JavaScript file to include in the HTML files in order to load MathJax.
 # mathjax_path = MathJax/MathJax.js
-MathJax.Hub.Config({
+#MathJax.Hub.Config({
+#
+#  "TeX": {"Macros": {"vector": ["\\vec{#1}", 1]}}, "tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}
+#
+#});
 
-  "TeX": {"Macros": {"vector": ["\\vec{#1}", 1]}}, "tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}
 
-});
 
 # I execute the notebooks manually in advance. If notebooks test the code,
 # they should be run at build time.
