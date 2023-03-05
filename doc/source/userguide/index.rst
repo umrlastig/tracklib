@@ -13,12 +13,12 @@ User Guide
   :maxdepth: 1
   
 
+  Core concept <coreconcept>
   Read/Write track(s), network and raster <reader_writer>
   Map matching on network <../notebook/MapMatchingOnNetwork>
 
 
 .. 2. Operation for manipulating track <2_operator>
-.. 1. Core concept <1_coreconcept>
 .. 3. Simplify, Interpolate & Filter <3_filter>
  
 
