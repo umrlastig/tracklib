@@ -33,7 +33,7 @@ release = "1.0"
 
 # -- General configuration ---------------------------------------------------
 
-mathjax_path = '/MathJax/MathJax.js'
+mathjax_path = 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -47,7 +47,7 @@ extensions = [
 	"nbsphinx",
     "autodocsumm",
     "IPython.sphinxext.ipython_console_highlighting",
-    "sphinx-mathjax-offline"
+    "sphinx.ext.mathjax"
 ]
 
 
