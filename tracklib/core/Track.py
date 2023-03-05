@@ -1402,7 +1402,7 @@ class Track:
             return estimate_speed(self)
         else:
             from tracklib.algo.Cinematics import smoothed_speed_calculation
-            return smoothed_speed_calculation(kernel)
+            return smoothed_speed_calculation(self, kernel)
 
 
     # DEPRECATED
