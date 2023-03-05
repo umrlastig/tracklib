@@ -21,4 +21,4 @@ sphinxcontrib-devhelp
 sphinxcontrib-htmlhelp
 sphinxcontrib-qthelp
 sphinxcontrib-serializinghtml
-myst-parser
+nb_extension_tagstyler
