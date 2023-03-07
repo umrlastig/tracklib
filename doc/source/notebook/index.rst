@@ -28,7 +28,7 @@ of the tracklib library.
   Summarize <Summarize>
   Switchbacks <Switchbacks>
   Kalman filter <Kalman1>
-  
+
   
 .. StopPoints <StopPoints>
 .. Mopsi <Mopsi>
