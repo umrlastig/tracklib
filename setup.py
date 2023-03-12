@@ -8,7 +8,8 @@ requirements = (
         "numpy==1.23.5", 
         "matplotlib", 
         "scikit-image", 
-        "progressbar2"
+        "progressbar2",
+        "psutil"
 )
 
 dev_requirements = (

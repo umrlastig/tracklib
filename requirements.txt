@@ -2,6 +2,7 @@ numpy<=1.23.5
 matplotlib
 scikit-image
 progressbar2
+psutil
 pytest
 pytest-runner
 coverage
