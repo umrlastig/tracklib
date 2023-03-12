@@ -15,7 +15,7 @@ User Guide
 
   Core concept <coreconcept>
   Read/Write track(s), network and raster <reader_writer>
-  Map matching on network <../notebook/MapMatchingOnNetwork>
+  Map matching <../notebook/MapMatchingOnNetwork>
 
 
 .. 2. Operation for manipulating track <2_operator>
