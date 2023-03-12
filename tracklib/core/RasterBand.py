@@ -241,15 +241,14 @@ class RasterBand:
 
 
     def plotAsImage(self, axe = None, figure = None, 
-                    color1 = (0, 0, 0), color2 = (255, 255, 255), novaluecolor='yellow'):
+                    color1 = (0, 0, 0), color2 = (255, 255, 255), novaluecolor='white'):
         """
         Plot as image
         """
         
-        tab = np.array(self.grid)
-        
+        tab = np.array(self.grid, dtype=np.float32)
         if self.getNoDataValue() != None:
-            tab[tab == self.getNoDataValue()] = None
+            tab[tab == self.getNoDataValue()] = np.nan
 
         cmap = utils.getOffsetColorMap(color1, color2, 0)
         cmap.set_bad(color=novaluecolor)
