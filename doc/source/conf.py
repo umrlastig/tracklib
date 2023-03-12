@@ -57,9 +57,9 @@ extensions = [
 
 #mathjax_path = 'MathJax/MathJax.js'
 # "sphinx-mathjax-offline"
-mathjax3_config = {
-    'tex': {'tags': 'ams', 'useLabelIds': True},
-}
+#mathjax3_config = {
+#    'tex': {'tags': 'ams', 'useLabelIds': True},
+#}
 
 
 # I execute the notebooks manually in advance. If notebooks test the code,
