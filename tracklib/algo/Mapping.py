@@ -17,6 +17,7 @@ from tracklib.core.ObsCoords import ENUCoords
 from tracklib.core.Operator import Operator
 from tracklib.core.Track import Track
 from tracklib.core.TrackCollection import TrackCollection
+from tracklib.util.Report import mapOnNetworkReport
 
 # --------------------------------------------------------------------------
 # Utils function for map-matching
@@ -153,7 +154,8 @@ def __mapOnNetwork (
     
 
 def mapOnNetwork(
-    tracks, network, gps_noise=50, transition_cost=10, search_radius=50, debug=False
+    tracks, network, gps_noise=50, transition_cost=10, search_radius=50, debug=False,
+    report=None
 ):
     """
     Map-matching on a network.
@@ -163,6 +165,20 @@ def mapOnNetwork(
         tracks = TrackCollection([tracks])
     for track in tracks:
         __mapOnNetwork(track, network, gps_noise, transition_cost, search_radius, debug)
+        
+    # Reporting
+    print ('---------------------------------------------------------------------')
+    print ('                    MAP MATCHING REPORT FILE                         ')
+    print ('---------------------------------------------------------------------')
+    print ('* General information')
+#    print ('User : ' + os.getlogin())
+#    print ('Date : ' + str(ObsTime.now()))
+#    print ('System : ' + platform.system() + '-' + platform.processor()) 
+#    print ('Python version : ' + platform.python_version())
+#    process = psutil.Process(os.getpid())
+#    memory = math.floor(process.memory_info().rss / (1024*1024))
+#    print ('Heap memory : ' + str(memory) + ' Mo')
+#    print ('---------------------------------------------------------------------')
 
 
 def mapOnRaster(track, raster):
@@ -174,9 +190,9 @@ def mapOnRaster(track, raster):
     """
     
     # create a new empty analytical feature for each raster band
-    for i in range(1, len(raster.bands)+1):
+    for i in range(raster.bandCount()):
         band = raster.getRasterBand(i)
-        name = band.name
+        name = band.getName()
         track.createAnalyticalFeature(name)
 
 
@@ -185,8 +201,9 @@ def mapOnRaster(track, raster):
         pos = track.getObs(j).position
         
         # for each band        
-        for i in range(1, len(raster.bands)+1):
-            name = raster.getRasterBand(i).name
+        for i in range(raster.bandCount()):
+            band = raster.getRasterBand(i)
+            name = band.getName()
             
             cell = band.getCell(pos)
             

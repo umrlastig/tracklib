@@ -5,9 +5,12 @@ from __future__ import annotations
 from typing import Union
 
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+import numpy as np
 
 from tracklib.core.Bbox import Bbox
 from tracklib.core.ObsCoords import ECEFCoords, ENUCoords, GeoCoords
+import tracklib.core.Utils as utils
 
 NO_DATA_VALUE = -9999
 DEFAULT_NAME = 'grid'
@@ -82,12 +85,28 @@ class RasterBand:
         self.YPixelSize = ay / self.nrow
         #print (self.XPixelSize, self.YPixelSize)
         
-        self.noDataValue = novalue
-        self.name = name
+        self.__noDataValue = novalue
+        self.__name = name
         
         
+    def setName(self, name):
+        self.__name = name
     def getName(self):
-        return self.name
+        return self.__name
+    
+    def setNoDataValue(self, noDataValue):
+        # On récupere l'ancienne valeur
+        oldvalue = self.__noDataValue
+        self.__noDataValue = noDataValue
+        
+        for i in range(self.nrow):
+            for j in range(self.ncol):
+                if self.grid[i][j] == oldvalue:
+                    self.grid[i][j] = self.__noDataValue
+        
+        
+    def getNoDataValue(self):
+        return self.__noDataValue
         
     
     def isIn(self, coord: Union[ENUCoords]):
@@ -115,18 +134,40 @@ class RasterBand:
     
     def __str__(self):
         output  = "-------------------------------------\n"
-        output += "Grid '" + self.name + "':\n"
+        output += "Grid '" + self.__name + "':\n"
+        output += "-------------------------------------\n"
         output += "       nrows = " + str(self.nrow) + "\n"
         output += "       ncols = " + str(self.ncol) + "\n"
         output += "       XPixelSize = " + str(self.XPixelSize) + "\n"
         output += "       YPixelSize = " + str(self.YPixelSize) + "\n"
-        output += " Bounding box: \n"
+        output += "   Bounding box: \n"
         output += "       Lower left corner : " + str(self.xmin) + "," + str(self.ymin) + "\n"
         output += "       Upper right corner: " + str(self.xmax) + "," + str(self.ymax) + "\n"
         output += "-------------------------------------\n"
         
         return output
     
+    def summary(self):
+        print (self.__str__())
+        
+    
+    def bandStatistics(self):
+        stats = np.array(self.grid)
+        if self.getNoDataValue() != None:
+            stats[stats == self.getNoDataValue()] = None
+        
+        print("-------------------------------------")
+        print("Grid '" + self.__name + "':")
+        print("-------------------------------------")
+        print("    Minimum value: ", np.nanmin(stats))
+        print("    Maximum value: ", np.nanmax(stats))
+        print("    Mean value:    ", np.nanmean(stats))
+        print("    Median value:  ", np.nanmedian(stats))
+        print("-------------------------------------\n")
+        
+        if self.getNoDataValue() != None:
+            stats[stats == None] = self.getNoDataValue()
+
     
     def getCell(self, coord: Union[ENUCoords, ECEFCoords, GeoCoords]) -> Union[tuple[float, float], None]:   
         """Normalized coordinates of coord
@@ -160,10 +201,9 @@ class RasterBand:
         return (idx, idy)
     
     
-    def plot(self, base: bool = True):   
-        """Plot grid
-        
-        :param base: TODO
+    def plotAsGraphic(self, backgroundcolor="lightcyan", bordercolor="lightgray"):   
+        """
+        Plot grid
         """
     
         fig = plt.figure()
@@ -173,10 +213,10 @@ class RasterBand:
     
         for i in range(1, self.ncol):
             xi = i * self.XPixelSize + self.xmin
-            ax.plot([xi, xi], [self.ymin, self.ymax], "-", color="lightgray")
+            ax.plot([xi, xi], [self.ymin, self.ymax], "-", color=bordercolor)
         for j in range(1, self.nrow):
             yj = j * self.YPixelSize + self.ymin
-            ax.plot([self.xmin, self.xmax], [yj, yj], "-", color="lightgray")
+            ax.plot([self.xmin, self.xmax], [yj, yj], "-", color=bordercolor)
     
         for i in range(self.nrow):
             y1 = self.ymin + (self.nrow - 1 - i) * self.YPixelSize
@@ -190,5 +230,42 @@ class RasterBand:
                         [[x1, y1], [x2, y1], [x2, y2], [x1, y2], [x1, y1]]
                     )
                     ax.add_patch(polygon)
-                    polygon.set_facecolor("lightcyan")
-    
+                    polygon.set_facecolor(backgroundcolor)
+                    
+                    text_kwargs = dict(ha='center', va='center', fontsize=12, color='C1')
+                    val = str(round(self.grid[i][j], 2))
+                    xm = (x2 - x1) / 2
+                    ym = (y2 - y1) / 2
+                    plt.text(x1 + xm, y1 + ym, val, **text_kwargs)
+        plt.title(self.getName())
+
+
+    def plotAsImage(self, axe = None, figure = None, 
+                    color1 = (0, 0, 0), color2 = (255, 255, 255), novaluecolor='yellow'):
+        """
+        Plot as image
+        """
+        
+        tab = np.array(self.grid)
+        
+        if self.getNoDataValue() != None:
+            tab[tab == self.getNoDataValue()] = None
+
+        cmap = utils.getOffsetColorMap(color1, color2, 0)
+        cmap.set_bad(color=novaluecolor)
+        
+        if axe == None:
+            im = plt.imshow(tab, cmap=cmap)
+            plt.title(self.getName())
+            plt.colorbar(im, fraction=0.046, pad=0.04)
+            plt.show()
+        else:
+            im = axe.imshow(tab, cmap=cmap)
+            axe.set_title(self.getName())
+            
+            divider = make_axes_locatable(axe)
+            cax = divider.append_axes('right', size='5%', pad=0.1)
+            if figure != None:
+                figure.colorbar(im, cax=cax, orientation='vertical', fraction=0.046)
+
+
