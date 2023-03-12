@@ -4,6 +4,9 @@
 from __future__ import annotations   
 
 import math
+import os
+import platform
+import psutil
 import progressbar
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,10 +17,10 @@ import tracklib.algo.Dynamics as Dynamics
 
 from tracklib.core.Obs import Obs
 from tracklib.core.ObsCoords import ENUCoords
+from tracklib.core.ObsTime import ObsTime
 from tracklib.core.Operator import Operator
 from tracklib.core.Track import Track
 from tracklib.core.TrackCollection import TrackCollection
-from tracklib.util.Report import mapOnNetworkReport
 
 # --------------------------------------------------------------------------
 # Utils function for map-matching
@@ -171,14 +174,14 @@ def mapOnNetwork(
     print ('                    MAP MATCHING REPORT FILE                         ')
     print ('---------------------------------------------------------------------')
     print ('* General information')
-#    print ('User : ' + os.getlogin())
-#    print ('Date : ' + str(ObsTime.now()))
-#    print ('System : ' + platform.system() + '-' + platform.processor()) 
-#    print ('Python version : ' + platform.python_version())
-#    process = psutil.Process(os.getpid())
-#    memory = math.floor(process.memory_info().rss / (1024*1024))
-#    print ('Heap memory : ' + str(memory) + ' Mo')
-#    print ('---------------------------------------------------------------------')
+    print ('User : ' + os.getlogin())
+    print ('Date : ' + str(ObsTime.now()))
+    print ('System : ' + platform.system() + '-' + platform.processor()) 
+    print ('Python version : ' + platform.python_version())
+    process = psutil.Process(os.getpid())
+    memory = math.floor(process.memory_info().rss / (1024*1024))
+    print ('Heap memory : ' + str(memory) + ' Mo')
+    print ('---------------------------------------------------------------------')
 
 
 def mapOnRaster(track, raster):
