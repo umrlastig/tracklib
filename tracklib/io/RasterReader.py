@@ -1,23 +1,25 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-'''
+
+# For type annotation
+from __future__ import annotations   
+from typing import Union
+
+from tracklib.core import (Bbox, RasterBand, Raster)
+from tracklib.core.ObsCoords import (ENUCoords, GeoCoords)
+
+
+class RasterReader:
+    '''
     This class offer static methods to load raster data:
     - read raster from ascii files, 
     - get DTM data from IGN web services.    
     '''
-
-# For type annotation
-from __future__ import annotations   
-#from typing import Union
-
-from tracklib.core import (Bbox, RasterBand, Raster)
-from tracklib.core.ObsCoords import (ENUCoords)
-
-
-class RasterReader:
-    
     
     @staticmethod
-    def readFromAscFile(path: str, name: str ='')-> Raster:
+    def readFromAscFile(path: str, 
+                        srid: Union[ENUCoords, ENUCoords, GeoCoords] =  ENUCoords,  
+                        name: str ='')-> Raster:
         '''
         Read grid data from an ASCII file. The first six lines of the file indicate the reference of the grid, 
         followed by the values listed in the order they would appear (left to right and top to bottom).
@@ -45,6 +47,8 @@ class RasterReader:
         -----------
         path : str
             chemin du fichier.
+        srid : str
+            nom de la classe représentant le type des coordonnées. The default is "ENUCoords".
         name: str
             nom de la band du raster, par exemple 'speed#avg'
 
@@ -101,12 +105,9 @@ class RasterReader:
             
         resolution = (cellsize, cellsize)
         marge = 0
-        
-        if name == '':
-            name = RasterBand.DEFAULT_NAME
             
         grid = RasterBand.RasterBand(bbox, resolution=resolution, margin=marge, 
-                         novalue=novalue, name=name)
+                         novalue=novalue, name=RasterBand.DEFAULT_NAME + '1')
            
         # Read the values
         i = 0

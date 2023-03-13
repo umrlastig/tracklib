@@ -105,12 +105,6 @@ class MatplotlibVisitor(iplot.IPlotVisitor):
         plot.h = 5
         return plot.plot(type, af_name, cmap, append=append, label=label)
     
-    def plotMMLink(self, track):
-        """
-        Plot the map matched track on network links.
-        """
-        pass
-    
     def plotSpatialIndex(self, si: index.SpatialIndex, base:bool=True, append=True):
         """
         Plot spatial index and collection structure together in the

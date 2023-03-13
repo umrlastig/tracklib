@@ -4,12 +4,9 @@
 from __future__ import annotations   
 
 import math
-#import os
-#import platform
-#import psutil
 import progressbar
 import numpy as np
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 import tracklib.util.Geometry as Geometry
 import tracklib.algo.Cinematics as Cinematics
@@ -17,7 +14,6 @@ import tracklib.algo.Dynamics as Dynamics
 
 from tracklib.core.Obs import Obs
 from tracklib.core.ObsCoords import ENUCoords
-#from tracklib.core.ObsTime import ObsTime
 from tracklib.core.Operator import Operator
 from tracklib.core.Track import Track
 from tracklib.core.TrackCollection import TrackCollection
@@ -157,8 +153,7 @@ def __mapOnNetwork (
     
 
 def mapOnNetwork(
-    tracks, network, gps_noise=50, transition_cost=10, search_radius=50, debug=False,
-    report=None
+    tracks, network, gps_noise=50, transition_cost=10, search_radius=50, debug=False
 ):
     """
     Map-matching on a network.
@@ -168,43 +163,7 @@ def mapOnNetwork(
         tracks = TrackCollection([tracks])
     for track in tracks:
         __mapOnNetwork(track, network, gps_noise, transition_cost, search_radius, debug)
-        
-    # Reporting
-#    print ('---------------------------------------------------------------------')
-#    print ('                    MAP MATCHING REPORT FILE                         ')
-#    print ('---------------------------------------------------------------------')
-#    print ('* General information')
-#    print ('Date : ' + str(ObsTime.now()))
-#    try:
-#        print ('User : ' + os.getlogin())
-#        print ('System : ' + platform.system() + '-' + platform.processor()) 
-#        print ('Python version : ' + platform.python_version())
-#        process = psutil.Process(os.getpid())
-#        memory = math.floor(process.memory_info().rss / (1024*1024))
-#        print ('Heap memory : ' + str(memory) + ' Mo')
-#    except:
-#        pass
-#    print ('---------------------------------------------------------------------')
-#    print ('* Input tracks ')
-#    print ('Number of tracks = ' + str(1))
-##    print ('Number of points = '+ str(trace.size()))
-##    percentMM = (nbmm / trace.size() * 100)
-##    print ('Number of map-matched points = ' + str(nbmm) + ' (' + str(round(percentMM, 2)) + ' %)')
-##    percentHP = (nbhp / trace.size() * 100)
-##    print ('Number of off-road = '+ str(nbhp) + ' (' + str(round(percentHP, 2)) + ' %)') 
-#    print ('---------------------------------------------------------------------')
-#    print ('* Input network')
-#    print ('Number of edges = ' + str(len(network.EDGES))) 
-#    print ('Number of nodes = ' + str(len(network.NODES))) 
-#    # print ('Number of vertices = 64674')
-#    print ('---------------------------------------------------------------------')
-#    print ('* Computation parameters')
-##    rmse = round(math.sqrt(d/nbmm),2)
-##    print ('GPS standard error = ' + str(rmse) + ' m')
-##    #'''
-##    #Transition model factor beta = 0.2
-##    print ('Search radius = ' + str(searchradius) + ' m')
-    
+
 
 def mapOnRaster(track, raster):
     """
@@ -215,9 +174,9 @@ def mapOnRaster(track, raster):
     """
     
     # create a new empty analytical feature for each raster band
-    for i in range(raster.bandCount()):
+    for i in range(1, len(raster.bands)+1):
         band = raster.getRasterBand(i)
-        name = band.getName()
+        name = band.name
         track.createAnalyticalFeature(name)
 
 
@@ -226,9 +185,8 @@ def mapOnRaster(track, raster):
         pos = track.getObs(j).position
         
         # for each band        
-        for i in range(raster.bandCount()):
-            band = raster.getRasterBand(i)
-            name = band.getName()
+        for i in range(1, len(raster.bands)+1):
+            name = raster.getRasterBand(i).name
             
             cell = band.getCell(pos)
             

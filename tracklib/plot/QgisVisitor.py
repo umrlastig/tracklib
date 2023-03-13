@@ -80,27 +80,6 @@ class QgisVisitor(iplot.IPlotVisitor):
         pass
     
     
-    def plotMMLink(self, track):
-        """
-        Plot the map matched track on network links.
-        """
-        layerLinkMM = QgsVectorLayer("LineString?crs=2154", "Link MM", "memory")
-        pr = layerLinkMM.dataProvider()
-        layerLinkMM.updateFields()
-        for k in range(len(track)):
-            pt1 = QgsPointXY(track[k].position.getX(), track[k].position.getY())
-            pt2 = QgsPointXY(track["hmm_inference", k][0].getX(), track["hmm_inference", k][0].getY())
-            fet = QgsFeature()
-            #fet.setAttributes(attrs)
-            fet.setGeometry(QgsGeometry.fromPolylineXY([pt1, pt2]))
-            pr.addFeatures([fet])
-        layerLinkMM.updateExtents()
-        QgsProject.instance().addMapLayer(layerLinkMM)
-            
-
-
-    
-    
     def plotSpatialIndex(self, si: index.SpatialIndex, base:bool=True, append=True):
         """
         Plot spatial index and collection structure together in the

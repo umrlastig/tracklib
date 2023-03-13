@@ -46,14 +46,6 @@ class IPlotVisitor(ABC):
         pass
     
     @abstractmethod
-    def plotMMLink(self, track):
-        """
-        Plot the map matched track on network links.
-        """
-        pass
-        
-    
-    @abstractmethod
     def plotSpatialIndex(self, si, base=True, append=True):
         """
         Plot a spatial index.
