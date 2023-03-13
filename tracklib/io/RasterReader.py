@@ -1,20 +1,20 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-# For type annotation
-from __future__ import annotations   
-from typing import Union
-
-from tracklib.core import (Bbox, RasterBand, Raster)
-from tracklib.core.ObsCoords import (ENUCoords, GeoCoords)
-
-
-class RasterReader:
-    '''
+'''
     This class offer static methods to load raster data:
     - read raster from ascii files, 
     - get DTM data from IGN web services.    
     '''
+
+# For type annotation
+from __future__ import annotations   
+#from typing import Union
+
+from tracklib.core import (Bbox, RasterBand, Raster)
+from tracklib.core.ObsCoords import (ENUCoords)
+
+
+class RasterReader:
+    
     
     @staticmethod
     def readFromAscFile(path: str, name: str ='')-> Raster:

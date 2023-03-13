@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+"""
+    Class for defining a spatial grid: structure de données un peu plus évoluée
+          qu'un tableau 2x2.
+"""
 
 # For type annotation
 from __future__ import annotations   
@@ -17,10 +21,6 @@ DEFAULT_NAME = 'grid'
 
 
 class RasterBand:
-    """
-    Class for defining a spatial grid: structure de données un peu plus évoluée
-          qu'un tableau 2x2.
-    """
     
     def __init__(
         self,
