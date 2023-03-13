@@ -14,7 +14,6 @@ numpy
 matplotlib
 scikit-image
 progressbar2
-psutil
 jupyter_contrib_nbextensions
 sphinxcontrib-jsmath 
 sphinxcontrib-applehelp
