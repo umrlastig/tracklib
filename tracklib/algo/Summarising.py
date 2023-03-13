@@ -1,5 +1,8 @@
 """Operator to aggregate analytical features and create raster and render image"""
 
+from __future__ import annotations   
+from typing import Union
+
 import math
 
 import tracklib.core.Utils as utils
@@ -10,8 +13,25 @@ from tracklib.core.RasterBand import NO_DATA_VALUE
 from tracklib.core.TrackCollection import TrackCollection
 
 
+
+def getMeasureName(af_algo:Union[int, str], aggregate=None):
+    """
+    Return the identifier of the measure defined by: af + aggregate operator
+    """
+        
+    if af_algo != "uid":
+        if isinstance(af_algo, str):
+            cle = af_algo + "#" + aggregate.__name__
+        else:
+            cle = af_algo.__name__ + "#" + aggregate.__name__
+    else:
+        cle = "uid" + "#" + aggregate.__name__
+            
+    return cle
+
+
 def summarize(collection: TrackCollection, af_algos, aggregates, 
-              resolution=None, margin: float = 0.05, verbose: bool = True,):
+              resolution=None, margin:float=0.05, verbose:bool=True):
     """
     Example:
         af_algos = [algo.speed, algo.speed]
@@ -36,11 +56,13 @@ def summarize(collection: TrackCollection, af_algos, aggregates,
         
         aggregate = aggregates[idx]
         
-        if isinstance(af_algo, str):
-            name = af_algo
-        else:
-            name = af_algo.__name__
-        cle = name + "#" + aggregate.__name__
+#        if isinstance(af_algo, str):
+#            name = af_algo
+#        else:
+#            name = af_algo.__name__
+#        cle = name + "#" + aggregate.__name__
+        cle = getMeasureName(af_algo, aggregate)
+        #print (cle)
             
         grille = RasterBand(collection.bbox(), resolution, margin, name = cle)
         #print (grille.name)
@@ -90,7 +112,7 @@ def summarize(collection: TrackCollection, af_algos, aggregates,
                         and line <= grille.nrow
                     ):
                     if not isinstance(af_algo, str):
-                        val = trace.getObsAnalyticalFeature(name, i)
+                        val = trace.getObsAnalyticalFeature(af_algo.__name__, i)
                     elif af_algo != "uid":
                         val = trace.getObsAnalyticalFeature(af_algo, i)
                     else:
