@@ -20,17 +20,6 @@ class RasterBand:
     """
     Class for defining a spatial grid: structure de données un peu plus évoluée
           qu'un tableau 2x2.
-    Mainly used by :class:`core.SpatialIndex.SpatialIndex` and `algo.Summarizing.summarize`
-    
-    
-    Parameters
-    ----------
-    nrow : int
-       Numbers of rows.
-    ncol : int
-       Numbers of cols.
-    
-    
     """
     
     def __init__(

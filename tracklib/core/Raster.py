@@ -1,5 +1,6 @@
 """
-This module contains the class to manipulate rasters
+This module contains the class to manipulate rasters.
+Class for defining a collection of RasterBand.
 """
 
 # For type annotation
@@ -11,10 +12,6 @@ import tracklib.core.RasterBand as grid
 
 
 class Raster:
-    """
-    Class for defining a collection of RasterBand. 
-    Mainly used by :function:`algo.Mapping.mapOnRaster` and `algo.Summarizing.summarize`.
-    """
     
     def __init__(self, grids: Union[grid.RasterBand, list], verbose=True):
         """
@@ -25,6 +22,7 @@ class Raster:
         ----------
         grids : list 
            A list of RasterBand or one RasterBand.
+           
         """
         
         grids = utils.listify(grids)
@@ -38,6 +36,7 @@ class Raster:
 
     def bandCount(self):
         """
+        TODO
         """
         return len(self.__bands)
 
