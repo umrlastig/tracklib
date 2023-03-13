@@ -1,6 +1,9 @@
 version: 2
 formats: all
 
+sphinx:
+   configuration: doc/source/conf.py
+
 python:
   version: 3.8
   install:
