@@ -109,6 +109,7 @@ class MatplotlibVisitor(iplot.IPlotVisitor):
         """
         Plot the map matched track on network links.
         """
+        pass
     
     def plotSpatialIndex(self, si: index.SpatialIndex, base:bool=True, append=True):
         """
