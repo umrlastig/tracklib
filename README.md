@@ -2,16 +2,20 @@
 
 <p align="center">
 <table style="border:none;border:0;width:60%"><tr>
-  <td align="center" style="width:30%"><img width="200px" src="https://github.com/mdvandamme/tracklib/blob/main/doc/source/TracklibLogo.png" /></td>
+  <td align="center" style="width:30%"><img width="200px" src="https://github.com/umrlastig/tracklib/blob/main/doc/source/img/TracklibLogo.png" /></td>
   <td style="padding:16px;"><label>Tracklib</label> library provide a variety of tools, operators and functions to manipulate GPS trajectories</td>
 </tr></table>
 </p>
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![Tracklib build & test](https://github.com/mdvandamme/tracklib/actions/workflows/ci.yml/badge.svg)](https://github.com/mdvandamme/tracklib/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/mdvandamme/tracklib/branch/main/graph/badge.svg?token=pHLaV21j2O)](https://codecov.io/gh/mdvandamme/tracklib)
+[![Tracklib build & test](https://github.com/umrlastig/tracklib/actions/workflows/ci.yml/badge.svg)](https://github.com/umrlastig/tracklib/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/umrlastig/tracklib/branch/main/graph/badge.svg?token=pHLaV21j2O)](https://codecov.io/gh/umrlastig/tracklib)
 [![Documentation Status](https://readthedocs.org/projects/tracklib/badge/?version=latest)](https://tracklib.readthedocs.io/en/latest/?badge=latest)
 [![Software License](https://img.shields.io/badge/Licence-Cecill--C-blue.svg?style=flat)](https://github.com/umrlastig/tracklib/blob/main/LICENCE)
+
+[![Supported Python Versions](https://img.shields.io/pypi/pyversions/tracklib.svg)](https://pypi.python.org/pypi/tracklib/)
+[![PyPI Version](https://img.shields.io/pypi/v/tracklib.svg)](https://pypi.python.org/pypi/tracklib/)
+![PyPI Downloads](https://img.shields.io/pypi/dm/tracklib?color=blue)
 
 
 More and more datasets of GPS trajectories are now available and they are studied very frequently in many scientific domains. 
@@ -24,17 +28,88 @@ and functions to simplify the creation of analytical features on a GPS tracks.
 
 The official documentation is available at **[ReadTheDocs](https://tracklib.readthedocs.io)**
 
+## Installation
+
+#### from pypi (i.e. via pip)
+
+```bash
+pip install tracklib
+```
+
+## Features
+
+
+## Quickstart
+
+### Prepare data
+
+Loading data from a GPX file, transform the geographic coordinates in a 
+local projection and display the track. Then computing the local speed.
+
+```python
+from tracklib.core.ObsTime import ObsTime
+from tracklib.io.TrackReader import TrackReader
+
+ObsTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
+
+path = '/home/marie-dominique/tracklib/tracklib/data/gpx/activity_5807084803.gpx'
+tracks = TrackReader.readFromGpx(path)
+trace = tracks.getTrack(0)
+
+# Transformation GEO coordinates to ENU
+trace.toENUCoords()
+
+# Display
+trace.plot()
+
+# Compute local speed
+trace.estimate_speed()
+```
+
+<p align="center">
+<img width="300px" 
+  src="https://raw.githubusercontent.com/umrlastig/tracklib/main/doc/source/img/quickstart_5.png" />
+</p>
+
+### Summarize speed and plot it in a raster images
+
+```python
+from tracklib.core.TrackCollection import TrackCollection
+from tracklib.algo import (Summarising, Analytics)
+
+collection = TrackCollection([trace])
+
+af_algos = [Analytics.speed, Analytics.speed, Analytics.speed]
+cell_operators = [Summarising.co_avg, Summarising.co_min, Summarising.co_max]
+marge = 0.1
+raster = Summarising.summarize(collection, af_algos, cell_operators, (3,3), marge)
+
+raster.setColor((0, 0, 0), (255, 255, 255))
+raster.plot(Analytics.speed, Summarising.co_avg, no_data_values = 0)
+```
+
+<p align="center">
+<img width="300px" 
+  src="https://raw.githubusercontent.com/umrlastig/tracklib/main/doc/source/img/summarize_quickstart.png" />
+</p>
+
+### Segmentation with speed change
+
+![png](https://tracklib.readthedocs.io/en/latest/_images/quickstart_4.png)
+
+
+
+## Development
+
 Institute: LASTIG, Univ Gustave Eiffel, ENSG, IGN
 
 Authors
 - Yann Méneroux
-- Marie-Dominique Van Damme
+- [Marie-Dominique Van Damme](https://www.umr-lastig.fr/mdvandamme/)
 - Nisar Hakam
 - [Lâmân LELÉGARD](https://www.umr-lastig.fr/laman-lelegard/) 
+- [Mattia Bunel ](https://www.umr-lastig.fr/mattia-bunel/index_fr.html)
 
-
-Minimal python version:
-- Python 3.6+
 
 
 
