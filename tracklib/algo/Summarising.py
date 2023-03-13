@@ -14,7 +14,7 @@ from tracklib.core.TrackCollection import TrackCollection
 
 
 
-def getMeasureName(af_algo: Union[int, str], aggregate = None):
+def getMeasureName(af_algo:Union[int, str], aggregate=None):
     """
     Return the identifier of the measure defined by: af + aggregate operator
     """
@@ -31,7 +31,7 @@ def getMeasureName(af_algo: Union[int, str], aggregate = None):
 
 
 def summarize(collection: TrackCollection, af_algos, aggregates, 
-              resolution=None, margin: float = 0.05, verbose: bool = True,):
+              resolution=None, margin:float=0.05, verbose:bool=True):
     """
     Example:
         af_algos = [algo.speed, algo.speed]
