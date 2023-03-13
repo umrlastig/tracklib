@@ -11,11 +11,10 @@ import tracklib.core.RasterBand as grid
 
 
 class Raster:
-    
-    '''
+    """
     Class for defining a collection of RasterBand. 
     Mainly used by :function:`algo.Mapping.mapOnRaster` and `algo.Summarizing.summarize`.
-    '''
+    """
     
     def __init__(self, grids: Union[grid.RasterBand, list], verbose=True):
         """
@@ -44,6 +43,7 @@ class Raster:
 
     def getNamesOfRasterBand(self):
         """
+        Return all the names of raster bands in a list.
         """
         return list(self.__bands.keys())
     
