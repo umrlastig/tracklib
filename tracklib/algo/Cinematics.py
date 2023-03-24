@@ -160,7 +160,7 @@ def computeRadialSignature(track, factor=1):
 
 
 def inflection(track, i):
-    '''
+    """
     Among the characteristic points, inflection points are the minima of curvature.
     This function is an AF algorithm to detect if the observation obs(i) 
     is an inflection point or not.
@@ -170,15 +170,14 @@ def inflection(track, i):
 
     Parameters
     -----------
-    track : Track
-    i : integer
-        the th point.
-
-    Returns
-    --------
-    int
-        1 if obs(i) is a inflection point, 0 else.
-    '''
+    
+    :param track: a track to compute inflection point
+    :param i: the th point
+    :type track: Track
+    :type i: int
+    :returns: 1 if obs(i) is a inflection point, 0 else.
+    :rtype: int
+    """
     
     if i == 0 or i == 1:
         return 0
@@ -209,17 +208,16 @@ def vertex(track, i):
     the maxima of curvature.
     This function is an AF algorithm to detect if the observation obs(i) 
     is a vertex point of the track or not.
-
+        
     Parameters
     -----------
-    track : Track
-    i : integer
-        the th point.
-
-    Returns
-    --------
-    int
-        1 if obs(i) is a vertex point, 0 else.
+    
+    :param track: a track to compute inflection point
+    :param i: the th point
+    :type track: Track
+    :type i: int
+    :returns: 1 if obs(i) is a vertex point, 0 else.
+    :rtype: int
     '''
     
     # on cherche imin, l'indice du point d'inflexion le plus proche 
@@ -259,17 +257,15 @@ def vertex(track, i):
 def curvature_radius(track, i):
     '''
     
-
     Parameters
     -----------
-    track : Track
-    i : integer
-        the th point.
-
-    Returns
-    --------
-    float
-        
+    
+    :param track: a track to compute inflection point
+    :param i: the th point
+    :type track: Track
+    :type i: int
+    :returns: curvature radius
+    :rtype: float
     '''
     
     # on cherche imin, l'indice du point d'inflexion le plus proche 
