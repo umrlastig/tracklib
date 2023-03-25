@@ -193,6 +193,11 @@ class TrackCollection:
         """TODO"""
         for trace in self.__TRACES:
             trace.addAnalyticalFeature(algorithm, name)
+            
+    def operate(self, operator, arg1=None, arg2=None, arg3=None):
+        """TODO"""
+        for trace in self.__TRACES:
+            trace.operate(operator, arg1, arg2, arg3)
 
     def plot(self, symbols=None, markersize=[4], margin=0.05, append=False):
         """TODO"""
