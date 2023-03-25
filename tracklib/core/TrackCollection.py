@@ -238,7 +238,7 @@ class TrackCollection:
             bbox = bbox + self.getTrack(i).bbox()
         return bbox
 
-    def resample(self, delta, algo: Literal[1, 2] = 1, mode: Literal[1, 2, 3, 4] = 2):   
+    def resample(self, delta, algo: Literal[1,2,3,4]=1, mode:Literal[1,2]=1):   
         """Resampling tracks with linear interpolation
 
 
