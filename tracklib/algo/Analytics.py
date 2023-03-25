@@ -3,6 +3,7 @@ Algorithm to create Analytical features: ds, speed, abs_curv.
 """
 
 import math
+import numpy as np
 #from typing import Iterable, Literal, Union   
 
 #from tracklib.core.Track import Track
@@ -116,6 +117,25 @@ def acceleration(track, i):
         return utils.NAN
 
     return d / dt
+
+
+def slope(track, i):
+    
+    if i == 0:
+        return utils.NAN
+    
+    z2 = track.getObs(i).position.getZ()
+    z1 = track.getObs(i-1).position.getZ()
+    rise = z2 - z1
+    run = track.getObs(i).distance2DTo(track.getObs(i-1))
+    #print (rise, run)
+    
+    if run <= 0:
+        return utils.NAN
+    
+    # return rise/run * 100
+    return math.atan(rise/run)*180/np.pi
+    
 
 
 # =============================================================================
