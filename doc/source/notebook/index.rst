@@ -24,11 +24,11 @@ of the tracklib library.
 .. toctree::
   :maxdepth: 1
 
-  Quickstart <Quickstart>
-  Summarize <Summarize>
-  Switchbacks <Switchbacks>
-  Kalman filter <Kalman1>
-  
+..  Quickstart <Quickstart>
+..  Summarize <Summarize>
+..  Switchbacks <Switchbacks>
+..  Kalman filter <Kalman>
+
   
 .. StopPoints <StopPoints>
 .. Mopsi <Mopsi>

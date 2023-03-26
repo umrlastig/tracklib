@@ -29,6 +29,13 @@ def isnan(number: Union[int, float]) -> bool:
     """Check if two numbers are different"""
     return number != number
 
+def removeNan(T:list) -> list:
+    newList = list()
+    for element in T:
+        if not isnan(element):
+            newList.append(element)
+    return newList
+
 def isfloat(value: Any) -> bool:   
     """Check is a value is a float"""
     try:

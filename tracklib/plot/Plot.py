@@ -231,7 +231,8 @@ class Plot:
         ax1.plot(x, data)
 
 
-    def plotProfil(self, template="SPATIAL_SPEED_PROFIL", afs=[]):
+    def plotProfil(self, template="SPATIAL_SPEED_PROFIL", afs=[], append=False,
+                   linestyle = '-', linewidth=1):
         """Représentation du profil de la trace suivant une AF.
 
         Le nom du template doit respecter: XXX_YYYY_PROFILE avec:
@@ -250,6 +251,14 @@ class Plot:
 
         afs: uniquement si 'isAFTransition'
         """
+        
+        if isinstance(append, bool):
+            if append:
+                ax1 = plt.gca()
+            else:
+                fig, ax1 = plt.subplots(figsize=(self.w, self.h))
+        else:
+            ax1 = append
         
         nomaxes = template.split("_")
         if len(nomaxes) != 3:
@@ -304,9 +313,10 @@ class Plot:
 
         tablegend.append("PROFIL")
 
-        fig, ax1 = plt.subplots(figsize=(10, 3))
+        #fig, ax1 = plt.subplots(figsize=(10, 3))
 
-        l = ax1.plot(X, Y, "-", color=self.color)
+        l = ax1.plot(X, Y, "-", color=self.color, linestyle=linestyle,
+                     linewidth=linewidth)
 
         tabplot.append(l)
         plt.xlim([xmin, xmax])

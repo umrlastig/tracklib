@@ -26,19 +26,19 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
         p1 = Obs.Obs(c1, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace1.addObs(p1)
         
-        c2 = Coords.ENUCoords(10, 0, 0)
+        c2 = Coords.ENUCoords(10, 0, 10)
         p2 = Obs.Obs(c2, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:12"))
         self.trace1.addObs(p2)
         
-        c3 = Coords.ENUCoords(10, 10, 0)
+        c3 = Coords.ENUCoords(10, 10, 10)
         p3 = Obs.Obs(c3, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:40"))
         self.trace1.addObs(p3)
         
-        c4 = Coords.ENUCoords(10, 20, 0)
+        c4 = Coords.ENUCoords(10, 20, 15)
         p4 = Obs.Obs(c4, ObsTime.ObsTime.readTimestamp("2018-01-01 10:01:50"))
         self.trace1.addObs(p4)
 		
-        c5 = Coords.ENUCoords(0, 20, 0)
+        c5 = Coords.ENUCoords(0, 20, 10)
         p5 = Obs.Obs(c5, ObsTime.ObsTime.readTimestamp("2018-01-01 10:02:10"))
         self.trace1.addObs(p5)
 		
@@ -156,7 +156,28 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
         self.assertTrue(math.isnan(v32))
         v33 = self.trace3.getObsAnalyticalFeature('speed', 3)
         self.assertTrue(math.isnan(v33))
-
+        
+        
+    def testSlope(self):
+        
+        self.trace1.addAnalyticalFeature(Analytics.slope)
+        
+        s0 = self.trace1.getObsAnalyticalFeature('slope', 0)
+        s1 = self.trace1.getObsAnalyticalFeature('slope', 1)
+        s2 = self.trace1.getObsAnalyticalFeature('slope', 2)
+        s3 = self.trace1.getObsAnalyticalFeature('slope', 3)
+        s4 = self.trace1.getObsAnalyticalFeature('slope', 4)
+        s5 = self.trace1.getObsAnalyticalFeature('slope', 5)
+        s6 = self.trace1.getObsAnalyticalFeature('slope', 6)
+        
+        self.assertEqual(math.isnan(s0), math.isnan(utils.NAN))
+        self.assertEqual(s1, 45.0)
+        self.assertEqual(s2, 0.0)
+        self.assertTrue(abs(s3 - 26.56) < 0.01)
+        self.assertTrue(abs(s4 + 26.56) < 0.01)
+        self.assertTrue(abs(s5 + 45.0) < 0.01)
+        self.assertEqual(s6, 0.0)
+        
 
     def testAcceleration(self):
 		
@@ -300,6 +321,8 @@ if __name__ == '__main__':
     suite.addTest(TestAlgoAnalyticsMethods("testAngleGeom"))
     suite.addTest(TestAlgoAnalyticsMethods("testCalculAngleOriente"))
     suite.addTest(TestAlgoAnalyticsMethods("testOrientation"))
+    suite.addTest(TestAlgoAnalyticsMethods("testSlope"))
+    
     
     #suite.addTest(TestAlgoAnalyticsMethods("testStopPointWithAccelerationCriteria"))
     #suite.addTest(TestAlgoAnalyticsMethods("testStopPointWithTimeWindowCriteria"))

@@ -193,6 +193,11 @@ class TrackCollection:
         """TODO"""
         for trace in self.__TRACES:
             trace.addAnalyticalFeature(algorithm, name)
+            
+    def operate(self, operator, arg1=None, arg2=None, arg3=None):
+        """TODO"""
+        for trace in self.__TRACES:
+            trace.operate(operator, arg1, arg2, arg3)
 
     def plot(self, symbols=None, markersize=[4], margin=0.05, append=False):
         """TODO"""
@@ -238,7 +243,7 @@ class TrackCollection:
             bbox = bbox + self.getTrack(i).bbox()
         return bbox
 
-    def resample(self, delta, algo: Literal[1, 2] = 1, mode: Literal[1, 2, 3, 4] = 2):   
+    def resample(self, delta, algo: Literal[1,2,3,4]=1, mode:Literal[1,2]=1):   
         """Resampling tracks with linear interpolation
 
 
