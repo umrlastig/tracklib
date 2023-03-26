@@ -40,6 +40,7 @@ class RasterBand:
         :param verbose: Verbose creation
         """
         
+        self.__bbox = bb
         bb = bb.copy()
         bb.addMargin(margin)
         (self.xmin, self.xmax, self.ymin, self.ymax) = bb.asTuple()
@@ -77,6 +78,8 @@ class RasterBand:
         self.__noDataValue = novalue
         self.__name = name
         
+    def bbox(self):
+        return self.__bbox
         
     def setName(self, name):
         self.__name = name
