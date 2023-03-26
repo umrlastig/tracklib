@@ -2242,4 +2242,10 @@ class Track:
 
     def __setitem__(self, n, obs):
         """TODO"""
+        if isinstance(n, tuple):
+            if isinstance(n[0], str):
+                self.setObsAnalyticalFeature(n[0], n[1], obs)
+            else:
+                self.setObsAnalyticalFeature(n[1], n[0], obs)
+            return
         self.__POINTS[n] = obs
