@@ -2251,7 +2251,6 @@ class Track:
                 self.setObsAnalyticalFeature(n[1], n[0], obs)
             return
         if isinstance(n, str):
-            print(self.hasAnalyticalFeature(n))
             self.createAnalyticalFeature(n, obs)
             return
         self.__POINTS[n] = obs
