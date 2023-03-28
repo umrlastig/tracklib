@@ -17,6 +17,67 @@ class RasterReader:
     
     
     @staticmethod
+    def readMetadataFromAscFile(path: str, name: str ='')-> Raster:
+        '''
+        '''
+        
+        with open (path, 'r') as fichier:
+            lines = fichier.readlines()
+            fichier.close()
+            
+        # Build an empty grid
+        xllcorner = 0
+        yllcorner = 0
+        cellsize = 0
+        nrows = 0
+        ncols = 0
+        
+        cptrowheader = 0
+        novalue = RasterBand.NO_DATA_VALUE
+        for line in lines:
+            cle = line.split(" ")[0].strip()
+            if cle in  ['ncols', 'nrows', 'xllcorner', 'yllcorner', 'cellsize', 'NODATA_value']:
+                cptrowheader += 1
+                    
+                i = 1
+                val = line.split(" ")[1].strip()
+                while val == '':
+                    i += 1
+                    val = line.split(" ")[i].strip()
+                    
+                if cle == 'ncols':
+                    ncols = int(val)
+                if cle == 'nrows':
+                    nrows = int(val)
+                if cle == 'xllcorner':
+                    xllcorner = float(val)
+                if cle == 'yllcorner':
+                    yllcorner = float(val)
+                if cle == 'cellsize':
+                    
+                    cellsize = int(float(val))
+                if cle == 'NODATA_value':
+                    novalue = float(val)
+            else:
+                break
+                    
+        ll = ENUCoords(xllcorner, yllcorner, 0)
+        ur = ENUCoords(xllcorner + cellsize * ncols, yllcorner + cellsize * nrows, 0)
+        bbox = Bbox.Bbox(ll, ur)
+            
+        resolution = (cellsize, cellsize)
+        marge = 0
+        
+        if name == '':
+            name = RasterBand.DEFAULT_NAME
+            
+        grid = RasterBand.RasterBand(bbox, resolution=resolution, margin=marge, 
+                         novalue=novalue, name=name)
+           
+        return grid
+    
+    
+    @staticmethod
     def readFromAscFile(path: str, name: str ='')-> Raster:
         '''
         Read grid data from an ASCII file. The first six lines of the file indicate the reference of the grid, 

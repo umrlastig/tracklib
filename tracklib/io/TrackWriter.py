@@ -502,6 +502,7 @@ class TrackWriter:
                 f.write(TrackWriter.__getGpxHeader())
             
             f.write("    <trk>\n")
+            f.write("    <name>" + str(track.tid) + "</name>\n")
             f.write("        <trkseg>\n")
             for i in range(len(track)):
                 x = "{:3.8f}".format(track[i].position.getX())

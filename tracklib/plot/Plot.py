@@ -315,7 +315,8 @@ class Plot:
 
         #fig, ax1 = plt.subplots(figsize=(10, 3))
 
-        l = ax1.plot(X, Y, "-", color=self.color, linestyle=linestyle,
+        # "-"
+        l = ax1.plot(X, Y, color=self.color, linestyle=linestyle,
                      linewidth=linewidth)
 
         tabplot.append(l)

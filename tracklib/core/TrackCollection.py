@@ -194,6 +194,16 @@ class TrackCollection:
         for trace in self.__TRACES:
             trace.addAnalyticalFeature(algorithm, name)
             
+            
+    def getAnalyticalFeature(self, af_name, withNan=True):
+        valuesAF = []
+        for track in self:
+            values = track.getAnalyticalFeature(af_name)
+            if not withNan:
+                values = Utils.removeNan(values)
+            valuesAF = valuesAF + values
+        return valuesAF
+            
     def operate(self, operator, arg1=None, arg2=None, arg3=None):
         """TODO"""
         for trace in self.__TRACES:
