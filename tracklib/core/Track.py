@@ -2237,7 +2237,9 @@ class Track:
             return self.getAnalyticalFeature(n)
         output = self.__POINTS[n]
         if not isinstance(output, Obs):
-            return Track(self.__POINTS[n])
+            track = Track(self.__POINTS[n])
+            track.__transmitAF(self)
+            return track
         return self.__POINTS[n]
 
     def __setitem__(self, n, obs):
@@ -2247,5 +2249,9 @@ class Track:
                 self.setObsAnalyticalFeature(n[0], n[1], obs)
             else:
                 self.setObsAnalyticalFeature(n[1], n[0], obs)
+            return
+        if isinstance(n, str):
+            print(self.hasAnalyticalFeature(n))
+            self.createAnalyticalFeature(n, obs)
             return
         self.__POINTS[n] = obs
