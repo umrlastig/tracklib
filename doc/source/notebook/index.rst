@@ -24,7 +24,7 @@ of the tracklib library.
 .. toctree::
   :maxdepth: 1
 
-..  Quickstart <Quickstart>
+  Quickstart <Quickstart>
 ..  Summarize <Summarize>
 ..  Switchbacks <Switchbacks>
 ..  Kalman filter <Kalman>
