@@ -25,9 +25,9 @@ of the tracklib library.
   :maxdepth: 1
 
   Quickstart <Quickstart>
-..  Summarize <Summarize>
-..  Switchbacks <Switchbacks>
-..  Kalman filter <Kalman>
+  Summarize <Summarize>
+  Switchbacks <Switchbacks>
+  Kalman filter <Kalman>
 
   
 .. StopPoints <StopPoints>
