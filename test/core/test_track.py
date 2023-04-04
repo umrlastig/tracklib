@@ -339,10 +339,34 @@ class TestTrack(TestCase):
         wkt = self.trace1.toWKT()
         self.assertEquals(wkt, "LINESTRING(1.0 5.0)")
         
+    
+    def test_create_and_init_af(self):
+        
+        # ajoute un nouvel AF de nom new_AF_name et lui affecte la valeur 2 à chaque époque.
+        self.trace2["AF_2"] = 2
+        T = self.trace2.getAnalyticalFeature('AF_2')
+        self.assertCountEqual (T, [2,2,2,2])
+        self.assertListEqual (T, [2,2,2,2])
+
+        # ajoute un nouvel AF en lui passant une liste
+        self.trace2["AF_LIST"] = [3]*len(self.trace2)
+        T = self.trace2.getAnalyticalFeature('AF_LIST')
+        self.assertCountEqual (T, [3,3,3,3])
+        self.assertListEqual (T, [3,3,3,3])
+        
+        # ajoute un nouvel AF de nom new_AF_name et lui affecte la valeur de 0 à n-1 
+        self.trace2["AF_LIST_2"] = [i for i in range(len(self.trace2))]
+        T = self.trace2.getAnalyticalFeature('AF_LIST_2')
+        self.assertCountEqual (T, [0,1,2,3])
+        self.assertListEqual (T, [0,1,2,3])
+        
+        
+        
 
 if __name__ == '__main__':
     suite = TestSuite()
     
+    '''
     suite.addTest(TestTrack("test_str"))
     suite.addTest(TestTrack("test_timezone"))
     suite.addTest(TestTrack("test_interval"))
@@ -357,7 +381,9 @@ if __name__ == '__main__':
     suite.addTest(TestTrack("test_af_xyztidx"))
     suite.addTest(TestTrack("test_obs_af"))
     suite.addTest(TestTrack("test_set_obs_af"))
-    
+    '''
+    suite.addTest(TestTrack("test_create_and_init_af"))
+    '''
     suite.addTest(TestTrack("test_sort"))
     suite.addTest(TestTrack("test_remove_obs"))
     suite.addTest(TestTrack("test_tid"))
@@ -365,6 +391,7 @@ if __name__ == '__main__':
     
     suite.addTest(TestTrack("test_remove_tpsDup"))
     suite.addTest(TestTrack("test_export"))
+    '''
     
     runner = TextTestRunner()
     runner.run(suite)
