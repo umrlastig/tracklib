@@ -366,7 +366,6 @@ class TestTrack(TestCase):
 if __name__ == '__main__':
     suite = TestSuite()
     
-    '''
     suite.addTest(TestTrack("test_str"))
     suite.addTest(TestTrack("test_timezone"))
     suite.addTest(TestTrack("test_interval"))
@@ -381,9 +380,8 @@ if __name__ == '__main__':
     suite.addTest(TestTrack("test_af_xyztidx"))
     suite.addTest(TestTrack("test_obs_af"))
     suite.addTest(TestTrack("test_set_obs_af"))
-    '''
     suite.addTest(TestTrack("test_create_and_init_af"))
-    '''
+
     suite.addTest(TestTrack("test_sort"))
     suite.addTest(TestTrack("test_remove_obs"))
     suite.addTest(TestTrack("test_tid"))
@@ -391,7 +389,6 @@ if __name__ == '__main__':
     
     suite.addTest(TestTrack("test_remove_tpsDup"))
     suite.addTest(TestTrack("test_export"))
-    '''
     
     runner = TextTestRunner()
     runner.run(suite)
