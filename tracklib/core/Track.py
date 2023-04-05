@@ -784,10 +784,12 @@ class Track:
                 break
         return id
 
-    def print(self, af_names="#all_features"):
+    def print(self, n=-1, af_names="#all_features"):
         """TODO
 
         Console print of track with analytical features"""
+        if n == -1:
+            n = len(self)
         if self.size() == 0:
             return
         if af_names == "#all_features":
@@ -797,15 +799,23 @@ class Track:
         print("-----------------------------------------------------------------")
         line = "Analytical features:  "
         for i in range(len(af_names)):
-            line += af_names[i] + "  "
+            line += af_names[i]
+            if (i < len(af_names)-1):
+                line += ", "
+        if (len(af_names) == 0):
+            line += "NONE"
         print(line)
         print("-----------------------------------------------------------------")
-        for i in range(self.size()):
-            output = (str)(self.__POINTS[i]) + ",  "
+        digits = math.floor(math.log(n)/math.log(10)) + 1
+        fmt = '{:0'+str(digits)+'d}'
+        for i in range(n):
+            output = "[" + fmt.format(i) + "]  "+(str)(self.__POINTS[i])
+            if (len(af_names) != 0):
+                output += ", "
             for j in range(len(af_names)):
                 output += str(self.getObsAnalyticalFeature(af_names[j], i))
                 if j < len(af_names) - 1:
-                    output += ","
+                    output += ", "
             print(output)
 
     def summary(self):
@@ -965,6 +975,24 @@ class Track:
         else:
             for i in range(self.size()):
                 self.getObs(i).features.append(val_init)
+                
+    def updateAnalyticalFeature(self, name, new_val):
+        """
+        Update values of an AF.
+        """
+        if not self.hasAnalyticalFeature(name):
+            sys.exit("Error: track does not contain analytical feature '" + name + "'")
+        if self.size() <= 0:
+            sys.exit(
+                "Error: can't add AF '" + name + "', there is no observation in track"
+            )
+        idAF = self.__analyticalFeaturesDico[name] 
+        if isinstance(new_val, list):
+            for i in range(self.size()):
+                self.getObs(i).features[idAF] = new_val[i]
+        else:
+            for i in range(self.size()):
+                self.getObs(i).features[idAF] = new_val
 
     def removeAnalyticalFeature(self, name):
         """TODO"""
@@ -2251,6 +2279,15 @@ class Track:
                 self.setObsAnalyticalFeature(n[1], n[0], obs)
             return
         if isinstance(n, str):
-            self.createAnalyticalFeature(n, obs)
+            if (obs == "#DELETE"):
+                self.removeAnalyticalFeature(n)
+                return
+            if (str(type(obs))[8:16] == "function"):
+                self.addAnalyticalFeature(obs, n)
+                return
+            if self.hasAnalyticalFeature(n):
+                self.updateAnalyticalFeature(n, obs)
+            else:
+                self.createAnalyticalFeature(n, obs)
             return
         self.__POINTS[n] = obs
