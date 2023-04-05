@@ -180,6 +180,12 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         
         a = Cinematics.computeAvgSpeed(self.trace2)
         self.assertLessEqual(abs(a - 0.419354), self.__epsilon, 'ComputeAvgSpeed')
+        
+        
+    def testComputeAvgAscSpeed(self):
+        
+        a = Cinematics.computeAvgAscSpeed(self.trace2)
+        self.assertLessEqual(abs(a - 0.096774), self.__epsilon, 'computeAvgAscSpeed')
 
 
     def testComputeNetDeniv(self):
@@ -216,6 +222,7 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         
 
 if __name__ == '__main__':
+    
     suite = unittest.TestSuite()
     suite.addTest(TestAlgoCinematicsMethods("testAFInflexion"))
     suite.addTest(TestAlgoCinematicsMethods("testAFvertex"))
@@ -225,6 +232,7 @@ if __name__ == '__main__':
     suite.addTest(TestAlgoCinematicsMethods("testComputeNetDeniv"))
     suite.addTest(TestAlgoCinematicsMethods("testComputeAscDeniv"))
     suite.addTest(TestAlgoCinematicsMethods("testComputeDescDeniv"))
+    suite.addTest(TestAlgoCinematicsMethods("testComputeAvgAscSpeed"))
     suite.addTest(TestAlgoCinematicsMethods("testComputeRadialSignature"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
