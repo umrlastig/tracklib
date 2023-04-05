@@ -72,7 +72,8 @@ def computeAvgSpeed(track, id_ini=0, id_fin=None):
     """
     if id_fin is None:
         id_fin = track.size() - 1
-    d = track.getCurvAbsBetweenTwoPoints(id_ini, id_fin)
+    # extract ?
+    d = computeCurvAbsBetweenTwoPoints(track, id_ini, id_fin)
     t = track[id_fin].timestamp - track[id_ini].timestamp
     return d / t
 
@@ -84,7 +85,7 @@ def computeAvgAscSpeed(track, id_ini=0, id_fin=None):
     """
     if id_fin is None:
         id_fin = track.size() - 1
-    dp = track.computeAscDeniv(id_ini, id_fin)
+    dp = computeAscDeniv(track, id_ini, id_fin)
     t = track[id_fin].timestamp - track[id_ini].timestamp
     return dp / t
 
