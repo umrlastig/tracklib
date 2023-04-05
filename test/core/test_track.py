@@ -332,7 +332,7 @@ class TestTrack(TestCase):
         self.trace2.addAnalyticalFeature(Analytics.ds)
         self.trace2.addAnalyticalFeature(Analytics.heading)
         self.trace2.addAnalyticalFeature(Analytics.speed)
-        self.trace2.print(['speed'])
+        #self.trace2.print(['speed'])
         
         self.trace2.summary()
         
