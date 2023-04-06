@@ -741,8 +741,67 @@ def stdbscan(track, eps1, eps2, minPts, deltaT):
     Cluster in AF
 
     '''
+    
+    stack = []
+    cluster_label = 0
+    
+    track.createAnalyticalFeature('stdbscan', -1)
+    track.createAnalyticalFeature('noise', -1)
+    
+    for i, obs in enumerate(track):
+        
+        nocluster = track.getObsAnalyticalFeature('stdbscan', i)
+        if nocluster == -1:
+        
+            neighbors_index = retrieveNeighbors(track, i, eps1, eps2)
+            #print (len(neighbors_index))
+            
+            if len(neighbors_index) < minPts:
+                track.setObsAnalyticalFeature('noise', i, 1)
+            else:
+                
+                cluster_label += 1
+                
+                for k in neighbors_index:
+                    track.setObsAnalyticalFeature('stdbscan', k, cluster_label)
+                
+                for idx in neighbors_index:
+                    stack.append(idx)
+                    
+                while len(stack) > 0:
+                     io = stack[0]
+                     stack.remove(io)
+                     
+                     neighbors_index2 = retrieveNeighbors(track, io, eps1, eps2)
+                     if len(neighbors_index2) >= minPts:
+                         
+                         for k in neighbors_index2:
+                             nonoise =  track.getObsAnalyticalFeature('noise', k)
+                             nocluster = track.getObsAnalyticalFeature('stdbscan', k)
+                             if nonoise > -1 or nocluster == -1:
+                                 track.setObsAnalyticalFeature('stdbscan', k, cluster_label)
+                                 
+
+def retrieveNeighbors(track, j, eps1, eps2):
+    neighbors_index = []
+    for i in range (track.size()):
+        if i == j:
+            continue
+        
+        dd = track.getObs(j).distanceTo(track.getObs(i))
+        dt = abs(track.getObs(j).timestamp.toAbsTime() - track.getObs(i).timestamp.toAbsTime())
+        if dd <= eps1 and dt <= eps2:
+            neighbors_index.append(i)
+        
+    return neighbors_index
+
+
+#def standardizing(neigh_ipm, ipm_cluster):
+#    return (neigh_ipm - ipm_cluster.mean()) / ipm_cluster.std(ddof=0)
 
 
 
-    pass
+    
+    
+                           
 
