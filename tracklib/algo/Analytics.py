@@ -317,7 +317,7 @@ def stop_point_with_acceleration_criteria(track, i):
 
     # Si un point d'indice [i] affiche une vitesse nulle suivant une deccelération,
     #    on cherche le prochain point d'accélération
-    if abs(v) < 0.001 and acc < 0:
+    if abs(v) < 3 and acc < 0:
         # Initialisation d'un compteur sur i
         j = i
         # Tant qu'aucun des points suivants n'accélère, on ne marque pas le point d'arrêt
@@ -358,7 +358,7 @@ def stop_point_with_time_window_criteria(trace, i):
     if i == N - 1:
         return trace.getObsAnalyticalFeature(name_af, N - 2)
 
-    T = 40  # fenetre de 45s
+    T = 15  # fenetre de 45s
     D = 30  # 30 metres
 
     S = trace.getAnalyticalFeature("abs_curv")

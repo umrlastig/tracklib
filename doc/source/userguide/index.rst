@@ -12,10 +12,11 @@ User Guide
 .. toctree::
   :maxdepth: 1
   
-
-  Core concept <coreconcept>
+  Core concept <1_coreconcept>
+  Operation for manipulating track <2_operator>
   Read/Write track(s), network and raster <reader_writer>
   Map matching on network <../notebook/MapMatchingOnNetwork>
+  Different methods to detect stops points <../notebook/StopPoints>
 
 
 .. 2. Operation for manipulating track <2_operator>
