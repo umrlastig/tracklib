@@ -46,6 +46,7 @@ extensions = [
     "autodocsumm",
     "IPython.sphinxext.ipython_console_highlighting"
 ]
+# 'sphinx_gallery.load_style',
 
 # I execute the notebooks manually in advance. If notebooks test the code,
 # they should be run at build time.

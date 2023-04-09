@@ -21,14 +21,6 @@ of the tracklib library.
         to launch by clicking on the link.
 
 
-.. toctree::
-  :maxdepth: 1
-
-  Quickstart <Quickstart>
-  Summarize <Summarize>
-  Switchbacks <Switchbacks>
-  Kalman filter <Kalman>
-
   
 .. nbgallery::
     :caption: This is a thumbnail gallery:
@@ -39,3 +31,4 @@ of the tracklib library.
     Quickstart
     Summarize
     Switchbacks
+    KalmanFiltering
