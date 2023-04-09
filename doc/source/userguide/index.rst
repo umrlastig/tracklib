@@ -17,9 +17,8 @@ User Guide
   Read/Write track(s), network and raster <reader_writer>
   Map matching on network <../notebook/MapMatchingOnNetwork>
   Different methods to detect stops points <../notebook/StopPoints>
-
-
-.. 2. Operation for manipulating track <2_operator>
+  
+.. Mopsi <Mopsi> (track's comparaison)
 .. 3. Simplify, Interpolate & Filter <3_filter>
  
 

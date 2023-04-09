@@ -30,6 +30,12 @@ of the tracklib library.
   Kalman filter <Kalman>
 
   
-.. StopPoints <StopPoints>
-.. Mopsi <Mopsi>
+.. nbgallery::
+    :caption: This is a thumbnail gallery:
+    :name: rst-gallery
+    :glob:
+    :reversed:
 
+    Quickstart
+    Summarize
+    Switchbacks
