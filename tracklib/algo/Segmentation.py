@@ -137,8 +137,7 @@ def split(track, source) -> TrackCollection:
 # -------------------------------------------------------------------
 #
 # -------------------------------------------------------------------
-def findStops(track: Track, spatial, temporal, mode,
-              verbose=True) -> Track:
+def findStops(track: Track, spatial, temporal, mode, verbose=True) -> Track:
     '''
     Function to find stop positions from a track
 
@@ -260,6 +259,7 @@ def plotStops(stops, x="x", y="y", r="radius", rf=1, sym="r-"):
         Circle(ENUCoords(stops[x][i], stops[y][i]), rf * stops[r][i]).plot(sym)
 
 
+'''
 def removeStops(track, stops=None):
     if stops is None:
         stops = extractStopsBis(track)
@@ -268,7 +268,7 @@ def removeStops(track, stops=None):
         output = output + track.extract(stops["id_end"][i], stops["id_ini"][i + 1])
     output = output + track.extract(stops["id_end"][-1], track.size() - 1)
     return output
-
+'''
 
 def findStopsGlobal(track, diameter=20, duration=60, downsampling=1, verbose=True):
     '''
@@ -800,6 +800,106 @@ def retrieveNeighbors(track, j, eps1, eps2):
 #    return (neigh_ipm - ipm_cluster.mean()) / ipm_cluster.std(ddof=0)
 
 
+# =============================================================================
+# =============================================================================
+from tracklib.algo.Analytics import speed, acceleration
+
+def stop_point_with_acceleration_criteria(track, i):
+    """
+    This algorithm detect stop point.
+    A point is a stop when speed is null and acceleration is negative.
+    """
+    if i == 0:
+        return 0
+
+    stop_point = 0
+    v = speed(track, i)
+    acc = acceleration(track, i)
+
+    # Si un point d'indice [i] affiche une vitesse nulle suivant une deccelération,
+    #    on cherche le prochain point d'accélération
+    if abs(v) < 3 and acc < 0:
+        # Initialisation d'un compteur sur i
+        j = i
+        # Tant qu'aucun des points suivants n'accélère, on ne marque pas le point d'arrêt
+        while j <= track.size() - 2 and acceleration(track, j) <= 0:
+            j += 1
+            # Si on trouve un point d'accélération, on donne la valeur 1
+            #     au paramètre du point d'indice [i]
+            if acceleration(track, j) > 0:
+                stop_point = 1
+
+    return stop_point
+
+
+VAL_AF_TIME_WINDOW_STOP = 1
+VAL_AF_TIME_WINDOW_MOVE = 0
+VAL_AF_TIME_WINDOW_NONE = -1
+
+
+def stop_point_with_time_window_criteria(trace, i):
+    """This algorithm of stop detection is based on geographical moving distance in time windows.
+
+    The AF has value:
+
+        - stop (*1*)
+        - not stop (*0*)
+        - not yet examined (*-1*)
+
+    """
+
+    name_af = "stop_point_with_time_window_criteria"
+
+    N = trace.size()
+
+    val = trace.getObsAnalyticalFeature(name_af, i)
+    if val > -1:
+        return val
+
+    if i == N - 1:
+        return trace.getObsAnalyticalFeature(name_af, N - 2)
+
+    T = 15  # fenetre de 45s
+    D = 30  # 30 metres
+
+    S = trace.getAnalyticalFeature("abs_curv")
+
+    j = i + 1
+    ispause = False
+
+    tj = trace.getObs(j).timestamp
+    ti = trace.getObs(i).timestamp
+
+    # On cherche la fin de la fenetre
+    while (tj - ti) <= T:
+        j = j + 1
+        if j == N - 1:
+            break
+        tj = trace.getObs(j).timestamp
+
+    #print(S[j] - S[i])
+
+    # On agrandit la fenetre
+    while (tj - ti) >= T and (S[j] - S[i]) <= D:
+        ispause = True
+        # print ('pause ' + str(i) + ',' + str(j))
+        j = j + 1
+        if j == N - 1:
+            break
+        tj = trace.getObs(j).timestamp
+
+    retour = VAL_AF_TIME_WINDOW_MOVE
+    if ispause:
+        # PAUSES.append([i, j-1])
+        #print ('pause de ' + str(i) + ',' + str(j-1))
+        retour = VAL_AF_TIME_WINDOW_STOP
+        for k in range(i, j - 1):
+            trace.setObsAnalyticalFeature(name_af, k, VAL_AF_TIME_WINDOW_STOP)
+
+    else:
+        trace.setObsAnalyticalFeature(name_af, i, VAL_AF_TIME_WINDOW_MOVE)
+
+    return retour
 
     
     

@@ -6,7 +6,7 @@ from tracklib.algo.Analytics import BIAF_SPEED, speed
 from tracklib.algo.Analytics import BIAF_HEADING, heading
 from tracklib.algo.Analytics import BIAF_DS, ds
 from tracklib.algo.Analytics import BIAF_ABS_CURV
-from tracklib.algo.Analytics import anglegeom, val_angle
+from tracklib.algo.Analytics import anglegeom, angleBetweenThreePoints
 import tracklib.core.Operator as Operator
 from tracklib.core.Utils import NAN
 
@@ -348,7 +348,7 @@ def setBendAsAf(T, angle_min = pi/2):
                     fin = j
                     break
                 
-            angle_virage = val_angle(T.getObs(deb), T.getObs(i), T.getObs(fin))
+            angle_virage = angleBetweenThreePoints(T.getObs(deb), T.getObs(i), T.getObs(fin))
             if angle_virage < angle_min:
                 # print (deb, fin, angle_virage, garde)
                 # Le virage est un bon virage, on prend tous les points

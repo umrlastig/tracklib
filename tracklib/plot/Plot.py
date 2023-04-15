@@ -363,7 +363,7 @@ class Plot:
             # chartBox = ax1.get_position()
             # ax1.set_position([chartBox.x0, chartBox.y0, chartBox.width, chartBox.height*0.8])
             ax1.legend(
-                tabplot,
+                #tabplot,
                 labels=tablegend,
                 loc="lower center",
                 borderaxespad=0.1,

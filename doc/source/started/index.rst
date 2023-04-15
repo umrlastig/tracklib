@@ -12,7 +12,7 @@ Getting Started
   :maxdepth: 1
 
   Installation <install>
-  Bird's eye view <overview>
+  Overview <overview>
 
 
   
