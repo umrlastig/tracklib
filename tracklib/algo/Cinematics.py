@@ -6,7 +6,7 @@ from tracklib.algo.Analytics import BIAF_SPEED, speed
 from tracklib.algo.Analytics import BIAF_HEADING, heading
 from tracklib.algo.Analytics import BIAF_DS, ds
 from tracklib.algo.Analytics import BIAF_ABS_CURV
-from tracklib.algo.Analytics import anglegeom, angleBetweenThreePoints
+from tracklib.algo.Analytics import anglegeom
 import tracklib.core.Operator as Operator
 from tracklib.util.Geometry import angleBetweenThreePoints
 
@@ -164,13 +164,18 @@ def computeRadialSignature(track, factor=1):
 def inflection(track, i):
     """
     Among the characteristic points, inflection points are those the curvature 
-    changes sign.
-    In tracklib, this characteristic is modeled as an AF algorithm to detect 
+    changes sign. In tracklib, this characteristic is modeled as an AF algorithm to detect 
     if the observation obs(i) is an inflection point or not.
     
     Le principe de détection est fondé sur l'étude de la variation 
     des produits vectoriels le long de la ligne. Les points d'inflexion sont 
     détectés aux changements de signe de ces produits.
+    Normalement, le point d'inflexion est le milieur de [oi, oi+1]. 
+    
+    TODO : Pour ne pas avoir à ajouter de points, on prend oi, à changer.
+    
+    Pour éviter les micros inflexion, on considère aussi qu'on a 
+    au moins 2 produits consécutifs de même signe de part et d’autre.
 
     Parameters
     -----------
@@ -184,12 +189,14 @@ def inflection(track, i):
     
     """
     
-    if i == 0:
+    if i == 0 or i == 1 or i == 2:
         return 0
     
-    if i == track.size() -1 or i == track.size() - 2:
+    if i == track.size()-1 or i == track.size()-2 or i == track.size()-3:
         return 0
     
+    x0 = track.getObs(i-2).position.getX()
+    y0 = track.getObs(i-2).position.getY()
     x1 = track.getObs(i-1).position.getX()
     y1 = track.getObs(i-1).position.getY()
     x2 = track.getObs(i).position.getX()
@@ -199,21 +206,34 @@ def inflection(track, i):
     y3 = track.getObs(i+1).position.getY()
     x4 = track.getObs(i+2).position.getX()
     y4 = track.getObs(i+2).position.getY()
+    x5 = track.getObs(i+3).position.getX()
+    y5 = track.getObs(i+3).position.getY()
   
     d1 = (x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1)
     d2 = (x3 - x2) * (y4 - y2) - (y3 - y2) * (x4 - x2)
     
-    if d1 > 0 and d2 == 0:
-        return 1
-    if d1 < 0 and d2 == 0:
-        return 1
-    if d2 > 0 and d1 == 0:
-        return 1
-    if d2 < 0 and d1 == 0:
-        return 1
+    # Signe différent => 1
+    isPICandidat = 0
     
-    if (d1 > 0 and d2 < 0) or (d1 < 0 and d2 > 0):
-        return 1
+    if d1 > 0 and d2 == 0:
+        isPICandidat = 1
+    if d1 < 0 and d2 == 0:
+        isPICandidat = 1
+    if d2 > 0 and d1 == 0:
+        isPICandidat = 1
+    if d2 < 0 and d1 == 0:
+        isPICandidat = 1
+    
+    if isPICandidat == 0:
+        isPICandidat = (d1 > 0 and d2 < 0) or (d1 < 0 and d2 > 0)
+
+    # On regarde un coup de plus avant, il faut le même signe que d1
+    if isPICandidat == 1:
+        d11 = (x1 - x0) * (y2 - y0) - (y1 - y0) * (x2 - x0)
+        if (d1 > 0 and d11 > 0) or (d1 < 0 and d11 < 0):
+            d22 = (x4 - x3) * (y5 - y3) - (y4 - y3) * (x5 - x3)
+            if (d2 > 0 and d22 > 0) or (d2 < 0 and d22 < 0):
+                return 1
     
     return 0
 
@@ -335,8 +355,8 @@ def setBendAsAF(track, angle_min = pi/2):
             #print (i, deb, fin)
                 
             angle_virage = angleBetweenThreePoints(track.getObs(deb), track.getObs(i), 
-                                                   track.getObs(fin))*pi/180
-            #print (angle_virage*180/pi, angle_min*180/pi)
+                                                   track.getObs(fin))
+            # print (angle_virage*180/pi, angle_min*180/pi)
             if angle_virage < angle_min:
                 # print (deb, fin, angle_virage, garde)
                 # Le virage est un bon virage, on prend tous les points
@@ -354,6 +374,8 @@ def setSwitchbacksAsAF(track, nb_virage_min = 3, dist_max = 150):
     à dist_max.
     Attention: c'est une structure de fonction particulière qui créée un AF, 
     elle ne s'appelle pas avec la méthode addAnalyticalFeature.
+    
+    TODO: a revoir
     
     Parameters
     -----------
