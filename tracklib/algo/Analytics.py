@@ -157,9 +157,14 @@ def angleBetweenThreePoints(o1, o2, o3):
     y1 = o1.position.getY()
     y2 = o2.position.getY()
     y3 = o3.position.getY()
+
+    # 3 points alignés    
+    if x1 == x2 and x2 == x3 and y1 == y2 and y2 == y3:
+        return 0
     
     num = (x1 - x2) * (x3 - x2) + (y1 - y2) * (y3 - y2)
     den = math.sqrt((x1-x2)**2 + (y1-y2)**2) * math.sqrt((x3-x2)**2 + (y3-y2)**2)
+    
     r = num / den
     if r > 1:
         r = 1
