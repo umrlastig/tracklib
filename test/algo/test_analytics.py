@@ -4,6 +4,7 @@
 import unittest
 
 import math
+from numpy import pi
 
 from tracklib.core import (Obs, Track, ObsTime)
 from tracklib.core import ObsCoords as Coords
@@ -242,22 +243,22 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
         self.assertEqual(math.isnan(a), math.isnan(utils.NAN))
 		
         a = Analytics.anglegeom(self.trace1, 1)
-        self.assertTrue(abs(a - 90) < 0.000001)
+        self.assertTrue(abs(a - pi/2) < 0.000001)
 		
         a = Analytics.anglegeom(self.trace1, 2)
-        self.assertTrue(abs(a - 180) < 0.000001)
+        self.assertTrue(abs(a - pi) < 0.000001)
         
         a = Analytics.anglegeom(self.trace1, 3)
-        self.assertTrue(abs(a - 90) < 0.000001)
+        self.assertTrue(abs(a - pi/2) < 0.000001)
 		
         a = Analytics.anglegeom(self.trace1, 4)
-        self.assertTrue(abs(a - 90) < 0.000001)
+        self.assertTrue(abs(a - pi/2) < 0.000001)
 		
         a = Analytics.anglegeom(self.trace1, 5)
         self.assertTrue(abs(a - 0) < 0.000001)
 		
         a = Analytics.anglegeom(self.trace1, 6)
-        self.assertTrue(abs(a - 90) < 0.000001)
+        self.assertTrue(abs(a - pi/2) < 0.000001)
 		
 		
     def testCalculAngleOriente(self):
@@ -287,16 +288,6 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
         self.assertTrue(abs(a - 90) < 0.000001)
 		
 		
-    def testValAngle(self):
-        
-        o1 = self.trace1.getObs(1)
-        o2 = self.trace1.getObs(2)
-        o3 = self.trace1.getObs(3)
-        
-        a = Analytics.angleBetweenThreePoints(o1, o2, o3)
-        self.assertTrue(abs(a - 180) < 0.000001)
-    
-	
 if __name__ == '__main__':
     
     suite = unittest.TestSuite()
@@ -306,11 +297,8 @@ if __name__ == '__main__':
     suite.addTest(TestAlgoAnalyticsMethods("testAcceleration"))
     suite.addTest(TestAlgoAnalyticsMethods("testOrientation"))
     suite.addTest(TestAlgoAnalyticsMethods("testSlope"))
-    
     suite.addTest(TestAlgoAnalyticsMethods("testAngleGeom"))
     suite.addTest(TestAlgoAnalyticsMethods("testCalculAngleOriente"))
-    suite.addTest(TestAlgoAnalyticsMethods("testValAngle"))
-    
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

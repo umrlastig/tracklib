@@ -8,7 +8,7 @@ from tracklib.algo.Analytics import BIAF_DS, ds
 from tracklib.algo.Analytics import BIAF_ABS_CURV
 from tracklib.algo.Analytics import anglegeom, angleBetweenThreePoints
 import tracklib.core.Operator as Operator
-from tracklib.core.Utils import NAN
+from tracklib.util.Geometry import angleBetweenThreePoints
 
 
 def estimate_speed(track):

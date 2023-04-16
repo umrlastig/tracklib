@@ -178,7 +178,7 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         p17 = Obs.Obs(c17, ObsTime.ObsTime.readTimestamp("2018-01-01 10:03:25"))
         self.trace3.addObs(p17)
         
-        c18 = Coords.ENUCoords(67, 18, 0)
+        c18 = Coords.ENUCoords(63, 20, 0)
         p18 = Obs.Obs(c18, ObsTime.ObsTime.readTimestamp("2018-01-01 10:03:25"))
         self.trace3.addObs(p18)
         
@@ -216,7 +216,7 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         self.assertEqual(afIsInflexion[15], 0)
         self.assertEqual(afIsInflexion[15], 0)
         self.assertEqual(afIsInflexion[16], 0)
-        self.assertEqual(afIsInflexion[17], 1)
+        self.assertEqual(afIsInflexion[17], 0)
         self.assertEqual(afIsInflexion[18], 0)
         self.assertEqual(afIsInflexion[19], 0)
 
@@ -245,7 +245,7 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         self.assertEqual(afVertex[12], 0)
         self.assertEqual(afVertex[13], 0)
         self.assertEqual(afVertex[14], 0)
-        self.assertEqual(afVertex[15], 1)
+        self.assertEqual(afVertex[15], 0)
         self.assertEqual(afVertex[16], 0)
         self.assertEqual(afVertex[17], 0)
         self.assertEqual(afVertex[18], 1)
@@ -279,8 +279,9 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         self.assertEqual(afBend[15], 1)
         self.assertEqual(afBend[16], 1)
         self.assertEqual(afBend[17], 1)
-        self.assertEqual(afBend[18], 0)
-        self.assertEqual(afBend[19], 0)
+        self.assertEqual(afBend[18], 1)
+        self.assertEqual(afBend[19], 1)
+        
         
     def testSwitchbacks(self):
         plt.figure(figsize = (8,4))
@@ -396,14 +397,15 @@ if __name__ == '__main__':
     suite.addTest(TestAlgoCinematicsMethods("testAFvertex"))
     suite.addTest(TestAlgoCinematicsMethods("testBends"))
     suite.addTest(TestAlgoCinematicsMethods("testSwitchbacks"))
-    #suite.addTest(TestAlgoCinematicsMethods("testSmoothedSpeedCalculation"))
-    #suite.addTest(TestAlgoCinematicsMethods("testCompareAbsCurv"))
-    #suite.addTest(TestAlgoCinematicsMethods("testEstimateHeading"))
-    #suite.addTest(TestAlgoCinematicsMethods("testComputeNetDeniv"))
-    #suite.addTest(TestAlgoCinematicsMethods("testComputeAscDeniv"))
-    #suite.addTest(TestAlgoCinematicsMethods("testComputeDescDeniv"))
-    #suite.addTest(TestAlgoCinematicsMethods("testComputeAvgAscSpeed"))
-    #suite.addTest(TestAlgoCinematicsMethods("testComputeRadialSignature"))
+    
+    suite.addTest(TestAlgoCinematicsMethods("testSmoothedSpeedCalculation"))
+    suite.addTest(TestAlgoCinematicsMethods("testCompareAbsCurv"))
+    suite.addTest(TestAlgoCinematicsMethods("testEstimateHeading"))
+    suite.addTest(TestAlgoCinematicsMethods("testComputeNetDeniv"))
+    suite.addTest(TestAlgoCinematicsMethods("testComputeAscDeniv"))
+    suite.addTest(TestAlgoCinematicsMethods("testComputeDescDeniv"))
+    suite.addTest(TestAlgoCinematicsMethods("testComputeAvgAscSpeed"))
+    suite.addTest(TestAlgoCinematicsMethods("testComputeRadialSignature"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
