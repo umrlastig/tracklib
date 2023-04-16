@@ -10,7 +10,7 @@ User Guide
 
 
 Basic principles
-----------------
+-----------------
 
 
 .. toctree::
@@ -21,11 +21,12 @@ Basic principles
   Read/Write track(s), network and raster <reader_writer>
   
 .. Simplify, Interpolate & Filter <3_filter>
-  
+.. Points caractéristiques
+
   
   
 Specific Usage
---------------
+---------------
   
 .. toctree::
   :maxdepth: 1
