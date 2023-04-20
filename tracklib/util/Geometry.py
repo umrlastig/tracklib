@@ -601,9 +601,19 @@ def angleBetweenThreePoints(o1, o2, o3):
     y2 = o2.position.getY()
     y3 = o3.position.getY()
 
-    # 3 points alignés    
+    # 3 points confondus
     if x1 == x2 and x2 == x3 and y1 == y2 and y2 == y3:
         return 0
+    
+    # 2 points confondus
+    if x1 == x2 and y1 == y2:
+        return 0
+    if x1 == x3 and y1 == y3:
+        return 0
+    if x2 == x3 and y2 == y3:
+        return 0
+    
+    # print (x1, x2, x3, y1, y2, y3)
     
     num = (x1 - x2) * (x3 - x2) + (y1 - y2) * (y3 - y2)
     den = math.sqrt((x1-x2)**2 + (y1-y2)**2) * math.sqrt((x3-x2)**2 + (y3-y2)**2)
