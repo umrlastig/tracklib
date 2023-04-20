@@ -239,7 +239,7 @@ def inflection(track):
             
             if (d1 > 0 and d11 > 0) or (d1 < 0 and d11 < 0):
                 d22 = (x4 - x3) * (y5 - y3) - (y4 - y3) * (x5 - x3)
-                print (i, d11, d22)
+                # print (i, d11, d22)
                 if (d2 > 0 and d22 > 0) or (d2 < 0 and d22 < 0):
                     #print (i)
                     track.setObsAnalyticalFeature('inflection', i, 1)
@@ -401,7 +401,7 @@ def setSwitchbacksAsAF(track, nb_virage_min = 3, dist_max = 150):
         setVertexAF(track)
     if not track.hasAnalyticalFeature('bend'):
         setBendAsAF(track)
-
+        
     SERIE = False
     deb = 0
     fin = 0
@@ -413,8 +413,8 @@ def setSwitchbacksAsAF(track, nb_virage_min = 3, dist_max = 150):
     dist = 0
     
     for i in range(track.size()):
-        afsommet = track.getObsAnalyticalFeature('vertex', i)
-        afvirage = track.getObsAnalyticalFeature('bend', i)
+        afsommet = track["vertex", i]
+        afvirage = track["bend", i]
         
         if afvirage == 1 and not SERIE:
             #print ("on démarre à : ", i)

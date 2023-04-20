@@ -156,7 +156,7 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
             cmap = self.COLS_BLEU, pointsize=50)
         plt.show()
         
-        T = [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 
+        T = [0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 
              0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0]
         self.assertEqual(afVertex, T) 
         
@@ -172,22 +172,28 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
             cmap = self.COLS_VERT, pointsize=50)
         plt.show()
         
-        T = [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+        T = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
              1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0]
         self.assertEqual(afBend, T) 
+
         
     def testSwitchbacks(self):
         plt.figure(figsize = (8,4))
         self.trace3.plot()
         
-        Cinematics.setSwitchbacksAsAF(self.trace3, nb_virage_min=2, 
-                                      dist_max=40)
+        Cinematics.setBendAsAF(self.trace3, angle_min = 130*pi/180)
+        Cinematics.setSwitchbacksAsAF(self.trace3, nb_virage_min=3, 
+                                      dist_max=200)
         afSwitchbacks = self.trace3.getAnalyticalFeature('switchbacks')
-        print (afSwitchbacks)
+        #print (afSwitchbacks)
         
         self.trace3.plot(type='POINT', af_name='switchbacks', append = True, 
             cmap = self.COLS_BLEU, pointsize=50)
         plt.show()
+        
+        T = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+             1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
+        self.assertEqual(afSwitchbacks, T) 
         
         
     def testSmoothedSpeedCalculation(self):
