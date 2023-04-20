@@ -94,6 +94,7 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         self.trace3 = Track([], 1)
         
+        self.trace3.addObs(Obs(ENUCoords(-39, 24, 0), ObsTime()))
         self.trace3.addObs(Obs(ENUCoords(-33, 22, 0), ObsTime()))
         self.trace3.addObs(Obs(ENUCoords(-20, 21, 0), ObsTime()))
         self.trace3.addObs(Obs(ENUCoords(-15, 20, 0), ObsTime()))
@@ -103,8 +104,10 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         self.trace3.addObs(Obs(ENUCoords(3, 1, 0), ObsTime()))
         self.trace3.addObs(Obs(ENUCoords(7, 0, 0), ObsTime()))
         self.trace3.addObs(Obs(ENUCoords(10, 1, 0), ObsTime()))
-        self.trace3.addObs(Obs(ENUCoords(21, 11, 0), ObsTime()))
-        self.trace3.addObs(Obs(ENUCoords(27, 15, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(12, 3, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(14, 8, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(20, 13, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(23, 15, 0), ObsTime()))
         self.trace3.addObs(Obs(ENUCoords(29, 16.5, 0), ObsTime()))
         self.trace3.addObs(Obs(ENUCoords(33, 17, 0), ObsTime()))
         self.trace3.addObs(Obs(ENUCoords(37, 16.5, 0), ObsTime()))
@@ -130,15 +133,15 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         plt.figure(figsize = (8,4))
         self.trace3.plot()
         
-        self.trace3.addAnalyticalFeature(Cinematics.inflection)
+        Cinematics.inflection(self.trace3)
         afIsInflexion = self.trace3.getAnalyticalFeature('inflection')
         #print (afIsInflexion)
         self.trace3.plot(type='POINT', af_name='inflection', append = True, 
             cmap = self.COLS_ROUGE, pointsize=40)
         plt.show()
         
-        T = [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-             0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+        T = [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 
+             0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0]
         self.assertEqual(afIsInflexion, T) 
         
         
