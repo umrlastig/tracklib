@@ -15,7 +15,7 @@
 
 [![Supported Python Versions](https://img.shields.io/pypi/pyversions/tracklib.svg)](https://pypi.python.org/pypi/tracklib/)
 [![PyPI Version](https://img.shields.io/pypi/v/tracklib.svg)](https://pypi.python.org/pypi/tracklib/)
-![PyPI Downloads](https://img.shields.io/pypi/dm/tracklib?color=blue)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/tracklib?color=blue)](https://pypistats.org/packages/tracklib)
 
 
 More and more datasets of GPS trajectories are now available and they are studied very frequently in many scientific domains. 
@@ -39,65 +39,15 @@ pip install tracklib
 ## Features
 
 
-## Quickstart
-
-### Prepare data
-
-Loading data from a GPX file, transform the geographic coordinates in a 
-local projection and display the track. Then computing the local speed.
-
-```python
-from tracklib.core.ObsTime import ObsTime
-from tracklib.io.TrackReader import TrackReader
-
-ObsTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
-
-path = '/home/marie-dominique/tracklib/tracklib/data/gpx/activity_5807084803.gpx'
-tracks = TrackReader.readFromGpx(path)
-trace = tracks.getTrack(0)
-
-# Transformation GEO coordinates to ENU
-trace.toENUCoords()
-
-# Display
-trace.plot()
-
-# Compute local speed
-trace.estimate_speed()
-```
-
-<p align="center">
-<img width="300px" 
-  src="https://raw.githubusercontent.com/umrlastig/tracklib/main/doc/source/img/quickstart_5.png" />
-</p>
-
-### Summarize speed and plot it in a raster images
-
-```python
-from tracklib.core.TrackCollection import TrackCollection
-from tracklib.algo import (Summarising, Analytics)
-
-collection = TrackCollection([trace])
-
-af_algos = [Analytics.speed, Analytics.speed, Analytics.speed]
-cell_operators = [Summarising.co_avg, Summarising.co_min, Summarising.co_max]
-marge = 0.1
-raster = Summarising.summarize(collection, af_algos, cell_operators, (3,3), marge)
-
-raster.setColor((0, 0, 0), (255, 255, 255))
-raster.plot(Analytics.speed, Summarising.co_avg, no_data_values = 0)
-```
-
-<p align="center">
-<img width="300px" 
-  src="https://raw.githubusercontent.com/umrlastig/tracklib/main/doc/source/img/summarize_quickstart.png" />
-</p>
-
-### Segmentation with speed change
-
-![png](https://tracklib.readthedocs.io/en/latest/_images/quickstart_4.png)
 
 
+## About
+
+|                |                                                           |
+| -------------- | --------------------------------------------------------- |
+| _version_      | See [pypi](https://pypi.org/project/tracklib/#history)    |
+| _status_       | Since 2020 November 1st, 2020                             |
+| _license_      | Cecill C                                                  |
 
 ## Development
 
