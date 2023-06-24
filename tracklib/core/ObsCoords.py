@@ -16,9 +16,12 @@ import copy
 import matplotlib.pyplot as plt
 
 # The current constants are used in this module : 
-Re: float = 6378137.0  #: Earth equatorial radius
-Fe: float = 1.0 / 298.257223563  #: Earth eccentricity
+Re: float = 6378137.0            #: Earth semi-major axis
+Be: float = 6356752.314          #: Earth semi-minor axis
+Fe: float = 1.0 / 298.257223563  #: Earth flattening
+Ee: float = 0.0818191910428      #: Earth eccentricity
 
+STANDARD_PROJ = 1   # 1: flat, 2: stereographic 
 
 class GeoCoords:
     """Class to represent geographics coordinates"""
@@ -79,9 +82,32 @@ class GeoCoords:
         # Special SRID projection
         if isinstance(base, int):
             return self.toProjCoords(base)
-        base_ecef = base.toECEFCoords()
-        point_ecef = self.toECEFCoords()
-        return point_ecef.toENUCoords(base_ecef)
+			
+        # ---------------------------------------	
+        # Sterographic projection test		
+		# ---------------------------------------	
+        if (STANDARD_PROJ == 2):
+            phi = self.lat*math.pi/180
+            psi = math.atan(Be/Re*math.tan(phi))
+            w = Be/math.sqrt((Re*math.sin(psi))**2 + (Be*math.cos(psi))**2)
+            N = Re/w
+            rho = Re*(1-Ee**2)/w**3
+            R = math.sqrt(N*rho)
+
+            lon = (self.lon-base.lon)*math.pi/180
+            lat = (self.lat-base.lat)*math.pi/180
+            x = +R*math.tan(math.pi/4-lat/2)*math.sin(lon)*math.cos(self.lat*math.pi/180)
+            y = -R*math.tan(math.pi/4-lat/2)*math.cos(lon)+6380968.157
+            output = ENUCoords(x, y, self.hgt)
+            return output			
+			
+        # ---------------------------------------	
+        # Standard flat projection	
+		# ---------------------------------------	
+        else:			
+            base_ecef = base.toECEFCoords()
+            point_ecef = self.toECEFCoords()
+            return point_ecef.toENUCoords(base_ecef)
 
     def toGeoCoords(self) -> GeoCoords:   
         """Artificial function to ensure point is GeoCoords
