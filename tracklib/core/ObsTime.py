@@ -15,7 +15,8 @@ class ObsTime:
     """
 
     BASE_YEAR = 2000
-    
+    UNIX_BASE_YEAR = 1970
+	
     ROUND_TO_SEC = 1
 
     __READ_FMT = "2D/2M/4Y 2h:2m:2s"
@@ -140,7 +141,7 @@ class ObsTime:
         :param elapsed_seconds: Elapsed seconds
         :return: Coverted time
         """
-        
+        '''
         # elapsed is in second or in millisecond ?
         from datetime import datetime
         from calendar import timegm
@@ -149,6 +150,7 @@ class ObsTime:
         tps = timegm(t.timetuple())
         if elapsed_seconds > tps:
             elapsed_seconds = elapsed_seconds / 1000
+        '''
 
         time = ObsTime()
 
@@ -157,7 +159,7 @@ class ObsTime:
 
         # Year
         sec = 0
-        year = 1970
+        year = ObsTime.UNIX_BASE_YEAR
         while sec < elapsed_seconds - SECOND_PER_YEAR:
             sec += SECOND_PER_YEAR
             if year % 4 == 0:
@@ -201,14 +203,14 @@ class ObsTime:
         return time
 
     def toAbsTime(self) -> float:   
-        """Converting to elapsed float seconds since 01/01/1970
+        """Converting to elapsed float seconds since 01/01/1970 (or 01/01/UNIX_BASE_YEAR)
 
-        **Warning:** does not consider leap seconds (31 since 1970)
+        **Warning:** does not consider leap seconds since 1972
 
         :return: elapsed float seconds
         """
         seconds = 0
-        for y in range(1970, self.year):
+        for y in range(ObsTime.UNIX_BASE_YEAR, self.year):
             seconds += 86400 * 365
             if y % 4 == 0:
                 seconds += 86400

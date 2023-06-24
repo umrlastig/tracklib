@@ -29,6 +29,7 @@ class TrackReader:
         id_E:int=-1, id_N:int=-1, id_U:int=-1, id_T:int=-1,
         separator:str=",",
         DateIni=-1,
+		timeUnit=1,
         h=0,
         com="#",
         no_data_value=-999999,
@@ -62,12 +63,13 @@ class TrackReader:
                          height or altitude (GEO/ENU)
                          -1 if file format is used
         :param int id_T: index (starts from 0) of column containing timestamp 
-                         (in seconds or in time_fmt format)
+                         (in seconds x timeUnit or in time_fmt format)
                          -1 if file format is used
         :param str separator: separating characters (can be multiple characters). 
                               Can be c (comma), b (blankspace), s (semi-column)
         :param GPSTime DateIni: initial date (in time_fmt format) if timestamps 
                                 are provided in seconds (-1 if not used)
+        :param float timeUnit: number of seconds per unit of time in id_T column
         :param int h: number of heading line
         :param str com: comment character (lines starting with cmt on the top left 
                         are skipped)
@@ -176,7 +178,7 @@ class TrackReader:
                     if isinstance(fmt.DateIni, int):
                         time = ObsTime.readTimestamp(fields[fmt.id_T])
                     else:
-                        time = fmt.DateIni.addSec((float)(fields[fmt.id_T]))
+                        time = fmt.DateIni.addSec((float)(fields[fmt.id_T])*timeUnit)
                 else:
                     time = ObsTime()
 
