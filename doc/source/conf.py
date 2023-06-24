@@ -23,7 +23,7 @@ sys.path.append(os.path.abspath("../../tracklib"))
 
 project = "TrackLib"
 copyright = (
-    "2022, LASTIG lab, French National Institute of Geographic and Forest Information"
+    "2023, LASTIG lab, French National Institute of Geographic and Forest Information"
 )
 author = "Yann Méneroux, Marie-Dominique Van Damme"
 
@@ -46,6 +46,7 @@ extensions = [
     "autodocsumm",
     "IPython.sphinxext.ipython_console_highlighting"
 ]
+# 'sphinx_gallery.load_style',
 
 # I execute the notebooks manually in advance. If notebooks test the code,
 # they should be run at build time.

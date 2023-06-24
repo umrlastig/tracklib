@@ -7,10 +7,23 @@
 Use Cases
 ==========
 
-A few use cases that describe application with GPS trajectories have 
+A few use cases, that describe application with GPS trajectories, have 
 been identified by the developpers Group. Each use case is related to one 
-or more previous research work. Each use case, uses several features 
+or more previous research work and uses several features 
 of the tracklib library.
+
+ 
+.. nbgallery::
+    :caption: use cases gallery:
+    :name: rst-gallery
+    :glob:
+    :reversed:
+
+    KalmanFiltering
+    Switchbacks
+    Summarize
+    Quickstart
+    
 
 .. note::
 
@@ -19,17 +32,3 @@ of the tracklib library.
      #. Start the notebook server from the command line: jupyter notebook,
      #. You should see the notebook open in your browser. Open the file you want 
         to launch by clicking on the link.
-
-
-.. toctree::
-  :maxdepth: 1
-
-  Quickstart <Quickstart>
-  Summarize <Summarize>
-  Switchbacks <Switchbacks>
-  Kalman filter <Kalman>
-
-  
-.. StopPoints <StopPoints>
-.. Mopsi <Mopsi>
-

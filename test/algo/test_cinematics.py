@@ -2,16 +2,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import matplotlib.pyplot as plt
+from numpy import pi
 import unittest
 
-#import math
-from tracklib.core import (Obs, Track, ObsTime)
-from tracklib.core import ObsCoords as Coords
-import tracklib.algo.Analytics as Analytics
+from tracklib.core.Obs import Obs
+from tracklib.core.ObsCoords import ENUCoords
+from tracklib.core.ObsTime import ObsTime
+from tracklib.core.Track import Track
 from tracklib.algo.Analytics import BIAF_ABS_CURV
 import tracklib.algo.Cinematics as Cinematics
-
-#import tracklib.core.Utils as utils
+import tracklib.core.Utils as utils
 
 
 class TestAlgoCinematicsMethods(unittest.TestCase):
@@ -20,112 +21,180 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
     
     def setUp (self):
         
-        ObsTime.ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
-        self.trace1 = Track.Track([], 1)
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        self.trace1 = Track([], 1)
 
-        c1 = Coords.ENUCoords(0, 0, 0)
-        p1 = Obs.Obs(c1, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        p1 = Obs(ENUCoords(0, 0, 0), ObsTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace1.addObs(p1)
         
-        c2 = Coords.ENUCoords(10, 0, 0)
-        p2 = Obs.Obs(c2, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:12"))
+        p2 = Obs(ENUCoords(10, 0, 0), ObsTime.readTimestamp("2018-01-01 10:00:12"))
         self.trace1.addObs(p2)
         
-        c3 = Coords.ENUCoords(10, 10, 0)
-        p3 = Obs.Obs(c3, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:40"))
+        p3 = Obs(ENUCoords(10, 10, 0), ObsTime.readTimestamp("2018-01-01 10:00:40"))
         self.trace1.addObs(p3)
         
-        c4 = Coords.ENUCoords(20, 10, 0)
-        p4 = Obs.Obs(c4, ObsTime.ObsTime.readTimestamp("2018-01-01 10:01:50"))
+        p4 = Obs(ENUCoords(20, 10, 0), ObsTime.readTimestamp("2018-01-01 10:01:50"))
         self.trace1.addObs(p4)
 		
-        c5 = Coords.ENUCoords(20, 20, 0)
-        p5 = Obs.Obs(c5, ObsTime.ObsTime.readTimestamp("2018-01-01 10:02:10"))
+        p5 = Obs(ENUCoords(20, 20, 0), ObsTime.readTimestamp("2018-01-01 10:02:10"))
         self.trace1.addObs(p5)
         
-        c6 = Coords.ENUCoords(30, 20, 0)
-        p6 = Obs.Obs(c6, ObsTime.ObsTime.readTimestamp("2018-01-01 10:02:35"))
+        p6 = Obs(ENUCoords(30, 20, 0), ObsTime.readTimestamp("2018-01-01 10:02:35"))
         self.trace1.addObs(p6)
         
-        c7 = Coords.ENUCoords(30, 30, 0)
-        p7 = Obs.Obs(c7, ObsTime.ObsTime.readTimestamp("2018-01-01 10:02:43"))
+        p7 = Obs(ENUCoords(30, 30, 0), ObsTime.readTimestamp("2018-01-01 10:02:43"))
         self.trace1.addObs(p7)
         
-        c8 = Coords.ENUCoords(40, 30, 0)
-        p8 = Obs.Obs(c8, ObsTime.ObsTime.readTimestamp("2018-01-01 10:02:55"))
+        p8 = Obs(ENUCoords(40, 30, 0), ObsTime.readTimestamp("2018-01-01 10:02:55"))
         self.trace1.addObs(p8)
         
-        c9 = Coords.ENUCoords(60, 30, 0)
-        p9 = Obs.Obs(c9, ObsTime.ObsTime.readTimestamp("2018-01-01 10:03:25"))
+        p9 = Obs(ENUCoords(60, 30, 0), ObsTime.readTimestamp("2018-01-01 10:03:25"))
         self.trace1.addObs(p9)
         
         # -----------------
         
-        ObsTime.ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
-        self.trace2 = Track.Track([], 1)
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        self.trace2 = Track([], 1)
 
-        c1 = Coords.ENUCoords(0, 0, 0)
-        p1 = Obs.Obs(c1, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        p1 = Obs(ENUCoords(0, 0, 0), 
+                 ObsTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace2.addObs(p1)
         
-        c2 = Coords.ENUCoords(10, 0, 10)
-        p2 = Obs.Obs(c2, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:12"))
+        p2 = Obs(ENUCoords(10, 0, 10), 
+                 ObsTime.readTimestamp("2018-01-01 10:00:12"))
         self.trace2.addObs(p2)
         
-        c3 = Coords.ENUCoords(10, 10, 10)
-        p3 = Obs.Obs(c3, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:40"))
+        p3 = Obs(ENUCoords(10, 10, 10), 
+                 ObsTime.readTimestamp("2018-01-01 10:00:40"))
         self.trace2.addObs(p3)
         
-        c4 = Coords.ENUCoords(10, 20, 15)
-        p4 = Obs.Obs(c4, ObsTime.ObsTime.readTimestamp("2018-01-01 10:01:50"))
+        p4 = Obs(ENUCoords(10, 20, 15), 
+                 ObsTime.readTimestamp("2018-01-01 10:01:50"))
         self.trace2.addObs(p4)
 		
-        c5 = Coords.ENUCoords(0, 20, 10)
-        p5 = Obs.Obs(c5, ObsTime.ObsTime.readTimestamp("2018-01-01 10:02:10"))
+        p5 = Obs(ENUCoords(0, 20, 10), 
+                 ObsTime.readTimestamp("2018-01-01 10:02:10"))
         self.trace2.addObs(p5)
 		
-        c6 = Coords.ENUCoords(0, 10, 0)
-        p6 = Obs.Obs(c6, ObsTime.ObsTime.readTimestamp("2018-01-01 10:02:15"))
+        p6 = Obs(ENUCoords(0, 10, 0), 
+                 ObsTime.readTimestamp("2018-01-01 10:02:15"))
         self.trace2.addObs(p6)
 		
-        c7 = Coords.ENUCoords(0, 20, 0)
-        p7 = Obs.Obs(c7, ObsTime.ObsTime.readTimestamp("2018-01-01 10:02:35"))
+        p7 = Obs(ENUCoords(0, 20, 0), 
+                 ObsTime.readTimestamp("2018-01-01 10:02:35"))
         self.trace2.addObs(p7)
 		
-        c8 = Coords.ENUCoords(5, 20, 0)
-        p8 = Obs.Obs(c8, ObsTime.ObsTime.readTimestamp("2018-01-01 10:02:35"))
+        p8 = Obs(ENUCoords(5, 20, 0), 
+                 ObsTime.readTimestamp("2018-01-01 10:02:35"))
         self.trace2.addObs(p8)
         
+        # -----------------
+        #   Pour les virages et lacets
+        
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        self.trace3 = Track([], 1)
+        
+        self.trace3.addObs(Obs(ENUCoords(-39, 24, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(-33, 22, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(-20, 21, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(-15, 20, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(-10, 18, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(-8, 15, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(-1, 4, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(3, 1, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(7, 0, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(10, 1, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(12, 3, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(14, 8, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(20, 13, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(23, 15, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(29, 16.5, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(33, 17, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(37, 16.5, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(40, 15, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(48, 10, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(51, 8, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(54, 8, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(58, 11, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(63, 15, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(65, 17, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(67, 18, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(72, 19, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(103, 17, 0), ObsTime()))
+        self.trace3.addObs(Obs(ENUCoords(108, 16, 0), ObsTime()))
+        
+        # Pour le dessin
+        self.COLS_ROUGE = utils.getColorMap((220, 220, 220), (255, 0, 0))
+        self.COLS_BLEU = utils.getColorMap((220, 220, 220), (0, 0, 255))
+        self.COLS_VERT = utils.getColorMap((220, 220, 220), (0, 255, 0))
 
+    
     def testAFInflexion(self):
-        self.trace1.plot()
-        self.trace1.addAnalyticalFeature(Cinematics.inflection)
-        afIsInflexion = self.trace1.getAnalyticalFeature('inflection')
+        plt.figure(figsize = (8,4))
+        self.trace3.plot()
+        
+        Cinematics.inflection(self.trace3)
+        afIsInflexion = self.trace3.getAnalyticalFeature('inflection')
         #print (afIsInflexion)
-        self.assertEqual(afIsInflexion[0], 0)
-        self.assertEqual(afIsInflexion[1], 0)
-        self.assertEqual(afIsInflexion[2], 1)
-        self.assertEqual(afIsInflexion[3], 1)
-        self.assertEqual(afIsInflexion[4], 1)
-        self.assertEqual(afIsInflexion[5], 1)
-        self.assertEqual(afIsInflexion[6], 0)
-        self.assertEqual(afIsInflexion[7], 0)
-
-
+        self.trace3.plot(type='POINT', af_name='inflection', append = True, 
+            cmap = self.COLS_ROUGE, pointsize=40)
+        plt.show()
+        
+        T = [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 
+             0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+        self.assertEqual(afIsInflexion, T) 
+        
+        
     def testAFvertex(self):
-        self.trace1.addAnalyticalFeature(Cinematics.inflection)
-        self.trace1.addAnalyticalFeature(Cinematics.vertex)
-        afVertex = self.trace1.getAnalyticalFeature('vertex')
+        plt.figure(figsize = (8,4))
+        self.trace3.plot()
+        
+        Cinematics.setVertexAF(self.trace3)
+        afVertex = self.trace3.getAnalyticalFeature('vertex')
         #print (afVertex)
-        self.assertEqual(afVertex[0], 0)
-        self.assertEqual(afVertex[1], 1)
-        self.assertEqual(afVertex[2], 0)
-        self.assertEqual(afVertex[3], 0)
-        self.assertEqual(afVertex[4], 0)
-        self.assertEqual(afVertex[5], 0)
-        self.assertEqual(afVertex[6], 0)
-        self.assertEqual(afVertex[7], 0)
+        self.trace3.plot(type='POINT', af_name='vertex', append = True, 
+            cmap = self.COLS_BLEU, pointsize=50)
+        plt.show()
+        
+        T = [0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 
+             0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0]
+        self.assertEqual(afVertex, T) 
+        
+        
+    def testBends(self):
+        plt.figure(figsize = (8,4))
+        self.trace3.plot()
+        
+        Cinematics.setBendAsAF(self.trace3, angle_min = 130*pi/180)
+        afBend = self.trace3.getAnalyticalFeature('bend')
+        #print (afBend)
+        self.trace3.plot(type='POINT', af_name='bend', append = True, 
+            cmap = self.COLS_VERT, pointsize=50)
+        plt.show()
+        
+        T = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+             1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0]
+        self.assertEqual(afBend, T) 
 
+        
+    def testSwitchbacks(self):
+        plt.figure(figsize = (8,4))
+        self.trace3.plot()
+        
+        Cinematics.setBendAsAF(self.trace3, angle_min = 130*pi/180)
+        Cinematics.setSwitchbacksAsAF(self.trace3, nb_virage_min=3, 
+                                      dist_max=200)
+        afSwitchbacks = self.trace3.getAnalyticalFeature('switchbacks')
+        #print (afSwitchbacks)
+        
+        self.trace3.plot(type='POINT', af_name='switchbacks', append = True, 
+            cmap = self.COLS_BLEU, pointsize=50)
+        plt.show()
+        
+        T = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+             1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
+        self.assertEqual(afSwitchbacks, T) 
+        
         
     def testSmoothedSpeedCalculation(self):
         Cinematics.smoothed_speed_calculation(self.trace1, 2)
@@ -226,6 +295,9 @@ if __name__ == '__main__':
     suite = unittest.TestSuite()
     suite.addTest(TestAlgoCinematicsMethods("testAFInflexion"))
     suite.addTest(TestAlgoCinematicsMethods("testAFvertex"))
+    suite.addTest(TestAlgoCinematicsMethods("testBends"))
+    suite.addTest(TestAlgoCinematicsMethods("testSwitchbacks"))
+    
     suite.addTest(TestAlgoCinematicsMethods("testSmoothedSpeedCalculation"))
     suite.addTest(TestAlgoCinematicsMethods("testCompareAbsCurv"))
     suite.addTest(TestAlgoCinematicsMethods("testEstimateHeading"))
@@ -234,6 +306,7 @@ if __name__ == '__main__':
     suite.addTest(TestAlgoCinematicsMethods("testComputeDescDeniv"))
     suite.addTest(TestAlgoCinematicsMethods("testComputeAvgAscSpeed"))
     suite.addTest(TestAlgoCinematicsMethods("testComputeRadialSignature"))
+    
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

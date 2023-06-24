@@ -6,9 +6,9 @@ from tracklib.algo.Analytics import BIAF_SPEED, speed
 from tracklib.algo.Analytics import BIAF_HEADING, heading
 from tracklib.algo.Analytics import BIAF_DS, ds
 from tracklib.algo.Analytics import BIAF_ABS_CURV
-from tracklib.algo.Analytics import anglegeom, val_angle
+from tracklib.algo.Analytics import anglegeom
 import tracklib.core.Operator as Operator
-from tracklib.core.Utils import NAN
+from tracklib.util.Geometry import angleBetweenThreePoints
 
 
 def estimate_speed(track):
@@ -160,15 +160,25 @@ def computeRadialSignature(track, factor=1):
     return track
 
 
-def inflection(track, i):
+# =============================================================================
+#  
+
+def inflection(track):
     """
-    Among the characteristic points, inflection points are the minima of curvature.
-    This function is an AF algorithm to detect if the observation obs(i) 
-    is an inflection point or not.
+    Among the characteristic points, inflection points are those the curvature 
+    changes sign. In tracklib, this characteristic is modeled as an AF algorithm to detect 
+    if the observation obs(i) is an inflection point or not.
+    
     Le principe de détection est fondé sur l'étude de la variation 
     des produits vectoriels le long de la ligne. Les points d'inflexion sont 
-    détectés aux changements de signe de ces produits
+    détectés aux changements de signe de ces produits. Pour éviter les micros 
+    inflexion, on considère aussi qu'on a au moins 2 produits consécutifs 
+    de même signe de part et d’autre.
 
+    Normalement, le point d'inflexion est le milieu de [oi, oi+1]. 
+    TODO : Pour ne pas avoir à ajouter de points, on prend oi, à changer.
+    
+    
     Parameters
     -----------
     
@@ -178,38 +188,74 @@ def inflection(track, i):
     :type i: int
     :returns: 1 if obs(i) is a inflection point, 0 else.
     :rtype: int
+    
     """
     
-    if i == 0 or i == 1:
-        return 0
-    if i == track.size() -1 or i == track.size() - 2:
-        return 0
+    track.createAnalyticalFeature('inflection', 0)
     
-    x1 = track.getObs(i-1).position.getX()
-    y1 = track.getObs(i-1).position.getY()
-    x2 = track.getObs(i).position.getX()
-    y2 = track.getObs(i).position.getY()
-    x3 = track.getObs(i+1).position.getX()
-    y3 = track.getObs(i+1).position.getY()
-    x4 = track.getObs(i+2).position.getX()
-    y4 = track.getObs(i+2).position.getY()
-  
-    d1 = (x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1)
-    d2 = (x3 - x2) * (y4 - y2) - (y3 - y2) * (x4 - x2)
+    for i in range(track.size()):
     
-    if (d1 > 0 and d2 < 0) or (d1 < 0 and d2 > 0):
-        return 1
+        if i == 0 or i == 1 or i == 2:
+            continue
     
-    return 0
+        if i == track.size()-1 or i == track.size()-2 or i == track.size()-3:
+            continue
+    
+        x0 = track.getObs(i-2).position.getX()
+        y0 = track.getObs(i-2).position.getY()
+        x1 = track.getObs(i-1).position.getX()
+        y1 = track.getObs(i-1).position.getY()
+        x2 = track.getObs(i).position.getX()
+        y2 = track.getObs(i).position.getY()
+        
+        x3 = track.getObs(i+1).position.getX()
+        y3 = track.getObs(i+1).position.getY()
+        x4 = track.getObs(i+2).position.getX()
+        y4 = track.getObs(i+2).position.getY()
+        x5 = track.getObs(i+3).position.getX()
+        y5 = track.getObs(i+3).position.getY()
+      
+        d1 = (x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1)
+        d2 = (x3 - x2) * (y4 - y2) - (y3 - y2) * (x4 - x2)
+        
+        # Signe différent => 1
+        isPICandidat = 0
+        
+        if d1 > 0 and d2 == 0:
+            isPICandidat = 1
+        if d1 < 0 and d2 == 0:
+            isPICandidat = 1
+        if d2 > 0 and d1 == 0:
+            isPICandidat = 1
+        if d2 < 0 and d1 == 0:
+            isPICandidat = 1
+        
+        if isPICandidat == 0:
+            isPICandidat = (d1 > 0 and d2 < 0) or (d1 < 0 and d2 > 0)
+    
+        # On regarde un coup de plus avant, il faut le même signe que d1
+        if isPICandidat == 1:
+            d11 = (x1 - x0) * (y2 - y0) - (y1 - y0) * (x2 - x0)
+            
+            if (d1 > 0 and d11 > 0) or (d1 < 0 and d11 < 0):
+                d22 = (x4 - x3) * (y5 - y3) - (y4 - y3) * (x5 - x3)
+                # print (i, d11, d22)
+                if (d2 > 0 and d22 > 0) or (d2 < 0 and d22 < 0):
+                    #print (i)
+                    track.setObsAnalyticalFeature('inflection', i, 1)
+    
 
 
-def vertex(track, i):
+def setVertexAF(track):
     '''
     Vertices are characteristic points of a track corresponding to 
-    the maxima of curvature.
+    the maxima of curvature between two inflexion points.
+    
+    "sommet" dans la thèse de Plazannet
+    
     This function is an AF algorithm to detect if the observation obs(i) 
     is a vertex point of the track or not.
-        
+    
     Parameters
     -----------
     
@@ -220,99 +266,63 @@ def vertex(track, i):
     :returns: 1 if obs(i) is a vertex point, 0 else.
     :rtype: int
     '''
-    
-    # on cherche imin, l'indice du point d'inflexion le plus proche 
-    # en amont de la trace
-    imin = 1
-    j = i-1
-    while j >= 0:
-        if track.getObsAnalyticalFeature('inflection', j) == 1:
-            imin = j
-            break
-        j -= 1
-    # on cherche imax, l'indice du point d'inflexion le plus proche 
-    # en aval de la trace
-    imax = track.size() - 2
-    j = i
-    while j < track.size() - 1:
-        if track.getObsAnalyticalFeature('inflection', j) == 1:
-            imax = j
-            break
-        j += 1
-    
-    # on cherche la plus petite courbure dans ]imin, imax[
-    K = 400
-    iK = -1
-    for j in range(imin, imax):
-        kj = anglegeom(track, j)
-        if kj < K:
-            K = kj
-            iK = j
-            
-    if iK == i:
-        return 1
 
-    return 0
-
-
-def curvature_radius(track, i):
-    '''
+    track.createAnalyticalFeature('vertex', 0)
     
-    Parameters
-    -----------
+    if not track.hasAnalyticalFeature('inflection'):
+        inflection(track)
     
-    :param track: a track to compute inflection point
-    :param i: the th point
-    :type track: Track
-    :type i: int
-    :returns: curvature radius
-    :rtype: float
-    '''
+    for i in range(track.size()):
+        
+        # on cherche imin, l'indice du point d'inflexion le plus proche 
+        # en amont de la trace
+        imin = 0
+        j = i-1
+        while j >= 0:
+            if track.getObsAnalyticalFeature('inflection', j) == 1:
+                imin = j
+                break
+            j -= 1
+        
+        # on cherche imax, l'indice du point d'inflexion le plus proche 
+        # en aval de la trace
+        imax = track.size() -1
+        j = i+1
+        while j <= track.size() - 1:
+            if track.getObsAnalyticalFeature('inflection', j) == 1:
+                imax = j
+                break
+            j += 1
+        
+        #print (i, imin, imax)
+        #if imin == 0:
+        #    continue
+        #if imax == track.size() - 1:
+        #    continue
+        #print (i, imin, imax)
     
-    # on cherche imin, l'indice du point d'inflexion le plus proche 
-    # en amont de la trace
-    imin = 1
-    j = i-1
-    while j >= 0:
-        if track.getObsAnalyticalFeature('inflection', j) == 1:
-            imin = j
-            break
-        j -= 1
-    # on cherche imax, l'indice du point d'inflexion le plus proche 
-    # en aval de la trace
-    imax = track.size() - 2
-    j = i
-    while j < track.size() - 1:
-        if track.getObsAnalyticalFeature('inflection', j) == 1:
-            imax = j
-            break
-        j += 1
+        # on cherche la plus petite courbure dans ]imin, imax[
+        K = 400
+        iK = -1
+        for j in range(imin, imax+1):
+            kj = anglegeom(track, j)
+            if kj < K:
+                K = kj
+                iK = j
     
-    # on cherche la plus petite courbure dans ]imin, imax[
-    K = 400
-    iK = -1
-    for j in range(imin, imax):
-        kj = anglegeom(track, j)
-        if kj < K:
-            K = kj
-            iK = j
-            
-    if iK == i:
-        return K
-
-    return NAN
+        #print ('   ', i, iK)
+        track.setObsAnalyticalFeature('vertex', iK, 1)
 
 
 from numpy import pi
-def setBendAsAf(T, angle_min = pi/2):
+def setBendAsAF(track, angle_min = pi/2):
     '''
-    Attribut les points de la trace qui composent 
+    Attribution des points de la trace qui composent 
     le virage défini par le sommet et les points d'inflexion les plus proches 
     de chaque côté.
+    
     Un bon virage est un virage dont l'angle avec le sommet et ses 
     points d'inflexion est inférieur à angle_min.
-    
-    Need vertex and inflection AF.
     
     AF = 'bend' and value is 1 if obs(i) is in a bend, 0 else.
 
@@ -322,44 +332,50 @@ def setBendAsAf(T, angle_min = pi/2):
     T : Track
         La trace dont on veut extraire les points autour du sommet.
     angle_min : float
-        angle min.
+        angle min in radians.
 
     '''
     
-    #    
-    T.createAnalyticalFeature('bend', 0)
+    track.createAnalyticalFeature('bend', 0)
+    if not track.hasAnalyticalFeature('inflection'):
+        inflection(track)
+    if not track.hasAnalyticalFeature('vertex'):
+        setVertexAF(track)
     
-    for i in range(T.size()):
+    for i in range(track.size()):
         # On ne traite que les virages à partir des sommets
-        afsommet = T.getObsAnalyticalFeature('vertex', i)
+        afsommet = track.getObsAnalyticalFeature('vertex', i)
         if afsommet == 1:
             # on cherche le pt inflexion avant
             deb = 0
             for j in range(i, -1, -1):
-                ptinflexion = T.getObsAnalyticalFeature('inflection', j)
+                ptinflexion = track.getObsAnalyticalFeature('inflection', j)
                 if ptinflexion == 1:
                     deb = j
                     break
             # On cherche le pt inflexion apres
-            fin = 0
-            for j in range(i, T.size()):
-                ptinflexion = T.getObsAnalyticalFeature('inflection', j)
+            fin = track.size()-1
+            for j in range(i, track.size()):
+                ptinflexion = track.getObsAnalyticalFeature('inflection', j)
                 if ptinflexion == 1:
                     fin = j
                     break
+            #print (i, deb, fin)
                 
-            angle_virage = val_angle(T.getObs(deb), T.getObs(i), T.getObs(fin))
+            angle_virage = angleBetweenThreePoints(track.getObs(deb), track.getObs(i), 
+                                                   track.getObs(fin))
+            # print (angle_virage*180/pi, angle_min*180/pi)
             if angle_virage < angle_min:
                 # print (deb, fin, angle_virage, garde)
                 # Le virage est un bon virage, on prend tous les points
                 for j in range(deb, fin):
-                    T.setObsAnalyticalFeature('bend', j, 1)
-                if fin < T.size():
-                    T.setObsAnalyticalFeature('bend', fin, 1)
+                    track.setObsAnalyticalFeature('bend', j, 1)
+                if fin < track.size():
+                    track.setObsAnalyticalFeature('bend', fin, 1)
+            
 
 
-
-def setSwitchbacksAsAf(track, nb_virage_min = 3, dist_max = 150):
+def setSwitchbacksAsAF(track, nb_virage_min = 3, dist_max = 150):
     '''
     Fusion des virages (consécutifs ou pas) si leur nombre est supérieur à 
     nb_virage_min et si la distance maximale entre deux sommets est inférieure 
@@ -367,7 +383,7 @@ def setSwitchbacksAsAf(track, nb_virage_min = 3, dist_max = 150):
     Attention: c'est une structure de fonction particulière qui créée un AF, 
     elle ne s'appelle pas avec la méthode addAnalyticalFeature.
     
-    Need bend, vertex and inflection AF.
+    TODO: a revoir
     
     Parameters
     -----------
@@ -378,7 +394,14 @@ def setSwitchbacksAsAf(track, nb_virage_min = 3, dist_max = 150):
     '''
     #    
     track.createAnalyticalFeature('switchbacks', 0)
-
+    
+    if not track.hasAnalyticalFeature('inflection'):
+        inflection(track)
+    if not track.hasAnalyticalFeature('vertex'):
+        setVertexAF(track)
+    if not track.hasAnalyticalFeature('bend'):
+        setBendAsAF(track)
+        
     SERIE = False
     deb = 0
     fin = 0
@@ -390,8 +413,8 @@ def setSwitchbacksAsAf(track, nb_virage_min = 3, dist_max = 150):
     dist = 0
     
     for i in range(track.size()):
-        afsommet = track.getObsAnalyticalFeature('vertex', i)
-        afvirage = track.getObsAnalyticalFeature('bend', i)
+        afsommet = track["vertex", i]
+        afvirage = track["bend", i]
         
         if afvirage == 1 and not SERIE:
             #print ("on démarre à : ", i)
@@ -400,8 +423,8 @@ def setSwitchbacksAsAf(track, nb_virage_min = 3, dist_max = 150):
             dist = 0
         elif SERIE and afvirage == 1:
             dist += track.getObs(i).distanceTo(track.getObs(i-1))
+            #print (dist)
         elif SERIE and afvirage != 1:
-            
             # Est-ce qu'on a fini la série ?
             fini = True
             # Sauf si le point suivant 

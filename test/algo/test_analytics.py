@@ -4,6 +4,7 @@
 import unittest
 
 import math
+from numpy import pi
 
 from tracklib.core import (Obs, Track, ObsTime)
 from tracklib.core import ObsCoords as Coords
@@ -158,27 +159,6 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
         self.assertTrue(math.isnan(v33))
         
         
-    def testSlope(self):
-        
-        self.trace1.addAnalyticalFeature(Analytics.slope)
-        
-        s0 = self.trace1.getObsAnalyticalFeature('slope', 0)
-        s1 = self.trace1.getObsAnalyticalFeature('slope', 1)
-        s2 = self.trace1.getObsAnalyticalFeature('slope', 2)
-        s3 = self.trace1.getObsAnalyticalFeature('slope', 3)
-        s4 = self.trace1.getObsAnalyticalFeature('slope', 4)
-        s5 = self.trace1.getObsAnalyticalFeature('slope', 5)
-        s6 = self.trace1.getObsAnalyticalFeature('slope', 6)
-        
-        self.assertEqual(math.isnan(s0), math.isnan(utils.NAN))
-        self.assertEqual(s1, 45.0)
-        self.assertEqual(s2, 0.0)
-        self.assertTrue(abs(s3 - 26.56) < 0.01)
-        self.assertTrue(abs(s4 + 26.56) < 0.01)
-        self.assertTrue(abs(s5 + 45.0) < 0.01)
-        self.assertEqual(s6, 0.0)
-        
-
     def testAcceleration(self):
 		
         v0 = self.trace2.getObsAnalyticalFeature('speed', 0)
@@ -206,6 +186,52 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
         self.assertTrue(math.isnan(v32))
         v33 = self.trace3.getObsAnalyticalFeature('acceleration', 3)
         self.assertTrue(math.isnan(v33))
+        
+    def testOrientation(self):
+        
+        a = Analytics.orientation(self.trace1, 0)
+        self.assertEqual(a, 1)
+		
+        a = Analytics.orientation(self.trace1, self.trace1.size() - 1)
+        self.assertEqual(a, 1)
+		
+        a = Analytics.orientation(self.trace1, 1)
+        self.assertEqual(a, 1)
+        
+        a = Analytics.orientation(self.trace1, 2)
+        self.assertEqual(a, 3)
+        
+        a = Analytics.orientation(self.trace1, 3)
+        self.assertEqual(a, 3)
+		
+        a = Analytics.orientation(self.trace1, 4)
+        self.assertEqual(a, 5)
+		
+        a = Analytics.orientation(self.trace1, 5)
+        self.assertEqual(a, 7)
+		
+        a = Analytics.orientation(self.trace1, 6)
+        self.assertEqual(a, 3)
+        
+    def testSlope(self):
+        
+        self.trace1.addAnalyticalFeature(Analytics.slope)
+        
+        s0 = self.trace1.getObsAnalyticalFeature('slope', 0)
+        s1 = self.trace1.getObsAnalyticalFeature('slope', 1)
+        s2 = self.trace1.getObsAnalyticalFeature('slope', 2)
+        s3 = self.trace1.getObsAnalyticalFeature('slope', 3)
+        s4 = self.trace1.getObsAnalyticalFeature('slope', 4)
+        s5 = self.trace1.getObsAnalyticalFeature('slope', 5)
+        s6 = self.trace1.getObsAnalyticalFeature('slope', 6)
+        
+        self.assertEqual(math.isnan(s0), math.isnan(utils.NAN))
+        self.assertEqual(s1, 45.0)
+        self.assertEqual(s2, 0.0)
+        self.assertTrue(abs(s3 - 26.56) < 0.01)
+        self.assertTrue(abs(s4 + 26.56) < 0.01)
+        self.assertTrue(abs(s5 + 45.0) < 0.01)
+        self.assertEqual(s6, 0.0)
 		
 		
     def testAngleGeom(self):
@@ -217,22 +243,22 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
         self.assertEqual(math.isnan(a), math.isnan(utils.NAN))
 		
         a = Analytics.anglegeom(self.trace1, 1)
-        self.assertTrue(abs(a - 90) < 0.000001)
+        self.assertTrue(abs(a - pi/2) < 0.000001)
 		
         a = Analytics.anglegeom(self.trace1, 2)
-        self.assertTrue(abs(a - 180) < 0.000001)
+        self.assertTrue(abs(a - pi) < 0.000001)
         
         a = Analytics.anglegeom(self.trace1, 3)
-        self.assertTrue(abs(a - 90) < 0.000001)
+        self.assertTrue(abs(a - pi/2) < 0.000001)
 		
         a = Analytics.anglegeom(self.trace1, 4)
-        self.assertTrue(abs(a - 90) < 0.000001)
+        self.assertTrue(abs(a - pi/2) < 0.000001)
 		
         a = Analytics.anglegeom(self.trace1, 5)
         self.assertTrue(abs(a - 0) < 0.000001)
 		
         a = Analytics.anglegeom(self.trace1, 6)
-        self.assertTrue(abs(a - 90) < 0.000001)
+        self.assertTrue(abs(a - pi/2) < 0.000001)
 		
 		
     def testCalculAngleOriente(self):
@@ -262,56 +288,6 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
         self.assertTrue(abs(a - 90) < 0.000001)
 		
 		
-    def testOrientation(self):
-        
-        a = Analytics.orientation(self.trace1, 0)
-        self.assertEqual(a, 1)
-		
-        a = Analytics.orientation(self.trace1, self.trace1.size() - 1)
-        self.assertEqual(a, 1)
-		
-        a = Analytics.orientation(self.trace1, 1)
-        self.assertEqual(a, 1)
-        
-        a = Analytics.orientation(self.trace1, 2)
-        self.assertEqual(a, 3)
-        
-        a = Analytics.orientation(self.trace1, 3)
-        self.assertEqual(a, 3)
-		
-        a = Analytics.orientation(self.trace1, 4)
-        self.assertEqual(a, 5)
-		
-        a = Analytics.orientation(self.trace1, 5)
-        self.assertEqual(a, 7)
-		
-        a = Analytics.orientation(self.trace1, 6)
-        self.assertEqual(a, 3)
-		
-		
-    # def testStopPointWithAccelerationCriteria(self):
-	# 	
-    #     v1 = self.trace2.getObsAnalyticalFeature('speed', 1)
-    #     a1 = self.trace2.getObsAnalyticalFeature('acceleration', 1)
-    #     self.assertTrue(abs(v1 - 0.5) < 0.000001)
-    #     self.assertTrue(abs(a1 + 0.0) < 0.000001)
-    #     isSTP = Analytics.stop_point_with_acceleration_criteria(self.trace2, 1)
-    #     #print (v1, a1, isSTP)		
-    #     self.assertEqual(isSTP, 0)
-	# 	
-    #     v2 = self.trace2.getObsAnalyticalFeature('speed', 2)
-    #     a2 = self.trace2.getObsAnalyticalFeature('acceleration', 2)
-    #     self.assertTrue(abs(v2 - 1.0) < 0.000001)
-    #     self.assertTrue(abs(a2 - 0.075) < 0.000001)
-    #     isSTP = Analytics.stop_point_with_acceleration_criteria(self.trace2, 2)
-    #     #print (v2, a2, isSTP)		
-    #     self.assertEqual(isSTP, 0)
-        
-		
-    # def testStopPointWithTimeWindowCriteria(self):
-    #     self.assertLessEqual(3, 5)
-    
-	
 if __name__ == '__main__':
     
     suite = unittest.TestSuite()
@@ -319,15 +295,10 @@ if __name__ == '__main__':
     suite.addTest(TestAlgoAnalyticsMethods("testHeading"))
     suite.addTest(TestAlgoAnalyticsMethods("testSpeed"))
     suite.addTest(TestAlgoAnalyticsMethods("testAcceleration"))
-    suite.addTest(TestAlgoAnalyticsMethods("testAngleGeom"))
-    suite.addTest(TestAlgoAnalyticsMethods("testCalculAngleOriente"))
     suite.addTest(TestAlgoAnalyticsMethods("testOrientation"))
     suite.addTest(TestAlgoAnalyticsMethods("testSlope"))
-    
-    
-    #suite.addTest(TestAlgoAnalyticsMethods("testStopPointWithAccelerationCriteria"))
-    #suite.addTest(TestAlgoAnalyticsMethods("testStopPointWithTimeWindowCriteria"))
-    
+    suite.addTest(TestAlgoAnalyticsMethods("testAngleGeom"))
+    suite.addTest(TestAlgoAnalyticsMethods("testCalculAngleOriente"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

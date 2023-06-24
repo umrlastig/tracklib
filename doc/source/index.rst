@@ -7,9 +7,15 @@
 Welcome to tracklib’s documentation!
 =====================================
 
+.. image:: img/TracklibLogo.png
+  :width: 200
+  :align: center
+  
+
 **tracklib** is a Python library that provides a variety of tools, operators and functions to manipulate GPS trajectories.
 
-:Source Code: https://github.com/umrlastig/tracklib
+:View the source code of tracklib: https://github.com/umrlastig/tracklib
+
 
 |TracklibBuildTest| |codecov| |rtd| |licence|
 
