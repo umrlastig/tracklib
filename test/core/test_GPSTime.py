@@ -40,7 +40,7 @@ class TestGPSTime(unittest.TestCase):
         self.assertEqual(18, d.sec)
         
         
-        d = ObsTime.readUnixTime(1334665563298)
+        d = ObsTime.readUnixTime(1334665563298 * 1e-3)
         print (d)
         self.assertIsInstance(d, ObsTime)
         self.assertEqual('17/04/2012 12:26:03', str(d)[0:19])
