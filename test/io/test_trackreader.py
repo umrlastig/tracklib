@@ -147,8 +147,9 @@ class TestTrackReader(TestCase):
         collection = TrackReader.readFromCsv(path=chemin, id_E=1, id_N=0, id_T=2, 
                                              srid="GeoCoords",
                                              DateIni = ObsTime.readTimestamp(dateInitiale),
+                                             timeUnit = 0.001,
                                              selector=s,
-                                             separator= ' ', verbose = True)
+                                             separator= ' ', verbose = False)
         # 
         self.assertIsInstance(collection, TrackCollection)
         self.assertEqual(collection.size(), 23)
@@ -157,12 +158,12 @@ class TestTrackReader(TestCase):
 if __name__ == '__main__':
     #unittest.main()
     suite = TestSuite()
-    
+
     # CSV
     suite.addTest(TestTrackReader("testReadCsvWithAFTrack"))
     suite.addTest(TestTrackReader("testReadCsvDir"))
     suite.addTest(TestTrackReader("testReadCsvSelect"))
-    
+
     # WKT
     suite.addTest(TestTrackReader("test_read_wkt_polygon"))
     suite.addTest(TestTrackReader("test_read_wkt_linestring"))
@@ -174,7 +175,7 @@ if __name__ == '__main__':
     suite.addTest(TestTrackReader("test_read_gpx_geo_rte"))
     suite.addTest(TestTrackReader("test_read_gpx_dir"))
     suite.addTest(TestTrackReader("testReadGpxWithAF"))
-    
+
     runner = TextTestRunner()
     runner.run(suite)
 

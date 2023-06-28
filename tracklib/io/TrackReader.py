@@ -92,7 +92,7 @@ class TrackReader:
                 p = path + "/" + f
                 trace = TrackReader.readFromCsv(
                     p, id_E, id_N, id_U, id_T,
-                    separator, DateIni, h, com, no_data_value,
+                    separator, DateIni, timeUnit, h, com, no_data_value,
                     srid, read_all, selector, verbose,
                 )
                 

@@ -55,7 +55,7 @@ class TestGPSTime(unittest.TestCase):
 if __name__ == '__main__':
     #unittest.main()
     suite = unittest.TestSuite()
-    #suite.addTest(TestGPSTime("test_format_time"))
+    suite.addTest(TestGPSTime("test_format_time"))
     suite.addTest(TestGPSTime("test_readunixtime"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
