@@ -410,6 +410,37 @@ class TestTrack(TestCase):
         self.assertEqual(6.0, self.trace2.getObsAnalyticalFeature('abs_curv', 5))
         self.assertEqual(A[5], self.trace2.getObsAnalyticalFeature('abs_curv', 5))
         
+        
+    def test_insert_obs2(self):
+        
+        ObsTime.ObsTime.setReadFormat("2D/2M/4Y 2h:2m:2s")
+        
+        track = Track.Track([], 1)
+        p = Obs.Obs(Coords.ENUCoords(904145.257, 6435910.726, 1228.000), ObsTime.ObsTime.readTimestamp("01/01/1970 00:00:00"))
+        track.addObs(p)
+        p = Obs.Obs(Coords.ENUCoords(904135.886, 6435924.287, 1230.000), ObsTime.ObsTime.readTimestamp("01/01/1970 00:00:00"))
+        track.addObs(p)
+        p = Obs.Obs(Coords.ENUCoords(904131.695, 6435940.496, 1232.000), ObsTime.ObsTime.readTimestamp("01/01/1970 00:00:00"))
+        track.addObs(p)
+        p = Obs.Obs(Coords.ENUCoords(904124.752, 6435949.758, 1234.000), ObsTime.ObsTime.readTimestamp("01/01/1970 00:00:00"))
+        track.addObs(p)
+        p = Obs.Obs(Coords.ENUCoords(904121.474, 6435953.784, 1235.000), ObsTime.ObsTime.readTimestamp("01/01/1970 00:00:00"))
+        track.addObs(p)
+        p = Obs.Obs(Coords.ENUCoords(904112.641, 6435964.640, 1237.000), ObsTime.ObsTime.readTimestamp("01/01/1970 00:00:00"))
+        track.addObs(p)
+        p = Obs.Obs(Coords.ENUCoords(904112.033, 6435956.730, 1239.000), ObsTime.ObsTime.readTimestamp("01/01/1970 00:00:00"))
+        track.addObs(p)
+        p = Obs.Obs(Coords.ENUCoords(904110.988, 6435953.029, 1240.000), ObsTime.ObsTime.readTimestamp("01/01/1970 00:00:00"))
+        track.addObs(p)
+        p = Obs.Obs(Coords.ENUCoords(904108.868, 6435945.536, 1242.000), ObsTime.ObsTime.readTimestamp("01/01/1970 00:00:00"))
+        track.addObs(p)
+        self.assertLessEqual(abs(track.length() - 84.83257), self.__epsilon)
+        
+        p = Obs.Obs(Coords.ENUCoords(904113.755, 6435963.271, 1236), ObsTime.ObsTime.readTimestamp("01/01/1970 00:00:00"))
+        track.insertObs(p, 5)
+        self.assertLessEqual(abs(track.length() - 84.994800), self.__epsilon)
+        
+        
 
 if __name__ == '__main__':
     suite = TestSuite()
@@ -439,6 +470,7 @@ if __name__ == '__main__':
     suite.addTest(TestTrack("test_export"))
     
     suite.addTest(TestTrack("test_insert_obs"))
+    suite.addTest(TestTrack("test_insert_obs2"))
     
     runner = TextTestRunner()
     runner.run(suite)
