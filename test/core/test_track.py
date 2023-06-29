@@ -4,6 +4,7 @@ from unittest import TestCase, TestSuite, TextTestRunner
 from tracklib.core import (Track, Obs, ObsTime)
 from tracklib.core import ObsCoords as Coords
 from tracklib.algo.Geometrics import Polygon
+import tracklib.algo.Cinematics as Cinematics
 
 
 class TestTrack(TestCase):
@@ -361,6 +362,53 @@ class TestTrack(TestCase):
         self.assertListEqual (T, [0,1,2,3])
         
         
+    def test_insert_obs(self):
+        
+        self.trace2.getObs(0).position.setZ(0)
+        self.trace2.getObs(1).position.setZ(0)
+        self.trace2.getObs(2).position.setZ(0)
+        self.trace2.getObs(3).position.setZ(0)
+        
+        self.assertEqual(4, self.trace2.size())
+        self.assertLessEqual(abs(self.trace2.length() - 4.0000), self.__epsilon)
+        
+        A = Cinematics.computeAbsCurv(self.trace2)
+        self.assertEqual(0.0, self.trace2.getObsAnalyticalFeature('abs_curv', 0))
+        self.assertEqual(A[0], self.trace2.getObsAnalyticalFeature('abs_curv', 0))
+        self.assertEqual(1.0, self.trace2.getObsAnalyticalFeature('abs_curv', 1))
+        self.assertEqual(A[1], self.trace2.getObsAnalyticalFeature('abs_curv', 1))
+        self.assertEqual(2.0, self.trace2.getObsAnalyticalFeature('abs_curv', 2))
+        self.assertEqual(A[2], self.trace2.getObsAnalyticalFeature('abs_curv', 2))
+        self.assertEqual(4.0, self.trace2.getObsAnalyticalFeature('abs_curv', 3))
+        self.assertEqual(A[3], self.trace2.getObsAnalyticalFeature('abs_curv', 3))
+        
+        self.trace2.removeAnalyticalFeature('abs_curv')
+        
+        c4 = Coords.ENUCoords(3.0, 4.0, 0)
+        p4 = Obs.Obs(c4, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:13"))
+        self.trace2.insertObs(p4, 3)
+        
+        c5 = Coords.ENUCoords(5.0, 4.0, 0)
+        p5 = Obs.Obs(c5, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:17"))
+        self.trace2.insertObs(p5)
+                
+        self.assertEqual(6, self.trace2.size())
+        self.assertLessEqual(abs(self.trace2.length() - 6.0000), self.__epsilon)
+        
+        #self.trace2.plotAsMarkers()
+        A = Cinematics.computeAbsCurv(self.trace2)
+        self.assertEqual(0.0, self.trace2.getObsAnalyticalFeature('abs_curv', 0))
+        self.assertEqual(A[0], self.trace2.getObsAnalyticalFeature('abs_curv', 0))
+        self.assertEqual(1.0, self.trace2.getObsAnalyticalFeature('abs_curv', 1))
+        self.assertEqual(A[1], self.trace2.getObsAnalyticalFeature('abs_curv', 1))
+        self.assertEqual(2.0, self.trace2.getObsAnalyticalFeature('abs_curv', 2))
+        self.assertEqual(A[2], self.trace2.getObsAnalyticalFeature('abs_curv', 2))
+        self.assertEqual(3.0, self.trace2.getObsAnalyticalFeature('abs_curv', 3))
+        self.assertEqual(A[3], self.trace2.getObsAnalyticalFeature('abs_curv', 3))
+        self.assertEqual(5.0, self.trace2.getObsAnalyticalFeature('abs_curv', 4))
+        self.assertEqual(A[4], self.trace2.getObsAnalyticalFeature('abs_curv', 4))
+        self.assertEqual(6.0, self.trace2.getObsAnalyticalFeature('abs_curv', 5))
+        self.assertEqual(A[5], self.trace2.getObsAnalyticalFeature('abs_curv', 5))
         
 
 if __name__ == '__main__':
@@ -389,6 +437,8 @@ if __name__ == '__main__':
     
     suite.addTest(TestTrack("test_remove_tpsDup"))
     suite.addTest(TestTrack("test_export"))
+    
+    suite.addTest(TestTrack("test_insert_obs"))
     
     runner = TextTestRunner()
     runner.run(suite)
