@@ -131,6 +131,10 @@ class ObsTime:
         :return: The read format
         """
         return ObsTime.__READ_FMT
+      
+    @staticmethod  
+    def isLeapYear(year) -> bool:
+        return ((year % 4 == 0) and ((year % 100 != 0) or (year % 400 == 0)))
 
     @staticmethod
     def readUnixTime(elapsed_seconds: float) -> ObsTime:   
@@ -162,7 +166,7 @@ class ObsTime:
         year = ObsTime.UNIX_BASE_YEAR
         while sec < elapsed_seconds - SECOND_PER_YEAR:
             sec += SECOND_PER_YEAR
-            if year % 4 == 0:
+            if ObsTime.isLeapYear(year):
                 sec += 86400
             year += 1
         time.year = year
@@ -172,7 +176,8 @@ class ObsTime:
         month = 0
         for i in range(12):
             sec_on_month = ObsTime.__day_per_month[month] * 86400
-            if (month == 1) and (year % 4 == 0):
+            #if (month == 1) and (year % 4 == 0):
+            if (month == 1) and ObsTime.isLeapYear(year):
                 sec_on_month += 86400
             if elapsed_seconds < sec_on_month:
                 break
@@ -212,11 +217,11 @@ class ObsTime:
         seconds = 0
         for y in range(ObsTime.UNIX_BASE_YEAR, self.year):
             seconds += 86400 * 365
-            if y % 4 == 0:
+            if ObsTime.isLeapYear(y):
                 seconds += 86400
         for m in range(1, self.month):
             seconds += ObsTime.__day_per_month[m - 1] * 86400
-            if (m == 2) and (self.year % 4 == 0):
+            if (m == 2) and ObsTime.isLeapYear(self.year):
                 seconds += 86400
         seconds += (self.day - 1) * 86400
         seconds += self.hour * 3600
