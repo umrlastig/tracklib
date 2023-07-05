@@ -84,7 +84,6 @@ def compLike(s1, s2) -> bool:
         return s1 in s2  # 'in' or 'equal' yet to be decided
     occ = []
     s = s1
-    d = len(s)
     for tok in tokens:
         id = s.find(tok)
         if id < 0:

@@ -17,6 +17,7 @@ combined in a conjunctive (AND) type global selector. Note that boolean
 algebraic rules show that it is possible as well to combine 4 conjunctive-
 type selectors (C1.R1, C1.R2, C2.R1 and C2.R2) in a disjunctive-type global 
 selector. 
+
 Constraints may be based on:
 
    - a geometrical shape (Rectangle, circle or polygon in Geometrics). This 
@@ -25,7 +26,7 @@ Constraints may be based on:
         - MODE_CROSSES: tracks crossing shape interior/boundary are selected
         - MODE_INSIDE : tracks remaining fully inside the shape are selected
         - MODE_GETS_IN: tracks getting in (at least once) shape are selected
-        - MODE_INSIDE : tracks getting out (at least once) shape are selected
+        - MODE_GETS_OUT: tracks getting out (at least once) shape are selected
 
    - a track t as a reference. Available modes are:
 
@@ -36,8 +37,9 @@ Constraints may be based on:
      (at least once) the toll gate are selected 
 
 All these constraint may be provided with an additional time constraint, 
-specifying the time interval (between two GPSTime dates) where crossing /
+specifying the time interval (between two ObsTime dates) where crossing /
 containing / getting in / getting out... operations are tested. 
+
 Besides, there are two types of selection:
 
    - TYPE_SELECT: tracks abiding by constraints are returned as they are
@@ -102,7 +104,10 @@ def printMode(constraint):
         return "GETS OUT"
 
 
-# ------------------------------- TIME CONSTRAINTS ----------------------------
+# -----------------------------------------------------------------------------
+#                             CONSTRAINTS 
+# -----------------------------------------------------------------------------
+
 class TimeConstraint:
     """Time constraints"""
 
@@ -145,13 +150,10 @@ class TimeConstraint:
         return output
 
 
-# ------------------------------- CONSTRAINTS ----------------------------
-
-# -------------------------------------------------
-# Special case of constraint defined by a track
-# -------------------------------------------------
 class TrackConstraint:
-    """TODO"""
+    """
+    Special case of constraint defined by a track.
+    """
 
     def __init__(
         self,
@@ -235,11 +237,10 @@ class TrackConstraint:
 
 
 
-# -------------------------------------------------
-# Special case of constraint defined by a segment
-# -------------------------------------------------
 class TollGateConstraint:
-    """TODO"""
+    """
+    Special case of constraint defined by a segment.
+    """
 
     def __init__(self, pt1, pt2, time=None, type=TYPE_SELECT):
         """TODO"""
@@ -359,9 +360,9 @@ class Constraint:
         self.shape.plot(sym)
 
 
-# ------------------------------- SELECTOR ----------------------------
-
-
+# -----------------------------------------------------------------------------
+#                                 SELECTOR 
+# -----------------------------------------------------------------------------
 class Selector:
     """TODO"""
 
@@ -428,8 +429,6 @@ class Selector:
 
 
 # --------------------------- GLOBAL SELECTOR ---------------------------
-
-
 class GlobalSelector:
     """TODO"""
 
