@@ -181,6 +181,16 @@ class TrackReader:
                         time = fmt.DateIni.addSec((float)(fields[fmt.id_T])*timeUnit)
                 else:
                     time = ObsTime()
+                    
+                # Blank fields
+                '''
+                if (fields[fmt.id_E].strip() == ''):
+                    fields[fmt.id_E] = fmt.no_data_value
+                if (fields[fmt.id_N].strip() == ''):
+                    fields[fmt.id_N] = fmt.no_data_value
+                if (fields[fmt.id_U].strip() == ''):
+                    fields[fmt.id_U] = fmt.no_data_value
+                '''
 
                 E = (float)(fields[fmt.id_E])
                 N = (float)(fields[fmt.id_N])
