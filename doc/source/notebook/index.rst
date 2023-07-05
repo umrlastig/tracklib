@@ -8,9 +8,9 @@ Use Cases
 ==========
 
 A few use cases, that describe application with GPS trajectories, have 
-been identified by the developpers Group. Each use case is related to one 
-or more previous research work and uses several features 
-of the tracklib library.
+been identified by the developpers group. Each use case is related to one 
+or more previous research work and uses several features of the tracklib 
+library.
 
  
 .. nbgallery::
@@ -19,6 +19,7 @@ of the tracklib library.
     :glob:
     :reversed:
 
+    MapMatchingOnNetwork
     KalmanFiltering
     Switchbacks
     Summarize

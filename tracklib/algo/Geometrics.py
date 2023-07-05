@@ -1,14 +1,4 @@
-"""Class to manage general operations on a track
-
-.. code-block:: python
-
-    circle1 = Geometrics.fitCircle(trace2)
-    circle1.plot()
-    circle2 = Geometrics.minCircle(trace2)
-    circle2.plot()
-
-
-"""
+"""Class to manage general operations on a track"""
 
 import copy
 import logging
@@ -50,17 +40,14 @@ class Circle:
             
         radius : float
             The radius of the circle
-
         """
-        
-        
-        
+
         self.center = center
         self.radius = radius
 
-    def plot(self, sym="r-", append=plt):
+    def plot(self, sym="r-", append=plt, linewidth=0.5):
         """
-        Draw the circle
+        Draw the circle.
         """
 
         if isinstance(append, bool):
@@ -78,7 +65,7 @@ class Circle:
             Y[t] = self.radius * math.sin(2 * math.pi * t / len(Y)) + self.center.getY()
         X[len(X) - 1] = X[0]
         Y[len(Y) - 1] = Y[0]
-        ax1.plot(X, Y, sym, linewidth=0.5)
+        ax1.plot(X, Y, sym, linewidth=linewidth)
 
         return ax1
 
@@ -159,10 +146,19 @@ class Rectangle:
         self.pmin = pmin
         self.pmax = pmax
 
-    def plot(self, sym="r-"):
+    def plot(self, sym="r-", append=plt):
         """
         Draw the rectangle
         """
+        
+        if isinstance(append, bool):
+            if append:
+                ax1 = plt.gca()
+            else:
+                fig, ax1 = plt.subplots(figsize=(12, 6))
+        else:
+            ax1 = append
+            
         XR = [
             self.pmin.getX(),
             self.pmax.getX(),
@@ -177,7 +173,9 @@ class Rectangle:
             self.pmax.getY(),
             self.pmin.getY(),
         ]
-        plt.plot(XR, YR, sym)
+        ax1.plot(XR, YR, sym)
+        
+        return ax1
 
     def contains(self, point):
         """
@@ -273,9 +271,20 @@ class Polygon:
             self.X.append(self.X[0])
             self.Y.append(self.Y[0])
 
-    def plot(self, sym="r-"):
+    def plot(self, sym="r-", append=plt):
         """TODO"""
-        plt.plot(self.X, self.Y, sym)
+        
+        if isinstance(append, bool):
+            if append:
+                ax1 = plt.gca()
+            else:
+                fig, ax1 = plt.subplots(figsize=(12, 6))
+        else:
+            ax1 = append
+            
+        ax1.plot(self.X, self.Y, sym)
+        
+        return ax1
 
     def contains(self, point):
         """TODO"""
@@ -709,7 +718,16 @@ def minCircleMatrix(track):
 
 
 def fitCircle(track, iter_max=100, epsilon=1e-10):
-    """TODO"""
+    """
+    
+    .. code-block:: python
+
+        circle1 = Geometrics.fitCircle(trace2)
+        circle1.plot()
+        circle2 = Geometrics.minCircle(trace2)
+        circle2.plot()
+    
+    """
 
     X = np.ones((3, 1))
     c = track.getCentroid()

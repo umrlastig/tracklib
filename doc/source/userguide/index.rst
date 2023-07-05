@@ -19,24 +19,14 @@ Basic principles
   Core concept <1_coreconcept>
   Operation for manipulating track <2_operator>
   Read/Write track(s), network and raster <reader_writer>
-  
-.. Simplify, Interpolate & Filter <3_filter>
-.. Points caractéristiques
+  Selection on GPS tracks <../notebook/Selection>
 
-  
-  
-Specific Usage
----------------
-  
-.. toctree::
-  :maxdepth: 1
-  
-  Map matching on network <../notebook/MapMatchingOnNetwork>
-  Different methods to detect stops points <../notebook/StopPoints>
- 
+
+.. Querying obstervations in a track <4_trackquery>
+.. Different methods to detect stops points <../notebook/StopPoints>
 .. Mopsi <Mopsi> (track's comparaison)
-
- 
+.. Simplify, Interpolate & Filter <3_filter>
+.. Points caractéristiques 
 
 
 

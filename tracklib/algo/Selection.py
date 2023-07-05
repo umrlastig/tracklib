@@ -338,8 +338,11 @@ class Constraint:
                             return True
             return False
 
+    
     def select(self, tracks):
-        """TODO"""
+        """
+        Selection only by taking into account the geometry !
+        """
         if self.type == TYPE_SELECT:
             output = TrackCollection()
             for track in tracks:
