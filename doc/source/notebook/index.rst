@@ -14,11 +14,11 @@ library.
 
  
 .. nbgallery::
-    :caption: use cases gallery:
     :name: rst-gallery
     :glob:
     :reversed:
 
+    StopPoints
     MapMatchingOnNetwork
     KalmanFiltering
     Switchbacks

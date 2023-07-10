@@ -819,9 +819,8 @@ class Track:
             print(output)
 
     def summary(self):
-        """TODO
-
-        Print summary (complete wkt below)
+        """
+        Print summary (complete wkt below).
         """
         output = "-------------------------------------\n"
         output += "GPS track #" + str(self.tid) + " of user " + str(self.uid) + ":\n"
@@ -1396,7 +1395,7 @@ class Track:
     
 
     def plot(self, sym="k-", type="LINE", af_name="", cmap=-1, append=True, 
-             label=None, pointsize=5, v:ivisitor.IPlotVisitor=None):
+             label=None, pointsize=5, w=6.4, h=4.8, v:ivisitor.IPlotVisitor=None):
         """
         Method to plot a track (short cut from Plot)
         Append:
@@ -1414,7 +1413,7 @@ class Track:
             import tracklib.plot.MatplotlibVisitor as visitor
             v = visitor.MatplotlibVisitor()
         return v.plotTrack(self, sym, type, af_name, cmap, append, 
-             label, pointsize)
+             label, pointsize, w, h)
     
 
     # =========================================================================

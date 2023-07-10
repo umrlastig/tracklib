@@ -82,7 +82,7 @@ class MatplotlibVisitor(iplot.IPlotVisitor):
         return plot.plotEllipses(track, sym, factor, af, append)
     
     def plotTrack(self, track, sym="k-", type="LINE", af_name="", cmap=-1, append=True, 
-             label=None, pointsize=5):
+             label=None, pointsize=5, w=6.4, h=4.8):
         """
         Method to plot a track (short cut from Plot)
         Append:
@@ -97,14 +97,14 @@ class MatplotlibVisitor(iplot.IPlotVisitor):
         """
         plot = Plot.Plot(track)
         plot.sym = sym
-        if not '-' in sym:
+        if not '-' in sym and type != 'CIRCULAR':
             type = "POINT"
             plot.pointsize = 20
         plot.pointsize = pointsize
         plot.color = sym[0]
         plot.marker = sym[1]
-        plot.w = 6
-        plot.h = 5
+        plot.w = w
+        plot.h = h
         return plot.plot(type, af_name, cmap, append=append, label=label)
     
     def plotMMLink(self, track):
