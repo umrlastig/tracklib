@@ -8,11 +8,6 @@
 User Guide
 ############
 
-
-Basic principles
------------------
-
-
 .. toctree::
   :maxdepth: 1
   
@@ -20,6 +15,7 @@ Basic principles
   Operation for manipulating track <2_operator>
   Read/Write track(s), network and raster <reader_writer>
   Selection on GPS tracks <../notebook/Selection>
+  Segmenter une trace <5_segmenter_trace>
 
 
 .. Querying obstervations in a track <4_trackquery>
