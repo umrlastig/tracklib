@@ -232,11 +232,21 @@ class RasterBand:
         plt.title(self.getName())
 
 
-    def plotAsImage(self, axe = None, figure = None, 
+    def plotAsImage(self, append=False, 
                     color1 = (0, 0, 0), color2 = (255, 255, 255), novaluecolor='white'):
         """
-        Plot as image
+        Plot raster band as an image.
         """
+        
+        if isinstance(append, bool):
+            if append:
+                ax1 = plt.gca()
+                fig = ax1.get_figure()
+            else:
+                fig, ax1 = plt.subplots(figsize=(self.w, self.h))
+        else:
+            ax1 = append
+            fig = ax1.get_figure()
         
         tab = np.array(self.grid, dtype=np.float32)
         if self.getNoDataValue() != None:
@@ -245,18 +255,14 @@ class RasterBand:
         cmap = utils.getOffsetColorMap(color1, color2, 0)
         cmap.set_bad(color=novaluecolor)
         
-        if axe == None:
-            im = plt.imshow(tab, cmap=cmap)
-            plt.title(self.getName())
-            plt.colorbar(im, fraction=0.046, pad=0.04)
-            plt.show()
-        else:
-            im = axe.imshow(tab, cmap=cmap)
-            axe.set_title(self.getName())
-            
-            divider = make_axes_locatable(axe)
-            cax = divider.append_axes('right', size='5%', pad=0.1)
-            if figure != None:
-                figure.colorbar(im, cax=cax, orientation='vertical', fraction=0.046)
+        im = ax1.imshow(tab, cmap=cmap)
+        ax1.set_title(self.getName())
+        #plt.colorbar(im, fraction=0.046, pad=0.04)
+        #plt.show()
+        
+        divider = make_axes_locatable(ax1)
+        cax = divider.append_axes('right', size='5%', pad=0.1)
+        if fig != None:
+            fig.colorbar(im, cax=cax, orientation='vertical', fraction=0.046)
 
 

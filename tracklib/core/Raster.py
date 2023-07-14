@@ -65,7 +65,7 @@ class Raster:
         #    pass
 
     
-    def plot(self, identifier: Union[int, str], axe=None, figure=None,
+    def plot(self, identifier: Union[int, str], append=False, 
              color1=(0, 0, 0), color2=(255, 255, 255)):
         """
         At the moment, juste one band of raster, that's why the name is needeed.
@@ -73,9 +73,9 @@ class Raster:
         
         if isinstance(identifier, int):
             name = self.__idxBands[identifier]
-            self.__bands[name].plotAsImage(axe, figure)
+            self.__bands[name].plotAsImage(append)
         else:
-            self.__bands[identifier].plotAsImage(axe, figure)
+            self.__bands[identifier].plotAsImage(append)
             
 
 
