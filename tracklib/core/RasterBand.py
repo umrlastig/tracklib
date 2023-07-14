@@ -243,7 +243,7 @@ class RasterBand:
                 ax1 = plt.gca()
                 fig = ax1.get_figure()
             else:
-                fig, ax1 = plt.subplots(figsize=(self.w, self.h))
+                fig, ax1 = plt.subplots(figsize=(10, 3))
         else:
             ax1 = append
             fig = ax1.get_figure()
