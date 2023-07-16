@@ -35,22 +35,7 @@ class TestPlot(unittest.TestCase):
         self.trace.plotAsMarkers(frg="k", bkg="w", sym_frg=" ", sym_bkg="o")
         plt.show()
         
-    def testPlotSegmentation(self):
-        
-        from tracklib.core.Operator import Operator
-        import tracklib.algo.Segmentation as segmentation
-        #import tracklib.algo.Interpolation as interp
-        
-        self.trace.operate(Operator.DIFFERENTIATOR, "speed", "dv")
-        self.trace.operate(Operator.RECTIFIER, "dv", "absdv")
-
-        #  Segmentation
-        segmentation.segmentation(self.trace, ["absdv"], "speed_decoup", [1.5])
-        
-        TAB_AFS = ['speed_decoup']
-        plot = Plot(self.trace)
-        plot.plotProfil('SPATIAL_SPEED_PROFIL', TAB_AFS)
-        plt.show()
+    
         
         
 
@@ -59,6 +44,5 @@ if __name__ == '__main__':
     suite.addTest(TestPlot("testPlotAnalyticalFeature"))
     suite.addTest(TestPlot("testPlotProfil"))
     suite.addTest(TestPlot("testPlotMarker"))
-    suite.addTest(TestPlot("testPlotSegmentation"))
     runner = unittest.TextTestRunner()
     runner.run(suite)

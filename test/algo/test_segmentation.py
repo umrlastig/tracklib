@@ -4,24 +4,75 @@ import matplotlib.pyplot as plt
 import os.path
 import random as r
 import unittest
-#import matplotlib.pyplot as plt
 
 from tracklib.core.Obs import Obs
 from tracklib.core.ObsCoords import ENUCoords
 from tracklib.core.ObsTime import ObsTime
 from tracklib.core.Track import Track
-from tracklib.io.TrackReader import TrackReader
-#from tracklib.io.FileReader import FileReader
+#from tracklib.io.TrackReader import TrackReader
 
-from tracklib.algo.Segmentation import findStopsGlobal#, findStopsLocal
+import tracklib.algo.Analytics as Analytics
+
+from tracklib.algo.Segmentation import segmentation, split
+from tracklib.algo.Segmentation import MODE_COMPARAISON_OR, MODE_COMPARAISON_AND
+#from tracklib.algo.Segmentation import findStopsGlobal#, findStopsLocal
 from tracklib.algo.Segmentation import retrieveNeighbors, stdbscan, computeAvgCluster
 
-class TestAlgoSegmentationMethods(unittest.TestCase):
+
+class TestAlgoSegmentation(unittest.TestCase):
     
-#    def setUp (self):
-#        self.resource_path = os.path.join(os.path.split(__file__)[0], "../..")
-#
-#
+    def setUp (self):
+        self.resource_path = os.path.join(os.path.split(__file__)[0], "../..")
+        #self.trace.estimate_speed()
+
+    def testSegmentation(self):
+        
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        trace = Track([], 1)
+        trace.addObs(Obs(ENUCoords(0, 0, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(1, 0, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(2, 0, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(2, 1, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(3, 1, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(4, 1, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(5, 1, 0), ObsTime()))
+        
+        trace.addAnalyticalFeature(Analytics.heading)
+        trace.createAnalyticalFeature('Temp', [39,30,37,35,45,40,30])
+        
+        #  Segmentation 1
+        segmentation(trace, ["Temp", "heading"], "decoup1", [35, 0], MODE_COMPARAISON_AND)
+        T = trace.getAnalyticalFeature('decoup1')
+        self.assertEqual(len(T), 7)
+        self.assertListEqual(T, [1,1,1,0,1,1,1])
+        
+        #  Segmentation 2
+        segmentation(trace, ["Temp", "heading"], "decoup2", [35, 0], MODE_COMPARAISON_OR)
+        T = trace.getAnalyticalFeature('decoup2')
+        self.assertEqual(len(T), 7)
+        self.assertListEqual(T, [1,0,1,0,1,1,0])
+        
+        #  Segmentation 3
+        segmentation(trace, "heading", "decoup3", 0)
+        T = trace.getAnalyticalFeature('decoup3')
+        self.assertEqual(len(T), 7)
+        self.assertListEqual(T, [1,1,1,0,1,1,1])
+    
+        # split avec indice
+        TRACES = split(trace, [0,2,5,6])
+        self.assertEqual(len(TRACES), 3)
+        self.assertEqual(TRACES[0].size(), 3)
+        #print (TRACES[0])
+        #self.assertEqual(TRACES[0][0], Obs(ENUCoords(0, 0, 0), ObsTime()))
+        self.assertEqual(TRACES[1].size(), 4)
+        self.assertEqual(TRACES[2].size(), 2)
+        
+        # split avec AF
+        TRACES = split(trace, "decoup3")
+        self.assertEqual(len(TRACES), 7)
+        
+        
+    
 #    def testStopsAFaire(self):
 #        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
 #        #chemin = os.path.join(self.resource_path, './data/trace1.dat')
@@ -231,13 +282,17 @@ class TestAlgoSegmentationMethods(unittest.TestCase):
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     
-    #suite.addTest(TestAlgoSegmentationMethods("testFindStopsLocal"))
-    #suite.addTest(TestAlgoSegmentationMethods("testStopPointWithAccelerationCriteria"))
-    #suite.addTest(TestAlgoSegmentationMethods("testStopPointWithTimeWindowCriteria"))
+    # segmentation + split
+    suite.addTest(TestAlgoSegmentation("testSegmentation"))
+    
+    
+    #suite.addTest(TestAlgoSegmentation("testFindStopsLocal"))
+    #suite.addTest(TestAlgoSegmentation("testStopPointWithAccelerationCriteria"))
+    #suite.addTest(TestAlgoSegmentation("testStopPointWithTimeWindowCriteria"))
     
     # ST-DBSCAN
-    suite.addTest(TestAlgoSegmentationMethods("testSTdbscanMailYM"))
-    suite.addTest(TestAlgoSegmentationMethods("testSTdbscanPapier"))
+    suite.addTest(TestAlgoSegmentation("testSTdbscanMailYM"))
+    suite.addTest(TestAlgoSegmentation("testSTdbscanPapier"))
     
     runner = unittest.TextTestRunner()
     runner.run(suite)

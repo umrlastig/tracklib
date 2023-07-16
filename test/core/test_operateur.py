@@ -9,16 +9,15 @@ import os
 import random
 import unittest
 
-import tracklib.algo.Analytics as algo
-import tracklib.algo.Cinematics as Cinematics
 from tracklib.core.ObsTime import ObsTime
 from tracklib.core.Operator import Operator
 from tracklib.core.Kernel import GaussianKernel
-import tracklib.algo.Interpolation as interpolation
 from tracklib.io.TrackReader import TrackReader
-import tracklib.algo.Segmentation as seg
 import tracklib.algo.Synthetics as synth
-
+import tracklib.algo.Analytics as Analytics
+from tracklib.algo.Segmentation import segmentation, split
+import tracklib.algo.Cinematics as Cinematics
+from tracklib.algo.Interpolation import MODE_SPATIAL
 
 def x(t):
     return 10 * math.cos(4 * math.pi * t)*(1 + math.cos(3.5 * math.pi * t))
@@ -33,28 +32,24 @@ class TestOperateurMethods(unittest.TestCase):
         self.resource_path = os.path.join(os.path.split(__file__)[0], "../..")
     
     def mafonct(self, track, af_name):
-        
         for i in range(len(track.getAnalyticalFeature(af_name))):
             val = track.getObsAnalyticalFeature(af_name, i)
             if val == 0:
                 track.setObsAnalyticalFeature(af_name, i, 1)
             else:
                 track.setObsAnalyticalFeature(af_name, i, 0)
-
+        
     def test_abs_curv1(self):
         ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, 'data/trace1.dat')
-        
         track = TrackReader.readFromCsv(chemin, 2, 3, -1, 4, separator=",", DateIni=-1, h=0, com="#", no_data_value=-999999, srid="ENUCoords")
         
-        track.addAnalyticalFeature(algo.diffJourAnneeTrace)
+        track.addAnalyticalFeature(Analytics.diffJourAnneeTrace)
         track.operate(Operator.INVERTER, "diffJourAnneeTrace", "rando_jour_neg")
-        #track.segmentation(["rando_jour_neg"], "rando_jour", [-1])
-        seg.segmentation(track, ["rando_jour_neg"], "rando_jour", [-1])
+        
+        segmentation(track, ["rando_jour_neg"], "rando_jour", [-1])
         self.mafonct(track, "rando_jour")
-        
-        TRACES = seg.split(track, "rando_jour")
-        
+        TRACES = split(track, "rando_jour")
         
         self.assertTrue(len(TRACES) == 4)
         
@@ -63,7 +58,7 @@ class TestOperateurMethods(unittest.TestCase):
             # trace.summary()
             Cinematics.computeAbsCurv(trace)
             
-            trace.resample(3, interpolation.MODE_SPATIAL)
+            trace.resample(3, MODE_SPATIAL)
             Cinematics.computeAbsCurv(trace)
             Sigma = trace.getAbsCurv()
             trace.estimate_speed()
@@ -83,6 +78,8 @@ class TestOperateurMethods(unittest.TestCase):
             #plt.plot(trace.getAnalyticalFeature("sigma"), trace.getAnalyticalFeature("speed2"), '-', color='gold')
             plt.plot(Sigma, Speed, '-', color='skyblue')
             plt.show()
+
+    
         
     
     
@@ -189,10 +186,10 @@ class TestOperateurMethods(unittest.TestCase):
         
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    suite.addTest(TestOperateurMethods("test_abs_curv1"))
     suite.addTest(TestOperateurMethods("test_random"))
     suite.addTest(TestOperateurMethods("test_generate"))
     suite.addTest(TestOperateurMethods("test_import"))
+    suite.addTest(TestOperateurMethods("test_abs_curv1"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
     

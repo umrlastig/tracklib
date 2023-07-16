@@ -57,7 +57,10 @@ def segmentation(track, afs_input, af_output,
     for i in range(track.size()):
 
         # On cumule les comparaisons pour chaque af_input
-        comp = True
+        if mode_comparaison == MODE_COMPARAISON_AND:
+            comp = True
+        else:
+            comp = False
 
         for index, af_input in enumerate(afs_input):
             current_value = track.getObsAnalyticalFeature(af_input, i)
@@ -730,7 +733,7 @@ def splitAR(track, pt1, pt2=None, radius=10, nb_min_pts=10, verbose=True):
 
 
 # =============================================================================
-#    Segmentation and Split track
+#    ST-DBSCAN
 # =============================================================================
 def stdbscan(track, af_name, eps1, eps2, minPts, deltaT, debug = False):
     '''
@@ -847,6 +850,7 @@ def retrieveNeighbors(track, af_name, j, eps1, eps2):
 # =============================================================================
 #   TODO: à voir ce qu'il faut en faire !!!!!
 # =============================================================================
+'''
 from tracklib.algo.Analytics import speed, acceleration
 
 def stop_point_with_acceleration_criteria(track, i):
@@ -946,7 +950,7 @@ def stop_point_with_time_window_criteria(trace, i):
 
     return retour
 
-    
+'''    
     
                            
 
