@@ -63,9 +63,9 @@ class MatplotlibVisitor(iplot.IPlotVisitor):
         ax1.plot(track.getX(), track.getY(), frg + sym_bkg, markersize=size)
         ax1.plot(track.getX(), track.getY(), bkg + sym_bkg, markersize=int(0.8 * size))
         ax1.plot(track.getX(), track.getY(), frg + sym_frg, markersize=int(0.8 * size))
-#        for i in range(track.size()):
-#            plt.text(track.getX()[i]+0.5, track.getY()[i]+0.5, str(i))
-        
+        #for i in range(track.size()):
+        #    val = track.getObsAnalyticalFeature('Temp', i)
+        #    plt.text(track.getX()[i]+0.1, track.getY()[i]+0.1, str(val))
         return ax1
     
     def plotTrackEllipses(self, track, sym="r-", factor=3, af=None, append=True):

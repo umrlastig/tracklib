@@ -34,11 +34,11 @@ MODE_SPLIT_RETURN_FAST = 1
 MODE_SEGMENTATION_MINIMIZE = 0
 MODE_SEGMENTATION_MAXIMIZE = 1
 
-# -------------------------------------------------------------------------
-# Segmentation and Split track
-# -------------------------------------------------------------------------
 
 
+# =============================================================================
+#    Segmentation and Split track
+# =============================================================================
 def segmentation(track, afs_input, af_output, 
                  thresholds_max, mode_comparaison=MODE_COMPARAISON_AND):
     """
@@ -81,11 +81,13 @@ def segmentation(track, afs_input, af_output,
             track.setObsAnalyticalFeature(af_output, i, 0)
 
 
-def split(track, source) -> TrackCollection:
-    """Splits track according to :
-
+def split(track, source, limit=0) -> TrackCollection:
+    """
+    Splits track according to :
         - af name (considered as a marker) if `source` is a string
         - list of index if `source` is a list
+        
+    if limit > 0, only track which have more or equal than limit points are keeped.
 
     :return: No track if no segmentation, otherwise a TrackCollection object
     """
@@ -102,41 +104,52 @@ def split(track, source) -> TrackCollection:
 
         for i in range(track.size()):
 
-            if track.getObsAnalyticalFeature(source, i) == 1:  # Nouvelle trajectoire
+            # Nouvelle trajectoire
+            if track.getObsAnalyticalFeature(source, i) == 1:  
 
                 # L'identifiant de la trace subdivisée est obtenue par concaténation
                 # de l'identifiant de la trace initiale et du compteur
                 new_id = str(track.uid) + "." + str(count)
 
                 # La liste de points correspondant à l'intervalle de subdivision est créée
-                new_traj = track.extract(begin, i)
-                new_traj.setUid(new_id)
-
-                NEW_TRACES.addTrack(new_traj)
-                count += 1
+                newtrack = track.extract(begin, i)
                 begin = i + 1
+                newtrack.setUid(new_id)
+
+                if (limit > 0 and newtrack.length() < limit):
+                    continue
+        
+                NEW_TRACES.addTrack(newtrack)
+                count += 1
+                
 
         # Si tous les points sont dans la même classe, la liste d'étapes reste vide
         # sinon, on clôt la derniere étape et on l'ajoute à la liste
         if begin != 0:
             new_id = str(track.uid) + "." + str(count)
-            new_traj = track.extract(begin, track.size() - 1)
-            new_traj.setUid(new_id)
-            NEW_TRACES.addTrack(new_traj)
+            newtrack = track.extract(begin, track.size() - 1)
+            
+            if limit == 0 or (limit > 0 and newtrack.length() >= limit):
+                newtrack.setUid(new_id)
+                NEW_TRACES.addTrack(newtrack)
+
 
     # --------------------------------------------
     # Split from list of indices
     # --------------------------------------------
     if isinstance(source, list):
         for i in range(len(source) - 1):
-            NEW_TRACES.addTrack(track.extract(source[i], source[i + 1]))
+            newtrack = track.extract(source[i], source[i + 1])
+            if (limit > 0 and newtrack.length() < limit):
+                continue
+            NEW_TRACES.addTrack(newtrack)
 
     return NEW_TRACES
 
 
-# -------------------------------------------------------------------
-#
-# -------------------------------------------------------------------
+# =============================================================================
+#    Find Stop
+# =============================================================================
 def findStops(track: Track, spatial, temporal, mode, verbose=True) -> Track:
     '''
     Function to find stop positions from a track
@@ -716,23 +729,28 @@ def splitAR(track, pt1, pt2=None, radius=10, nb_min_pts=10, verbose=True):
     return tracks
 
 
-
-def stdbscan(track, eps1, eps2, minPts, deltaT):
+# =============================================================================
+#    Segmentation and Split track
+# =============================================================================
+def stdbscan(track, af_name, eps1, eps2, minPts, deltaT, debug = False):
     '''
+    
+    References
+    ----------
     Birant, D., & Kut, A. (2007). ST-DBSCAN: An algorithm for clustering
     spatial–temporal data. Data & Knowledge Engineering, 60(1), 208-221.
 
 
     Parameters
-    ----------
-    track : TYPE
-        DESCRIPTION.
-    eps1 : TYPE
-        DESCRIPTION.
-    eps2 : TYPE
-        DESCRIPTION.
-    minPts : TYPE
-        DESCRIPTION.
+    -----------
+    track : Track
+        track to detect stop points.
+    eps1 : float
+        maximum geographical coordinate (spatial) distance value.
+    eps2 : float
+        maximum non-spatial distance value.
+    minPts : int
+        minimum number of points within eps1 and eps2 distance.
     deltaT : float
         threshold value to be included in a cluster.
 
@@ -745,52 +763,78 @@ def stdbscan(track, eps1, eps2, minPts, deltaT):
     stack = []
     cluster_label = 0
     
-    track.createAnalyticalFeature('stdbscan', -1)
-    track.createAnalyticalFeature('noise', -1)
+    track.createAnalyticalFeature('stdbscan', 0)
+    track.createAnalyticalFeature('noise', 0)
     
     for i, obs in enumerate(track):
-        
         nocluster = track.getObsAnalyticalFeature('stdbscan', i)
-        if nocluster == -1:
-        
-            neighbors_index = retrieveNeighbors(track, i, eps1, eps2)
-            #print (len(neighbors_index))
-            
+        if nocluster == 0:
+            neighbors_index = retrieveNeighbors(track, af_name, i, eps1, eps2)
             if len(neighbors_index) < minPts:
                 track.setObsAnalyticalFeature('noise', i, 1)
             else:
-                
                 cluster_label += 1
-                
+                if debug:
+                    print ('New cluster ', str(cluster_label), ', i= ', i)
+                    
                 for k in neighbors_index:
                     track.setObsAnalyticalFeature('stdbscan', k, cluster_label)
-                
-                for idx in neighbors_index:
-                    stack.append(idx)
+                    stack.append(k)
                     
                 while len(stack) > 0:
                      io = stack[0]
                      stack.remove(io)
-                     
-                     neighbors_index2 = retrieveNeighbors(track, io, eps1, eps2)
+                     neighbors_index2 = retrieveNeighbors(track, af_name, io, eps1, eps2)
                      if len(neighbors_index2) >= minPts:
-                         
                          for k in neighbors_index2:
                              nonoise =  track.getObsAnalyticalFeature('noise', k)
                              nocluster = track.getObsAnalyticalFeature('stdbscan', k)
-                             if nonoise > -1 or nocluster == -1:
+                             # avg
+                             avgCluster = computeAvgCluster(track, af_name, cluster_label)
+                             diff = abs(avgCluster - track.getObsAnalyticalFeature(af_name, k))
+                             if (nonoise > 0 or nocluster == 0) and diff < deltaT:
                                  track.setObsAnalyticalFeature('stdbscan', k, cluster_label)
-                                 
+                                 track.setObsAnalyticalFeature('noise', k, 0)
+                                 stack.append(k)
+                    
+def computeAvgCluster(track, af_name, cluster_label):
+    '''
+    AF average values of the cluster_label cluster.
+    '''
+    avgCluster = 0
+    nbObsCluster = 0
+    for o in range(track.size()):
+        valueAF = track.getObsAnalyticalFeature(af_name, o)
+        nocluster = track.getObsAnalyticalFeature('stdbscan', o)
+        if nocluster == cluster_label:
+            nbObsCluster += 1
+            avgCluster += valueAF
+    avgCluster = avgCluster / nbObsCluster
+    return avgCluster
+    
 
-def retrieveNeighbors(track, j, eps1, eps2):
+def retrieveNeighbors(track, af_name, j, eps1, eps2):
+    '''
+    objects that have a distance less than Eps1 and Eps2 parameters to the selected object.
+    Equals to the intersection of Retrieve_Neighbours(object, Eps1) and Retrieve_Neighbours(object, Eps2)
+
+    Eps1 is the distance parameter for spatial attributes (latitude and longitude). 
+    Eps2 is the distance parameter for non-spatial attributes (af values)
+
+    return list of index
+    '''
     neighbors_index = []
     for i in range (track.size()):
         if i == j:
             continue
+        valj = track.getObsAnalyticalFeature(af_name, j)
+        vali = track.getObsAnalyticalFeature(af_name, i)
+        daf = abs(valj - vali)
         
         dd = track.getObs(j).distanceTo(track.getObs(i))
-        dt = abs(track.getObs(j).timestamp.toAbsTime() - track.getObs(i).timestamp.toAbsTime())
-        if dd <= eps1 and dt <= eps2:
+        #dt = abs(track.getObs(j).timestamp.toAbsTime() - track.getObs(i).timestamp.toAbsTime())
+        
+        if dd <= eps1 and daf <= eps2:
             neighbors_index.append(i)
         
     return neighbors_index
@@ -801,6 +845,7 @@ def retrieveNeighbors(track, j, eps1, eps2):
 
 
 # =============================================================================
+#   TODO: à voir ce qu'il faut en faire !!!!!
 # =============================================================================
 from tracklib.algo.Analytics import speed, acceleration
 
