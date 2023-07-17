@@ -46,6 +46,15 @@ class IPlotVisitor(ABC):
         pass
     
     @abstractmethod
+    def plotTrackProfil(
+        self, track, template="SPATIAL_SPEED_PROFIL", afs=[], append=False,
+                   linestyle = '-', linewidth=1):
+        """
+        Plot a profil track.
+        """
+        pass
+    
+    @abstractmethod
     def plotMMLink(self, track):
         """
         Plot the map matched track on network links.

@@ -68,6 +68,15 @@ class MatplotlibVisitor(iplot.IPlotVisitor):
         #    plt.text(track.getX()[i]+0.1, track.getY()[i]+0.1, str(val))
         return ax1
     
+    def plotTrackProfil(
+        self, track, template="SPATIAL_SPEED_PROFIL", afs=[], append=False,
+                   linestyle = '-', linewidth=1):
+        """
+        Plot a profil track.
+        """
+        plot = Plot.Plot(track)
+        return plot.plotProfil(template, afs, append, linestyle, linewidth)
+    
     def plotTrackEllipses(self, track, sym="r-", factor=3, af=None, append=True):
         """
         Plot track uncertainty (as error ellipses)

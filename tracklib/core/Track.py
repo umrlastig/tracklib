@@ -1377,7 +1377,6 @@ class Track:
             import tracklib.plot.MatplotlibVisitor as visitor
             v = visitor.MatplotlibVisitor()
         return v.plotTrackAsMarkers(self, size, frg, bkg, sym_frg, sym_bkg, type, append)
-        
     
     def plotEllipses(self, sym="r-", factor=3, af=None, append=True,
                      v:ivisitor.IPlotVisitor=None):
@@ -1392,7 +1391,6 @@ class Track:
             import tracklib.plot.MatplotlibVisitor as visitor
             v = visitor.MatplotlibVisitor()
         return v.plotTrackAsMarkers(self, sym, factor, af, append)
-    
 
     def plot(self, sym="k-", type="LINE", af_name="", cmap=-1, append=True, 
              label=None, pointsize=5, w=6.4, h=4.8, v:ivisitor.IPlotVisitor=None):
@@ -1415,6 +1413,15 @@ class Track:
         return v.plotTrack(self, sym, type, af_name, cmap, append, 
              label, pointsize, w, h)
     
+    def plotProfil(self, template="SPATIAL_SPEED_PROFIL", afs=[], append=False,
+                   linestyle = '-', linewidth=1, v:ivisitor.IPlotVisitor=None):
+        """
+        """
+        if v == None:
+            import tracklib.plot.MatplotlibVisitor as visitor
+            v = visitor.MatplotlibVisitor()
+        return v.plotTrackProfil(self, template, afs, append, linestyle,linewidth)
+        
 
     # =========================================================================
     #    Built-in Analytical Features
