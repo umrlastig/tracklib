@@ -44,6 +44,13 @@ class Circle:
 
         self.center = center
         self.radius = radius
+        
+    def __str__(self):
+        """Transform the circle in string"""
+        txt  = "Circle with \n"
+        txt += "      center at " + str(self.center)  + "\n"
+        txt += "      and radius equal to " + str(self.radius)
+        return txt
 
     def plot(self, sym="r-", append=plt, linewidth=0.5):
         """
@@ -145,6 +152,13 @@ class Rectangle:
         
         self.pmin = pmin
         self.pmax = pmax
+        
+    def __str__(self):
+        """Transform the rectangle in string"""
+        txt  = "Rectangle with \n"
+        txt += "      lower left coordinate " + str(self.pmin)  + "\n"
+        txt += "      and upper right coordinate " + str(self.pmax)
+        return txt
 
     def plot(self, sym="r-", append=plt):
         """
@@ -270,6 +284,13 @@ class Polygon:
         if not ((self.X[-1] == self.X[0]) and (self.Y[-1] == self.Y[0])):
             self.X.append(self.X[0])
             self.Y.append(self.Y[0])
+            
+    def __str__(self):
+        """Transform the polygon in string"""
+        txt  = "Polygon with vertex: \n"
+        for i in range(len(self.X)):
+            txt += "      [" + str(self.X[i]) + "," + str(self.Y[i])  + "]\n"
+        return txt
 
     def plot(self, sym="r-", append=plt):
         """TODO"""

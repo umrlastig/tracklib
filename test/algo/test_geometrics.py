@@ -92,6 +92,7 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
     def testCircle(self):
         
         circle = Geometrics.Circle(ENUCoords(3.55, 2.2), 3)
+        print (circle)
         circle.plot()
         self.trace3.plot()
         
@@ -125,6 +126,7 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         ll = ENUCoords(0, 0)
         ur = ENUCoords(10, 20)
         bbox = Geometrics.Rectangle(ll, ur)
+        print (bbox)
         bbox.plot()
         self.trace3.plot()
         plt.plot([0], [0], 'ro', markersize=10)
@@ -176,6 +178,7 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         
         poly = Geometrics.Polygon([0, 10, 10, 0, -10, -10], [0, 10, 30, 40, 30, 10])
         poly.plot()
+        print (poly)
         
         self.trace2.plot()
         
