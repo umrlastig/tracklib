@@ -17,6 +17,7 @@ from tracklib.algo.Segmentation import segmentation, split, splitAR
 from tracklib.algo.Segmentation import MODE_COMPARAISON_OR, MODE_COMPARAISON_AND
 from tracklib.algo.Segmentation import findStops, findStopsLocal, MODE_STOPS_LOCAL
 from tracklib.algo.Segmentation import findStopsGlobal, plotStops, MODE_STOPS_GLOBAL
+from tracklib.algo.Segmentation import findStopsLocalWithAcceleration, MODE_STOPS_ACC
 from tracklib.algo.Segmentation import retrieveNeighbors, stdbscan, computeAvgCluster
 
 
@@ -193,23 +194,44 @@ class TestAlgoSegmentation(unittest.TestCase):
         stops2 = findStops(trace, 0.6, 10, MODE_STOPS_LOCAL)
         self.assertEqual(len(stops), len(stops2), 'nb stop')
     
-#    # def testStopPointWithAccelerationCriteria(self):
-#	# 	
-#    #     v1 = self.trace2.getObsAnalyticalFeature('speed', 1)
-#    #     a1 = self.trace2.getObsAnalyticalFeature('acceleration', 1)
-#    #     self.assertTrue(abs(v1 - 0.5) < 0.000001)
-#    #     self.assertTrue(abs(a1 + 0.0) < 0.000001)
-#    #     isSTP = Analytics.stop_point_with_acceleration_criteria(self.trace2, 1)
-#    #     #print (v1, a1, isSTP)		
-#    #     self.assertEqual(isSTP, 0)
-#	# 	
-#    #     v2 = self.trace2.getObsAnalyticalFeature('speed', 2)
-#    #     a2 = self.trace2.getObsAnalyticalFeature('acceleration', 2)
-#    #     self.assertTrue(abs(v2 - 1.0) < 0.000001)
-#    #     self.assertTrue(abs(a2 - 0.075) < 0.000001)
-#    #     isSTP = Analytics.stop_point_with_acceleration_criteria(self.trace2, 2)
-#    #     #print (v2, a2, isSTP)		
-#    #     self.assertEqual(isSTP, 0)
+    
+    def testFindStopsLocalWithAcceleration(self):
+
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        trace = Track([], 1)
+        
+        trace.addObs(Obs(ENUCoords(0*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:00:00")))
+        trace.addObs(Obs(ENUCoords(1*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:10:00")))
+        trace.addObs(Obs(ENUCoords(2*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:20:00")))
+        trace.addObs(Obs(ENUCoords(3*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:30:00")))
+        trace.addObs(Obs(ENUCoords(4*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:40:00")))
+        
+        trace.addObs(Obs(ENUCoords(5*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:50:00")))
+        trace.addObs(Obs(ENUCoords(5*600+10, 0, 0), ObsTime.readTimestamp("2018-01-01 11:00:00")))
+        #trace.addObs(Obs(ENUCoords(5*600+10, 0, 0), ObsTime.readTimestamp("2018-01-01 11:10:00")))
+        
+        trace.addObs(Obs(ENUCoords(6*600+10, 0, 0), ObsTime.readTimestamp("2018-01-01 11:10:00")))
+        trace.addObs(Obs(ENUCoords(7*600+10, 0, 0), ObsTime.readTimestamp("2018-01-01 11:20:00")))
+        trace.addObs(Obs(ENUCoords(8*600+10, 0, 0), ObsTime.readTimestamp("2018-01-01 11:30:00")))
+        
+        trace.plotProfil('TEMPORAL_SPEED_PROFIL')
+        plt.ylim([0, 1.5])
+        plt.show()
+        
+        #print (trace.getAnalyticalFeature('speed'))
+        
+        stops = findStopsLocalWithAcceleration(trace, diameter=50, duration=15)
+        
+        self.assertEqual(len(stops), 1, 'nb stop')
+        self.assertEqual(int(stops.getAnalyticalFeature('id_ini')[0]), 5)
+        self.assertEqual(int(stops.getAnalyticalFeature('id_end')[0]), 6)
+        self.assertEqual(stops.getAnalyticalFeature('nb_points')[0], 2)
+        self.assertTrue(abs(stops.getAnalyticalFeature('duration')[0] - 600.0) < 0.001)
+        self.assertTrue(abs(stops.getAnalyticalFeature('rmse')[0] - 5.0) < 0.001)
+        
+        # rebelote
+        stops2 = findStops(trace, 50, 15, MODE_STOPS_ACC)
+        self.assertEqual(len(stops), len(stops2), 'nb stop')
         
     
     def testSTdbscanPapier(self):
@@ -370,7 +392,7 @@ if __name__ == '__main__':
     # Find stops
     suite.addTest(TestAlgoSegmentation("testFindStopsGlocal"))
     suite.addTest(TestAlgoSegmentation("testFindStopsLocal"))
-    #suite.addTest(TestAlgoSegmentation("testStopPointWithAccelerationCriteria"))
+    suite.addTest(TestAlgoSegmentation("testFindStopsLocalWithAcceleration"))
     
     # ST-DBSCAN
     suite.addTest(TestAlgoSegmentation("testSTdbscanMailYM"))

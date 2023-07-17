@@ -12,7 +12,7 @@ from tracklib.algo.Geometrics import Circle, minCircle
 import tracklib.core.Utils as utils
 from tracklib.algo.Interpolation import ALGO_LINEAR, MODE_SPATIAL
 import tracklib.core.Operator as Operator
-#from tracklib.algo.Analytics import speed, acceleration
+from tracklib.algo.Analytics import acceleration
 
 # --------------------------------------------------------------------------
 # Circular import (not satisfying solution)
@@ -317,7 +317,7 @@ def findStops(track: Track, spatial, temporal, mode, verbose=True) -> Track:
     if mode == MODE_STOPS_RTK:
         return findStopsGlobalForRTK(track, spatial, temporal, verbose)
     if mode == MODE_STOPS_ACC:
-        pass
+        return findStopsLocalWithAcceleration(track, spatial, temporal)
 
 
 def findStopsLocal(track, speed=1, duration=10):
@@ -401,35 +401,93 @@ def findStopsLocal(track, speed=1, duration=10):
 
 
 
-def stop_point_with_acceleration_criteria(track, diameter=20, duration=60):
+def findStopsLocalWithAcceleration(track, diameter=20, duration=60):
     """
     This algorithm detect stop point.
-    A point is a stop when speed is null and acceleration is negative.
+    A point is a stop when speed is null or very low and acceleration is negative.
     """
     
-    '''
-    if i == 0:
-        return 0
+    track.estimate_speed()
+    track.addAnalyticalFeature(acceleration)
+    #print (track.getListAnalyticalFeatures())
+    
+    stops = Track()
+    
+    TMP_RADIUS = []
+    TMP_MEAN_X = []
+    TMP_MEAN_Y = []
+    TMP_MEAN_Z = []
+    TMP_IDSTART = []
+    TMP_IDEND = []
+    TMP_STD_X = []
+    TMP_STD_Y = []
+    TMP_STD_Z = []
+    TMP_DURATION = []
+    TMP_NBPOINTS = []
+    
+    i = 0
+    #stop_point = 0
+    while i < track.size():
+        v = track.getObsAnalyticalFeature('speed', i)
+        a = track.getObsAnalyticalFeature('acceleration', i)
 
-    stop_point = 0
-    v = speed(track, i)
-    acc = acceleration(track, i)
+        trouve = False
 
-    # Si un point d'indice [i] affiche une vitesse nulle suivant une deccelération,
-    #    on cherche le prochain point d'accélération
-    if abs(v) < 3 and acc < 0:
-        # Initialisation d'un compteur sur i
-        j = i
-        # Tant qu'aucun des points suivants n'accélère, on ne marque pas le point d'arrêt
-        while j <= track.size() - 2 and acceleration(track, j) <= 0:
-            j += 1
-            # Si on trouve un point d'accélération, on donne la valeur 1
-            #     au paramètre du point d'indice [i]
-            if acceleration(track, j) > 0:
-                stop_point = 1
+        # Si un point d'indice [i] affiche une vitesse nulle suivant une deccelération,
+        #    on cherche le prochain point d'accélération
+        if abs(v) < 3 and a < 0:
+            
+            # Initialisation d'un compteur sur i
+            j = i
+            # Tant qu'aucun des points suivants n'accélère, on ne marque pas le point d'arrêt
+            while j <= track.size()-2 and track.getObsAnalyticalFeature('acceleration', j) <= 0:
+                j += 1
+                # Si on trouve un point d'accélération, on donne la valeur 1
+                #     au paramètre du point d'indice [i]
+                if acceleration(track, j) > 0:
+                    # stop_point = 1
+                    portion = track.extract(i, j)
+                    C = minCircle(portion)
+                    if C != None:
+                        if (C.radius > diameter / 2) or (portion.duration() < duration):
+                            continue
+            
+                        stops.addObs(Obs(C.center, portion.getFirstObs().timestamp))
+                        TMP_RADIUS.append(C.radius)
+                        TMP_MEAN_X.append(portion.operate(Operator.Operator.AVERAGER, "x"))
+                        TMP_MEAN_Y.append(portion.operate(Operator.Operator.AVERAGER, "y"))
+                        TMP_MEAN_Z.append(portion.operate(Operator.Operator.AVERAGER, "z"))
+                        TMP_STD_X.append(portion.operate(Operator.Operator.STDDEV, "x"))
+                        TMP_STD_Y.append(portion.operate(Operator.Operator.STDDEV, "y"))
+                        TMP_STD_Z.append(portion.operate(Operator.Operator.STDDEV, "z"))
+                        TMP_IDSTART.append(i)
+                        TMP_IDEND.append(j)
+                        TMP_NBPOINTS.append(j-i+1)
+                        TMP_DURATION.append(portion.duration())
+                    
+                        trouve = True
+                        break
+        if trouve:
+            i = j
+        else:
+            i += 1
 
-    return stop_point
-    '''
+    stops.createAnalyticalFeature("radius", TMP_RADIUS)
+    stops.createAnalyticalFeature("mean_x", TMP_MEAN_X)
+    stops.createAnalyticalFeature("mean_y", TMP_MEAN_Y)
+    stops.createAnalyticalFeature("mean_z", TMP_MEAN_Z)
+    stops.createAnalyticalFeature("id_ini", TMP_IDSTART)
+    stops.createAnalyticalFeature("id_end", TMP_IDEND)
+    stops.createAnalyticalFeature("sigma_x", TMP_STD_X)
+    stops.createAnalyticalFeature("sigma_y", TMP_STD_Y)
+    stops.createAnalyticalFeature("sigma_z", TMP_STD_Z)
+    stops.createAnalyticalFeature("duration", TMP_DURATION)
+    stops.createAnalyticalFeature("nb_points", TMP_NBPOINTS)
+
+    stops.operate(Operator.Operator.QUAD_ADDER, "sigma_x", "sigma_y", "rmse")
+
+    return stops
+    
 
 # ----------------------------------------------------------------
 # Fonctions utilitaires
