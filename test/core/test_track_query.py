@@ -11,7 +11,7 @@ from tracklib.core.ObsTime import ObsTime
 
 from tracklib.algo import (Analytics)
 
-class TestQuery(TestCase):
+class TestTrackQuery(TestCase):
     
     __epsilon = 0.001
     
@@ -164,10 +164,10 @@ class TestQuery(TestCase):
 
 if __name__ == '__main__':
     suite = TestSuite()
-    suite.addTest(TestQuery("test_selectstar"))
-    suite.addTest(TestQuery("test_selectwhere1"))
-    suite.addTest(TestQuery("test_selectwhere2"))
-    suite.addTest(TestQuery("test_selectagg"))
-    suite.addTest(TestQuery("test_selectcolumn"))
+    suite.addTest(TestTrackQuery("test_selectstar"))
+    suite.addTest(TestTrackQuery("test_selectwhere1"))
+    suite.addTest(TestTrackQuery("test_selectwhere2"))
+    suite.addTest(TestTrackQuery("test_selectagg"))
+    suite.addTest(TestTrackQuery("test_selectcolumn"))
     runner = TextTestRunner()
     runner.run(suite)
