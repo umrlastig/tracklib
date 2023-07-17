@@ -338,7 +338,7 @@ def findStopsGlobal(track, diameter=20, duration=60, downsampling=1, verbose=Tru
             if track[j - 1].timestamp - track[i].timestamp <= duration:
                 C[i, j] = 0
                 continue
-
+            
             cercle = minCircle(track.extract(i, j - 1))
             if cercle != None:
                 C[i, j] = 2 * cercle.radius
@@ -353,9 +353,9 @@ def findStopsGlobal(track, diameter=20, duration=60, downsampling=1, verbose=Tru
     # Computes optimal partition with dynamic programing
     # ---------------------------------------------------------------------------
     segmentation = optimalPartition(C, MODE_SEGMENTATION_MAXIMIZE, verbose)
+    #print ('seg', segmentation)
 
     stops = Track()
-
     TMP_RADIUS = []
     TMP_MEAN_X = []
     TMP_MEAN_Y = []
@@ -374,6 +374,7 @@ def findStopsGlobal(track, diameter=20, duration=60, downsampling=1, verbose=Tru
         if C != None:
             if (C.radius > diameter / 2) or (portion.duration() < duration):
                 continue
+            
             stops.addObs(Obs(C.center, portion.getFirstObs().timestamp))
             TMP_RADIUS.append(C.radius)
             TMP_MEAN_X.append(portion.operate(Operator.Operator.AVERAGER, "x"))
@@ -602,23 +603,24 @@ def splitReturnTripFast(track, side_effect=0.1, sampling=1):
     return TRACKS
 
 
-# -------------------------------------------------------------------------
-#  Generic method to segment a track with dynamic programming
-# -------------------------------------------------------------------------
-# Inputs:
-#    - track: A track to segment (potentially with analytical features)
-#    - cost: a three or four-valued function taking as input a track, two
-#      integers i < j and an optional global parameter, and returning
-#      the cost of a segment from i to j (both included) in track
-#      Note that cost function may as well be considered as a reward
-#      function, simply by setting mode to MODE_SEGMENTATION_MAXIMIZE
-#    - mode: a parameter inidcating wether cost function must be minnimized
-#      (MODE_SEGMENTATION_MINIMIZE) or maximized (MODE_SEGMENTATION_MAXIMIZE)
-#    - verbose: parameter to enable progress bar and console displays
-# Output:
-#    - A optimal segmentation, represented as a list of indices in track
-# -------------------------------------------------------------------------
 def optimalPartition(cost_matrix, mode=MODE_SEGMENTATION_MINIMIZE, verbose=True):
+    '''
+    -------------------------------------------------------------------------
+    Generic method to segment a track (with it cost matrix) with dynamic programming
+    -------------------------------------------------------------------------
+    Inputs:
+        - cost: a three or four-valued function taking as input a track, two
+                integers i < j and an optional global parameter, and returning
+                the cost of a segment from i to j (both included) in track
+                Note that cost function may as well be considered as a reward
+                function, simply by setting mode to MODE_SEGMENTATION_MAXIMIZE
+        - mode: a parameter inidcating wether cost function must be minnimized
+               (MODE_SEGMENTATION_MINIMIZE) or maximized (MODE_SEGMENTATION_MAXIMIZE)
+        - verbose: parameter to enable progress bar and console displays
+    Output:
+        - A optimal segmentation, represented as a list of indices in track
+    -------------------------------------------------------------------------
+    '''
 
     N = cost_matrix.shape[0] - 1
     D = np.zeros((N, N))
@@ -879,76 +881,6 @@ def stop_point_with_acceleration_criteria(track, i):
                 stop_point = 1
 
     return stop_point
-
-
-VAL_AF_TIME_WINDOW_STOP = 1
-VAL_AF_TIME_WINDOW_MOVE = 0
-VAL_AF_TIME_WINDOW_NONE = -1
-
-
-def stop_point_with_time_window_criteria(trace, i):
-    """This algorithm of stop detection is based on geographical moving distance in time windows.
-
-    The AF has value:
-
-        - stop (*1*)
-        - not stop (*0*)
-        - not yet examined (*-1*)
-
-    """
-
-    name_af = "stop_point_with_time_window_criteria"
-
-    N = trace.size()
-
-    val = trace.getObsAnalyticalFeature(name_af, i)
-    if val > -1:
-        return val
-
-    if i == N - 1:
-        return trace.getObsAnalyticalFeature(name_af, N - 2)
-
-    T = 15  # fenetre de 45s
-    D = 30  # 30 metres
-
-    S = trace.getAnalyticalFeature("abs_curv")
-
-    j = i + 1
-    ispause = False
-
-    tj = trace.getObs(j).timestamp
-    ti = trace.getObs(i).timestamp
-
-    # On cherche la fin de la fenetre
-    while (tj - ti) <= T:
-        j = j + 1
-        if j == N - 1:
-            break
-        tj = trace.getObs(j).timestamp
-
-    #print(S[j] - S[i])
-
-    # On agrandit la fenetre
-    while (tj - ti) >= T and (S[j] - S[i]) <= D:
-        ispause = True
-        # print ('pause ' + str(i) + ',' + str(j))
-        j = j + 1
-        if j == N - 1:
-            break
-        tj = trace.getObs(j).timestamp
-
-    retour = VAL_AF_TIME_WINDOW_MOVE
-    if ispause:
-        # PAUSES.append([i, j-1])
-        #print ('pause de ' + str(i) + ',' + str(j-1))
-        retour = VAL_AF_TIME_WINDOW_STOP
-        for k in range(i, j - 1):
-            trace.setObsAnalyticalFeature(name_af, k, VAL_AF_TIME_WINDOW_STOP)
-
-    else:
-        trace.setObsAnalyticalFeature(name_af, i, VAL_AF_TIME_WINDOW_MOVE)
-
-    return retour
 
 '''    
     

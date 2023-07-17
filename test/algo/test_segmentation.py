@@ -9,13 +9,13 @@ from tracklib.core.Obs import Obs
 from tracklib.core.ObsCoords import ENUCoords
 from tracklib.core.ObsTime import ObsTime
 from tracklib.core.Track import Track
-#from tracklib.io.TrackReader import TrackReader
+from tracklib.io.TrackReader import TrackReader
 
 import tracklib.algo.Analytics as Analytics
 
 from tracklib.algo.Segmentation import segmentation, split
 from tracklib.algo.Segmentation import MODE_COMPARAISON_OR, MODE_COMPARAISON_AND
-#from tracklib.algo.Segmentation import findStopsGlobal#, findStopsLocal
+from tracklib.algo.Segmentation import findStopsGlobal#, findStopsLocal
 from tracklib.algo.Segmentation import retrieveNeighbors, stdbscan, computeAvgCluster
 
 
@@ -71,43 +71,43 @@ class TestAlgoSegmentation(unittest.TestCase):
         TRACES = split(trace, "decoup3")
         self.assertEqual(len(TRACES), 7)
         
+
+    def testFindStopsGlocal(self):
         
-    
-#    def testStopsAFaire(self):
-#        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
-#        #chemin = os.path.join(self.resource_path, './data/trace1.dat')
-#        #trace = FileReader.readFromCsv(chemin, 2, 3, -1, 4, separator=",")
-#        
-#
-#    def testFindStopsLocal(self):
-#        resource_path = os.path.join(os.path.split(__file__)[0], "../..")
-#        gpxpath = os.path.join(resource_path, 'data/gpx/vincennes.gpx')
-#        ObsTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
-#        tracks = TrackReader.readFromGpx(gpxpath, srid='ENU')
-#        trace = tracks.getTrack(0)
-#        #trace = trace.extract(1150, 2500)
-#        print (trace.size())
-#
-#        
-#        #trace.summary()
-#
-#        #plot = Plot(trace)
-#        #plot.plotProfil('SPATIAL_SPEED_PROFIL')
-#        
-#        #trace.plot()
-#        
-#        stops = findStopsGlobal(trace, downsampling=5)
-#        print (type(stops), len(stops))
-#        
-#        
-#        #COLS = utils.getColorMap((220, 220, 220), (255, 0, 0))
-#        #trace.plot(type='POINT', af_name='virage', append = False, cmap = COLS)
-#    
-#        #plt.plot(stops.getX(), stops.getY(), 'ro')
-#    
-#    
-#        #self.assertLessEqual(3, 5)
-#        
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        trace = Track([], 1)
+        trace.addObs(Obs(ENUCoords(0*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:00:00")))
+        trace.addObs(Obs(ENUCoords(1*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:10:00")))
+        trace.addObs(Obs(ENUCoords(2*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:20:00")))
+        trace.addObs(Obs(ENUCoords(3*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:30:00")))
+        trace.addObs(Obs(ENUCoords(4*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:40:00")))
+        
+        trace.addObs(Obs(ENUCoords(5*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:50:00")))
+        trace.addObs(Obs(ENUCoords(5*600+10, 0, 0), ObsTime.readTimestamp("2018-01-01 11:00:00")))
+        #trace.addObs(Obs(ENUCoords(5*600+10, 0, 0), ObsTime.readTimestamp("2018-01-01 11:10:00")))
+        
+        trace.addObs(Obs(ENUCoords(6*600+10, 0, 0), ObsTime.readTimestamp("2018-01-01 11:10:00")))
+        trace.addObs(Obs(ENUCoords(7*600+10, 0, 0), ObsTime.readTimestamp("2018-01-01 11:20:00")))
+        trace.addObs(Obs(ENUCoords(8*600+10, 0, 0), ObsTime.readTimestamp("2018-01-01 11:30:00")))
+        
+        trace.plotProfil('TEMPORAL_SPEED_PROFIL')
+        plt.ylim([0, 1.5])
+        plt.show()
+        
+        stops = findStopsGlobal(trace, diameter=50, duration=15, downsampling=1)
+        
+        self.assertEqual(len(stops), 1, 'nb stop')
+        self.assertTrue(abs(stops.getAnalyticalFeature('radius')[0]- 5.0) < 0.0001, 'taille de la pause en distance')
+        self.assertTrue(abs(stops.getAnalyticalFeature('duration')[0]- 600.0) < 0.0001, 'taille de la pause en temps')
+        self.assertEqual(stops.getAnalyticalFeature('nb_points')[0], 2, 'nb point 1er stop')
+        
+        self.assertEqual(stops.getAnalyticalFeature('id_ini')[0], 5, 'indice begin 1st stop')
+        self.assertEqual(stops.getAnalyticalFeature('id_end')[0], 6, 'indice end 1st stop')
+        
+        
+        
+        
+        
 #    # def testStopPointWithAccelerationCriteria(self):
 #	# 	
 #    #     v1 = self.trace2.getObsAnalyticalFeature('speed', 1)
@@ -285,8 +285,8 @@ if __name__ == '__main__':
     # segmentation + split
     suite.addTest(TestAlgoSegmentation("testSegmentation"))
     
-    
-    #suite.addTest(TestAlgoSegmentation("testFindStopsLocal"))
+    # Find stops
+    suite.addTest(TestAlgoSegmentation("testFindStopsGlocal"))
     #suite.addTest(TestAlgoSegmentation("testStopPointWithAccelerationCriteria"))
     #suite.addTest(TestAlgoSegmentation("testStopPointWithTimeWindowCriteria"))
     
