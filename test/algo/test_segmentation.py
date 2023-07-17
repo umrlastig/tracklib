@@ -15,7 +15,7 @@ import tracklib.algo.Analytics as Analytics
 
 from tracklib.algo.Segmentation import segmentation, split, splitAR
 from tracklib.algo.Segmentation import MODE_COMPARAISON_OR, MODE_COMPARAISON_AND
-from tracklib.algo.Segmentation import findStops, findStopsLocal
+from tracklib.algo.Segmentation import findStops, findStopsLocal, MODE_STOPS_LOCAL
 from tracklib.algo.Segmentation import findStopsGlobal, plotStops, MODE_STOPS_GLOBAL
 from tracklib.algo.Segmentation import retrieveNeighbors, stdbscan, computeAvgCluster
 
@@ -188,6 +188,10 @@ class TestAlgoSegmentation(unittest.TestCase):
         self.assertEqual(stops.getAnalyticalFeature('nb_points')[0], 2)
         self.assertTrue(abs(stops.getAnalyticalFeature('duration')[0] - 600.0) < 0.001)
         self.assertTrue(abs(stops.getAnalyticalFeature('rmse')[0] - 5.0) < 0.001)
+        
+        # rebelote
+        stops2 = findStops(trace, 0.6, 10, MODE_STOPS_LOCAL)
+        self.assertEqual(len(stops), len(stops2), 'nb stop')
     
 #    # def testStopPointWithAccelerationCriteria(self):
 #	# 	
@@ -360,17 +364,17 @@ if __name__ == '__main__':
     suite = unittest.TestSuite()
     
     # segmentation + split
-#    suite.addTest(TestAlgoSegmentation("testSegmentation"))
-#    suite.addTest(TestAlgoSegmentation("testSplitAR"))
+    suite.addTest(TestAlgoSegmentation("testSegmentation"))
+    suite.addTest(TestAlgoSegmentation("testSplitAR"))
     
     # Find stops
-#    suite.addTest(TestAlgoSegmentation("testFindStopsGlocal"))
+    suite.addTest(TestAlgoSegmentation("testFindStopsGlocal"))
     suite.addTest(TestAlgoSegmentation("testFindStopsLocal"))
     #suite.addTest(TestAlgoSegmentation("testStopPointWithAccelerationCriteria"))
     
     # ST-DBSCAN
-#    suite.addTest(TestAlgoSegmentation("testSTdbscanMailYM"))
-#    suite.addTest(TestAlgoSegmentation("testSTdbscanPapier"))
+    suite.addTest(TestAlgoSegmentation("testSTdbscanMailYM"))
+    suite.addTest(TestAlgoSegmentation("testSTdbscanPapier"))
     
     runner = unittest.TextTestRunner()
     runner.run(suite)
