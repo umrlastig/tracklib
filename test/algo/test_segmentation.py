@@ -19,6 +19,7 @@ from tracklib.algo.Segmentation import findStops, findStopsLocal, MODE_STOPS_LOC
 from tracklib.algo.Segmentation import findStopsGlobal, plotStops, MODE_STOPS_GLOBAL
 from tracklib.algo.Segmentation import findStopsLocalWithAcceleration, MODE_STOPS_ACC
 from tracklib.algo.Segmentation import retrieveNeighbors, stdbscan, computeAvgCluster
+from tracklib.algo.Segmentation import splitReturnTripExhaustive
 
 
 class TestAlgoSegmentation(unittest.TestCase):
@@ -109,6 +110,27 @@ class TestAlgoSegmentation(unittest.TestCase):
         plt.xlim([1,8])
         plt.ylim([1,8])
         plt.show()
+        
+        
+    def testSplitReturnTripExhaustive(self):
+        
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        trace = Track([], 1)
+        trace.addObs(Obs(ENUCoords(0*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:00:00")))
+        trace.addObs(Obs(ENUCoords(1*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:10:00")))
+        trace.addObs(Obs(ENUCoords(2*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:20:00")))
+        trace.addObs(Obs(ENUCoords(3*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:30:00")))
+        trace.addObs(Obs(ENUCoords(4*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:40:00")))
+        
+        tracks = splitReturnTripExhaustive(trace)
+        print (len(tracks))
+        trace1 = tracks.getTrack(0)
+        trace2 = tracks[1]
+        print (len(trace1), len(trace2))
+
+    def testSplitReturnTripFast(self):
+        pass
+    
 
     def testFindStopsGlocal(self):
         
@@ -388,6 +410,8 @@ if __name__ == '__main__':
     # segmentation + split
     suite.addTest(TestAlgoSegmentation("testSegmentation"))
     suite.addTest(TestAlgoSegmentation("testSplitAR"))
+    suite.addTest(TestAlgoSegmentation("testSplitReturnTripExhaustive"))
+    suite.addTest(TestAlgoSegmentation("testSplitReturnTripFast"))
     
     # Find stops
     suite.addTest(TestAlgoSegmentation("testFindStopsGlocal"))
