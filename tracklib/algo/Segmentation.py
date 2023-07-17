@@ -12,6 +12,7 @@ from tracklib.algo.Geometrics import Circle, minCircle
 import tracklib.core.Utils as utils
 from tracklib.algo.Interpolation import ALGO_LINEAR, MODE_SPATIAL
 import tracklib.core.Operator as Operator
+#from tracklib.algo.Analytics import speed, acceleration
 
 # --------------------------------------------------------------------------
 # Circular import (not satisfying solution)
@@ -35,10 +36,12 @@ MODE_SEGMENTATION_MINIMIZE = 0
 MODE_SEGMENTATION_MAXIMIZE = 1
 
 
-
+# =============================================================================
 # =============================================================================
 #    Segmentation and Split track
 # =============================================================================
+# =============================================================================
+
 def segmentation(track, afs_input, af_output, 
                  thresholds_max, mode_comparaison=MODE_COMPARAISON_AND):
     """
@@ -101,18 +104,16 @@ def split(track, source, limit=0) -> TrackCollection:
     # Split from analytical feature name
     # --------------------------------------------
     if isinstance(source, str):
-
         count = 0  # Initialisation du compteur des étapes
         begin = 0  # indice du premier point de l'étape
-
         for i in range(track.size()):
-
             # Nouvelle trajectoire
             if track.getObsAnalyticalFeature(source, i) == 1:  
 
                 # L'identifiant de la trace subdivisée est obtenue par concaténation
                 # de l'identifiant de la trace initiale et du compteur
-                new_id = str(track.uid) + "." + str(count)
+                # Important pour les pauses
+                new_id = str(track.uid) + "." + str(count) + "." + str(begin) + "." + str(i)
 
                 # La liste de points correspondant à l'intervalle de subdivision est créée
                 newtrack = track.extract(begin, i)
@@ -124,18 +125,17 @@ def split(track, source, limit=0) -> TrackCollection:
         
                 NEW_TRACES.addTrack(newtrack)
                 count += 1
-                
 
         # Si tous les points sont dans la même classe, la liste d'étapes reste vide
         # sinon, on clôt la derniere étape et on l'ajoute à la liste
         if begin != 0:
-            new_id = str(track.uid) + "." + str(count)
+            # Formalisme Important pour les pauses
+            new_id = str(track.uid) + "." + str(count)+ "." + str(begin) + "." + str(track.size()-1)
             newtrack = track.extract(begin, track.size() - 1)
             
             if limit == 0 or (limit > 0 and newtrack.length() >= limit):
                 newtrack.setUid(new_id)
                 NEW_TRACES.addTrack(newtrack)
-
 
     # --------------------------------------------
     # Split from list of indices
@@ -147,6 +147,7 @@ def split(track, source, limit=0) -> TrackCollection:
                 continue
             NEW_TRACES.addTrack(newtrack)
 
+    # RETURN collection
     return NEW_TRACES
 
 
@@ -207,9 +208,85 @@ def splitAR(track, pt1, pt2=None, radius=10, nb_min_pts=10, verbose=True):
     return tracks
 
 
+def splitReturnTrip(track, mode):
+    if mode == MODE_SPLIT_RETURN_EXHAUSTIVE:
+        return splitReturnTripExhaustive(track)
+    if mode == MODE_SPLIT_RETURN_FAST:
+        return splitReturnTripFast(track)
+
+
+def splitReturnTripExhaustive(track):
+    """Split track when there is a return trip to keep only the first part"""
+
+    min_val = 1e300
+    argmin = 0
+
+    AVG = Operator.Operator.AVERAGER
+    for return_point in progressbar.progressbar(range(1, track.size() - 1)):
+
+        T1 = track.extract(0, return_point)
+        T2 = track.extract(return_point, track.size() - 1)
+
+        avg = (T1 - T2).operate(AVG, "diff") + (T2 - T1).operate(AVG, "diff")
+
+        if avg < min_val:
+            min_val = avg
+            argmin = return_point
+
+    first_part = track.extract(0, argmin - 1)
+    second_part = track.extract(argmin, track.size() - 1)
+
+    TRACKS = TrackCollection()
+    TRACKS.addTrack(first_part)
+    TRACKS.addTrack(second_part)
+
+    return TRACKS
+
+
+def splitReturnTripFast(track, side_effect=0.1, sampling=1):
+    """Split track when there is a return trip to keep only the first part.
+    Second version with Fast Fourier Transform"""
+
+    track = track.copy()
+    track.toENUCoords(track.getFirstObs().position)
+    track_test = track.copy()
+    track_test.resample(
+        (track_test.length() / track_test.size()) / sampling, ALGO_LINEAR, MODE_SPATIAL
+    )
+
+    H = np.fft.fft(track_test.getY())
+    G = np.fft.fft(track_test.getY()[::-1])
+    temp = np.flip(np.abs(np.fft.ifft(H * np.conj(G))))
+
+    id = np.argmax(
+        temp[int(side_effect * len(temp)) : int((1 - side_effect) * len(temp))]
+    )
+    pt = track_test[id].position
+
+    dmin = 1e300
+    argmin = 0
+    for i in range(track.size()):
+        d = track[i].position.distance2DTo(pt)
+        if d < dmin:
+            dmin = d
+            argmin = i
+
+    first_part = track.extract(0, argmin - 1)
+    second_part = track.extract(argmin, track.size() - 1)
+
+    TRACKS = TrackCollection()
+    TRACKS.addTrack(first_part)
+    TRACKS.addTrack(second_part)
+
+    return TRACKS
+
+
+# =============================================================================
 # =============================================================================
 #    Find Stop
 # =============================================================================
+# =============================================================================
+
 def findStops(track: Track, spatial, temporal, mode, verbose=True) -> Track:
     '''
     Function to find stop positions from a track
@@ -243,63 +320,75 @@ def findStops(track: Track, spatial, temporal, mode, verbose=True) -> Track:
         pass
 
 
-# -----------------------------------------------------------------------------
-# Function to find stop positions from a track
-# Inputs:
-#     - duration: minimal stop duration (in seconds)
-#     - speed: maximal speed during stop (in ground units / sec)
-# Output: a track with centroids (and first time of stop sequence)
-# For classical standard GPS track set 1 m/s for 10 sec)
-# -----------------------------------------------------------------------------
 def findStopsLocal(track, speed=1, duration=10):
+    '''
+    # -------------------------------------------------------------------------
+    Function to find stop positions from a track
+    
+    Inputs:
+        - duration: minimal stop duration (in seconds)
+        - speed: maximal speed during stop (in ground units / sec)
+    Output: a track with centroids (and first time of stop sequence)
+    
+    For classical standard GPS track set 1 m/s for 10 sec)
+    # -------------------------------------------------------------------------
+    '''
 
     track = track.copy()
     stops = Track()
-
+    
     segmentation(track, "speed", "#mark", speed)
     track.operate(Operator.Operator.DIFFERENTIATOR, "#mark")
     track.operate(Operator.Operator.RECTIFIER, "#mark")
+    track.operate(Operator.Operator.SHIFT_LEFT, "#mark")
+    #print (track.getAnalyticalFeature('#mark'))
+                  
+    segmentedTracks = split(track, "#mark")
+    #print (len(segmentedTracks))
 
-    TRACES = split(track, "#mark")
-
+    TMP_RADIUS = []
     TMP_MEAN_X = []
     TMP_MEAN_Y = []
     TMP_MEAN_Z = []
+    TMP_IDSTART = []
+    TMP_IDEND = []
     TMP_STD_X = []
     TMP_STD_Y = []
     TMP_STD_Z = []
     TMP_DURATION = []
     TMP_NBPOINTS = []
 
-    TMP_SIGMA_X = []
-    TMP_SIGMA_Y = []
-    TMP_SIGMA_Z = []
-
-    for i in range(0, len(TRACES), 2):
-        if TRACES[i].duration() < duration:
+    for i in range(1, len(segmentedTracks), 2):
+        trackWS = segmentedTracks[i]
+        if trackWS.duration() < duration:
             continue
-        stops.addObs(
-            Obs(
-                TRACES[i].getCentroid().copy(), TRACES[i].getFirstObs().timestamp.copy()
-            )
-        )
-        TMP_SIGMA_X.append(TRACES[i].operate(Operator.Operator.AVERAGER, "x"))
-        TMP_SIGMA_Y.append(TRACES[i].operate(Operator.Operator.AVERAGER, "y"))
-        TMP_SIGMA_Z.append(TRACES[i].operate(Operator.Operator.AVERAGER, "z"))
-        TMP_SIGMA_X.append(TRACES[i].operate(Operator.Operator.STDDEV, "x"))
-        TMP_SIGMA_Y.append(TRACES[i].operate(Operator.Operator.STDDEV, "y"))
-        TMP_SIGMA_Z.append(TRACES[i].operate(Operator.Operator.STDDEV, "z"))
-        TMP_NBPOINTS.append(TRACES[i].size())
-        TMP_DURATION.append(TRACES[i].duration())
+        # print (trackWS)
+        center = trackWS.getCentroid().copy()
+        stops.addObs(Obs(center, trackWS.getFirstObs().timestamp.copy()))
+            
+        TMP_RADIUS.append(center)
+        TMP_MEAN_X.append(trackWS.operate(Operator.Operator.AVERAGER, "x"))
+        TMP_MEAN_Y.append(trackWS.operate(Operator.Operator.AVERAGER, "y"))
+        TMP_MEAN_Z.append(trackWS.operate(Operator.Operator.AVERAGER, "z"))
+        TMP_STD_X.append(trackWS.operate(Operator.Operator.STDDEV, "x"))
+        TMP_STD_Y.append(trackWS.operate(Operator.Operator.STDDEV, "y"))
+        TMP_STD_Z.append(trackWS.operate(Operator.Operator.STDDEV, "z"))
+        
+        tab = trackWS.uid.split('.')
+        TMP_IDSTART.append(tab[2])
+        TMP_IDEND.append(tab[3])
+        TMP_NBPOINTS.append(trackWS.size())
+        TMP_DURATION.append(trackWS.duration())
 
     if stops.size() == 0:
         return stops
 
-
-    # stops.createAnalyticalFeature("radius", TMP_RADIUS)
+    stops.createAnalyticalFeature("radius", TMP_RADIUS)
     stops.createAnalyticalFeature("mean_x", TMP_MEAN_X)
     stops.createAnalyticalFeature("mean_y", TMP_MEAN_Y)
     stops.createAnalyticalFeature("mean_z", TMP_MEAN_Z)
+    stops.createAnalyticalFeature("id_ini", TMP_IDSTART)
+    stops.createAnalyticalFeature("id_end", TMP_IDEND)
     stops.createAnalyticalFeature("sigma_x", TMP_STD_X)
     stops.createAnalyticalFeature("sigma_y", TMP_STD_Y)
     stops.createAnalyticalFeature("sigma_z", TMP_STD_Z)
@@ -310,6 +399,37 @@ def findStopsLocal(track, speed=1, duration=10):
 
     return stops
 
+
+
+def stop_point_with_acceleration_criteria(track, diameter=20, duration=60):
+    """
+    This algorithm detect stop point.
+    A point is a stop when speed is null and acceleration is negative.
+    """
+    
+    '''
+    if i == 0:
+        return 0
+
+    stop_point = 0
+    v = speed(track, i)
+    acc = acceleration(track, i)
+
+    # Si un point d'indice [i] affiche une vitesse nulle suivant une deccelération,
+    #    on cherche le prochain point d'accélération
+    if abs(v) < 3 and acc < 0:
+        # Initialisation d'un compteur sur i
+        j = i
+        # Tant qu'aucun des points suivants n'accélère, on ne marque pas le point d'arrêt
+        while j <= track.size() - 2 and acceleration(track, j) <= 0:
+            j += 1
+            # Si on trouve un point d'accélération, on donne la valeur 1
+            #     au paramètre du point d'indice [i]
+            if acceleration(track, j) > 0:
+                stop_point = 1
+
+    return stop_point
+    '''
 
 # ----------------------------------------------------------------
 # Fonctions utilitaires
@@ -587,79 +707,6 @@ def findStopsGlobalForRTK(
     return stops
 
 
-def splitReturnTrip(track, mode):
-    if mode == MODE_SPLIT_RETURN_EXHAUSTIVE:
-        return splitReturnTripExhaustive(track)
-    if mode == MODE_SPLIT_RETURN_FAST:
-        return splitReturnTripFast(track)
-
-
-def splitReturnTripExhaustive(track):
-    """Split track when there is a return trip to keep only the first part"""
-
-    min_val = 1e300
-    argmin = 0
-
-    AVG = Operator.Operator.AVERAGER
-    for return_point in progressbar.progressbar(range(1, track.size() - 1)):
-
-        T1 = track.extract(0, return_point)
-        T2 = track.extract(return_point, track.size() - 1)
-
-        avg = (T1 - T2).operate(AVG, "diff") + (T2 - T1).operate(AVG, "diff")
-
-        if avg < min_val:
-            min_val = avg
-            argmin = return_point
-
-    first_part = track.extract(0, argmin - 1)
-    second_part = track.extract(argmin, track.size() - 1)
-
-    TRACKS = TrackCollection()
-    TRACKS.addTrack(first_part)
-    TRACKS.addTrack(second_part)
-
-    return TRACKS
-
-
-def splitReturnTripFast(track, side_effect=0.1, sampling=1):
-    """Split track when there is a return trip to keep only the first part.
-    Second version with Fast Fourier Transform"""
-
-    track = track.copy()
-    track.toENUCoords(track.getFirstObs().position)
-    track_test = track.copy()
-    track_test.resample(
-        (track_test.length() / track_test.size()) / sampling, ALGO_LINEAR, MODE_SPATIAL
-    )
-
-    H = np.fft.fft(track_test.getY())
-    G = np.fft.fft(track_test.getY()[::-1])
-    temp = np.flip(np.abs(np.fft.ifft(H * np.conj(G))))
-
-    id = np.argmax(
-        temp[int(side_effect * len(temp)) : int((1 - side_effect) * len(temp))]
-    )
-    pt = track_test[id].position
-
-    dmin = 1e300
-    argmin = 0
-    for i in range(track.size()):
-        d = track[i].position.distance2DTo(pt)
-        if d < dmin:
-            dmin = d
-            argmin = i
-
-    first_part = track.extract(0, argmin - 1)
-    second_part = track.extract(argmin, track.size() - 1)
-
-    TRACKS = TrackCollection()
-    TRACKS.addTrack(first_part)
-    TRACKS.addTrack(second_part)
-
-    return TRACKS
-
-
 def optimalPartition(cost_matrix, mode=MODE_SEGMENTATION_MINIMIZE, verbose=True):
     '''
     # -------------------------------------------------------------------------
@@ -741,8 +788,11 @@ def optimalSegmentation(
 
 
 # =============================================================================
+# =============================================================================
 #    ST-DBSCAN
 # =============================================================================
+# =============================================================================
+    
 def stdbscan(track, af_name, eps1, eps2, minPts, deltaT, debug = False):
     '''
     
@@ -855,40 +905,9 @@ def retrieveNeighbors(track, af_name, j, eps1, eps2):
 #    return (neigh_ipm - ipm_cluster.mean()) / ipm_cluster.std(ddof=0)
 
 
-# =============================================================================
-#   TODO: à voir ce qu'il faut en faire !!!!!
-# =============================================================================
-'''
-from tracklib.algo.Analytics import speed, acceleration
 
-def stop_point_with_acceleration_criteria(track, i):
-    """
-    This algorithm detect stop point.
-    A point is a stop when speed is null and acceleration is negative.
-    """
-    if i == 0:
-        return 0
 
-    stop_point = 0
-    v = speed(track, i)
-    acc = acceleration(track, i)
-
-    # Si un point d'indice [i] affiche une vitesse nulle suivant une deccelération,
-    #    on cherche le prochain point d'accélération
-    if abs(v) < 3 and acc < 0:
-        # Initialisation d'un compteur sur i
-        j = i
-        # Tant qu'aucun des points suivants n'accélère, on ne marque pas le point d'arrêt
-        while j <= track.size() - 2 and acceleration(track, j) <= 0:
-            j += 1
-            # Si on trouve un point d'accélération, on donne la valeur 1
-            #     au paramètre du point d'indice [i]
-            if acceleration(track, j) > 0:
-                stop_point = 1
-
-    return stop_point
-
-'''    
+   
     
                            
 

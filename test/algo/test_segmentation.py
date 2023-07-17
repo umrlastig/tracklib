@@ -15,9 +15,8 @@ import tracklib.algo.Analytics as Analytics
 
 from tracklib.algo.Segmentation import segmentation, split, splitAR
 from tracklib.algo.Segmentation import MODE_COMPARAISON_OR, MODE_COMPARAISON_AND
-from tracklib.algo.Segmentation import findStops
+from tracklib.algo.Segmentation import findStops, findStopsLocal
 from tracklib.algo.Segmentation import findStopsGlobal, plotStops, MODE_STOPS_GLOBAL
-#, findStopsLocal
 from tracklib.algo.Segmentation import retrieveNeighbors, stdbscan, computeAvgCluster
 
 
@@ -103,8 +102,8 @@ class TestAlgoSegmentation(unittest.TestCase):
         trace2 = tracks[1]
         self.assertEqual(trace2.size(), 7)
         
-        trace1.plot(type='POINT', sym='mo', pointsize=20, append=True)
-        trace2.plot(type='POINT', sym='bo', pointsize=20, append=True)
+        trace1.plot(type='POINT', sym='mo', pointsize=30, append=True)
+        trace2.plot(type='POINT', sym='bo', pointsize=30, append=True)
         
         plt.xlim([1,8])
         plt.ylim([1,8])
@@ -150,7 +149,46 @@ class TestAlgoSegmentation(unittest.TestCase):
         stops2 = findStops(trace, 50, 15, MODE_STOPS_GLOBAL)
         self.assertEqual(len(stops), len(stops2), 'nb stop')
         
+
+    def testFindStopsLocal(self):
         
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        trace = Track([], 1)
+        
+        trace.addObs(Obs(ENUCoords(0*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:00:00")))
+        trace.addObs(Obs(ENUCoords(1*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:10:00")))
+        trace.addObs(Obs(ENUCoords(2*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:20:00")))
+        trace.addObs(Obs(ENUCoords(3*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:30:00")))
+        trace.addObs(Obs(ENUCoords(4*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:40:00")))
+        
+        trace.addObs(Obs(ENUCoords(5*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:50:00")))
+        trace.addObs(Obs(ENUCoords(5*600+10, 0, 0), ObsTime.readTimestamp("2018-01-01 11:00:00")))
+        #trace.addObs(Obs(ENUCoords(5*600+10, 0, 0), ObsTime.readTimestamp("2018-01-01 11:10:00")))
+        
+        trace.addObs(Obs(ENUCoords(6*600+10, 0, 0), ObsTime.readTimestamp("2018-01-01 11:10:00")))
+        trace.addObs(Obs(ENUCoords(7*600+10, 0, 0), ObsTime.readTimestamp("2018-01-01 11:20:00")))
+        trace.addObs(Obs(ENUCoords(8*600+10, 0, 0), ObsTime.readTimestamp("2018-01-01 11:30:00")))
+        
+        trace.plotProfil('TEMPORAL_SPEED_PROFIL')
+        plt.ylim([0, 1.5])
+        plt.show()
+        
+        #print (trace.getAnalyticalFeature('speed'))
+        
+        stops = findStopsLocal(trace, speed=0.6, duration=10)
+        
+        trace.plot(type='POINT', sym='ko', pointsize=50)
+        stops.plot(type='POINT', sym='ro', pointsize=30)
+        plt.xlim([-600, 5500])
+        plt.show()
+        
+        self.assertEqual(len(stops), 1, 'nb stop')
+        self.assertEqual(int(stops.getAnalyticalFeature('id_ini')[0]), 5)
+        self.assertEqual(int(stops.getAnalyticalFeature('id_end')[0]), 6)
+        self.assertEqual(stops.getAnalyticalFeature('nb_points')[0], 2)
+        self.assertTrue(abs(stops.getAnalyticalFeature('duration')[0] - 600.0) < 0.001)
+        self.assertTrue(abs(stops.getAnalyticalFeature('rmse')[0] - 5.0) < 0.001)
+    
 #    # def testStopPointWithAccelerationCriteria(self):
 #	# 	
 #    #     v1 = self.trace2.getObsAnalyticalFeature('speed', 1)
@@ -323,10 +361,11 @@ if __name__ == '__main__':
     
     # segmentation + split
 #    suite.addTest(TestAlgoSegmentation("testSegmentation"))
-    suite.addTest(TestAlgoSegmentation("testSplitAR"))
+#    suite.addTest(TestAlgoSegmentation("testSplitAR"))
     
     # Find stops
 #    suite.addTest(TestAlgoSegmentation("testFindStopsGlocal"))
+    suite.addTest(TestAlgoSegmentation("testFindStopsLocal"))
     #suite.addTest(TestAlgoSegmentation("testStopPointWithAccelerationCriteria"))
     
     # ST-DBSCAN
