@@ -9,13 +9,15 @@ from tracklib.core.Obs import Obs
 from tracklib.core.ObsCoords import ENUCoords
 from tracklib.core.ObsTime import ObsTime
 from tracklib.core.Track import Track
-from tracklib.io.TrackReader import TrackReader
+#from tracklib.io.TrackReader import TrackReader
 
 import tracklib.algo.Analytics as Analytics
 
-from tracklib.algo.Segmentation import segmentation, split
+from tracklib.algo.Segmentation import segmentation, split, splitAR
 from tracklib.algo.Segmentation import MODE_COMPARAISON_OR, MODE_COMPARAISON_AND
-from tracklib.algo.Segmentation import findStopsGlobal#, findStopsLocal
+from tracklib.algo.Segmentation import findStops
+from tracklib.algo.Segmentation import findStopsGlobal, plotStops, MODE_STOPS_GLOBAL
+#, findStopsLocal
 from tracklib.algo.Segmentation import retrieveNeighbors, stdbscan, computeAvgCluster
 
 
@@ -71,6 +73,42 @@ class TestAlgoSegmentation(unittest.TestCase):
         TRACES = split(trace, "decoup3")
         self.assertEqual(len(TRACES), 7)
         
+        
+    def testSplitAR(self):
+        
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        trace = Track([], 1)
+        
+        r.seed(10)
+        for i in range(20):
+            x = r.random() * 2 + 2
+            y = r.random() * 2 + 2
+            trace.addObs(Obs(ENUCoords(x, y, 0), ObsTime()))
+        for i in range(30):
+            x = r.random() * 2 + 5
+            y = r.random() * 2 + 5
+            trace.addObs(Obs(ENUCoords(x, y, 0), ObsTime()))
+            
+        trace.plot(type='POINT', sym='go', pointsize=50)
+        
+        pt1 = ENUCoords(3,3,0)
+        plt.plot([3],[3], 'ro')
+        pt2 = ENUCoords(6,6,0)
+        plt.plot([6],[6], 'ro')
+        tracks = splitAR(trace, pt1=pt1, pt2=pt2, radius=0.5, nb_min_pts=6)
+        self.assertEqual(len(tracks), 2)
+        
+        trace1 = tracks[0]
+        self.assertEqual(trace1.size(), 7)
+        trace2 = tracks[1]
+        self.assertEqual(trace2.size(), 7)
+        
+        trace1.plot(type='POINT', sym='mo', pointsize=20, append=True)
+        trace2.plot(type='POINT', sym='bo', pointsize=20, append=True)
+        
+        plt.xlim([1,8])
+        plt.ylim([1,8])
+        plt.show()
 
     def testFindStopsGlocal(self):
         
@@ -104,8 +142,13 @@ class TestAlgoSegmentation(unittest.TestCase):
         self.assertEqual(stops.getAnalyticalFeature('id_ini')[0], 5, 'indice begin 1st stop')
         self.assertEqual(stops.getAnalyticalFeature('id_end')[0], 6, 'indice end 1st stop')
         
+        self.assertTrue(abs(stops.getAnalyticalFeature('rmse')[0]- 5.0) < 0.0001, 'rmse')
         
+        plotStops(stops)
         
+        # rebelote
+        stops2 = findStops(trace, 50, 15, MODE_STOPS_GLOBAL)
+        self.assertEqual(len(stops), len(stops2), 'nb stop')
         
         
 #    # def testStopPointWithAccelerationCriteria(self):
@@ -125,11 +168,7 @@ class TestAlgoSegmentation(unittest.TestCase):
 #    #     isSTP = Analytics.stop_point_with_acceleration_criteria(self.trace2, 2)
 #    #     #print (v2, a2, isSTP)		
 #    #     self.assertEqual(isSTP, 0)
-#        
-#		
-#    # def testStopPointWithTimeWindowCriteria(self):
-#    #     self.assertLessEqual(3, 5)
-    
+        
     
     def testSTdbscanPapier(self):
         
@@ -283,16 +322,16 @@ if __name__ == '__main__':
     suite = unittest.TestSuite()
     
     # segmentation + split
-    suite.addTest(TestAlgoSegmentation("testSegmentation"))
+#    suite.addTest(TestAlgoSegmentation("testSegmentation"))
+    suite.addTest(TestAlgoSegmentation("testSplitAR"))
     
     # Find stops
-    suite.addTest(TestAlgoSegmentation("testFindStopsGlocal"))
+#    suite.addTest(TestAlgoSegmentation("testFindStopsGlocal"))
     #suite.addTest(TestAlgoSegmentation("testStopPointWithAccelerationCriteria"))
-    #suite.addTest(TestAlgoSegmentation("testStopPointWithTimeWindowCriteria"))
     
     # ST-DBSCAN
-    suite.addTest(TestAlgoSegmentation("testSTdbscanMailYM"))
-    suite.addTest(TestAlgoSegmentation("testSTdbscanPapier"))
+#    suite.addTest(TestAlgoSegmentation("testSTdbscanMailYM"))
+#    suite.addTest(TestAlgoSegmentation("testSTdbscanPapier"))
     
     runner = unittest.TextTestRunner()
     runner.run(suite)
