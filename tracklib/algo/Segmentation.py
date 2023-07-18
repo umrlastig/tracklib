@@ -177,21 +177,13 @@ def splitAR(track, pt1, pt2=None, radius=10, nb_min_pts=10, verbose=True):
     k = -1
     while k < len(track) - 1:
         k = k + 1
-        if (
-            min(
-                track[k].position.distance2DTo(pt1), track[k].position.distance2DTo(pt2)
-            )
-            < radius
-        ):
+        if min(track[k].position.distance2DTo(pt1), track[k].position.distance2DTo(pt2)) < radius:
             if len(subtrack) > nb_min_pts:
                 tracks.addTrack(subtrack)
                 if verbose:
-                    print(
-                        "Add sub-track: ",
-                        subtrack[0].timestamp,
-                        subtrack[-1].timestamp,
-                        "[" + str(len(tracks)) + "]",
-                    )
+                    print("Add sub-track: ",
+                        subtrack[0].timestamp, subtrack[-1].timestamp,
+                        "[" + str(len(tracks)) + "]",)
                 subtrack = Track()
             subtrack.addObs(track[k].copy())
     
@@ -851,7 +843,7 @@ def optimalSegmentation(
 # =============================================================================
 # =============================================================================
     
-def stdbscan(track, af_name, eps1, eps2, minPts, deltaT, debug = False):
+def stdbscan(track, af_name, eps1, eps2, minPts, deltaAF, debug = False):
     '''
     
     References
@@ -870,7 +862,7 @@ def stdbscan(track, af_name, eps1, eps2, minPts, deltaT, debug = False):
         maximum non-spatial distance value.
     minPts : int
         minimum number of points within eps1 and eps2 distance.
-    deltaT : float
+    deltaAF : float
         threshold value to be included in a cluster.
 
     Returns
@@ -878,7 +870,7 @@ def stdbscan(track, af_name, eps1, eps2, minPts, deltaT, debug = False):
     Cluster in AF
 
     '''
-    
+    #track = track.copy()
     stack = []
     cluster_label = 0
     
@@ -911,10 +903,11 @@ def stdbscan(track, af_name, eps1, eps2, minPts, deltaT, debug = False):
                              # avg
                              avgCluster = computeAvgCluster(track, af_name, cluster_label)
                              diff = abs(avgCluster - track.getObsAnalyticalFeature(af_name, k))
-                             if (nonoise > 0 or nocluster == 0) and diff < deltaT:
+                             if (nonoise > 0 or nocluster == 0) and diff < deltaAF:
                                  track.setObsAnalyticalFeature('stdbscan', k, cluster_label)
                                  track.setObsAnalyticalFeature('noise', k, 0)
                                  stack.append(k)
+    #return track
                     
 def computeAvgCluster(track, af_name, cluster_label):
     '''

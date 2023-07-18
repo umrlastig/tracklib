@@ -279,7 +279,6 @@ class TestAlgoSegmentation(unittest.TestCase):
         
         stdbscan(trace1, 'Temp', 3.5, 4, 3, 2)
         
-        
         for i in range(34):
             noise = trace1.getObsAnalyticalFeature('noise', i)
             self.assertEqual(noise, 0)
