@@ -1,4 +1,10 @@
 Segmentation
 -------------
-.. automodule:: tracklib.algo.Segmentation
-    :members:    
+
+    
+    
+    
+st-dbscan
+-----------
+
+.. autofunction:: tracklib.algo.Segmentation.stdbscan
