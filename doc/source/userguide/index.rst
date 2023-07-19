@@ -23,6 +23,7 @@ User Guide
 
     UG_Selection
     UG_Segmentation
+    UG_Stdbscan
     
 
 
