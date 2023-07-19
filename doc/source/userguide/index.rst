@@ -16,12 +16,14 @@ User Guide
   Read/Write track(s), network and raster <reader_writer>
   
   
-.. toctree::
-  :maxdepth: 1  
-  
-  Selection on GPS tracks <../notebook/UG_Selection>
-  Segmenter une trace <../notebook/UG_Segmentation>
+.. nbgallery::
+    :name: rst-gallery
+    :glob:
+    :reversed:
 
+    UG_Selection
+    UG_Segmentation
+    
 
 
 ..  Autres fonctionnalités dans tracklib: stdbscan, etc. <../notebook/UG_OtherFunctionnality>

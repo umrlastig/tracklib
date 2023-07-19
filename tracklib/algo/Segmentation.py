@@ -513,6 +513,7 @@ def removeStops(track, stops=None):
     return output
 '''
 
+
 def findStopsGlobal(track, diameter=20, duration=60, downsampling=1, verbose=True):
     '''
     Find stop points in a track based on two parameters:
@@ -921,7 +922,11 @@ def computeAvgCluster(track, af_name, cluster_label):
         if nocluster == cluster_label:
             nbObsCluster += 1
             avgCluster += valueAF
-    avgCluster = avgCluster / nbObsCluster
+    if nbObsCluster != 0:
+        avgCluster = avgCluster / nbObsCluster
+    else:
+        # TODO: à vérifier
+        avgCluster = 0
     return avgCluster
     
 

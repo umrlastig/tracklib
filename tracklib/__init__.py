@@ -2,6 +2,13 @@
 
 #__version__ = '0.3'
 
+#import matplotlib.pyplot as plt
+
+#from tracklib.core.ObsCoords import ENUCoords, GeoCoords, ECEFCoords
+#from tracklib.core.ObsTime import ObsTime
+#from tracklib.core.Obs import Obs
+
+
 
 # -----------------------------------------------------------------------------
 #   LOGGING
