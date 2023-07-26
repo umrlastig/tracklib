@@ -16,28 +16,18 @@ User Guide
   Read/Write track(s), network and raster <reader_writer>
   
   
-Simplify, Interpolate & Filter
---------------------------------
-
-.. nbgallery::
-    :name: rst-gallery
-    :glob:
-    :reversed:
-
-    UG_Simplification
-
-
-Other features
+Features
 ---------------
 
 .. nbgallery::
-    :name: rst-gallery2
+    :name: userguide-features-gallery
     :glob:
     :reversed:
 
     UG_Stdbscan
     UG_Selection
     UG_Segmentation
+    UG_Simplification
 
 
 
