@@ -52,7 +52,7 @@ Documentation
   
   Getting Started <started/index>
   User Guide <userguide/index>
-  Use Cases <notebook/index>
+  Use Cases <usecase/index>
   API Reference <api/index>
 
 

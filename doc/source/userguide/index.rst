@@ -6,7 +6,7 @@
 
 
 User Guide
-############
+===========
 
 .. toctree::
   :maxdepth: 1
@@ -16,21 +16,35 @@ User Guide
   Read/Write track(s), network and raster <reader_writer>
   
   
+Simplify, Interpolate & Filter
+--------------------------------
+
 .. nbgallery::
     :name: rst-gallery
     :glob:
     :reversed:
 
+    UG_Simplification
+
+
+Autres transformations
+------------------------
+
+  
+.. nbgallery::
+    :name: rst-gallery
+    :glob:
+    :reversed:
+
+    UG_Stdbscan
     UG_Selection
     UG_Segmentation
-    UG_Stdbscan
-    
+
 
 
 ..  Autres fonctionnalités dans tracklib: stdbscan, etc. <../notebook/UG_OtherFunctionnality>
 .. Querying obstervations in a track <4_trackquery>
 .. Mopsi <Mopsi> (track's comparaison)
-.. Simplify, Interpolate & Filter <3_filter>
 .. Points caractéristiques 
 
 
