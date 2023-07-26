@@ -882,8 +882,8 @@ def stdbscan(track, af_name, eps1, eps2, minPts, deltaAF, debug = False):
         nocluster = track.getObsAnalyticalFeature('stdbscan', i)
         if nocluster == 0:
             neighbors_index = retrieveNeighbors(track, af_name, i, eps1, eps2)
-            print (neighbors_index)
-            break
+            #print (neighbors_index)
+            #break
             if len(neighbors_index) < minPts:
                 track.setObsAnalyticalFeature('noise', i, 1)
             else:
@@ -947,20 +947,17 @@ def retrieveNeighbors(track, af_name, j, eps1, eps2):
         if i == j:
             continue
         
+        valj = track.getObsAnalyticalFeature(af_name, j)
+        vali = track.getObsAnalyticalFeature(af_name, i)
+        daf = abs(valj - vali)
+        # print (daf)
+        
         dd = track.getObs(j).distanceTo(track.getObs(i))
-        
-        if dd <= eps1:
-        
-            valj = track.getObsAnalyticalFeature(af_name, j)
-            vali = track.getObsAnalyticalFeature(af_name, i)
-            daf = abs(valj - vali)
-            print (daf)
-        
         
         #dt = abs(track.getObs(j).timestamp.toAbsTime() - track.getObs(i).timestamp.toAbsTime())
         
-            if dd <= eps1 and daf <= eps2:
-                neighbors_index.append(i)
+        if dd <= eps1 and daf <= eps2:
+            neighbors_index.append(i)
         
     return neighbors_index
 

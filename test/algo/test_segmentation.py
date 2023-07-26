@@ -283,6 +283,8 @@ class TestAlgoSegmentation(unittest.TestCase):
             noise = trace1.getObsAnalyticalFeature('noise', i)
             self.assertEqual(noise, 0)
             
+        print(computeAvgCluster(trace1, 'Temp', 1))
+            
         self.assertTrue(abs(computeAvgCluster(trace1, 'Temp', 1) - 2.25) < 0.001)
         self.assertTrue(abs(computeAvgCluster(trace1, 'Temp', 2) - 9.277) < 0.001)
             
