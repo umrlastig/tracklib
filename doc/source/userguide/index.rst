@@ -27,12 +27,11 @@ Simplify, Interpolate & Filter
     UG_Simplification
 
 
-Autres transformations
-------------------------
+Other features
+---------------
 
-  
 .. nbgallery::
-    :name: rst-gallery
+    :name: rst-gallery2
     :glob:
     :reversed:
 
