@@ -92,6 +92,13 @@ def compLike(s1, s2) -> bool:
 
 
 
+def addListToAF(track, af_name, array):
+    """TODO"""
+    if af_name == None:
+        return
+    for i in range(track.size()):
+        track.setObsAnalyticalFeature(af_name, i, array[i])
+        
 
 # --------------------------------------------------------------------------
 # Function to form distance matrix (old version)

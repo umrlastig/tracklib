@@ -19,14 +19,6 @@ BIAF_ABS_CURV = "abs_curv"
 BUILT_IN_AF = [BIAF_DS, BIAF_SPEED, BIAF_ABS_CURV, BIAF_HEADING]
 
 
-def addListToAF(track, af_name, array):
-    """TODO"""
-    if af_name == None:
-        return
-    for i in range(track.size()):
-        track.setObsAnalyticalFeature(af_name, i, array[i])
-
-
 def ds(track, i):
     """TODO"""
     if i == 0:
