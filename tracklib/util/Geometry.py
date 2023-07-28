@@ -41,7 +41,7 @@ import numpy as np
 # --------------------------------------------------------------------------
 from tracklib.core.Obs import Obs
 from tracklib.core.ObsTime import ObsTime
-import tracklib.core.Utils as Utils
+from tracklib.core.ObsCoords import makeCoords
 
 
 def cartesienne(segment) -> list[float, float, float]:   
@@ -403,7 +403,7 @@ def intersection(track1, track2, withTime=-1):
 
                 x = X[0, 0]
                 y = X[1, 0]
-                p = Utils.makeCoords(x, y, 0, track1.getSRID())
+                p = makeCoords(x, y, 0, track1.getSRID())
 
                 # Linear interpolation on track 1
                 w1 = p.distance2DTo(track1[i].position)

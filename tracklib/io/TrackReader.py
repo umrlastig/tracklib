@@ -10,11 +10,11 @@ import os
 from xml.dom import minidom
 
 from tracklib.core.ObsTime import ObsTime
-from tracklib.core.ObsCoords import ENUCoords, GeoCoords, ECEFCoords
+from tracklib.core.ObsCoords import ENUCoords, GeoCoords, ECEFCoords, makeCoords
 from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
 from tracklib.core.TrackCollection import TrackCollection
-import tracklib.core.Utils as utils
+from tracklib.core.Utils import islist, isfloat
 from tracklib.io.TrackFormat import TrackFormat
 
 
@@ -423,7 +423,7 @@ class TrackReader:
                     else:
                         z = 0.0
                         
-                    point = Obs(utils.makeCoords(x, y, z, srid.upper()), ObsTime())   
+                    point = Obs(makeCoords(x, y, z, srid.upper()), ObsTime())   
                     track.addObs(point)
                     
 
@@ -515,7 +515,7 @@ class TrackReader:
                     else:
                         time = ObsTime()
     
-                    point = Obs(utils.makeCoords(lon, lat, hgt, srid), time)
+                    point = Obs(makeCoords(lon, lat, hgt, srid), time)
                     trace.addObs(point)
                     
                     if read_all:
@@ -526,9 +526,9 @@ class TrackReader:
                                     if ext.tagName not in extensions:
                                         extensions[ext.tagName] = []
                                     val = ext.firstChild.nodeValue
-                                    if utils.isfloat(val):
+                                    if isfloat(val):
                                         extensions[ext.tagName].append(float(val))
-                                    elif utils.islist(val):
+                                    elif islist(val):
                                         import json
                                         extensions[ext.tagName].append(json.loads(val))
                                     else:

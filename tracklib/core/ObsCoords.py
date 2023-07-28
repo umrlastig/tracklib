@@ -635,6 +635,30 @@ class ECEFCoords:
 
 
 # --------------------------------------------------
+#   Utils
+# --------------------------------------------------
+def makeCoords(x: float, y: float, z: float, srid: str) -> Union[ENUCoords, ECEFCoords, GeoCoords]:   
+    """Function to form coords object from (x,y,z) data
+
+    :param x: 1st coordinate (X, lon or E)
+    :param y: 2nd coordinate (Y, lat or N)
+    :param z: 3rd coordinate (Z, hgt or U)
+    :param srid: Id of coord system (ECEF, GEO or ENU)
+
+    :return: Coords object in the proper srid
+    """
+    if srid.upper() in ["ENUCOORDS", "ENU"]:
+        return ENUCoords(x, y, z)
+    if srid.upper() in ["GEOCOORDS", "GEO"]:
+        return GeoCoords(x, y, z)
+    if srid.upper() in ["ECEFCOORDS", "ECEF"]:
+        return ECEFCoords(x, y, z)
+    
+    print("Error: unknown coordinate type [" + str(srid) + "]")
+    exit()
+
+
+# --------------------------------------------------
 # Static projection methods
 # --------------------------------------------------
 def _proj(coords, srid: int):   

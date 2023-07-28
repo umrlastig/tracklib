@@ -6,7 +6,7 @@ from tracklib.core.ObsTime import ObsTime
 from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
 from tracklib.core.TrackCollection import TrackCollection
-import tracklib.core.Utils as utils
+from tracklib.core.ObsCoords import makeCoords
 
 # import os # This is is needed in the pyqgis console also
 from qgis.PyQt.QtCore import QVariant
@@ -261,7 +261,7 @@ class Qgis:
                 geom.transform(xform)
                 
                 time = ObsTime()
-                obs = Obs(utils.makeCoords(geom.asPoint().x(), geom.asPoint().y(), 0, "ENUCoords"), time)
+                obs = Obs(makeCoords(geom.asPoint().x(), geom.asPoint().y(), 0, "ENUCoords"), time)
                 track.setObs(j, obs)
             
         

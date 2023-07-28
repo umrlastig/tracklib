@@ -11,8 +11,6 @@ import json
 import sys
 import numpy as np
 
-from tracklib.core.ObsCoords import GeoCoords, ENUCoords, ECEFCoords
-
 import matplotlib.colors as mcolors
 
 from heapq import heapify, heappush, heappop
@@ -93,25 +91,7 @@ def compLike(s1, s2) -> bool:
     return True
 
 
-def makeCoords(x: float, y: float, z: float, srid: str) -> Union[ENUCoords, ECEFCoords, GeoCoords]:   
-    """Function to form coords object from (x,y,z) data
 
-    :param x: 1st coordinate (X, lon or E)
-    :param y: 2nd coordinate (Y, lat or N)
-    :param z: 3rd coordinate (Z, hgt or U)
-    :param srid: Id of coord system (ECEF, GEO or ENU)
-
-    :return: Coords object in the proper srid
-    """
-    if srid.upper() in ["ENUCOORDS", "ENU"]:
-        return ENUCoords(x, y, z)
-    if srid.upper() in ["GEOCOORDS", "GEO"]:
-        return GeoCoords(x, y, z)
-    if srid.upper() in ["ECEFCOORDS", "ECEF"]:
-        return ECEFCoords(x, y, z)
-    
-    print("Error: unknown coordinate type [" + str(srid) + "]")
-    exit()
 
 # --------------------------------------------------------------------------
 # Function to form distance matrix (old version)

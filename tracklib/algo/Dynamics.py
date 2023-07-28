@@ -4,7 +4,8 @@ import math
 import progressbar
 import numpy as np
 
-import tracklib.core.Utils as utils
+from tracklib.core.ObsCoords import makeCoords
+from tracklib.core.Utils import unlistify
 import tracklib.algo.Stochastics as Stochastics
 
 MODE_OBS_AS_SCALAR = 0
@@ -408,7 +409,7 @@ class Kalman:
     # track, from a list of analytical feature names (obs)
     # ------------------------------------------------------------
     def __getObs(self, track, obs, k, mode):
-        return utils.unlistify(track.getObsAnalyticalFeatures(obs, k))
+        return unlistify(track.getObsAnalyticalFeatures(obs, k))
 
     # ------------------------------------------------------------
     # Main function of Kalman object, to estimate the states
@@ -622,7 +623,7 @@ class HMM:
             if len(y) < 2:
                 print("Error: wrong number of observations in HMM to form 2D position")
                 exit()
-            ytemp = [utils.makeCoords(y[0], y[1], 0.0, track.getSRID())]
+            ytemp = [makeCoords(y[0], y[1], 0.0, track.getSRID())]
             for remain in range(2, len(y)):
                 ytemp.append(y[remain])
             y = ytemp
@@ -630,12 +631,12 @@ class HMM:
             if len(y) < 3:
                 print("Error: wrong number of observations in HMM to form 3D position")
                 exit()
-            ytemp = [utils.makeCoords(y[0], y[1], y[2], track.getSRID())]
+            ytemp = [makeCoords(y[0], y[1], y[2], track.getSRID())]
             for remain in range(3, len(y)):
                 ytemp.append(y[remain])
             y = ytemp
 
-        return utils.unlistify(y)
+        return unlistify(y)
 
     # Method to deal with computation trace
     def printTrace(self, message, importance, level):
