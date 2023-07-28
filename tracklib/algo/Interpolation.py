@@ -235,8 +235,8 @@ def gaussian_process_temporal(track, timestamps, kernel, factor=1.0, sigma=0.0, 
     return __gaussian_process(track, TO, TU, kernel, factor, sigma, cp_var)
 
 def __gaussian_process(track, TO, TU, kernel, factor, sigma, cp_var):
-
-    new_track = Track()
+    from tracklib.core import Track as TrackTracklib
+    new_track = TrackTracklib()
 
     # Observations
     yx = np.array(track.getX())

@@ -271,7 +271,6 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     suite.addTest(TestAlgoComparaisonMethods("testCompare"))
-    '''
     suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileNN"))
     suite.addTest(TestAlgoComparaisonMethods("testDifference12ProfileNN"))
     suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileDTW"))
@@ -281,7 +280,6 @@ if __name__ == '__main__':
     suite.addTest(TestAlgoComparaisonMethods("testCentralNNTrack"))
     suite.addTest(TestAlgoComparaisonMethods("testCentralDTWTrack"))
     suite.addTest(TestAlgoComparaisonMethods("testMedoidHausdorffTrack"))
-    '''
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
