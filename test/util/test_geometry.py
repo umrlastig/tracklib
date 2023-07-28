@@ -3,8 +3,9 @@
 import unittest
 
 import tracklib.util.Geometry as Geometry
-from tracklib.core import (Obs, Track, ObsTime)
-from tracklib.core import ObsCoords as Coords
+from tracklib import (Obs, ObsTime, ENUCoords)
+from tracklib.core import Track
+
 
 class TestGeometry(unittest.TestCase):
     
@@ -104,19 +105,19 @@ class TestGeometry(unittest.TestCase):
     
     def testProjPolyligne(self):
          
-        ObsTime.ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         trace1 = Track.Track([], 1)
 
-        c1 = Coords.ENUCoords(0, 0, 0)
-        p1 = Obs.Obs(c1, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        c1 = ENUCoords(0, 0, 0)
+        p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         trace1.addObs(p1)
         
-        c2 = Coords.ENUCoords(10, 0, 0)
-        p2 = Obs.Obs(c2, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:12"))
+        c2 = ENUCoords(10, 0, 0)
+        p2 = Obs(c2, ObsTime.readTimestamp("2018-01-01 10:00:12"))
         trace1.addObs(p2)
         
-        c3 = Coords.ENUCoords(20, 0, 0)
-        p3 = Obs.Obs(c3, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:12"))
+        c3 = ENUCoords(20, 0, 0)
+        p3 = Obs(c3, ObsTime.readTimestamp("2018-01-01 10:00:12"))
         trace1.addObs(p3)
         
         distmin, xproj, yproj, iproj = Geometry.proj_polyligne(trace1.getX(), trace1.getY(), 
@@ -127,7 +128,7 @@ class TestGeometry(unittest.TestCase):
         self.assertEqual(yproj, 0)
         self.assertEqual(iproj, 0)
         
-        p  = Coords.ENUCoords(16, 5, 0)
+        p  = ENUCoords(16, 5, 0)
         distmin, xproj, yproj, iproj = Geometry.proj_polyligne(trace1.getX(), trace1.getY(), 
                                     p.getX(), p.getY())
         
@@ -141,23 +142,23 @@ class TestGeometry(unittest.TestCase):
         # 3eme CAS
         trace1 = Track.Track([], 1)
 
-        c1 = Coords.ENUCoords(0, 0, 0)
-        p1 = Obs.Obs(c1, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        c1 = ENUCoords(0, 0, 0)
+        p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         trace1.addObs(p1)
         
-        c2 = Coords.ENUCoords(10, 0, 0)
-        p2 = Obs.Obs(c2, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:12"))
+        c2 = ENUCoords(10, 0, 0)
+        p2 = Obs(c2, ObsTime.readTimestamp("2018-01-01 10:00:12"))
         trace1.addObs(p2)
         
-        c3 = Coords.ENUCoords(10, 10, 0)
-        p3 = Obs.Obs(c3, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:12"))
+        c3 = ENUCoords(10, 10, 0)
+        p3 = Obs(c3, ObsTime.readTimestamp("2018-01-01 10:00:12"))
         trace1.addObs(p3)
         
-        c4 = Coords.ENUCoords(20, 10, 0)
-        p4 = Obs.Obs(c4, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:12"))
+        c4 = ENUCoords(20, 10, 0)
+        p4 = Obs(c4, ObsTime.readTimestamp("2018-01-01 10:00:12"))
         trace1.addObs(p4)
         
-        p  = Coords.ENUCoords(18, 8, 0)
+        p  = ENUCoords(18, 8, 0)
         distmin, xproj, yproj, iproj = Geometry.proj_polyligne(trace1.getX(), trace1.getY(), 
                                     p.getX(), p.getY())
         
