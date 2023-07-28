@@ -9,8 +9,8 @@
 from __future__ import annotations   
 #from typing import Union
 
-from tracklib.core import (ENUCoords)
-from tracklib.core import (Bbox, RasterBand, Raster)
+from tracklib.core import (ENUCoords, Bbox)
+from tracklib.core import (RasterBand, Raster)
 
 
 class RasterReader:
@@ -63,7 +63,7 @@ class RasterReader:
                     
         ll = ENUCoords(xllcorner, yllcorner, 0)
         ur = ENUCoords(xllcorner + cellsize * ncols, yllcorner + cellsize * nrows, 0)
-        bbox = Bbox.Bbox(ll, ur)
+        bbox = Bbox(ll, ur)
             
         resolution = (cellsize, cellsize)
         marge = 0
@@ -158,7 +158,7 @@ class RasterReader:
                     
         ll = ENUCoords(xllcorner, yllcorner, 0)
         ur = ENUCoords(xllcorner + cellsize * ncols, yllcorner + cellsize * nrows, 0)
-        bbox = Bbox.Bbox(ll, ur)
+        bbox = Bbox(ll, ur)
             
         resolution = (cellsize, cellsize)
         marge = 0
