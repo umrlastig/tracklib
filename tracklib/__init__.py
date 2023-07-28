@@ -11,7 +11,7 @@ from tracklib.core import *
 from tracklib.util import *
 from tracklib.algo import *
 from tracklib.plot import *
-#from tracklib.io import *
+from tracklib.io import *
 
 
 # -----------------------------------------------------------------------------
