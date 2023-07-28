@@ -10,7 +10,7 @@ import random
 import unittest
 
 from tracklib import (ObsTime)
-from tracklib.core.Operator import Operator
+from tracklib.core.operators import Operator
 from tracklib.core.Kernel import GaussianKernel
 from tracklib.io.TrackReader import TrackReader
 import tracklib.algo.Synthetics as synth
