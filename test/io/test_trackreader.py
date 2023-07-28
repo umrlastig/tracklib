@@ -3,13 +3,11 @@
 import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
 
-from tracklib.core.ObsTime import ObsTime
-from tracklib.core.Track import Track
-from tracklib.core.TrackCollection import TrackCollection
-from tracklib.io.TrackReader import TrackReader
 
-from tracklib.core.ObsCoords import ENUCoords
-import tracklib.algo.Geometrics as Geometrics
+from tracklib import Rectangle, ObsTime, TrackCollection, ENUCoords
+
+from tracklib.core.Track import Track
+from tracklib.io.TrackReader import TrackReader
 from tracklib.algo.Selection import Constraint
 from tracklib.algo.Selection import TYPE_CUT_AND_SELECT, MODE_INSIDE
 from tracklib.algo.Selection import Selector
@@ -137,7 +135,7 @@ class TestTrackReader(TestCase):
         Ymax = 62.615
         ll = ENUCoords(Xmin, Ymin)
         ur = ENUCoords(Xmax, Ymax)
-        bbox = Geometrics.Rectangle(ll, ur)
+        bbox = Rectangle(ll, ur)
         constraintBBox = Constraint(shape = bbox, mode = MODE_INSIDE, type=TYPE_CUT_AND_SELECT)
         s = Selector([constraintBBox])
         

@@ -6,13 +6,14 @@ from unittest import TestCase, TestSuite, TextTestRunner
 
 from tracklib import (Obs, ObsTime, ENUCoords)
 from tracklib.core.Track import Track
+from tracklib.util import Circle, Rectangle
 from tracklib.io.TrackReader import TrackReader
 from tracklib.algo.Selection import Selector, GlobalSelector
 from tracklib.algo.Selection import Constraint, TimeConstraint, TrackConstraint
 from tracklib.algo.Selection import MODE_INSIDE, MODE_CROSSES, MODE_GETS_IN, MODE_GETS_OUT
 from tracklib.algo.Selection import MODE_PARALLEL
 from tracklib.algo.Selection import COMBINATION_OR
-import tracklib.algo.Geometrics as Geometrics
+
 
 
 
@@ -114,7 +115,7 @@ class TestSelection(TestCase):
         
         center = self.trace.getObs(int(self.trace.size()/2)).position
         radius = 91000
-        circle1 = Geometrics.Circle(center, radius)
+        circle1 = Circle(center, radius)
         #circle.plot()
         #plt.show()
         
@@ -146,7 +147,7 @@ class TestSelection(TestCase):
         
         center = self.trace.getObs(int(self.trace.size()/2)).position
         radius = 45000
-        circle2 = Geometrics.Circle(center, radius)
+        circle2 = Circle(center, radius)
         #circle2.plot()
         #plt.show()
         
@@ -178,7 +179,7 @@ class TestSelection(TestCase):
         
         center = self.trace.getObs(0).position
         radius = 10000
-        circle3 = Geometrics.Circle(center, radius)
+        circle3 = Circle(center, radius)
         # circle3.plot()
         # plt.show()
         
@@ -211,7 +212,7 @@ class TestSelection(TestCase):
         pt = self.trace.getObs(int(self.trace.size()/2)).position
         center = ENUCoords(pt.getX() + 10000, pt.getY() + 30000)
         radius = 10000
-        circle4 = Geometrics.Circle(center, radius)
+        circle4 = Circle(center, radius)
         circle4.plot()
         plt.show()
         
@@ -248,14 +249,14 @@ class TestSelection(TestCase):
         
         center = self.trace.getObs(int(self.trace.size()/2)).position
         radius = 91000
-        circle1 = Geometrics.Circle(center, radius)
+        circle1 = Circle(center, radius)
         #circle1.plot()
         #plt.show()
         
         pt = self.trace.getObs(int(self.trace.size()/2)).position
         center = ENUCoords(pt.getX() + 10000, pt.getY() + 30000)
         radius = 10000
-        circle4 = Geometrics.Circle(center, radius)
+        circle4 = Circle(center, radius)
         
         # =====================================================================
         c1 = Constraint(shape = circle1, time=t1, mode = MODE_CROSSES)
@@ -351,13 +352,13 @@ class TestSelection(TestCase):
         
         center = self.trace.getObs(int(self.trace.size()/2)).position
         radius = 91000
-        circle1 = Geometrics.Circle(center, radius)
+        circle1 = Circle(center, radius)
         circle1.plot('b-')
         
         pt = self.trace.getObs(int(self.trace.size()/2)).position
         ll = ENUCoords(pt.getX() + 1000, pt.getY() + 15000)
         ur = ENUCoords(pt.getX() + 10000, pt.getY() + 40000)
-        rect1 = Geometrics.Rectangle(ll, ur)
+        rect1 = Rectangle(ll, ur)
         rect1.plot()
 
         # =====================================================================
@@ -389,7 +390,7 @@ class TestSelection(TestCase):
         
         # ---------------------------------------------------------------------
         center = ENUCoords(0,0)
-        circle = Geometrics.Circle(center, 1)
+        circle = Circle(center, 1)
         c1 = Constraint(shape = circle, time=t1, mode = MODE_INSIDE)
         s = Selector([c1])
         self.assertEqual(1, len(s))
@@ -404,7 +405,7 @@ class TestSelection(TestCase):
         t1.setMaxTimestamp(ObsTime('2018-07-31 17:55:00'))
         center = self.trace.getObs(int(self.trace.size()/2)).position
         radius = 91000
-        circle1 = Geometrics.Circle(center, radius)
+        circle1 = Circle(center, radius)
         
         c1 = Constraint(time=t1)
         c1.setShape(circle1)

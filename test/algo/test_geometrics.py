@@ -4,10 +4,12 @@ import math
 import unittest
 import matplotlib.pyplot as plt
 
-from tracklib import (Obs, ObsTime, ENUCoords)
+from tracklib import (Obs, ObsTime, ENUCoords,
+                      Circle, Rectangle, Polygon,
+                      minCircle, fitCircle, minCircleMatrix,
+                      diameter, convexHull, plotPolygon,
+                      minimumBoundingRectangle)
 from tracklib.core.Track import Track
-import tracklib.algo.Geometrics as Geometrics
-
 
 
 class TestAlgoGeometricsMethods(unittest.TestCase):
@@ -88,7 +90,7 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
     
     def testCircle(self):
         
-        circle = Geometrics.Circle(ENUCoords(3.55, 2.2), 3)
+        circle = Circle(ENUCoords(3.55, 2.2), 3)
         print (circle)
         circle.plot()
         self.trace3.plot()
@@ -99,13 +101,13 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         circle.translate(5, 2)
         circle.plot()
         
-        circlebis = Geometrics.Circle(ENUCoords(3.55, 2.2), 8)
+        circlebis = Circle(ENUCoords(3.55, 2.2), 8)
         circlebis.plot('b:', append=True)
         
-        circlebis = Geometrics.Circle(ENUCoords(3.55, 2.2), 7)
+        circlebis = Circle(ENUCoords(3.55, 2.2), 7)
         circlebis.plot('b:', append=False)
         
-        circleter = Geometrics.Circle(ENUCoords(3.55, 2.2), 3)
+        circleter = Circle(ENUCoords(3.55, 2.2), 3)
         circleter.translate(2, 3)
         circleter.plot('g--', append=plt)
         
@@ -122,7 +124,7 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         
         ll = ENUCoords(0, 0)
         ur = ENUCoords(10, 20)
-        bbox = Geometrics.Rectangle(ll, ur)
+        bbox = Rectangle(ll, ur)
         print (bbox)
         bbox.plot()
         self.trace3.plot()
@@ -132,21 +134,21 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         self.assertEqual(t.size(), 4)
         
         r = bbox.copy()
-        self.assertIsInstance(r, Geometrics.Rectangle)
+        self.assertIsInstance(r, Rectangle)
         self.assertEqual(r.pmin.E, bbox.pmin.E)
         self.assertEqual(r.pmin.N, bbox.pmin.N)
         self.assertEqual(r.pmax.E, bbox.pmax.E)
         self.assertEqual(r.pmax.N, bbox.pmax.N)
         
         r.translate(10, 20)
-        self.assertIsInstance(r, Geometrics.Rectangle)
+        self.assertIsInstance(r, Rectangle)
         self.assertEqual(r.pmin.E, 10)
         self.assertEqual(r.pmin.N, 20)
         self.assertEqual(r.pmax.E, 20)
         self.assertEqual(r.pmax.N, 40)
         
         r.rotate(math.pi/2)
-        self.assertIsInstance(r, Geometrics.Rectangle)
+        self.assertIsInstance(r, Rectangle)
         self.assertEqual(round(r.pmin.E), float(-20))
         self.assertEqual(round(r.pmin.N), float(10))
         self.assertEqual(round(r.pmax.E), float(-40))
@@ -154,7 +156,7 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         r.plot('g--')
         
         r.scale(1.5)
-        self.assertIsInstance(r, Geometrics.Rectangle)
+        self.assertIsInstance(r, Rectangle)
         self.assertEqual(round(r.pmin.E), float(-30))
         self.assertEqual(round(r.pmin.N), float(15))
         self.assertEqual(round(r.pmax.E), float(-60))
@@ -173,14 +175,14 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         
     def testPolygon(self):
         
-        poly = Geometrics.Polygon([0, 10, 10, 0, -10, -10], [0, 10, 30, 40, 30, 10])
+        poly = Polygon([0, 10, 10, 0, -10, -10], [0, 10, 30, 40, 30, 10])
         poly.plot()
         print (poly)
         
         self.trace2.plot()
         
         P2 = poly.copy()
-        self.assertIsInstance(P2, Geometrics.Polygon)
+        self.assertIsInstance(P2, Polygon)
         self.assertEqual(P2.X, poly.X)
         self.assertEqual(P2.Y, poly.Y)
         
@@ -189,13 +191,13 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         
         P2.translate(10, 5)
         P2.plot('g--')
-        self.assertIsInstance(P2, Geometrics.Polygon)
+        self.assertIsInstance(P2, Polygon)
         self.assertEqual(P2.X, [10, 20, 20, 10, 0, 0, 10])
         self.assertEqual(P2.Y, [5, 15, 35, 45, 35, 15, 5])
         
         P2.rotate(math.pi)
         P2.plot('b:')
-        self.assertIsInstance(P2, Geometrics.Polygon)
+        self.assertIsInstance(P2, Polygon)
         self.assertEqual(int(P2.X[0]), -10)
         self.assertEqual(int(P2.X[1]), -20)
         self.assertEqual(int(P2.X[2]), -20)
@@ -213,7 +215,7 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         
         P2.scale(0.2)
         P2.plot('b:')
-        self.assertIsInstance(P2, Geometrics.Polygon)
+        self.assertIsInstance(P2, Polygon)
         
         s = P2.area()
         self.assertEqual(s, 24.0)
@@ -238,14 +240,14 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         
         self.trace1.plot()
         
-        C1 = Geometrics.minCircle(self.trace1)
+        C1 = minCircle(self.trace1)
         C1.plot()
         self.assertLessEqual(abs(1 - C1.radius), self.__epsilon, "Rayon du cercle")
         self.assertIsInstance(C1.center, ENUCoords)
         self.assertLessEqual(abs(0 - C1.center.getX()), self.__epsilon, "coord x du centre cercle")
         self.assertLessEqual(abs(0 - C1.center.getY()), self.__epsilon, "coord y du centre cercle")
 
-        C2 = Geometrics.fitCircle(self.trace1)
+        C2 = fitCircle(self.trace1)
         C2.plot()
         self.assertLessEqual(abs(1 - C2.radius), self.__epsilon, "Rayon du cercle")
         self.assertIsInstance(C2.center, ENUCoords)
@@ -260,19 +262,19 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         self.trace2.plot()
         #plt.plot(track.getX(), track.getY(), 'b+')
         
-        circle1 = Geometrics.fitCircle(self.trace2)
-        self.assertIsInstance(circle1, Geometrics.Circle)
+        circle1 = fitCircle(self.trace2)
+        self.assertIsInstance(circle1, Circle)
         self.assertLessEqual(abs(28.363 - circle1.radius), self.__epsilon, "Rayon du cercle")
         self.assertIsInstance(circle1.center, ENUCoords)
         self.assertLessEqual(abs(-25.09 - circle1.center.getX()), self.__epsilon, "coord x du centre cercle")
         self.assertLessEqual(abs(14.79 - circle1.center.getY()), self.__epsilon, "coord y du centre cercle")
         circle1.plot()
         
-        circle2 = Geometrics.minCircle(self.trace2)
-        self.assertIsInstance(circle2, Geometrics.Circle)
+        circle2 = minCircle(self.trace2)
+        self.assertIsInstance(circle2, Circle)
         circle2.plot()
         
-        circle3 = Geometrics.minCircleMatrix(self.trace2)
+        circle3 = minCircleMatrix(self.trace2)
         self.assertEqual(circle3.size, 169)
         # ??
         
@@ -281,7 +283,7 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
 
     def testDiameter(self):
         
-        D = Geometrics.diameter(self.trace1)
+        D = diameter(self.trace1)
         A = self.trace1.getObs(D[1])
         B = self.trace1.getObs(D[2])
         self.assertEqual(D[0], 2)
@@ -291,7 +293,7 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         self.assertEqual(B.position.getX(), -1)
         self.assertEqual(B.position.getY(), 0)
         
-        D = Geometrics.diameter(self.trace2)
+        D = diameter(self.trace2)
         A = self.trace2.getObs(D[1])
         B = self.trace2.getObs(D[2])
         self.assertIsInstance(A, Obs)
@@ -302,8 +304,8 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
     def testConvexHull(self):
         
         self.trace3.plot()
-        T = Geometrics.convexHull(self.trace3)
-        Geometrics.plotPolygon(T)
+        T = convexHull(self.trace3)
+        plotPolygon(T)
         plt.show()
         self.assertEqual(len(T), 2*5)
         self.assertEqual(T[0], 0)
@@ -314,20 +316,20 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         self.assertEqual(T[7], -3)
 
         self.trace2.plot()
-        T = Geometrics.convexHull(self.trace2)
-        Geometrics.plotPolygon(T)
+        T = convexHull(self.trace2)
+        plotPolygon(T)
         plt.show()
         
         
     def testminimumBoundingRectangle(self):
         
         self.trace3.plot()
-        R = Geometrics.minimumBoundingRectangle(self.trace3)
+        R = minimumBoundingRectangle(self.trace3)
         T = []
         for coord in R[0]:
             T.append(coord[0])
             T.append(coord[1])
-        Geometrics.plotPolygon(T)
+        plotPolygon(T)
         
         self.assertEqual(R[1], 16.5)
         self.assertLessEqual(abs(3.104 - R[2]), self.__epsilon, "l")

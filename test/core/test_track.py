@@ -3,7 +3,7 @@ from unittest import TestCase, TestSuite, TextTestRunner
 
 from tracklib import (ENUCoords, ObsTime, Obs)
 from tracklib.core import (Track)
-from tracklib.algo.Geometrics import Polygon
+from tracklib.util import Polygon
 import tracklib.algo.Cinematics as Cinematics
 
 
