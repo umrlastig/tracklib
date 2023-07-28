@@ -3,13 +3,13 @@ Class to manage cinematic computations on GPS tracks
 """
 
 
-from tracklib import angleBetweenThreePoints
-from tracklib.algo.Analytics import BIAF_SPEED, speed
-from tracklib.algo.Analytics import BIAF_HEADING, heading
-from tracklib.algo.Analytics import BIAF_DS, ds
-from tracklib.algo.Analytics import BIAF_ABS_CURV
-from tracklib.algo.Analytics import anglegeom
-import tracklib.core.Operator as Operator
+from . import (anglegeom,
+               BIAF_SPEED, speed,
+               BIAF_HEADING, heading,
+               BIAF_DS, ds,
+               BIAF_ABS_CURV)
+from tracklib.core import Operator
+from tracklib.util import angleBetweenThreePoints
 
 
 def estimate_speed(track):
@@ -97,7 +97,7 @@ def computeAbsCurv(track):
     if not track.hasAnalyticalFeature(BIAF_DS):
         track.addAnalyticalFeature(ds, BIAF_DS)
     if not track.hasAnalyticalFeature(BIAF_ABS_CURV):
-        track.operate(Operator.Operator.INTEGRATOR, BIAF_DS, BIAF_ABS_CURV)
+        track.operate(Operator.INTEGRATOR, BIAF_DS, BIAF_ABS_CURV)
     track.removeAnalyticalFeature(BIAF_DS)
 
     return track.getAnalyticalFeature(BIAF_ABS_CURV)

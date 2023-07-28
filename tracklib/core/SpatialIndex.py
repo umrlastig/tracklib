@@ -6,11 +6,11 @@ import math
 import pickle
 import progressbar
 
-from tracklib import GeoCoords, ENUCoords, isSegmentIntersects
+from tracklib.core import (GeoCoords, ENUCoords, TrackCollection)
+from tracklib.util import isSegmentIntersects
 from tracklib.core.Bbox import Bbox
 from tracklib.core.Track import Track
 from tracklib.core.Network import Edge
-from tracklib.core.TrackCollection import TrackCollection
 import tracklib.plot.IPlotVisitor as ivisitor
 
 

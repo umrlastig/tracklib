@@ -8,8 +8,8 @@ import numpy as np
 import random
 import sys
 
-from tracklib import (ENUCoords, 
-                      right, inclusion, collinear, isSegmentIntersects,
+from tracklib.core import ENUCoords
+from tracklib.util import (right, inclusion, collinear, isSegmentIntersects,
                       transform, transform_inverse)
 
 MODE_ENCLOSING_BBOX = 0

@@ -2,10 +2,9 @@
 
 import random
 
-from tracklib import (ENUCoords, ObsTime, Obs)
+from tracklib.core import (ENUCoords, ObsTime, Obs, TrackCollection, Kernel)
 from tracklib.core.Track import Track
-from tracklib.core.TrackCollection import TrackCollection
-import tracklib.core.Kernel as Kernel
+
 
 # =========================================================================
 # Generate analytical track

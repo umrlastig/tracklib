@@ -228,7 +228,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         TRACES = []
         TRACES.append(self.trace1)
         TRACES.append(self.trace2)
-        collection = TrackCollection.TrackCollection(TRACES)
+        collection = TrackCollection(TRACES)
         self.plot()
         
         central = Comparison.centralTrack(collection)
@@ -245,7 +245,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         TRACES = []
         TRACES.append(self.trace1)
         TRACES.append(self.trace2)
-        collection = TrackCollection.TrackCollection(TRACES)
+        collection = TrackCollection(TRACES)
         self.plot()
         
         central = Comparison.centralTrack(collection, mode = "DTW")
@@ -263,7 +263,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         TRACES = []
         TRACES.append(self.trace1)
         TRACES.append(self.trace2)
-        collection = TrackCollection.TrackCollection(TRACES)
+        collection = TrackCollection(TRACES)
         self.plot()
         
         medoid = Comparison.medoid(collection, mode = "Hausdorff")

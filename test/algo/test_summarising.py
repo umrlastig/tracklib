@@ -4,10 +4,11 @@ from unittest import TestCase, TestSuite, TextTestRunner
 import matplotlib.pyplot as plt
 import os.path
 
-from tracklib import (Obs, ObsTime, ENUCoords)
-from tracklib.core import (Track, RasterBand, TrackCollection)
+from tracklib import (Obs, ObsTime, ENUCoords, TrackCollection,
+                      speed)
+#from tracklib.algo import (Analytics)
+from tracklib.core import (Track, RasterBand)
 from tracklib.io.TrackReader import TrackReader
-from tracklib.algo import (Analytics)
 from tracklib.algo import (Summarising) 
 
 
@@ -59,11 +60,11 @@ class TestSummarising(TestCase):
         
         TRACES.append(trace2)
         
-        collection = TrackCollection.TrackCollection(TRACES)
+        collection = TrackCollection(TRACES)
         
         # ---------------------------------------------------------------------
     
-        collection.addAnalyticalFeature(Analytics.speed)
+        collection.addAnalyticalFeature(speed)
         
         af_algos = ['speed', 'speed'] #, utils.stop_point]
         cell_operators = [Summarising.co_avg, Summarising.co_max] #, utils.sum]
@@ -75,7 +76,7 @@ class TestSummarising(TestCase):
         
         name = Summarising.getMeasureName('speed', Summarising.co_avg)
         self.assertEqual(name, 'speed#co_avg')
-        name = Summarising.getMeasureName(Analytics.speed, Summarising.co_avg)
+        name = Summarising.getMeasureName(speed, Summarising.co_avg)
         self.assertEqual(name, 'speed#co_avg')
                          
         grille = raster.getRasterBand(name)
@@ -150,7 +151,7 @@ class TestSummarising(TestCase):
         plt.show()
         
         
-        name2 = Summarising.getMeasureName(Analytics.speed, Summarising.co_max)
+        name2 = Summarising.getMeasureName(speed, Summarising.co_max)
         self.assertEqual(name2, 'speed#co_max')
         grille2 = raster.getRasterBand(name2)
         grille2.plotAsGraphic()
@@ -178,9 +179,9 @@ class TestSummarising(TestCase):
         # speed
         trace.estimate_speed()
         
-        collection = TrackCollection.TrackCollection([trace])
+        collection = TrackCollection([trace])
         
-        af_algos = [Analytics.speed, Analytics.speed, Analytics.speed]
+        af_algos = [speed, speed, speed]
         cell_operators = [Summarising.co_avg, Summarising.co_min, Summarising.co_max]
         marge = 0.000005
         raster = Summarising.summarize(collection, af_algos, cell_operators, margin = marge)
@@ -189,9 +190,9 @@ class TestSummarising(TestCase):
         raster.getRasterBand(0).summary()
         raster.plot(0)
 
-        raster.plot(Summarising.getMeasureName(Analytics.speed, Summarising.co_avg))
-        raster.plot(Summarising.getMeasureName(Analytics.speed, Summarising.co_min))
-        raster.plot(Summarising.getMeasureName(Analytics.speed, Summarising.co_max))
+        raster.plot(Summarising.getMeasureName(speed, Summarising.co_avg))
+        raster.plot(Summarising.getMeasureName(speed, Summarising.co_min))
+        raster.plot(Summarising.getMeasureName(speed, Summarising.co_max))
         plt.show()
         
         

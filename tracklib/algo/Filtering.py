@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from tracklib.core.Operator import Operator
+from tracklib.core import Operator
 from tracklib.algo.Dynamics import MODE_OBS_AND_STATES_AS_3D_POSITIONS
 from tracklib.algo.Dynamics import DYN_MAT_2D_CST_SPEED
 from tracklib.algo.Dynamics import HMM as dynamics_hmm

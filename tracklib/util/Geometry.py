@@ -39,7 +39,7 @@ import numpy as np
 # --------------------------------------------------------------------------
 # Circular import (not satisfying solution)
 # --------------------------------------------------------------------------
-from tracklib import ObsTime, Obs, makeCoords
+from tracklib.core import ObsTime, Obs, makeCoords
 
 
 def cartesienne(segment) -> list[float, float, float]:   

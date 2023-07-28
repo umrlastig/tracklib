@@ -13,20 +13,24 @@ import copy
 import numpy as np
 #import matplotlib.pyplot as plt
 
-from tracklib import (ObsTime, ENUCoords, Obs, 
-                      intersection,
-                      isnan,
-                      listify,
-                      NAN,
-                      isfloat,
-                      compLike)
+from tracklib.core import (ObsTime, ENUCoords, Obs, 
+                           isnan,
+                           listify,
+                           NAN,
+                           isfloat,
+                           compLike,
+                           TrackCollection,
+                           Operator,UnaryOperator,BinaryOperator,
+                           ScalarOperator,UnaryVoidOperator,BinaryVoidOperator,
+                           ScalarVoidOperator,
+                           DiracKernel)
+from tracklib.util import intersection
+from tracklib.algo import BIAF_SPEED, BIAF_ABS_CURV
+                      
 from tracklib.algo.Geometrics import Polygon
-from tracklib.core.TrackCollection import TrackCollection
 import tracklib.plot.IPlotVisitor as ivisitor
-import tracklib.core.Operator as Operator
 from tracklib.core.Bbox import Bbox
-from tracklib.core.Kernel import DiracKernel
-from tracklib.algo.Analytics import BIAF_SPEED, BIAF_ABS_CURV
+
 
 
 class Track:
@@ -291,10 +295,10 @@ class Track:
     def getCentroid(self):
         """TODO"""
         m = self.getObs(0).position.copy()
-        m.setX(self.operate(Operator.Operator.AVERAGER, "x"))
-        m.setY(self.operate(Operator.Operator.AVERAGER, "y"))
+        m.setX(self.operate(Operator.AVERAGER, "x"))
+        m.setY(self.operate(Operator.AVERAGER, "y"))
         if not isnan(m.getZ()):
-            m.setZ(self.operate(Operator.Operator.AVERAGER, 'z'))
+            m.setZ(self.operate(Operator.AVERAGER, 'z'))
         return m
 
     def getEnclosedPolygon(self):
@@ -303,27 +307,27 @@ class Track:
 
     def getMinX(self):
         """TODO"""
-        return self.operate(Operator.Operator.MIN, "x")
+        return self.operate(Operator.MIN, "x")
 
     def getMinY(self):
         """TODO"""
-        return self.operate(Operator.Operator.MIN, "y")
+        return self.operate(Operator.MIN, "y")
 
     def getMinZ(self):
         """TODO"""
-        return self.operate(Operator.Operator.MIN, "z")
+        return self.operate(Operator.MIN, "z")
 
     def getMaxX(self):
         """TODO"""
-        return self.operate(Operator.Operator.MAX, "x")
+        return self.operate(Operator.MAX, "x")
 
     def getMaxY(self):
         """TODO"""
-        return self.operate(Operator.Operator.MAX, "y")
+        return self.operate(Operator.MAX, "y")
 
     def getMaxZ(self):
         """TODO"""
-        return self.operate(Operator.Operator.MAX, "z")
+        return self.operate(Operator.MAX, "z")
 
     def getLowerLeftPoint(self):
         """TODO"""
@@ -1122,7 +1126,7 @@ class Track:
             return output
 
         # UnaryOperator
-        if isinstance(operator, Operator.UnaryOperator):
+        if isinstance(operator, UnaryOperator):
             if isinstance(arg1, str):
                 return operator.execute(self, arg1)
             output = [0] * len(arg1)
@@ -1131,7 +1135,7 @@ class Track:
             return output
 
         # BinaryOperator
-        if isinstance(operator, Operator.BinaryOperator):
+        if isinstance(operator, BinaryOperator):
             if isinstance(arg1, str):
                 return operator.execute(self, arg1, arg2)
             if len(arg1) != len(arg2):
@@ -1146,7 +1150,7 @@ class Track:
             return output
 
         # ScalarOperator
-        if isinstance(operator, Operator.ScalarOperator):
+        if isinstance(operator, ScalarOperator):
             if isinstance(arg1, str):
                 return operator.execute(self, arg1, arg2)
             output = [0] * len(arg1)
@@ -1155,7 +1159,7 @@ class Track:
             return output
 
         # UnaryVoidOperator
-        if isinstance(operator, Operator.UnaryVoidOperator):
+        if isinstance(operator, UnaryVoidOperator):
             if arg2 == None:
                 arg2 = arg1
             if isinstance(arg1, str):
@@ -1170,7 +1174,7 @@ class Track:
                 operator.execute(self, arg1[i], arg2[i])
 
         # BinaryVoidOperator
-        if isinstance(operator, Operator.BinaryVoidOperator):
+        if isinstance(operator, BinaryVoidOperator):
             if arg3 == None:
                 arg3 = arg1
             if isinstance(arg1, str):
@@ -1191,7 +1195,7 @@ class Track:
                 operator.execute(self, arg1[i], arg2[i], arg3[i])
 
         # ScalarVoidOperator
-        if isinstance(operator, Operator.ScalarVoidOperator):
+        if isinstance(operator, ScalarVoidOperator):
             if arg3 == None:
                 arg3 = arg1
             if isinstance(arg1, str):
@@ -1670,29 +1674,29 @@ class Track:
                         tmp.addObs(Obs(ENUCoords(0, 0, 0)))
                     tmp.createAnalyticalFeature("#tmp", AF)
                     if AGG[aggregator[af]] == "SUM":
-                        OUTPUT.append(tmp.operate(Operator.Operator.SUM, "#tmp"))
+                        OUTPUT.append(tmp.operate(Operator.SUM, "#tmp"))
                     if AGG[aggregator[af]] == "AVG":
-                        OUTPUT.append(tmp.operate(Operator.Operator.AVERAGER, "#tmp"))
+                        OUTPUT.append(tmp.operate(Operator.AVERAGER, "#tmp"))
                     if AGG[aggregator[af]] == "VAR":
-                        OUTPUT.append(tmp.operate(Operator.Operator.VARIANCE, "#tmp"))
+                        OUTPUT.append(tmp.operate(Operator.VARIANCE, "#tmp"))
                     if AGG[aggregator[af]] == "MEDIAN":
-                        OUTPUT.append(tmp.operate(Operator.Operator.MEDIAN, "#tmp"))
+                        OUTPUT.append(tmp.operate(Operator.MEDIAN, "#tmp"))
                     if AGG[aggregator[af]] == "MIN":
-                        OUTPUT.append(tmp.operate(Operator.Operator.MIN, "#tmp"))
+                        OUTPUT.append(tmp.operate(Operator.MIN, "#tmp"))
                     if AGG[aggregator[af]] == "MAX":
-                        OUTPUT.append(tmp.operate(Operator.Operator.MAX, "#tmp"))
+                        OUTPUT.append(tmp.operate(Operator.MAX, "#tmp"))
                     if AGG[aggregator[af]] == "RMSE":
-                        OUTPUT.append(tmp.operate(Operator.Operator.RMSE, "#tmp"))
+                        OUTPUT.append(tmp.operate(Operator.RMSE, "#tmp"))
                     if AGG[aggregator[af]] == "STDDEV":
-                        OUTPUT.append(tmp.operate(Operator.Operator.STDDEV, "#tmp"))
+                        OUTPUT.append(tmp.operate(Operator.STDDEV, "#tmp"))
                     if AGG[aggregator[af]] == "ARGMIN":
-                        OUTPUT.append(tmp.operate(Operator.Operator.ARGMIN, "#tmp"))
+                        OUTPUT.append(tmp.operate(Operator.ARGMIN, "#tmp"))
                     if AGG[aggregator[af]] == "ARGMAX":
-                        OUTPUT.append(tmp.operate(Operator.Operator.ARGMAX, "#tmp"))
+                        OUTPUT.append(tmp.operate(Operator.ARGMAX, "#tmp"))
                     if AGG[aggregator[af]] == "ZEROS":
-                        OUTPUT.append(tmp.operate(Operator.Operator.ZEROS, "#tmp"))
+                        OUTPUT.append(tmp.operate(Operator.ZEROS, "#tmp"))
                     if AGG[aggregator[af]] == "MAD":
-                        OUTPUT.append(tmp.operate(Operator.Operator.MAD, "#tmp"))
+                        OUTPUT.append(tmp.operate(Operator.MAD, "#tmp"))
 
             if len(OUTPUT) == 1:
                 return OUTPUT[0]
@@ -1770,11 +1774,11 @@ class Track:
         # Functional operator
         if operator == "@":
             out_af = "#" + str(temp_af_counter)
-            if op1 in Operator.Operator.NAMES_DICT_VOID:
-                self.operate(Operator.Operator.NAMES_DICT_VOID[op1], op2, out_af)
+            if op1 in Operator.NAMES_DICT_VOID:
+                self.operate(Operator.NAMES_DICT_VOID[op1], op2, out_af)
                 return out_af
-            if op1 in Operator.Operator.NAMES_DICT_NON_VOID:
-                out = self.operate(Operator.Operator.NAMES_DICT_NON_VOID[op1], op2)
+            if op1 in Operator.NAMES_DICT_NON_VOID:
+                out = self.operate(Operator.NAMES_DICT_NON_VOID[op1], op2)
                 self.createAnalyticalFeature(out_af, [out] * self.size())
                 return out_af
             print("Function '" + op1 + "' is unknown")
@@ -1786,14 +1790,14 @@ class Track:
         # [AF operator AF] case
         if op1IsAF and op2IsAF:
             out_af = "#" + str(temp_af_counter)
-            self.operate(Operator.Operator.NAMES_DICT_VOID[operator], op1, op2, out_af)
+            self.operate(Operator.NAMES_DICT_VOID[operator], op1, op2, out_af)
             return out_af
 
         # [AF operator float] case
         if op1IsAF and not op2IsAF:
             out_af = "#" + str(temp_af_counter)
             self.operate(
-                Operator.Operator.NAMES_DICT_VOID["s" + operator],
+                Operator.NAMES_DICT_VOID["s" + operator],
                 op1,
                 float(op2),
                 out_af,
@@ -1804,7 +1808,7 @@ class Track:
         if op2IsAF and not op1IsAF:
             out_af = "#" + str(temp_af_counter)
             self.operate(
-                Operator.Operator.NAMES_DICT_VOID["sr" + operator],
+                Operator.NAMES_DICT_VOID["sr" + operator],
                 op2,
                 float(op1),
                 out_af,
@@ -1891,11 +1895,11 @@ class Track:
         expression = Track.__specialOpChar(expression)
         expression = Track.__convertReflexOperator(expression)
         expression = Track.__unaryOp(expression)
-        for f_name in Operator.Operator.NAMES_DICT_VOID:
+        for f_name in Operator.NAMES_DICT_VOID:
             if f_name[-1] in ["+", "-", "*", "/", "^", "!"]:
                 continue
             expression = expression.replace(f_name + "(", f_name + "@(")
-        for f_name in Operator.Operator.NAMES_DICT_NON_VOID:
+        for f_name in Operator.NAMES_DICT_NON_VOID:
             if f_name[-1] in ["+", "-", "*", "/", "^"]:
                 continue
             expression = expression.replace(f_name + "(", f_name + "@(")
@@ -2032,9 +2036,9 @@ class Track:
             for i in range(1, n - 4):
                 portion = track.extract(i, i + 4)
                 d = portion.getCentroid().distance2DTo(init_center)
-                sdx = portion.operate(Operator.Operator.STDDEV, "x")
-                sdy = portion.operate(Operator.Operator.STDDEV, "y")
-                sdz = portion.operate(Operator.Operator.STDDEV, "z")
+                sdx = portion.operate(Operator.STDDEV, "x")
+                sdy = portion.operate(Operator.STDDEV, "y")
+                sdz = portion.operate(Operator.STDDEV, "z")
                 if d > parameter + (sdx * sdx + sdy * sdy + sdz * sdz) ** 0.5:
                     break
             if i == n - 5:
@@ -2045,9 +2049,9 @@ class Track:
             for i in range(n - 5, 5, -1):
                 portion = track.extract(i - 4, i)
                 d = portion.getCentroid().distance2DTo(init_center)
-                sdx = portion.operate(Operator.Operator.STDDEV, "x")
-                sdy = portion.operate(Operator.Operator.STDDEV, "y")
-                sdz = portion.operate(Operator.Operator.STDDEV, "z")
+                sdx = portion.operate(Operator.STDDEV, "x")
+                sdy = portion.operate(Operator.STDDEV, "y")
+                sdz = portion.operate(Operator.STDDEV, "z")
                 if d > parameter + math.sqrt(sdx * sdx + sdy * sdy + sdz * sdz) ** 0.5:
                     break
             if i == 5:

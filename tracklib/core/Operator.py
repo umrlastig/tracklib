@@ -6,9 +6,8 @@ import math
 import numpy as np
 from abc import abstractmethod
 
-from tracklib import NAN, isnan
-import tracklib.algo.Analytics as algoAF
-from tracklib.core.Kernel import Kernel
+from . import NAN, isnan, Kernel
+from tracklib.algo import addListToAF
 
 
 class UnaryOperator:
@@ -158,7 +157,7 @@ class Integrator(UnaryVoidOperator):
         temp = [0] * track.size()
         for i in range(1, track.size()):
             temp[i] = temp[i - 1] + track.getObsAnalyticalFeature(af_input, i)
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -180,7 +179,7 @@ class Differentiator(UnaryVoidOperator):
                 af_input, i
             ) - track.getObsAnalyticalFeature(af_input, i - 1)
         temp[0] = NAN
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -202,7 +201,7 @@ class ForwardFiniteDiff(UnaryVoidOperator):
                 af_input, i + 1
             ) - track.getObsAnalyticalFeature(af_input, i)
         temp[0] = NAN
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -224,7 +223,7 @@ class BackwardFiniteDiff(UnaryVoidOperator):
                 af_input, i + 1
             ) - track.getObsAnalyticalFeature(af_input, i)
         temp[0] = NAN
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -246,7 +245,7 @@ class CenteredFiniteDiff(UnaryVoidOperator):
                 af_input, i + 1
             ) - track.getObsAnalyticalFeature(af_input, i - 1)
         temp[0] = NAN
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -268,7 +267,7 @@ class SecondOrderFiniteDiff(UnaryVoidOperator):
             temp[i] -= 2 * track.getObsAnalyticalFeature(af_input, i)
             temp[i] += track.getObsAnalyticalFeature(af_input, i - 1)
         temp[0] = NAN
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -572,7 +571,7 @@ class Adder(BinaryVoidOperator):
             temp[i] = track.getObsAnalyticalFeature(
                 af_input1, i
             ) + track.getObsAnalyticalFeature(af_input2, i)
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -594,7 +593,7 @@ class Substracter(BinaryVoidOperator):
             temp[i] = track.getObsAnalyticalFeature(
                 af_input1, i
             ) - track.getObsAnalyticalFeature(af_input2, i)
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -615,7 +614,7 @@ class Multiplier(BinaryVoidOperator):
         for i in range(0, track.size()):
             temp[i] = track.getObsAnalyticalFeature(af_input1, i)
             temp[i] *= track.getObsAnalyticalFeature(af_input2, i)
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -640,7 +639,7 @@ class Divider(BinaryVoidOperator):
                 temp[i] = NAN
             else:
                 temp[i] = num / denom
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -662,7 +661,7 @@ class Power(BinaryVoidOperator):
             temp[i] = track.getObsAnalyticalFeature(
                 af_input1, i
             ) ** track.getObsAnalyticalFeature(af_input2, i)
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -684,7 +683,7 @@ class Modulo(BinaryVoidOperator):
             temp[i] = track.getObsAnalyticalFeature(
                 af_input1, i
             ) % track.getObsAnalyticalFeature(af_input2, i)
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -707,7 +706,7 @@ class Above(BinaryVoidOperator):
                 track.getObsAnalyticalFeature(af_input1, i)
                 > track.getObsAnalyticalFeature(af_input2, i)
             )
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -730,7 +729,7 @@ class Below(BinaryVoidOperator):
                 track.getObsAnalyticalFeature(af_input1, i)
                 < track.getObsAnalyticalFeature(af_input2, i)
             )
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -752,7 +751,7 @@ class QuadraticAdder(BinaryVoidOperator):
             temp[i] = track.getObsAnalyticalFeature(af_input1, i) ** 2
             temp[i] += track.getObsAnalyticalFeature(af_input2, i) ** 2
             temp[i] = temp[i] ** 0.5
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -778,7 +777,7 @@ class Derivator(BinaryVoidOperator):
                 af_input2, i
             ) - track.getObsAnalyticalFeature(af_input2, i - 1)
             temp[i] = df / dt
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -821,7 +820,7 @@ class PointwiseEqualer(BinaryVoidOperator):
                 track.getObsAnalyticalFeature(af_input1, i)
                 == track.getObsAnalyticalFeature(af_input2, i)
             ) * 1
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -841,7 +840,7 @@ class Convolution(BinaryVoidOperator):
         H = np.fft.fft(track[af_input1])
         G = np.fft.fft(track[af_input2])
         temp = np.abs(np.fft.ifft(H * np.conj(G)))
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 		
 class Correlator(BinaryVoidOperator):
@@ -861,7 +860,7 @@ class Correlator(BinaryVoidOperator):
         for i in range(0, track.size()):
             track.operate(Operator.SHIFT_CIRCULAR, af_input1, i, "temp") 
             temp[i] = track.operate(Operator.CORRELATION, "temp", af_input2)
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -1200,7 +1199,7 @@ class Shift(ScalarVoidOperator):
                 temp[i] = NAN
                 continue
             temp[i] = track.getObsAnalyticalFeature(af_input, int(i - number))
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -1213,7 +1212,7 @@ class ShiftCircular(ScalarVoidOperator):
         temp = [0] * track.size()
         for i in range(track.size()):
             temp[i] = track.getObsAnalyticalFeature(af_input, int((i-number)%track.size()))
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -1241,7 +1240,7 @@ class ScalarAdder(ScalarVoidOperator):
         temp = [0] * track.size()
         for i in range(0, track.size()):
             temp[i] = track.getObsAnalyticalFeature(af_input, i) + number
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -1254,7 +1253,7 @@ class ScalarSubstracter(ScalarVoidOperator):
         temp = [0] * track.size()
         for i in range(0, track.size()):
             temp[i] = track.getObsAnalyticalFeature(af_input, i) - number
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -1267,7 +1266,7 @@ class ScalarRevSubstracter(ScalarVoidOperator):
         temp = [0] * track.size()
         for i in range(0, track.size()):
             temp[i] = number - track.getObsAnalyticalFeature(af_input, i)
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -1280,7 +1279,7 @@ class ScalarMuliplier(ScalarVoidOperator):
         temp = [0] * track.size()
         for i in range(0, track.size()):
             temp[i] = track.getObsAnalyticalFeature(af_input, i) * number
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -1312,7 +1311,7 @@ class ScalarPower(ScalarVoidOperator):
         temp = [0] * track.size()
         for i in range(0, track.size()):
             temp[i] = track.getObsAnalyticalFeature(af_input, i) ** number
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -1325,7 +1324,7 @@ class ScalarModulo(ScalarVoidOperator):
         temp = [0] * track.size()
         for i in range(0, track.size()):
             temp[i] = track.getObsAnalyticalFeature(af_input, i) % number
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -1338,7 +1337,7 @@ class ScalarBelow(ScalarVoidOperator):
         temp = [0] * track.size()
         for i in range(0, track.size()):
             temp[i] = 0.0 + track.getObsAnalyticalFeature(af_input, i) < number
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -1351,7 +1350,7 @@ class ScalarRevBelow(ScalarVoidOperator):
         temp = [0] * track.size()
         for i in range(0, track.size()):
             temp[i] = 0.0 + number < track.getObsAnalyticalFeature(af_input, i)
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -1364,7 +1363,7 @@ class ScalarAbove(ScalarVoidOperator):
         temp = [0] * track.size()
         for i in range(0, track.size()):
             temp[i] = 0.0 + track.getObsAnalyticalFeature(af_input, i) > number
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -1377,7 +1376,7 @@ class ScalarRevAbove(ScalarVoidOperator):
         temp = [0] * track.size()
         for i in range(0, track.size()):
             temp[i] = 0.0 + number > track.getObsAnalyticalFeature(af_input, i)
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -1390,7 +1389,7 @@ class ScalarRevPower(ScalarVoidOperator):
         temp = [0] * track.size()
         for i in range(0, track.size()):
             temp[i] = number ** track.getObsAnalyticalFeature(af_input, i)
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -1403,7 +1402,7 @@ class ScalarRevModulo(ScalarVoidOperator):
         temp = [0] * track.size()
         for i in range(0, track.size()):
             temp[i] = number % track.getObsAnalyticalFeature(af_input, i)
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -1425,7 +1424,7 @@ class Apply(ScalarVoidOperator):
         temp = [0] * track.size()
         for i in range(0, track.size()):
             temp[i] = function(track.getObsAnalyticalFeature(af_input, i))
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -1488,7 +1487,7 @@ class Filter(ScalarVoidOperator):
             for i in range(track.size() - D, track.size()):
                 temp[i] = track.getObsAnalyticalFeature(af_input, i)
 
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -1541,7 +1540,7 @@ class Filter_FFT(ScalarVoidOperator):
             for i in range(track.size() - D, track.size()):
                 temp[i] = track.getObsAnalyticalFeature(af_input, i)
 
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 
@@ -1554,7 +1553,7 @@ class Random(ScalarVoidOperator):
         temp = [0] * track.size()
         for i in range(0, track.size()):
             temp[i] = probability() + track.getObsAnalyticalFeature(af_input, i)
-        algoAF.addListToAF(track, af_output, temp)
+        addListToAF(track, af_output, temp)
         return temp
 
 

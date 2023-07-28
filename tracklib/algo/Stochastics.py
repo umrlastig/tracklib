@@ -5,9 +5,11 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 
-from tracklib import Obs, listify, makeCovarianceMatrixFromKernel
-from tracklib.core.Kernel import Kernel, DiracKernel, GaussianKernel
-from tracklib.core.TrackCollection import TrackCollection
+from tracklib.core import (Obs, 
+                           listify, 
+                           makeCovarianceMatrixFromKernel,
+                           DiracKernel, GaussianKernel,
+                           TrackCollection)
 import tracklib.algo.Cinematics as Cinematics
 from tracklib.algo.Interpolation import (
     gaussian_process as interpolation_gaussian_process,

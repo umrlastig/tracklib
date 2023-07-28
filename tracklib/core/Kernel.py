@@ -27,16 +27,13 @@ An example of Kernel simplification with an
 
 # For type annotation
 from __future__ import annotations   
-from typing import Any, Union
+from typing import Any
 
 from collections.abc import Callable
 import sys
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-
-from tracklib.core.TrackCollection import TrackCollection
-
 
 class Kernel:
     """Generic kernel class"""
@@ -326,7 +323,7 @@ class ExperimentalKernel:
 
     The fitted kernel is returned as standard output.
     """
-
+    
     def __init__(self, dmax: float, method: str = "DTW", r: float = None):   
         """Constructor of Experimental kernel
 
@@ -348,6 +345,7 @@ class ExperimentalKernel:
 
     def addTrackPair(self, track1, track2):
         """TODO"""
+        from tracklib.core.TrackCollection import TrackCollection
         self.addTrackCollection(TrackCollection([track1, track2]))
 
     def addTrackCollection(self, trackCollection, verbose=False):

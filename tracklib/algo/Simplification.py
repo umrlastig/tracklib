@@ -6,8 +6,8 @@ import sys
 import math
 import numpy as np
 
-from tracklib import aire_visval, distance_to_segment
-import tracklib.core.Operator as Operator
+from tracklib.util import aire_visval, distance_to_segment
+from tracklib.core import Operator
 import tracklib.algo.Geometrics as Geometrics
 from tracklib.algo.Segmentation import (
     MODE_SEGMENTATION_MINIMIZE,
@@ -102,7 +102,7 @@ def visvalingam (track, eps):
     output = track.copy()
     output.addAnalyticalFeature(aire_visval, "@aire")
     while 1:
-        id = output.operate(Operator.Operator.ARGMIN, "@aire")
+        id = output.operate(Operator.ARGMIN, "@aire")
         if output.getObsAnalyticalFeature("@aire", id) > eps:
             break
         output.removeObs(id)

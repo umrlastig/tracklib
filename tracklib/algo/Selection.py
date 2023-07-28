@@ -64,12 +64,11 @@ General constraint syntax:
 
 import matplotlib.pyplot as plt
 
-from tracklib import (ENUCoords, GeoCoords, Obs, ObsTime,
-                      compLike,
-                      intersects,
-                      listify)
+from tracklib.core import (ENUCoords, GeoCoords, Obs, ObsTime,
+                      compLike, listify,
+                      TrackCollection)
+from tracklib.util import intersects
 from tracklib.core.Track import Track
-from tracklib.core.TrackCollection import TrackCollection
 from tracklib.algo.Geometrics import Rectangle
 
 

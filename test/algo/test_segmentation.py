@@ -5,9 +5,8 @@ import os.path
 import random as r
 import unittest
 
-from tracklib import (Obs, ObsTime, ENUCoords)
+from tracklib import (Obs, ObsTime, ENUCoords, heading)
 from tracklib.core.Track import Track
-import tracklib.algo.Analytics as Analytics
 from tracklib.algo.Segmentation import segmentation, split, splitAR
 from tracklib.algo.Segmentation import MODE_COMPARAISON_OR, MODE_COMPARAISON_AND
 from tracklib.algo.Segmentation import findStops, findStopsLocal, MODE_STOPS_LOCAL
@@ -35,7 +34,7 @@ class TestAlgoSegmentation(unittest.TestCase):
         trace.addObs(Obs(ENUCoords(4, 1, 0), ObsTime()))
         trace.addObs(Obs(ENUCoords(5, 1, 0), ObsTime()))
         
-        trace.addAnalyticalFeature(Analytics.heading)
+        trace.addAnalyticalFeature(heading)
         trace.createAnalyticalFeature('Temp', [39,30,37,35,45,40,30])
         
         #  Segmentation 1

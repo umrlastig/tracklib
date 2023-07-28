@@ -4,9 +4,8 @@ from __future__ import annotations
 from typing import Literal   
 
 
-from tracklib import ObsTime, makeCoords, Obs
+from tracklib.core import ObsTime, makeCoords, Obs, TrackCollection
 from tracklib.core.Track import Track
-from tracklib.core.TrackCollection import TrackCollection
 
 
 # import os # This is is needed in the pyqgis console also

@@ -27,9 +27,8 @@ from unittest import TestCase, TestSuite, TextTestRunner
 #import sys
 #sys.path.append('~/Bureau/KitYann/2-Tracklib/tracklib/tracklib')
 
-from tracklib import (ObsTime)
+from tracklib import (ObsTime, GaussianKernel)
 from tracklib.io.TrackReader import TrackReader
-from tracklib.core.Kernel import GaussianKernel
 import tracklib.algo.Interpolation as itp
 
 

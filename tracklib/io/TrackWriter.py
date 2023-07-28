@@ -9,12 +9,13 @@ import os
 import progressbar
 import sys 
 
-from tracklib import ObsTime, rgbToHex, interpColors
+from tracklib.core import (ObsTime, 
+                      rgbToHex, interpColors, 
+                      TrackCollection, Operator)
 from tracklib.io.TrackFormat import TrackFormat
 from tracklib.core.Network import Network
 from tracklib.core.Track import Track
-from tracklib.core.TrackCollection import TrackCollection
-import tracklib.core.Operator as Operator
+
 
 
 class TrackWriter:
@@ -293,8 +294,8 @@ class TrackWriter:
                 break
 
         if not af is None:
-            vmin = track.operate(Operator.Operator.MIN, af)
-            vmax = track.operate(Operator.Operator.MAX, af)
+            vmin = track.operate(Operator.MIN, af)
+            vmax = track.operate(Operator.MAX, af)
 
         default_color = c1
 

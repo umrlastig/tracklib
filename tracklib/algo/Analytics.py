@@ -2,11 +2,13 @@
 Algorithm to create Analytical features: ds, speed, abs_curv.
 """
 
-import math
-import numpy as np
 #from typing import Iterable, Literal, Union   
 
-from tracklib import NAN, angleBetweenThreePoints
+import math
+import numpy as np
+
+from tracklib.core import NAN
+from tracklib.util import angleBetweenThreePoints
 
 
 # Liste des AF algo intégrés à disposition

@@ -8,9 +8,9 @@ import progressbar
 import numpy as np
 import matplotlib.pyplot as plt
 
-from tracklib import dist_point_to_segment
+from tracklib.util import dist_point_to_segment
+from tracklib.core import TrackCollection
 
-from tracklib.core.TrackCollection import TrackCollection
 from tracklib.core.Track import Track
 import tracklib.algo.Cinematics as Cinematics
 import tracklib.algo.Dynamics as Dynamics

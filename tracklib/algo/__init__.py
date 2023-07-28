@@ -1,7 +1,10 @@
 """Tracklib algorithms"""
 
-"""
+
 from .Analytics import *
+
+
+"""
 from .Cinematics import *
 from .Comparison import *
 from .Dynamics import *

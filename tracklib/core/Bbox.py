@@ -9,7 +9,7 @@ from typing import Union
 import copy
 import matplotlib.pyplot as plt
 
-from tracklib import ENUCoords, GeoCoords, ECEFCoords
+from tracklib.core import ENUCoords, GeoCoords, ECEFCoords
 from tracklib.algo.Geometrics import Polygon
 
 

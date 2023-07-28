@@ -10,8 +10,8 @@ from matplotlib.patches import Ellipse
 from PIL import Image
 import sys
 
-from tracklib import NAN, getColorMap, isnan
-from tracklib.algo.Analytics import BIAF_ABS_CURV
+from tracklib.algo import BIAF_ABS_CURV
+from tracklib.core import NAN, getColorMap, isnan, Operator
 from tracklib.algo.Cinematics import computeAbsCurv
 
 
@@ -84,8 +84,6 @@ class Plot:
         On peut visualiser la valeur d'une AF avec une couleur sur les points.
         """
 
-        import tracklib.core.Operator as Operator
-
         if isinstance(append, bool):
             if append:
                 ax1 = plt.gca()
@@ -97,10 +95,10 @@ class Plot:
         X = self.track.getX()
         Y = self.track.getY()
 
-        xmin = self.track.operate(Operator.Operator.MIN, "x")
-        xmax = self.track.operate(Operator.Operator.MAX, "x")
-        ymin = self.track.operate(Operator.Operator.MIN, "y")
-        ymax = self.track.operate(Operator.Operator.MAX, "y")
+        xmin = self.track.operate(Operator.MIN, "x")
+        xmax = self.track.operate(Operator.MAX, "x")
+        ymin = self.track.operate(Operator.MIN, "y")
+        ymax = self.track.operate(Operator.MAX, "y")
 
         dx = xmax - xmin
         dy = ymax - ymin
@@ -154,8 +152,6 @@ class Plot:
     def __plotCircular(self, ax):
         
         from numpy import sin, pi, cos
-        import tracklib.core.Operator as Operator
-        
         import tracklib.algo.Cinematics as Cinematics
         Cinematics.computeAbsCurv(self.track)
         
@@ -183,8 +179,8 @@ class Plot:
         plt.text(r + decal, 0 - decal, 'E')
         
         T = self.track.getT()
-        tmin = self.track.operate(Operator.Operator.MIN, "t")
-        tmax = self.track.operate(Operator.Operator.MAX, "t")
+        tmin = self.track.operate(Operator.MIN, "t")
+        tmax = self.track.operate(Operator.MAX, "t")
         
         X1 = []
         X2 = []
@@ -365,8 +361,6 @@ class Plot:
                 "Error: pour le profil il faut respecter XXX_YYY_PROFIL avec YYY: ALTI, SPEED or existing AF"
             )
         
-        import tracklib.core.Operator as Operator
-
         tabplot = []
         tablegend = []
         nomaxes = template.split("_")
@@ -375,25 +369,25 @@ class Plot:
         if axe1 == "SPATIAL":
             computeAbsCurv(self.track)
             X = self.track.getAbsCurv()
-            xmin = self.track.operate(Operator.Operator.MIN, "abs_curv")
-            xmax = self.track.operate(Operator.Operator.MAX, "abs_curv")
+            xmin = self.track.operate(Operator.MIN, "abs_curv")
+            xmax = self.track.operate(Operator.MAX, "abs_curv")
             xtitle = "curvilinear abscissa"
         elif axe1 == "TEMPORAL":
             X = self.track.getT()
-            xmin = self.track.operate(Operator.Operator.MIN, "t")
-            xmax = self.track.operate(Operator.Operator.MAX, "t")
+            xmin = self.track.operate(Operator.MIN, "t")
+            xmax = self.track.operate(Operator.MAX, "t")
             xtitle = "timestamp"
 
         axe2 = nomaxes[1]
         if axe2 == "SPEED":
             Y = self.track.estimate_speed()
-            ymax = self.track.operate(Operator.Operator.MAX, "speed")
+            ymax = self.track.operate(Operator.MAX, "speed")
         elif axe2 == "ALTI":
             Y = self.track.getZ()
-            ymax = self.track.operate(Operator.Operator.MAX, "z")
+            ymax = self.track.operate(Operator.MAX, "z")
         else:
             Y = self.track.getAnalyticalFeature(axe2)
-            ymax = self.track.operate(Operator.Operator.MAX, axe2)
+            ymax = self.track.operate(Operator.MAX, axe2)
 
         tablegend.append("PROFIL")
 

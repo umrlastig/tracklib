@@ -3,7 +3,7 @@
 from typing import Literal   
 import matplotlib.pyplot as plt
 
-from tracklib import removeNan, listify, compLike
+from . import removeNan, listify, compLike
 
 
 class TrackCollection:

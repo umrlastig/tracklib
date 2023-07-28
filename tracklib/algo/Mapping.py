@@ -11,13 +11,14 @@ import progressbar
 import numpy as np
 #import matplotlib.pyplot as plt
 
-from tracklib import (ENUCoords, Obs,
-                      proj_polyligne)
+from tracklib.util import proj_polyligne
+from tracklib.core import (ENUCoords, Obs,
+                           TrackCollection,
+                           Operator)
 import tracklib.algo.Cinematics as Cinematics
 import tracklib.algo.Dynamics as Dynamics
-from tracklib.core.Operator import Operator
 from tracklib.core.Track import Track
-from tracklib.core.TrackCollection import TrackCollection
+
 
 # --------------------------------------------------------------------------
 # Utils function for map-matching

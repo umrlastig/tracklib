@@ -5,11 +5,10 @@ from unittest import TestCase, TestSuite, TextTestRunner
 import matplotlib.pyplot as plt
 import os.path
 
-from tracklib import (ObsTime)
+from tracklib import (ObsTime, GaussianKernel, Operator)
 from tracklib.io.TrackReader import TrackReader
 import tracklib.algo.Simplification as spf
-from tracklib.core.Operator import Operator
-from tracklib.core.Kernel import GaussianKernel # UniformKernel
+
 
 class TestSimplificationMethods(TestCase):
     

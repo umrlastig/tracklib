@@ -2,7 +2,7 @@
 
 import os.path
 
-from tracklib import ObsTime
+from tracklib.core import ObsTime
 
 
 class TrackFormat:

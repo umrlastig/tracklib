@@ -10,8 +10,9 @@ __version__ = '0.5.1'
 
 from tracklib.core import *
 from tracklib.util import *
+from tracklib.algo import *
 #from tracklib.io import *
-#from tracklib.algo import *
+
 
 
 

@@ -9,10 +9,12 @@ from numpy import pi
 #import tracklib
 #from tracklib.core import ENUCoords, Bbox, Polygon
 
-from tracklib import (Obs, ObsTime, ENUCoords, NAN)
+from tracklib import (Obs, ObsTime, ENUCoords, NAN,
+                      speed, acceleration, ds, heading, slope,
+                      anglegeom, orientation, calculAngleOriente)
 from tracklib.core import Track
-# import tracklib.core.Utils as utils
-import tracklib.algo.Analytics as Analytics
+
+
 
 
 class TestAlgoAnalyticsMethods(unittest.TestCase):
@@ -64,8 +66,8 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
         p4 = Obs(ENUCoords(0, 30, 0), ObsTime.readTimestamp("2018-01-01 10:00:30"))
         self.trace2.addObs(p4)
 		
-        self.trace2.addAnalyticalFeature(Analytics.speed)
-        self.trace2.addAnalyticalFeature(Analytics.acceleration)
+        self.trace2.addAnalyticalFeature(speed)
+        self.trace2.addAnalyticalFeature(acceleration)
         
         
         # ---------------------------------------------------------------------		
@@ -82,12 +84,12 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
         p4 = Obs(ENUCoords(0, 30, 0), ObsTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace3.addObs(p4)
 		
-        self.trace3.addAnalyticalFeature(Analytics.speed)
-        self.trace3.addAnalyticalFeature(Analytics.acceleration)
+        self.trace3.addAnalyticalFeature(speed)
+        self.trace3.addAnalyticalFeature(acceleration)
 		
 		
     def testDS(self):
-        self.trace3.addAnalyticalFeature(Analytics.ds)
+        self.trace3.addAnalyticalFeature(ds)
         ds30 = self.trace3.getObsAnalyticalFeature('ds', 0)
         self.assertEqual(ds30, 0)
         
@@ -102,7 +104,7 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
         
     def testHeading(self):
         
-        self.trace1.addAnalyticalFeature(Analytics.heading)
+        self.trace1.addAnalyticalFeature(heading)
         
         s0 = self.trace1.getObsAnalyticalFeature('heading', 0)
         s1 = self.trace1.getObsAnalyticalFeature('heading', 1)
@@ -176,33 +178,33 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
         
     def testOrientation(self):
         
-        a = Analytics.orientation(self.trace1, 0)
+        a = orientation(self.trace1, 0)
         self.assertEqual(a, 1)
 		
-        a = Analytics.orientation(self.trace1, self.trace1.size() - 1)
+        a = orientation(self.trace1, self.trace1.size() - 1)
         self.assertEqual(a, 1)
 		
-        a = Analytics.orientation(self.trace1, 1)
+        a = orientation(self.trace1, 1)
         self.assertEqual(a, 1)
         
-        a = Analytics.orientation(self.trace1, 2)
+        a = orientation(self.trace1, 2)
         self.assertEqual(a, 3)
         
-        a = Analytics.orientation(self.trace1, 3)
+        a = orientation(self.trace1, 3)
         self.assertEqual(a, 3)
 		
-        a = Analytics.orientation(self.trace1, 4)
+        a = orientation(self.trace1, 4)
         self.assertEqual(a, 5)
 		
-        a = Analytics.orientation(self.trace1, 5)
+        a = orientation(self.trace1, 5)
         self.assertEqual(a, 7)
 		
-        a = Analytics.orientation(self.trace1, 6)
+        a = orientation(self.trace1, 6)
         self.assertEqual(a, 3)
         
     def testSlope(self):
         
-        self.trace1.addAnalyticalFeature(Analytics.slope)
+        self.trace1.addAnalyticalFeature(slope)
         
         s0 = self.trace1.getObsAnalyticalFeature('slope', 0)
         s1 = self.trace1.getObsAnalyticalFeature('slope', 1)
@@ -223,55 +225,55 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
 		
     def testAngleGeom(self):
 		
-        a = Analytics.anglegeom(self.trace1, 0)
+        a = anglegeom(self.trace1, 0)
         self.assertEqual(math.isnan(a), math.isnan(NAN))
         
-        a = Analytics.anglegeom(self.trace1, self.trace1.size() - 1)
+        a = anglegeom(self.trace1, self.trace1.size() - 1)
         self.assertEqual(math.isnan(a), math.isnan(NAN))
 		
-        a = Analytics.anglegeom(self.trace1, 1)
+        a = anglegeom(self.trace1, 1)
         self.assertTrue(abs(a - pi/2) < 0.000001)
 		
-        a = Analytics.anglegeom(self.trace1, 2)
+        a = anglegeom(self.trace1, 2)
         self.assertTrue(abs(a - pi) < 0.000001)
         
-        a = Analytics.anglegeom(self.trace1, 3)
+        a = anglegeom(self.trace1, 3)
         self.assertTrue(abs(a - pi/2) < 0.000001)
 		
-        a = Analytics.anglegeom(self.trace1, 4)
+        a = anglegeom(self.trace1, 4)
         self.assertTrue(abs(a - pi/2) < 0.000001)
 		
-        a = Analytics.anglegeom(self.trace1, 5)
+        a = anglegeom(self.trace1, 5)
         self.assertTrue(abs(a - 0) < 0.000001)
 		
-        a = Analytics.anglegeom(self.trace1, 6)
+        a = anglegeom(self.trace1, 6)
         self.assertTrue(abs(a - pi/2) < 0.000001)
 		
 		
     def testCalculAngleOriente(self):
         
-        a = Analytics.calculAngleOriente(self.trace1, 0)
+        a = calculAngleOriente(self.trace1, 0)
         self.assertEqual(math.isnan(a), math.isnan(NAN))
 		
-        a = Analytics.calculAngleOriente(self.trace1, self.trace1.size() - 1)
+        a = calculAngleOriente(self.trace1, self.trace1.size() - 1)
         self.assertEqual(math.isnan(a), math.isnan(NAN))
 		
-        a = Analytics.calculAngleOriente(self.trace1, 1)
+        a = calculAngleOriente(self.trace1, 1)
         self.assertTrue(abs(a + 90) < 0.000001)
         
-        a = Analytics.calculAngleOriente(self.trace1, 2)
+        a = calculAngleOriente(self.trace1, 2)
         self.assertTrue(abs(a - 180) < 0.000001)
         
-        a = Analytics.calculAngleOriente(self.trace1, 3)
+        a = calculAngleOriente(self.trace1, 3)
         self.assertTrue(abs(a + 90) < 0.000001)
 		
-        a = Analytics.calculAngleOriente(self.trace1, 4)
+        a = calculAngleOriente(self.trace1, 4)
         self.assertTrue(abs(a + 90) < 0.000001)
 		
-        a = Analytics.calculAngleOriente(self.trace1, 5)
+        a = calculAngleOriente(self.trace1, 5)
         self.assertTrue(abs(a - 0) < 0.000001)
 		
-        a = Analytics.calculAngleOriente(self.trace1, 6)
+        a = calculAngleOriente(self.trace1, 6)
         self.assertTrue(abs(a - 90) < 0.000001)
 		
 		

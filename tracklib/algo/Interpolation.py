@@ -8,7 +8,7 @@ import sys
 import math
 import numpy as np
 
-from tracklib import (Obs, ENUCoords, ObsTime, 
+from tracklib.core import (Obs, ENUCoords, ObsTime, 
                       makeCovarianceMatrixFromKernelOld,
                       makeDistanceMatrixOld)
 

@@ -4,7 +4,7 @@ import math
 import progressbar
 import numpy as np
 
-from tracklib import makeCoords, unlistify
+from tracklib.core import makeCoords, unlistify
 import tracklib.algo.Stochastics as Stochastics
 
 MODE_OBS_AS_SCALAR = 0

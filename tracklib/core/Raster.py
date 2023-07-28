@@ -7,7 +7,7 @@ Class for defining a collection of RasterBand.
 from __future__ import annotations   
 from typing import Union
 
-from tracklib import listify
+from tracklib.core import listify
 import tracklib.core.RasterBand as grid
 
 

@@ -5,17 +5,16 @@ import math
 import progressbar
 import numpy as np
 
-from tracklib import (ENUCoords, Obs, isnan)
+from tracklib.core import (ENUCoords, Obs, isnan, TrackCollection, Operator)
+from tracklib.algo import acceleration
 from tracklib.algo.Geometrics import Circle, minCircle
 from tracklib.algo.Interpolation import ALGO_LINEAR, MODE_SPATIAL
-import tracklib.core.Operator as Operator
-from tracklib.algo.Analytics import acceleration
 
 # --------------------------------------------------------------------------
 # Circular import (not satisfying solution)
 # --------------------------------------------------------------------------
 from tracklib.core.Track import Track
-from tracklib.core.TrackCollection import TrackCollection
+
 
 
 MODE_COMPARAISON_AND = 1
@@ -210,7 +209,7 @@ def splitReturnTripExhaustive(track):
     min_val = 1e300
     argmin = 0
 
-    AVG = Operator.Operator.AVERAGER
+    AVG = Operator.AVERAGER
     for return_point in progressbar.progressbar(range(1, track.size() - 1)):
 
         T1 = track.extract(0, return_point)
@@ -327,9 +326,9 @@ def findStopsLocal(track, speed=1, duration=10):
     stops = Track()
     
     segmentation(track, "speed", "#mark", speed)
-    track.operate(Operator.Operator.DIFFERENTIATOR, "#mark")
-    track.operate(Operator.Operator.RECTIFIER, "#mark")
-    track.operate(Operator.Operator.SHIFT_LEFT, "#mark")
+    track.operate(Operator.DIFFERENTIATOR, "#mark")
+    track.operate(Operator.RECTIFIER, "#mark")
+    track.operate(Operator.SHIFT_LEFT, "#mark")
     #print (track.getAnalyticalFeature('#mark'))
                   
     segmentedTracks = split(track, "#mark")
@@ -356,12 +355,12 @@ def findStopsLocal(track, speed=1, duration=10):
         stops.addObs(Obs(center, trackWS.getFirstObs().timestamp.copy()))
             
         TMP_RADIUS.append(center)
-        TMP_MEAN_X.append(trackWS.operate(Operator.Operator.AVERAGER, "x"))
-        TMP_MEAN_Y.append(trackWS.operate(Operator.Operator.AVERAGER, "y"))
-        TMP_MEAN_Z.append(trackWS.operate(Operator.Operator.AVERAGER, "z"))
-        TMP_STD_X.append(trackWS.operate(Operator.Operator.STDDEV, "x"))
-        TMP_STD_Y.append(trackWS.operate(Operator.Operator.STDDEV, "y"))
-        TMP_STD_Z.append(trackWS.operate(Operator.Operator.STDDEV, "z"))
+        TMP_MEAN_X.append(trackWS.operate(Operator.AVERAGER, "x"))
+        TMP_MEAN_Y.append(trackWS.operate(Operator.AVERAGER, "y"))
+        TMP_MEAN_Z.append(trackWS.operate(Operator.AVERAGER, "z"))
+        TMP_STD_X.append(trackWS.operate(Operator.STDDEV, "x"))
+        TMP_STD_Y.append(trackWS.operate(Operator.STDDEV, "y"))
+        TMP_STD_Z.append(trackWS.operate(Operator.STDDEV, "z"))
         
         tab = trackWS.uid.split('.')
         TMP_IDSTART.append(tab[2])
@@ -384,7 +383,7 @@ def findStopsLocal(track, speed=1, duration=10):
     stops.createAnalyticalFeature("duration", TMP_DURATION)
     stops.createAnalyticalFeature("nb_points", TMP_NBPOINTS)
 
-    stops.operate(Operator.Operator.QUAD_ADDER, "sigma_x", "sigma_y", "rmse")
+    stops.operate(Operator.QUAD_ADDER, "sigma_x", "sigma_y", "rmse")
 
     return stops
 
@@ -443,12 +442,12 @@ def findStopsLocalWithAcceleration(track, diameter=20, duration=60):
             
                         stops.addObs(Obs(C.center, portion.getFirstObs().timestamp))
                         TMP_RADIUS.append(C.radius)
-                        TMP_MEAN_X.append(portion.operate(Operator.Operator.AVERAGER, "x"))
-                        TMP_MEAN_Y.append(portion.operate(Operator.Operator.AVERAGER, "y"))
-                        TMP_MEAN_Z.append(portion.operate(Operator.Operator.AVERAGER, "z"))
-                        TMP_STD_X.append(portion.operate(Operator.Operator.STDDEV, "x"))
-                        TMP_STD_Y.append(portion.operate(Operator.Operator.STDDEV, "y"))
-                        TMP_STD_Z.append(portion.operate(Operator.Operator.STDDEV, "z"))
+                        TMP_MEAN_X.append(portion.operate(Operator.AVERAGER, "x"))
+                        TMP_MEAN_Y.append(portion.operate(Operator.AVERAGER, "y"))
+                        TMP_MEAN_Z.append(portion.operate(Operator.AVERAGER, "z"))
+                        TMP_STD_X.append(portion.operate(Operator.STDDEV, "x"))
+                        TMP_STD_Y.append(portion.operate(Operator.STDDEV, "y"))
+                        TMP_STD_Z.append(portion.operate(Operator.STDDEV, "z"))
                         TMP_IDSTART.append(i)
                         TMP_IDEND.append(j)
                         TMP_NBPOINTS.append(j-i+1)
@@ -473,7 +472,7 @@ def findStopsLocalWithAcceleration(track, diameter=20, duration=60):
     stops.createAnalyticalFeature("duration", TMP_DURATION)
     stops.createAnalyticalFeature("nb_points", TMP_NBPOINTS)
 
-    stops.operate(Operator.Operator.QUAD_ADDER, "sigma_x", "sigma_y", "rmse")
+    stops.operate(Operator.QUAD_ADDER, "sigma_x", "sigma_y", "rmse")
 
     return stops
     
@@ -602,12 +601,12 @@ def findStopsGlobal(track, diameter=20, duration=60, downsampling=1, verbose=Tru
             
             stops.addObs(Obs(C.center, portion.getFirstObs().timestamp))
             TMP_RADIUS.append(C.radius)
-            TMP_MEAN_X.append(portion.operate(Operator.Operator.AVERAGER, "x"))
-            TMP_MEAN_Y.append(portion.operate(Operator.Operator.AVERAGER, "y"))
-            TMP_MEAN_Z.append(portion.operate(Operator.Operator.AVERAGER, "z"))
-            TMP_STD_X.append(portion.operate(Operator.Operator.STDDEV, "x"))
-            TMP_STD_Y.append(portion.operate(Operator.Operator.STDDEV, "y"))
-            TMP_STD_Z.append(portion.operate(Operator.Operator.STDDEV, "z"))
+            TMP_MEAN_X.append(portion.operate(Operator.AVERAGER, "x"))
+            TMP_MEAN_Y.append(portion.operate(Operator.AVERAGER, "y"))
+            TMP_MEAN_Z.append(portion.operate(Operator.AVERAGER, "z"))
+            TMP_STD_X.append(portion.operate(Operator.STDDEV, "x"))
+            TMP_STD_Y.append(portion.operate(Operator.STDDEV, "y"))
+            TMP_STD_Z.append(portion.operate(Operator.STDDEV, "z"))
             TMP_IDSTART.append(segmentation[i] * downsampling)
             TMP_IDEND.append((segmentation[i + 1] - 1) * downsampling)
             TMP_NBPOINTS.append(segmentation[i + 1] - segmentation[i])
@@ -628,7 +627,7 @@ def findStopsGlobal(track, diameter=20, duration=60, downsampling=1, verbose=Tru
     stops.createAnalyticalFeature("duration", TMP_DURATION)
     stops.createAnalyticalFeature("nb_points", TMP_NBPOINTS)
 
-    stops.operate(Operator.Operator.QUAD_ADDER, "sigma_x", "sigma_y", "rmse")
+    stops.operate(Operator.QUAD_ADDER, "sigma_x", "sigma_y", "rmse")
     stops.base = track.base
 
     return stops
@@ -675,9 +674,9 @@ def findStopsGlobalForRTK(
                 C[i, j] = 0
                 continue
             portion = track.extract(i, j - 1)
-            varx = portion.operate(Operator.Operator.VARIANCE, "x")
-            vary = portion.operate(Operator.Operator.VARIANCE, "y")
-            varz = portion.operate(Operator.Operator.VARIANCE, "z")
+            varx = portion.operate(Operator.VARIANCE, "x")
+            vary = portion.operate(Operator.VARIANCE, "y")
+            varz = portion.operate(Operator.VARIANCE, "z")
             C[i, j] = math.sqrt(varx + vary + varz)
             C[i, j] = (C[i, j] < std_max) * (j - i) ** 2
     C = C + np.transpose(C)
@@ -708,13 +707,13 @@ def findStopsGlobalForRTK(
         if radius == 0:
             continue
 
-        xm = portion.operate(Operator.Operator.AVERAGER, "x")
-        ym = portion.operate(Operator.Operator.AVERAGER, "y")
-        zm = portion.operate(Operator.Operator.AVERAGER, "z")
+        xm = portion.operate(Operator.AVERAGER, "x")
+        ym = portion.operate(Operator.AVERAGER, "y")
+        zm = portion.operate(Operator.AVERAGER, "z")
 
-        xv = portion.operate(Operator.Operator.VARIANCE, "x")
-        yv = portion.operate(Operator.Operator.VARIANCE, "y")
-        zv = portion.operate(Operator.Operator.VARIANCE, "z")
+        xv = portion.operate(Operator.VARIANCE, "x")
+        yv = portion.operate(Operator.VARIANCE, "y")
+        zv = portion.operate(Operator.VARIANCE, "z")
 
         pt = portion[0].position.copy()
         pt.setX(xm)
@@ -749,7 +748,7 @@ def findStopsGlobalForRTK(
     stops.createAnalyticalFeature("duration", TMP_DURATION)
     stops.createAnalyticalFeature("nb_points", TMP_NBPOINTS)
 
-    stops.operate(Operator.Operator.QUAD_ADDER, "sigma_x", "sigma_y", "rmse")
+    stops.operate(Operator.QUAD_ADDER, "sigma_x", "sigma_y", "rmse")
     stops.base = track.base
 
     return stops
