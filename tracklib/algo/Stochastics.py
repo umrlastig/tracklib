@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from tracklib import Obs, listify, makeCovarianceMatrixFromKernel
-from tracklib.core.Kernel import Kernel, DiracKernel
+from tracklib.core.Kernel import Kernel, DiracKernel, GaussianKernel
 from tracklib.core.TrackCollection import TrackCollection
 import tracklib.algo.Cinematics as Cinematics
 from tracklib.algo.Interpolation import (
@@ -249,7 +249,7 @@ def noise(
     return noised_track
 
 
-def randomizer(input, f, sigma=[7], kernel=[Kernel.GaussianKernel(650)], N=10):
+def randomizer(input, f, sigma=[7], kernel=[GaussianKernel(650)], N=10):
     """Randomizing traces for sensitivity analysis on output `f`
 
     :param input: a track, or list of tracks to be randomized
