@@ -11,7 +11,6 @@ from .Filtering import *
 
 
 """
-from .Geometrics import *
 from .Comparison import *
 from .Mapping import *
 from .Segmentation import *

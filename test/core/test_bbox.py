@@ -5,9 +5,8 @@ import unittest
 import math
 import matplotlib.pyplot as plt
 
-from tracklib import (ENUCoords)
+from tracklib import (ENUCoords, Polygon)
 from tracklib.core.Bbox import Bbox
-import tracklib.algo.Geometrics as Geometrics
 
 
 class TestBbox(unittest.TestCase):
@@ -35,7 +34,7 @@ class TestBbox(unittest.TestCase):
         self.assertFalse(emprise.contains(ENUCoords(3.45, 0.0)))
         self.assertFalse(emprise.contains(ENUCoords(0.0, 0.0)))
         
-        poly = Geometrics.Polygon([Xmin, Xmax, Xmax, Xmin, Xmin], [Ymin, Ymin, Ymax, Ymax, Ymin])
+        poly = Polygon([Xmin, Xmax, Xmax, Xmin, Xmin], [Ymin, Ymin, Ymax, Ymax, Ymin])
         self.assertEqual(emprise.geom().X, poly.X)
         self.assertEqual(emprise.geom().Y, poly.Y)
         

@@ -67,8 +67,7 @@ import matplotlib.pyplot as plt
 from tracklib.core import (ENUCoords, GeoCoords, Obs, ObsTime,
                       compLike, listify,
                       TrackCollection)
-from tracklib.util import intersects
-from tracklib.algo.Geometrics import Rectangle
+from tracklib.util import intersects, Rectangle
 
 from tracklib.core.Track import Track
 

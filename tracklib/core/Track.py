@@ -19,12 +19,11 @@ from . import (ObsTime, ENUCoords, Obs,
                compLike,
                TrackCollection,
                DiracKernel)
-from tracklib.util import intersection
+from tracklib.util import intersection, Polygon
 from tracklib.algo import BIAF_SPEED, BIAF_ABS_CURV
 from tracklib.plot import IPlotVisitor
                       
 from tracklib.core.Bbox import Bbox
-from tracklib.algo.Geometrics import Polygon
 from tracklib.core.operators import UnaryOperator, BinaryOperator, ScalarOperator
 from tracklib.core.operators import ScalarVoidOperator, BinaryVoidOperator, UnaryVoidOperator
 from tracklib.core.operators import Operator

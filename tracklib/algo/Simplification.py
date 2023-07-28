@@ -6,8 +6,9 @@ import sys
 import math
 import numpy as np
 
-from tracklib.util import aire_visval, distance_to_segment
-from tracklib.algo.Geometrics import boundingShape, MODE_ENCLOSING_MBR
+from tracklib.util import (aire_visval, 
+                           distance_to_segment,
+                           boundingShape, MODE_ENCLOSING_MBR)
 from tracklib.algo.Segmentation import (
     MODE_SEGMENTATION_MINIMIZE,
     MODE_SEGMENTATION_MAXIMIZE,

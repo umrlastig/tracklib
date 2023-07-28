@@ -9,7 +9,7 @@ import random
 import sys
 
 from tracklib.core import ENUCoords
-from tracklib.util import (right, inclusion, collinear, isSegmentIntersects,
+from . import (right, inclusion, collinear, isSegmentIntersects,
                       transform, transform_inverse)
 
 MODE_ENCLOSING_BBOX = 0
