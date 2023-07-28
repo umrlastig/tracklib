@@ -10,7 +10,8 @@ import copy
 import matplotlib.pyplot as plt
 
 from tracklib.core import ENUCoords, GeoCoords, ECEFCoords
-from tracklib.core.operators import Operator
+#from tracklib.core.operators import Operator
+from tracklib.algo.Geometrics import Polygon
 
 
 class Bbox:
