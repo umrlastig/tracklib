@@ -4,11 +4,28 @@
 
 #import matplotlib.pyplot as plt
 
-#from tracklib.core.ObsCoords import ENUCoords, GeoCoords, ECEFCoords
-#from tracklib.core.ObsTime import ObsTime
-#from tracklib.core.Obs import Obs
+
+__version__ = '0.5.1'
 
 
+#from tracklib.core import *
+#from tracklib.util import *
+#from tracklib.io import *
+#from tracklib.algo import *
+
+
+
+"""
+from tracklib.core.ObsCoords import ENUCoords, GeoCoords, ECEFCoords
+from tracklib.core.ObsTime import ObsTime
+from tracklib.core.Obs import Obs
+from tracklib.core.Track import Track
+from tracklib.core.TrackCollection import TrackCollection
+import tracklib.core.Utils as utils
+from tracklib.io.TrackFormat import TrackFormat
+
+from tracklib.io.TrackReader import TrackReader
+"""
 
 # -----------------------------------------------------------------------------
 #   LOGGING
@@ -34,7 +51,6 @@
 
 
 
-#from .core.Obs import Obs
 #from .core.Track import Track
 
 
