@@ -13,13 +13,13 @@ import numpy as np
 
 from tracklib.util import proj_polyligne
 from tracklib.core import (ENUCoords, Obs,
-                           TrackCollection,
-                           Operator)
+                           TrackCollection)
 from . import (HMM, 
                MODE_OBS_AS_2D_POSITIONS, 
                MODE_VERBOSE_PROGRESS,
                computeAbsCurv)
 from tracklib.core.Track import Track
+from tracklib.core.operators import Operator
 
 
 # --------------------------------------------------------------------------
