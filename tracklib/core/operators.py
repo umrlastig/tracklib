@@ -6,7 +6,7 @@ import math
 import numpy as np
 from abc import abstractmethod
 
-from . import NAN, isnan, addListToAF
+from . import NAN, isnan, addListToAF, Kernel
 
 
 class UnaryOperator:
@@ -1437,7 +1437,6 @@ class Filter(ScalarVoidOperator):
         # Preparing kernel
         # --------------------------------------------------------------
         boundary = False
-        from tracklib.core import Kernel
         if isinstance(kernel, Kernel):
             boundary = kernel.filterBoundary()
             if (str(kernel) == 'Dirac kernel'):
