@@ -13,7 +13,7 @@ import copy
 import numpy as np
 #import matplotlib.pyplot as plt
 
-import tracklib.core.operators
+
 from . import (ObsTime, ENUCoords, Obs, 
                isnan, listify, NAN, isfloat,
                compLike,
@@ -25,7 +25,9 @@ from tracklib.plot import IPlotVisitor
                       
 from tracklib.core.Bbox import Bbox
 from tracklib.algo.Geometrics import Polygon
-
+from tracklib.core.operators import UnaryOperator, BinaryOperator, ScalarOperator
+from tracklib.core.operators import ScalarVoidOperator, BinaryVoidOperator, UnaryVoidOperator
+from tracklib.core.operators import Operator
 
 class Track:
     """
@@ -289,10 +291,10 @@ class Track:
     def getCentroid(self):
         """TODO"""
         m = self.getObs(0).position.copy()
-        m.setX(self.operate(tracklib.core.operators.Operator.AVERAGER, "x"))
-        m.setY(self.operate(tracklib.core.operators.Operator.AVERAGER, "y"))
+        m.setX(self.operate(Operator.AVERAGER, "x"))
+        m.setY(self.operate(Operator.AVERAGER, "y"))
         if not isnan(m.getZ()):
-            m.setZ(self.operate(tracklib.core.operators.Operator.AVERAGER, 'z'))
+            m.setZ(self.operate(Operator.AVERAGER, 'z'))
         return m
 
     def getEnclosedPolygon(self):
@@ -301,27 +303,27 @@ class Track:
 
     def getMinX(self):
         """TODO"""
-        return self.operate(tracklib.core.operators.Operator.MIN, "x")
+        return self.operate(Operator.MIN, "x")
 
     def getMinY(self):
         """TODO"""
-        return self.operate(tracklib.core.operators.Operator.MIN, "y")
+        return self.operate(Operator.MIN, "y")
 
     def getMinZ(self):
         """TODO"""
-        return self.operate(tracklib.core.operators.Operator.MIN, "z")
+        return self.operate(Operator.MIN, "z")
 
     def getMaxX(self):
         """TODO"""
-        return self.operate(tracklib.core.operators.Operator.MAX, "x")
+        return self.operate(Operator.MAX, "x")
 
     def getMaxY(self):
         """TODO"""
-        return self.operate(tracklib.core.operators.Operator.MAX, "y")
+        return self.operate(Operator.MAX, "y")
 
     def getMaxZ(self):
         """TODO"""
-        return self.operate(tracklib.core.operators.Operator.MAX, "z")
+        return self.operate(Operator.MAX, "z")
 
     def getLowerLeftPoint(self):
         """TODO"""
@@ -1120,7 +1122,7 @@ class Track:
             return output
 
         # UnaryOperator
-        if isinstance(operator, tracklib.core.operators.UnaryOperator):
+        if isinstance(operator, UnaryOperator):
             if isinstance(arg1, str):
                 return operator.execute(self, arg1)
             output = [0] * len(arg1)
@@ -1129,7 +1131,7 @@ class Track:
             return output
 
         # BinaryOperator
-        if isinstance(operator, tracklib.core.operators.BinaryOperator):
+        if isinstance(operator, BinaryOperator):
             if isinstance(arg1, str):
                 return operator.execute(self, arg1, arg2)
             if len(arg1) != len(arg2):
@@ -1144,7 +1146,7 @@ class Track:
             return output
 
         # ScalarOperator
-        if isinstance(operator, tracklib.core.operators.ScalarOperator):
+        if isinstance(operator, ScalarOperator):
             if isinstance(arg1, str):
                 return operator.execute(self, arg1, arg2)
             output = [0] * len(arg1)
@@ -1153,7 +1155,7 @@ class Track:
             return output
 
         # UnaryVoidOperator
-        if isinstance(operator, tracklib.core.operators.UnaryVoidOperator):
+        if isinstance(operator, UnaryVoidOperator):
             if arg2 == None:
                 arg2 = arg1
             if isinstance(arg1, str):
@@ -1168,7 +1170,7 @@ class Track:
                 operator.execute(self, arg1[i], arg2[i])
 
         # BinaryVoidOperator
-        if isinstance(operator, tracklib.core.operators.BinaryVoidOperator):
+        if isinstance(operator, BinaryVoidOperator):
             if arg3 == None:
                 arg3 = arg1
             if isinstance(arg1, str):
@@ -1189,7 +1191,7 @@ class Track:
                 operator.execute(self, arg1[i], arg2[i], arg3[i])
 
         # ScalarVoidOperator
-        if isinstance(operator, tracklib.core.operators.ScalarVoidOperator):
+        if isinstance(operator, ScalarVoidOperator):
             if arg3 == None:
                 arg3 = arg1
             if isinstance(arg1, str):
