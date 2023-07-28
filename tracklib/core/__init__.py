@@ -9,13 +9,10 @@ from .Utils import *
 from .TrackCollection import *
 from .Kernel import *
 from .Bbox import *
-
-
-
+from .Raster import *
 
 """
 from .Track import *
 from .Network import *
 from .SpatialIndex import *
-from .Raster import *
 """

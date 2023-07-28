@@ -7,10 +7,12 @@
 
 # For type annotation
 from __future__ import annotations   
-#from typing import Union
 
-from tracklib.core import (ENUCoords, Bbox)
-from tracklib.core import (Raster)
+from tracklib.core import (ENUCoords, Bbox, 
+                           Raster, 
+                           NO_DATA_VALUE,
+                           DEFAULT_NAME,
+                           RasterBand)
 
 
 class RasterReader:
@@ -33,7 +35,7 @@ class RasterReader:
         ncols = 0
         
         cptrowheader = 0
-        novalue = Raster.NO_DATA_VALUE
+        novalue = NO_DATA_VALUE
         for line in lines:
             cle = line.split(" ")[0].strip()
             if cle in  ['ncols', 'nrows', 'xllcorner', 'yllcorner', 'cellsize', 'NODATA_value']:
@@ -69,9 +71,9 @@ class RasterReader:
         marge = 0
         
         if name == '':
-            name = Raster.DEFAULT_NAME
+            name = DEFAULT_NAME
             
-        grid = Raster.RasterBand(bbox, resolution=resolution, margin=marge, 
+        grid = RasterBand(bbox, resolution=resolution, margin=marge, 
                          novalue=novalue, name=name)
            
         return grid
@@ -128,7 +130,7 @@ class RasterReader:
         ncols = 0
         
         cptrowheader = 0
-        novalue = Raster.NO_DATA_VALUE
+        novalue = NO_DATA_VALUE
         for line in lines:
             cle = line.split(" ")[0].strip()
             if cle in  ['ncols', 'nrows', 'xllcorner', 'yllcorner', 'cellsize', 'NODATA_value']:
@@ -164,9 +166,9 @@ class RasterReader:
         marge = 0
         
         if name == '':
-            name = Raster.DEFAULT_NAME
+            name = DEFAULT_NAME
             
-        grid = Raster.RasterBand(bbox, resolution=resolution, margin=marge, 
+        grid = RasterBand(bbox, resolution=resolution, margin=marge, 
                          novalue=novalue, name=name)
            
         # Read the values
@@ -184,7 +186,7 @@ class RasterReader:
             i += 1
 
         # Return raster with one grid            
-        return Raster.Raster(grid)
+        return Raster(grid)
 
 
 #    @staticmethod

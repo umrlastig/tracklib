@@ -6,10 +6,8 @@ from typing import Union
 import math
 
 from tracklib.core import (listify, isnan, NAN,
-                           TrackCollection)
-from tracklib.core.Raster import Raster, RasterBand, NO_DATA_VALUE
-
-
+                           TrackCollection,
+                           Raster, RasterBand, NO_DATA_VALUE)
 
 def getMeasureName(af_algo:Union[int, str], aggregate=None):
     """
