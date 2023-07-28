@@ -7,13 +7,11 @@ Class for defining a collection of RasterBand.
 from __future__ import annotations   
 from typing import Union
 
-from tracklib.core import listify
-#import tracklib.core.RasterBand as grid
-
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
 
+from tracklib.core import listify
 from tracklib.core import ECEFCoords, ENUCoords, GeoCoords, getOffsetColorMap
 from tracklib.core.Bbox import Bbox
 
