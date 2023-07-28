@@ -18,7 +18,7 @@ from . import (HMM,
                MODE_OBS_AS_2D_POSITIONS, 
                MODE_VERBOSE_PROGRESS,
                computeAbsCurv)
-from tracklib.core.Track import Track
+from tracklib.core import Track
 from tracklib.core import Operator
 
 # --------------------------------------------------------------------------

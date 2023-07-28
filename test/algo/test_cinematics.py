@@ -8,7 +8,7 @@ import unittest
 
 from tracklib import (Obs, ObsTime, ENUCoords, getColorMap)
 from tracklib.algo import BIAF_ABS_CURV
-from tracklib.core.Track import Track
+from tracklib.core import Track
 import tracklib.algo.Cinematics as Cinematics
 
 

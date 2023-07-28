@@ -10,8 +10,7 @@ from tracklib.core import (GeoCoords, ENUCoords, TrackCollection)
 from tracklib.util import isSegmentIntersects
 from tracklib.plot import IPlotVisitor
 
-from tracklib.core.Bbox import Bbox
-from tracklib.core.Track import Track
+from tracklib.core import (Bbox, Track)
 from tracklib.core.Network import Edge
 
 

@@ -11,6 +11,7 @@ import numpy as np
 from tracklib.core import (Obs, ENUCoords, ObsTime, 
                       makeCovarianceMatrixFromKernelOld,
                       makeDistanceMatrixOld)
+from tracklib.core import Track
 
 MODE_SPATIAL = 1
 MODE_TEMPORAL = 2
@@ -25,11 +26,6 @@ B_SPLINE_DEGREE = 3
 B_SPLINE_RESOL = None
 GP_KERNEL = None
 GP_SMOOTHING = 0
-
-# --------------------------------------------------------------------------
-# Circular import (not satisfying solution)
-# --------------------------------------------------------------------------
-from tracklib.core.Track import Track
 
 
 def resample(track, delta, algo: Literal[1, 2, 3, 4] = 1, mode: Literal[1, 2] = 1):   
@@ -302,11 +298,12 @@ def __gaussian_process(track, TO, TU, kernel, factor, sigma, cp_var):
 # --------------------------------------------------------------------------
 def prepareTimeSampling(input, tini=None, tfin=None):
     """TODO"""
+    from tracklib.core import Track as TrackTracklib
     output = []
     if isinstance(input, list):
         for i in range(len(input)):
             output.append(input[i].toAbsTime())
-    if isinstance(input, Track):
+    if isinstance(input, TrackTracklib):
         for i in range(input.size()):
             output.append(input.getObs(i).timestamp.toAbsTime())
     if isinstance(input, int) or isinstance(input, float):

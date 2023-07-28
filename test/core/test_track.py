@@ -17,13 +17,13 @@ class TestTrack(TestCase):
         ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         
         # ---------------------------------------------------------------------
-        self.trace1 = Track.Track([], 1)
+        self.trace1 = Track([], 1)
         c1 = ENUCoords(1.0, 5.0, 0)
         p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace1.addObs(p1)
         
         # ---------------------------------------------------------------------
-        self.trace2 = Track.Track([], 1)
+        self.trace2 = Track([], 1)
         c1 = ENUCoords(1.0, 5.0, 0)
         p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace2.addObs(p1)
@@ -41,7 +41,7 @@ class TestTrack(TestCase):
         self.trace2.addObs(p4)
         
         # ---------------------------------------------------------------------
-        self.trace3 = Track.Track([], 1)
+        self.trace3 = Track([], 1)
         self.trace3.addObs(p1)
         self.trace3.addObs(p2)
         self.trace3.addObs(p3)
@@ -415,7 +415,7 @@ class TestTrack(TestCase):
         
         ObsTime.setReadFormat("2D/2M/4Y 2h:2m:2s")
         
-        track = Track.Track([], 1)
+        track = Track([], 1)
         p = Obs(ENUCoords(904145.257, 6435910.726, 1228.000), ObsTime.readTimestamp("01/01/1970 00:00:00"))
         track.addObs(p)
         p = Obs(ENUCoords(904135.886, 6435924.287, 1230.000), ObsTime.readTimestamp("01/01/1970 00:00:00"))

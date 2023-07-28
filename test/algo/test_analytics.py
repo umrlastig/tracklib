@@ -22,9 +22,9 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
     def setUp (self):
         
         ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
-        self.trace1 = Track.Track([], 1)
-        self.trace2 = Track.Track([], 1)
-        self.trace3 = Track.Track([], 1)
+        self.trace1 = Track([], 1)
+        self.trace2 = Track([], 1)
+        self.trace3 = Track([], 1)
 
         # ---------------------------------------------------------------------
 		

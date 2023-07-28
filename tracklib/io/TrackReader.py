@@ -13,7 +13,7 @@ from tracklib.core import (ObsTime, ENUCoords, ECEFCoords, GeoCoords, Obs,
                            islist, isfloat,
                            makeCoords,
                            TrackCollection)
-from tracklib.core.Track import Track
+from tracklib.core import Track
 from tracklib.io.TrackFormat import TrackFormat
 
 

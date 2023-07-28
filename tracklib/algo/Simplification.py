@@ -18,7 +18,7 @@ from tracklib.algo.Segmentation import (
 # --------------------------------------------------------------------------
 # Circular import (not satisfying solution)
 # --------------------------------------------------------------------------
-from tracklib.core.Track import Track
+from tracklib.core import Track
 
 
 MODE_SIMPLIFY_DOUGLAS_PEUCKER = 1

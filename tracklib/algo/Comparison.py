@@ -12,7 +12,7 @@ from tracklib.util import dist_point_to_segment
 from tracklib.core import TrackCollection
 from . import computeAbsCurv, synchronize, HMM, MODE_OBS_AS_2D_POSITIONS
 
-from tracklib.core.Track import Track
+from tracklib.core import Track
 
 
 MODE_COMPARAISON_NEAREST_NEIGHBOUR = 1

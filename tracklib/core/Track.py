@@ -1275,8 +1275,8 @@ class Track:
             - a reference track
         """
 
-        from tracklib.algo.Interpolation import resample as interpolation_resample
-        from tracklib.algo.Interpolation import MODE_SPATIAL as MODE_SPATIAL
+        from tracklib.algo import resample
+        from tracklib.algo import MODE_SPATIAL
 
         if delta is None:  # Number of points only is specified
             if npts is None:
@@ -1294,7 +1294,7 @@ class Track:
             print("Error: track data must be in ENU coordinates for resampling")
             exit()
 
-        interpolation_resample(self, delta, algo, mode)
+        resample(self, delta, algo, mode)
         self.__analyticalFeaturesDico = {}
 
     # =========================================================================

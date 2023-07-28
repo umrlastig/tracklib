@@ -5,7 +5,7 @@ from typing import Literal
 
 
 from tracklib.core import ObsTime, makeCoords, Obs, TrackCollection
-from tracklib.core.Track import Track
+from tracklib.core import Track
 
 
 # import os # This is is needed in the pyqgis console also

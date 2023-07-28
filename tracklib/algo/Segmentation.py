@@ -14,7 +14,7 @@ from tracklib.core import Operator
 # --------------------------------------------------------------------------
 # Circular import (not satisfying solution)
 # --------------------------------------------------------------------------
-from tracklib.core.Track import Track
+from tracklib.core import Track
 
 
 

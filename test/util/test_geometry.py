@@ -106,7 +106,7 @@ class TestGeometry(unittest.TestCase):
     def testProjPolyligne(self):
          
         ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
-        trace1 = Track.Track([], 1)
+        trace1 = Track([], 1)
 
         c1 = ENUCoords(0, 0, 0)
         p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 10:00:00"))
@@ -140,7 +140,7 @@ class TestGeometry(unittest.TestCase):
         
         # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         # 3eme CAS
-        trace1 = Track.Track([], 1)
+        trace1 = Track([], 1)
 
         c1 = ENUCoords(0, 0, 0)
         p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 10:00:00"))

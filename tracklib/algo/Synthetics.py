@@ -2,8 +2,12 @@
 
 import random
 
-from tracklib.core import (ENUCoords, ObsTime, Obs, TrackCollection, GaussianKernel)
-from tracklib.core.Track import Track
+from tracklib.core import (ENUCoords, 
+                           ObsTime, 
+                           Obs, 
+                           TrackCollection, 
+                           GaussianKernel,
+                           Track)
 
 
 # =========================================================================

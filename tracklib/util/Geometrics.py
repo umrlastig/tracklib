@@ -109,7 +109,7 @@ class Circle:
             DESCRIPTION.
 
         """
-        from tracklib.core.Track import Track
+        from tracklib.core import Track
         t = Track()
         for obs in track:
             if self.contains(obs.position):
@@ -228,7 +228,7 @@ class Rectangle:
             DESCRIPTION.
 
         """
-        from tracklib.core.Track import Track
+        from tracklib.core import Track
         t = Track()
         for obs in track:
             if self.contains(obs.position):
@@ -326,7 +326,7 @@ class Polygon:
             DESCRIPTION.
 
         """
-        from tracklib.core.Track import Track
+        from tracklib.core import Track
         t = Track()
         for obs in track:
             if self.contains(obs.position):

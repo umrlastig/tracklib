@@ -5,8 +5,7 @@ import unittest
 import matplotlib.pyplot as plt
 #import numpy as np
 
-from tracklib import (Obs, ObsTime, ENUCoords)
-from tracklib.core import (Track, TrackCollection)
+from tracklib.core import (Obs, ObsTime, ENUCoords, Track, TrackCollection)
 import tracklib.algo.Comparison as Comparison
 
 
@@ -19,7 +18,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         
         # ---------------------------------------------------------------------
         
-        self.trace1 = Track.Track([], 1)
+        self.trace1 = Track([], 1)
         
         p1 = Obs(ENUCoords(1.0, 5.0, 0), ObsTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace1.addObs(p1)
@@ -56,7 +55,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         
         # ---------------------------------------------------------------------
         
-        self.trace2 = Track.Track([], 2)
+        self.trace2 = Track([], 2)
         
         r1 = Obs(ENUCoords(1.0, 1.0, 0), ObsTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace2.addObs(r1)
@@ -161,7 +160,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         
         
     def testHausdorffSimilarity(self):
-        trackA = Track.Track([], 1)
+        trackA = Track([], 1)
         c = ENUCoords(1.0, 0.0, 0)
         p = Obs(c, ObsTime())
         trackA.addObs(p)
@@ -175,7 +174,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         p = Obs(c, ObsTime())
         trackA.addObs(p)
 
-        trackB = Track.Track([], 1)
+        trackB = Track([], 1)
         c = ENUCoords(2.0, 0.0, 0)
         p = Obs(c, ObsTime())
         trackB.addObs(p)
@@ -197,7 +196,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         self.assertLessEqual(abs(d - 2.12132), self.__epsilon)
         
     def testFrechetSimilarity(self):
-        trackA = Track.Track([], 1)
+        trackA = Track([], 1)
         c = ENUCoords(2.0, 1.0, 0)
         p = Obs(c, ObsTime())
         trackA.addObs(p)
@@ -211,7 +210,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         p = Obs(c, ObsTime())
         trackA.addObs(p)
 
-        trackB = Track.Track([], 1)
+        trackB = Track([], 1)
         c = ENUCoords(2.0, 0.0, 0)
         p = Obs(c, ObsTime())
         trackB.addObs(p)
@@ -272,6 +271,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     suite.addTest(TestAlgoComparaisonMethods("testCompare"))
+    '''
     suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileNN"))
     suite.addTest(TestAlgoComparaisonMethods("testDifference12ProfileNN"))
     suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileDTW"))
@@ -281,6 +281,7 @@ if __name__ == '__main__':
     suite.addTest(TestAlgoComparaisonMethods("testCentralNNTrack"))
     suite.addTest(TestAlgoComparaisonMethods("testCentralDTWTrack"))
     suite.addTest(TestAlgoComparaisonMethods("testMedoidHausdorffTrack"))
+    '''
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

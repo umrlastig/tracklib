@@ -17,7 +17,7 @@ from tracklib.core import (ECEFCoords, ENUCoords, GeoCoords,
                       Bbox)
 from tracklib.plot import IPlotVisitor
 import tracklib.algo.Simplification as Simplification
-from tracklib.core.Track import Track
+from tracklib.core import Track
 
 
 

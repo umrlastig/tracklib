@@ -21,7 +21,7 @@ class TestAlgoMappingMethods(unittest.TestCase):
     def getDataset1(self):
         ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         
-        trace = Track.Track([], 1)
+        trace = Track([], 1)
 
         c1 = ENUCoords(2, 1, 0)
         p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 10:00:01"))
@@ -69,7 +69,7 @@ class TestAlgoMappingMethods(unittest.TestCase):
         network = Network()
         
         # Segment 1
-        s1 = Track.Track([], 1)
+        s1 = Track([], 1)
         c1 = ENUCoords(0, 0, 0)
         p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         s1.addObs(p1)
@@ -87,7 +87,7 @@ class TestAlgoMappingMethods(unittest.TestCase):
         network.addEdge(edge, noeudIni, noeudFin)
             
         # Segment 2
-        s2 = Track.Track([], 2)
+        s2 = Track([], 2)
         c1 = ENUCoords(10, 0, 0)
         p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         s2.addObs(p1)
@@ -105,7 +105,7 @@ class TestAlgoMappingMethods(unittest.TestCase):
         network.addEdge(edge, noeudIni, noeudFin)
         
         # Segment 3
-        s3 = Track.Track([], 2)
+        s3 = Track([], 2)
         c1 = ENUCoords(10, 5, 0)
         p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         s3.addObs(p1)
@@ -123,7 +123,7 @@ class TestAlgoMappingMethods(unittest.TestCase):
         network.addEdge(edge, noeudIni, noeudFin)
         
         # Segment 4
-        s4 = Track.Track([], 2)
+        s4 = Track([], 2)
         c1 = ENUCoords(10, 0, 0)
         p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         s4.addObs(p1)
@@ -141,7 +141,7 @@ class TestAlgoMappingMethods(unittest.TestCase):
         network.addEdge(edge, noeudIni, noeudFin)
         
         # Segment 5
-        s5 = Track.Track([], 2)
+        s5 = Track([], 2)
         c1 = ENUCoords(20, 5, 0)
         p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         s5.addObs(p1)
@@ -159,7 +159,7 @@ class TestAlgoMappingMethods(unittest.TestCase):
         network.addEdge(edge, noeudIni, noeudFin)
             
         # Segment 6
-        s6 = Track.Track([], 2)
+        s6 = Track([], 2)
         c1 = ENUCoords(20, 0, 0)
         p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         s6.addObs(p1)

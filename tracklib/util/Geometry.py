@@ -363,7 +363,7 @@ def intersection(track1, track2, withTime=-1):
         print("Error: tracks must have same SRID to compute intersections")
         exit()
 
-    from tracklib.core.Track import Track
+    from tracklib.core import Track
     I = Track()
     TMP_I = []
     TMP_J = []

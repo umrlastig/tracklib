@@ -25,7 +25,7 @@ class TestSummarising(TestCase):
         TRACES = []
         
         # ---------------------------------------------------------------------
-        trace1 = Track.Track([], 1)
+        trace1 = Track([], 1)
         c1 = ENUCoords(10, 10, 0)
         p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         trace1.addObs(p1)
@@ -45,7 +45,7 @@ class TestSummarising(TestCase):
         TRACES.append(trace1)
         
         # ---------------------------------------------------------------------
-        trace2 = Track.Track([], 2)
+        trace2 = Track([], 2)
         c7 = ENUCoords(25, 10, 0)
         p7 = Obs(c7, ObsTime.readTimestamp("2018-01-01 10:00:15"))
         trace2.addObs(p7)

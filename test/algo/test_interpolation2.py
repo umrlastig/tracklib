@@ -18,7 +18,7 @@ class TestInterpolation2(TestCase):
         
         # ---------------------------------------------------------------------
         
-        self.trace1 = Track.Track([], 1)
+        self.trace1 = Track([], 1)
         
         c1 = ENUCoords(0.0, 0.0, 0)
         p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 10:00:00"))
@@ -38,7 +38,7 @@ class TestInterpolation2(TestCase):
         
         # ---------------------------------------------------------------------
         
-        self.trace2 = Track.Track([], 2)
+        self.trace2 = Track([], 2)
         
         d1 = ENUCoords(0.0, 1.0, 0)
         r1 = Obs(d1, ObsTime.readTimestamp("2018-01-01 10:01:00"))
