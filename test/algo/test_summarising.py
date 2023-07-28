@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 import os.path
 
 from tracklib import (Obs, ObsTime, ENUCoords, TrackCollection,
-                      speed)
-#from tracklib.algo import (Analytics)
-from tracklib.core import (Track, Raster)
+                      speed,
+                      RasterBand, NO_DATA_VALUE)
+from tracklib.core import (Track)
 from tracklib.io.TrackReader import TrackReader
 from tracklib.algo import (Summarising) 
 
@@ -80,9 +80,9 @@ class TestSummarising(TestCase):
         self.assertEqual(name, 'speed#co_avg')
                          
         grille = raster.getRasterBand(name)
-        self.assertIsInstance(grille, Raster.RasterBand)
+        self.assertIsInstance(grille, RasterBand)
         
-        self.assertEqual(grille.getNoDataValue(), Raster.NO_DATA_VALUE)
+        self.assertEqual(grille.getNoDataValue(), NO_DATA_VALUE)
         
         grille.plotAsGraphic()
         plt.show()
