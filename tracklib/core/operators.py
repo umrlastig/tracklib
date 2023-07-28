@@ -6,8 +6,7 @@ import math
 import numpy as np
 from abc import abstractmethod
 
-from . import NAN, isnan, Kernel
-from tracklib.core import addListToAF
+from . import NAN, isnan, Kernel, addListToAF
 
 
 class UnaryOperator:

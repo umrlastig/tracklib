@@ -21,7 +21,6 @@ from . import (HMM,
 from tracklib.core.Track import Track
 from tracklib.core.operators import Operator
 
-
 # --------------------------------------------------------------------------
 # Utils function for map-matching
 # --------------------------------------------------------------------------

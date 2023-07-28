@@ -2,7 +2,6 @@
 Class to manage cinematic computations on GPS tracks
 """
 
-
 from tracklib.util import angleBetweenThreePoints
 from . import (anglegeom,
                BIAF_SPEED, speed,

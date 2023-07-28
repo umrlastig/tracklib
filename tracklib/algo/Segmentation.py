@@ -5,7 +5,8 @@ import math
 import progressbar
 import numpy as np
 
-from tracklib.core import (ENUCoords, Obs, isnan, TrackCollection)
+from tracklib.core import (ENUCoords, Obs, isnan, 
+                           TrackCollection)
 from tracklib.util import Circle, minCircle
 from tracklib.algo import (acceleration, 
                            ALGO_LINEAR, MODE_SPATIAL)

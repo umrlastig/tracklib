@@ -11,22 +11,23 @@ import sys
 import math
 import copy
 import numpy as np
-#import matplotlib.pyplot as plt
-
 
 from . import (ObsTime, ENUCoords, Obs, 
                isnan, listify, NAN, isfloat,
                compLike,
                TrackCollection,
-               DiracKernel)
+               DiracKernel,
+               Bbox)
 from tracklib.util import intersection, Polygon
-from tracklib.algo import BIAF_SPEED, BIAF_ABS_CURV
 from tracklib.plot import IPlotVisitor
-                      
-from tracklib.core.Bbox import Bbox
-from tracklib.core.operators import UnaryOperator, BinaryOperator, ScalarOperator
-from tracklib.core.operators import ScalarVoidOperator, BinaryVoidOperator, UnaryVoidOperator
-from tracklib.core.operators import Operator
+from tracklib.algo import BIAF_SPEED, BIAF_ABS_CURV                      
+from tracklib.core.operators import (UnaryOperator, 
+                                    BinaryOperator, 
+                                    ScalarOperator,
+                                    ScalarVoidOperator, 
+                                    BinaryVoidOperator, 
+                                    UnaryVoidOperator,
+                                    Operator)
 
 class Track:
     """
