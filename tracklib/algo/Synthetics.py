@@ -1,14 +1,10 @@
 """Class to manage GPS tracks synthetic generations"""
 
-import math
 import random
 
-from tracklib.core.ObsCoords import ENUCoords
-from tracklib.core.Obs import Obs
+from tracklib import (ENUCoords, ObsTime, Obs)
 from tracklib.core.Track import Track
 from tracklib.core.TrackCollection import TrackCollection
-from tracklib.core.ObsTime import ObsTime
-
 import tracklib.core.Kernel as Kernel
 
 # =========================================================================

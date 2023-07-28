@@ -9,8 +9,8 @@
 from __future__ import annotations   
 #from typing import Union
 
+from tracklib import (ENUCoords)
 from tracklib.core import (Bbox, RasterBand, Raster)
-from tracklib.core.ObsCoords import (ENUCoords)
 
 
 class RasterReader:

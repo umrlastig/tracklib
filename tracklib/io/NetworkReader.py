@@ -7,9 +7,7 @@ import progressbar
 import requests
 from xml.dom import minidom
 
-from tracklib.core.ObsTime import ObsTime
-from tracklib.core.ObsCoords import ENUCoords, ECEFCoords, GeoCoords
-from tracklib.core.Obs import Obs
+from tracklib import ObsTime, ENUCoords, ECEFCoords, GeoCoords, Obs
 from tracklib.core.Track import Track
 from tracklib.core.Network import Network, Node, Edge
 from tracklib.core.SpatialIndex import SpatialIndex

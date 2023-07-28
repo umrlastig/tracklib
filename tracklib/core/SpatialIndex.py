@@ -6,14 +6,13 @@ import math
 import pickle
 import progressbar
 
+from tracklib import GeoCoords, ENUCoords, isSegmentIntersects
 from tracklib.core.Bbox import Bbox
 from tracklib.core.Track import Track
 from tracklib.core.Network import Edge
 from tracklib.core.TrackCollection import TrackCollection
-from tracklib.core.ObsCoords import GeoCoords, ENUCoords
-
 import tracklib.plot.IPlotVisitor as ivisitor
-import tracklib.util.Geometry as Geometry
+
 
 
 class SpatialIndex:
@@ -503,25 +502,25 @@ class SpatialIndex:
 
                 # traverse
                 segment1 = [i, j, i + 1, j]
-                if Geometry.isSegmentIntersects(segment1, segment2):
+                if isSegmentIntersects(segment1, segment2):
                     if (i, j) not in CELLS:
                         CELLS.append((i, j))
                     continue
 
                 segment1 = [i, j, i, j + 1]
-                if Geometry.isSegmentIntersects(segment1, segment2):
+                if isSegmentIntersects(segment1, segment2):
                     if (i, j) not in CELLS:
                         CELLS.append((i, j))
                     continue
 
                 segment1 = [i, j + 1, i + 1, j + 1]
-                if Geometry.isSegmentIntersects(segment1, segment2):
+                if isSegmentIntersects(segment1, segment2):
                     if (i, j) not in CELLS:
                         CELLS.append((i, j))
                     continue
 
                 segment1 = [i + 1, j, i + 1, j + 1]
-                if Geometry.isSegmentIntersects(segment1, segment2):
+                if isSegmentIntersects(segment1, segment2):
                     if (i, j) not in CELLS:
                         CELLS.append((i, j))
                     continue

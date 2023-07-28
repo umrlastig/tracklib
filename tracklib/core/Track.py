@@ -13,21 +13,19 @@ import copy
 import numpy as np
 #import matplotlib.pyplot as plt
 
-from tracklib.core.Obs import Obs
-from tracklib.core.ObsCoords import ENUCoords
-from tracklib.core.ObsTime import ObsTime
+from tracklib import (ObsTime, ENUCoords, Obs, 
+                      intersection,
+                      isnan,
+                      listify,
+                      NAN,
+                      isfloat,
+                      compLike)
 from tracklib.algo.Geometrics import Polygon
 from tracklib.core.TrackCollection import TrackCollection
-
 import tracklib.plot.IPlotVisitor as ivisitor
-import tracklib.core.Utils as Utils
 import tracklib.core.Operator as Operator
-
-from tracklib.util.Geometry import intersection
-
 from tracklib.core.Bbox import Bbox
 from tracklib.core.Kernel import DiracKernel
-
 from tracklib.algo.Analytics import BIAF_SPEED, BIAF_ABS_CURV
 
 
@@ -295,7 +293,7 @@ class Track:
         m = self.getObs(0).position.copy()
         m.setX(self.operate(Operator.Operator.AVERAGER, "x"))
         m.setY(self.operate(Operator.Operator.AVERAGER, "y"))
-        if not Utils.isnan(m.getZ()):
+        if not isnan(m.getZ()):
             m.setZ(self.operate(Operator.Operator.AVERAGER, 'z'))
         return m
 
@@ -392,7 +390,7 @@ class Track:
 
     def getAnalyticalFeatures(self, af_names):
         """TODO"""
-        af_names = Utils.listify(af_names)
+        af_names = listify(af_names)
         output = []
         for af in af_names:
             output.append(self.getAnalyticalFeature(af))
@@ -435,7 +433,7 @@ class Track:
 
     def getObsAnalyticalFeatures(self, af_names, i):
         """TODO"""
-        af_names = Utils.listify(af_names)
+        af_names = listify(af_names)
         output = []
         for af in af_names:
             output.append(self.getObsAnalyticalFeature(af, i))
@@ -947,7 +945,7 @@ class Track:
             try:
                 value = algorithm(self, i)
             except IndexError:
-                value = Utils.NAN
+                value = NAN
             self.getObs(i).features[idAF] = value
         
         return self.getAnalyticalFeature(name)
@@ -1490,7 +1488,7 @@ class Track:
         """TODO"""
 
         if operator == "LIKE":
-            return Utils.compLike(str(val1), val2)
+            return compLike(str(val1), val2)
 
         if isinstance(val1, int):
             val2 = int(val2)
@@ -1751,7 +1749,7 @@ class Track:
             return
 
         # Floating point operation
-        if Utils.isfloat(op1) and Utils.isfloat(op2):
+        if isfloat(op1) and isfloat(op2):
             op1 = float(op1)
             op2 = float(op2)
             if operator == "+":

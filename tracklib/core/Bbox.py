@@ -9,15 +9,15 @@ from typing import Union
 import copy
 import matplotlib.pyplot as plt
 
-from tracklib.core import ObsCoords as Coords
+from tracklib import ENUCoords, GeoCoords, ECEFCoords
 from tracklib.algo.Geometrics import Polygon
 
 
 class Bbox:
     """Class to represent a boundary box"""
 
-    def __init__(self, ll: Union[Coords.ENUCoords, Coords.ENUCoords, Coords.GeoCoords], 
-                 ur: Union[Coords.ENUCoords, Coords.ENUCoords, Coords.GeoCoords]):
+    def __init__(self, ll: Union[ENUCoords, ECEFCoords, GeoCoords], 
+                 ur: Union[ENUCoords, ECEFCoords, GeoCoords]):
         """Constructor of :class:`Bbox`
 
         :param ll: lower left point
@@ -45,7 +45,7 @@ class Bbox:
 
     def getLowerLeft(
         self,
-    ) -> Union[Coords.ENUCoords, Coords.ENUCoords, Coords.GeoCoords]:
+    ) -> Union[ENUCoords, ECEFCoords, GeoCoords]:
         """Return the lower-left coordinates of :class:`Bbox`
 
         :return: Lower-left coordinates
@@ -54,7 +54,7 @@ class Bbox:
 
     def getUpperRight(
         self,
-    ) -> Union[Coords.ENUCoords, Coords.ENUCoords, Coords.GeoCoords]:
+    ) -> Union[ENUCoords, ECEFCoords, GeoCoords]:
         """Return the upper-right coordinates of :class:`Bbox`
 
         :return: Upper-right coordinates
@@ -209,7 +209,7 @@ class Bbox:
         ]
         return Polygon(X, Y)
 
-    def toECEFCoords(self, base: Union[Coords.ENUCoords, Coords.ENUCoords, Coords.GeoCoords] = None):
+    def toECEFCoords(self, base: Union[ENUCoords, ECEFCoords, GeoCoords] = None):
         """Coordinate transformation to :class:`core.Coords.ECEFCoords`
 
         :param base: base coordinates, defaults to None
@@ -217,7 +217,7 @@ class Bbox:
         self.ll.toECEFCoords(base)
         self.ur.toECEFCoords(base)
 
-    def toGeoCoords(self, base: Union[Coords.ENUCoords, Coords.ENUCoords, Coords.GeoCoords] = None):
+    def toGeoCoords(self, base: Union[ENUCoords, ECEFCoords, GeoCoords] = None):
         """Coordinate transformation to :class:`core.Coords.GeoCoords`
 
         :param base: base coordinates, defaults to None
@@ -225,7 +225,7 @@ class Bbox:
         self.ll.toGeoCoords(base)
         self.ur.toGeoCoords(base)
 
-    def toENUCoords(self, base: Union[Coords.ENUCoords, Coords.ENUCoords, Coords.GeoCoords] = None):
+    def toENUCoords(self, base: Union[ENUCoords, ECEFCoords, GeoCoords] = None):
         """Coordinate transformation to :class:`core.Coords.ENUCoords`
 
         :param base: base coordinates, defaults to None

@@ -12,9 +12,8 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
 
+from tracklib import ECEFCoords, ENUCoords, GeoCoords, getOffsetColorMap
 from tracklib.core.Bbox import Bbox
-from tracklib.core.ObsCoords import ECEFCoords, ENUCoords, GeoCoords
-import tracklib.core.Utils as utils
 
 NO_DATA_VALUE = -9999
 DEFAULT_NAME = 'grid'
@@ -252,7 +251,7 @@ class RasterBand:
         if self.getNoDataValue() != None:
             tab[tab == self.getNoDataValue()] = np.nan
 
-        cmap = utils.getOffsetColorMap(color1, color2, 0)
+        cmap = getOffsetColorMap(color1, color2, 0)
         cmap.set_bad(color=novaluecolor)
         
         im = ax1.imshow(tab, cmap=cmap)

@@ -6,9 +6,7 @@ import math
 import numpy as np
 #from typing import Iterable, Literal, Union   
 
-#from tracklib.core.Track import Track
-import tracklib.core.Utils as utils
-from tracklib.util.Geometry import angleBetweenThreePoints
+from tracklib import NAN, angleBetweenThreePoints
 
 
 # Liste des AF algo intégrés à disposition
@@ -68,7 +66,7 @@ def speed(track, i):
         ds0 = track.getObs(1).position.distance2DTo(track.getObs(0).position)
         dt0 = track.getObs(1).timestamp - track.getObs(0).timestamp
         if dt0 == 0:
-            return utils.NAN
+            return NAN
         else:
             return ds0 / dt0
 
@@ -78,7 +76,7 @@ def speed(track, i):
         dsN = track.getObs(N - 1).position.distance2DTo(track.getObs(N - 2).position)
         dtN = track.getObs(N - 1).timestamp - track.getObs(N - 2).timestamp
         if dtN == 0:
-            return utils.NAN
+            return NAN
         else:
             return dsN / dtN
 
@@ -89,7 +87,7 @@ def speed(track, i):
     # La vitesse est obtenue en divisant la distance entre deux points successifs
     # par le temps les séparant
     if dt == 0:
-        return utils.NAN
+        return NAN
     else:
         return ds / dt
 
@@ -100,7 +98,7 @@ def acceleration(track, i):
     """
 
     if i == 0:
-        return utils.NAN
+        return NAN
 
     N = track.size()
     if i == N - 1:
@@ -108,14 +106,14 @@ def acceleration(track, i):
         dt = track.getObs(i).timestamp - track.getObs(i - 1).timestamp
 
         if dt == 0:
-            return utils.NAN
+            return NAN
         return d / dt
 
     d = speed(track, i + 1) - speed(track, i - 1)
     dt = track.getObs(i + 1).timestamp - track.getObs(i - 1).timestamp
 
     if dt == 0:
-        return utils.NAN
+        return NAN
 
     return d / dt
 
@@ -123,7 +121,7 @@ def acceleration(track, i):
 def slope(track, i):
     
     if i == 0:
-        return utils.NAN
+        return NAN
     
     z2 = track.getObs(i).position.getZ()
     z1 = track.getObs(i-1).position.getZ()
@@ -132,7 +130,7 @@ def slope(track, i):
     #print (rise, run)
     
     if run <= 0:
-        return utils.NAN
+        return NAN
     
     # return rise/run * 100
     return math.atan(rise/run)*180/np.pi
@@ -148,11 +146,11 @@ def anglegeom(track, i) -> float:
     :return: Angle abc (degrees)
     """
     if i == 0:
-        return utils.NAN
+        return NAN
 
     N = track.size()
     if i == N - 1:
-        return utils.NAN
+        return NAN
     
     return angleBetweenThreePoints(track.getObs(i-1), track.getObs(i), track.getObs(i+1))
 
@@ -161,11 +159,11 @@ def calculAngleOriente(track, i):
     """Mesure l'angle orienté dans le sens trigonométrique abc."""
 
     if i == 0:
-        return utils.NAN
+        return NAN
 
     N = track.size()
     if i == N - 1:
-        return utils.NAN
+        return NAN
 
     a = track.getObs(i - 1).position
     b = track.getObs(i).position
@@ -210,7 +208,7 @@ def orientation(track, i):
     }
     # 1:E, 2:NE, 3:N, 4:NW, 5:W, 6:SW, 7:S, 8:SE
 
-    cap = utils.NAN
+    cap = NAN
 
     if i == 0:
         # On calcule pour le point1 et on prend cette valeur
@@ -232,7 +230,7 @@ def orientation(track, i):
     #print (angle)
 
     # On convertit la valeur calculée en orientation relative
-    cap = utils.NAN
+    cap = NAN
 
     for direction in orientation_dictionnary:
         binf = orientation_dictionnary[direction][0]

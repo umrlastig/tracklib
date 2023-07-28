@@ -5,11 +5,8 @@ import math
 import progressbar
 import numpy as np
 
-from tracklib.core.Obs import Obs
-from tracklib.core.ObsCoords import ENUCoords
+from tracklib import (ENUCoords, Obs, isnan)
 from tracklib.algo.Geometrics import Circle, minCircle
-
-import tracklib.core.Utils as utils
 from tracklib.algo.Interpolation import ALGO_LINEAR, MODE_SPATIAL
 import tracklib.core.Operator as Operator
 from tracklib.algo.Analytics import acceleration
@@ -69,7 +66,7 @@ def segmentation(track, afs_input, af_output,
             current_value = track.getObsAnalyticalFeature(af_input, i)
 
             # on compare uniquement si on peut
-            if not utils.isnan(current_value):
+            if not isnan(current_value):
 
                 seuil_max = sys.float_info.max
                 if thresholds_max != None and len(thresholds_max) >= index:

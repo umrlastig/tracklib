@@ -6,8 +6,8 @@ import math
 import numpy as np
 from abc import abstractmethod
 
+from tracklib import NAN, isnan
 import tracklib.algo.Analytics as algoAF
-import tracklib.core.Utils as utils
 from tracklib.core.Kernel import Kernel
 
 
@@ -179,7 +179,7 @@ class Differentiator(UnaryVoidOperator):
             temp[i] = track.getObsAnalyticalFeature(
                 af_input, i
             ) - track.getObsAnalyticalFeature(af_input, i - 1)
-        temp[0] = utils.NAN
+        temp[0] = NAN
         algoAF.addListToAF(track, af_output, temp)
         return temp
 
@@ -201,7 +201,7 @@ class ForwardFiniteDiff(UnaryVoidOperator):
             temp[i] = track.getObsAnalyticalFeature(
                 af_input, i + 1
             ) - track.getObsAnalyticalFeature(af_input, i)
-        temp[0] = utils.NAN
+        temp[0] = NAN
         algoAF.addListToAF(track, af_output, temp)
         return temp
 
@@ -223,7 +223,7 @@ class BackwardFiniteDiff(UnaryVoidOperator):
             temp[i] = track.getObsAnalyticalFeature(
                 af_input, i + 1
             ) - track.getObsAnalyticalFeature(af_input, i)
-        temp[0] = utils.NAN
+        temp[0] = NAN
         algoAF.addListToAF(track, af_output, temp)
         return temp
 
@@ -245,7 +245,7 @@ class CenteredFiniteDiff(UnaryVoidOperator):
             temp[i] = track.getObsAnalyticalFeature(
                 af_input, i + 1
             ) - track.getObsAnalyticalFeature(af_input, i - 1)
-        temp[0] = utils.NAN
+        temp[0] = NAN
         algoAF.addListToAF(track, af_output, temp)
         return temp
 
@@ -267,7 +267,7 @@ class SecondOrderFiniteDiff(UnaryVoidOperator):
             temp[i] = track.getObsAnalyticalFeature(af_input, i + 1)
             temp[i] -= 2 * track.getObsAnalyticalFeature(af_input, i)
             temp[i] += track.getObsAnalyticalFeature(af_input, i - 1)
-        temp[0] = utils.NAN
+        temp[0] = NAN
         algoAF.addListToAF(track, af_output, temp)
         return temp
 
@@ -637,7 +637,7 @@ class Divider(BinaryVoidOperator):
             num = track.getObsAnalyticalFeature(af_input1, i)
             denom = track.getObsAnalyticalFeature(af_input2, i)
             if denom == 0:
-                temp[i] = utils.NAN
+                temp[i] = NAN
             else:
                 temp[i] = num / denom
         algoAF.addListToAF(track, af_output, temp)
@@ -962,7 +962,7 @@ class Sum(UnaryOperator):
         somme = 0
         for i in range(track.size()):
             val = track.getObsAnalyticalFeature(af_input, i)
-            if utils.isnan(val):
+            if isnan(val):
                 continue
             somme += track.getObsAnalyticalFeature(af_input, i)
         return somme
@@ -977,7 +977,7 @@ class Averager(UnaryOperator):
         count = 0
         for i in range(track.size()):
             val = track.getObsAnalyticalFeature(af_input, i)
-            if utils.isnan(val):
+            if isnan(val):
                 continue
             count += 1
             mean += track.getObsAnalyticalFeature(af_input, i)
@@ -994,7 +994,7 @@ class Variance(UnaryOperator):
         var = 0
         for i in range(track.size()):
             val = track.getObsAnalyticalFeature(af_input, i)
-            if utils.isnan(val):
+            if isnan(val):
                 continue
             count += 1
             var += (track.getObsAnalyticalFeature(af_input, i) - mean) ** 2
@@ -1018,7 +1018,7 @@ class Mse(UnaryOperator):
         count = 0
         for i in range(track.size()):
             val = track.getObsAnalyticalFeature(af_input, i)
-            if utils.isnan(val):
+            if isnan(val):
                 continue
             count += 1
             mse += track.getObsAnalyticalFeature(af_input, i) ** 2
@@ -1041,7 +1041,7 @@ class Mad(UnaryOperator):
         AD = []
         for i in range(track.size()):
             val = track.getObsAnalyticalFeature(af_input, i)
-            if utils.isnan(val):
+            if isnan(val):
                 continue
             AD.append(abs(val))
         sort_index = np.argsort(np.array(AD))
@@ -1071,7 +1071,7 @@ class Covariance(BinaryOperator):
         for i in range(track.size()):
             x1 = track.getObsAnalyticalFeature(af_input1, i)
             x2 = track.getObsAnalyticalFeature(af_input2, i)
-            if utils.isnan(x1) or utils.isnan(x2):
+            if isnan(x1) or isnan(x2):
                 continue
             rho += (x1 - m1) * (x2 - m2)
             count += 1
@@ -1097,7 +1097,7 @@ class L0Diff(BinaryOperator):
         for i in range(track.size()):
             x1 = track.getObsAnalyticalFeature(af_input1, i)
             x2 = track.getObsAnalyticalFeature(af_input2, i)
-            if utils.isnan(x1) or utils.isnan(x2):
+            if isnan(x1) or isnan(x2):
                 continue
             if x1 == x2:
                 continue
@@ -1115,7 +1115,7 @@ class L1Diff(BinaryOperator):
         for i in range(track.size()):
             x1 = track.getObsAnalyticalFeature(af_input1, i)
             x2 = track.getObsAnalyticalFeature(af_input2, i)
-            if utils.isnan(x1) or utils.isnan(x2):
+            if isnan(x1) or isnan(x2):
                 continue
             count += 1
             ecart += abs(x1 - x2)
@@ -1132,7 +1132,7 @@ class L2Diff(BinaryOperator):
         for i in range(track.size()):
             x1 = track.getObsAnalyticalFeature(af_input1, i)
             x2 = track.getObsAnalyticalFeature(af_input2, i)
-            if utils.isnan(x1) or utils.isnan(x2):
+            if isnan(x1) or isnan(x2):
                 continue
             count += 1
             ecart += (x1 - x2) ** 2
@@ -1148,7 +1148,7 @@ class LInfDiff(BinaryOperator):
         for i in range(track.size()):
             x1 = track.getObsAnalyticalFeature(af_input1, i)
             x2 = track.getObsAnalyticalFeature(af_input2, i)
-            if utils.isnan(x1) or utils.isnan(x2):
+            if isnan(x1) or isnan(x2):
                 continue
             val = abs(x1 - x2)
             if val > ecart:
@@ -1164,7 +1164,7 @@ class Equal(BinaryOperator):
         for i in range(track.size()):
             val1 = track.getObsAnalyticalFeature(af_input1, i)
             val2 = track.getObsAnalyticalFeature(af_input2, i)
-            if (utils.isnan(val1)) and (utils.isnan(val2)):
+            if (isnan(val1)) and (isnan(val2)):
                 continue
             if val1 != val2:
                 return False
@@ -1197,7 +1197,7 @@ class Shift(ScalarVoidOperator):
         temp = [0] * track.size()
         for i in range(track.size()):
             if (i - number < 0) or (i - number >= track.size()):
-                temp[i] = utils.NAN
+                temp[i] = NAN
                 continue
             temp[i] = track.getObsAnalyticalFeature(af_input, int(i - number))
         algoAF.addListToAF(track, af_output, temp)
@@ -1473,7 +1473,7 @@ class Filter(ScalarVoidOperator):
                 if i - j + D >= track.size():
                     continue
                 val = track.getObsAnalyticalFeature(af_input, i - j + D)
-                if utils.isnan(val):
+                if isnan(val):
                     continue
                 temp[i] += val * kernel[j]
                 norm += kernel[j]

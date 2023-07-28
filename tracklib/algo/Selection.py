@@ -64,15 +64,12 @@ General constraint syntax:
 
 import matplotlib.pyplot as plt
 
-from tracklib.core.ObsCoords import ENUCoords, GeoCoords
+from tracklib import (ENUCoords, GeoCoords, Obs, ObsTime,
+                      compLike,
+                      intersects,
+                      listify)
 from tracklib.core.Track import Track
 from tracklib.core.TrackCollection import TrackCollection
-from tracklib.core.Obs import Obs
-
-import tracklib.core.Utils as utils
-import tracklib.util.Geometry as Geometry
-
-from tracklib.core.ObsTime import ObsTime
 from tracklib.algo.Geometrics import Rectangle
 
 
@@ -146,7 +143,7 @@ class TimeConstraint:
         """TODO"""
         output = (self.minTimestamp <= timestamp) and (timestamp <= self.maxTimestamp)
         if not (self.pattern is None):
-            output = output & utils.compLike(str(timestamp), self.pattern)
+            output = output & compLike(str(timestamp), self.pattern)
         return output
 
 
@@ -204,7 +201,7 @@ class TrackConstraint:
             counter = 0
             lgth = 0
             for i in range(len(self.segments)):
-                if Geometry.intersects(self.segments[i], track):
+                if intersects(self.segments[i], track):
                     counter += 1
                     lgth += self.track[i].position.distance2DTo(
                         self.track[i + 1].position
@@ -215,7 +212,7 @@ class TrackConstraint:
                         return True
             return False
         else:
-            return Geometry.intersects(self.track, track)
+            return intersects(self.track, track)
 
     def select(self, tracks):
         """TODO"""
@@ -261,7 +258,7 @@ class TollGateConstraint:
 
     def contains(self, track):
         """TODO"""
-        return Geometry.intersects(self.gate, track)
+        return intersects(self.gate, track)
 
     def select(self, tracks):
         """TODO"""
@@ -371,7 +368,7 @@ class Selector:
 
     def __init__(self, constraints, combination=COMBINATION_AND):
         """TODO"""
-        self.constraints = utils.listify(constraints)
+        self.constraints = listify(constraints)
         self.combination = combination
 
     def __len__(self):
@@ -401,7 +398,7 @@ class Selector:
 
     def plot(self, sym=["r-", "g-", "b-"]):
         """TODO"""
-        sym = utils.listify(sym)
+        sym = listify(sym)
         for i in range(len(self)):
             self.constraints[i].plot(sym[i % len(sym)])
 
@@ -437,7 +434,7 @@ class GlobalSelector:
 
     def __init__(self, selectors, combination=COMBINATION_AND):
         """TODO"""
-        self.selectors = utils.listify(selectors)
+        self.selectors = listify(selectors)
         self.combination = combination
 
     def __len__(self):

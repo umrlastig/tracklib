@@ -7,7 +7,7 @@ Class for defining a collection of RasterBand.
 from __future__ import annotations   
 from typing import Union
 
-import tracklib.core.Utils as utils
+from tracklib import listify
 import tracklib.core.RasterBand as grid
 
 
@@ -25,7 +25,7 @@ class Raster:
            
         """
         
-        grids = utils.listify(grids)
+        grids = listify(grids)
         
         self.__idxBands = []
         self.__bands = {}

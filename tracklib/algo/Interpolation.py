@@ -8,11 +8,9 @@ import sys
 import math
 import numpy as np
 
-import tracklib.core.Utils as utils
-
-from tracklib.core.Obs import Obs
-from tracklib.core.ObsCoords import ENUCoords
-from tracklib.core.ObsTime import ObsTime
+from tracklib import (Obs, ENUCoords, ObsTime, 
+                      makeCovarianceMatrixFromKernelOld,
+                      makeDistanceMatrixOld)
 
 MODE_SPATIAL = 1
 MODE_TEMPORAL = 2
@@ -258,14 +256,14 @@ def __gaussian_process(track, TO, TU, kernel, factor, sigma, cp_var):
     yz = yz - bz
 
     # Computing obs covariance matrix
-    K = utils.makeCovarianceMatrixFromKernelOld(kernel, TO, TO, factor)
+    K = makeCovarianceMatrixFromKernelOld(kernel, TO, TO, factor)
     K = np.add(K, sigma ** 2 * np.identity(len(TO)))
 
     # Computing unknown sites covariance matrix
-    KSS = utils.makeCovarianceMatrixFromKernelOld(kernel, TU, TU, factor)
+    KSS = makeCovarianceMatrixFromKernelOld(kernel, TU, TU, factor)
 
     # Computing obs - unknown sites covariance matrix
-    KS = utils.makeCovarianceMatrixFromKernelOld(kernel, TO, TU, factor)
+    KS = makeCovarianceMatrixFromKernelOld(kernel, TO, TU, factor)
 
     # Computing posterior distribution means
     MUX = np.matmul(KS.T, np.linalg.solve(K, yx))
@@ -384,7 +382,7 @@ def __smooth_resample_spatial(track, ds):
     for i in range(len(Si)):
         Si[i] = Si[i] / M
 
-    D = utils.makeDistanceMatrixOld(S, S)
+    D = makeDistanceMatrixOld(S, S)
     D = D ** 2 * np.log(D + 1e-100)
 
     for i in range(D.shape[0]):
@@ -437,7 +435,7 @@ def __smooth_resample_spatial(track, ds):
     at1 = CT[1]
 
     PTS = np.array(S)
-    Di = utils.makeDistanceMatrixOld(Si, S)
+    Di = makeDistanceMatrixOld(Si, S)
 
     Xi = [0] * len(Si)
     Yi = [0] * len(Si)
@@ -484,7 +482,7 @@ def __smooth_resample_temporal(track, reference):
     for i in range(len(REF)):
         REF[i] = REF[i] - M
 
-    D = utils.makeDistanceMatrixOld(T, T)
+    D = makeDistanceMatrixOld(T, T)
     D = D ** 2 * np.log(D + 1e-100)
 
     for i in range(D.shape[0]):
@@ -529,7 +527,7 @@ def __smooth_resample_temporal(track, reference):
     az1 = CZ[1]
 
     PTS = np.array(T)
-    Di = utils.makeDistanceMatrixOld(REF, T)
+    Di = makeDistanceMatrixOld(REF, T)
 
     Xi = [0] * len(REF)
     Yi = [0] * len(REF)
@@ -619,8 +617,8 @@ def __bsplines_temporal(track, reference, degree=3, knots_nb=None):
     kfunc = np.vectorize(lambda t: __phi(t / knots_nb, phi))
 
     # Spline coefficients
-    A = kfunc(utils.makeDistanceMatrixOld(T, BP))
-    DI = kfunc(utils.makeDistanceMatrixOld(BP, REF))
+    A = kfunc(makeDistanceMatrixOld(T, BP))
+    DI = kfunc(makeDistanceMatrixOld(BP, REF))
     if A.shape[1] == X.shape[0]:
         C = np.linalg.solve(A, np.column_stack((X, Y, Z)))
     else:
@@ -716,8 +714,8 @@ def __bsplines_spatial(track, ds, degree=3, knots_nb=None):
     kfunc = np.vectorize(lambda t: __phi(t / knots_nb, phi))
 
     # Spline coefficients
-    A = kfunc(utils.makeDistanceMatrixOld(S, BP))
-    DI = kfunc(utils.makeDistanceMatrixOld(BP, Si))
+    A = kfunc(makeDistanceMatrixOld(S, BP))
+    DI = kfunc(makeDistanceMatrixOld(BP, Si))
     if A.shape[1] == X.shape[0]:
         C = np.linalg.solve(A, np.column_stack((X, Y, Z, T)))
     else:

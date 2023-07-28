@@ -2,13 +2,14 @@
 Class to manage cinematic computations on GPS tracks
 """
 
+
+from tracklib import angleBetweenThreePoints
 from tracklib.algo.Analytics import BIAF_SPEED, speed
 from tracklib.algo.Analytics import BIAF_HEADING, heading
 from tracklib.algo.Analytics import BIAF_DS, ds
 from tracklib.algo.Analytics import BIAF_ABS_CURV
 from tracklib.algo.Analytics import anglegeom
 import tracklib.core.Operator as Operator
-from tracklib.util.Geometry import angleBetweenThreePoints
 
 
 def estimate_speed(track):

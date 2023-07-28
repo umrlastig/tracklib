@@ -10,9 +10,10 @@ from matplotlib.patches import Ellipse
 from PIL import Image
 import sys
 
+from tracklib import NAN, getColorMap, isnan
 from tracklib.algo.Analytics import BIAF_ABS_CURV
 from tracklib.algo.Cinematics import computeAbsCurv
-import tracklib.core.Utils as utils
+
 
 # MODE_REPRESENT_TRACK2D = 1
 # MODE_REPRESENT_SPEED_PROFIL = 2
@@ -59,8 +60,8 @@ class Plot:
         """
         tabmarqueurs = track.getAnalyticalFeature(af_name)
         marqueurs = set(tabmarqueurs)
-        if utils.NAN in marqueurs:
-            marqueurs.remove(utils.NAN)
+        if NAN in marqueurs:
+            marqueurs.remove(NAN)
         if len(marqueurs.intersection([0, 1])) == 2:
             return True
         else:
@@ -110,7 +111,7 @@ class Plot:
 
         if af_name != None and af_name != "":
             if cmap == -1:
-                cmap = utils.getColorMap((255, 0, 0), (32, 178, 170))
+                cmap = getColorMap((255, 0, 0), (32, 178, 170))
             values = self.track.getAnalyticalFeature(af_name)
 
             #s = [self.pointsize + values[n]*15 for n in range(len(X))]
@@ -282,7 +283,7 @@ class Plot:
         values = self.track.getAnalyticalFeature(af_name)
         for i in range(len(values)):
             val = values[i]
-            if not utils.isnan(val):
+            if not isnan(val):
                 data.append(val)
         
         ax1.boxplot(data, vert=False)
@@ -307,7 +308,7 @@ class Plot:
         values = self.track.getAnalyticalFeature(af_name)
         for i in range(len(values)):
             val = values[i]
-            if not utils.isnan(val):
+            if not isnan(val):
                 x.append(self.track.getObsAnalyticalFeature('abs_curv', i))
                 data.append(val)
         
@@ -419,8 +420,8 @@ class Plot:
             #if 1 == 1:
                 tabmarqueurs = self.track.getAnalyticalFeature(af_name)
                 marqueurs = set(tabmarqueurs)
-                if utils.NAN in marqueurs:
-                    marqueurs.remove(utils.NAN)
+                if NAN in marqueurs:
+                    marqueurs.remove(NAN)
 
                 xaf = []
                 yaf = []

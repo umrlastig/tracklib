@@ -5,13 +5,9 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 
-from tracklib.core.Obs import Obs
-from tracklib.core.Kernel import DiracKernel
+from tracklib import Obs, listify, makeCovarianceMatrixFromKernel
+from tracklib.core.Kernel import Kernel, DiracKernel
 from tracklib.core.TrackCollection import TrackCollection
-
-import tracklib.core.Utils as utils
-import tracklib.core.Kernel as Kernel
-
 import tracklib.algo.Cinematics as Cinematics
 from tracklib.algo.Interpolation import (
     gaussian_process as interpolation_gaussian_process,
@@ -87,8 +83,8 @@ class NoiseProcess:
             self.amplitudes = [1]
             self.kernels = [DiracKernel()]
         else:
-            self.amplitudes = utils.listify(amps)
-            self.kernels = utils.listify(kernels)
+            self.amplitudes = listify(amps)
+            self.kernels = listify(kernels)
 
         self.distribution = distribution
 
@@ -200,8 +196,8 @@ def noise(
 	:param mode: 'linear' (default), 'circular' or 'euclidian'
 	:param force: force definite-positive matrix with removal of negative eigen values"""
 
-    sigma = utils.listify(sigma)
-    kernel = utils.listify(kernel)
+    sigma = listify(sigma)
+    kernel = listify(kernel)
 
     if len(sigma) != len(kernel):
         sys.exit(
@@ -215,7 +211,7 @@ def noise(
 
     for n in range(len(sigma)):
 
-        SIGMA_S = utils.makeCovarianceMatrixFromKernel(kernel[n], track, force=force, mode=mode)
+        SIGMA_S = makeCovarianceMatrixFromKernel(kernel[n], track, force=force, mode=mode)
         SIGMA_S += np.identity(N) * 1e-12
         SIGMA_S *= sigma[n] ** 2 / SIGMA_S[0, 0]
 

@@ -9,8 +9,7 @@ from __future__ import annotations
 import sys
 import copy
 
-from tracklib.core.ObsCoords import ECEFCoords, ENUCoords
-from tracklib.core.ObsTime import ObsTime
+from . import ECEFCoords, ENUCoords, ObsTime
 
 
 class Obs:

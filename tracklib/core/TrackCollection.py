@@ -3,7 +3,7 @@
 from typing import Literal   
 import matplotlib.pyplot as plt
 
-import tracklib.core.Utils as Utils
+from tracklib import removeNan, listify, compLike
 
 
 class TrackCollection:
@@ -200,7 +200,7 @@ class TrackCollection:
         for track in self:
             values = track.getAnalyticalFeature(af_name)
             if not withNan:
-                values = Utils.removeNan(values)
+                values = removeNan(values)
             valuesAF = valuesAF + values
         return valuesAF
             
@@ -215,8 +215,8 @@ class TrackCollection:
             symbols = ["r-", "g-", "b-", "c-", "m-", "y-", "k-"]
         if len(self) == 0:
             return
-        symbols = Utils.listify(symbols)
-        markersize = Utils.listify(markersize)
+        symbols = listify(symbols)
+        markersize = listify(markersize)
         if not append:
             (xmin, xmax, ymin, ymax) = self.bbox().asTuple()
             dx = margin * (xmax - xmin)
@@ -443,8 +443,8 @@ class TrackCollection:
         if isinstance(n, tuple):
             tracks = TrackCollection()
             for track in self:
-                if (Utils.compLike(track.uid, n[0])) and (
-                    Utils.compLike(track.tid, n[1])
+                if (compLike(track.uid, n[0])) and (
+                    compLike(track.tid, n[1])
                 ):
                     tracks.addTrack(track)
             return tracks

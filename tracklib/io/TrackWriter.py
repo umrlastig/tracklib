@@ -9,12 +9,11 @@ import os
 import progressbar
 import sys 
 
-from tracklib.core.ObsTime import ObsTime
+from tracklib import ObsTime, rgbToHex, interpColors
 from tracklib.io.TrackFormat import TrackFormat
 from tracklib.core.Network import Network
 from tracklib.core.Track import Track
-from tracklib.core.Track import TrackCollection
-import tracklib.core.Utils as utils
+from tracklib.core.TrackCollection import TrackCollection
 import tracklib.core.Operator as Operator
 
 
@@ -312,7 +311,7 @@ class TrackWriter:
             f.write("      <Style>\n")
             f.write("        <LineStyle>\n")
             f.write(
-                "          <color>" + utils.rgbToHex(default_color)[2:] + "</color>\n"
+                "          <color>" + rgbToHex(default_color)[2:] + "</color>\n"
             )
             f.write("        </LineStyle>\n")
             f.write("      </Style>\n")
@@ -351,9 +350,9 @@ class TrackWriter:
                 f.write("        <IconStyle>")
                 if not af is None:
                     v = track.getObsAnalyticalFeature(af, i)
-                    default_color = utils.interpColors(v, vmin, vmax, c1, c2)
+                    default_color = interpColors(v, vmin, vmax, c1, c2)
                 f.write(
-                    "          <color>" + utils.rgbToHex(default_color)[2:] + "</color>"
+                    "          <color>" + rgbToHex(default_color)[2:] + "</color>"
                 )
                 f.write("          <scale>0.3</scale>")
                 f.write(
@@ -399,7 +398,7 @@ class TrackWriter:
             f.write("      <Style>\n")
             f.write("        <LineStyle>\n")
             f.write(
-                "          <color>" + utils.rgbToHex(default_color)[2:] + "</color>\n"
+                "          <color>" + rgbToHex(default_color)[2:] + "</color>\n"
             )
             f.write("        </LineStyle>\n")
             f.write("      </Style>\n")

@@ -9,12 +9,10 @@ import io
 import os
 from xml.dom import minidom
 
-from tracklib.core.ObsTime import ObsTime
-from tracklib.core.ObsCoords import ENUCoords, GeoCoords, ECEFCoords, makeCoords
-from tracklib.core.Obs import Obs
+from tracklib import (ObsTime, ENUCoords, ECEFCoords, GeoCoords, Obs, 
+                      makeCoords, islist, isfloat)
 from tracklib.core.Track import Track
 from tracklib.core.TrackCollection import TrackCollection
-from tracklib.core.Utils import islist, isfloat
 from tracklib.io.TrackFormat import TrackFormat
 
 

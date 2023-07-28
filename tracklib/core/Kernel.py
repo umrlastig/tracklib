@@ -28,11 +28,10 @@ An example of Kernel simplification with an
 # For type annotation
 from __future__ import annotations   
 from typing import Any, Union
-from collections.abc import Callable
 
+from collections.abc import Callable
 import sys
 import math
-from typing import Callable
 import numpy as np
 import matplotlib.pyplot as plt
 

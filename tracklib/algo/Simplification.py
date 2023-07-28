@@ -6,9 +6,8 @@ import sys
 import math
 import numpy as np
 
-import tracklib.util.Geometry as Geometry
+from tracklib import aire_visval, distance_to_segment
 import tracklib.core.Operator as Operator
-
 import tracklib.algo.Geometrics as Geometrics
 from tracklib.algo.Segmentation import (
     MODE_SEGMENTATION_MINIMIZE,
@@ -101,7 +100,7 @@ def visvalingam (track, eps):
     """
     eps **= 2
     output = track.copy()
-    output.addAnalyticalFeature(Geometry.aire_visval, "@aire")
+    output.addAnalyticalFeature(aire_visval, "@aire")
     while 1:
         id = output.operate(Operator.Operator.ARGMIN, "@aire")
         if output.getObsAnalyticalFeature("@aire", id) > eps:
@@ -109,11 +108,11 @@ def visvalingam (track, eps):
         output.removeObs(id)
         if id > 1:
             output.setObsAnalyticalFeature(
-                "@aire", id - 1, Geometry.aire_visval(output, id - 1)
+                "@aire", id - 1, aire_visval(output, id - 1)
             )
         if id < output.size() - 1:
             output.setObsAnalyticalFeature(
-                "@aire", id, Geometry.aire_visval(output, id)
+                "@aire", id, aire_visval(output, id)
             )
     output.removeAnalyticalFeature("@aire")
     return output
@@ -151,7 +150,7 @@ def douglas_peucker (track, eps):
         ya = L[0].position.getY()
         xb = L[n - 1].position.getX()
         yb = L[n - 1].position.getY()
-        d = Geometry.distance_to_segment(x0, y0, xa, ya, xb, yb)
+        d = distance_to_segment(x0, y0, xa, ya, xb, yb)
         if d > dmax:
             dmax = d
             imax = i

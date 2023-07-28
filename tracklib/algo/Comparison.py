@@ -8,14 +8,13 @@ import progressbar
 import numpy as np
 import matplotlib.pyplot as plt
 
+from tracklib import dist_point_to_segment
+
 from tracklib.core.TrackCollection import TrackCollection
 from tracklib.core.Track import Track
-
 import tracklib.algo.Cinematics as Cinematics
 import tracklib.algo.Dynamics as Dynamics
 import tracklib.algo.Interpolation as Interpolation
-
-from tracklib.util.Geometry import dist_point_to_segment
 
 MODE_COMPARAISON_NEAREST_NEIGHBOUR = 1
 MODE_COMPARAISON_DTW = 2

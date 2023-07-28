@@ -10,12 +10,10 @@ import progressbar
 import numpy as np
 import matplotlib.pyplot as plt
 
+from tracklib import ECEFCoords, ENUCoords, GeoCoords, Obs, priority_dict
 import tracklib.algo.Simplification as Simplification
 from tracklib.core.Bbox import Bbox
-from tracklib.core.ObsCoords import ECEFCoords, ENUCoords, GeoCoords
-from tracklib.core.Obs import Obs
 from tracklib.core.Track import Track
-from tracklib.core.Utils import priority_dict
 from tracklib.core.TrackCollection import TrackCollection
 import tracklib.plot.IPlotVisitor as ivisitor
 

@@ -11,13 +11,10 @@ import progressbar
 import numpy as np
 #import matplotlib.pyplot as plt
 
-import tracklib.util.Geometry as Geometry
+from tracklib import (ENUCoords, Obs,
+                      proj_polyligne)
 import tracklib.algo.Cinematics as Cinematics
 import tracklib.algo.Dynamics as Dynamics
-
-from tracklib.core.Obs import Obs
-from tracklib.core.ObsCoords import ENUCoords
-#from tracklib.core.ObsTime import ObsTime
 from tracklib.core.Operator import Operator
 from tracklib.core.Track import Track
 from tracklib.core.TrackCollection import TrackCollection
@@ -28,7 +25,7 @@ from tracklib.core.TrackCollection import TrackCollection
 def __projOnTrack(point, track):
     """TODO"""
     # distmin, xproj, yproj, iproj
-    proj = Geometry.proj_polyligne(
+    proj = proj_polyligne(
         track.getX(), track.getY(), point.getX(), point.getY()
     )
     # ENUCoords projete, distmin, iproj

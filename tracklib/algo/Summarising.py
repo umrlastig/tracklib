@@ -5,8 +5,7 @@ from typing import Union
 
 import math
 
-import tracklib.core.Utils as utils
-
+from tracklib import (listify, isnan, NAN)
 from tracklib.core.Raster import Raster
 from tracklib.core.RasterBand import RasterBand
 from tracklib.core.RasterBand import NO_DATA_VALUE
@@ -39,8 +38,8 @@ def summarize(collection: TrackCollection, af_algos, aggregates,
     
     """
     
-    af_algos = utils.listify(af_algos)
-    aggregates = utils.listify(aggregates)
+    af_algos = listify(af_algos)
+    aggregates = listify(aggregates)
     
     if len(af_algos) == 0:
         print("Error: af_algos is empty")
@@ -133,7 +132,7 @@ def summarize(collection: TrackCollection, af_algos, aggregates,
                 sumval = aggregate(tarray)
                 
                 # print (sumval)
-                if utils.isnan(sumval):
+                if isnan(sumval):
                     grille.grid[i][j] = NO_DATA_VALUE
                 # # elif valmax != None and val > valmax:
                 else:
@@ -152,11 +151,11 @@ def summarize(collection: TrackCollection, af_algos, aggregates,
 
 def co_sum(tarray):
     """TODO"""
-    tarray = utils.listify(tarray)
+    tarray = listify(tarray)
     somme = 0
     for i in range(len(tarray)):
         val = tarray[i]
-        if utils.isnan(val):
+        if isnan(val):
             continue
         somme += val
     return somme
@@ -164,13 +163,13 @@ def co_sum(tarray):
 
 def co_min(tarray):
     """TODO"""
-    tarray = utils.listify(tarray)
+    tarray = listify(tarray)
     if len(tarray) <= 0:
-        return utils.NAN
+        return NAN
     min = tarray[0]
     for i in range(1, len(tarray)):
         val = tarray[i]
-        if utils.isnan(val):
+        if isnan(val):
             continue
         if val < min:
             min = val
@@ -179,13 +178,13 @@ def co_min(tarray):
 
 def co_max(tarray):
     """TODO"""
-    tarray = utils.listify(tarray)
+    tarray = listify(tarray)
     if len(tarray) <= 0:
-        return utils.NAN
+        return NAN
     max = tarray[0]
     for i in range(1, len(tarray)):
         val = tarray[i]
-        if utils.isnan(val):
+        if isnan(val):
             continue
         if val > max:
             max = val
@@ -194,11 +193,11 @@ def co_max(tarray):
 
 def co_count(tarray):
     """TODO"""
-    tarray = utils.listify(tarray)
+    tarray = listify(tarray)
     count = 0
     for i in range(len(tarray)):
         val = tarray[i]
-        if utils.isnan(val):
+        if isnan(val):
             continue
         count += 1
     return count
@@ -206,27 +205,27 @@ def co_count(tarray):
 
 def co_avg(tarray):
     """TODO"""
-    tarray = utils.listify(tarray)
+    tarray = listify(tarray)
     if len(tarray) <= 0:
-        return utils.NAN
+        return NAN
     mean = 0
     count = 0
     for i in range(len(tarray)):
         val = tarray[i]
-        if utils.isnan(val):
+        if isnan(val):
             continue
         count += 1
         mean += val
     if count == 0:
-        return utils.NAN
+        return NAN
     return mean / count
 
 
 def co_dominant(tarray):
     """TODO"""
-    tarray = utils.listify(tarray)
+    tarray = listify(tarray)
     if len(tarray) <= 0:
-        return utils.NAN
+        return NAN
 
     # Dico : clé - nb occurence
     cles_count_dictionnary = {}
@@ -250,9 +249,9 @@ def co_dominant(tarray):
 
 def co_median(tarray):
     """TODO""" 
-    tarray = utils.listify(tarray)
+    tarray = listify(tarray)
     if len(tarray) <= 0:
-        return utils.NAN
+        return NAN
 
     n = len(tarray)
     # on tri le tableau pour trouver le milieu
