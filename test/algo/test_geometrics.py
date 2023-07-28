@@ -4,11 +4,8 @@ import math
 import unittest
 import matplotlib.pyplot as plt
 
-from tracklib.core.ObsTime import ObsTime
-from tracklib.core.ObsCoords import ENUCoords
-from tracklib.core.Obs import Obs
+from tracklib import (Obs, ObsTime, ENUCoords)
 from tracklib.core.Track import Track
-
 import tracklib.algo.Geometrics as Geometrics
 
 

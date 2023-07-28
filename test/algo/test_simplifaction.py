@@ -5,7 +5,7 @@ from unittest import TestCase, TestSuite, TextTestRunner
 import matplotlib.pyplot as plt
 import os.path
 
-from tracklib.core.ObsTime import ObsTime
+from tracklib import (ObsTime)
 from tracklib.io.TrackReader import TrackReader
 import tracklib.algo.Simplification as spf
 from tracklib.core.Operator import Operator

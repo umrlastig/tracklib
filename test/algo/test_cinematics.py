@@ -6,13 +6,11 @@ import matplotlib.pyplot as plt
 from numpy import pi
 import unittest
 
-from tracklib.core.Obs import Obs
-from tracklib.core.ObsCoords import ENUCoords
-from tracklib.core.ObsTime import ObsTime
+from tracklib import (Obs, ObsTime, ENUCoords, getColorMap)
 from tracklib.core.Track import Track
 from tracklib.algo.Analytics import BIAF_ABS_CURV
 import tracklib.algo.Cinematics as Cinematics
-import tracklib.core.Utils as utils
+
 
 
 class TestAlgoCinematicsMethods(unittest.TestCase):
@@ -124,9 +122,9 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         self.trace3.addObs(Obs(ENUCoords(108, 16, 0), ObsTime()))
         
         # Pour le dessin
-        self.COLS_ROUGE = utils.getColorMap((220, 220, 220), (255, 0, 0))
-        self.COLS_BLEU = utils.getColorMap((220, 220, 220), (0, 0, 255))
-        self.COLS_VERT = utils.getColorMap((220, 220, 220), (0, 255, 0))
+        self.COLS_ROUGE = getColorMap((220, 220, 220), (255, 0, 0))
+        self.COLS_BLEU = getColorMap((220, 220, 220), (0, 0, 255))
+        self.COLS_VERT = getColorMap((220, 220, 220), (0, 255, 0))
 
     
     def testAFInflexion(self):

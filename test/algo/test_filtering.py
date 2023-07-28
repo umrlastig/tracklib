@@ -4,7 +4,7 @@ import os.path
 
 from unittest import TestCase, TestSuite, TextTestRunner
 
-from tracklib.core.ObsTime import ObsTime
+from tracklib import (ObsTime)
 from tracklib.io.TrackReader import TrackReader
 from tracklib.core.Kernel import DiracKernel
 from tracklib.core.Kernel import GaussianKernel

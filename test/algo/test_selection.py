@@ -4,17 +4,16 @@ import matplotlib.pyplot as plt
 import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
 
-from tracklib.core.ObsCoords import ENUCoords
-from tracklib.core.Obs import Obs
+from tracklib import (Obs, ObsTime, ENUCoords)
 from tracklib.core.Track import Track
+from tracklib.io.TrackReader import TrackReader
 from tracklib.algo.Selection import Selector, GlobalSelector
 from tracklib.algo.Selection import Constraint, TimeConstraint, TrackConstraint
 from tracklib.algo.Selection import MODE_INSIDE, MODE_CROSSES, MODE_GETS_IN, MODE_GETS_OUT
 from tracklib.algo.Selection import MODE_PARALLEL
 from tracklib.algo.Selection import COMBINATION_OR
 import tracklib.algo.Geometrics as Geometrics
-from tracklib.core.ObsTime import ObsTime
-from tracklib.io.TrackReader import TrackReader
+
 
 
 class TestSelection(TestCase):

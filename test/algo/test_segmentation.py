@@ -5,14 +5,9 @@ import os.path
 import random as r
 import unittest
 
-from tracklib.core.Obs import Obs
-from tracklib.core.ObsCoords import ENUCoords
-from tracklib.core.ObsTime import ObsTime
+from tracklib import (Obs, ObsTime, ENUCoords)
 from tracklib.core.Track import Track
-#from tracklib.io.TrackReader import TrackReader
-
 import tracklib.algo.Analytics as Analytics
-
 from tracklib.algo.Segmentation import segmentation, split, splitAR
 from tracklib.algo.Segmentation import MODE_COMPARAISON_OR, MODE_COMPARAISON_AND
 from tracklib.algo.Segmentation import findStops, findStopsLocal, MODE_STOPS_LOCAL

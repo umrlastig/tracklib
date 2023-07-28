@@ -5,12 +5,12 @@ This module contains the class to manage bounding box
 # For type annotation
 from __future__ import annotations
 from typing import Union
-import sys
+
 import copy
 import matplotlib.pyplot as plt
 
-from tracklib.algo.Geometrics import Polygon
 from tracklib.core import ObsCoords as Coords
+from tracklib.algo.Geometrics import Polygon
 
 
 class Bbox:

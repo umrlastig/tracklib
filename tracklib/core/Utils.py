@@ -5,7 +5,7 @@ some utility functions.
 
 # For type annotation
 from __future__ import annotations   
-from typing import Any, Iterable, Optional, Union
+from typing import Any, Optional, Union
 
 import json
 import sys

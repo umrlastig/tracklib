@@ -9,8 +9,8 @@ from tracklib.io.TrackReader import TrackReader
 from tracklib.io.RasterReader import RasterReader
 import tracklib.algo.Mapping as mapping
 
-from tracklib.core import ObsCoords as Coords
-from tracklib.core import (Obs, Track, ObsTime)
+from tracklib import (Obs, ObsTime, ENUCoords)
+from tracklib.core import (Track)
 from tracklib.core.Network import Network, Node, Edge
 from tracklib.core.SpatialIndex import SpatialIndex
 import tracklib.algo.Cinematics as Cinematics
@@ -19,44 +19,44 @@ import tracklib.algo.Cinematics as Cinematics
 class TestAlgoMappingMethods(unittest.TestCase):
     
     def getDataset1(self):
-        ObsTime.ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         
         trace = Track.Track([], 1)
 
-        c1 = Coords.ENUCoords(2, 1, 0)
-        p1 = Obs.Obs(c1, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:01"))
+        c1 = ENUCoords(2, 1, 0)
+        p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 10:00:01"))
         trace.addObs(p1)
         
-        c2 = Coords.ENUCoords(5, 2, 0)
-        p2 = Obs.Obs(c2, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:02"))
+        c2 = ENUCoords(5, 2, 0)
+        p2 = Obs(c2, ObsTime.readTimestamp("2018-01-01 10:00:02"))
         trace.addObs(p2)
         
-        c3 = Coords.ENUCoords(7, 1.5, 0)
-        p3 = Obs.Obs(c3, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:03"))
+        c3 = ENUCoords(7, 1.5, 0)
+        p3 = Obs(c3, ObsTime.readTimestamp("2018-01-01 10:00:03"))
         trace.addObs(p3)
         
-        c4 = Coords.ENUCoords(11, 1, 0)
-        p4 = Obs.Obs(c4, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:04"))
+        c4 = ENUCoords(11, 1, 0)
+        p4 = Obs(c4, ObsTime.readTimestamp("2018-01-01 10:00:04"))
         trace.addObs(p4)
             
-        c5 = Coords.ENUCoords(13, 3, 0)
-        p5 = Obs.Obs(c5, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:04"))
+        c5 = ENUCoords(13, 3, 0)
+        p5 = Obs(c5, ObsTime.readTimestamp("2018-01-01 10:00:04"))
         trace.addObs(p5)
         
-        c6 = Coords.ENUCoords(15, 2, 0)
-        p6 = Obs.Obs(c6, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:04"))
+        c6 = ENUCoords(15, 2, 0)
+        p6 = Obs(c6, ObsTime.readTimestamp("2018-01-01 10:00:04"))
         trace.addObs(p6)
         
-        c7 = Coords.ENUCoords(18, 1, 0)
-        p7 = Obs.Obs(c7, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:04"))
+        c7 = ENUCoords(18, 1, 0)
+        p7 = Obs(c7, ObsTime.readTimestamp("2018-01-01 10:00:04"))
         trace.addObs(p7)
         
-        c8 = Coords.ENUCoords(22, 1, 0)
-        p8 = Obs.Obs(c8, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:04"))
+        c8 = ENUCoords(22, 1, 0)
+        p8 = Obs(c8, ObsTime.readTimestamp("2018-01-01 10:00:04"))
         trace.addObs(p8)
         
-        c9 = Coords.ENUCoords(27, -0.5, 0)
-        p9 = Obs.Obs(c9, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:04"))
+        c9 = ENUCoords(27, -0.5, 0)
+        p9 = Obs(c9, ObsTime.readTimestamp("2018-01-01 10:00:04"))
         trace.addObs(p9)
         
         #print (len(trace))
@@ -70,11 +70,11 @@ class TestAlgoMappingMethods(unittest.TestCase):
         
         # Segment 1
         s1 = Track.Track([], 1)
-        c1 = Coords.ENUCoords(0, 0, 0)
-        p1 = Obs.Obs(c1, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        c1 = ENUCoords(0, 0, 0)
+        p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         s1.addObs(p1)
-        c2 = Coords.ENUCoords(10, 0, 0)
-        p2 = Obs.Obs(c2, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        c2 = ENUCoords(10, 0, 0)
+        p2 = Obs(c2, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         s1.addObs(p2)
         Cinematics.computeAbsCurv(s1)
         edge = Edge(1, s1)
@@ -88,11 +88,11 @@ class TestAlgoMappingMethods(unittest.TestCase):
             
         # Segment 2
         s2 = Track.Track([], 2)
-        c1 = Coords.ENUCoords(10, 0, 0)
-        p1 = Obs.Obs(c1, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        c1 = ENUCoords(10, 0, 0)
+        p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         s2.addObs(p1)
-        c2 = Coords.ENUCoords(10, 5, 0)
-        p2 = Obs.Obs(c2, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        c2 = ENUCoords(10, 5, 0)
+        p2 = Obs(c2, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         s2.addObs(p2)
         Cinematics.computeAbsCurv(s2)
         edge = Edge(2, s2)
@@ -106,11 +106,11 @@ class TestAlgoMappingMethods(unittest.TestCase):
         
         # Segment 3
         s3 = Track.Track([], 2)
-        c1 = Coords.ENUCoords(10, 5, 0)
-        p1 = Obs.Obs(c1, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        c1 = ENUCoords(10, 5, 0)
+        p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         s3.addObs(p1)
-        c2 = Coords.ENUCoords(20, 5, 0)
-        p2 = Obs.Obs(c2, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        c2 = ENUCoords(20, 5, 0)
+        p2 = Obs(c2, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         s3.addObs(p2)
         Cinematics.computeAbsCurv(s3)
         edge = Edge(3, s3)
@@ -124,11 +124,11 @@ class TestAlgoMappingMethods(unittest.TestCase):
         
         # Segment 4
         s4 = Track.Track([], 2)
-        c1 = Coords.ENUCoords(10, 0, 0)
-        p1 = Obs.Obs(c1, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        c1 = ENUCoords(10, 0, 0)
+        p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         s4.addObs(p1)
-        c2 = Coords.ENUCoords(20, 0, 0)
-        p2 = Obs.Obs(c2, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        c2 = ENUCoords(20, 0, 0)
+        p2 = Obs(c2, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         s4.addObs(p2)
         Cinematics.computeAbsCurv(s4)
         edge = Edge(4, s4)
@@ -142,11 +142,11 @@ class TestAlgoMappingMethods(unittest.TestCase):
         
         # Segment 5
         s5 = Track.Track([], 2)
-        c1 = Coords.ENUCoords(20, 5, 0)
-        p1 = Obs.Obs(c1, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        c1 = ENUCoords(20, 5, 0)
+        p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         s5.addObs(p1)
-        c2 = Coords.ENUCoords(20, 0, 0)
-        p2 = Obs.Obs(c2, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        c2 = ENUCoords(20, 0, 0)
+        p2 = Obs(c2, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         s5.addObs(p2)
         Cinematics.computeAbsCurv(s5)
         edge = Edge(5, s5)
@@ -160,11 +160,11 @@ class TestAlgoMappingMethods(unittest.TestCase):
             
         # Segment 6
         s6 = Track.Track([], 2)
-        c1 = Coords.ENUCoords(20, 0, 0)
-        p1 = Obs.Obs(c1, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        c1 = ENUCoords(20, 0, 0)
+        p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         s6.addObs(p1)
-        c2 = Coords.ENUCoords(30, 0, 0)
-        p2 = Obs.Obs(c2, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        c2 = ENUCoords(30, 0, 0)
+        p2 = Obs(c2, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         s6.addObs(p2)
         Cinematics.computeAbsCurv(s6)
         edge = Edge(6, s6)
@@ -188,7 +188,7 @@ class TestAlgoMappingMethods(unittest.TestCase):
         print (self.raster.getRasterBand(0))
         self.band = self.raster.getRasterBand(0)
         
-        ObsTime.ObsTime.setReadFormat("4Y/2M/2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y/2M/2D 2h:2m:2s")
         tracepath = os.path.join(resource_path, 'data/asc/8961191_v3.csv')
         self.trace = TrackReader.readFromCsv(tracepath, 
                                         id_E=0, id_N=1, id_U=3, id_T=4, 
@@ -244,7 +244,7 @@ class TestAlgoMappingMethods(unittest.TestCase):
         path_cam = os.path.join(resource_path, 'data/hybridation_gnss_camera.dat')
         path_gps = os.path.join(resource_path, 'data/hybridation_gnss_camera.pos')
         
-        ObsTime.ObsTime.setReadFormat("2D/2M/4Y-2h:2m:2s.3z")
+        ObsTime.setReadFormat("2D/2M/4Y-2h:2m:2s.3z")
         
         
         track_cam = TrackReader.readFromCsv(path_cam, 1, 2, 3, 0, " ", srid="ENUCoords")
@@ -252,8 +252,8 @@ class TestAlgoMappingMethods(unittest.TestCase):
         
         track_cam.incrementTime(0, 18-3600)
         
-        ini_time = ObsTime.ObsTime("06/06/2021-16:02:00.000")
-        fin_time = ObsTime.ObsTime("06/06/2021-16:12:12.000")
+        ini_time = ObsTime("06/06/2021-16:02:00.000")
+        fin_time = ObsTime("06/06/2021-16:12:12.000")
         
         
         track_cam = track_cam.extractSpanTime(ini_time, fin_time)
