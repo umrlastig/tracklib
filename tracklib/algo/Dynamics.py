@@ -5,7 +5,8 @@ import progressbar
 import numpy as np
 
 from tracklib.core import makeCoords, unlistify
-import tracklib.algo.Stochastics as Stochastics
+from . import khi2test
+
 
 MODE_OBS_AS_SCALAR = 0
 MODE_OBS_AS_2D_POSITIONS = 1
@@ -492,7 +493,7 @@ class Kalman:
                 S = self.__cov(SIGMA_PTS2, W, Z) + self.getR(k, track)
 
                 # Innovation control
-                if Stochastics.khi2test(I, S, self.control):
+                if khi2test(I, S, self.control):
                     continue
 
                 T = self.__cross_cov(SIGMA_PTS, SIGMA_PTS2, W, MU, Z)

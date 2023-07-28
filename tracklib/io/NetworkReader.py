@@ -8,12 +8,14 @@ import requests
 from xml.dom import minidom
 
 from tracklib.core import ObsTime, ENUCoords, ECEFCoords, GeoCoords, Obs
+from tracklib.algo import computeAbsCurv
+
 from tracklib.core.Track import Track
 from tracklib.core.Network import Network, Node, Edge
 from tracklib.core.SpatialIndex import SpatialIndex
 from tracklib.core.Bbox import Bbox
 from tracklib.io.NetworkFormat import NetworkFormat
-import tracklib.algo.Cinematics as Cinematics
+
 
 
 class NetworkReader:
@@ -357,7 +359,7 @@ def readLineAndAddToNetwork(row, fmt):
         return
 
     track = Track(TAB_OBS)
-    Cinematics.computeAbsCurv(track)
+    computeAbsCurv(track)
 
     edge = Edge(edge_id, track)
 

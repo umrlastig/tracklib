@@ -11,9 +11,9 @@ from PIL import Image
 import sys
 
 from tracklib.algo import BIAF_ABS_CURV
-from tracklib.core import NAN, getColorMap, isnan, Operator
+from tracklib.core import NAN, getColorMap, isnan
 from tracklib.algo.Cinematics import computeAbsCurv
-
+from tracklib.core.operators import Operator
 
 # MODE_REPRESENT_TRACK2D = 1
 # MODE_REPRESENT_SPEED_PROFIL = 2

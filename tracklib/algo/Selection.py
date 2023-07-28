@@ -68,9 +68,9 @@ from tracklib.core import (ENUCoords, GeoCoords, Obs, ObsTime,
                       compLike, listify,
                       TrackCollection)
 from tracklib.util import intersects
-from tracklib.core.Track import Track
-from tracklib.algo.Geometrics import Rectangle
+from . import Rectangle
 
+from tracklib.core.Track import Track
 
 MODE_CROSSES = 0
 MODE_INSIDE = 1

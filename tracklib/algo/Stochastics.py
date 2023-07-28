@@ -10,10 +10,9 @@ from tracklib.core import (Obs,
                            makeCovarianceMatrixFromKernel,
                            DiracKernel, GaussianKernel,
                            TrackCollection)
-import tracklib.algo.Cinematics as Cinematics
-from tracklib.algo.Interpolation import (
-    gaussian_process as interpolation_gaussian_process,
-)
+
+# gaussian_process
+from . import (computeAbsCurv)
 
 
 DISTRIBUTION_NORMAL = 1
@@ -146,32 +145,32 @@ def seed(integer):
     np.random.seed(integer)
 
 
-def gaussian_process(self, timestamps, kernel, factor=1.0, sigma=0.0, cp_var=False):
-    """Track interpolation and smoothing with Gaussian Process (GP)
-
-    :param timestamps: points where interpolation must be computed. May be a list of
-        timestamps, a track or a number of seconds
-    :param kernel: a symetric function k(xi-xj) describing the statistical similarity
-        between the coordinates X,Y,Z taken in two points :
-
-        .. math::
-
-            k(t2-t1) = Cov(X(t1), X(t2))
-
-            k(t2-t1) = Cov(X(t1), X(t2))
-
-            k(t2-t1) = Cov(Z(t1), Z(t2))
-
-
-    :param factor: unit factor of variance if the kernel must be scaled
-    :param sigma: observation noise standard deviation (in coords units)
-    :param cp_var: compute covariance matrix and store pointwise sigmas
-
-    :return: interpolated/smoothed track (without AF)"""
-
-    return interpolation_gaussian_process(
-        self, timestamps, kernel, factor, sigma, cp_var
-    )
+#def gaussian_process(self, timestamps, kernel, factor=1.0, sigma=0.0, cp_var=False):
+#    """Track interpolation and smoothing with Gaussian Process (GP)
+#
+#    :param timestamps: points where interpolation must be computed. May be a list of
+#        timestamps, a track or a number of seconds
+#    :param kernel: a symetric function k(xi-xj) describing the statistical similarity
+#        between the coordinates X,Y,Z taken in two points :
+#
+#        .. math::
+#
+#            k(t2-t1) = Cov(X(t1), X(t2))
+#
+#            k(t2-t1) = Cov(X(t1), X(t2))
+#
+#            k(t2-t1) = Cov(Z(t1), Z(t2))
+#
+#
+#    :param factor: unit factor of variance if the kernel must be scaled
+#    :param sigma: observation noise standard deviation (in coords units)
+#    :param cp_var: compute covariance matrix and store pointwise sigmas
+#
+#    :return: interpolated/smoothed track (without AF)"""
+#
+#    return gaussian_process(
+#        self, timestamps, kernel, factor, sigma, cp_var
+#    )
 
 
 def randomColor():
@@ -207,7 +206,7 @@ def noise(
         )
 
     N = track.size()
-    Cinematics.computeAbsCurv(track)
+    computeAbsCurv(track)
 
     noised_track = track.copy()
 

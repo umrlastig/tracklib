@@ -2,12 +2,21 @@
 
 import matplotlib.pyplot as plt
 
+from tracklib.plot import (Plot, 
+                           IPlotVisitor,
+                           MARKERS_TYPE_NO_ENTRY,
+                           MARKERS_TYPE_INTERDICTION,
+                           MARKERS_TYPE_SPOT,
+                           MARKERS_TYPE_WARNING,
+                           MARKERS_TYPE_GIVE_WAY,
+                           MARKERS_TYPE_NO_STOP,
+                           MARKERS_TYPE_INFORMATION)
+
 import tracklib.core.Network as network
 import tracklib.core.SpatialIndex as index
-import tracklib.plot.IPlotVisitor as iplot
-import tracklib.plot.Plot as Plot
 
-class MatplotlibVisitor(iplot.IPlotVisitor):
+
+class MatplotlibVisitor(IPlotVisitor):
     
     def plotTrackAsMarkers(
         self, track, size=8, frg="k", bkg="w", sym_frg="+", sym_bkg="o", type=None, 
@@ -24,37 +33,37 @@ class MatplotlibVisitor(iplot.IPlotVisitor):
             ax1 = plt
         
         if not type is None:
-            if type == Plot.MARKERS_TYPE_NO_ENTRY:
+            if type == MARKERS_TYPE_NO_ENTRY:
                 frg = "w"
                 bkg = "r"
                 sym_frg = "_"
                 sym_bkg = "o"
-            if type == Plot.MARKERS_TYPE_INTERDICTION:
+            if type == MARKERS_TYPE_INTERDICTION:
                 frg = "w"
                 bkg = "r"
                 sym_frg = "."
                 sym_bkg = "o"
-            if type == Plot.MARKERS_TYPE_SPOT:
+            if type == MARKERS_TYPE_SPOT:
                 frg = "r"
                 bkg = "w"
                 sym_frg = "."
                 sym_bkg = "o"
-            if type == Plot.MARKERS_TYPE_WARNING:
+            if type == MARKERS_TYPE_WARNING:
                 frg = "r"
                 bkg = "w"
                 sym_frg = " "
                 sym_bkg = "^"
-            if type == Plot.MARKERS_TYPE_GIVE_WAY:
+            if type == MARKERS_TYPE_GIVE_WAY:
                 frg = "r"
                 bkg = "w"
                 sym_frg = " "
                 sym_bkg = "v"
-            if type == Plot.MARKERS_TYPE_NO_STOP:
+            if type == MARKERS_TYPE_NO_STOP:
                 frg = "r"
                 bkg = "b"
                 sym_frg = "x"
                 sym_bkg = "o"
-            if type == Plot.MARKERS_TYPE_INFORMATION:
+            if type == MARKERS_TYPE_INFORMATION:
                 frg = "b"
                 bkg = "w"
                 sym_frg = " "
@@ -74,7 +83,7 @@ class MatplotlibVisitor(iplot.IPlotVisitor):
         """
         Plot a profil track.
         """
-        plot = Plot.Plot(track)
+        plot = Plot(track)
         return plot.plotProfil(template, afs, append, linestyle, linewidth)
     
     def plotTrackEllipses(self, track, sym="r-", factor=3, af=None, append=True):
@@ -84,7 +93,7 @@ class MatplotlibVisitor(iplot.IPlotVisitor):
         2 x 2 covariance matrix. If this matrix has dim > 2,
         first two dimensions are arbitrarily considered
         """
-        plot = Plot.Plot(track)
+        plot = Plot(track)
         plot.sym = sym
         plot.w = 6
         plot.h = 5
@@ -104,7 +113,7 @@ class MatplotlibVisitor(iplot.IPlotVisitor):
     
         af_name: test si isAFTransition
         """
-        plot = Plot.Plot(track)
+        plot = Plot(track)
         plot.sym = sym
         if not '-' in sym and type != 'CIRCULAR':
             type = "POINT"

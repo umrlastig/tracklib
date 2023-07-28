@@ -13,24 +13,18 @@ import copy
 import numpy as np
 #import matplotlib.pyplot as plt
 
-from tracklib.core import (ObsTime, ENUCoords, Obs, 
-                           isnan,
-                           listify,
-                           NAN,
-                           isfloat,
-                           compLike,
-                           TrackCollection,
-                           Operator,UnaryOperator,BinaryOperator,
-                           ScalarOperator,UnaryVoidOperator,BinaryVoidOperator,
-                           ScalarVoidOperator,
-                           DiracKernel)
+import tracklib.core.operators
+from . import (ObsTime, ENUCoords, Obs, 
+               isnan, listify, NAN, isfloat,
+               compLike,
+               TrackCollection,
+               DiracKernel)
 from tracklib.util import intersection
 from tracklib.algo import BIAF_SPEED, BIAF_ABS_CURV
+from tracklib.plot import IPlotVisitor
                       
-from tracklib.algo.Geometrics import Polygon
-import tracklib.plot.IPlotVisitor as ivisitor
 from tracklib.core.Bbox import Bbox
-
+from tracklib.algo.Geometrics import Polygon
 
 
 class Track:
@@ -295,10 +289,10 @@ class Track:
     def getCentroid(self):
         """TODO"""
         m = self.getObs(0).position.copy()
-        m.setX(self.operate(Operator.AVERAGER, "x"))
-        m.setY(self.operate(Operator.AVERAGER, "y"))
+        m.setX(self.operate(tracklib.core.operators.Operator.AVERAGER, "x"))
+        m.setY(self.operate(tracklib.core.operators.Operator.AVERAGER, "y"))
         if not isnan(m.getZ()):
-            m.setZ(self.operate(Operator.AVERAGER, 'z'))
+            m.setZ(self.operate(tracklib.core.operators.Operator.AVERAGER, 'z'))
         return m
 
     def getEnclosedPolygon(self):
@@ -307,27 +301,27 @@ class Track:
 
     def getMinX(self):
         """TODO"""
-        return self.operate(Operator.MIN, "x")
+        return self.operate(tracklib.core.operators.Operator.MIN, "x")
 
     def getMinY(self):
         """TODO"""
-        return self.operate(Operator.MIN, "y")
+        return self.operate(tracklib.core.operators.Operator.MIN, "y")
 
     def getMinZ(self):
         """TODO"""
-        return self.operate(Operator.MIN, "z")
+        return self.operate(tracklib.core.operators.Operator.MIN, "z")
 
     def getMaxX(self):
         """TODO"""
-        return self.operate(Operator.MAX, "x")
+        return self.operate(tracklib.core.operators.Operator.MAX, "x")
 
     def getMaxY(self):
         """TODO"""
-        return self.operate(Operator.MAX, "y")
+        return self.operate(tracklib.core.operators.Operator.MAX, "y")
 
     def getMaxZ(self):
         """TODO"""
-        return self.operate(Operator.MAX, "z")
+        return self.operate(tracklib.core.operators.Operator.MAX, "z")
 
     def getLowerLeftPoint(self):
         """TODO"""
@@ -1126,7 +1120,7 @@ class Track:
             return output
 
         # UnaryOperator
-        if isinstance(operator, UnaryOperator):
+        if isinstance(operator, tracklib.core.operators.UnaryOperator):
             if isinstance(arg1, str):
                 return operator.execute(self, arg1)
             output = [0] * len(arg1)
@@ -1135,7 +1129,7 @@ class Track:
             return output
 
         # BinaryOperator
-        if isinstance(operator, BinaryOperator):
+        if isinstance(operator, tracklib.core.operators.BinaryOperator):
             if isinstance(arg1, str):
                 return operator.execute(self, arg1, arg2)
             if len(arg1) != len(arg2):
@@ -1150,7 +1144,7 @@ class Track:
             return output
 
         # ScalarOperator
-        if isinstance(operator, ScalarOperator):
+        if isinstance(operator, tracklib.core.operators.ScalarOperator):
             if isinstance(arg1, str):
                 return operator.execute(self, arg1, arg2)
             output = [0] * len(arg1)
@@ -1159,7 +1153,7 @@ class Track:
             return output
 
         # UnaryVoidOperator
-        if isinstance(operator, UnaryVoidOperator):
+        if isinstance(operator, tracklib.core.operators.UnaryVoidOperator):
             if arg2 == None:
                 arg2 = arg1
             if isinstance(arg1, str):
@@ -1174,7 +1168,7 @@ class Track:
                 operator.execute(self, arg1[i], arg2[i])
 
         # BinaryVoidOperator
-        if isinstance(operator, BinaryVoidOperator):
+        if isinstance(operator, tracklib.core.operators.BinaryVoidOperator):
             if arg3 == None:
                 arg3 = arg1
             if isinstance(arg1, str):
@@ -1195,7 +1189,7 @@ class Track:
                 operator.execute(self, arg1[i], arg2[i], arg3[i])
 
         # ScalarVoidOperator
-        if isinstance(operator, ScalarVoidOperator):
+        if isinstance(operator, tracklib.core.operators.ScalarVoidOperator):
             if arg3 == None:
                 arg3 = arg1
             if isinstance(arg1, str):
@@ -1372,7 +1366,7 @@ class Track:
     # =========================================================================
     def plotAsMarkers(
         self, size=8, frg="k", bkg="w", sym_frg="+", sym_bkg="o", type=None, 
-        append=True, v:ivisitor.IPlotVisitor=None
+        append=True, v:IPlotVisitor=None
     ):
         """TODO"""
         if v == None:
@@ -1381,7 +1375,7 @@ class Track:
         return v.plotTrackAsMarkers(self, size, frg, bkg, sym_frg, sym_bkg, type, append)
     
     def plotEllipses(self, sym="r-", factor=3, af=None, append=True,
-                     v:ivisitor.IPlotVisitor=None):
+                     v:IPlotVisitor=None):
         """
         Plot track uncertainty (as error ellipses)
         Input track must contain an AF with (at least) a
@@ -1395,7 +1389,7 @@ class Track:
         return v.plotTrackAsMarkers(self, sym, factor, af, append)
 
     def plot(self, sym="k-", type="LINE", af_name="", cmap=-1, append=True, 
-             label=None, pointsize=5, w=6.4, h=4.8, v:ivisitor.IPlotVisitor=None):
+             label=None, pointsize=5, w=6.4, h=4.8, v:IPlotVisitor=None):
         """
         Method to plot a track (short cut from Plot)
         Append:
@@ -1416,7 +1410,7 @@ class Track:
              label, pointsize, w, h)
     
     def plotProfil(self, template="SPATIAL_SPEED_PROFIL", afs=[], append=False,
-                   linestyle = '-', linewidth=1, v:ivisitor.IPlotVisitor=None):
+                   linestyle = '-', linewidth=1, v:IPlotVisitor=None):
         """
         """
         if v == None:

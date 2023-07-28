@@ -5,11 +5,11 @@ import math
 import progressbar
 import numpy as np
 
-from tracklib.core import (ENUCoords, Obs, isnan, TrackCollection, Operator)
-from tracklib.algo import acceleration
+from tracklib.core import (ENUCoords, Obs, isnan, TrackCollection)
+from tracklib.algo import (acceleration, 
+                           ALGO_LINEAR, MODE_SPATIAL)
+from tracklib.core.operators import Operator
 from tracklib.algo.Geometrics import Circle, minCircle
-from tracklib.algo.Interpolation import ALGO_LINEAR, MODE_SPATIAL
-
 # --------------------------------------------------------------------------
 # Circular import (not satisfying solution)
 # --------------------------------------------------------------------------

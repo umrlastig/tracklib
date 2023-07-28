@@ -10,11 +10,10 @@ import matplotlib.pyplot as plt
 
 from tracklib.util import dist_point_to_segment
 from tracklib.core import TrackCollection
+from . import computeAbsCurv, synchronize, HMM, MODE_OBS_AS_2D_POSITIONS
 
 from tracklib.core.Track import Track
-import tracklib.algo.Cinematics as Cinematics
-import tracklib.algo.Dynamics as Dynamics
-import tracklib.algo.Interpolation as Interpolation
+
 
 MODE_COMPARAISON_NEAREST_NEIGHBOUR = 1
 MODE_COMPARAISON_DTW = 2
@@ -175,16 +174,16 @@ def differenceProfile(track1, track2, mode: Literal["NN", "DTW", "FDTW"] = "NN",
         Q = lambda i, j, k, t: (j < i + 30) * (j >= i) * 1
         P = lambda s, y, k, t: math.exp(-track2[s].position.distance2DTo(y))
 
-        Dynamics.HMM(S, Q, P).estimate(
+        HMM(S, Q, P).estimate(
             output,
             ["x", "y"],
-            mode=Dynamics.MODE_OBS_AS_2D_POSITIONS,
+            mode=MODE_OBS_AS_2D_POSITIONS,
             verbose=2 * verbose,
         )
 
         __fillAFProfile(track1, track2, output, output["hmm_inference"])
 
-    Cinematics.computeAbsCurv(output)
+    computeAbsCurv(output)
     return output
 
 
@@ -206,15 +205,15 @@ def __fillAFProfile(track1, track2, output, S):
         output.setObsAnalyticalFeature("ey", i, ey)
 
 
-def synchronize(track1, track2):
-    """Resampling of 2 tracks with linear interpolation on a common base of
-    timestamps
-
-    :param track: track to synchronize with
-    """
-
-    Interpolation.synchronize(track1, track2)
-
+#def synchronize(track1, track2):
+#    """Resampling of 2 tracks with linear interpolation on a common base of
+#    timestamps
+#
+#    :param track: track to synchronize with
+#    """
+#
+#    synchronize(track1, track2)
+#
 
 def compare(track1, track2) -> float:   
     """Comparison of 2 tracks.
@@ -230,7 +229,7 @@ def compare(track1, track2) -> float:
     trackA = track1.copy()
     trackB = track2.copy()
 
-    Interpolation.synchronize(trackA, trackB)
+    synchronize(trackA, trackB)
 
     rmse = 0
     for i in range(trackA.size()):

@@ -15,8 +15,10 @@ from tracklib.util import proj_polyligne
 from tracklib.core import (ENUCoords, Obs,
                            TrackCollection,
                            Operator)
-import tracklib.algo.Cinematics as Cinematics
-import tracklib.algo.Dynamics as Dynamics
+from . import (HMM, 
+               MODE_OBS_AS_2D_POSITIONS, 
+               MODE_VERBOSE_PROGRESS,
+               computeAbsCurv)
 from tracklib.core.Track import Track
 
 
@@ -117,7 +119,7 @@ def __mapOnNetwork (
         if (len(STATES[-1]) == 0):
             STATES[-1].append((track[i].position, -1, -1, -1))
     
-    model = Dynamics.HMM()
+    model = HMM()
     model.setStates(__states)
     model.setTransitionModel(__tst_log)
     model.setObservationModel(__obs_log)
@@ -125,8 +127,8 @@ def __mapOnNetwork (
     model.estimate(
         track,
         obs=["x", "y"],
-        mode=Dynamics.MODE_OBS_AS_2D_POSITIONS,
-        verbose=verbose * Dynamics.MODE_VERBOSE_PROGRESS,
+        mode=MODE_OBS_AS_2D_POSITIONS,
+        verbose=verbose * MODE_VERBOSE_PROGRESS,
     )
     
     #for k in progressbar.progressbar(range(len(track))):
@@ -325,8 +327,8 @@ def mapOn(
                 track_copy.translate(init[2, 0], init[3, 0])
 
             # Match data by rough scale factor
-            Cinematics.computeAbsCurv(track_copy)
-            Cinematics.computeAbsCurv(reference)
+            computeAbsCurv(track_copy)
+            computeAbsCurv(reference)
             track_copy.operate(Operator.DIFFERENTIATOR, "abs_curv", "ds")
             reference.operate(Operator.DIFFERENTIATOR, "abs_curv", "ds")
             f = reference.operate(Operator.AVERAGER, "ds") / track_copy.operate(

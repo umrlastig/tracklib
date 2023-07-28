@@ -2,10 +2,10 @@
 
 import numpy as np
 
-from tracklib.core import Operator
-from tracklib.algo.Dynamics import MODE_OBS_AND_STATES_AS_3D_POSITIONS
-from tracklib.algo.Dynamics import DYN_MAT_2D_CST_SPEED
-from tracklib.algo.Dynamics import HMM as dynamics_hmm
+from . import (MODE_OBS_AND_STATES_AS_3D_POSITIONS, 
+               DYN_MAT_2D_CST_SPEED,
+               HMM)
+from tracklib.core.operators import Operator
 
 FILTER_LOW_PASS = 0     # Low-pass brick-wall filter
 FILTER_HIGH_PASS = 1    # High-pass brick-wall filter
@@ -217,7 +217,7 @@ def MarkovRegularization(track, sigma, speed, resolution):
     global res, sig
     sig = sigma
     res = resolution
-    model = dynamics_hmm()
+    model = HMM()
     model.setStates(__Markov_S)
     model.setTransitionModel(speed)
     model.setObservationModel(__Markov_Plog)

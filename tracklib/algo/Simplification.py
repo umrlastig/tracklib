@@ -7,18 +7,19 @@ import math
 import numpy as np
 
 from tracklib.util import aire_visval, distance_to_segment
-from tracklib.core import Operator
-import tracklib.algo.Geometrics as Geometrics
+from tracklib.algo.Geometrics import boundingShape, MODE_ENCLOSING_MBR
 from tracklib.algo.Segmentation import (
     MODE_SEGMENTATION_MINIMIZE,
     MODE_SEGMENTATION_MAXIMIZE,
+    optimalSegmentation
 )
-from tracklib.algo.Segmentation import optimalSegmentation
+from tracklib.core.operators import Operator
 
 # --------------------------------------------------------------------------
 # Circular import (not satisfying solution)
 # --------------------------------------------------------------------------
 from tracklib.core.Track import Track
+
 
 MODE_SIMPLIFY_DOUGLAS_PEUCKER = 1
 MODE_SIMPLIFY_VISVALINGAM = 2
@@ -204,7 +205,7 @@ def __cost_largest_deviation(track, i, j, offset):
     if j <= i + 1:
         return offset
     else:
-        R = Geometrics.boundingShape(track.extract(i, j), Geometrics.MODE_ENCLOSING_MBR)
+        R = boundingShape(track.extract(i, j), MODE_ENCLOSING_MBR)
         return min(R[2], R[3]) + offset
 
 
@@ -217,7 +218,7 @@ def __cost_mbr_ratio(track, i, j, offset):
     if j <= i + 1:
         return offset
     else:
-        R = Geometrics.boundingShape(track.extract(i, j), Geometrics.MODE_ENCLOSING_MBR)
+        R = boundingShape(track.extract(i, j), MODE_ENCLOSING_MBR)
         l = min(R[2], R[3])
         L = max(R[2], R[3])
         return l / L + offset
@@ -232,7 +233,7 @@ def __cost_largest_deviation_strict(track, i, j, offset):
     if j <= i + 1:
         return offset
     else:
-        R = Geometrics.boundingShape(track.extract(i, j), Geometrics.MODE_ENCLOSING_MBR)
+        R = boundingShape(track.extract(i, j), MODE_ENCLOSING_MBR)
         l = min(R[2], R[3])
         return 1e300 * (l > offset) + 1
 
