@@ -6,9 +6,12 @@ import unittest
 import math
 from numpy import pi
 
-from tracklib.core import (Obs, Track, ObsTime)
-from tracklib.core import ObsCoords as Coords
-import tracklib.core.Utils as utils
+#import tracklib
+#from tracklib.core import ENUCoords, Bbox, Polygon
+
+from tracklib import (Obs, ObsTime, ENUCoords, NAN)
+from tracklib.core import Track
+# import tracklib.core.Utils as utils
 import tracklib.algo.Analytics as Analytics
 
 
@@ -16,61 +19,49 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
     
     def setUp (self):
         
-        ObsTime.ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         self.trace1 = Track.Track([], 1)
         self.trace2 = Track.Track([], 1)
         self.trace3 = Track.Track([], 1)
 
         # ---------------------------------------------------------------------
 		
-        c1 = Coords.ENUCoords(0, 0, 0)
-        p1 = Obs.Obs(c1, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        p1 = Obs(ENUCoords(0, 0, 0), ObsTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace1.addObs(p1)
         
-        c2 = Coords.ENUCoords(10, 0, 10)
-        p2 = Obs.Obs(c2, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:12"))
+        p2 = Obs(ENUCoords(10, 0, 10), ObsTime.readTimestamp("2018-01-01 10:00:12"))
         self.trace1.addObs(p2)
         
-        c3 = Coords.ENUCoords(10, 10, 10)
-        p3 = Obs.Obs(c3, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:40"))
+        p3 = Obs(ENUCoords(10, 10, 10), ObsTime.readTimestamp("2018-01-01 10:00:40"))
         self.trace1.addObs(p3)
         
-        c4 = Coords.ENUCoords(10, 20, 15)
-        p4 = Obs.Obs(c4, ObsTime.ObsTime.readTimestamp("2018-01-01 10:01:50"))
+        p4 = Obs(ENUCoords(10, 20, 15), ObsTime.readTimestamp("2018-01-01 10:01:50"))
         self.trace1.addObs(p4)
 		
-        c5 = Coords.ENUCoords(0, 20, 10)
-        p5 = Obs.Obs(c5, ObsTime.ObsTime.readTimestamp("2018-01-01 10:02:10"))
+        p5 = Obs(ENUCoords(0, 20, 10), ObsTime.readTimestamp("2018-01-01 10:02:10"))
         self.trace1.addObs(p5)
 		
-        c6 = Coords.ENUCoords(0, 10, 0)
-        p6 = Obs.Obs(c6, ObsTime.ObsTime.readTimestamp("2018-01-01 10:02:15"))
+        p6 = Obs(ENUCoords(0, 10, 0), ObsTime.readTimestamp("2018-01-01 10:02:15"))
         self.trace1.addObs(p6)
 		
-        c7 = Coords.ENUCoords(0, 20, 0)
-        p7 = Obs.Obs(c7, ObsTime.ObsTime.readTimestamp("2018-01-01 10:02:35"))
+        p7 = Obs(ENUCoords(0, 20, 0), ObsTime.readTimestamp("2018-01-01 10:02:35"))
         self.trace1.addObs(p7)
 		
-        c8 = Coords.ENUCoords(5, 20, 0)
-        p8 = Obs.Obs(c8, ObsTime.ObsTime.readTimestamp("2018-01-01 10:02:35"))
+        p8 = Obs(ENUCoords(5, 20, 0), ObsTime.readTimestamp("2018-01-01 10:02:35"))
         self.trace1.addObs(p8)
 		
         # ---------------------------------------------------------------------		
 		
-        c1 = Coords.ENUCoords(0, 0, 0)
-        p1 = Obs.Obs(c1, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        p1 = Obs(ENUCoords(0, 0, 0), ObsTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace2.addObs(p1)
 		
-        c2 = Coords.ENUCoords(0, 10, 0)
-        p2 = Obs.Obs(c2, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:10"))
+        p2 = Obs(ENUCoords(0, 10, 0), ObsTime.readTimestamp("2018-01-01 10:00:10"))
         self.trace2.addObs(p2)
 		
-        c3 = Coords.ENUCoords(0, 10, 0)
-        p3 = Obs.Obs(c3, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:20"))
+        p3 = Obs(ENUCoords(0, 10, 0), ObsTime.readTimestamp("2018-01-01 10:00:20"))
         self.trace2.addObs(p3)
 		
-        c4 = Coords.ENUCoords(0, 30, 0)
-        p4 = Obs.Obs(c4, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:30"))
+        p4 = Obs(ENUCoords(0, 30, 0), ObsTime.readTimestamp("2018-01-01 10:00:30"))
         self.trace2.addObs(p4)
 		
         self.trace2.addAnalyticalFeature(Analytics.speed)
@@ -79,20 +70,16 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
         
         # ---------------------------------------------------------------------		
 		
-        c1 = Coords.ENUCoords(0, 0, 0)
-        p1 = Obs.Obs(c1, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        p1 = Obs(ENUCoords(0, 0, 0), ObsTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace3.addObs(p1)
 		
-        c2 = Coords.ENUCoords(0, 10, 0)
-        p2 = Obs.Obs(c2, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        p2 = Obs(ENUCoords(0, 10, 0), ObsTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace3.addObs(p2)
 		
-        c3 = Coords.ENUCoords(0, 10, 0)
-        p3 = Obs.Obs(c3, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        p3 = Obs(ENUCoords(0, 10, 0), ObsTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace3.addObs(p3)
 		
-        c4 = Coords.ENUCoords(0, 30, 0)
-        p4 = Obs.Obs(c4, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        p4 = Obs(ENUCoords(0, 30, 0), ObsTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace3.addObs(p4)
 		
         self.trace3.addAnalyticalFeature(Analytics.speed)
@@ -167,7 +154,7 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
         v3 = self.trace2.getObsAnalyticalFeature('speed', 3)
         
         a0 = self.trace2.getObsAnalyticalFeature('acceleration', 0)
-        self.assertEqual(math.isnan(a0), math.isnan(utils.NAN))
+        self.assertEqual(math.isnan(a0), math.isnan(NAN))
 
         a1 = self.trace2.getObsAnalyticalFeature('acceleration', 1)
         self.assertTrue(abs(a1 - (v2-v0)/20) < 0.000001)
@@ -225,7 +212,7 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
         s5 = self.trace1.getObsAnalyticalFeature('slope', 5)
         s6 = self.trace1.getObsAnalyticalFeature('slope', 6)
         
-        self.assertEqual(math.isnan(s0), math.isnan(utils.NAN))
+        self.assertEqual(math.isnan(s0), math.isnan(NAN))
         self.assertEqual(s1, 45.0)
         self.assertEqual(s2, 0.0)
         self.assertTrue(abs(s3 - 26.56) < 0.01)
@@ -237,10 +224,10 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
     def testAngleGeom(self):
 		
         a = Analytics.anglegeom(self.trace1, 0)
-        self.assertEqual(math.isnan(a), math.isnan(utils.NAN))
+        self.assertEqual(math.isnan(a), math.isnan(NAN))
         
         a = Analytics.anglegeom(self.trace1, self.trace1.size() - 1)
-        self.assertEqual(math.isnan(a), math.isnan(utils.NAN))
+        self.assertEqual(math.isnan(a), math.isnan(NAN))
 		
         a = Analytics.anglegeom(self.trace1, 1)
         self.assertTrue(abs(a - pi/2) < 0.000001)
@@ -264,10 +251,10 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
     def testCalculAngleOriente(self):
         
         a = Analytics.calculAngleOriente(self.trace1, 0)
-        self.assertEqual(math.isnan(a), math.isnan(utils.NAN))
+        self.assertEqual(math.isnan(a), math.isnan(NAN))
 		
         a = Analytics.calculAngleOriente(self.trace1, self.trace1.size() - 1)
-        self.assertEqual(math.isnan(a), math.isnan(utils.NAN))
+        self.assertEqual(math.isnan(a), math.isnan(NAN))
 		
         a = Analytics.calculAngleOriente(self.trace1, 1)
         self.assertTrue(abs(a + 90) < 0.000001)
