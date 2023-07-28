@@ -5,7 +5,7 @@ import unittest
 import math
 import matplotlib.pyplot as plt
 
-from tracklib.core.ObsCoords import ENUCoords
+from tracklib import (ENUCoords)
 from tracklib.core.Bbox import Bbox
 import tracklib.algo.Geometrics as Geometrics
 

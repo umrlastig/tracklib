@@ -4,7 +4,6 @@ from unittest import TestCase, TestSuite, TextTestRunner
 import matplotlib.pyplot as plt
 import os.path
 
-
 from tracklib import (Obs, ObsTime, ENUCoords)
 from tracklib.core import (Track, RasterBand, TrackCollection)
 from tracklib.io.TrackReader import TrackReader

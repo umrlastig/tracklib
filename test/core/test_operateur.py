@@ -9,7 +9,7 @@ import os
 import random
 import unittest
 
-from tracklib.core.ObsTime import ObsTime
+from tracklib import (ObsTime)
 from tracklib.core.Operator import Operator
 from tracklib.core.Kernel import GaussianKernel
 from tracklib.io.TrackReader import TrackReader

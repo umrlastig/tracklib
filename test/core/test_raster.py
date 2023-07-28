@@ -2,8 +2,7 @@
 
 from unittest import TestCase, TestSuite, TextTestRunner
 
-
-from tracklib.core.ObsCoords import ENUCoords
+from tracklib import (ENUCoords)
 from tracklib.core import (RasterBand, Bbox)
 
 

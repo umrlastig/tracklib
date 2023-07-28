@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from unittest import TestCase, TestSuite, TextTestRunner
 
-from tracklib.core import (Track, Obs, ObsTime)
-from tracklib.core import ObsCoords as Coords
+from tracklib import (ENUCoords, ObsTime, Obs)
+from tracklib.core import (Track)
 from tracklib.algo.Geometrics import Polygon
 import tracklib.algo.Cinematics as Cinematics
 
@@ -14,30 +14,30 @@ class TestTrack(TestCase):
     __epsilon = 0.001
     
     def setUp (self):
-        ObsTime.ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         
         # ---------------------------------------------------------------------
         self.trace1 = Track.Track([], 1)
-        c1 = Coords.ENUCoords(1.0, 5.0, 0)
-        p1 = Obs.Obs(c1, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        c1 = ENUCoords(1.0, 5.0, 0)
+        p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace1.addObs(p1)
         
         # ---------------------------------------------------------------------
         self.trace2 = Track.Track([], 1)
-        c1 = Coords.ENUCoords(1.0, 5.0, 0)
-        p1 = Obs.Obs(c1, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        c1 = ENUCoords(1.0, 5.0, 0)
+        p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         self.trace2.addObs(p1)
         
-        c2 = Coords.ENUCoords(2.0, 5.0, 0)
-        p2 = Obs.Obs(c2, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:05"))
+        c2 = ENUCoords(2.0, 5.0, 0)
+        p2 = Obs(c2, ObsTime.readTimestamp("2018-01-01 10:00:05"))
         self.trace2.addObs(p2)
         
-        c3 = Coords.ENUCoords(3.0, 5.0, 0)
-        p3 = Obs.Obs(c3, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:10"))
+        c3 = ENUCoords(3.0, 5.0, 0)
+        p3 = Obs(c3, ObsTime.readTimestamp("2018-01-01 10:00:10"))
         self.trace2.addObs(p3)
         
-        c4 = Coords.ENUCoords(5.0, 5.0, 0.4)
-        p4 = Obs.Obs(c4, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:20"))
+        c4 = ENUCoords(5.0, 5.0, 0.4)
+        p4 = Obs(c4, ObsTime.readTimestamp("2018-01-01 10:00:20"))
         self.trace2.addObs(p4)
         
         # ---------------------------------------------------------------------
@@ -47,8 +47,8 @@ class TestTrack(TestCase):
         self.trace3.addObs(p3)
         self.trace3.addObs(p4)
         
-        c5 = Coords.ENUCoords(7.0, 5.0, 0)
-        p5 = Obs.Obs(c5, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:45"))
+        c5 = ENUCoords(7.0, 5.0, 0)
+        p5 = Obs(c5, ObsTime.readTimestamp("2018-01-01 10:00:45"))
         self.trace3.addObs(p5)
         
         
@@ -101,7 +101,7 @@ class TestTrack(TestCase):
         tab = self.trace1.getTimestamps()
         self.assertEqual(len(tab), 1)
         self.assertEqual(tab[0], 
-                         ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00"))
+                         ObsTime.readTimestamp("2018-01-01 10:00:00"))
         
         
     def test_enclosed_polygon(self):
@@ -121,7 +121,7 @@ class TestTrack(TestCase):
         self.assertEqual(t1.getObs(3).position.getX(), 4.0)
         
         t2 = self.trace2.copy()
-        pos = Coords.ENUCoords(3.0, 4.0, 0.0)
+        pos = ENUCoords(3.0, 4.0, 0.0)
         t2.shiftTo(1, pos)
         self.assertEqual(t2.getObs(0).position.getX(), 2.0)
         self.assertEqual(t2.getObs(0).position.getY(), 4.0)
@@ -261,8 +261,8 @@ class TestTrack(TestCase):
 
     def test_sort(self):
         self.assertTrue(self.trace2.isSorted())
-        c1 = Coords.ENUCoords(0.0, 5.0, 0.5)
-        p1 = Obs.Obs(c1, ObsTime.ObsTime.readTimestamp("2018-01-01 09:59:55"))
+        c1 = ENUCoords(0.0, 5.0, 0.5)
+        p1 = Obs(c1, ObsTime.readTimestamp("2018-01-01 09:59:55"))
         self.trace2.addObs(p1)
         self.assertFalse(self.trace2.isSorted())
         self.trace2.sort()
@@ -301,7 +301,7 @@ class TestTrack(TestCase):
         self.assertEqual(str(self.trace2.getTimestamps(1)).strip()[0:19], 
                          "01/01/2018 10:00:10")
         
-        self.trace2.removeObsList([ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:00")])
+        self.trace2.removeObsList([ObsTime.readTimestamp("2018-01-01 10:00:00")])
         self.assertEqual(self.trace2.size(), 1)
         self.assertEqual(self.trace2.getX(), [3.0])
         self.assertEqual(self.trace2.getY(), [5.0])
@@ -384,12 +384,12 @@ class TestTrack(TestCase):
         
         self.trace2.removeAnalyticalFeature('abs_curv')
         
-        c4 = Coords.ENUCoords(3.0, 4.0, 0)
-        p4 = Obs.Obs(c4, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:13"))
+        c4 = ENUCoords(3.0, 4.0, 0)
+        p4 = Obs(c4, ObsTime.readTimestamp("2018-01-01 10:00:13"))
         self.trace2.insertObs(p4, 3)
         
-        c5 = Coords.ENUCoords(5.0, 4.0, 0)
-        p5 = Obs.Obs(c5, ObsTime.ObsTime.readTimestamp("2018-01-01 10:00:17"))
+        c5 = ENUCoords(5.0, 4.0, 0)
+        p5 = Obs(c5, ObsTime.readTimestamp("2018-01-01 10:00:17"))
         self.trace2.insertObs(p5)
                 
         self.assertEqual(6, self.trace2.size())
@@ -413,30 +413,30 @@ class TestTrack(TestCase):
         
     def test_insert_obs2(self):
         
-        ObsTime.ObsTime.setReadFormat("2D/2M/4Y 2h:2m:2s")
+        ObsTime.setReadFormat("2D/2M/4Y 2h:2m:2s")
         
         track = Track.Track([], 1)
-        p = Obs.Obs(Coords.ENUCoords(904145.257, 6435910.726, 1228.000), ObsTime.ObsTime.readTimestamp("01/01/1970 00:00:00"))
+        p = Obs(ENUCoords(904145.257, 6435910.726, 1228.000), ObsTime.readTimestamp("01/01/1970 00:00:00"))
         track.addObs(p)
-        p = Obs.Obs(Coords.ENUCoords(904135.886, 6435924.287, 1230.000), ObsTime.ObsTime.readTimestamp("01/01/1970 00:00:00"))
+        p = Obs(ENUCoords(904135.886, 6435924.287, 1230.000), ObsTime.readTimestamp("01/01/1970 00:00:00"))
         track.addObs(p)
-        p = Obs.Obs(Coords.ENUCoords(904131.695, 6435940.496, 1232.000), ObsTime.ObsTime.readTimestamp("01/01/1970 00:00:00"))
+        p = Obs(ENUCoords(904131.695, 6435940.496, 1232.000), ObsTime.readTimestamp("01/01/1970 00:00:00"))
         track.addObs(p)
-        p = Obs.Obs(Coords.ENUCoords(904124.752, 6435949.758, 1234.000), ObsTime.ObsTime.readTimestamp("01/01/1970 00:00:00"))
+        p = Obs(ENUCoords(904124.752, 6435949.758, 1234.000), ObsTime.readTimestamp("01/01/1970 00:00:00"))
         track.addObs(p)
-        p = Obs.Obs(Coords.ENUCoords(904121.474, 6435953.784, 1235.000), ObsTime.ObsTime.readTimestamp("01/01/1970 00:00:00"))
+        p = Obs(ENUCoords(904121.474, 6435953.784, 1235.000), ObsTime.readTimestamp("01/01/1970 00:00:00"))
         track.addObs(p)
-        p = Obs.Obs(Coords.ENUCoords(904112.641, 6435964.640, 1237.000), ObsTime.ObsTime.readTimestamp("01/01/1970 00:00:00"))
+        p = Obs(ENUCoords(904112.641, 6435964.640, 1237.000), ObsTime.readTimestamp("01/01/1970 00:00:00"))
         track.addObs(p)
-        p = Obs.Obs(Coords.ENUCoords(904112.033, 6435956.730, 1239.000), ObsTime.ObsTime.readTimestamp("01/01/1970 00:00:00"))
+        p = Obs(ENUCoords(904112.033, 6435956.730, 1239.000), ObsTime.readTimestamp("01/01/1970 00:00:00"))
         track.addObs(p)
-        p = Obs.Obs(Coords.ENUCoords(904110.988, 6435953.029, 1240.000), ObsTime.ObsTime.readTimestamp("01/01/1970 00:00:00"))
+        p = Obs(ENUCoords(904110.988, 6435953.029, 1240.000), ObsTime.readTimestamp("01/01/1970 00:00:00"))
         track.addObs(p)
-        p = Obs.Obs(Coords.ENUCoords(904108.868, 6435945.536, 1242.000), ObsTime.ObsTime.readTimestamp("01/01/1970 00:00:00"))
+        p = Obs(ENUCoords(904108.868, 6435945.536, 1242.000), ObsTime.readTimestamp("01/01/1970 00:00:00"))
         track.addObs(p)
         self.assertLessEqual(abs(track.length() - 84.83257), self.__epsilon)
         
-        p = Obs.Obs(Coords.ENUCoords(904113.755, 6435963.271, 1236), ObsTime.ObsTime.readTimestamp("01/01/1970 00:00:00"))
+        p = Obs(ENUCoords(904113.755, 6435963.271, 1236), ObsTime.readTimestamp("01/01/1970 00:00:00"))
         track.insertObs(p, 5)
         self.assertLessEqual(abs(track.length() - 84.994800), self.__epsilon)
         

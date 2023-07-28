@@ -1,9 +1,7 @@
 from unittest import TestCase, TestSuite, TextTestRunner
 import os.path
 
-from tracklib.core.ObsTime import ObsTime
-from tracklib.core.ObsCoords import ENUCoords
-from tracklib.core.Obs import Obs
+from tracklib import (ENUCoords, ObsTime, Obs)
 from tracklib.core.Track import Track
 from tracklib.core.TrackCollection import TrackCollection
 

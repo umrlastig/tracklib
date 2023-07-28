@@ -7,9 +7,10 @@ import math
 import os.path
 import unittest
 
-from tracklib.core.ObsTime import ObsTime
+from tracklib import (ObsTime)
 from tracklib.core.Operator import Operator
 from tracklib.io.TrackReader import TrackReader
+
 
 class TestVitesseMethods(unittest.TestCase):
     
