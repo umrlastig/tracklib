@@ -10,7 +10,7 @@ from __future__ import annotations
 #from typing import Union
 
 from tracklib.core import (ENUCoords, Bbox)
-from tracklib.core import (RasterBand, Raster)
+from tracklib.core import (Raster)
 
 
 class RasterReader:
@@ -33,7 +33,7 @@ class RasterReader:
         ncols = 0
         
         cptrowheader = 0
-        novalue = RasterBand.NO_DATA_VALUE
+        novalue = Raster.NO_DATA_VALUE
         for line in lines:
             cle = line.split(" ")[0].strip()
             if cle in  ['ncols', 'nrows', 'xllcorner', 'yllcorner', 'cellsize', 'NODATA_value']:
@@ -69,9 +69,9 @@ class RasterReader:
         marge = 0
         
         if name == '':
-            name = RasterBand.DEFAULT_NAME
+            name = Raster.DEFAULT_NAME
             
-        grid = RasterBand.RasterBand(bbox, resolution=resolution, margin=marge, 
+        grid = Raster.RasterBand(bbox, resolution=resolution, margin=marge, 
                          novalue=novalue, name=name)
            
         return grid
@@ -128,7 +128,7 @@ class RasterReader:
         ncols = 0
         
         cptrowheader = 0
-        novalue = RasterBand.NO_DATA_VALUE
+        novalue = Raster.NO_DATA_VALUE
         for line in lines:
             cle = line.split(" ")[0].strip()
             if cle in  ['ncols', 'nrows', 'xllcorner', 'yllcorner', 'cellsize', 'NODATA_value']:
@@ -164,9 +164,9 @@ class RasterReader:
         marge = 0
         
         if name == '':
-            name = RasterBand.DEFAULT_NAME
+            name = Raster.DEFAULT_NAME
             
-        grid = RasterBand.RasterBand(bbox, resolution=resolution, margin=marge, 
+        grid = Raster.RasterBand(bbox, resolution=resolution, margin=marge, 
                          novalue=novalue, name=name)
            
         # Read the values

@@ -7,7 +7,7 @@ import os.path
 from tracklib import (Obs, ObsTime, ENUCoords, TrackCollection,
                       speed)
 #from tracklib.algo import (Analytics)
-from tracklib.core import (Track, RasterBand)
+from tracklib.core import (Track, Raster)
 from tracklib.io.TrackReader import TrackReader
 from tracklib.algo import (Summarising) 
 
@@ -80,9 +80,9 @@ class TestSummarising(TestCase):
         self.assertEqual(name, 'speed#co_avg')
                          
         grille = raster.getRasterBand(name)
-        self.assertIsInstance(grille, RasterBand.RasterBand)
+        self.assertIsInstance(grille, Raster.RasterBand)
         
-        self.assertEqual(grille.getNoDataValue(), RasterBand.NO_DATA_VALUE)
+        self.assertEqual(grille.getNoDataValue(), Raster.NO_DATA_VALUE)
         
         grille.plotAsGraphic()
         plt.show()

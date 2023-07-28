@@ -7,9 +7,7 @@ import math
 
 from tracklib.core import (listify, isnan, NAN,
                            TrackCollection)
-from tracklib.core.Raster import Raster
-from tracklib.core.RasterBand import RasterBand
-from tracklib.core.RasterBand import NO_DATA_VALUE
+from tracklib.core.Raster import Raster, RasterBand, NO_DATA_VALUE
 
 
 
