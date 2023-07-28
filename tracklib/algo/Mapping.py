@@ -19,7 +19,7 @@ from . import (HMM,
                MODE_VERBOSE_PROGRESS,
                computeAbsCurv)
 from tracklib.core.Track import Track
-from tracklib.core.operators import Operator
+from tracklib.core import Operator
 
 # --------------------------------------------------------------------------
 # Utils function for map-matching

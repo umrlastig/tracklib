@@ -8,7 +8,7 @@ from . import (anglegeom,
                BIAF_HEADING, heading,
                BIAF_DS, ds,
                BIAF_ABS_CURV)
-from tracklib.core.operators import Operator
+from tracklib.core import Operator
 
 
 def estimate_speed(track):

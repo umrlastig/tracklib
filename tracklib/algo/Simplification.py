@@ -9,7 +9,7 @@ import numpy as np
 from tracklib.util import (aire_visval, 
                            distance_to_segment,
                            boundingShape, MODE_ENCLOSING_MBR)
-from tracklib.core.operators import Operator
+from tracklib.core import Operator
 from tracklib.algo.Segmentation import (
     MODE_SEGMENTATION_MINIMIZE,
     MODE_SEGMENTATION_MAXIMIZE,

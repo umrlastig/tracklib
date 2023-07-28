@@ -10,7 +10,7 @@ from tracklib.core import (ENUCoords, Obs, isnan,
 from tracklib.util import Circle, minCircle
 from tracklib.algo import (acceleration, 
                            ALGO_LINEAR, MODE_SPATIAL)
-from tracklib.core.operators import Operator
+from tracklib.core import Operator
 # --------------------------------------------------------------------------
 # Circular import (not satisfying solution)
 # --------------------------------------------------------------------------

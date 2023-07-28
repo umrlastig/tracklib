@@ -13,10 +13,10 @@ import matplotlib.pyplot as plt
 from tracklib.core import (ECEFCoords, ENUCoords, GeoCoords, 
                       Obs, 
                       priority_dict,
-                      TrackCollection)
+                      TrackCollection,
+                      Bbox)
 from tracklib.plot import IPlotVisitor
 import tracklib.algo.Simplification as Simplification
-from tracklib.core.Bbox import Bbox
 from tracklib.core.Track import Track
 
 

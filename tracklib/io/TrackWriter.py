@@ -15,7 +15,7 @@ from tracklib.core import (ObsTime,
 from tracklib.io.TrackFormat import TrackFormat
 from tracklib.core.Network import Network
 from tracklib.core.Track import Track
-from tracklib.core.operators import Operator
+from tracklib.core import Operator
 
 
 class TrackWriter:

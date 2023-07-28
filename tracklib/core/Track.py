@@ -21,7 +21,8 @@ from . import (ObsTime, ENUCoords, Obs,
 from tracklib.util import intersection, Polygon
 from tracklib.plot import IPlotVisitor
 from tracklib.algo import BIAF_SPEED, BIAF_ABS_CURV                      
-from tracklib.core.operators import (UnaryOperator, 
+
+from . import (UnaryOperator, 
                                     BinaryOperator, 
                                     ScalarOperator,
                                     ScalarVoidOperator, 
@@ -1302,7 +1303,7 @@ class Track:
     def smooth(self, width=1):
         """TODO"""
         import tracklib.algo.Filtering as Filtering
-        from tracklib.core.Kernel import GaussianKernel
+        from tracklib.core import GaussianKernel
         self = Filtering.filter_seq(self, GaussianKernel(width))
 
     def incrementTime(self, dt=1, offset=0):

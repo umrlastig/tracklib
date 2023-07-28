@@ -9,9 +9,8 @@ import os
 import random
 import unittest
 
-from tracklib import (ObsTime)
-from tracklib.core.operators import Operator
-from tracklib.core.Kernel import GaussianKernel
+from tracklib import (ObsTime, Operator, GaussianKernel)
+
 from tracklib.io.TrackReader import TrackReader
 import tracklib.algo.Synthetics as synth
 import tracklib.algo.Analytics as Analytics
@@ -101,10 +100,10 @@ class TestOperateurMethods(unittest.TestCase):
 
         track.operate(Operator.FILTER, ("x_noised", "y_noised"), kernel, ("x_filtered", "y_filtered"))
 
-        plt.plot(track.getX(), track.getY(), 'k--')
-        plt.plot(track.getAnalyticalFeature("x_noised"), track.getAnalyticalFeature("y_noised"), 'b-')
-        plt.plot(track.getAnalyticalFeature("x_filtered"), track.getAnalyticalFeature("y_filtered"), 'r-')
-        plt.show()    
+        #plt.plot(track.getX(), track.getY(), 'k--')
+        #plt.plot(track.getAnalyticalFeature("x_noised"), track.getAnalyticalFeature("y_noised"), 'b-')
+        #plt.plot(track.getAnalyticalFeature("x_filtered"), track.getAnalyticalFeature("y_filtered"), 'r-')
+        #plt.show()    
         
         
     def x2(t):
@@ -187,9 +186,9 @@ class TestOperateurMethods(unittest.TestCase):
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     suite.addTest(TestOperateurMethods("test_random"))
-    suite.addTest(TestOperateurMethods("test_generate"))
-    suite.addTest(TestOperateurMethods("test_import"))
-    suite.addTest(TestOperateurMethods("test_abs_curv1"))
+    #suite.addTest(TestOperateurMethods("test_generate"))
+    #suite.addTest(TestOperateurMethods("test_import"))
+    #suite.addTest(TestOperateurMethods("test_abs_curv1"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
     

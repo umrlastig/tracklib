@@ -2,7 +2,7 @@
 
 import random
 
-from tracklib.core import (ENUCoords, ObsTime, Obs, TrackCollection, Kernel)
+from tracklib.core import (ENUCoords, ObsTime, Obs, TrackCollection, GaussianKernel)
 from tracklib.core.Track import Track
 
 
@@ -55,7 +55,7 @@ def generate(
             obs = Obs(ENUCoords(x_t(t), y_t(t), z_t(t)), tps)
         track.addObs(obs)
     if randomTrack:
-        track = track.noise(50, Kernel.GaussianKernel(scope))
+        track = track.noise(50, GaussianKernel(scope))
     return track
 
 
