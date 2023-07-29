@@ -14,8 +14,6 @@ from .Segmentation import *
 from .Selection import *
 from .Simplification import *
 
-
-"""
 from .Mapping import *
 from .Summarising import *
-"""
+

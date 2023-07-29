@@ -4,22 +4,16 @@
 from __future__ import annotations   
 
 import math
-#import os
-#import platform
-#import psutil
 import progressbar
 import numpy as np
-#import matplotlib.pyplot as plt
 
+import tracklib as tracklib
 from tracklib.util import proj_polyligne
-from tracklib.core import (ENUCoords, Obs,
-                           TrackCollection)
+from tracklib.core import (ENUCoords, Obs, Operator)
 from . import (HMM, 
                MODE_OBS_AS_2D_POSITIONS, 
                MODE_VERBOSE_PROGRESS,
                computeAbsCurv)
-from tracklib.core import Track
-from tracklib.core import Operator
 
 # --------------------------------------------------------------------------
 # Utils function for map-matching
@@ -111,7 +105,7 @@ def __mapOnNetwork (
                         (p, elem, __distToNode(eg, p, v, 0), __distToNode(eg, p, v, 1))
                     )
                     if debug:
-                        wkt = Track([Obs(track[i].position), Obs(p)]).toWKT()
+                        wkt = tracklib.Track([Obs(track[i].position), Obs(p)]).toWKT()
                         f1.write(str(i) + ' "' + wkt + '" ' + str(d) + "\n")
                         
         # If no candidate link found
@@ -163,8 +157,8 @@ def mapOnNetwork(
     Map-matching on a network.
     """
     
-    if isinstance(tracks, Track):
-        tracks = TrackCollection([tracks])
+    if isinstance(tracks, tracklib.Track):
+        tracks = tracklib.TrackCollection([tracks])
     for track in tracks:
         __mapOnNetwork(track, network, gps_noise, transition_cost, search_radius, debug)
         
@@ -384,7 +378,7 @@ def mapOn(
 
         P1 = [track.getObs(i).position.copy() for i in TP1]
 
-        if isinstance(reference, Track):
+        if isinstance(reference, tracklib.Track):
             P2 = [reference.getObs(i).position.copy() for i in TP2]
         else:
             P2 = reference
