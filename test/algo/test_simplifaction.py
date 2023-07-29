@@ -5,8 +5,14 @@ from unittest import TestCase, TestSuite, TextTestRunner
 import matplotlib.pyplot as plt
 import os.path
 
-from tracklib import (ObsTime, GaussianKernel, Operator, TrackReader)
-import tracklib.algo.Simplification as spf
+from tracklib import (ObsTime, GaussianKernel, Operator, TrackReader,
+                      simplify,
+                      MODE_SIMPLIFY_DOUGLAS_PEUCKER,
+                      MODE_SIMPLIFY_VISVALINGAM,
+                      MODE_SIMPLIFY_SQUARING,
+                      MODE_SIMPLIFY_MINIMIZE_ELONGATION_RATIO,
+                      MODE_SIMPLIFY_PRECLUDE_LARGE_DEVIATION)
+
 
 
 class TestSimplificationMethods(TestCase):
@@ -27,14 +33,14 @@ class TestSimplificationMethods(TestCase):
         ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, 'data/trace1.dat')
         track = TrackReader.readFromCsv(chemin, 2, 3, -1, 4, separator=",")
-        track = spf.simplify(track, 5, mode = spf.MODE_SIMPLIFY_DOUGLAS_PEUCKER)
+        track = simplify(track, 5, mode=MODE_SIMPLIFY_DOUGLAS_PEUCKER)
         
     
     def test_visvalingam(self):
         ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, 'data/trace1.dat')
         track = TrackReader.readFromCsv(chemin, 2, 3, -1, 4, separator=",")
-        track = spf.simplify(track, 5, mode = spf.MODE_SIMPLIFY_VISVALINGAM)
+        track = simplify(track, 5, mode=MODE_SIMPLIFY_VISVALINGAM)
         
         
     def test_gaussien(self):
@@ -54,8 +60,7 @@ class TestSimplificationMethods(TestCase):
         Douglas-Peucker, tolerance 50 m
         '''
         self.track *= 10
-        self.track = spf.simplify(self.track, 50, 
-                                  mode = spf.MODE_SIMPLIFY_DOUGLAS_PEUCKER)
+        self.track = simplify(self.track, 50, mode=MODE_SIMPLIFY_DOUGLAS_PEUCKER)
         self.view(self.track, sym)    
     
 
@@ -64,8 +69,7 @@ class TestSimplificationMethods(TestCase):
         Vis-Valingam, tolerance 500 m2
         '''
         self.track *= 10
-        self.track = spf.simplify(self.track, 5e2, 
-                                  mode = spf.MODE_SIMPLIFY_VISVALINGAM)
+        self.track = simplify(self.track, 5e2, mode=MODE_SIMPLIFY_VISVALINGAM)
         self.view(self.track, sym)    
     
 
@@ -73,8 +77,7 @@ class TestSimplificationMethods(TestCase):
         '''
         Equarissage, tolerance 50 m
         '''
-        self.track = spf.simplify(self.track, 50, 
-                                  mode = spf.MODE_SIMPLIFY_SQUARING)
+        self.track = simplify(self.track, 50, mode=MODE_SIMPLIFY_SQUARING)
         self.view(self.track, sym)    
 
 
@@ -82,8 +85,7 @@ class TestSimplificationMethods(TestCase):
         '''
         Minimisation des elongations par segment  
         '''
-        self.track = spf.simplify(self.track, 0.05, 
-                                  mode = spf.MODE_SIMPLIFY_MINIMIZE_ELONGATION_RATIO)
+        self.track = simplify(self.track, 0.05, mode=MODE_SIMPLIFY_MINIMIZE_ELONGATION_RATIO)
         self.view(self.track, sym)    
     
     
@@ -91,8 +93,7 @@ class TestSimplificationMethods(TestCase):
         '''
         Minimisation des deviations
         '''
-        self.track = spf.simplify(self.track, 0.05, 
-                                  mode = spf.MODE_SIMPLIFY_PRECLUDE_LARGE_DEVIATION)
+        self.track = simplify(self.track, 0.05, mode=MODE_SIMPLIFY_PRECLUDE_LARGE_DEVIATION)
         self.view(self.track, sym)    
     
 

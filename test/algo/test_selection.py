@@ -438,12 +438,12 @@ if __name__ == '__main__':
     
     suite = TestSuite()
     
-    suite.addTest(TestSelection("test_print"))
-    suite.addTest(TestSelection("test_selection_one_timestamp_constraint"))
-    suite.addTest(TestSelection("test_selection_one_shape_constraint"))
-    suite.addTest(TestSelection("test_selection_one_shape_time_constraint"))
+    #suite.addTest(TestSelection("test_print"))
+    #suite.addTest(TestSelection("test_selection_one_timestamp_constraint"))
+    #suite.addTest(TestSelection("test_selection_one_shape_constraint"))
+    #suite.addTest(TestSelection("test_selection_one_shape_time_constraint"))
     suite.addTest(TestSelection("test_selection_track_constraint"))
-    suite.addTest(TestSelection("test_selection_combinaison_constraint"))
+    #suite.addTest(TestSelection("test_selection_combinaison_constraint"))
    
     runner = TextTestRunner()
     runner.run(suite)

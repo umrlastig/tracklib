@@ -5,8 +5,7 @@ import unittest
 import math
 import matplotlib.pyplot as plt
 
-from tracklib import (ENUCoords, Polygon)
-from tracklib.core.Bbox import Bbox
+from tracklib import (ENUCoords, Polygon, Bbox)
 
 
 class TestBbox(unittest.TestCase):
