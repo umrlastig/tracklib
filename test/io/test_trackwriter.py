@@ -289,7 +289,7 @@ class TestTrackWriter(TestCase):
 if __name__ == '__main__':
     
     suite = TestSuite()
-    '''
+
     suite.addTest(TestTrackWriter("test_write_csv_path"))
     suite.addTest(TestTrackWriter("test_write_csv_minim"))
     suite.addTest(TestTrackWriter("test_write_csv_2AF"))
@@ -304,14 +304,14 @@ if __name__ == '__main__':
     suite.addTest(TestTrackWriter("testWriteTwoTrackToOneGpx0AF"))
     suite.addTest(TestTrackWriter("testWriteTwoTrackToOneGpx1AF"))
     suite.addTest(TestTrackWriter("testWriteTwoTrackToOneGpx2AF"))
-    '''
+
     #tracks - many gpx
-    #suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx0AF"))
-    #suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx1AF"))
+    suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx0AF"))
+    suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx1AF"))
     suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx2AF"))
     
-    #suite.addTest(TestTrackWriter("testWriteKml"))
-    #suite.addTest(TestTrackWriter("testExportGeoJson"))
+    suite.addTest(TestTrackWriter("testWriteKml"))
+    suite.addTest(TestTrackWriter("testExportGeoJson"))
     
     runner = TextTestRunner()
     runner.run(suite)
