@@ -4,7 +4,7 @@
 from __future__ import annotations   
 from typing import Literal   
 
-from tracklib.core.Network import Network
+from tracklib.core import Network
 
 class NetworkWriter:
     """

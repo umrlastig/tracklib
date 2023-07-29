@@ -11,7 +11,7 @@ from tracklib.util import isSegmentIntersects
 from tracklib.plot import IPlotVisitor
 
 from tracklib.core import (Bbox, Track)
-from tracklib.core.Network import Edge
+from tracklib.core import Edge
 
 
 

@@ -673,7 +673,7 @@ class Track:
     # positions. Timestamps are reinterpolated
     # -----------------------------------------------------
     def removeTpsDup(self, et = 1e-3):
-        from tracklib.algo.Cinematics import computeAbsCurv
+        from tracklib.algo import computeAbsCurv
         
         computeAbsCurv(self)
         new_track = Track()
@@ -1431,10 +1431,10 @@ class Track:
         if raw speeds are required. If kernel is specified
         smoothed speed estimation is computed."""
         if kernel is None:
-            from tracklib.algo.Cinematics import estimate_speed
+            from tracklib.algo import estimate_speed
             return estimate_speed(self)
         else:
-            from tracklib.algo.Cinematics import smoothed_speed_calculation
+            from tracklib.algo import smoothed_speed_calculation
             return smoothed_speed_calculation(self, kernel)
 
 
@@ -2236,7 +2236,7 @@ class Track:
     # ------------------------------------------------------------
     def __floordiv__(self, track):
         """TODO"""
-        from tracklib.algo.Interpolation import MODE_TEMPORAL
+        from tracklib.algo import MODE_TEMPORAL
         track_resampled = self.copy()
         track_resampled.resample(track, mode = MODE_TEMPORAL)
         return track_resampled

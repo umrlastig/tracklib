@@ -151,8 +151,8 @@ class Plot:
     def __plotCircular(self, ax):
         
         from numpy import sin, pi, cos
-        import tracklib.algo.Cinematics as Cinematics
-        Cinematics.computeAbsCurv(self.track)
+        from tracklib.algo import computeAbsCurv
+        computeAbsCurv(self.track)
         
         r = 0.7
         decal = 0.05

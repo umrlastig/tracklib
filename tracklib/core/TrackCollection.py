@@ -81,18 +81,18 @@ class TrackCollection:
 
     def createSpatialIndex(self, resolution=None, verbose=True):
         """TODO"""
-        from tracklib.core.SpatialIndex import SpatialIndex
+        from tracklib.core import SpatialIndex
 
         self.spatial_index = SpatialIndex(self, resolution, verbose)
 
     def exportSpatialIndex(self, filename):
         """TODO"""
-        # from tracklib.core.SpatialIndex import SpatialIndex
+        # from tracklib.core import SpatialIndex
         self.spatial_index.save(filename)
 
     def importSpatialIndex(self, filename):
         """TODO"""
-        from tracklib.core.SpatialIndex import SpatialIndex
+        from tracklib.core import SpatialIndex
 
         self.spatial_index = SpatialIndex.load(filename)
 

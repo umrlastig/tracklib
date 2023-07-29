@@ -9,11 +9,8 @@ from xml.dom import minidom
 
 from tracklib.core import ObsTime, ENUCoords, ECEFCoords, GeoCoords, Obs
 from tracklib.algo import computeAbsCurv
-
-from tracklib.core import Bbox, Track
-from tracklib.core.Network import Network, Node, Edge
-from tracklib.core.SpatialIndex import SpatialIndex
-from tracklib.io.NetworkFormat import NetworkFormat
+from tracklib.core import Bbox, Track, Network, Node, Edge, SpatialIndex
+from . import NetworkFormat
 
 
 

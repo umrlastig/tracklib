@@ -302,7 +302,7 @@ class Network:
         :param margin: TODO
         :param verbose: Verbose creation
         """
-        from tracklib.core.SpatialIndex import SpatialIndex
+        from tracklib.core import SpatialIndex
 
         self.spatial_index = SpatialIndex(self, resolution, margin, verbose)
 
@@ -318,7 +318,7 @@ class Network:
 
         :parma filename: File to import
         """
-        from tracklib.core.SpatialIndex import SpatialIndex
+        from tracklib.core import SpatialIndex
 
         self.spatial_index = SpatialIndex.load(filename)
 

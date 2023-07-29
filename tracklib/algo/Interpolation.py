@@ -11,7 +11,7 @@ import numpy as np
 from tracklib.core import (Obs, ENUCoords, ObsTime, 
                       makeCovarianceMatrixFromKernelOld,
                       makeDistanceMatrixOld)
-from tracklib.core import Track
+#from tracklib.core import Track
 
 MODE_SPATIAL = 1
 MODE_TEMPORAL = 2

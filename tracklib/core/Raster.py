@@ -13,7 +13,7 @@ import numpy as np
 
 from tracklib.core import listify
 from tracklib.core import ECEFCoords, ENUCoords, GeoCoords, getOffsetColorMap
-from tracklib.core.Bbox import Bbox
+from tracklib.core import Bbox
 
 NO_DATA_VALUE = -9999
 DEFAULT_NAME = 'grid'

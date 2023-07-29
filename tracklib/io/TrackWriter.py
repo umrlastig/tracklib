@@ -9,13 +9,13 @@ import os
 import progressbar
 import sys 
 
+from . import TrackFormat
 from tracklib.core import (ObsTime, 
                       rgbToHex, interpColors, 
-                      TrackCollection)
-from tracklib.io.TrackFormat import TrackFormat
-from tracklib.core.Network import Network
-from tracklib.core import Track
-from tracklib.core import Operator
+                      TrackCollection,
+                      Network,
+                      Track,
+                      Operator)
 
 
 class TrackWriter:

@@ -12,8 +12,7 @@ from tracklib.plot import (Plot,
                            MARKERS_TYPE_NO_STOP,
                            MARKERS_TYPE_INFORMATION)
 
-import tracklib.core.Network as network
-import tracklib.core.SpatialIndex as index
+from tracklib.core import SpatialIndex, Edge
 
 
 class MatplotlibVisitor(IPlotVisitor):
@@ -131,7 +130,7 @@ class MatplotlibVisitor(IPlotVisitor):
         """
         pass
     
-    def plotSpatialIndex(self, si: index.SpatialIndex, base:bool=True, append=True):
+    def plotSpatialIndex(self, si: SpatialIndex, base:bool=True, append=True):
         """
         Plot spatial index and collection structure together in the
         same reference frame (geographic reference frame)
@@ -232,13 +231,13 @@ class MatplotlibVisitor(IPlotVisitor):
         for i in range(len(L)):
             edge = L[i][1]
             for j in range(edge.geom.size() - 1):
-                if edge.orientation == network.Edge.DOUBLE_SENS:
+                if edge.orientation == Edge.DOUBLE_SENS:
                     x1b.append(edge.geom.getX()[j])
                     x2b.append(edge.geom.getX()[j + 1])
                     y1b.append(edge.geom.getY()[j])
                     y2b.append(edge.geom.getY()[j + 1])
                 else:
-                    if edge.orientation == network.Edge.SENS_DIRECT:
+                    if edge.orientation == Edge.SENS_DIRECT:
                         x1d.append(edge.geom.getX()[j])
                         x2d.append(edge.geom.getX()[j + 1])
                         y1d.append(edge.geom.getY()[j])

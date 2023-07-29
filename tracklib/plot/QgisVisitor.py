@@ -2,10 +2,8 @@
 
 import matplotlib.pyplot as plt
 
-import tracklib.core.Network as network
-import tracklib.core.SpatialIndex as index
-import tracklib.plot.IPlotVisitor as iplot
-import tracklib.plot.Plot as Plot
+from tracklib.core import SpatialIndex
+from tracklib.plot import IPlotVisitor
 
 from qgis.PyQt.QtCore import QVariant
 from qgis.core import QgsProject, QgsVectorLayer, QgsField
@@ -14,7 +12,7 @@ from qgis.core import QgsMarkerSymbol, QgsLineSymbol, QgsSimpleLineSymbolLayer
 from qgis.core import QgsFillSymbol
 
 
-class QgisVisitor(iplot.IPlotVisitor):
+class QgisVisitor(IPlotVisitor):
     
     
     def plotTrackAsMarkers(
@@ -101,7 +99,7 @@ class QgisVisitor(iplot.IPlotVisitor):
 
     
     
-    def plotSpatialIndex(self, si: index.SpatialIndex, base:bool=True, append=True):
+    def plotSpatialIndex(self, si: SpatialIndex, base:bool=True, append=True):
         """
         Plot spatial index and collection structure together in the
         same reference frame (geographic reference frame)
