@@ -3,9 +3,8 @@
 from __future__ import annotations 
 from typing import Literal   
 
-
-from tracklib.core import ObsTime, makeCoords, Obs, TrackCollection
-from tracklib.core import Track
+import tracklib as tracklib
+from tracklib.core import ObsTime, makeCoords, Obs
 
 
 # import os # This is is needed in the pyqgis console also
@@ -16,6 +15,7 @@ from qgis.core import QgsPointXY, QgsFeature, QgsGeometry
 from qgis.core import QgsMarkerSymbol, QgsLineSymbol
 from qgis.core import QgsCategorizedSymbolRenderer, QgsRendererCategory
 from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform
+
 
 class Qgis:
     '''
@@ -108,8 +108,8 @@ class Qgis:
         :param af: AF exported in qgis layer like attributes
         """
         
-        if isinstance(tracks, Track):
-            collection = TrackCollection()
+        if isinstance(tracks, tracklib.Track):
+            collection = tracklib.TrackCollection()
             collection.addTrack(tracks)
             tracks = collection
         
@@ -190,8 +190,8 @@ class Qgis:
 
         """
         
-        if isinstance(tracks, Track):
-            collection = TrackCollection()
+        if isinstance(tracks, tracklib.Track):
+            collection = tracklib.TrackCollection()
             collection.addTrack(tracks)
             tracks = collection
         

@@ -19,16 +19,13 @@ from . import (ObsTime, ENUCoords, Obs,
                DiracKernel,
                Bbox)
 from tracklib.util import intersection, Polygon
-from tracklib.plot import IPlotVisitor
+from tracklib.plot import IPlotVisitor, MatplotlibVisitor
 from tracklib.algo import BIAF_SPEED, BIAF_ABS_CURV                      
 
-from . import (UnaryOperator, 
-                                    BinaryOperator, 
-                                    ScalarOperator,
-                                    ScalarVoidOperator, 
-                                    BinaryVoidOperator, 
-                                    UnaryVoidOperator,
-                                    Operator)
+from . import (UnaryOperator, BinaryOperator, 
+               ScalarOperator, ScalarVoidOperator, 
+               BinaryVoidOperator, UnaryVoidOperator,
+               Operator)
 
 class Track:
     """
@@ -1373,8 +1370,7 @@ class Track:
     ):
         """TODO"""
         if v == None:
-            import tracklib.plot.MatplotlibVisitor as visitor
-            v = visitor.MatplotlibVisitor()
+            v = MatplotlibVisitor()
         return v.plotTrackAsMarkers(self, size, frg, bkg, sym_frg, sym_bkg, type, append)
     
     def plotEllipses(self, sym="r-", factor=3, af=None, append=True,
@@ -1387,8 +1383,7 @@ class Track:
         """
         
         if v == None:
-            import tracklib.plot.MatplotlibVisitor as visitor
-            v = visitor.MatplotlibVisitor()
+            v = MatplotlibVisitor()
         return v.plotTrackAsMarkers(self, sym, factor, af, append)
 
     def plot(self, sym="k-", type="LINE", af_name="", cmap=-1, append=True, 
@@ -1407,8 +1402,7 @@ class Track:
         """
         
         if v == None:
-            import tracklib.plot.MatplotlibVisitor as visitor
-            v = visitor.MatplotlibVisitor()
+            v = MatplotlibVisitor()
         return v.plotTrack(self, sym, type, af_name, cmap, append, 
              label, pointsize, w, h)
     
@@ -1417,8 +1411,7 @@ class Track:
         """
         """
         if v == None:
-            import tracklib.plot.MatplotlibVisitor as visitor
-            v = visitor.MatplotlibVisitor()
+            v = MatplotlibVisitor()
         return v.plotTrackProfil(self, template, afs, append, linestyle,linewidth)
         
 

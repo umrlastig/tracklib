@@ -2,7 +2,6 @@
 
 import matplotlib.pyplot as plt
 
-from tracklib.core import SpatialIndex
 from tracklib.plot import IPlotVisitor
 
 from qgis.PyQt.QtCore import QVariant
@@ -98,8 +97,8 @@ class QgisVisitor(IPlotVisitor):
 
 
     
-    
-    def plotSpatialIndex(self, si: SpatialIndex, base:bool=True, append=True):
+    # SpatialIndex
+    def plotSpatialIndex(self, si, base:bool=True, append=True):
         """
         Plot spatial index and collection structure together in the
         same reference frame (geographic reference frame)
