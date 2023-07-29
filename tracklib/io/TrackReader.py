@@ -6,6 +6,7 @@ from typing import Union, Literal
 
 import csv
 import io
+import json
 import os
 from xml.dom import minidom
 
@@ -529,7 +530,6 @@ class TrackReader:
                                     if isfloat(val):
                                         extensions[ext.tagName].append(float(val))
                                     elif islist(val):
-                                        import json
                                         extensions[ext.tagName].append(json.loads(val))
                                     else:
                                         extensions[ext.tagName].append(val)

@@ -36,9 +36,7 @@ from __future__ import annotations
 import math
 import numpy as np
 
-# --------------------------------------------------------------------------
-# Circular import (not satisfying solution)
-# --------------------------------------------------------------------------
+import tracklib as tracklib
 from tracklib.core import ObsTime, Obs, makeCoords
 
 
@@ -363,8 +361,7 @@ def intersection(track1, track2, withTime=-1):
         print("Error: tracks must have same SRID to compute intersections")
         exit()
 
-    from tracklib.core import Track
-    I = Track()
+    I = tracklib.Track()
     TMP_I = []
     TMP_J = []
     TMP_TPS2 = []
