@@ -2,6 +2,8 @@
 Class to manage cinematic computations on GPS tracks
 """
 
+from numpy import pi
+
 from tracklib.util import angleBetweenThreePoints
 from . import (anglegeom,
                BIAF_SPEED, speed,
@@ -314,7 +316,6 @@ def setVertexAF(track):
         track.setObsAnalyticalFeature('vertex', iK, 1)
 
 
-from numpy import pi
 def setBendAsAF(track, angle_min = pi/2):
     '''
     Attribution des points de la trace qui composent 

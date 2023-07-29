@@ -4,7 +4,7 @@ import numpy as np
 
 from . import (MODE_OBS_AND_STATES_AS_3D_POSITIONS, 
                DYN_MAT_2D_CST_SPEED,
-               HMM)
+               HMM, Kalman as DKalman)
 from tracklib.core import Operator
 
 FILTER_LOW_PASS = 0     # Low-pass brick-wall filter
@@ -91,8 +91,6 @@ def __kalman(track, sigma, speed_std, speed_af=None, verbose=True):
     track = track.copy()
     dt = abs(track.frequency())
     
-    from tracklib.algo.Dynamics import Kalman as dynamics_kalman
-
     # -----------------------------------------------------
     # Mode speed recorded in AF field
     # -----------------------------------------------------
@@ -113,7 +111,7 @@ def __kalman(track, sigma, speed_std, speed_af=None, verbose=True):
         )
         P0 = sigma ** 2 * np.eye(4, 4)
 
-        UKF = dynamics_kalman(spreading=1)
+        UKF = DKalman(spreading=1)
         UKF.setTransition(F, Q)
         UKF.setObservation(H, R)
         UKF.setInitState(X0, P0)
@@ -135,7 +133,7 @@ def __kalman(track, sigma, speed_std, speed_af=None, verbose=True):
         X0 = np.array([[p0.getX()], [p0.getY()]])  # Initial state
         P0 = sigma ** 2 * np.eye(2, 2)  # Initial covariance
 
-        UKF = dynamics_kalman(spreading=1)
+        UKF = DKalman(spreading=1)
         UKF.setTransition(F, Q)   # Dynamic model
         UKF.setObservation(H, R)  # Observation model
         UKF.setInitState(X0, P0)  # Initialization
