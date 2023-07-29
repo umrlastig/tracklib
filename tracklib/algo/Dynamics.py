@@ -129,7 +129,7 @@ def DYN_MAT_3D_CST_ACC_COV(dt, std_jrk):
     return std_jrk ** 2 * G @ G.transpose()
 
 
-class Kalman:
+class KalmanFilter:
     """Class to define a Kalman filter"""
 
     def __init__(

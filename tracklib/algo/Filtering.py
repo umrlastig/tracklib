@@ -4,7 +4,7 @@ import numpy as np
 
 from . import (MODE_OBS_AND_STATES_AS_3D_POSITIONS, 
                DYN_MAT_2D_CST_SPEED,
-               HMM, Kalman as DKalman)
+               HMM, KalmanFilter as DKalman)
 from tracklib.core import Operator
 
 FILTER_LOW_PASS = 0     # Low-pass brick-wall filter

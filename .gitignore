@@ -55,7 +55,7 @@ data/traj_rm_all.pos
 data/traj_rm_remove_sat_all.pos
 data/traj_rm_sat_vertical.pos
 data/traj_rm_vertical.pos
-doc/source/notebook/.ipynb_checkpoints
+doc/source/usecase/.ipynb_checkpoints
 doc/source/userguide/.ipynb_checkpoints
 data/test/couplage.kml
 data/test/gpx1.gpx
