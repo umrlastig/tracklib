@@ -57,6 +57,7 @@ data/traj_rm_sat_vertical.pos
 data/traj_rm_vertical.pos
 doc/source/usecase/.ipynb_checkpoints
 doc/source/userguide/.ipynb_checkpoints
+doc/source/usecase/.ipynb_checkpoints/KalmanFiltering-checkpoint.ipynb
 data/test/couplage.kml
 data/test/gpx1.gpx
 data/test/gpx2.gpx
