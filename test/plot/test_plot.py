@@ -5,10 +5,8 @@ import unittest
 import matplotlib.pyplot as plt
 import os.path
 
-from tracklib.core.ObsTime import ObsTime
-from tracklib.io.TrackReader import TrackReader
-from tracklib.plot.Plot import Plot
-
+from tracklib import (ObsTime, TrackReader, Plot)
+                      
 
 class TestPlot(unittest.TestCase):
     

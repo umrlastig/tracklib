@@ -476,7 +476,7 @@ class TrackWriter:
         if not oneFile:
             if not os.path.isdir(path):
                 print ("Error: path need to be a directory")
-                exit()
+                sys.exit()
             if path != '' and path[len(path) - 1:] != '/':
                 path += '/'
         else:

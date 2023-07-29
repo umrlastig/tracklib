@@ -5,17 +5,11 @@ import os.path
 import filecmp
 from unittest import TestCase, TestSuite, TextTestRunner
 
-from tracklib.core.ObsCoords import ENUCoords
-from tracklib.core.Obs import Obs
-from tracklib.core.Track import Track
-from tracklib.core.TrackCollection import TrackCollection
-from tracklib.core.ObsTime import ObsTime
+from tracklib import (Track, ENUCoords, Obs,
+                      TrackCollection, ObsTime,
+                      TrackWriter, TrackReader,
+                      speed, computeAbsCurv)
 
-from tracklib.io.TrackWriter import TrackWriter
-from tracklib.io.TrackReader import TrackReader
-
-from tracklib.algo import Analytics
-import tracklib.algo.Cinematics as Cinematics
 
 
 class TestTrackWriter(TestCase):
@@ -66,8 +60,8 @@ class TestTrackWriter(TestCase):
         p10 = Obs(ENUCoords(4, 20), ObsTime.readTimestamp('2020-01-01 10:00:15'))
         self.trace2.addObs(p10)
         
-        self.trace1.addAnalyticalFeature(Analytics.speed)
-        self.trace2.addAnalyticalFeature(Analytics.speed)
+        self.trace1.addAnalyticalFeature(speed)
+        self.trace2.addAnalyticalFeature(speed)
         
         self.collection = TrackCollection()
         self.collection.addTrack(self.trace1)
@@ -106,8 +100,8 @@ class TestTrackWriter(TestCase):
         p5 = Obs(ENUCoords(2, 2), ObsTime.readTimestamp('2020-01-01 10:00:04'))
         track.addObs(p5)
        
-        track.addAnalyticalFeature(Analytics.speed)
-        Cinematics.computeAbsCurv(track)
+        track.addAnalyticalFeature(speed)
+        computeAbsCurv(track)
        
         csvpath = os.path.join(self.resource_path, 'data/test/test_write_csv_2AF.wkt')
         af_names = ['speed', 'abs_curv']
@@ -135,8 +129,8 @@ class TestTrackWriter(TestCase):
         p5 = Obs(ENUCoords(2, 2), ObsTime.readTimestamp('2020-01-01 10:00:04'))
         track.addObs(p5)
        
-        track.addAnalyticalFeature(Analytics.speed)
-        Cinematics.computeAbsCurv(track)
+        track.addAnalyticalFeature(speed)
+        computeAbsCurv(track)
        
         csvpath = os.path.join(self.resource_path, 'data/test/test_write_csv_2AF_desordre.wkt')
         af_names = ['speed', 'abs_curv']
@@ -185,13 +179,13 @@ class TestTrackWriter(TestCase):
         TrackWriter.writeToGpx(self.trace1, path=gpxpath, af=True, oneFile=True)
         
     def testWriteOneTrackToOneGpx2AF(self):
-        Cinematics.computeAbsCurv(self.trace1)
+        computeAbsCurv(self.trace1)
         gpxpath = os.path.join(self.resource_path, 'data/test/gpx3.gpx')
         TrackWriter.writeToGpx(self.trace1, path=gpxpath, af=True, oneFile=True)
 
     def testWriteTwoTrackToOneGpx0AF(self):
-        Cinematics.computeAbsCurv(self.trace1)
-        Cinematics.computeAbsCurv(self.trace2)
+        computeAbsCurv(self.trace1)
+        computeAbsCurv(self.trace2)
         
         gpxpath = os.path.join(self.resource_path, 'data/test/gpx5.gpx')
         TrackWriter.writeToGpx(self.collection, path=gpxpath, af=False, oneFile=True)
@@ -201,15 +195,15 @@ class TestTrackWriter(TestCase):
         TrackWriter.writeToGpx(self.collection, path=gpxpath, af=True, oneFile=True)
         
     def testWriteTwoTrackToOneGpx2AF(self):
-        Cinematics.computeAbsCurv(self.trace1)
-        Cinematics.computeAbsCurv(self.trace2)
+        computeAbsCurv(self.trace1)
+        computeAbsCurv(self.trace2)
         
         gpxpath = os.path.join(self.resource_path, 'data/test/gpx7.gpx')
         TrackWriter.writeToGpx(self.collection, path=gpxpath, af=True, oneFile=True)
         
     def testWriteTwoTrackToManyGpx0AF(self):
-        Cinematics.computeAbsCurv(self.trace1)
-        Cinematics.computeAbsCurv(self.trace2)
+        computeAbsCurv(self.trace1)
+        computeAbsCurv(self.trace2)
         
         gpxpath = os.path.join(self.resource_path, 'data/test/gpx1')
         TrackWriter.writeToGpx(self.collection, path=gpxpath, af=False, oneFile=False)
@@ -219,10 +213,10 @@ class TestTrackWriter(TestCase):
         TrackWriter.writeToGpx(self.collection, path=gpxpath, af=True, oneFile=False)
         
     def testWriteTwoTrackToManyGpx2AF(self):
-        Cinematics.computeAbsCurv(self.trace1)
-        Cinematics.computeAbsCurv(self.trace2)
+        computeAbsCurv(self.trace1)
+        computeAbsCurv(self.trace2)
         
-        gpxpath = os.path.join(self.resource_path, 'data/test/gpx3')
+        gpxpath = os.path.join(self.resource_path, 'data/test/gpx3/')
         TrackWriter.writeToGpx(self.collection, path=gpxpath, af=True, oneFile=False)
         
         gpxpath = os.path.join(self.resource_path, 'data/test/gpx3/11.gpx')
@@ -242,7 +236,7 @@ class TestTrackWriter(TestCase):
         tracks = TrackReader.readFromGpx(gpxpath)
         trace = tracks.getTrack(0)
        
-        trace.addAnalyticalFeature(Analytics.speed)
+        trace.addAnalyticalFeature(speed)
         #print (trace.getAnalyticalFeature('speed'))
         
         kmlpath = os.path.join(self.resource_path, 'data/test/couplage.kml')
@@ -295,7 +289,7 @@ class TestTrackWriter(TestCase):
 if __name__ == '__main__':
     
     suite = TestSuite()
-
+    '''
     suite.addTest(TestTrackWriter("test_write_csv_path"))
     suite.addTest(TestTrackWriter("test_write_csv_minim"))
     suite.addTest(TestTrackWriter("test_write_csv_2AF"))
@@ -310,14 +304,14 @@ if __name__ == '__main__':
     suite.addTest(TestTrackWriter("testWriteTwoTrackToOneGpx0AF"))
     suite.addTest(TestTrackWriter("testWriteTwoTrackToOneGpx1AF"))
     suite.addTest(TestTrackWriter("testWriteTwoTrackToOneGpx2AF"))
-    
+    '''
     #tracks - many gpx
-    suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx0AF"))
-    suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx1AF"))
+    #suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx0AF"))
+    #suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx1AF"))
     suite.addTest(TestTrackWriter("testWriteTwoTrackToManyGpx2AF"))
     
-    suite.addTest(TestTrackWriter("testWriteKml"))
-    suite.addTest(TestTrackWriter("testExportGeoJson"))
+    #suite.addTest(TestTrackWriter("testWriteKml"))
+    #suite.addTest(TestTrackWriter("testExportGeoJson"))
     
     runner = TextTestRunner()
     runner.run(suite)

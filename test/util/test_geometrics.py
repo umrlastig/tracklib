@@ -4,12 +4,11 @@ import math
 import unittest
 import matplotlib.pyplot as plt
 
-from tracklib import (Obs, ObsTime, ENUCoords,
+from tracklib import (Obs, ObsTime, ENUCoords, Track,
                       Circle, Rectangle, Polygon,
                       minCircle, fitCircle, minCircleMatrix,
                       diameter, convexHull, plotPolygon,
                       minimumBoundingRectangle)
-from tracklib.core.Track import Track
 
 
 class TestAlgoGeometricsMethods(unittest.TestCase):

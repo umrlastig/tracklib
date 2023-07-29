@@ -3,14 +3,10 @@
 import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
 
-
-from tracklib import Rectangle, ObsTime, TrackCollection, ENUCoords
-
-from tracklib.core.Track import Track
-from tracklib.io.TrackReader import TrackReader
-from tracklib.algo.Selection import Constraint
-from tracklib.algo.Selection import TYPE_CUT_AND_SELECT, MODE_INSIDE
-from tracklib.algo.Selection import Selector
+from tracklib import (Track, Rectangle, ObsTime, TrackCollection, ENUCoords,
+                      TrackReader, Constraint,
+                      TYPE_CUT_AND_SELECT, MODE_INSIDE,
+                      Selector)
 
 
 class TestTrackReader(TestCase):

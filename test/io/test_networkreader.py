@@ -4,11 +4,7 @@ import matplotlib.pyplot as plt
 import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
 
-#from tracklib.core.Network import Node
-from tracklib.core.Bbox import Bbox
-from tracklib.core import ObsCoords as Coords
-from tracklib.io.NetworkReader import NetworkReader
-#from tracklib.io.TrackReader import TrackReader
+from tracklib import (Bbox, NetworkReader, GeoCoords)
 
 
 class TestNetworkReader(TestCase):
@@ -53,7 +49,7 @@ class TestNetworkReader(TestCase):
         xmax = 6.82568
         ymin = 45.3485
         ymax = 45.4029
-        emprise = Bbox(Coords.GeoCoords(xmin, ymin), Coords.GeoCoords(xmax, ymax))
+        emprise = Bbox(GeoCoords(xmin, ymin), GeoCoords(xmax, ymax))
 
         proj = "EPSG:4326"
 
