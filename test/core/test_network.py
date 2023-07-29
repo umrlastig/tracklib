@@ -3,9 +3,7 @@
 import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
 
-from tracklib.core.Track import Track
-from tracklib.core.Network import Node, Edge
-from tracklib.io.NetworkReader import NetworkReader
+from tracklib import (Track, Node, Edge, NetworkReader)
 
 
 import matplotlib.pyplot as plt

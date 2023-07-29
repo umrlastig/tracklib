@@ -4,9 +4,8 @@ from unittest import TestCase, TestSuite, TextTestRunner
 
 import numpy as np
 
-from tracklib import (ENUCoords, ObsTime, Obs)
-from tracklib.core.Track import Track
-from tracklib.algo import (Analytics)
+from tracklib import (ENUCoords, ObsTime, Obs, Track,
+                      speed, heading, orientation)
 
 
 class TestTrackQuery(TestCase):
@@ -41,7 +40,7 @@ class TestTrackQuery(TestCase):
     
     def test_selectstar(self):
         
-        self.track.addAnalyticalFeature(Analytics.speed)
+        self.track.addAnalyticalFeature(speed)
         trace = self.track.query("SELECT *")
         self.assertEqual(9, trace.size())
         self.assertTrue(trace.hasAnalyticalFeature('speed'))
@@ -50,7 +49,7 @@ class TestTrackQuery(TestCase):
     
     def test_selectwhere1(self):
         
-        self.track.addAnalyticalFeature(Analytics.speed)
+        self.track.addAnalyticalFeature(speed)
         trace = self.track.query("SELECT * WHERE speed < 0.5")
         self.assertEqual(4, trace.size())
         self.assertTrue(trace.hasAnalyticalFeature('speed'))
@@ -59,13 +58,13 @@ class TestTrackQuery(TestCase):
         self.assertLessEqual((0.2070 - trace.getObsAnalyticalFeatures('speed', 2)[0]), self.__epsilon, 'erreur de vitesse 2')
         self.assertLessEqual((0.2070 - trace.getObsAnalyticalFeatures('speed', 3)[0]), self.__epsilon, 'erreur de vitesse 3')
         
-        self.track.addAnalyticalFeature(Analytics.speed)
+        self.track.addAnalyticalFeature(speed)
         trace = self.track.query("SELECT * WHERE speed <= 0.5")
         self.assertEqual(5, trace.size())
 
     def test_selectwhere2(self):
         
-        self.track.addAnalyticalFeature(Analytics.speed)
+        self.track.addAnalyticalFeature(speed)
         trace = self.track.query("SELECT * WHERE speed > 0.5")
         self.assertEqual(4, trace.size())
         self.assertTrue(trace.hasAnalyticalFeature('speed'))
@@ -83,7 +82,7 @@ class TestTrackQuery(TestCase):
         
     def test_selectagg(self):
         
-        self.track.addAnalyticalFeature(Analytics.speed)
+        self.track.addAnalyticalFeature(speed)
         speeds = self.track.getAnalyticalFeature('speed')
         
         # AVG
@@ -125,9 +124,9 @@ class TestTrackQuery(TestCase):
         
         
     def test_selectcolumn(self):
-        self.track.addAnalyticalFeature(Analytics.speed)
-        self.track.addAnalyticalFeature(Analytics.heading)
-        self.track.addAnalyticalFeature(Analytics.orientation)
+        self.track.addAnalyticalFeature(speed)
+        self.track.addAnalyticalFeature(heading)
+        self.track.addAnalyticalFeature(orientation)
         
         # 
         manymax = self.track.query("SELECT MAX(x), MAX(y), MAX(z), MAX(t)")

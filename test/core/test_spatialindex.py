@@ -3,10 +3,9 @@
 from unittest import TestCase, TestSuite, TextTestRunner
 import os.path
 
-from tracklib import (ENUCoords, ObsTime, Obs)
-from tracklib.core.Track import Track
-from tracklib.core.TrackCollection import TrackCollection
-from tracklib.core.SpatialIndex import SpatialIndex
+from tracklib import (ENUCoords, ObsTime, Obs, Track,
+                      TrackCollection,
+                      SpatialIndex)
 
 
 class TestSpatialIndex(TestCase):
