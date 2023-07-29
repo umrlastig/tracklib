@@ -8,6 +8,7 @@ import numpy as np
 import random
 import sys
 
+import tracklib as tracklib
 from tracklib.core import ENUCoords
 from . import (right, inclusion, collinear, isSegmentIntersects,
                       transform, transform_inverse)
@@ -109,8 +110,7 @@ class Circle:
             DESCRIPTION.
 
         """
-        from tracklib.core import Track
-        t = Track()
+        t = tracklib.Track()
         for obs in track:
             if self.contains(obs.position):
                 t.addObs(obs)
@@ -228,8 +228,7 @@ class Rectangle:
             DESCRIPTION.
 
         """
-        from tracklib.core import Track
-        t = Track()
+        t = tracklib.Track()
         for obs in track:
             if self.contains(obs.position):
                 t.addObs(obs)
@@ -326,8 +325,7 @@ class Polygon:
             DESCRIPTION.
 
         """
-        from tracklib.core import Track
-        t = Track()
+        t = tracklib.Track()
         for obs in track:
             if self.contains(obs.position):
                 t.addObs(obs)
