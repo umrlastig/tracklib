@@ -37,6 +37,7 @@ import matplotlib.pyplot as plt
 
 import tracklib as tracklib
 
+
 class Kernel:
     """Generic kernel class"""
 
@@ -351,15 +352,13 @@ class ExperimentalKernel:
 
     def addTrackCollection(self, trackCollection, verbose=False):
         """TODO"""
-        from tracklib.algo import  differenceProfile # <- Assez moche... A voir comment resoudre
-
         N = trackCollection.size()
         for i in range(N - 1):
             print("Reference set on track [" + str(i + 1) + "/" + str(N - 1) + "]")
             t1 = trackCollection[i]
             for j in range(i + 1, N):
                 t2 = trackCollection[j]
-                pf = differenceProfile(
+                pf = tracklib.differenceProfile(
                     t1, t2, mode=self.method, ends=True, p=1, verbose=verbose
                 )
                 self.addDifferenceProfile(pf)
