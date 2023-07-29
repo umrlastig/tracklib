@@ -3,15 +3,15 @@
 
 import sys
 import math
-from typing import Iterable, Literal, Union   
+from typing import Literal
 import progressbar
 import numpy as np
 import matplotlib.pyplot as plt
 
+import tracklib as tracklib
 from tracklib.util import dist_point_to_segment
-from tracklib.core import TrackCollection
 from . import computeAbsCurv, synchronize, HMM, MODE_OBS_AS_2D_POSITIONS
-from tracklib.core import Track
+
 
 MODE_COMPARAISON_NEAREST_NEIGHBOUR = 1
 MODE_COMPARAISON_DTW = 2
@@ -252,7 +252,7 @@ def centralTrack(tracks, mode="NN", verbose=True):
     tracks = tracks.copy()
 
     if isinstance(tracks, list):
-        tracks = TrackCollection(tracks)
+        tracks = tracklib.TrackCollection(tracks)
     base = tracks.toENUCoordsIfNeeded()
     central = tracks[0].copy()
 
@@ -380,7 +380,7 @@ def medoid (tracks, mode="Hausdorff", verbose=True):
     tracks = tracks.copy()
 
     if isinstance(tracks, list):
-        tracks = TrackCollection(tracks)
+        tracks = tracklib.TrackCollection(tracks)
     base = tracks.toENUCoordsIfNeeded()
     medoid = tracks[0].copy() 
     

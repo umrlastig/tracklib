@@ -64,12 +64,11 @@ General constraint syntax:
 
 import matplotlib.pyplot as plt
 
-import tracklib
+import tracklib as tracklib
 from tracklib.core import (ENUCoords, GeoCoords, Obs, ObsTime,
-                      compLike, listify,
-                      TrackCollection)
+                      compLike, listify)
 from tracklib.util import intersects, Rectangle
-#from tracklib.core import Track
+
 
 MODE_CROSSES = 0
 MODE_INSIDE = 1
@@ -179,7 +178,7 @@ class TrackConstraint:
                 continue
             pt1.translate(+buffer * dy / R, -buffer * dx / R)
             pt2.translate(-buffer * dy / R, +buffer * dx / R)
-            t = tracklib.core.Track([Obs(pt1), Obs(pt2)])
+            t = tracklib.Track([Obs(pt1), Obs(pt2)])
             self.segments.append(t)
 
     def __str__(self):
@@ -217,14 +216,14 @@ class TrackConstraint:
         """TODO"""
         
         if self.type == TYPE_SELECT:
-            output = TrackCollection()
+            output = tracklib.TrackCollection()
             for track in tracks:
                 if self.contains(track):
                     output.addTrack(track)
             return output
         
         if self.type == TYPE_CUT_AND_SELECT:
-            output = TrackCollection()
+            output = tracklib.TrackCollection()
             for track in tracks:
                 t = self.shape.select(track)
                 if t.size() > 0:
@@ -240,7 +239,7 @@ class TollGateConstraint:
 
     def __init__(self, pt1, pt2, time=None, type=TYPE_SELECT):
         """TODO"""
-        self.gate = tracklib.core.Track([Obs(pt1), Obs(pt2)])
+        self.gate = tracklib.Track([Obs(pt1), Obs(pt2)])
         self.time = time
         self.type = type
 
@@ -262,7 +261,7 @@ class TollGateConstraint:
     def select(self, tracks):
         """TODO"""
         if self.type == TYPE_SELECT:
-            output = TrackCollection()
+            output = tracklib.TrackCollection()
             for track in tracks:
                 if self.contains(track):
                     output.addTrack(track)
@@ -340,14 +339,14 @@ class Constraint:
         Selection only by taking into account the geometry !
         """
         if self.type == TYPE_SELECT:
-            output = TrackCollection()
+            output = tracklib.TrackCollection()
             for track in tracks:
                 if self.contains(track):
                     output.addTrack(track)
             return output
         
         if self.type == TYPE_CUT_AND_SELECT:
-            output = TrackCollection()
+            output = tracklib.TrackCollection()
             for track in tracks:
                 t = self.shape.select(track)
                 if t.size() > 0:

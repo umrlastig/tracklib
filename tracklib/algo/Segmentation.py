@@ -5,17 +5,12 @@ import math
 import progressbar
 import numpy as np
 
-from tracklib.core import (ENUCoords, Obs, isnan, 
-                           TrackCollection)
+import tracklib as tracklib
+from tracklib.core import (ENUCoords, Obs, isnan)
 from tracklib.util import Circle, minCircle
 from tracklib.algo import (acceleration, 
                            ALGO_LINEAR, MODE_SPATIAL)
 from tracklib.core import Operator
-# --------------------------------------------------------------------------
-# Circular import (not satisfying solution)
-# --------------------------------------------------------------------------
-from tracklib.core import Track
-
 
 
 MODE_COMPARAISON_AND = 1
@@ -83,8 +78,8 @@ def segmentation(track, afs_input, af_output,
         else:
             track.setObsAnalyticalFeature(af_output, i, 0)
 
-
-def split(track, source, limit=0) -> TrackCollection:
+# -> TrackCollection
+def split(track, source, limit=0):
     """
     Splits track according to :
         - af name (considered as a marker) if `source` is a string
@@ -95,7 +90,7 @@ def split(track, source, limit=0) -> TrackCollection:
     :return: No track if no segmentation, otherwise a TrackCollection object
     """
 
-    NEW_TRACES = TrackCollection()
+    NEW_TRACES = tracklib.TrackCollection()
 
     # --------------------------------------------
     # Split from analytical feature name
@@ -168,9 +163,9 @@ def splitAR(track, pt1, pt2=None, radius=10, nb_min_pts=10, verbose=True):
     if pt2 is None:
         pt2 = pt1
 
-    tracks = TrackCollection()
+    tracks = tracklib.TrackCollection()
     
-    subtrack = Track()
+    subtrack = tracklib.Track()
     k = -1
     while k < len(track) - 1:
         k = k + 1
@@ -181,7 +176,7 @@ def splitAR(track, pt1, pt2=None, radius=10, nb_min_pts=10, verbose=True):
                     print("Add sub-track: ",
                         subtrack[0].timestamp, subtrack[-1].timestamp,
                         "[" + str(len(tracks)) + "]",)
-                subtrack = Track()
+                subtrack = tracklib.Track()
             subtrack.addObs(track[k].copy())
     
     if len(subtrack) > nb_min_pts:
@@ -225,7 +220,7 @@ def splitReturnTripExhaustive(track):
     first_part = track.extract(0, argmin - 1)
     second_part = track.extract(argmin, track.size() - 1)
 
-    TRACKS = TrackCollection()
+    TRACKS = tracklib.TrackCollection()
     TRACKS.addTrack(first_part)
     TRACKS.addTrack(second_part)
 
@@ -263,7 +258,7 @@ def splitReturnTripFast(track, side_effect=0.1, sampling=1):
     first_part = track.extract(0, argmin - 1)
     second_part = track.extract(argmin, track.size() - 1)
 
-    TRACKS = TrackCollection()
+    TRACKS = tracklib.TrackCollection()
     TRACKS.addTrack(first_part)
     TRACKS.addTrack(second_part)
 
@@ -275,8 +270,9 @@ def splitReturnTripFast(track, side_effect=0.1, sampling=1):
 #    Find Stop
 # =============================================================================
 # =============================================================================
-
-def findStops(track: Track, spatial, temporal, mode, verbose=True) -> Track:
+# Track
+#  -> Track
+def findStops(track, spatial, temporal, mode, verbose=True):
     '''
     Function to find stop positions from a track
 
@@ -324,7 +320,7 @@ def findStopsLocal(track, speed=1, duration=10):
     '''
 
     track = track.copy()
-    stops = Track()
+    stops = tracklib.Track()
     
     segmentation(track, "speed", "#mark", speed)
     track.operate(Operator.DIFFERENTIATOR, "#mark")
@@ -400,7 +396,7 @@ def findStopsLocalWithAcceleration(track, diameter=20, duration=60):
     track.addAnalyticalFeature(acceleration)
     #print (track.getListAnalyticalFeatures())
     
-    stops = Track()
+    stops = tracklib.Track()
     
     TMP_RADIUS = []
     TMP_MEAN_X = []
@@ -580,7 +576,7 @@ def findStopsGlobal(track, diameter=20, duration=60, downsampling=1, verbose=Tru
     segmentation = optimalPartition(C, MODE_SEGMENTATION_MAXIMIZE, verbose)
     #print ('seg', segmentation)
 
-    stops = Track()
+    stops = tracklib.Track()
     TMP_RADIUS = []
     TMP_MEAN_X = []
     TMP_MEAN_Y = []
@@ -687,7 +683,7 @@ def findStopsGlobalForRTK(
     # ---------------------------------------------------------------------------
     segmentation = optimalPartition(C, MODE_SEGMENTATION_MAXIMIZE, verbose)
 
-    stops = Track()
+    stops = tracklib.Track()
 
     TMP_RADIUS = []
     TMP_MEAN_X = []

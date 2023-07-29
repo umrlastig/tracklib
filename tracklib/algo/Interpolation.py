@@ -8,10 +8,10 @@ import sys
 import math
 import numpy as np
 
+import tracklib as tracklib
 from tracklib.core import (Obs, ENUCoords, ObsTime, 
                       makeCovarianceMatrixFromKernelOld,
                       makeDistanceMatrixOld)
-#from tracklib.core import Track
 
 MODE_SPATIAL = 1
 MODE_TEMPORAL = 2
@@ -235,8 +235,7 @@ def gaussian_process_temporal(track, timestamps, kernel, factor=1.0, sigma=0.0, 
     return __gaussian_process(track, TO, TU, kernel, factor, sigma, cp_var)
 
 def __gaussian_process(track, TO, TU, kernel, factor, sigma, cp_var):
-    from tracklib.core import Track as TrackTracklib
-    new_track = TrackTracklib()
+    new_track = tracklib.Track()
 
     # Observations
     yx = np.array(track.getX())
@@ -298,12 +297,11 @@ def __gaussian_process(track, TO, TU, kernel, factor, sigma, cp_var):
 # --------------------------------------------------------------------------
 def prepareTimeSampling(input, tini=None, tfin=None):
     """TODO"""
-    from tracklib.core import Track as TrackTracklib
     output = []
     if isinstance(input, list):
         for i in range(len(input)):
             output.append(input[i].toAbsTime())
-    if isinstance(input, TrackTracklib):
+    if isinstance(input, tracklib.Track):
         for i in range(input.size()):
             output.append(input.getObs(i).timestamp.toAbsTime())
     if isinstance(input, int) or isinstance(input, float):

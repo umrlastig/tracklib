@@ -2,12 +2,11 @@
 
 import random
 
+import tracklib as tracklib
 from tracklib.core import (ENUCoords, 
                            ObsTime, 
                            Obs, 
-                           TrackCollection, 
-                           GaussianKernel,
-                           Track)
+                           GaussianKernel)
 
 
 # =========================================================================
@@ -27,7 +26,7 @@ def generate(
     randomTrack = y_t is None
     if randomTrack:
         if N > 1:
-            tracks = TrackCollection()
+            tracks = tracklib.TrackCollection()
             for i in range(N):
                 tracks.addTrack(generate(x_t, N=1, verbose=verbose))
             return tracks
@@ -45,7 +44,7 @@ def generate(
         date_fin = date_ini.addHour(1)
     if dt == None:
         dt = (date_fin - date_ini) / 100
-    track = Track()
+    track = tracklib.Track()
     tps = date_ini.copy()
     N = (date_fin - date_ini) / dt
     if verbose:
@@ -72,7 +71,7 @@ def generateDataSet(vx, vy, N=100, pmin=(0, 0), pmax=(100, 100), Nbmax=1000):
     TRACKS = []
     for i in range(N):
 
-        track = Track()
+        track = tracklib.Track()
         xini = random.random() * (pmax[0] - pmin[0]) + pmin[0]
         yini = random.random() * (pmax[1] - pmin[1]) + pmin[1]
         date_ini = ObsTime.random()

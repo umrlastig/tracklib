@@ -1,21 +1,21 @@
 """Core routines."""
 
 
-from .ObsCoords import *
-from .ObsTime import *
-from .Obs import *
-from .Utils import *
+from .obs_coords import *
+from .obs_time import *
+from .obs import *
+from .utils import *
 
 from .kernel import *
 from .operators import *
 
-from .TrackCollection import *
+from .track_collection import *
 
-from .Bbox import *
-from .Raster import *
+from .bbox import *
+from .raster import *
 
-from .Track import *
+from .track import *
 
-from .Network import *
-from .SpatialIndex import *
+from .network import *
+from .spatial_index import *
 
