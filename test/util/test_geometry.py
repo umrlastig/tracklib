@@ -5,7 +5,7 @@ import unittest
 import tracklib.util.Geometry as Geometry
 from tracklib import (Obs, ObsTime, ENUCoords)
 from tracklib.core import Track
-
+from tracklib.algo import TimeConstraint
 
 class TestGeometry(unittest.TestCase):
     
@@ -167,26 +167,70 @@ class TestGeometry(unittest.TestCase):
         self.assertEqual(yproj, 10)
         self.assertEqual(iproj, 2)
         
-        
-        
-        
-        
+
     def testDistPointDroite(self):
-        
         param = [4, 0, 1]
         d = Geometry.dist_point_droite(param, 0, 0)
         self.assertEqual(d, 0.25)
         
         
+    def testIntersection(self):
         
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        
+        trace1 = Track([], 1)
+        p1 = Obs(ENUCoords(0, 0, 0), ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        trace1.addObs(p1)
+        p2 = Obs(ENUCoords(10, 0, 0), ObsTime.readTimestamp("2018-01-01 10:30:00"))
+        trace1.addObs(p2)
+        p3 = Obs(ENUCoords(30, 0, 0), ObsTime.readTimestamp("2018-01-01 11:30:00"))
+        trace1.addObs(p3)
+        
+        trace2 = Track([], 1)
+        p1 = Obs(ENUCoords(5, 5, 0), ObsTime.readTimestamp("2018-01-01 10:40:00"))
+        trace2.addObs(p1)
+        p2 = Obs(ENUCoords(5, -5, 0), ObsTime.readTimestamp("2018-01-01 11:00:00"))
+        trace2.addObs(p2)
+        p3 = Obs(ENUCoords(15, -5, 0), ObsTime.readTimestamp("2018-01-01 11:10:00"))
+        trace2.addObs(p3)
+        p4 = Obs(ENUCoords(15, 5, 0), ObsTime.readTimestamp("2018-01-01 11:20:00"))
+        trace2.addObs(p4)
+        
+        T = Geometry.intersection(trace1 ,trace2, -1)
+        self.assertEqual(T.size(), 2)
+        self.assertEqual(T[0].position.getX(), 5.0)
+        self.assertEqual(T[0].position.getY(), 0.0)
+        self.assertEqual(T[1].position.getX(), 15.0)
+        self.assertEqual(T[1].position.getY(), 0.0)
+        self.assertEqual(str(T[0].timestamp), '01/01/2018 10:00:00')
+        self.assertEqual(str(T[1].timestamp), '01/01/2018 10:30:00')
+        
+        T = Geometry.intersection(trace1 ,trace2, 1000)
+        self.assertEqual(T.size(), 0)
+        
+        T = Geometry.intersection(trace1 ,trace2, 2000)
+        self.assertEqual(T.size(), 1)
+        self.assertEqual(T[0].position.getX(), 15.0)
+        self.assertEqual(T[0].position.getY(), 0.0)
+        self.assertEqual(str(T[0].timestamp), '01/01/2018 10:30:00')
+        
+        T = Geometry.intersection(trace1 ,trace2, 3000)
+        self.assertEqual(T.size(), 2)
+        self.assertEqual(T[0].position.getX(), 5.0)
+        self.assertEqual(T[0].position.getY(), 0.0)
+        self.assertEqual(str(T[0].timestamp), '01/01/2018 10:00:00')
+        self.assertEqual(T[1].position.getX(), 15.0)
+        self.assertEqual(T[1].position.getY(), 0.0)
+        self.assertEqual(str(T[1].timestamp), '01/01/2018 10:30:00')
     
         
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    suite.addTest(TestGeometry("testIntersectionCelluleSegment"))
-    suite.addTest(TestGeometry("testAzimuth"))
-    suite.addTest(TestGeometry("testProjPolyligne"))
-    suite.addTest(TestGeometry("testProjSegment"))
-    suite.addTest(TestGeometry("testDistPointDroite"))
+    #suite.addTest(TestGeometry("testIntersectionCelluleSegment"))
+    #suite.addTest(TestGeometry("testAzimuth"))
+    #suite.addTest(TestGeometry("testProjPolyligne"))
+    #suite.addTest(TestGeometry("testProjSegment"))
+    #suite.addTest(TestGeometry("testDistPointDroite"))
+    suite.addTest(TestGeometry("testIntersection"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
