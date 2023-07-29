@@ -64,11 +64,12 @@ General constraint syntax:
 
 import matplotlib.pyplot as plt
 
+import tracklib
 from tracklib.core import (ENUCoords, GeoCoords, Obs, ObsTime,
                       compLike, listify,
                       TrackCollection)
 from tracklib.util import intersects, Rectangle
-from tracklib.core import Track
+#from tracklib.core import Track
 
 MODE_CROSSES = 0
 MODE_INSIDE = 1
@@ -178,7 +179,8 @@ class TrackConstraint:
                 continue
             pt1.translate(+buffer * dy / R, -buffer * dx / R)
             pt2.translate(-buffer * dy / R, +buffer * dx / R)
-            self.segments.append(Track([Obs(pt1), Obs(pt2)]))
+            t = tracklib.core.Track([Obs(pt1), Obs(pt2)])
+            self.segments.append(t)
 
     def __str__(self):
         """TODO"""
@@ -238,7 +240,7 @@ class TollGateConstraint:
 
     def __init__(self, pt1, pt2, time=None, type=TYPE_SELECT):
         """TODO"""
-        self.gate = Track([Obs(pt1), Obs(pt2)])
+        self.gate = tracklib.core.Track([Obs(pt1), Obs(pt2)])
         self.time = time
         self.type = type
 

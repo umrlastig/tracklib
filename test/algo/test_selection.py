@@ -5,12 +5,11 @@ import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
 
 from tracklib import (Obs, ObsTime, ENUCoords, Track,
-                      Circle, Rectangle, TrackReader)
-from tracklib.algo.Selection import Selector, GlobalSelector
-from tracklib.algo.Selection import Constraint, TimeConstraint, TrackConstraint
-from tracklib.algo.Selection import MODE_INSIDE, MODE_CROSSES, MODE_GETS_IN, MODE_GETS_OUT
-from tracklib.algo.Selection import MODE_PARALLEL
-from tracklib.algo.Selection import COMBINATION_OR
+                      Circle, Rectangle, TrackReader,
+                      Selector, GlobalSelector,
+                      Constraint, TimeConstraint, TrackConstraint,
+                      MODE_INSIDE, MODE_CROSSES, MODE_GETS_IN, MODE_GETS_OUT,
+                      MODE_PARALLEL, COMBINATION_OR)
 
 
 
