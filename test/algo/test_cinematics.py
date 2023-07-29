@@ -7,9 +7,20 @@ from numpy import pi
 import unittest
 
 from tracklib import (Obs, ObsTime, ENUCoords, getColorMap)
-from tracklib.algo import BIAF_ABS_CURV
+from tracklib.algo import (BIAF_ABS_CURV, 
+                           inflection, 
+                           setVertexAF, 
+                           setBendAsAF,
+                           setSwitchbacksAsAF,
+                           smoothed_speed_calculation,
+                           computeAbsCurv,
+                           estimate_heading,
+                           computeAvgSpeed,
+                           computeAvgAscSpeed,
+                           computeNetDeniv,
+                           computeAscDeniv,
+                           computeDescDeniv)
 from tracklib.core import Track
-import tracklib.algo.Cinematics as Cinematics
 
 
 
@@ -131,7 +142,7 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         plt.figure(figsize = (8,4))
         self.trace3.plot()
         
-        Cinematics.inflection(self.trace3)
+        inflection(self.trace3)
         afIsInflexion = self.trace3.getAnalyticalFeature('inflection')
         #print (afIsInflexion)
         self.trace3.plot(type='POINT', af_name='inflection', append = True, 
@@ -147,7 +158,7 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         plt.figure(figsize = (8,4))
         self.trace3.plot()
         
-        Cinematics.setVertexAF(self.trace3)
+        setVertexAF(self.trace3)
         afVertex = self.trace3.getAnalyticalFeature('vertex')
         #print (afVertex)
         self.trace3.plot(type='POINT', af_name='vertex', append = True, 
@@ -163,7 +174,7 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         plt.figure(figsize = (8,4))
         self.trace3.plot()
         
-        Cinematics.setBendAsAF(self.trace3, angle_min = 130*pi/180)
+        setBendAsAF(self.trace3, angle_min = 130*pi/180)
         afBend = self.trace3.getAnalyticalFeature('bend')
         #print (afBend)
         self.trace3.plot(type='POINT', af_name='bend', append = True, 
@@ -179,8 +190,8 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         plt.figure(figsize = (8,4))
         self.trace3.plot()
         
-        Cinematics.setBendAsAF(self.trace3, angle_min = 130*pi/180)
-        Cinematics.setSwitchbacksAsAF(self.trace3, nb_virage_min=3, 
+        setBendAsAF(self.trace3, angle_min = 130*pi/180)
+        setSwitchbacksAsAF(self.trace3, nb_virage_min=3, 
                                       dist_max=200)
         afSwitchbacks = self.trace3.getAnalyticalFeature('switchbacks')
         #print (afSwitchbacks)
@@ -195,9 +206,9 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         
         
     def testSmoothedSpeedCalculation(self):
-        Cinematics.smoothed_speed_calculation(self.trace1, 2)
+        smoothed_speed_calculation(self.trace1, 2)
         speeds = self.trace1.getAnalyticalFeature('speed')
-        Cinematics.computeAbsCurv(self.trace1)
+        computeAbsCurv(self.trace1)
         
         ds8 = self.trace1.getObsAnalyticalFeature('abs_curv', 8)
         ds4 = self.trace1.getObsAnalyticalFeature('abs_curv', 4)
@@ -209,10 +220,10 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         
         
     def testCompareAbsCurv(self):
-        speeds1 = Cinematics.computeAbsCurv(self.trace1)
+        speeds1 = computeAbsCurv(self.trace1)
         #print (speeds1)
         
-        Cinematics.computeAbsCurv(self.trace1)
+        computeAbsCurv(self.trace1)
         for i in range(self.trace1.size()):
             self.assertEqual(speeds1[i], 
                 self.trace1.getObsAnalyticalFeature(BIAF_ABS_CURV, i))
@@ -222,7 +233,7 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         
         import math
         
-        Cinematics.estimate_heading(self.trace2)
+        estimate_heading(self.trace2)
         
         s0 = self.trace2.getObsAnalyticalFeature('heading', 0)
         s1 = self.trace2.getObsAnalyticalFeature('heading', 1)
@@ -245,42 +256,42 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
     
     def testComputeAvgSpeed(self):
         
-        a = Cinematics.computeAvgSpeed(self.trace2)
+        a = computeAvgSpeed(self.trace2)
         self.assertLessEqual(abs(a - 0.419354), self.__epsilon, 'ComputeAvgSpeed')
         
         
     def testComputeAvgAscSpeed(self):
         
-        a = Cinematics.computeAvgAscSpeed(self.trace2)
+        a = computeAvgAscSpeed(self.trace2)
         self.assertLessEqual(abs(a - 0.096774), self.__epsilon, 'computeAvgAscSpeed')
 
 
     def testComputeNetDeniv(self):
         
-        a = Cinematics.computeNetDeniv(self.trace2)
+        a = computeNetDeniv(self.trace2)
         self.assertLessEqual(abs(a - 0), self.__epsilon, 'ComputeAvgSpeed')
         
-        a = Cinematics.computeNetDeniv(self.trace2, 0, 3)
+        a = computeNetDeniv(self.trace2, 0, 3)
         self.assertLessEqual(abs(a - 15), self.__epsilon, 'ComputeAvgSpeed')
         
         
     def testComputeAscDeniv(self):
         
-        a = Cinematics.computeAscDeniv(self.trace2)
+        a = computeAscDeniv(self.trace2)
         self.assertLessEqual(abs(a - 15), self.__epsilon, 'ComputeAscDeniv')
-        a = Cinematics.computeAscDeniv(self.trace2, 0, 3)
+        a = computeAscDeniv(self.trace2, 0, 3)
         self.assertLessEqual(abs(a - 15), self.__epsilon, 'ComputeAscDeniv')
-        a = Cinematics.computeAscDeniv(self.trace2, 3)
+        a = computeAscDeniv(self.trace2, 3)
         self.assertLessEqual(abs(a - 0), self.__epsilon, 'ComputeAscDeniv')
     
     
     def testComputeDescDeniv(self):
         
-        a = Cinematics.computeDescDeniv(self.trace2)
+        a = computeDescDeniv(self.trace2)
         self.assertLessEqual(abs(a + 15), self.__epsilon, 'computeDescDeniv')
-        a = Cinematics.computeDescDeniv(self.trace2, 0, 3)
+        a = computeDescDeniv(self.trace2, 0, 3)
         self.assertLessEqual(abs(a - 0), self.__epsilon, 'computeDescDeniv')
-        a = Cinematics.computeDescDeniv(self.trace2, 4)
+        a = computeDescDeniv(self.trace2, 4)
         self.assertLessEqual(abs(a + 10), self.__epsilon, 'computeDescDeniv')
         
         

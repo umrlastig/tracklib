@@ -5,8 +5,7 @@ from unittest import TestCase, TestSuite, TextTestRunner
 import matplotlib.pyplot as plt
 import os.path
 
-from tracklib import (ObsTime, GaussianKernel, Operator)
-from tracklib.io.TrackReader import TrackReader
+from tracklib import (ObsTime, GaussianKernel, Operator, TrackReader)
 import tracklib.algo.Simplification as spf
 
 

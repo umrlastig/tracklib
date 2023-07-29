@@ -3,8 +3,8 @@
 from unittest import TestCase, TestSuite, TextTestRunner
 
 from tracklib import (Obs, ObsTime, ENUCoords)
-from tracklib.core import (Track)
-import tracklib.algo.Interpolation as itp
+from tracklib.core import Track
+from tracklib.algo import synchronize
 
 
 
@@ -63,7 +63,7 @@ class TestInterpolation2(TestCase):
         
     def testSynchronize(self):
         
-        itp.synchronize(self.trace1, self.trace2)
+        synchronize(self.trace1, self.trace2)
         self.assertEqual(self.trace1.size(), 5)
         self.assertEqual(self.trace2.size(), 5)
         

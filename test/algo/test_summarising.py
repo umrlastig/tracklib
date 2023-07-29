@@ -6,9 +6,8 @@ import os.path
 
 from tracklib import (Obs, ObsTime, ENUCoords, TrackCollection,
                       speed,
-                      RasterBand, NO_DATA_VALUE)
-from tracklib.core import (Track)
-from tracklib.io.TrackReader import TrackReader
+                      RasterBand, NO_DATA_VALUE,
+                      Track, TrackReader)
 from tracklib.algo import (Summarising) 
 
 

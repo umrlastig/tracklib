@@ -5,15 +5,11 @@ import matplotlib.pyplot as plt
 import os.path
 import unittest
 
-from tracklib.io.TrackReader import TrackReader
-from tracklib.io.RasterReader import RasterReader
-import tracklib.algo.Mapping as mapping
-
-from tracklib import (Obs, ObsTime, ENUCoords)
-from tracklib.core import (Track)
-from tracklib.core.Network import Network, Node, Edge
-from tracklib.core.SpatialIndex import SpatialIndex
-import tracklib.algo.Cinematics as Cinematics
+from tracklib.io import TrackReader, RasterReader
+from tracklib.core import (Obs, ObsTime, ENUCoords)
+from tracklib.core import (Track, Network, Node, Edge, SpatialIndex)
+from tracklib.algo import (computeAbsCurv)
+from tracklib.algo.Mapping import mapOnRaster, mapOnNetwork, mapOn
 
 
 class TestAlgoMappingMethods(unittest.TestCase):
@@ -76,7 +72,7 @@ class TestAlgoMappingMethods(unittest.TestCase):
         c2 = ENUCoords(10, 0, 0)
         p2 = Obs(c2, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         s1.addObs(p2)
-        Cinematics.computeAbsCurv(s1)
+        computeAbsCurv(s1)
         edge = Edge(1, s1)
         edge.orientation = Edge.DOUBLE_SENS
         edge.weight = s1.length()
@@ -94,7 +90,7 @@ class TestAlgoMappingMethods(unittest.TestCase):
         c2 = ENUCoords(10, 5, 0)
         p2 = Obs(c2, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         s2.addObs(p2)
-        Cinematics.computeAbsCurv(s2)
+        computeAbsCurv(s2)
         edge = Edge(2, s2)
         edge.orientation = Edge.DOUBLE_SENS
         edge.weight = s2.length()
@@ -112,7 +108,7 @@ class TestAlgoMappingMethods(unittest.TestCase):
         c2 = ENUCoords(20, 5, 0)
         p2 = Obs(c2, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         s3.addObs(p2)
-        Cinematics.computeAbsCurv(s3)
+        computeAbsCurv(s3)
         edge = Edge(3, s3)
         edge.orientation = Edge.DOUBLE_SENS
         edge.weight = s3.length()
@@ -130,7 +126,7 @@ class TestAlgoMappingMethods(unittest.TestCase):
         c2 = ENUCoords(20, 0, 0)
         p2 = Obs(c2, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         s4.addObs(p2)
-        Cinematics.computeAbsCurv(s4)
+        computeAbsCurv(s4)
         edge = Edge(4, s4)
         edge.orientation = Edge.DOUBLE_SENS
         edge.weight = s4.length()
@@ -148,7 +144,7 @@ class TestAlgoMappingMethods(unittest.TestCase):
         c2 = ENUCoords(20, 0, 0)
         p2 = Obs(c2, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         s5.addObs(p2)
-        Cinematics.computeAbsCurv(s5)
+        computeAbsCurv(s5)
         edge = Edge(5, s5)
         edge.orientation = Edge.DOUBLE_SENS
         edge.weight = s5.length()
@@ -166,7 +162,7 @@ class TestAlgoMappingMethods(unittest.TestCase):
         c2 = ENUCoords(30, 0, 0)
         p2 = Obs(c2, ObsTime.readTimestamp("2018-01-01 10:00:00"))
         s6.addObs(p2)
-        Cinematics.computeAbsCurv(s6)
+        computeAbsCurv(s6)
         edge = Edge(6, s6)
         edge.orientation = Edge.DOUBLE_SENS
         edge.weight = s6.length()
@@ -197,7 +193,7 @@ class TestAlgoMappingMethods(unittest.TestCase):
         
         self.assertEqual(self.band.grid[465][1151], 2007.0, 'ele MNT VT')
         self.assertEqual(self.trace.size(), 363, 'track size')
-        mapping.mapOnRaster(self.trace, self.raster)
+        mapOnRaster(self.trace, self.raster)
         
         for j in range(self.trace.size()):
             pos = self.trace.getObs(j).position
@@ -233,7 +229,7 @@ class TestAlgoMappingMethods(unittest.TestCase):
         
         # =====================================================================
         #
-        mapping.mapOnNetwork(trace, network, search_radius=5.5, debug=False)
+        mapOnNetwork(trace, network, search_radius=5.5, debug=False)
         
         plt.show()
         
@@ -261,7 +257,7 @@ class TestAlgoMappingMethods(unittest.TestCase):
         track_gps = track_gps // track_cam
         
         track_cam.rotate(0.2);
-        mapping.mapOn(track_cam, track_gps)
+        mapOn(track_cam, track_gps)
         
         track_cam.plot('r-')
         track_gps.plot('b+')

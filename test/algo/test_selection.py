@@ -4,10 +4,8 @@ import matplotlib.pyplot as plt
 import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
 
-from tracklib import (Obs, ObsTime, ENUCoords)
-from tracklib.core.Track import Track
-from tracklib.util import Circle, Rectangle
-from tracklib.io.TrackReader import TrackReader
+from tracklib import (Obs, ObsTime, ENUCoords, Track,
+                      Circle, Rectangle, TrackReader)
 from tracklib.algo.Selection import Selector, GlobalSelector
 from tracklib.algo.Selection import Constraint, TimeConstraint, TrackConstraint
 from tracklib.algo.Selection import MODE_INSIDE, MODE_CROSSES, MODE_GETS_IN, MODE_GETS_OUT

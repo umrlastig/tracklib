@@ -19,7 +19,6 @@
 #      la forme globale de la trace en réduisant le nombre de points
 # -----------------------------------------------------------------------------
 import math
-import matplotlib.pyplot as plt
 import os.path
 
 from unittest import TestCase, TestSuite, TextTestRunner
@@ -27,9 +26,18 @@ from unittest import TestCase, TestSuite, TextTestRunner
 #import sys
 #sys.path.append('~/Bureau/KitYann/2-Tracklib/tracklib/tracklib')
 
+import tracklib
 from tracklib import (ObsTime, GaussianKernel)
-from tracklib.io.TrackReader import TrackReader
-import tracklib.algo.Interpolation as itp
+from tracklib.io import TrackReader
+#import tracklib.algo.Interpolation as itp
+from tracklib.algo import (MODE_TEMPORAL, 
+                           MODE_SPATIAL,
+                           ALGO_THIN_SPLINES,
+                           ALGO_B_SPLINES,
+                           ALGO_GAUSSIAN_PROCESS)
+#                           SPLINE_PENALIZATION,
+#                           GP_KERNEL,
+#                           GP_SMOOTHING)
 
 
 
@@ -183,7 +191,7 @@ class TestInterpolation(TestCase):
         Interpolation lineaire en mode temporel : en 20 pts
         '''
         #temp = track.copy()
-        self.track.resample(npts = 80, mode = itp.MODE_TEMPORAL)  
+        self.track.resample(npts = 80, mode = MODE_TEMPORAL)  
         self.view(self.track, sym)
 
         
@@ -219,7 +227,7 @@ class TestInterpolation(TestCase):
         Interpolation lineaire : sur-echantillonnage spatial facteur 2
         '''
         #temp = track.copy()
-        self.track.resample(factor = 2, mode = itp.MODE_SPATIAL)  
+        self.track.resample(factor = 2, mode = MODE_SPATIAL)  
         self.view(self.track, sym)
 
         
@@ -228,7 +236,7 @@ class TestInterpolation(TestCase):
         Interpolation par splines plaques minces en mode spatial : 1 pt / 10 m
         '''
         # temp = track.copy()
-        self.track.resample(delta=10, algo = itp.ALGO_THIN_SPLINES)  
+        self.track.resample(delta=10, algo = ALGO_THIN_SPLINES)  
         self.view(self.track, sym)
 
         
@@ -237,7 +245,7 @@ class TestInterpolation(TestCase):
         Interpolation par splines plaques minces en mode temporel : 2 pt/s
         '''
         # temp = track.copy()
-        self.track.resample(delta=0.5, algo = itp.ALGO_THIN_SPLINES, mode = itp.MODE_TEMPORAL)  
+        self.track.resample(delta=0.5, algo=ALGO_THIN_SPLINES, mode=MODE_TEMPORAL)  
         self.view(self.track, sym)
  	
 
@@ -247,7 +255,7 @@ class TestInterpolation(TestCase):
         '''
         # temp = track.copy()
         self.track %= 5
-        self.track.resample(delta=1, algo = itp.ALGO_B_SPLINES)  
+        self.track.resample(delta=1, algo = ALGO_B_SPLINES)  
         self.view(self.track, sym)
 
         
@@ -257,7 +265,7 @@ class TestInterpolation(TestCase):
         '''
         # temp = track.copy()
         self.track %= 5
-        self.track.resample(delta=1, algo = itp.ALGO_B_SPLINES, mode = itp.MODE_TEMPORAL)  
+        self.track.resample(delta=1, algo=ALGO_B_SPLINES, mode=MODE_TEMPORAL)  
         self.view(self.track, sym)
  	
  	
@@ -266,8 +274,8 @@ class TestInterpolation(TestCase):
         Interpolation par processus gaussien en mode spatial : 1 pt / m
         '''
         # temp = track.copy()
-        itp.GP_KERNEL = GaussianKernel(10)
-        self.track.resample(delta=100, algo = itp.ALGO_GAUSSIAN_PROCESS)  
+        tracklib.algo.Interpolation.GP_KERNEL = GaussianKernel(10)
+        self.track.resample(delta=100, algo=ALGO_GAUSSIAN_PROCESS)  
         self.view(self.track, sym)	
 
         
@@ -276,8 +284,8 @@ class TestInterpolation(TestCase):
         Interpolation par processus gaussien en mode temporel : 1 pt/s   
         '''
         # temp = track.copy()
-        itp.GP_KERNEL = GaussianKernel(10)
-        self.track.resample(delta=1, algo = itp.ALGO_GAUSSIAN_PROCESS, mode = itp.MODE_TEMPORAL)  
+        tracklib.algo.Interpolation.GP_KERNEL = GaussianKernel(10)
+        self.track.resample(delta=1, algo=ALGO_GAUSSIAN_PROCESS, mode=MODE_TEMPORAL)  
         self.view(self.track, sym)	
 	        
         
@@ -292,8 +300,8 @@ class TestInterpolation(TestCase):
         Lissage/interpolation par splines plaques minces en mode spatial : 1 pt / 10 m
         '''
         # temp = track.copy()
-        itp.SPLINE_PENALIZATION = 1e-2
-        self.track.resample(delta=10, algo = itp.ALGO_THIN_SPLINES)  
+        tracklib.algo.Interpolation.SPLINE_PENALIZATION = 1e-2
+        self.track.resample(delta=10, algo=ALGO_THIN_SPLINES)  
         self.view(self.track, sym)
  	
 
@@ -302,8 +310,8 @@ class TestInterpolation(TestCase):
          Lissage/interpolation par splines plaques minces en mode temporel : 1 pt/s
          '''
          # temp = track.copy()
-         itp.SPLINE_PENALIZATION = 1e4
-         self.track.resample(delta=10, algo = itp.ALGO_THIN_SPLINES, mode = itp.MODE_TEMPORAL)  
+         tracklib.algo.Interpolation.SPLINE_PENALIZATION = 1e4
+         self.track.resample(delta=10, algo=ALGO_THIN_SPLINES, mode=MODE_TEMPORAL)  
          self.view(self.track, sym)
  	
 
@@ -312,9 +320,9 @@ class TestInterpolation(TestCase):
         Lissage/interpolation par processus gaussien en mode spatial : 1 pt / 10 m
         '''
         # temp = track.copy()
-        itp.GP_KERNEL = GaussianKernel(100)
-        itp.GP_SMOOTHING = 0.001
-        self.track.resample(delta=10, algo = itp.ALGO_GAUSSIAN_PROCESS)  
+        tracklib.algo.Interpolation.GP_KERNEL = GaussianKernel(100)
+        tracklib.algo.Interpolation.GP_SMOOTHING = 0.001
+        self.track.resample(delta=10, algo = ALGO_GAUSSIAN_PROCESS)  
         self.view(self.track, sym)	
  	
 
@@ -323,21 +331,13 @@ class TestInterpolation(TestCase):
         Lissage/interpolation par processus gaussien en mode temporel : 1 pt/s    
         '''
         # temp = track.copy()
-        itp.GP_KERNEL = GaussianKernel(100)
-        itp.GP_SMOOTHING = 0.001
-        self.track.resample(delta=1, algo = itp.ALGO_GAUSSIAN_PROCESS, mode = itp.MODE_TEMPORAL)  
+        tracklib.algo.Interpolation.GP_KERNEL = GaussianKernel(100)
+        tracklib.algo.Interpolation.GP_SMOOTHING = 0.001
+        self.track.resample(delta=1, algo=ALGO_GAUSSIAN_PROCESS, mode=MODE_TEMPORAL)  
         self.view(self.track, sym)	
  	
  	
      
-     
- 	
-
-    
-
-
-    
-    
     
 if __name__ == '__main__':
     suite = TestSuite()

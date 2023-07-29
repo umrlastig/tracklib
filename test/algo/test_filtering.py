@@ -5,7 +5,7 @@ import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
 
 from tracklib import (ObsTime)
-from tracklib.io.TrackReader import TrackReader
+from tracklib.io import TrackReader
 from tracklib import DiracKernel, GaussianKernel, TriangularKernel, ExponentialKernel
 import tracklib.algo.Filtering as flt
 
