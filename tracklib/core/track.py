@@ -16,11 +16,20 @@ from . import (ObsTime, ENUCoords, Obs,
                isnan, listify, NAN, isfloat,
                compLike,
                TrackCollection,
-               DiracKernel,
+               DiracKernel, GaussianKernel,
                Bbox)
 from tracklib.util import intersection, Polygon
 from tracklib.plot import IPlotVisitor, MatplotlibVisitor
-from tracklib.algo import BIAF_SPEED, BIAF_ABS_CURV                      
+from tracklib.algo import (BIAF_SPEED, BIAF_ABS_CURV, 
+                           computeAbsCurv, 
+                           resample, MODE_SPATIAL,
+                           filter_seq,
+                           mapOn,
+                           noise,
+                           estimate_speed,
+                           smoothed_speed_calculation,
+                           differenceProfile,
+                           MODE_TEMPORAL)                     
 
 from . import (UnaryOperator, BinaryOperator, 
                ScalarOperator, ScalarVoidOperator, 
@@ -670,8 +679,6 @@ class Track:
     # positions. Timestamps are reinterpolated
     # -----------------------------------------------------
     def removeTpsDup(self, et = 1e-3):
-        from tracklib.algo import computeAbsCurv
-        
         computeAbsCurv(self)
         new_track = Track()
         for i in range(len(self)):
@@ -1272,9 +1279,6 @@ class Track:
             - a reference track
         """
 
-        from tracklib.algo import resample
-        from tracklib.algo import MODE_SPATIAL
-
         if delta is None:  # Number of points only is specified
             if npts is None:
                 npts = len(self)*factor
@@ -1299,9 +1303,7 @@ class Track:
     # =========================================================================
     def smooth(self, width=1):
         """TODO"""
-        import tracklib.algo.Filtering as Filtering
-        from tracklib.core import GaussianKernel
-        self = Filtering.filter_seq(self, GaussianKernel(width))
+        self = filter_seq(self, GaussianKernel(width))
 
     def incrementTime(self, dt=1, offset=0):
         """Add 1 sec to each subsequent record. Use incrementTime to
@@ -1347,19 +1349,17 @@ class Track:
         Track argument may also be replaced ny a list of points.
         Note that mapOn does not handle negative determinant (symetries not allowed)
         """
-        from tracklib.algo.Mapping import mapOn as mapping_mapOn
 
-        return mapping_mapOn(self, reference, TP1, TP2, init, N_ITER_MAX, mode, verbose)
+        return mapOn(self, reference, TP1, TP2, init, N_ITER_MAX, mode, verbose)
 
     # =========================================================================
     #  Adding noise to tracks
     # =========================================================================
     def noise(self, sigma=5, kernel=None, force=False, cycle=False):
         """TODO"""
-        from tracklib.algo.Stochastics import noise as stochastics_noise
         if kernel is None:
             kernel = DiracKernel()
-        return stochastics_noise(self, sigma, kernel, force=force, cycle=cycle)
+        return noise(self, sigma, kernel, force=force, cycle=cycle)
 
     # =========================================================================
     # Graphical methods
@@ -1424,10 +1424,8 @@ class Track:
         if raw speeds are required. If kernel is specified
         smoothed speed estimation is computed."""
         if kernel is None:
-            from tracklib.algo import estimate_speed
             return estimate_speed(self)
         else:
-            from tracklib.algo import smoothed_speed_calculation
             return smoothed_speed_calculation(self, kernel)
 
 
@@ -2187,13 +2185,11 @@ class Track:
     # ------------------------------------------------------------
     def __sub__(self, arg):
         """TODO"""
-        from tracklib.algo import differenceProfile as comp_differenceProfile
-
         if isinstance(arg, int):
             print("Available operator not implemented yet")
             return None
         else:
-            return comp_differenceProfile(self, arg)
+            return differenceProfile(self, arg)
 
     # ------------------------------------------------------------
     # [*] Temporal resampling of track or track intersections
@@ -2229,7 +2225,6 @@ class Track:
     # ------------------------------------------------------------
     def __floordiv__(self, track):
         """TODO"""
-        from tracklib.algo import MODE_TEMPORAL
         track_resampled = self.copy()
         track_resampled.resample(track, mode = MODE_TEMPORAL)
         return track_resampled
