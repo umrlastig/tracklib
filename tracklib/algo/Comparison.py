@@ -11,9 +11,7 @@ import matplotlib.pyplot as plt
 from tracklib.util import dist_point_to_segment
 from tracklib.core import TrackCollection
 from . import computeAbsCurv, synchronize, HMM, MODE_OBS_AS_2D_POSITIONS
-
 from tracklib.core import Track
-
 
 MODE_COMPARAISON_NEAREST_NEIGHBOUR = 1
 MODE_COMPARAISON_DTW = 2
@@ -238,8 +236,11 @@ def compare(track1, track2) -> float:
     return math.sqrt(rmse / trackA.size())
 
 
-def centralTrack(tracks: Union[TrackCollection, Iterable[Track]], 
-                 mode: Literal["NN", "DTW", "FDTW"] = "NN", verbose: bool = True) -> Track:   
+# Union[TrackCollection, Iterable[Track]]
+# Literal["NN", "DTW", "FDTW"]
+# bool
+# -> Track
+def centralTrack(tracks, mode="NN", verbose=True):   
     """Computes central track of a track collection
 
     :param tracks: TrackCollection or list of tracks
@@ -370,8 +371,11 @@ def discreteFrechetCouplingMeasure(track1, track2, i, j, ca):
     return ca[i][j]
 
 
-def medoid (tracks: Union[TrackCollection, Iterable[Track]], 
-                 mode: Literal["Hausdorff"] = "Hausdorff", verbose: bool = True) -> Track: 
+# Union[TrackCollection, Iterable[Track]]
+# Literal["Hausdorff"]
+# bool
+# -> Track
+def medoid (tracks, mode="Hausdorff", verbose=True): 
     
     tracks = tracks.copy()
 

@@ -2194,7 +2194,7 @@ class Track:
     # ------------------------------------------------------------
     def __sub__(self, arg):
         """TODO"""
-        from tracklib.algo.Comparison import differenceProfile as comp_differenceProfile
+        from tracklib.algo import differenceProfile as comp_differenceProfile
 
         if isinstance(arg, int):
             print("Available operator not implemented yet")

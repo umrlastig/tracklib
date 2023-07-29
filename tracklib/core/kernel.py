@@ -350,7 +350,7 @@ class ExperimentalKernel:
 
     def addTrackCollection(self, trackCollection, verbose=False):
         """TODO"""
-        import tracklib.algo.Comparison as Comparison  # <- Assez moche... A voir comment resoudre
+        from tracklib.algo import  differenceProfile # <- Assez moche... A voir comment resoudre
 
         N = trackCollection.size()
         for i in range(N - 1):
@@ -358,7 +358,7 @@ class ExperimentalKernel:
             t1 = trackCollection[i]
             for j in range(i + 1, N):
                 t2 = trackCollection[j]
-                pf = Comparison.differenceProfile(
+                pf = differenceProfile(
                     t1, t2, mode=self.method, ends=True, p=1, verbose=verbose
                 )
                 self.addDifferenceProfile(pf)
