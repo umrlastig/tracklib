@@ -35,6 +35,8 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
+import tracklib as tracklib
+
 class Kernel:
     """Generic kernel class"""
 
@@ -345,8 +347,7 @@ class ExperimentalKernel:
 
     def addTrackPair(self, track1, track2):
         """TODO"""
-        from tracklib.core.TrackCollection import TrackCollection
-        self.addTrackCollection(TrackCollection([track1, track2]))
+        self.addTrackCollection(tracklib.TrackCollection([track1, track2]))
 
     def addTrackCollection(self, trackCollection, verbose=False):
         """TODO"""

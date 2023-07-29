@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 
 from . import removeNan, listify, compLike
 
+import tracklib as tracklib
+
 
 class TrackCollection:
     """TODO"""
@@ -81,20 +83,15 @@ class TrackCollection:
 
     def createSpatialIndex(self, resolution=None, verbose=True):
         """TODO"""
-        from tracklib.core import SpatialIndex
-
-        self.spatial_index = SpatialIndex(self, resolution, verbose)
+        self.spatial_index = tracklib.SpatialIndex(self, resolution, verbose)
 
     def exportSpatialIndex(self, filename):
         """TODO"""
-        # from tracklib.core import SpatialIndex
         self.spatial_index.save(filename)
 
     def importSpatialIndex(self, filename):
         """TODO"""
-        from tracklib.core import SpatialIndex
-
-        self.spatial_index = SpatialIndex.load(filename)
+        self.spatial_index = tracklib.SpatialIndex.load(filename)
 
     # =========================================================================
     # Track collection coordinate transformation

@@ -6,6 +6,7 @@ from __future__ import annotations
 # from typing import Union
 
 import copy
+from datetime import datetime
 import random
 
 
@@ -241,7 +242,6 @@ class ObsTime:
     @staticmethod
     def now() -> ObsTime:   
         """Get Current Date and Time"""
-        from datetime import datetime
         nowobj = datetime.now()
         
         tps = ObsTime(nowobj.year, nowobj.month, nowobj.day, 

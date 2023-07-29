@@ -10,6 +10,7 @@ import progressbar
 import numpy as np
 import matplotlib.pyplot as plt
 
+import tracklib as tracklib
 from tracklib.core import (ECEFCoords, ENUCoords, GeoCoords,
                       Obs,
                       priority_dict,
@@ -302,9 +303,7 @@ class Network:
         :param margin: TODO
         :param verbose: Verbose creation
         """
-        from tracklib.core import SpatialIndex
-
-        self.spatial_index = SpatialIndex(self, resolution, margin, verbose)
+        self.spatial_index = tracklib.SpatialIndex(self, resolution, margin, verbose)
 
     def exportSpatialIndex(self, filename: str):
         """Export the spatial index to a file
@@ -318,9 +317,7 @@ class Network:
 
         :parma filename: File to import
         """
-        from tracklib.core import SpatialIndex
-
-        self.spatial_index = SpatialIndex.load(filename)
+        self.spatial_index = tracklib.SpatialIndex.load(filename)
 
     # ------------------------------------------------------------
     # Topologic methods

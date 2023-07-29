@@ -206,8 +206,7 @@ class SpatialIndex:
 
     def highlight(self, i, j, v:IPlotVisitor=None, sym="r-", size=0.5):
         if v == None:
-            import tracklib.plot.MatplotlibVisitor as visitor
-            v = visitor.MatplotlibVisitor()
+            v = MatplotlibVisitor()
         v.highlightCellInSpatialIndex(self, i, j, sym, size)
     
     
