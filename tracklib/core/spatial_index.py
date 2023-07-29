@@ -8,7 +8,7 @@ import progressbar
 
 from tracklib.core import (GeoCoords, ENUCoords, TrackCollection)
 from tracklib.util import isSegmentIntersects
-from tracklib.plot import IPlotVisitor
+from tracklib.plot import IPlotVisitor, MatplotlibVisitor
 
 from tracklib.core import (Bbox, Track)
 from tracklib.core import Edge
@@ -201,8 +201,7 @@ class SpatialIndex:
     
     def plot(self, base:bool=True, append=True, v:IPlotVisitor=None):
         if v == None:
-            import tracklib.plot.MatplotlibVisitor as visitor
-            v = visitor.MatplotlibVisitor()
+            v = MatplotlibVisitor()
         v.plotSpatialIndex(self, base, append)
 
     def highlight(self, i, j, v:IPlotVisitor=None, sym="r-", size=0.5):

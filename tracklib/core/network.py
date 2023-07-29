@@ -15,7 +15,7 @@ from tracklib.core import (ECEFCoords, ENUCoords, GeoCoords,
                       priority_dict,
                       TrackCollection,
                       Bbox)
-from tracklib.plot import IPlotVisitor
+from tracklib.plot import IPlotVisitor, MatplotlibVisitor
 from tracklib.algo import simplify
 from tracklib.core import Track
 
@@ -536,8 +536,7 @@ class Network:
         v:IPlotVisitor=None):
 
         if v == None:
-            import tracklib.plot.MatplotlibVisitor as visitor
-            v = visitor.MatplotlibVisitor()
+            v = MatplotlibVisitor()
 
         v.plotNetwork(self, edges, nodes, direct, indirect, size, append)
 
