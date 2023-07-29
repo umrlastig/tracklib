@@ -10,14 +10,10 @@ from tracklib.util import (aire_visval,
                            distance_to_segment,
                            boundingShape, MODE_ENCLOSING_MBR)
 from tracklib.core import Operator
-from tracklib.algo.Segmentation import (
-    MODE_SEGMENTATION_MINIMIZE,
-    MODE_SEGMENTATION_MAXIMIZE,
-    optimalSegmentation
-)
+from tracklib.algo import (MODE_SEGMENTATION_MINIMIZE, MODE_SEGMENTATION_MAXIMIZE,
+                           optimalSegmentation)
 # --------------------------------------------------------------------------
 # Circular import (not satisfying solution)
-# --------------------------------------------------------------------------
 from tracklib.core import Track
 
 

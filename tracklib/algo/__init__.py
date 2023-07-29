@@ -9,12 +9,14 @@ from .Dynamics import *
 from .Filtering import *
 
 from .Comparison import *
+from .Segmentation import *
 from .Selection import *
+
+
 
 """
 
 from .Mapping import *
-from .Segmentation import *
 from .Simplification import *
 from .Summarising import *
 from .Synthetics import *
