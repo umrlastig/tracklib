@@ -1,8 +1,8 @@
 """This module contains the class to manage Network"""
 
 # For type annotation
-from __future__ import annotations   
-from typing import Literal, Union, Dict, Tuple   
+from __future__ import annotations
+from typing import Literal, Union, Dict, Tuple
 
 import random
 #from typing import Union
@@ -10,13 +10,13 @@ import progressbar
 import numpy as np
 import matplotlib.pyplot as plt
 
-from tracklib.core import (ECEFCoords, ENUCoords, GeoCoords, 
-                      Obs, 
+from tracklib.core import (ECEFCoords, ENUCoords, GeoCoords,
+                      Obs,
                       priority_dict,
                       TrackCollection,
                       Bbox)
 from tracklib.plot import IPlotVisitor
-import tracklib.algo.Simplification as Simplification
+from tracklib.algo import simplify
 from tracklib.core import Track
 
 
@@ -24,7 +24,7 @@ from tracklib.core import Track
 class Node:
     """Node / vertice of a network"""
 
-    def __init__(self, id: int, coord: Union[ECEFCoords, ENUCoords, GeoCoords]):   
+    def __init__(self, id: int, coord: Union[ECEFCoords, ENUCoords, GeoCoords]):
         """:class:`Node` constructor
 
         :param id: unique id of Node
@@ -33,11 +33,11 @@ class Node:
         self.id = id
         self.coord = coord
 
-    def __str__(self) -> str:   
+    def __str__(self) -> str:
         """Node to string"""
         return "Node object: " + str(self.id)
 
-    def __lt__(self, other: Node) -> bool:   
+    def __lt__(self, other: Node) -> bool:
         """Check if a node is bigger than the current node
 
         :param other: Node to test
@@ -47,7 +47,7 @@ class Node:
             return self.id < other.id
         return False
 
-    def __eq__(self, other: Node) -> bool:   
+    def __eq__(self, other: Node) -> bool:
         """Check if a node is equal with the current node
 
         :param other: Node to test
@@ -57,11 +57,11 @@ class Node:
             return self.id == other.id
         return False
 
-    def __hash__(self) -> int:   
+    def __hash__(self) -> int:
         """Return the hash of current node"""
         return hash(self.id)
 
-    def distanceTo(self, node: Node) -> float:   
+    def distanceTo(self, node: Node) -> float:
         """Distance to an other node
 
         :param node: Node to compute the distance
@@ -69,7 +69,7 @@ class Node:
         """
         return self.coord.distanceTo(node.coord)
 
-    def distance2DTo(self, node: Node) -> float:   
+    def distance2DTo(self, node: Node) -> float:
         """2d distance to an other node
 
         :param node: Node to compute the distance
@@ -89,7 +89,7 @@ class Edge:
     SENS_DIRECT = 1
     SENS_INVERSE = -1
 
-    def __init__(self, id: int, track: Track):   
+    def __init__(self, id: int, track: Track):
         """:class:`Edge` constructor
 
         :param id: unique id of Edge
@@ -103,14 +103,14 @@ class Edge:
         self.orientation = 0
         self.weight = 0
 
-    def plot(self, sym: str = "k-"):   
+    def plot(self, sym: str = "k-"):
         """Plot the edge
 
         :param sym: TODO
         """
         self.geom.plot(sym)
 
-    def __str__(self) -> str:   
+    def __str__(self) -> str:
         """Print the edge"""
         return "Edge #" + str(self.id)
 
@@ -149,7 +149,7 @@ class Network:
 
         self.spatial_index = None
 
-    def addNode(self, node: Node):   
+    def addNode(self, node: Node):
         """Add a :class:`Node` to the current :class:`Network`
 
         :param Node: Node to add
@@ -164,7 +164,7 @@ class Network:
             self.PREV_NODES[node.id] = []
             self.NBGR_NODES[node.id] = []
 
-    def addEdge(self, edge: Edge, source: Node, target: Node):   
+    def addEdge(self, edge: Edge, source: Node, target: Node):
         """Add a :class:`Edge` to the current :class:`Network`
 
         :param edge: Edge to add
@@ -203,14 +203,14 @@ class Network:
         """Define an iterator on Network"""
         yield from [l[1] for l in list(self.EDGES.items())]
 
-    def size(self) -> int:   
+    def size(self) -> int:
         """Return the number of edges
 
         :return: Number of edges
         """
         return len(self.EDGES)
 
-    def setRoutingMethod(self, method: int):   
+    def setRoutingMethod(self, method: int):
         """Define the routing algorithm
 
         :param method: Algorithm of routing. Two values are possible :
@@ -224,14 +224,14 @@ class Network:
         """
         self.routing_mode = method
 
-    def setAStarWeight(self, weight: float):   
+    def setAStarWeight(self, weight: float):
         """Define the A* weight"""
         self.astar_wgt = weight
 
     # ------------------------------------------------------------
     # Topometric methods
     # ------------------------------------------------------------
-    def toGeoCoords(self, base: Union[ECEFCoords, ENUCoords]):   
+    def toGeoCoords(self, base: Union[ECEFCoords, ENUCoords]):
         """Convert network to :class:`core.Coords.GeoCoords`
 
         :param base: Base coordinate for conversion
@@ -241,7 +241,7 @@ class Network:
         for id in self.__idx_edges:
             self.EDGES[id].geom.toGeoCoords(base)
 
-    def toENUCoords(self, base: Union[GeoCoords, ECEFCoords]):   
+    def toENUCoords(self, base: Union[GeoCoords, ECEFCoords]):
         """Convert network to :class:`core.Coords.ENUCoords`
 
         :param base: Base coordinate for conversion
@@ -251,14 +251,14 @@ class Network:
         for id in self.__idx_edges:
             self.EDGES[id].geom.toENUCoords(base)
 
-    def getSRID(self) -> int:   
+    def getSRID(self) -> int:
         """Return the SRID of network
 
         :return: SRID of current network
         """
         return self.EDGES[self.__idx_edges[0]].geom.getSRID()
 
-    def totalLength(self) -> int:   
+    def totalLength(self) -> int:
         """Count the edges of current network
 
         :return: Number of edges
@@ -268,7 +268,7 @@ class Network:
             count += self.EDGES[id].geom.length()
         return count
 
-    def simplify(self, tolerance, mode: int = 1):   
+    def simplify(self, tolerance, mode: int = 1):
         """Simplification of current network
 
         :param tolerance: TODO
@@ -286,7 +286,7 @@ class Network:
 
         """
         for id in self.__idx_edges:
-            self.EDGES[id].geom = Simplification.simplify(
+            self.EDGES[id].geom = simplify(
                 self.EDGES[id].geom, tolerance, mode
             )
 
@@ -306,14 +306,14 @@ class Network:
 
         self.spatial_index = SpatialIndex(self, resolution, margin, verbose)
 
-    def exportSpatialIndex(self, filename: str):   
+    def exportSpatialIndex(self, filename: str):
         """Export the spatial index to a file
 
         :param filename: File to export
         """
         self.spatial_index.save(filename)
 
-    def importSpatialIndex(self, filename: str):   
+    def importSpatialIndex(self, filename: str):
         """Import a spatial index from a file
 
         :parma filename: File to import
@@ -325,49 +325,49 @@ class Network:
     # ------------------------------------------------------------
     # Topologic methods
     # ------------------------------------------------------------
-    def getNextNodes(self, node_id: int):   
+    def getNextNodes(self, node_id: int):
         """Give the XXX of a node
 
         :param node_id: id of a node
         """
         return self.NEXT_NODES[node_id]
 
-    def getNextEdges(self, node_id: int):   
+    def getNextEdges(self, node_id: int):
         """Give the XXX of a node
 
         :param node_id: id of a node
         """
         return self.NEXT_EDGES[node_id]
 
-    def getPrevNodes(self, node_id: int):   
+    def getPrevNodes(self, node_id: int):
         """Give the XXX of a node
 
         :param node_id: id of a node
         """
         return self.PREV_NODES[node_id]
 
-    def getPrevEdges(self, node_id: int):   
+    def getPrevEdges(self, node_id: int):
         """Give the XXX of a node
 
         :param node_id: id of a node
         """
         return self.PREV_EDGES[node_id]
 
-    def getAdjacentNodes(self, node_id: int):   
+    def getAdjacentNodes(self, node_id: int):
         """Give the XXX of a node
 
         :param node_id: id of a node
         """
         return self.NBGR_NODES[node_id]
 
-    def getIncidentEdges(self, node_id: int):   
+    def getIncidentEdges(self, node_id: int):
         """Give the XXX of a node
 
         :param node_id: id of a node
         """
         return self.NBGR_EDGES[node_id]
 
-    def degree(self, node_id: int) -> int:   
+    def degree(self, node_id: int) -> int:
         """Compute the degree of a node
 
         :param node_id: id of a node
@@ -375,7 +375,7 @@ class Network:
         """
         return self.getAdjacentNodes(node_id).size()
 
-    def degreeIn(self, node_id: int) -> int:   
+    def degreeIn(self, node_id: int) -> int:
         """Compute the in degree of a node
 
         :param node_id: id of a node
@@ -383,7 +383,7 @@ class Network:
         """
         return self.getPrevNodes(node_id).size()
 
-    def degreeOut(self, node_id: int) -> int:   
+    def degreeOut(self, node_id: int) -> int:
         """Compute the out degree of a node
 
         :param node_id: id of a node
@@ -394,7 +394,7 @@ class Network:
     # ------------------------------------------------------------
     # Acces to data
     # ------------------------------------------------------------
-    def __getitem__(self, n: int) -> Edge:   
+    def __getitem__(self, n: int) -> Edge:
         """Return an edge item from its id
 
         :param n: Edge id
@@ -402,36 +402,36 @@ class Network:
         """
         return self.EDGES[self.__idx_edges[n]]
 
-    def __setitem__(self, n: int, edge: Edge):   
+    def __setitem__(self, n: int, edge: Edge):
         """Set an Edge for a give id value
 
         :param id: The id
         :param edge: The edge to set
         """
         self.EDGES[self.__idx_edges[id]] = edge
-        
-    def getIndexNodes(self) -> list[int]:   
+
+    def getIndexNodes(self) -> list[int]:
         """Return the list of seted nodes
 
         :return: A list of nodes id
         """
         return self.__idx_nodes
 
-    def getNumberOfNodes(self) -> int:   
+    def getNumberOfNodes(self) -> int:
         """Number of nodes in the network
 
         :return: Number of nodes
         """
         return len(self.NODES)
 
-    def getNumberOfEdges(self) -> int:   
+    def getNumberOfEdges(self) -> int:
         """Number of edges in the network
 
         :return: Number of edges
         """
         return len(self.EDGES)
 
-    def getNumberOfVertices(self) -> int:   
+    def getNumberOfVertices(self) -> int:
         """Number of vertices in the network
 
         :return: Number of vertices
@@ -441,7 +441,7 @@ class Network:
             count += self.EDGES[id].geom.size()
         return count
 
-    def getNodeId(self, n: int) -> int:   
+    def getNodeId(self, n: int) -> int:
         """The return the id of the n-est Node
 
         :param n: Position of the node
@@ -449,7 +449,7 @@ class Network:
         """
         return self.__idx_nodes[n]
 
-    def getEdgeId(self, n: int) -> int:   
+    def getEdgeId(self, n: int) -> int:
         """The return the id of the n-est Edge
 
         :param n: Position of the Edge
@@ -457,21 +457,21 @@ class Network:
         """
         return self.__idx_edges[n]
 
-    def getNodesId(self) -> list[int]:   
+    def getNodesId(self) -> list[int]:
         """Return a list of all nodes Id
 
         :return: A list of id
         """
         return [l[0] for l in list(self.NODES.items())]
 
-    def getEdgesId(self) -> list[int]:   
+    def getEdgesId(self) -> list[int]:
         """Return a list of all edges Id
 
         :return: A list of id
         """
         return [l[0] for l in list(self.EDGES.items())]
 
-    def getRandomNode(self) -> Node:   
+    def getRandomNode(self) -> Node:
         """Return a random node of network
 
         :return: A node randomly choosed
@@ -480,35 +480,35 @@ class Network:
             self.getNodesId()[random.randint(0, self.getNumberOfNodes() - 1)]
         )
 
-    def hasNode(self, id: int) -> bool:   
+    def hasNode(self, id: int) -> bool:
         """Check if a node with a given id exist
 
         :param id: node id to test
         """
         return id in self.NODES
 
-    def hasEdge(self, id: int) -> bool:   
+    def hasEdge(self, id: int) -> bool:
         """Check if a node with a given id exist
 
         :param id: edge id to test
         """
         return id in self.EDGES
 
-    def getNode(self, id: int) -> Node:   
+    def getNode(self, id: int) -> Node:
         """Return the node with a give id
 
         :param id: node id to get
         """
         return self.NODES[id]
 
-    def getEdge(self, id: int) -> Edge:   
+    def getEdge(self, id: int) -> Edge:
         """Return the edge with a give id
 
         :param id: edge id to get
         """
         return self.EDGES[id]
 
-    def getAllEdgeGeoms(self) -> TrackCollection:   
+    def getAllEdgeGeoms(self) -> TrackCollection:
         """Return a TrackCollection of all edges
 
         :return: All edges of :class:`Network`
@@ -518,29 +518,29 @@ class Network:
             tracks.addTrack(self.EDGES[id].geom)
         return tracks
 
-    def bbox(self) -> Bbox:   
+    def bbox(self) -> Bbox:
         """Return the :class:`Bbox` of network"""
         return self.getAllEdgeGeoms().bbox()
 
     # ------------------------------------------------------------
     # Graphics
     # ------------------------------------------------------------
-    
+
     def plot(self,
         edges: str = "k-",
         nodes: str = "",
         direct: str = "k--",
         indirect: str = "k--",
         size: float = 0.5,
-        append=plt, 
+        append=plt,
         v:IPlotVisitor=None):
-        
+
         if v == None:
             import tracklib.plot.MatplotlibVisitor as visitor
             v = visitor.MatplotlibVisitor()
-        
+
         v.plotNetwork(self, edges, nodes, direct, indirect, size, append)
-    
+
     # ------------------------------------------------------------
     # Routing methods
     # ------------------------------------------------------------
@@ -596,7 +596,7 @@ class Network:
             return node.id
         return node
 
-    def sub_network(self, source: Union[int, Node, Union[GeoCoords, ENUCoords, ECEFCoords]], cut: float, mode: Literal["TOPOLOGIC", "GEOMETRIC"] = "TOPOLOGIC", verbose: bool = True) -> Network:   
+    def sub_network(self, source: Union[int, Node, Union[GeoCoords, ENUCoords, ECEFCoords]], cut: float, mode: Literal["TOPOLOGIC", "GEOMETRIC"] = "TOPOLOGIC", verbose: bool = True) -> Network:
         """Extracts sub-network from routing forward search
 
         An edge is added to the output network if bot its ends have been visited during
@@ -621,7 +621,7 @@ class Network:
         print("Error: unknown network extraction mode: ", mode)
         exit(1)
 
-    def __sub_network_routing(self, verbose: bool) -> Network:   
+    def __sub_network_routing(self, verbose: bool) -> Network:
         """Sub network generation
 
         :param verbose: Verbose creation
@@ -640,7 +640,7 @@ class Network:
             sub_net.addEdge(e, e.source, e.target)
         return sub_net
 
-    def __sub_network_geometric(self, source: Union[Node, str], cut: float, verbose: bool) -> Network:   
+    def __sub_network_geometric(self, source: Union[Node, str], cut: float, verbose: bool) -> Network:
         """Sub network generation, based on geometry
 
         :param source: Source for the sub-network
@@ -681,7 +681,7 @@ class Network:
             elem[1].antecedent = ""
             elem[1].antecedent_edge = ""
 
-    def run_routing_forward(self, source: Union[Node, int], target: Union[Node, int] = None, cut: float = 1e300, output_dict: dict = None):   
+    def run_routing_forward(self, source: Union[Node, int], target: Union[Node, int] = None, cut: float = 1e300, output_dict: dict = None):
         """Executes forward pass of routing algorithm to find shortest distance between
         source node and all other nodes in graph.
 
@@ -742,7 +742,7 @@ class Network:
                     fils.antecedent_edge = e.id
                     fil.__setitem__(fils, fils.poids)
 
-    def shortest_distance( self, source: Union[int, Node], target: Union[int, Node] = None, cut: float = 1e300, output_dict: dict = None) -> Union[float, list[float]]:   
+    def shortest_distance( self, source: Union[int, Node], target: Union[int, Node] = None, cut: float = 1e300, output_dict: dict = None) -> Union[float, list[float]]:
         """Finds shortest distance between source node and either a target node or a
         list of target nodes.
 
@@ -769,7 +769,7 @@ class Network:
         else:
             return [(n[1].poids < 0) * 1e300 + n[1].poids for n in self.NODES.items()]
 
-    def all_shortest_distances(self, cut: float = 1e300, output_dict: dict = None) -> Dict[Tuple[int, int], float]:   
+    def all_shortest_distances(self, cut: float = 1e300, output_dict: dict = None) -> Dict[Tuple[int, int], float]:
         """Computes all shortest distances between pairs of nodes
 
         The results are saved in a dictionnary `{key=(source, n), value=d}`.
@@ -799,7 +799,7 @@ class Network:
             self.run_routing_forward(id_source, cut=cut, output_dict=output_dict)
         return output_dict
 
-    def run_routing_backward(self, target: Union[int, Node]) -> Union[Track, None]:   
+    def run_routing_backward(self, target: Union[int, Node]) -> Union[Track, None]:
         """Computes shortest path between the source node used in forward step
         :func:`run_routing_forward` and any target node.
 
@@ -827,7 +827,7 @@ class Network:
             node = node.antecedent
         return track
 
-    def shortest_path( self, source: Union[int, Node], target: Union[int, Node], cut: float = 1e300, output_dict: dict = None) -> Union[Track, None]:   
+    def shortest_path( self, source: Union[int, Node], target: Union[int, Node], cut: float = 1e300, output_dict: dict = None) -> Union[Track, None]:
         """Computes shortest path between source and target nodes
 
         :param source: A source node
@@ -841,7 +841,7 @@ class Network:
         self.run_routing_forward(source, target, cut=cut, output_dict=output_dict)
         return self.run_routing_backward(target)
 
-    def distanceBtwPts( self, edge1: int, abs_curv_1: float, edge2: int, abs_curv_2: float) -> float:   
+    def distanceBtwPts( self, edge1: int, abs_curv_1: float, edge2: int, abs_curv_2: float) -> float:
         """Distance between 2 points
 
         Each points being described by:
@@ -880,7 +880,7 @@ class Network:
 
         return min(min(d1, d2), min(d3, d4))
 
-    def prepare(self, cut: Union[float, None] = 1e300):   
+    def prepare(self, cut: Union[float, None] = 1e300):
         """Precomputes shortest distances between all pairs of nodes and saves the
         result in :attr:`DISTANCES` attribute.
 
@@ -890,7 +890,7 @@ class Network:
             self.DISTANCES = dict()
         self.all_shortest_distances(cut=cut, output_dict=self.DISTANCES)
 
-    def has_prepared_shortest_distance(self, source: Union[int, Node], target: Union[int, Node]) -> bool:   
+    def has_prepared_shortest_distance(self, source: Union[int, Node], target: Union[int, Node]) -> bool:
         """Tests if a shortest distance has been precomputed
 
         :param source: A source node
@@ -909,7 +909,7 @@ class Network:
         key = (source, target)
         return key in self.DISTANCES
 
-    def prepared_shortest_distance(self, source: Union[int, Node], target: Union[int, Node]) -> float:   
+    def prepared_shortest_distance(self, source: Union[int, Node], target: Union[int, Node]) -> float:
         """Finds shortest distance from the precomputation. May be called only after
         :func:`prepare` or :func:`load_prep.`
 
@@ -933,7 +933,7 @@ class Network:
         else:
             return 1e300
 
-    def save_prep(self, filename: str):   
+    def save_prep(self, filename: str):
         """Saves DISTANCES attribute in a npy file for further use
 
         :param filename: Path to save precomputed structure
@@ -945,7 +945,7 @@ class Network:
             exit(1)
         np.save(filename, self.DISTANCES)
 
-    def load_prep(self, filename: str):   
+    def load_prep(self, filename: str):
         """Imports DISTANCES attribute from an npy file
 
         :param filename: Path where precomputed structure is saved
