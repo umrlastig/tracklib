@@ -103,6 +103,44 @@ class TestTrack(TestCase):
         self.assertEqual(tab[0], 
                          ObsTime.readTimestamp("2018-01-01 10:00:00"))
         
+    
+    def test_to_image_coords(self):
+        
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        
+        trace = Track([], 1)
+        p1 = Obs(ENUCoords(5, 5, 0), ObsTime.readTimestamp("2018-01-01 10:40:00"))
+        trace.addObs(p1)
+        p2 = Obs(ENUCoords(5, -5, 0), ObsTime.readTimestamp("2018-01-01 11:00:00"))
+        trace.addObs(p2)
+        p3 = Obs(ENUCoords(15, -5, 0), ObsTime.readTimestamp("2018-01-01 11:10:00"))
+        trace.addObs(p3)
+        p4 = Obs(ENUCoords(15, 5, 0), ObsTime.readTimestamp("2018-01-01 11:20:00"))
+        trace.addObs(p4)
+        
+        trace.print()
+        trace.plotAsMarkers()
+        
+        P1 = ENUCoords(0, 0, 0)
+        P2 = ENUCoords(10, 10, 0)
+        p1 = [1, 1]
+        p2 = [2, 2]
+        trace.toImageCoords(P1, P2, p1, p2)
+        
+        self.assertEqual(trace.size(), 4)
+        self.assertEqual(trace[0].position.getX(), 1.5)
+        self.assertEqual(trace[0].position.getY(), 1.5)
+        self.assertEqual(str(trace[0].timestamp), '01/01/2018 10:40:00')
+        self.assertEqual(trace[1].position.getX(), 1.5)
+        self.assertEqual(trace[1].position.getY(), 0.5)
+        self.assertEqual(str(trace[1].timestamp), '01/01/2018 11:00:00')
+        self.assertEqual(trace[2].position.getX(), 2.5)
+        self.assertEqual(trace[2].position.getY(), 0.5)
+        self.assertEqual(str(trace[2].timestamp), '01/01/2018 11:10:00')
+        self.assertEqual(trace[3].position.getX(), 2.5)
+        self.assertEqual(trace[3].position.getY(), 1.5)
+        self.assertEqual(str(trace[3].timestamp), '01/01/2018 11:20:00')
+        
         
     def test_enclosed_polygon(self):
         poly = self.trace2.getEnclosedPolygon()
@@ -454,6 +492,7 @@ if __name__ == '__main__':
     suite.addTest(TestTrack("test_make_odd"))
     suite.addTest(TestTrack("test_make_even"))
     suite.addTest(TestTrack("test_loop"))
+    suite.addTest(TestTrack("test_to_image_coords"))
     
     suite.addTest(TestTrack("test_afs"))
     suite.addTest(TestTrack("test_af_xyztidx"))
