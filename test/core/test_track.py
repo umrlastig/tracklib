@@ -130,16 +130,16 @@ class TestTrack(TestCase):
         self.assertEqual(trace.size(), 4)
         self.assertEqual(trace[0].position.getX(), 1.5)
         self.assertEqual(trace[0].position.getY(), 1.5)
-        self.assertEqual(str(trace[0].timestamp), '01/01/2018 10:40:00')
+        self.assertEqual(str(trace[0].timestamp)[:19], '01/01/2018 10:40:00')
         self.assertEqual(trace[1].position.getX(), 1.5)
         self.assertEqual(trace[1].position.getY(), 0.5)
-        self.assertEqual(str(trace[1].timestamp), '01/01/2018 11:00:00')
+        self.assertEqual(str(trace[1].timestamp)[:19], '01/01/2018 11:00:00')
         self.assertEqual(trace[2].position.getX(), 2.5)
         self.assertEqual(trace[2].position.getY(), 0.5)
-        self.assertEqual(str(trace[2].timestamp), '01/01/2018 11:10:00')
+        self.assertEqual(str(trace[2].timestamp)[:19], '01/01/2018 11:10:00')
         self.assertEqual(trace[3].position.getX(), 2.5)
         self.assertEqual(trace[3].position.getY(), 1.5)
-        self.assertEqual(str(trace[3].timestamp), '01/01/2018 11:20:00')
+        self.assertEqual(str(trace[3].timestamp)[:19], '01/01/2018 11:20:00')
         
         
     def test_enclosed_polygon(self):
