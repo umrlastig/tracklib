@@ -4,6 +4,7 @@ This module contains the class to plot GPS tracks and its AF
 
 import math
 import numpy as np
+from numpy import sin, pi, cos
 import progressbar
 import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
@@ -150,8 +151,6 @@ class Plot:
     
     def __plotCircular(self, ax):
         
-        from numpy import sin, pi, cos
-        from tracklib.algo import computeAbsCurv
         computeAbsCurv(self.track)
         
         r = 0.7
