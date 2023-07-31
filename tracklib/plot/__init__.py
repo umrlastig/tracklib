@@ -1,9 +1,9 @@
 """plot functions and classes to display core objects"""
 
 
-from .IPlotVisitor import IPlotVisitor
-from .Plot import *
-from .MatplotlibVisitor import MatplotlibVisitor
+from .iplot_visitor import *
+from .plot import *
+from .matplotlib_visitor import MatplotlibVisitor
 
 '''
 from .Qgis import *
