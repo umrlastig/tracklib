@@ -3,11 +3,11 @@
 :License: --
 :Date: 21/09/2020
 
+
 Installation
 ============
 
 Tracklib is supported on Python versions 3.8+.
-
 
 
 Dependencies
@@ -21,7 +21,6 @@ The following projects are required dependencies of Tracklib:
 * `progressbar2 <https://pypi.org/project/progressbar2/>`_ - A progress bar to display the progress of a long running operation.
 
 
-
 PyPI
 ~~~~
 
@@ -32,7 +31,6 @@ Tracklib can be installed from `PyPI <https://pypi.org/project/tracklib/>`_
 using ``pip``::
 
     pip install tracklib
-
 
 
 Installing the Current Development Branch from GitHub in current environment
