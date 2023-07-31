@@ -41,7 +41,7 @@ setup (
     license="Cecill-C",
     python_requires=">=3.8",
     classifiers=[
-        "Development Status :: 1 - Alpha",
+        "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 3.8",
     ],
