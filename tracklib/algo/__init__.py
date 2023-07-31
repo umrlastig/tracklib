@@ -2,9 +2,9 @@
 
 
 from .Synthetics import *
-from .Analytics import *
+from .analytics import *
 from .Interpolation import *
-from .Cinematics import *
+from .cinematics import *
 from .Stochastics import *
 from .Dynamics import *
 from .Filtering import *
