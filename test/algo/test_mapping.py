@@ -5,11 +5,13 @@ import matplotlib.pyplot as plt
 import os.path
 import unittest
 
-from tracklib.io import TrackReader, RasterReader
-from tracklib.core import (Obs, ObsTime, ENUCoords)
-from tracklib.core import (Track, Network, Node, Edge, SpatialIndex)
-from tracklib.algo import (computeAbsCurv)
-from tracklib.algo.Mapping import mapOnRaster, mapOnNetwork, mapOn
+from tracklib import (Obs, ObsTime, ENUCoords, 
+                      Track, 
+                      Network, Node, Edge, 
+                      SpatialIndex,
+                      computeAbsCurv,
+                      mapOnRaster, mapOnNetwork, mapOn,
+                      TrackReader, RasterReader)
 
 
 class TestAlgoMappingMethods(unittest.TestCase):

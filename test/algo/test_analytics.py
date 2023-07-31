@@ -11,9 +11,8 @@ from numpy import pi
 
 from tracklib import (Obs, ObsTime, ENUCoords, NAN,
                       speed, acceleration, ds, heading, slope,
-                      anglegeom, orientation, calculAngleOriente)
-from tracklib.core import Track
-
+                      anglegeom, orientation, calculAngleOriente,
+                      Track)
 
 
 

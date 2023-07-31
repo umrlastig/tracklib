@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 
 import os.path
-
 from unittest import TestCase, TestSuite, TextTestRunner
-
-from tracklib import (ObsTime)
-from tracklib.io import TrackReader
-from tracklib import DiracKernel, GaussianKernel, TriangularKernel, ExponentialKernel
-import tracklib.algo.Filtering as flt
+from tracklib import (ObsTime, TrackReader,
+                      DiracKernel, 
+                      GaussianKernel, 
+                      TriangularKernel, 
+                      ExponentialKernel,
+                      filter_seq,
+                      filter_freq,
+                      FILTER_XY, FILTER_TEMPORAL, FILTER_LOW_PASS, FILTER_SPATIAL,
+                      Kalman)
 
 
 class TestFiltering(TestCase):
@@ -36,7 +39,7 @@ class TestFiltering(TestCase):
         '''
         Filtrage par noyau fenetre glissante de taille 5
         '''
-        self.track = flt.filter_seq(self.track, kernel=5, dim=flt.FILTER_XY)
+        self.track = filter_seq(self.track, kernel=5, dim=FILTER_XY)
         self.view(self.track, sym)	
 
 
@@ -44,7 +47,7 @@ class TestFiltering(TestCase):
         '''
         Filtrage par noyau 'user-defined'
         '''
-        self.track = flt.filter_seq(self.track, kernel=[1,2,32,2,1], dim=["x","y"])
+        self.track = filter_seq(self.track, kernel=[1,2,32,2,1], dim=["x","y"])
         self.view(self.track, sym)	
 	
 
@@ -52,7 +55,7 @@ class TestFiltering(TestCase):
         '''
         Filtrage par noyau 'user-defined' pour faire un filtre 'avance'
         '''
-        self.track = flt.filter_seq(self.track, kernel=[0,0,1], dim=["y"])
+        self.track = filter_seq(self.track, kernel=[0,0,1], dim=["y"])
         self.view(self.track, sym)	
 	
 
@@ -60,7 +63,7 @@ class TestFiltering(TestCase):
         '''
         Filtrage par noyau 'user-defined' pour faire un filtre 'retard'
         '''
-        self.track = flt.filter_seq(self.track, kernel=[1,0,0], dim=["y"])
+        self.track = filter_seq(self.track, kernel=[1,0,0], dim=["y"])
         self.view(self.track, sym)	
 
         
@@ -70,7 +73,7 @@ class TestFiltering(TestCase):
         '''
         self.track = self.track.copy()
         self.track *= 10
-        self.track = flt.filter_seq(self.track, kernel=GaussianKernel(20), dim=flt.FILTER_XY)
+        self.track = filter_seq(self.track, kernel=GaussianKernel(20), dim=FILTER_XY)
         self.view(self.track, sym)	
 
 
@@ -80,7 +83,7 @@ class TestFiltering(TestCase):
         '''
         self.track = self.track.copy()
         self.track *= 10
-        self.track = flt.filter_seq(self.track, kernel=ExponentialKernel(20), dim=flt.FILTER_XY)
+        self.track = filter_seq(self.track, kernel=ExponentialKernel(20), dim=FILTER_XY)
         self.view(self.track, sym)	
 
 
@@ -90,7 +93,7 @@ class TestFiltering(TestCase):
         '''
         self.track = self.track.copy()
         self.track *= 10
-        self.track = flt.filter_seq(self.track, kernel=TriangularKernel(20), dim=flt.FILTER_XY)
+        self.track = filter_seq(self.track, kernel=TriangularKernel(20), dim=FILTER_XY)
         self.view(self.track, sym)	
 
     
@@ -100,7 +103,7 @@ class TestFiltering(TestCase):
         '''
         self.track = self.track.copy()
         self.track *= 10
-        self.track = flt.filter_seq(self.track, kernel=DiracKernel(), dim=flt.FILTER_XY)
+        self.track = filter_seq(self.track, kernel=DiracKernel(), dim=FILTER_XY)
         self.view(self.track, sym)	
      
      
@@ -108,8 +111,8 @@ class TestFiltering(TestCase):
         '''
         Filtrage passe-bas par transformation de Fourier (frequence temporelle)
         '''
-        self.track = flt.filter_freq(self.track, 1, mode=flt.FILTER_TEMPORAL, 
-                                      type=flt.FILTER_LOW_PASS, dim=flt.FILTER_XY)
+        self.track = filter_freq(self.track, 1, mode=FILTER_TEMPORAL, 
+                                      type=FILTER_LOW_PASS, dim=FILTER_XY)
         self.view(self.track, sym)	
      
      
@@ -118,10 +121,10 @@ class TestFiltering(TestCase):
         Filtrage passe-bas par transformation de Fourier (frequence spatiale)
         '''
         self.track *= 10
-        self.track = flt.filter_freq(self.track, 0.03, 
-                                      mode=flt.FILTER_SPATIAL, 
-                                      type=flt.FILTER_LOW_PASS, 
-                                      dim=flt.FILTER_XY)
+        self.track = filter_freq(self.track, 0.03, 
+                                      mode=FILTER_SPATIAL, 
+                                      type=FILTER_LOW_PASS, 
+                                      dim=FILTER_XY)
         self.view(self.track, sym)	
 
 
@@ -129,7 +132,7 @@ class TestFiltering(TestCase):
         '''
         Filtrage de Kalman (50 cm sur le GPS / 2 m.s-1 sur la vitesse)
         '''
-        self.track = flt.Kalman(self.track, 0.5, 2)
+        self.track = Kalman(self.track, 0.5, 2)
         self.view(self.track, sym)	
         
         

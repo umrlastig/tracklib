@@ -27,14 +27,15 @@ from unittest import TestCase, TestSuite, TextTestRunner
 #sys.path.append('~/Bureau/KitYann/2-Tracklib/tracklib/tracklib')
 
 import tracklib
-from tracklib import (ObsTime, GaussianKernel)
-from tracklib.io import TrackReader
-#import tracklib.algo.Interpolation as itp
-from tracklib.algo import (MODE_TEMPORAL, 
-                           MODE_SPATIAL,
-                           ALGO_THIN_SPLINES,
-                           ALGO_B_SPLINES,
-                           ALGO_GAUSSIAN_PROCESS)
+from tracklib import (ObsTime, GaussianKernel, TrackReader,
+                      MODE_TEMPORAL, 
+                      MODE_SPATIAL,
+                      ALGO_THIN_SPLINES,
+                      ALGO_B_SPLINES,
+                      ALGO_GAUSSIAN_PROCESS,
+                      generate
+                      #GP_KERNEL, GP_SMOOTHING
+                      )
 #                           SPLINE_PENALIZATION,
 #                           GP_KERNEL,
 #                           GP_SMOOTHING)
@@ -86,95 +87,95 @@ class TestInterpolation(TestCase):
     # Interpolation
     # --------------------------------------------------------------------
     
-    # def test1(self, sym = 'r-'):
-    #     '''
-    #     Interpolation lineaire en mode spatial.
-    #     Trajectoire est un cercle, interpolation spatiale arc de cercle 
-    #                 dont on sait calculer l'écart.
-    #     '''
-    #     R = 100
-    #     for z in range(2, R):
-    #         self.trackCercle = Synthetics.generate(x_t, y_t, dt=5, verbose=False) % 10
-    #         self.trackCercle.resample(delta=z, mode=1)  
-        
-    #         ei = 20.67 / self.trackCercle.size()**3 * R
-    #         epsilon = ei + R
-        
-    #         self.view(self.trackCercle, sym)
-    #         for i in range(self.trackCercle.size() - 2):
-    #             d = self.trackCercle.getObs(i).distanceTo(self.trackCercle.getObs(i+1))
-    #             self.assertLessEqual(d, epsilon, 'erreur pour ' + str(i))
+    def test1(self, sym = 'r-'):
+         '''
+         Interpolation lineaire en mode spatial.
+         Trajectoire est un cercle, interpolation spatiale arc de cercle 
+                     dont on sait calculer l'écart.
+         '''
+         R = 100
+         for z in range(2, R):
+             self.trackCercle = generate(x_t, y_t, dt=5, verbose=False) % 10
+             self.trackCercle.resample(delta=z, mode=1)  
+       
+             ei = 20.67 / self.trackCercle.size()**3 * R
+             epsilon = ei + R
+       
+             self.view(self.trackCercle, sym)
+             for i in range(self.trackCercle.size() - 2):
+                 d = self.trackCercle.getObs(i).distanceTo(self.trackCercle.getObs(i+1))
+                 self.assertLessEqual(d, epsilon, 'erreur pour ' + str(i))
 
         
-    # def test2(self, sym = 'r-'):
-    #     '''
-    #     Interpolation lineaire en mode temporel :  1 pt/s 
-    #     '''
-    #     R = 100
-    #     for z in range(2, R):
-    #         self.trackCercle = Synthetics.generate(x_t, y_t, dt=5, verbose=False) % 10
-    #         self.trackCercle.plot('kx') # , append = False
-    #         self.trackCercle.resample(delta=z, mode = itp.MODE_TEMPORAL)  
-    #         self.view(self.trackCercle, sym)
-    #         for i in range(self.trackCercle.size() - 2):
-    #             d = self.trackCercle.getObs(i).distanceTo(self.trackCercle.getObs(i+1))
-    #             err = abs(d - 2*3.1415*100/self.trackCercle.size())
-    #             self.assertLessEqual(err, self.__epsilon, 'erreur pour ' + str(i))
+    def test2(self, sym = 'r-'):
+        '''
+        Interpolation lineaire en mode temporel :  1 pt/s 
+        '''
+        R = 100
+        for z in range(2, R):
+            self.trackCercle = generate(x_t, y_t, dt=5, verbose=False) % 10
+            self.trackCercle.plot('kx') # , append = False
+            self.trackCercle.resample(delta=z, mode=MODE_TEMPORAL)  
+            self.view(self.trackCercle, sym)
+            for i in range(self.trackCercle.size() - 2):
+                d = self.trackCercle.getObs(i).distanceTo(self.trackCercle.getObs(i+1))
+                err = abs(d - 2*3.1415*100/self.trackCercle.size())
+                self.assertLessEqual(err, self.__epsilon, 'erreur pour ' + str(i))
 
 
-    # def test3(self, sym = 'r-'):
-    #     '''
-    #     Interpolation lineaire en mode temporel :  definition par timestamps
-    #     '''
-    #     R = 100
-    #     for z in range(2, R):
-    #         self.trackCercle = Synthetics.generate(x_t, y_t, dt=z, verbose=False) % 10
-    #         self.trackCercle.plot('kx')
+    def test3(self, sym = 'r-'):
+        '''
+        Interpolation lineaire en mode temporel :  definition par timestamps
+        '''
+        R = 100
+        for z in range(2, R):
+            self.trackCercle = generate(x_t, y_t, dt=z, verbose=False) % 10
+            self.trackCercle.plot('kx')
+      
+            a = int(self.trackCercle[0].timestamp.toAbsTime())
+            b = int(self.trackCercle[-1].timestamp.toAbsTime())
+            T = [ObsTime.readUnixTime(x) for x in range(a, b, 10)]
         
-    #         a = int(self.trackCercle[0].timestamp.toAbsTime())
-    #         b = int(self.trackCercle[-1].timestamp.toAbsTime())
-    #         T = [GPSTime.readUnixTime(x) for x in range(a, b, 10)]
-        
-    #         self.trackCercle.resample(delta=T, mode = itp.MODE_TEMPORAL)
-    #         self.view(self.trackCercle, sym)
-    #         for i in range(self.trackCercle.size() - 2):
-    #             d = self.trackCercle.getObs(i).distanceTo(self.trackCercle.getObs(i+1))
-    #             err = abs(d - 2*3.1415*100/self.trackCercle.size())
-    #             self.assertLessEqual(err, self.__epsilon, 'erreur pour ' + str(i))
+            self.trackCercle.resample(delta=T, mode = MODE_TEMPORAL)
+            self.view(self.trackCercle, sym)
+            for i in range(self.trackCercle.size() - 2):
+                d = self.trackCercle.getObs(i).distanceTo(self.trackCercle.getObs(i+1))
+                err = abs(d - 2*3.1415*100/self.trackCercle.size())
+                self.assertLessEqual(err, self.__epsilon, 'erreur pour ' + str(i))
         
 
-    # def test4(self, sym = 'r-'):
-    #     '''
-    #     Interpolation lineaire en mode temporel :  definition // autre trace
-    #     '''
-    #     R = 100
-    #     for z in range(2, R):
-    #         self.trackCercle = Synthetics.generate(x_t, y_t, dt=z, verbose=False) % 10
-    #         self.trackCercle.plot('kx')
+    def test4(self, sym = 'r-'):
+        '''
+        Interpolation lineaire en mode temporel :  definition // autre trace
+        '''
+        R = 100
+        for z in range(2, R):
+            self.trackCercle = generate(x_t, y_t, dt=z, verbose=False) % 10
+            self.trackCercle.plot('kx')
             
-    #         temp = self.trackCercle.copy()
-    #         temp %= 5
-    #         if temp.size() < 2:
-    #             continue
-    #         temp.resample(delta=self.trackCercle, mode = itp.MODE_TEMPORAL)
-    #         self.view(temp, sym)
+            temp = self.trackCercle.copy()
+            temp %= 5
+            if temp.size() < 2:
+                continue
+            temp.resample(delta=self.trackCercle, mode = MODE_TEMPORAL)
+            self.view(temp, sym)
             
 
-    # def test5(self, sym = 'r-'):
-    #     '''
-    #     Idem test 4 en raccourci
-    #     '''
-    #     R = 100
-    #     for z in range(2, R):
-    #         self.trackCercle = Synthetics.generate(x_t, y_t, dt=z, verbose=False) % 10
-    #         self.trackCercle.plot('kx')
+    def test5(self, sym = 'r-'):
+        '''
+        Idem test 4 en raccourci
+        '''
+        R = 100
+        for z in range(2, R):
+            self.trackCercle = generate(x_t, y_t, dt=z, verbose=False) % 10
+            self.trackCercle.plot('kx')
         
-    #         temp = self.trackCercle.copy()
-    #         temp %= 5
-    #         if temp.size() < 2:
-    #             continue
-    #         temp = temp // self.trackCercle   
-    #         self.view(temp, sym)
+            temp = self.trackCercle.copy()
+            temp %= 5
+            if temp.size() < 2:
+                continue
+            temp = temp // self.trackCercle   
+            self.view(temp, sym)
 
         
     def test6(self, sym = 'r-'):
@@ -274,7 +275,7 @@ class TestInterpolation(TestCase):
         Interpolation par processus gaussien en mode spatial : 1 pt / m
         '''
         # temp = track.copy()
-        tracklib.algo.Interpolation.GP_KERNEL = GaussianKernel(10)
+        tracklib.algo.interpolation.GP_KERNEL = GaussianKernel(10)
         self.track.resample(delta=100, algo=ALGO_GAUSSIAN_PROCESS)  
         self.view(self.track, sym)	
 
@@ -284,7 +285,7 @@ class TestInterpolation(TestCase):
         Interpolation par processus gaussien en mode temporel : 1 pt/s   
         '''
         # temp = track.copy()
-        tracklib.algo.Interpolation.GP_KERNEL = GaussianKernel(10)
+        tracklib.algo.interpolation.GP_KERNEL = GaussianKernel(10)
         self.track.resample(delta=1, algo=ALGO_GAUSSIAN_PROCESS, mode=MODE_TEMPORAL)  
         self.view(self.track, sym)	
 	        
@@ -300,7 +301,7 @@ class TestInterpolation(TestCase):
         Lissage/interpolation par splines plaques minces en mode spatial : 1 pt / 10 m
         '''
         # temp = track.copy()
-        tracklib.algo.Interpolation.SPLINE_PENALIZATION = 1e-2
+        tracklib.algo.interpolation.SPLINE_PENALIZATION = 1e-2
         self.track.resample(delta=10, algo=ALGO_THIN_SPLINES)  
         self.view(self.track, sym)
  	
@@ -310,7 +311,7 @@ class TestInterpolation(TestCase):
          Lissage/interpolation par splines plaques minces en mode temporel : 1 pt/s
          '''
          # temp = track.copy()
-         tracklib.algo.Interpolation.SPLINE_PENALIZATION = 1e4
+         tracklib.algo.interpolation.SPLINE_PENALIZATION = 1e4
          self.track.resample(delta=10, algo=ALGO_THIN_SPLINES, mode=MODE_TEMPORAL)  
          self.view(self.track, sym)
  	
@@ -320,9 +321,9 @@ class TestInterpolation(TestCase):
         Lissage/interpolation par processus gaussien en mode spatial : 1 pt / 10 m
         '''
         # temp = track.copy()
-        tracklib.algo.Interpolation.GP_KERNEL = GaussianKernel(100)
-        tracklib.algo.Interpolation.GP_SMOOTHING = 0.001
-        self.track.resample(delta=10, algo = ALGO_GAUSSIAN_PROCESS)  
+        tracklib.algo.interpolation.GP_KERNEL = GaussianKernel(100)
+        tracklib.algo.interpolation.GP_SMOOTHING = 0.001
+        self.track.resample(delta=10, algo=ALGO_GAUSSIAN_PROCESS)  
         self.view(self.track, sym)	
  	
 
@@ -331,8 +332,8 @@ class TestInterpolation(TestCase):
         Lissage/interpolation par processus gaussien en mode temporel : 1 pt/s    
         '''
         # temp = track.copy()
-        tracklib.algo.Interpolation.GP_KERNEL = GaussianKernel(100)
-        tracklib.algo.Interpolation.GP_SMOOTHING = 0.001
+        tracklib.algo.interpolation.GP_KERNEL = GaussianKernel(100)
+        tracklib.algo.interpolation.GP_SMOOTHING = 0.001
         self.track.resample(delta=1, algo=ALGO_GAUSSIAN_PROCESS, mode=MODE_TEMPORAL)  
         self.view(self.track, sym)	
  	
@@ -342,11 +343,11 @@ class TestInterpolation(TestCase):
 if __name__ == '__main__':
     suite = TestSuite()
     
-    #suite.addTest(TestInterpolation("test1"))
-    #suite.addTest(TestInterpolation("test2"))
-    #suite.addTest(TestInterpolation("test3"))
-    #suite.addTest(TestInterpolation("test4"))
-    #suite.addTest(TestInterpolation("test5"))
+    suite.addTest(TestInterpolation("test1"))
+    suite.addTest(TestInterpolation("test2"))
+    suite.addTest(TestInterpolation("test3"))
+    suite.addTest(TestInterpolation("test4"))
+    suite.addTest(TestInterpolation("test5"))
     suite.addTest(TestInterpolation("test6"))
     suite.addTest(TestInterpolation("test7"))
     suite.addTest(TestInterpolation("test8"))

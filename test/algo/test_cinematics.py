@@ -6,22 +6,21 @@ import matplotlib.pyplot as plt
 from numpy import pi
 import unittest
 
-from tracklib import (Obs, ObsTime, ENUCoords, getColorMap)
-from tracklib.algo import (BIAF_ABS_CURV, 
-                           inflection, 
-                           setVertexAF, 
-                           setBendAsAF,
-                           setSwitchbacksAsAF,
-                           smoothed_speed_calculation,
-                           computeAbsCurv,
-                           estimate_heading,
-                           computeAvgSpeed,
-                           computeAvgAscSpeed,
-                           computeNetDeniv,
-                           computeAscDeniv,
-                           computeDescDeniv)
-from tracklib.core import Track
-
+from tracklib import (Obs, ObsTime, ENUCoords, getColorMap,
+                      BIAF_ABS_CURV, 
+                      inflection, 
+                      setVertexAF, 
+                      setBendAsAF,
+                      setSwitchbacksAsAF,
+                      smoothed_speed_calculation,
+                      computeAbsCurv,
+                      estimate_heading,
+                      computeAvgSpeed,
+                      computeAvgAscSpeed,
+                      computeNetDeniv,
+                      computeAscDeniv,
+                      computeDescDeniv,
+                      Track)
 
 
 class TestAlgoCinematicsMethods(unittest.TestCase):

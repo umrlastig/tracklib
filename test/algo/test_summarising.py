@@ -7,8 +7,10 @@ import os.path
 from tracklib import (Obs, ObsTime, ENUCoords, TrackCollection,
                       speed,
                       RasterBand, NO_DATA_VALUE,
-                      Track, TrackReader)
-from tracklib.algo import (Summarising) 
+                      Track, TrackReader,
+                      co_avg, co_max, co_min,
+                      summarize, getMeasureName)
+
 
 
 
@@ -66,16 +68,16 @@ class TestSummarising(TestCase):
         collection.addAnalyticalFeature(speed)
         
         af_algos = ['speed', 'speed'] #, utils.stop_point]
-        cell_operators = [Summarising.co_avg, Summarising.co_max] #, utils.sum]
+        cell_operators = [co_avg, co_max] #, utils.sum]
         
         #  Construction du raster
         marge = 0.0
-        raster = Summarising.summarize(collection, 
+        raster = summarize(collection, 
                                        af_algos, cell_operators, (60, 60), marge)
         
-        name = Summarising.getMeasureName('speed', Summarising.co_avg)
+        name = getMeasureName('speed', co_avg)
         self.assertEqual(name, 'speed#co_avg')
-        name = Summarising.getMeasureName(speed, Summarising.co_avg)
+        name = getMeasureName(speed, co_avg)
         self.assertEqual(name, 'speed#co_avg')
                          
         grille = raster.getRasterBand(name)
@@ -89,8 +91,8 @@ class TestSummarising(TestCase):
         grille.plotAsImage()
         plt.show()
         
-        raster = Summarising.summarize(collection, 
-                                       af_algos, cell_operators, (60, 60), marge)
+        raster = summarize(collection, 
+                           af_algos, cell_operators, (60, 60), marge)
         grille = raster.getRasterBand(name)
         grille.setNoDataValue(0)
         self.assertEqual(grille.getNoDataValue(), 0)
@@ -150,7 +152,7 @@ class TestSummarising(TestCase):
         plt.show()
         
         
-        name2 = Summarising.getMeasureName(speed, Summarising.co_max)
+        name2 = getMeasureName(speed, co_max)
         self.assertEqual(name2, 'speed#co_max')
         grille2 = raster.getRasterBand(name2)
         grille2.plotAsGraphic()
@@ -181,17 +183,17 @@ class TestSummarising(TestCase):
         collection = TrackCollection([trace])
         
         af_algos = [speed, speed, speed]
-        cell_operators = [Summarising.co_avg, Summarising.co_min, Summarising.co_max]
+        cell_operators = [co_avg, co_min, co_max]
         marge = 0.000005
-        raster = Summarising.summarize(collection, af_algos, cell_operators, margin = marge)
+        raster = summarize(collection, af_algos, cell_operators, margin=marge)
         raster.getRasterBand(0).noDataValue = 0
         
         raster.getRasterBand(0).summary()
         raster.plot(0)
 
-        raster.plot(Summarising.getMeasureName(speed, Summarising.co_avg))
-        raster.plot(Summarising.getMeasureName(speed, Summarising.co_min))
-        raster.plot(Summarising.getMeasureName(speed, Summarising.co_max))
+        raster.plot(getMeasureName(speed, co_avg))
+        raster.plot(getMeasureName(speed, co_min))
+        raster.plot(getMeasureName(speed, co_max))
         plt.show()
         
         

@@ -5,8 +5,16 @@ import unittest
 import matplotlib.pyplot as plt
 #import numpy as np
 
-from tracklib.core import (Obs, ObsTime, ENUCoords, Track, TrackCollection)
-import tracklib.algo.Comparison as Comparison
+from tracklib import (Obs, ObsTime, ENUCoords, 
+                      Track, TrackCollection,
+                      compare, 
+                      differenceProfile, 
+                      plotDifferenceProfile,
+                      premiereComposanteHausdorff,
+                      hausdorff, discreteFrechet,
+                      centralTrack,
+                      medoid)
+
 
 
 class TestAlgoComparaisonMethods(unittest.TestCase):
@@ -119,43 +127,43 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         
         
     def testCompare(self):
-        a = Comparison.compare(self.trace1, self.trace2)
+        a = compare(self.trace1, self.trace2)
         self.assertLessEqual(abs(a - 4.0280), self.__epsilon, "Comparaison")
 
 
     def testDifference21ProfileNN(self):
-        profile = Comparison.differenceProfile(self.trace2, self.trace1, 
+        profile = differenceProfile(self.trace2, self.trace1, 
                                                mode = "NN", p=2)
         self.trace1.plot('b-')
         self.trace2.plot('r-')
-        Comparison.plotDifferenceProfile(profile, self.trace1)
+        plotDifferenceProfile(profile, self.trace1)
         plt.show()
         
         
     def testDifference12ProfileNN(self):
-        profile = Comparison.differenceProfile(self.trace1, self.trace2, 
+        profile = differenceProfile(self.trace1, self.trace2, 
                                                mode = "NN", p=2)
         self.trace1.plot('r-')
         self.trace2.plot('r-')
-        Comparison.plotDifferenceProfile(profile, self.trace2)
+        plotDifferenceProfile(profile, self.trace2)
         plt.show()
         
         
     def testDifference21ProfileDTW(self):
-        profile = Comparison.differenceProfile(self.trace2, self.trace1, 
+        profile = differenceProfile(self.trace2, self.trace1, 
                                                mode = "DTW", p=2)
         self.trace1.plot('r-')
         self.trace2.plot('r-')
-        Comparison.plotDifferenceProfile(profile, self.trace1)
+        plotDifferenceProfile(profile, self.trace1)
         plt.show()
     
     
     def testDifference21ProfileFDTW(self):
-        profile = Comparison.differenceProfile(self.trace2, self.trace1, 
+        profile = differenceProfile(self.trace2, self.trace1, 
                                                mode = "FDTW", p=2)
         self.trace1.plot('r-')
         self.trace2.plot('r-')
-        Comparison.plotDifferenceProfile(profile, self.trace1)
+        plotDifferenceProfile(profile, self.trace1)
         plt.show()
         
         
@@ -188,11 +196,11 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         p = Obs(c, ObsTime())
         trackB.addObs(p)
 
-        dAB = Comparison.premiereComposanteHausdorff(trackA, trackB)
-        dBA = Comparison.premiereComposanteHausdorff(trackB, trackA)
+        dAB = premiereComposanteHausdorff(trackA, trackB)
+        dBA = premiereComposanteHausdorff(trackB, trackA)
         self.assertLessEqual(abs(dBA-2.12132), self.__epsilon)
         self.assertLessEqual(abs(dAB-1.34164), self.__epsilon)
-        d = Comparison.hausdorff(trackA, trackB)
+        d = hausdorff(trackA, trackB)
         self.assertLessEqual(abs(d - 2.12132), self.__epsilon)
         
     def testFrechetSimilarity(self):
@@ -221,7 +229,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         p = Obs(c, ObsTime())
         trackB.addObs(p)
 
-        self.assertEqual(Comparison.discreteFrechet(trackA, trackB), 2.0)
+        self.assertEqual(discreteFrechet(trackA, trackB), 2.0)
     
     def testCentralNNTrack(self):
         TRACES = []
@@ -230,7 +238,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         collection = TrackCollection(TRACES)
         self.plot()
         
-        central = Comparison.centralTrack(collection)
+        central = centralTrack(collection)
         
         central.plot()
         central.plotAsMarkers(frg="k", bkg="w", sym_frg=" ", sym_bkg="o")
@@ -247,7 +255,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         collection = TrackCollection(TRACES)
         self.plot()
         
-        central = Comparison.centralTrack(collection, mode = "DTW")
+        central = centralTrack(collection, mode = "DTW")
         
         central.plot()
         central.plotAsMarkers(frg="k", bkg="w", sym_frg=" ", sym_bkg="o")
@@ -265,7 +273,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         collection = TrackCollection(TRACES)
         self.plot()
         
-        medoid = Comparison.medoid(collection, mode = "Hausdorff")
+        med = medoid(collection, mode = "Hausdorff")
 
     
 if __name__ == '__main__':

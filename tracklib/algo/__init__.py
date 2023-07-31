@@ -1,19 +1,19 @@
 """Tracklib algorithms"""
 
 
-from .Synthetics import *
+from .synthetics import *
 from .analytics import *
-from .Interpolation import *
+from .interpolation import *
 from .cinematics import *
-from .Stochastics import *
-from .Dynamics import *
-from .Filtering import *
+from .stochastics import *
+from .dynamics import *
+from .filtering import *
 
-from .Comparison import *
-from .Segmentation import *
-from .Selection import *
-from .Simplification import *
+from .comparison import *
+from .segmentation import *
+from .selection import *
+from .simplification import *
 
-from .Mapping import *
-from .Summarising import *
+from .mapping import *
+from .summarising import *
 
