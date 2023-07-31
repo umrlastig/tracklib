@@ -17,7 +17,9 @@ User Guide
   
   
 Features
----------------
+--------
+
+Here is a gallery of several examples demonstrating what ``tracklib`` can do.
 
 .. nbgallery::
     :name: userguide-features-gallery
@@ -25,8 +27,10 @@ Features
     :reversed:
 
     UG_Stdbscan
+    UG_Comparison
     UG_Selection
     UG_Segmentation
+    UG_Interpolation
     UG_Simplification
 
 

@@ -28,7 +28,7 @@ GP_KERNEL = None
 GP_SMOOTHING = 0
 
 
-def resample(track, delta, algo: Literal[1, 2, 3, 4] = 1, mode: Literal[1, 2] = 1):   
+def resample(track, delta, algo: Literal[1, 2, 3, 4]=1, mode:Literal[1, 2]=1):   
     """Resampling of a track with linear interpolation delta
 
     Interpolation interval (time in sec if temporal mode is selected,

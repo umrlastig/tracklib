@@ -2,7 +2,7 @@
 # Script pour tester toutes les fonctions d'interpolation, lissage, 
 # filtrage et simplification. 
 #
-# Pour memoire :
+# Pour memoire:
 #
 #    - Interpolation : ajoute, supprime ou modifie les sequences de 
 #      points. Implique necessairement la suppression ou la creation 
@@ -33,13 +33,7 @@ from tracklib import (ObsTime, GaussianKernel, TrackReader,
                       ALGO_THIN_SPLINES,
                       ALGO_B_SPLINES,
                       ALGO_GAUSSIAN_PROCESS,
-                      generate
-                      #GP_KERNEL, GP_SMOOTHING
-                      )
-#                           SPLINE_PENALIZATION,
-#                           GP_KERNEL,
-#                           GP_SMOOTHING)
-
+                      generate)
 
 
 # changer aussi R dans setUp
