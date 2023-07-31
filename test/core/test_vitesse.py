@@ -7,9 +7,7 @@ import math
 import os.path
 import unittest
 
-from tracklib import (ObsTime)
-from tracklib.core.operators import Operator
-from tracklib.io.TrackReader import TrackReader
+from tracklib import ObsTime, Operator, TrackReader
 
 
 class TestVitesseMethods(unittest.TestCase):
