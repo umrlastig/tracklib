@@ -1,6 +1,6 @@
 """Utils functions"""
 
 
-from .Geometry import *
-from .Geometrics import *
+from .geometry import *
+from .geometrics import *
 
