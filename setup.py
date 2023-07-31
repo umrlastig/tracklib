@@ -30,10 +30,11 @@ doc_requirements = (
 
 setup (
     name="tracklib",
-    version="0.6.0",
+    version="v0.6.0",
     description="Tracklib library provide a variety of tools, operators and functions to manipulate GPS trajectories",
     long_description="See https://github.com/umrlastig/tracklib",
     url="https://github.com/umrlastig/tracklib",
+    download_url= 'https://github.com/umrlastig/tracklib/archive/refs/tags/v0.6.0.tar.gz',
     author="Yann Méneroux, Marie-Dominique Van Damme",
     author_email="todo@ign.fr",
     keywords=['gps', 'track', 'python'],
