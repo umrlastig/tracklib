@@ -13,7 +13,7 @@
 [![Documentation Status](https://readthedocs.org/projects/tracklib/badge/?version=latest)](https://tracklib.readthedocs.io/en/latest/?badge=latest)
 [![Software License](https://img.shields.io/badge/Licence-Cecill--C-blue.svg?style=flat)](https://github.com/umrlastig/tracklib/blob/main/LICENCE)
 
-[![Supported Python Versions](https://img.shields.io/pypi/pyversions/tracklib.svg)](https://pypi.python.org/pypi/tracklib/)
+[![Supported Python Versions](https://img.shields.io/pypi/pyversions/tracklib.svg)](https://www.python.org/downloads/)
 [![PyPI Version](https://img.shields.io/pypi/v/tracklib.svg)](https://pypi.python.org/pypi/tracklib/)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/tracklib?color=blue)](https://pypistats.org/packages/tracklib)
 
