@@ -3,15 +3,58 @@
 :License: --
 :Date: 21/09/2020
 
+Installation
+============
 
-Installing tracklib
-*********************
+Tracklib is supported on Python versions 3.8+.
 
-Installing tracklib for development
-====================================
 
-Tracklib developer mode 
--------------------------
+
+Dependencies
+~~~~~~~~~~~~
+
+The following projects are required dependencies of Tracklib:
+
+* `NumPy <https://pypi.org/project/numpy/>`_ - NumPy for data arrays access.
+* `matplotlib <https://pypi.org/project/matplotlib/>`_ - Used for colormaps and 2D plotting.
+* `scikit-image <https://pypi.org/project/scikit-image/>`_ - Used for image processing in Python.
+* `progressbar2 <https://pypi.org/project/progressbar2/>`_ - A progress bar to display the progress of a long running operation.
+
+
+
+PyPI
+~~~~
+
+.. image:: https://img.shields.io/pypi/v/tracklib.svg?logo=python&logoColor=white
+   :target: https://pypi.python.org/pypi/tracklib/
+
+Tracklib can be installed from `PyPI <https://pypi.org/project/tracklib/>`_
+using ``pip``::
+
+    pip install tracklib
+
+
+
+Installing the Current Development Branch from GitHub in current environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To install ``tracklib`` from the latest up-to-date development branch from github, 
+use one of the following:
+
+.. code::
+
+   pip install -U git+https://github.com/umrlastig/tracklib.git@main
+
+Alternatively, you can clone the repository with git and install it with pip.
+
+.. code::
+
+   git clone https://github.com/umrlastig/tracklib.git
+   cd tracklib
+   pip install -e .
+
+
+Installing the Current Development Branch from GitHub in a new python environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. You may install the latest development version by cloning the GitLab repository:
 
@@ -56,9 +99,9 @@ Tracklib developer mode
  
 
 Running test
---------------
+~~~~~~~~~~~~
    
-5 If you want to run unit tests, you have to install these dependencies:
+If you want to run unit tests, you have to install these dependencies:
 
 .. code-block:: shell
 
@@ -69,9 +112,9 @@ Running test
 
 
 Running documentation
-------------------------
+~~~~~~~~~~~~~~~~~~~~~
 
-6. If you want to generate the documentation, you have to install some dependencies are required:
+If you want to generate the documentation, you have to install some dependencies are required:
 
 .. code-block:: shell
 
@@ -80,7 +123,7 @@ Running documentation
    pip install sphinx_rtd_theme
    pip install sphinx-autodoc-typehints
 
-7. To launch the documentation:
+To launch the documentation:
 
 .. code-block:: shell
 
@@ -89,9 +132,9 @@ Running documentation
 
 
 Spyder IDE
------------
+~~~~~~~~~~
 
-8. A python IDE make the development more easy. 
+A python IDE make the development more easy. 
 
 .. code-block:: shell
 
@@ -117,8 +160,9 @@ To use spyder, you have to create a new project with an existing directory.
    <br />
    
 
+
 Run tracklib as an 3rd party python library for QGIS
------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. Check in the QGIS Python Console with which version of python, Qgis runs. To find out where: 
 
@@ -149,21 +193,8 @@ Run tracklib as an 3rd party python library for QGIS
 
 
 
-Installing tracklib for using in python script
-================================================
+Running tracklib examples in Jupyter Notebooks
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**tracklib** is written in pure Python, so installation is easy. tracklib works on Python 3.5+.
-
-
-Installing from the Python Package Index
-------------------------------------------
-
-You can download it from PyPI repository using pip:
-
-.. code-block:: shell
-   
-   TODO
-
-
-
+TODO
 
