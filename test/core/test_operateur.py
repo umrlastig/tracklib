@@ -9,14 +9,16 @@ import os
 import random
 import unittest
 
-from tracklib import (ObsTime, Operator, GaussianKernel)
+from tracklib import (ObsTime, Operator, GaussianKernel,
+                      TrackReader,
+                      segmentation, split,
+                      computeAbsCurv,
+                      generate,
+                      diffJourAnneeTrace,
+                      MODE_SPATIAL)
 
-from tracklib.io.TrackReader import TrackReader
-import tracklib.algo.Synthetics as synth
-import tracklib.algo.Analytics as Analytics
-from tracklib.algo.Segmentation import segmentation, split
-import tracklib.algo.Cinematics as Cinematics
-from tracklib.algo.Interpolation import MODE_SPATIAL
+#import tracklib.algo.Synthetics as synth
+
 
 def x(t):
     return 10 * math.cos(4 * math.pi * t)*(1 + math.cos(3.5 * math.pi * t))
@@ -43,7 +45,7 @@ class TestOperateurMethods(unittest.TestCase):
         chemin = os.path.join(self.resource_path, 'data/trace1.dat')
         track = TrackReader.readFromCsv(chemin, 2, 3, -1, 4, separator=",", DateIni=-1, h=0, com="#", no_data_value=-999999, srid="ENUCoords")
         
-        track.addAnalyticalFeature(Analytics.diffJourAnneeTrace)
+        track.addAnalyticalFeature(diffJourAnneeTrace)
         track.operate(Operator.INVERTER, "diffJourAnneeTrace", "rando_jour_neg")
         
         segmentation(track, ["rando_jour_neg"], "rando_jour", [-1])
@@ -55,10 +57,10 @@ class TestOperateurMethods(unittest.TestCase):
         if len(TRACES) > 0:
             trace = TRACES[1]
             # trace.summary()
-            Cinematics.computeAbsCurv(trace)
+            computeAbsCurv(trace)
             
             trace.resample(3, MODE_SPATIAL)
-            Cinematics.computeAbsCurv(trace)
+            computeAbsCurv(trace)
             Sigma = trace.getAbsCurv()
             trace.estimate_speed()
             Speed = trace.getAnalyticalFeature('speed')
@@ -86,7 +88,7 @@ class TestOperateurMethods(unittest.TestCase):
     def test_random(self):
         ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         #track = core_Track.Track.generate(TestOperateurMethods.x, TestOperateurMethods.y)
-        track = synth.generate(x, y)
+        track = generate(x, y)
 
         track.createAnalyticalFeature("a")
 
@@ -114,7 +116,7 @@ class TestOperateurMethods(unittest.TestCase):
     def test_generate(self):
         ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         #track = core_Track.Track.generate(TestOperateurMethods.x2, TestOperateurMethods.y2)
-        track = synth.generate(TestOperateurMethods.x2, TestOperateurMethods.y2)
+        track = generate(TestOperateurMethods.x2, TestOperateurMethods.y2)
         
         track.createAnalyticalFeature("a")
         track.operate(Operator.RANDOM, "a", prob, "randx")
@@ -186,9 +188,9 @@ class TestOperateurMethods(unittest.TestCase):
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     suite.addTest(TestOperateurMethods("test_random"))
-    #suite.addTest(TestOperateurMethods("test_generate"))
-    #suite.addTest(TestOperateurMethods("test_import"))
-    #suite.addTest(TestOperateurMethods("test_abs_curv1"))
+    suite.addTest(TestOperateurMethods("test_generate"))
+    suite.addTest(TestOperateurMethods("test_import"))
+    suite.addTest(TestOperateurMethods("test_abs_curv1"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
     

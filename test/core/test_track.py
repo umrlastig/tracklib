@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from unittest import TestCase, TestSuite, TextTestRunner
 
-from tracklib import (ENUCoords, ObsTime, Obs)
-from tracklib.core import (Track)
-from tracklib.util import Polygon
-import tracklib.algo.Cinematics as Cinematics
+from tracklib import (ENUCoords, ObsTime, Obs, Track, 
+                      Polygon, 
+                      computeAbsCurv,
+                      ds, speed, heading)
 
 
 class TestTrack(TestCase):
@@ -239,10 +239,9 @@ class TestTrack(TestCase):
 
 
     def test_afs(self):
-        import tracklib.algo.Analytics as Analytics
-        self.trace2.addAnalyticalFeature(Analytics.ds)
-        self.trace2.addAnalyticalFeature(Analytics.heading)
-        self.trace2.addAnalyticalFeature(Analytics.speed)
+        self.trace2.addAnalyticalFeature(ds)
+        self.trace2.addAnalyticalFeature(heading)
+        self.trace2.addAnalyticalFeature(speed)
         
         T = self.trace2.getAnalyticalFeatures('speed')
         self.assertListEqual(T[0], [0.2, 0.2, 0.2, 0.2])
@@ -367,10 +366,9 @@ class TestTrack(TestCase):
     
     
     def test_export(self):
-        import tracklib.algo.Analytics as Analytics
-        self.trace2.addAnalyticalFeature(Analytics.ds)
-        self.trace2.addAnalyticalFeature(Analytics.heading)
-        self.trace2.addAnalyticalFeature(Analytics.speed)
+        self.trace2.addAnalyticalFeature(ds)
+        self.trace2.addAnalyticalFeature(heading)
+        self.trace2.addAnalyticalFeature(speed)
         #self.trace2.print(['speed'])
         
         self.trace2.summary()
@@ -410,7 +408,7 @@ class TestTrack(TestCase):
         self.assertEqual(4, self.trace2.size())
         self.assertLessEqual(abs(self.trace2.length() - 4.0000), self.__epsilon)
         
-        A = Cinematics.computeAbsCurv(self.trace2)
+        A = computeAbsCurv(self.trace2)
         self.assertEqual(0.0, self.trace2.getObsAnalyticalFeature('abs_curv', 0))
         self.assertEqual(A[0], self.trace2.getObsAnalyticalFeature('abs_curv', 0))
         self.assertEqual(1.0, self.trace2.getObsAnalyticalFeature('abs_curv', 1))
@@ -434,7 +432,7 @@ class TestTrack(TestCase):
         self.assertLessEqual(abs(self.trace2.length() - 6.0000), self.__epsilon)
         
         #self.trace2.plotAsMarkers()
-        A = Cinematics.computeAbsCurv(self.trace2)
+        A = computeAbsCurv(self.trace2)
         self.assertEqual(0.0, self.trace2.getObsAnalyticalFeature('abs_curv', 0))
         self.assertEqual(A[0], self.trace2.getObsAnalyticalFeature('abs_curv', 0))
         self.assertEqual(1.0, self.trace2.getObsAnalyticalFeature('abs_curv', 1))

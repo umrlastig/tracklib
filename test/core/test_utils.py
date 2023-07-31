@@ -3,9 +3,10 @@
 
 import unittest
 
-from tracklib import (ENUCoords, ObsTime, Obs, makeDistanceMatrix)
-from tracklib.core import Track
-import tracklib.algo.Cinematics as Cinematics
+from tracklib import (ENUCoords, ObsTime, Obs, 
+                      makeDistanceMatrix,
+                      computeAbsCurv,
+                      Track)
 
 
 class TestUtils(unittest.TestCase):
@@ -26,7 +27,7 @@ class TestUtils(unittest.TestCase):
         p3 = Obs(c3, ObsTime.readTimestamp("2018-01-01 10:00:10"))
         self.trace1.addObs(p3)
         
-        Cinematics.computeAbsCurv(self.trace1)
+        computeAbsCurv(self.trace1)
     
     
     def testMakeDistanceMatrixModeLinear(self):
