@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import os.path
-
 import filecmp
 from unittest import TestCase, TestSuite, TextTestRunner
-
 from tracklib import (Track, ENUCoords, Obs,
                       TrackCollection, ObsTime,
                       TrackWriter, TrackReader,

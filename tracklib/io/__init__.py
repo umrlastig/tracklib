@@ -1,13 +1,13 @@
 """classes to load and export core objects"""
 
-from .NetworkFormat import *
-from .NetworkReader import *
-from .NetworkWriter import *
+from .network_format import *
+from .network_reader import *
+from .network_writer import *
 
-from .RasterReader import *
-from .RasterWriter import *
+from .raster_reader import *
+from .raster_writer import *
 
-from .TrackFormat import *
-from .TrackReader import *
-from .TrackWriter import *
+from .track_format import *
+from .track_reader import *
+from .track_writer import *
 

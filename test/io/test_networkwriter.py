@@ -3,9 +3,8 @@
 import filecmp
 import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
+from tracklib import (NetworkReader, NetworkWriter)
 
-from tracklib.io.NetworkReader import NetworkReader
-from tracklib.io.NetworkWriter import NetworkWriter
 
 class TestNetworkwriter(TestCase):
     

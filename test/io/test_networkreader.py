@@ -3,7 +3,6 @@
 import matplotlib.pyplot as plt
 import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
-
 from tracklib import (Bbox, NetworkReader, GeoCoords)
 
 

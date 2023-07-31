@@ -2,7 +2,6 @@
 
 import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
-
 from tracklib import (Track, Rectangle, ObsTime, TrackCollection, ENUCoords,
                       TrackReader, Constraint,
                       TYPE_CUT_AND_SELECT, MODE_INSIDE,

@@ -2,8 +2,7 @@
 
 import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
-
-from tracklib.io.RasterReader import RasterReader
+from tracklib import RasterReader
 
 
 class TestRasterReader(TestCase):
