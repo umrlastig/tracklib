@@ -130,11 +130,30 @@ class TestTrackCollection(TestCase):
         self.assertEqual(collection.size(), 14)
         
         
+    def test_collection_getitem(self):
+        ObsTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
+        path = os.path.join(self.resource_path, 'data/gpx/geo')
+        tracks = TrackReader.readFromGpx(path, srid='GEO', type='trk')
+        tracks[0].uid = '1'
+        tracks[0].tid = 'a'
+        tracks[1].uid = '2'
+        tracks[1].tid = 'b'
+        
+        tracks = tracks + tracks
+        self.assertEqual(tracks.size(), 4)
+        
+        uids = ('2', 'b')
+        T = tracks[uids]
+        self.assertEqual(T.size(), 2)
+
+        
+        
 if __name__ == '__main__':
     suite = TestSuite()
     suite.addTest(TestTrackCollection("test_collection1"))
     suite.addTest(TestTrackCollection("test_collection_filter_bbox"))
     suite.addTest(TestTrackCollection("test_collection_operation"))
     suite.addTest(TestTrackCollection("test_collection_segmentation"))
+    suite.addTest(TestTrackCollection("test_collection_getitem"))
     runner = TextTestRunner()
     runner.run(suite)

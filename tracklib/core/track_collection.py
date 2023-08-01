@@ -3,9 +3,9 @@
 from typing import Literal   
 import matplotlib.pyplot as plt
 
-from . import removeNan, listify, compLike
-
 import tracklib as tracklib
+from tracklib.core import removeNan, listify, compLike
+
 
 
 class TrackCollection:
@@ -430,12 +430,11 @@ class TrackCollection:
             t.resample(track)  # Mode temporal / linear
         return output
 
-    # ------------------------------------------------------------
-    # [[n]] Get and set track number n
-    # May be tuple with uid, tid
-    # ------------------------------------------------------------
+    
     def __getitem__(self, n):
-        """TODO"""
+        """[[n]] Get and set track number n
+           May be tuple with uid, tid
+        """
         if isinstance(n, tuple):
             tracks = TrackCollection()
             for track in self:
@@ -444,7 +443,9 @@ class TrackCollection:
                 ):
                     tracks.addTrack(track)
             return tracks
+        
         return TrackCollection.__collectionnify(self.__TRACES[n])
+
 
     def __setitem__(self, n, track):
         self.__TRACES[n] = track
