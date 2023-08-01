@@ -468,7 +468,7 @@ class TrackCollection:
     def segmentation(self, afs_input, af_output, thresholds_max, mode_comparaison=1):
         """TODO"""
         for t in self.__TRACES:
-            t.segmentation(afs_input, af_output, thresholds_max, mode_comparaison)
+            tracklib.algo.segmentation(t, afs_input, af_output, thresholds_max, mode_comparaison)
 
     def split_segmentation(self, af_output):
         """
@@ -477,7 +477,7 @@ class TrackCollection:
         """
         NEW_TRACES = []
         for track in self.__TRACES:
-            TRACES_SPLIT = track.split_segmentation(af_output)
+            TRACES_SPLIT = tracklib.algo.split(track, af_output)
             # Si le tableau est nulle pas de segmentation, on ne fait rien
             # sinon on supprime la trace et on ajoute les traces splittées
             if len(TRACES_SPLIT) > 0:
@@ -487,4 +487,4 @@ class TrackCollection:
             else:
                 NEW_TRACES.append(track)
 
-        self.__TRACES = NEW_TRACES
+        return TrackCollection(NEW_TRACES)

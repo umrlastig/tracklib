@@ -30,11 +30,11 @@ from tracklib.algo import (BIAF_SPEED, BIAF_ABS_CURV,
                            smoothed_speed_calculation,
                            differenceProfile,
                            MODE_TEMPORAL)                     
-
 from . import (UnaryOperator, BinaryOperator, 
                ScalarOperator, ScalarVoidOperator, 
                BinaryVoidOperator, UnaryVoidOperator,
                Operator)
+
 
 class Track:
     """

@@ -4,7 +4,8 @@ import os.path
 from tracklib import (ENUCoords, ObsTime, Obs, 
                       Track, TrackCollection,
                       TrackReader,
-                      Bbox)
+                      Bbox,
+                      heading)
 
 
 class TestTrackCollection(TestCase):
@@ -100,10 +101,40 @@ class TestTrackCollection(TestCase):
         self.assertEqual(T2[0].size(), tracks2[0].size()-100)
         
         
+    def test_collection_segmentation(self):
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        trace1 = Track([], 1)
+        trace1.addObs(Obs(ENUCoords(0, 0, 0), ObsTime()))
+        trace1.addObs(Obs(ENUCoords(1, 0, 0), ObsTime()))
+        trace1.addObs(Obs(ENUCoords(2, 0, 0), ObsTime()))
+        trace1.addObs(Obs(ENUCoords(2, 1, 0), ObsTime()))
+        trace1.addObs(Obs(ENUCoords(3, 1, 0), ObsTime()))
+        trace1.addObs(Obs(ENUCoords(4, 1, 0), ObsTime()))
+        trace1.addObs(Obs(ENUCoords(5, 1, 0), ObsTime()))
+        
+        trace1.addAnalyticalFeature(heading)
+        trace1.createAnalyticalFeature('Temp', [39,30,37,35,45,40,30])
+        
+        trace2 = trace1.copy()
+        
+        TRACES = TrackCollection([trace1, trace2])
+        
+        TRACES.segmentation("heading", "decoup3", 0)
+        for trace in TRACES:
+            T = trace.getAnalyticalFeature('decoup3')
+            self.assertEqual(len(T), 7)
+            self.assertListEqual(T, [1,1,1,0,1,1,1])
+        
+        
+        collection = TRACES.split_segmentation("decoup3")
+        self.assertEqual(collection.size(), 14)
+        
+        
 if __name__ == '__main__':
     suite = TestSuite()
     suite.addTest(TestTrackCollection("test_collection1"))
     suite.addTest(TestTrackCollection("test_collection_filter_bbox"))
     suite.addTest(TestTrackCollection("test_collection_operation"))
+    suite.addTest(TestTrackCollection("test_collection_segmentation"))
     runner = TextTestRunner()
     runner.run(suite)
