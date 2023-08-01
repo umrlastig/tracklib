@@ -277,6 +277,48 @@ class TestOperateurMethods(unittest.TestCase):
         trace.operate(Operator.LOG, "op1", "op20")
         vt = [math.log(1), 0, math.log(1), 0, math.log(2), 0, math.log(2)]
         self.assertListEqual(vt, trace.getAnalyticalFeature('op20'))
+
+        
+    def test_binary_void_operator(self):
+        
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        trace = Track([], 1)
+        trace.addObs(Obs(ENUCoords(0, 0, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(1, 0, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(2, 0, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(3, 1, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(4, 1, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(5, 1, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(6, 1, 0), ObsTime()))
+        
+        trace["a"] = [1, -1, 1, -2, 2, -3, 2]
+        trace["b"] = [3,  2, 1, -4, 5, -2, 3]
+        self.assertListEqual([1, -1, 1, -2, 2, -3, 2], trace.getAnalyticalFeature('a'))
+        self.assertListEqual([3, 2, 1, -4, 5, -2, 3], trace.getAnalyticalFeature('b'))
+        
+        trace.operate(Operator.MULTIPLIER, "a", "b", "op1")
+        vt = [3, -2, 1, 8, 10, 6, 6]
+        self.assertListEqual(vt, trace.getAnalyticalFeature('op1'))
+        
+        trace.operate(Operator.POWER, "a", "b", "op2")
+        vt = [1, 1, 1, 0.0625, 32, 0.1111111111111111, 8]
+        self.assertListEqual(vt, trace.getAnalyticalFeature('op2'))
+        
+        trace.operate(Operator.MODULO, "a", "b", "op3")
+        vt = [1, 1, 0, -2, 2, -1, 2]
+        self.assertListEqual(vt, trace.getAnalyticalFeature('op3'))
+        
+        trace.operate(Operator.ABOVE, "a", "b", "op4")
+        vt = [0, 0, 0, 1, 0, 0, 0]
+        self.assertListEqual(vt, trace.getAnalyticalFeature('op4'))
+        
+        trace.operate(Operator.BELOW, "a", "b", "op5")
+        vt = [1, 1, 0, 0, 1, 1, 1]
+        self.assertListEqual(vt, trace.getAnalyticalFeature('op5'))
+        
+        #trace.operate(Operator.DERIVATOR, "a", "b", "op6")
+        #vt = [NAN, 1, 0, 0, 1, 1, 1]
+        #self.assertListEqual(vt, trace.getAnalyticalFeature('op6'))
         
         
 if __name__ == '__main__':
@@ -287,6 +329,7 @@ if __name__ == '__main__':
     suite.addTest(TestOperateurMethods("test_abs_curv1"))
     suite.addTest(TestOperateurMethods("test_make_RPN"))
     suite.addTest(TestOperateurMethods("test_unary_void_operator"))
+    suite.addTest(TestOperateurMethods("test_binary_void_operator"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
     
