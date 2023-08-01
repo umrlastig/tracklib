@@ -262,11 +262,12 @@ class SecondOrderFiniteDiff(UnaryVoidOperator):
         """
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
-        for i in range(1, track.size()):
+        for i in range(1, track.size()-1):
             temp[i] = track.getObsAnalyticalFeature(af_input, i + 1)
             temp[i] -= 2 * track.getObsAnalyticalFeature(af_input, i)
             temp[i] += track.getObsAnalyticalFeature(af_input, i - 1)
         temp[0] = NAN
+        temp[track.size()-1] = NAN
         addListToAF(track, af_output, temp)
         return temp
 
@@ -365,11 +366,10 @@ class Reverser(UnaryVoidOperator):
         :param af_output: TODO
         :return: TODO
         """
-        track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
         for i in range(0, track.size()):
             temp[i] = track.getObsAnalyticalFeature(af_input, track.size()-i-1)
-        return temp
+        track[af_output] = temp
 
 
 class Rectifier(UnaryVoidOperator):
@@ -1685,7 +1685,7 @@ class Operator:
     BACKWARD_FINITE_DIFF = BackwardFiniteDiff()  # y(t) = x(t) - x(t-1)
     FORWARD_FINITE_DIFF = ForwardFiniteDiff()  # y(t) = x(t+1) - x(t)
     CENTERED_FINITE_DIFF = CenteredFiniteDiff()  # y(t) = x(t+1) - x(t-1)
-    SECOND_ORDER_FINITE_DIFF = SecondOrderFiniteDiff()  # y(t) = x(t+1) - x(t-1)
+    SECOND_ORDER_FINITE_DIFF = SecondOrderFiniteDiff()  # y(t) = x(t+1) + x(t-1) - 2*x(t)
     DIODE = Diode()  # y(t) = 1[x>0] * x(t)
     SIGN = Sign()  # y(t) = x(t)/|x(t)|
     EXP = Exp()  # y(t) = exp(x(t))

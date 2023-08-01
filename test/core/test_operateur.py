@@ -5,6 +5,7 @@
 """
 import math
 import matplotlib.pyplot as plt
+import numpy as np
 import os
 import random
 import unittest
@@ -18,7 +19,8 @@ from tracklib import (Track, Obs, ENUCoords, ObsTime,
                       diffJourAnneeTrace,
                       MODE_SPATIAL,
                       makeRPN,
-                      NAN)
+                      NAN,
+                      co_avg)
 
 
 def x(t):
@@ -203,7 +205,7 @@ class TestOperateurMethods(unittest.TestCase):
         trace.addObs(Obs(ENUCoords(4, 1, 0), ObsTime()))
         trace.addObs(Obs(ENUCoords(5, 1, 0), ObsTime()))
         trace.addObs(Obs(ENUCoords(6, 1, 0), ObsTime()))
-        trace.plot('bo')
+        #trace.plot('bo')
         
         trace["op1"] = [1, -1, 1, -2, 2, -2, 2]
         self.assertListEqual([1, -1, 1, -2, 2, -2, 2], trace.getAnalyticalFeature('op1'))
@@ -223,13 +225,64 @@ class TestOperateurMethods(unittest.TestCase):
         trace.operate(Operator.BACKWARD_FINITE_DIFF, "op1", "op6")
         self.assertListEqual([NAN, -2, 2, -3, 4, -4, 4], trace.getAnalyticalFeature('op6'))
         
+        trace.operate(Operator.SECOND_ORDER_FINITE_DIFF, "op1", "op7")
+        self.assertListEqual([NAN, 4, -5, 7, -8, 8, NAN], trace.getAnalyticalFeature('op7'))
+        
+        trace.operate(Operator.SHIFT_CIRCULAR_RIGHT, "op1", "op8")
+        self.assertListEqual([2, 1, -1, 1, -2, 2, -2], trace.getAnalyticalFeature('op8'))
+        
+        trace.operate(Operator.SHIFT_CIRCULAR_LEFT, "op1", "op9")
+        self.assertListEqual([-1, 1, -2, 2, -2, 2, 1], trace.getAnalyticalFeature('op9'))
+        
+        trace.operate(Operator.INVERSER, "op1", "op10")
+        self.assertListEqual([1, -1, 1, -0.5, 0.5, -0.5, 0.5], trace.getAnalyticalFeature('op10'))
+        
+        trace.operate(Operator.REVERSER, "op1", "op11")
+        vt = [2, -2, 2, -2, 1, -1, 1]
+        self.assertListEqual(vt, trace.getAnalyticalFeature('op11'))
+        
+        trace.operate(Operator.DEBIASER, "op1", "op12")
+        mean = np.mean([1, -1, 1, -2, 2, -2, 2])
+        vt = [1-mean, -1-mean, 1-mean, -2-mean, 2-mean, -2-mean, 2-mean]
+        self.assertListEqual(vt, trace.getAnalyticalFeature('op12'))
+        
+        trace.operate(Operator.NORMALIZER, "op1", "op13")
+        mean = np.mean([1, -1, 1, -2, 2, -2, 2])
+        sigma = math.sqrt(np.var([1, -1, 1, -2, 2, -2, 2]))
+        vt = [(1-mean)/sigma, (-1-mean)/sigma, (1-mean)/sigma, (-2-mean)/sigma, (2-mean)/sigma, (-2-mean)/sigma, (2-mean)/sigma]
+        self.assertListEqual(vt, trace.getAnalyticalFeature('op13'))
+        
+        trace.operate(Operator.DIODE, "op1", "op14")
+        self.assertListEqual([1, 0, 1, 0, 2, 0, 2], trace.getAnalyticalFeature('op14'))
+        
+        trace.operate(Operator.SIGN, "op1", "op15")
+        self.assertListEqual([1, -1, 1, -1, 1, -1, 1], trace.getAnalyticalFeature('op15'))
+        
+        trace.operate(Operator.EXP, "op1", "op16")
+        vt = [math.exp(1), math.exp(-1), math.exp(1), math.exp(-2), math.exp(2), math.exp(-2), math.exp(2)]
+        self.assertListEqual(vt, trace.getAnalyticalFeature('op16'))
+        
+        trace.operate(Operator.COS, "op1", "op17")
+        vt = [math.cos(1), math.cos(-1), math.cos(1), math.cos(-2), math.cos(2), math.cos(-2), math.cos(2)]
+        self.assertListEqual(vt, trace.getAnalyticalFeature('op17'))
+        
+        trace.operate(Operator.SIN, "op1", "op18")
+        vt = [math.sin(1), math.sin(-1), math.sin(1), math.sin(-2), math.sin(2), math.sin(-2), math.sin(2)]
+        self.assertListEqual(vt, trace.getAnalyticalFeature('op18'))
+        
+        trace.operate(Operator.TAN, "op1", "op19")
+        vt = [math.tan(1), math.tan(-1), math.tan(1), math.tan(-2), math.tan(2), math.tan(-2), math.tan(2)]
+        self.assertListEqual(vt, trace.getAnalyticalFeature('op19'))
+        
+        
+        
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    #suite.addTest(TestOperateurMethods("test_random"))
-    #suite.addTest(TestOperateurMethods("test_generate"))
-    #suite.addTest(TestOperateurMethods("test_import"))
-    #suite.addTest(TestOperateurMethods("test_abs_curv1"))
-    #suite.addTest(TestOperateurMethods("test_make_RPN"))
+    suite.addTest(TestOperateurMethods("test_random"))
+    suite.addTest(TestOperateurMethods("test_generate"))
+    suite.addTest(TestOperateurMethods("test_import"))
+    suite.addTest(TestOperateurMethods("test_abs_curv1"))
+    suite.addTest(TestOperateurMethods("test_make_RPN"))
     suite.addTest(TestOperateurMethods("test_unary_void_operator"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
