@@ -473,16 +473,16 @@ class TrackReader:
         :return: collection of tracks contains in Gpx files.
         """
              
-        TRACES = TrackCollection()
-        
         if os.path.isdir(path):
+            TRACES = TrackCollection()
             LISTFILE = os.listdir(path)
             for f in LISTFILE:
                 if path[len(path)-1:] == '/':
                     collection = TrackReader.readFromGpx(path + f)
                 else:
                     collection = TrackReader.readFromGpx(path + '/' + f)
-                TRACES.addTrack(collection.getTrack(0))
+                for i in range(collection.size()):
+                    TRACES.addTrack(collection[i])
             return TRACES
         
         elif os.path.isfile(path) or isinstance(io.StringIO(path), io.IOBase):
@@ -543,13 +543,13 @@ class TrackReader:
                         for i in range(trace.size()):
                             trace.setObsAnalyticalFeature(key, i, extensions[key][i])
                         
-                TRACES.addTrack(trace)
+                #TRACES.addTrack(trace)
 
             # pourquoi ?
             # --> pour remettre le format comme il etait avant la lecture :)   
             ObsTime.setReadFormat(format_old)
     
-            collection = TrackCollection(TRACES)
+            collection = TrackCollection([trace])
             return collection
         
         else:
