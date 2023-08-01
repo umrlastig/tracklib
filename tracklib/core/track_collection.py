@@ -300,12 +300,11 @@ class TrackCollection:
         for i in range(len(output)):
             output[i] = output[i].simplify(tolerance, mode)
 
-    # ------------------------------------------------------------
-    # [+] Concatenation of two track collections
-    # ------------------------------------------------------------
+    
     def __add__(self, collection):
-        """TODO"""
+        """[+] Concatenation of two track collections"""
         return TrackCollection(self.__TRACES + collection.__TRACES)
+
 
     # ------------------------------------------------------------
     # [/] Even split track collection (returns n+1 collections)

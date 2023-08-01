@@ -52,6 +52,7 @@ class TestTrackReader(TestCase):
         self.assertIsInstance(trace, Track)
         self.assertLessEqual(abs(trace.length() - 2412), self.__epsilon, "Longueur gpx geo")
         
+        
     def test_read_gpx_geo_trk(self):
         path = os.path.join(self.resource_path, 'data/gpx/activity_5807084803.gpx')
         ObsTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
