@@ -478,13 +478,9 @@ class TrackCollection:
         NEW_TRACES = []
         for track in self.__TRACES:
             TRACES_SPLIT = tracklib.algo.split(track, af_output)
-            # Si le tableau est nulle pas de segmentation, on ne fait rien
-            # sinon on supprime la trace et on ajoute les traces splittées
-            if len(TRACES_SPLIT) > 0:
-                for split in TRACES_SPLIT:
-                    # print (split.size())
-                    NEW_TRACES.append(split)
-            else:
-                NEW_TRACES.append(track)
+            # on ajoute les traces splittées
+            for split in TRACES_SPLIT:
+                # print (split.size())
+                NEW_TRACES.append(split)
 
         return TrackCollection(NEW_TRACES)
