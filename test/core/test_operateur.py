@@ -9,16 +9,16 @@ import os
 import random
 import unittest
 
-from tracklib import (ObsTime, Operator, GaussianKernel,
+from tracklib import (Track, Obs, ENUCoords, ObsTime, 
+                      Operator, GaussianKernel,
                       TrackReader,
                       segmentation, split,
                       computeAbsCurv,
                       generate,
                       diffJourAnneeTrace,
                       MODE_SPATIAL,
-                      makeRPN)
-
-#import tracklib.algo.Synthetics as synth
+                      makeRPN,
+                      NAN)
 
 
 def x(t):
@@ -27,6 +27,7 @@ def y(t):
     return t
 def prob():
     return random.random()-0.5
+
 
 class TestOperateurMethods(unittest.TestCase):
     
@@ -82,10 +83,6 @@ class TestOperateurMethods(unittest.TestCase):
             plt.show()
 
     
-        
-    
-    
-        
     def test_random(self):
         ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         #track = core_Track.Track.generate(TestOperateurMethods.x, TestOperateurMethods.y)
@@ -194,15 +191,46 @@ class TestOperateurMethods(unittest.TestCase):
         tab = makeRPN('a*(b+c/2)')
         self.assertEqual(len(tab), 7)
         self.assertListEqual(['a', 'b', 'c', '2', '/', '+', '*'], tab)
+        
+        
+    def test_unary_void_operator(self):
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        trace = Track([], 1)
+        trace.addObs(Obs(ENUCoords(0, 0, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(1, 0, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(2, 0, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(3, 1, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(4, 1, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(5, 1, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(6, 1, 0), ObsTime()))
+        trace.plot('bo')
+        
+        trace["op1"] = [1, -1, 1, -2, 2, -2, 2]
+        self.assertListEqual([1, -1, 1, -2, 2, -2, 2], trace.getAnalyticalFeature('op1'))
+        
+        trace.operate(Operator.IDENTITY, "op1", "op2")
+        self.assertListEqual([1, -1, 1, -2, 2, -2, 2], trace.getAnalyticalFeature('op2'))
+        
+        trace.operate(Operator.RECTIFIER, "op1", "op3")
+        self.assertListEqual([1, 1, 1, 2, 2, 2, 2], trace.getAnalyticalFeature('op3'))
+        
+        trace.operate(Operator.FORWARD_FINITE_DIFF, "op1", "op4")
+        self.assertListEqual([-2, 2, -3, 4, -4, 4, NAN], trace.getAnalyticalFeature('op4'))
 
+        trace.operate(Operator.CENTERED_FINITE_DIFF, "op1", "op5")
+        self.assertListEqual([NAN, 0, -1, 1, 0, 0, NAN], trace.getAnalyticalFeature('op5'))
+        
+        trace.operate(Operator.BACKWARD_FINITE_DIFF, "op1", "op6")
+        self.assertListEqual([NAN, -2, 2, -3, 4, -4, 4], trace.getAnalyticalFeature('op6'))
         
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    suite.addTest(TestOperateurMethods("test_random"))
-    suite.addTest(TestOperateurMethods("test_generate"))
-    suite.addTest(TestOperateurMethods("test_import"))
-    suite.addTest(TestOperateurMethods("test_abs_curv1"))
-    suite.addTest(TestOperateurMethods("test_make_RPN"))
+    #suite.addTest(TestOperateurMethods("test_random"))
+    #suite.addTest(TestOperateurMethods("test_generate"))
+    #suite.addTest(TestOperateurMethods("test_import"))
+    #suite.addTest(TestOperateurMethods("test_abs_curv1"))
+    #suite.addTest(TestOperateurMethods("test_make_RPN"))
+    suite.addTest(TestOperateurMethods("test_unary_void_operator"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
     

@@ -195,11 +195,11 @@ class ForwardFiniteDiff(UnaryVoidOperator):
         """
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
-        for i in range(1, track.size()):
+        for i in range(0, track.size()-1):
             temp[i] = track.getObsAnalyticalFeature(
                 af_input, i + 1
             ) - track.getObsAnalyticalFeature(af_input, i)
-        temp[0] = NAN
+        temp[track.size()-1] = NAN
         addListToAF(track, af_output, temp)
         return temp
 
@@ -219,8 +219,8 @@ class BackwardFiniteDiff(UnaryVoidOperator):
         temp = [0] * track.size()
         for i in range(1, track.size()):
             temp[i] = track.getObsAnalyticalFeature(
-                af_input, i + 1
-            ) - track.getObsAnalyticalFeature(af_input, i)
+                af_input, i 
+            ) - track.getObsAnalyticalFeature(af_input, i - 1)
         temp[0] = NAN
         addListToAF(track, af_output, temp)
         return temp
@@ -239,11 +239,12 @@ class CenteredFiniteDiff(UnaryVoidOperator):
         """
         track.createAnalyticalFeature(af_output)
         temp = [0] * track.size()
-        for i in range(1, track.size()):
+        for i in range(1, track.size()-1):
             temp[i] = track.getObsAnalyticalFeature(
                 af_input, i + 1
             ) - track.getObsAnalyticalFeature(af_input, i - 1)
         temp[0] = NAN
+        temp[track.size()-1] = NAN
         addListToAF(track, af_output, temp)
         return temp
 
