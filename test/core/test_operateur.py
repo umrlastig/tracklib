@@ -15,7 +15,8 @@ from tracklib import (ObsTime, Operator, GaussianKernel,
                       computeAbsCurv,
                       generate,
                       diffJourAnneeTrace,
-                      MODE_SPATIAL)
+                      MODE_SPATIAL,
+                      makeRPN)
 
 #import tracklib.algo.Synthetics as synth
 
@@ -182,7 +183,17 @@ class TestOperateurMethods(unittest.TestCase):
         self.assertEqual('{:5.3f}'.format(std_n), '116.343')
         #print("U std = " + '{:5.3f}'.format(std_u) + " m")
         self.assertEqual('{:5.3f}'.format(std_u), '8.616')
-
+        
+        
+    def test_make_RPN(self):
+        
+        tab = makeRPN('3 * (10 + 5 )')
+        self.assertEqual(len(tab), 5)
+        self.assertListEqual(['3', '10', '5', '+', '*'], tab)
+        
+        tab = makeRPN('a*(b+c/2)')
+        self.assertEqual(len(tab), 7)
+        self.assertListEqual(['a', 'b', 'c', '2', '/', '+', '*'], tab)
 
         
 if __name__ == '__main__':
@@ -191,6 +202,7 @@ if __name__ == '__main__':
     suite.addTest(TestOperateurMethods("test_generate"))
     suite.addTest(TestOperateurMethods("test_import"))
     suite.addTest(TestOperateurMethods("test_abs_curv1"))
+    suite.addTest(TestOperateurMethods("test_make_RPN"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
     
