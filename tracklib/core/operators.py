@@ -503,7 +503,14 @@ class Log(UnaryVoidOperator):
         :param af_output: TODO
         :return: TODO
         """
-        return track.operate(Operator.APPLY, af_input, math.log, af_output)
+        temp = [0] * track.size()
+        for i in range(0, track.size()):
+            val = track.getObsAnalyticalFeature(af_input, i)
+            if val > 0:
+                temp[i] = math.log(val)
+            else:
+                temp[i] = 0
+        track[af_output] = temp
 
 
 class Cos(UnaryVoidOperator):

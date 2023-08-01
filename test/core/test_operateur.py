@@ -274,6 +274,9 @@ class TestOperateurMethods(unittest.TestCase):
         vt = [math.tan(1), math.tan(-1), math.tan(1), math.tan(-2), math.tan(2), math.tan(-2), math.tan(2)]
         self.assertListEqual(vt, trace.getAnalyticalFeature('op19'))
         
+        trace.operate(Operator.LOG, "op1", "op20")
+        vt = [math.log(1), 0, math.log(1), 0, math.log(2), 0, math.log(2)]
+        self.assertListEqual(vt, trace.getAnalyticalFeature('op20'))
         
         
 if __name__ == '__main__':
