@@ -295,6 +295,8 @@ class TestOperateurMethods(unittest.TestCase):
         trace["b"] = [3,  2, 1, -4, 5, -2, 3]
         self.assertListEqual([1, -1, 1, -2, 2, -3, 2], trace.getAnalyticalFeature('a'))
         self.assertListEqual([3, 2, 1, -4, 5, -2, 3], trace.getAnalyticalFeature('b'))
+        A = trace.getAnalyticalFeature('a')
+        B = trace.getAnalyticalFeature('b')
         
         trace.operate(Operator.MULTIPLIER, "a", "b", "op1")
         vt = [3, -2, 1, 8, 10, 6, 6]
@@ -316,9 +318,33 @@ class TestOperateurMethods(unittest.TestCase):
         vt = [1, 1, 0, 0, 1, 1, 1]
         self.assertListEqual(vt, trace.getAnalyticalFeature('op5'))
         
-        #trace.operate(Operator.DERIVATOR, "a", "b", "op6")
+        trace.operate(Operator.DERIVATOR, "a", "b", "op6")
+        vt = [0, 2, -2, 0.6, 4/9, -5/-7, 1]
+        self.assertListEqual(vt, trace.getAnalyticalFeature('op6'))
+        
+        #trace.operate(Operator.RENORMALIZER, "a", "b", "op7")
         #vt = [NAN, 1, 0, 0, 1, 1, 1]
-        #self.assertListEqual(vt, trace.getAnalyticalFeature('op6'))
+        #self.assertListEqual(vt, trace.getAnalyticalFeature('op7'))
+        
+        #trace.operate(Operator.POINTWISE_EQUALER, "a", "b", "op8")
+        #vt = [NAN, 1, 0, 0, 1, 1, 1]
+        #self.assertListEqual(vt, trace.getAnalyticalFeature('op8'))
+        
+        #trace.operate(Operator.CONVOLUTION, "a", "b", "op9")
+        #vt = [NAN, 1, 0, 0, 1, 1, 1]
+        #self.assertListEqual(vt, trace.getAnalyticalFeature('op9'))
+        
+        #trace.operate(Operator.CORRELATOR, "a", "b", "op10")
+        #print (trace.getAnalyticalFeature('op10')[0])
+        #print (np.cov(A[0], B[0]))
+        #c11 = np.cov(A[0], B[0])[0][1] / (math.sqrt(np.var(A[0])) * np.sqrt(np.var(B[0])))
+        #print (c11)
+        #vt = [c11, 1, 0, 0, 1, 1, 1]
+        #self.assertListEqual(vt, trace.getAnalyticalFeature('op10'))
+        
+        
+        
+        
         
         
 if __name__ == '__main__':
