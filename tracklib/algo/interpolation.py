@@ -129,19 +129,18 @@ def __resampleSpatial(track, ds):
         interp_points.append(pi)
     
     # And the last point
-    interp_points.append(track.getLastObs().copy())
+    #interp_points.append(track.getLastObs().copy())
 
     track.setObsList(interp_points)
 
 
 def __resampleTemporal(track, reference):
-    """TODO
-
+    """
     Resampling of a track with linear interpolation
-    reference: list of timestamps, track or sec interval"""
+    reference: list of timestamps, track or sec interval
+    """
 
     T = []
-
     for i in range(track.size()):
         T.append(track.getObs(i).timestamp.toAbsTime())
 
@@ -155,7 +154,6 @@ def __resampleTemporal(track, reference):
     running_id = 0
 
     for k in range(len(REF)):
-
         t = REF[k]
 
         if t <= tini:
