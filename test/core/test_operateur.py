@@ -353,12 +353,12 @@ class TestOperateurMethods(unittest.TestCase):
         
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    #suite.addTest(TestOperateurMethods("test_random"))
-    #suite.addTest(TestOperateurMethods("test_generate"))
-    #suite.addTest(TestOperateurMethods("test_import"))
-    #suite.addTest(TestOperateurMethods("test_abs_curv1"))
-    #suite.addTest(TestOperateurMethods("test_make_RPN"))
-    #suite.addTest(TestOperateurMethods("test_unary_void_operator"))
+    suite.addTest(TestOperateurMethods("test_random"))
+    suite.addTest(TestOperateurMethods("test_generate"))
+    suite.addTest(TestOperateurMethods("test_import"))
+    suite.addTest(TestOperateurMethods("test_abs_curv1"))
+    suite.addTest(TestOperateurMethods("test_make_RPN"))
+    suite.addTest(TestOperateurMethods("test_unary_void_operator"))
     suite.addTest(TestOperateurMethods("test_binary_void_operator"))
     runner = unittest.TextTestRunner()
     runner.run(suite)

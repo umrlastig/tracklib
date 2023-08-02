@@ -1250,11 +1250,15 @@ class Track:
         return output
 
     def resample(self, delta=None, algo=1, mode=1, npts=None, factor=1):
-        """Resampling a track with linear interpolation
-
-        Resampling a track with linear interpolation
+        """
+        Resampling a track with linear interpolation.
+        
+        Parameters
+        ----------
+        
         delta: interpolation interval
            (time in sec if temporal mode is selected, space in meters if spatial).
+        
         npts = number of points
         If none of delta and npts are specified, the track is resampled regularly
         with the same number of points * factor.

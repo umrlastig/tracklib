@@ -90,27 +90,23 @@ def resample(track, delta, algo: Literal[1, 2, 3, 4]=1, mode:Literal[1, 2]=1):
 
 
 def __resampleSpatial(track, ds):
-    """TODO
-
+    """
     Resampling of a track with linear interpolation
-    ds: curv abs interval (in m) between two samples"""
-
+    ds: curv abs interval (in m) between two samples
+    """
     S = [0]
     for i in range(1, track.size()):
         dl = track.getObs(i - 1).position.distance2DTo(track.getObs(i).position)
-        S.append(S[i - 1] + dl)
+        S.append(S[i-1] + dl)
 
-    sini = S[0]
-    sfin = S[len(S) - 1]
-    N = (int)((sfin - sini) / ds)
+    N = (int)(track.length() / ds)
 
     interp_points = [track.getFirstObs().copy()]
     interp_points[0].features = []
     running_id = 0
 
     for k in range(1, N + 1):
-
-        s = k * ds + sini
+        s = k * ds + S[0]
 
         while S[running_id] < s:
             running_id += 1
@@ -131,6 +127,9 @@ def __resampleSpatial(track, ds):
         pi = Obs(ENUCoords(X, Y, Z), ObsTime.readUnixTime(T))
 
         interp_points.append(pi)
+    
+    # And the last point
+    interp_points.append(track.getLastObs().copy())
 
     track.setObsList(interp_points)
 
