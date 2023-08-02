@@ -1260,6 +1260,7 @@ class Track:
            (time in sec if temporal mode is selected, space in meters if spatial).
         
         npts = number of points
+        
         If none of delta and npts are specified, the track is resampled regularly
         with the same number of points * factor.
         If both are specified, priority is given to delta.

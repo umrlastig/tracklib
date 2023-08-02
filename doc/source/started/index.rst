@@ -12,6 +12,8 @@ Getting Started
   :maxdepth: 1
 
   Installation <install>
+  Jupyter Notebook <jupyter>
+  Tracklib in QGis environment <qgis>
   Overview <overview>
 
 
