@@ -322,13 +322,17 @@ class TestOperateurMethods(unittest.TestCase):
         vt = [0, 2, -2, 0.6, 4/9, -5/-7, 1]
         self.assertListEqual(vt, trace.getAnalyticalFeature('op6'))
         
-        #trace.operate(Operator.RENORMALIZER, "a", "b", "op7")
-        #vt = [NAN, 1, 0, 0, 1, 1, 1]
-        #self.assertListEqual(vt, trace.getAnalyticalFeature('op7'))
+        trace.operate(Operator.RENORMALIZER, "a", "b", "op7")
+        m1 = np.average(A)
+        m2 = np.average(B)
+        s1 = math.sqrt(np.var(A))
+        s2 = math.sqrt(np.var(B))
+        vt = [(A[0]-m1)*s2/s1+m2, (A[1]-m1)*s2/s1+m2, (A[2]-m1)*s2/s1+m2, (A[3]-m1)*s2/s1+m2, (A[4]-m1)*s2/s1+m2, (A[5]-m1)*s2/s1+m2, (A[6]-m1)*s2/s1+m2]
+        self.assertListEqual(vt, trace.getAnalyticalFeature('op7'))
         
-        #trace.operate(Operator.POINTWISE_EQUALER, "a", "b", "op8")
-        #vt = [NAN, 1, 0, 0, 1, 1, 1]
-        #self.assertListEqual(vt, trace.getAnalyticalFeature('op8'))
+        trace.operate(Operator.POINTWISE_EQUALER, "a", "b", "op8")
+        vt = [0, 0, 1, 0, 0, 0, 0]
+        self.assertListEqual(vt, trace.getAnalyticalFeature('op8'))
         
         #trace.operate(Operator.CONVOLUTION, "a", "b", "op9")
         #vt = [NAN, 1, 0, 0, 1, 1, 1]
@@ -349,12 +353,12 @@ class TestOperateurMethods(unittest.TestCase):
         
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    suite.addTest(TestOperateurMethods("test_random"))
-    suite.addTest(TestOperateurMethods("test_generate"))
-    suite.addTest(TestOperateurMethods("test_import"))
-    suite.addTest(TestOperateurMethods("test_abs_curv1"))
-    suite.addTest(TestOperateurMethods("test_make_RPN"))
-    suite.addTest(TestOperateurMethods("test_unary_void_operator"))
+    #suite.addTest(TestOperateurMethods("test_random"))
+    #suite.addTest(TestOperateurMethods("test_generate"))
+    #suite.addTest(TestOperateurMethods("test_import"))
+    #suite.addTest(TestOperateurMethods("test_abs_curv1"))
+    #suite.addTest(TestOperateurMethods("test_make_RPN"))
+    #suite.addTest(TestOperateurMethods("test_unary_void_operator"))
     suite.addTest(TestOperateurMethods("test_binary_void_operator"))
     runner = unittest.TextTestRunner()
     runner.run(suite)

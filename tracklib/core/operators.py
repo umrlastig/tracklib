@@ -804,8 +804,15 @@ class Renormalizer(BinaryVoidOperator):
         m2 = track.operate(Operator.AVERAGER, af_input2)
         s1 = track.operate(Operator.STDDEV, af_input1)
         s2 = track.operate(Operator.STDDEV, af_input2)
-        f = lambda x: (x - m1) * s2 / s1 + m2
-        return track.operate(Operator.APPLY, af_input, f, af_output)
+        #f = lambda x: (x - m1) * s2 / s1 + m2
+        #return track.operate(Operator.APPLY, af_input1, af_input2, f, af_output)
+        track.createAnalyticalFeature(af_output)
+        temp = [0] * track.size()
+        for i in range(0, track.size()):
+            x1 = track.getObsAnalyticalFeature(af_input1, i)
+            temp[i] = (x1 - m1) * s2 / s1 + m2
+        addListToAF(track, af_output, temp)
+        return temp
 
 
 class PointwiseEqualer(BinaryVoidOperator):
