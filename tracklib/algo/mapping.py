@@ -211,31 +211,28 @@ def mapOnRaster(track, raster):
     for i in range(raster.bandCount()):
         band = raster.getRasterBand(i)
         name = band.getName()
-        track.createAnalyticalFeature(name)
-
+        track[name] = band.getNoDataValue()
 
     # for each point         
     for j in range(track.size()):
         pos = track.getObs(j).position
-        
+                
         # for each band        
         for i in range(raster.bandCount()):
             band = raster.getRasterBand(i)
             name = band.getName()
             
-            cell = band.getCell(pos)
-            
-            if cell == None:
-                message = "Warning: point is not located in the spatial grid. "
-                print(message)
-                continue
-            
-            cx = math.floor(cell[0])
-            cy = math.floor(cell[1])
-            val = band.grid[cx][cy]
-            
-            track.setObsAnalyticalFeature(name, j, val)
-            
+            if band.isIn(pos):
+                cell = band.getCell(pos)
+                if cell == None:
+                    message = "Warning: point is not located in the spatial grid. "
+                    print(message)
+                    continue
+                cx = math.floor(cell[0])
+                cy = math.floor(cell[1])
+                val = band.grid[cy][cx]
+                track.setObsAnalyticalFeature(name, j, val)
+
 
 def mapOn(
     track,

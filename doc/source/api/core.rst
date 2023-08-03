@@ -15,7 +15,6 @@ Module core
    ./core/core-obstime.rst
    ./core/core-operator.rst
    ./core/core-raster.rst
-   ./core/core-rasterband.rst
    ./core/core-index.rst
    ./core/core-track.rst
    ./core/core-trackcollection.rst

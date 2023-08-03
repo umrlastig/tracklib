@@ -26,6 +26,7 @@ Here is a gallery of several examples demonstrating what ``tracklib`` can do.
     :glob:
     :reversed:
 
+    UG_MapOnRaster
     UG_Stdbscan
     UG_Comparison
     UG_Selection
