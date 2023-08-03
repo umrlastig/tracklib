@@ -1,6 +1,6 @@
 """
 This module contains the class to manipulate rasters.
-Class for defining a collection of RasterBand.
+A raster is defined as a collection of RasterBand.
 """
 
 # For type annotation
@@ -21,17 +21,11 @@ DEFAULT_NAME = 'grid'
 
 class RasterBand:
     
-    def __init__(
-        self,
-        bb: Bbox,
-        resolution=None,
-        margin: float = 0.05,
-        novalue: float = NO_DATA_VALUE,
-        name = DEFAULT_NAME,
-        verbose: bool = True,
-    ):
+    def __init__(self, bb: Bbox, resolution=None, margin:float=0.05, novalue:float=NO_DATA_VALUE,
+        name=DEFAULT_NAME, verbose:bool=True):
         """
         Grid constructor.
+        
         :param bbox: Bouding box
         :param resolution: Grid resolution
         :param margin: relative float. Default value is +5%
@@ -39,21 +33,18 @@ class RasterBand:
         :param verbose: Verbose creation
         """
         
-        self.__bbox = bb
         bb = bb.copy()
         bb.addMargin(margin)
+        self.__bbox = bb
         (self.xmin, self.xmax, self.ymin, self.ymax) = bb.asTuple()
-        #print (self.xmin, self.xmax)
+        
         ax, ay = bb.getDimensions()
-        #print (ax, ay)
-    
         if resolution is None:
             am = max(ax, ay)
             r = am / 100
             resolution = (int(ax / r), int(ay / r))
         else:
             r = resolution
-            #print (ax, r[0])
             resolution = (int(ax / r[0]), int(ay / r[1]))
         #print (resolution)
     
@@ -80,8 +71,9 @@ class RasterBand:
     def bbox(self):
         return self.__bbox
         
-    def setName(self, name):
-        self.__name = name
+# TODO : impact dans le dictionnaire du raster à gérer
+#    def setName(self, name):
+#        self.__name = name
     def getName(self):
         return self.__name
     
@@ -115,9 +107,9 @@ class RasterBand:
             true if contains, false else.
     
         '''
-        if coord.E < self.xmin and coord.E > self.xmax:
+        if coord.E < self.xmin or coord.E > self.xmax:
             return False
-        if coord.N < self.ymin and coord.N > self.ymax:
+        if coord.N < self.ymin or coord.N > self.ymax:
             return False
         
         return True
@@ -267,19 +259,19 @@ class RasterBand:
 
 class Raster:
     
-    def __init__(self, grids: Union[grid.RasterBand, list], verbose=True):
+    def __init__(self, grids:Union[RasterBand, list]):
         """
         On crée un raster avec une ou plusieurs grilles géographiques 
-        déjà chargées avec les données.
+        déjà chargées avec des données.
         
         Parameters
         ----------
-        grids : list 
+        grids : list or RasterBand
            A list of RasterBand or one RasterBand.
            
         """
-        
-        grids = listify(grids)
+        if isinstance(grids, RasterBand):
+            grids = listify(grids)
         
         self.__idxBands = []
         self.__bands = {}
@@ -287,44 +279,29 @@ class Raster:
             self.__bands[itergrid.getName()] = itergrid
             self.__idxBands.append(itergrid.getName())
 
-
     def bandCount(self):
-        """
-        TODO
-        """
+        """Return the number of bands in this raster"""
         return len(self.__bands)
 
     def getNamesOfRasterBand(self):
-        """
-        Return all the names of raster bands in a list.
-        """
+        """Return all names of raster bands in a list."""
         return list(self.__bands.keys())
     
-    
-    def getRasterBand(self, identifier: Union[int, str]) -> grid.RasterBand:
-        """
-        Return the raster band by the index
-        """
+    def getRasterBand(self, identifier: Union[int, str]) -> RasterBand:
+        """Return the raster band according to index or name"""
         if isinstance(identifier, int):
             name = self.__idxBands[identifier]
             return self.__bands[name]
-        
         return self.__bands[identifier]
 
-    
 #    def summary(self):
 #        pass
     
-    #def bandStatistics(self, name: Union[int, str]):
-        #    pass
-
+#    def bandStatistics(self, name: Union[int, str]):
+#        pass
     
-    def plot(self, identifier: Union[int, str], append=False, 
-             color1=(0, 0, 0), color2=(255, 255, 255)):
-        """
-        At the moment, juste one band of raster, that's why the name is needeed.
-        """
-        
+    def plot(self, identifier:Union[int, str], append=False):
+        """For now, juste one band of raster, that's why the name is needeed."""
         if isinstance(identifier, int):
             name = self.__idxBands[identifier]
             self.__bands[name].plotAsImage(append)
