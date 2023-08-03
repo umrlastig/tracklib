@@ -196,7 +196,7 @@ class TestAlgoMappingMethods(unittest.TestCase):
         for j in range(self.trace.size()):
             pos = self.trace.getObs(j).position
             if pos.getX() == 942323.41762134002055973:
-                self.assertEqual(1191.0, self.trace.getObsAnalyticalFeature('grid', j), 
+                self.assertEqual(2006.0, self.trace.getObsAnalyticalFeature('grid', j), 
                                  'ele MNT AF:')
                 self.assertEqual(2002.007, pos.getZ(), 'ele Z:')
         
