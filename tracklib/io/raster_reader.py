@@ -122,55 +122,14 @@ class RasterReader:
             lines = fichier.readlines()
             fichier.close()
             
-        # Build an empty grid
-        xllcorner = 0
-        yllcorner = 0
-        cellsize = 0
-        nrows = 0
-        ncols = 0
+        grid = RasterReader.readMetadataFromAscFile(path, name)
         
         cptrowheader = 0
-        novalue = NO_DATA_VALUE
         for line in lines:
             cle = line.split(" ")[0].strip()
             if cle in  ['ncols', 'nrows', 'xllcorner', 'yllcorner', 'cellsize', 'NODATA_value']:
                 cptrowheader += 1
-                    
-                i = 1
-                val = line.split(" ")[1].strip()
-                while val == '':
-                    i += 1
-                    val = line.split(" ")[i].strip()
-                    
-                if cle == 'ncols':
-                    ncols = int(val)
-                if cle == 'nrows':
-                    nrows = int(val)
-                if cle == 'xllcorner':
-                    xllcorner = float(val)
-                if cle == 'yllcorner':
-                    yllcorner = float(val)
-                if cle == 'cellsize':
-                    
-                    cellsize = int(float(val))
-                if cle == 'NODATA_value':
-                    novalue = float(val)
-            else:
-                break
-                    
-        ll = ENUCoords(xllcorner, yllcorner, 0)
-        ur = ENUCoords(xllcorner + cellsize * ncols, yllcorner + cellsize * nrows, 0)
-        bbox = Bbox(ll, ur)
-            
-        resolution = (cellsize, cellsize)
-        marge = 0
-        
-        if name == '':
-            name = DEFAULT_NAME
-            
-        grid = RasterBand(bbox, resolution=resolution, margin=marge, 
-                         novalue=novalue, name=name)
-           
+
         # Read the values
         i = 0
         for line in lines[cptrowheader:]:
@@ -179,21 +138,14 @@ class RasterReader:
             for val in lineValues:
                 if val.strip() == '':
                     continue
-                
-                grid.grid[j][i] = float(val)
+                grid.grid[i][j] = float(val)
                 j += 1
-                
             i += 1
 
         # Return raster with one grid            
         return Raster(grid)
-
-
-#    @staticmethod
-#    def getAltitude(bbox, proj=None, nomproxy=None):
-#        URL_ELEVATION = ''
-#        # https://wxs.ign.fr/altimetrie/geoportail/r/wms?LAYERS=ELEVATION.ELEVATIONGRIDCOVERAGE.HIGHRES&EXCEPTIONS=text/xml&FORMAT=image%2Fgeotiff&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&STYLES=&CRS=EPSG:2154&BBOX=660034.3692562445,6859000.245020923,660169.3953205446,6859140.163403969&WIDTH=2048&HEIGHT=2048
-
         
+
+      
         
         
