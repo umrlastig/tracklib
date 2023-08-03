@@ -57,12 +57,10 @@ class TestAlgoMappingMethods(unittest.TestCase):
         trace.addObs(p9)
         
         #print (len(trace))
-        
         return trace
     
     
     def getDataset2(self):
-
         network = Network()
         
         # Segment 1
@@ -175,7 +173,6 @@ class TestAlgoMappingMethods(unittest.TestCase):
         
         return network
     
-    #def setUp (self):
         
     def testMapOnRaster(self):
         resource_path = os.path.join(os.path.split(__file__)[0], "../..")
@@ -205,7 +202,6 @@ class TestAlgoMappingMethods(unittest.TestCase):
         
 
     def testMapOnNetwork(self):
-        
         trace = self.getDataset1()
         network = self.getDataset2()
         
@@ -235,7 +231,6 @@ class TestAlgoMappingMethods(unittest.TestCase):
         
         
     def testMapOn(self):
-        
         resource_path = os.path.join(os.path.split(__file__)[0], "../..")
         path_cam = os.path.join(resource_path, 'data/hybridation_gnss_camera.dat')
         path_gps = os.path.join(resource_path, 'data/hybridation_gnss_camera.pos')
@@ -263,7 +258,6 @@ class TestAlgoMappingMethods(unittest.TestCase):
         track_gps.plot('b+')
         plt.show()
 
-        
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()

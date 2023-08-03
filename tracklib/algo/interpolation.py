@@ -129,7 +129,7 @@ def __resampleSpatial(track, ds):
         interp_points.append(pi)
     
     # And the last point
-    #interp_points.append(track.getLastObs().copy())
+    interp_points.append(track.getLastObs().copy())
 
     track.setObsList(interp_points)
 
@@ -293,7 +293,10 @@ def __gaussian_process(track, TO, TU, kernel, factor, sigma, cp_var):
 # Output : a list of timestamps
 # --------------------------------------------------------------------------
 def prepareTimeSampling(input, tini=None, tfin=None):
-    """TODO"""
+    """
+    Function to prepare a list of timestamps for interpolation functions.
+    
+    """
     output = []
     if isinstance(input, list):
         for i in range(len(input)):

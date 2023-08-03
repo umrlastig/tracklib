@@ -185,10 +185,7 @@ class RasterBand:
     
     
     def plotAsGraphic(self, backgroundcolor="lightcyan", bordercolor="lightgray"):   
-        """
-        Plot grid
-        """
-    
+        """ Plot as vector grid. """
         fig = plt.figure()
         ax = fig.add_subplot(
             111, xlim=(self.xmin, self.xmax), ylim=(self.ymin, self.ymax)
@@ -225,10 +222,8 @@ class RasterBand:
 
     def plotAsImage(self, append=False, 
                     color1 = (0, 0, 0), color2 = (255, 255, 255), novaluecolor='white'):
-        """
-        Plot raster band as an image.
-        """
-        
+        """ Plot raster band as an image. """
+      
         if isinstance(append, bool):
             if append:
                 ax1 = plt.gca()
@@ -248,8 +243,6 @@ class RasterBand:
         
         im = ax1.imshow(tab, cmap=cmap)
         ax1.set_title(self.getName())
-        #plt.colorbar(im, fraction=0.046, pad=0.04)
-        #plt.show()
         
         divider = make_axes_locatable(ax1)
         cax = divider.append_axes('right', size='5%', pad=0.1)
