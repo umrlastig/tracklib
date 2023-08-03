@@ -4,7 +4,6 @@
 import matplotlib.pyplot as plt
 import os.path
 import unittest
-
 from tracklib import (Obs, ObsTime, ENUCoords, 
                       Track, 
                       Network, Node, Edge, 
@@ -183,9 +182,8 @@ class TestAlgoMappingMethods(unittest.TestCase):
         
         mntpath = os.path.join(resource_path, 'data/asc/test.asc')
         self.raster = RasterReader.readFromAscFile(mntpath)
-        print (self.raster.getRasterBand(0))
         self.band = self.raster.getRasterBand(0)
-        
+
         ObsTime.setReadFormat("4Y/2M/2D 2h:2m:2s")
         tracepath = os.path.join(resource_path, 'data/asc/8961191_v3.csv')
         self.trace = TrackReader.readFromCsv(tracepath, 
@@ -193,18 +191,18 @@ class TestAlgoMappingMethods(unittest.TestCase):
                                         separator=",", h=1)
         #self.trace.plot()
         
-        self.assertEqual(self.band.grid[465][1151], 2007.0, 'ele MNT VT')
+        self.assertEqual(self.band.grid[1151][465], 2007.0, 'ele MNT VT')
         self.assertEqual(self.trace.size(), 363, 'track size')
+        
         mapOnRaster(self.trace, self.raster)
         
         for j in range(self.trace.size()):
             pos = self.trace.getObs(j).position
             if pos.getX() == 942323.41762134002055973:
-                self.assertEqual(2006.0, 
-                                 self.trace.getObsAnalyticalFeature('grid', j), 
+                self.assertEqual(1191.0, self.trace.getObsAnalyticalFeature('grid', j), 
                                  'ele MNT AF:')
                 self.assertEqual(2002.007, pos.getZ(), 'ele Z:')
-
+        
 
     def testMapOnNetwork(self):
         
