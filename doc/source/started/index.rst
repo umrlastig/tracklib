@@ -13,7 +13,7 @@ Getting Started
 
   Installation <install>
   Jupyter Notebook <jupyter>
-  Tracklib in QGis environment <qgis>
+  Coding with tracklib in QGIS <qgis>
   Overview <overview>
 
 

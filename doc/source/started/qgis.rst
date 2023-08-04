@@ -4,11 +4,14 @@
 :Date: 04/08/2023
 
 
-Write python's code with tracklib in QGIS (ubuntu)
-===================================================
+.. Write python's code with tracklib in QGIS (ubuntu)
+
+Coding with tracklib in QGIS (ubuntu)
+=====================================
 
 If you want to run ``tracklib`` as an 3rd party python library for QGIS, it's possible. First you have to configure QGis environment, 
 then you can test if the example below.
+
 
 Set environment
 ~~~~~~~~~~~~~~~
@@ -63,7 +66,19 @@ Set environment
 Run the example
 ~~~~~~~~~~~~~~~
 
-  
+The example load a CSV file containing routes (geometry defined by a wkt) and display it in QGis desktop.
+
+
+.. code-block:: python
    
-   
+	import tracklib as tkl
+
+	csvpath = '/home/glagaffe/tracklib/tracklib/data/lacet/ecrins.csv'
+	tracks = tkl.TrackReader.readFromWkt(csvpath, 0, 1, 2, ",", 1, "ENUCoords", None, True)
+
+	trace = tracks["917262","%"][0].extract(22, 180)
+	trace.resample(5, MODE_SPATIAL)
+
+	vqgis = tkl.QgisVisitor()
+	trace.plotAsMarkers(append=True, v=vqgis)
 
