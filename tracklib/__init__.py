@@ -4,7 +4,7 @@
 #import matplotlib.pyplot as plt
 
 
-__version__ = '0.6.4'
+__version__ = '0.6.6'
 
 
 from tracklib.core import *

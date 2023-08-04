@@ -57,6 +57,12 @@ class QgisVisitor(IPlotVisitor):
         QgsProject.instance().addMapLayer(layerTrack)
         
         
+    def plotTrackProfil(
+        self, track, template="SPATIAL_SPEED_PROFIL", afs=[], append=False,
+                   linestyle = '-', linewidth=1):
+        pass
+        
+        
     def plotTrackEllipses(self, track, sym="r-", factor=3, af=None, append=True):
         """
         Plot track uncertainty (as error ellipses)
