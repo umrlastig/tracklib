@@ -81,6 +81,20 @@ The example load a CSV file containing routes (geometry defined by a wkt) and di
 
 	vqgis = tkl.QgisVisitor()
 	trace.plotAsMarkers(v=vqgis)
+	
+
+
+The result looks like this:
+
+.. container:: centerside
+  
+   .. figure:: ../img/visu_qgis.png
+      :width: 500px
+      :align: center
+		
+      Display a track computed by tracklib in QGis
+	
+
 
 
 
