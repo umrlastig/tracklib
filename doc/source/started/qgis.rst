@@ -82,3 +82,9 @@ The example load a CSV file containing routes (geometry defined by a wkt) and di
 	vqgis = tkl.QgisVisitor()
 	trace.plotAsMarkers(append=True, v=vqgis)
 
+
+
+.. /usr/bin/pip3 install tracklib
+.. /usr/bin/python3 /home/marie-dominique/TestImport.py
+ 
+
