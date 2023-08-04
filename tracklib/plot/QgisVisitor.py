@@ -4,12 +4,15 @@ import matplotlib.pyplot as plt
 
 from tracklib.plot import IPlotVisitor
 
-from qgis.PyQt.QtCore import QVariant
-from qgis.core import QgsProject, QgsVectorLayer, QgsField
-from qgis.core import QgsPointXY, QgsFeature, QgsGeometry
-from qgis.core import QgsMarkerSymbol, QgsLineSymbol, QgsSimpleLineSymbolLayer
-from qgis.core import QgsFillSymbol
-
+try:
+    from qgis.PyQt.QtCore import QVariant
+    from qgis.core import QgsProject, QgsVectorLayer, QgsField
+    from qgis.core import QgsPointXY, QgsFeature, QgsGeometry
+    from qgis.core import QgsMarkerSymbol, QgsLineSymbol, QgsSimpleLineSymbolLayer
+    from qgis.core import QgsFillSymbol
+except ImportError:
+    print ('no qgis')
+    
 
 class QgisVisitor(IPlotVisitor):
     

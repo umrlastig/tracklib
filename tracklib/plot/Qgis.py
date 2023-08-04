@@ -7,14 +7,17 @@ import tracklib as tracklib
 from tracklib.core import ObsTime, makeCoords, Obs
 
 
-# import os # This is is needed in the pyqgis console also
-from qgis.PyQt.QtCore import QVariant
-from qgis.PyQt.QtGui import QColor
-from qgis.core import QgsProject, QgsVectorLayer, QgsField
-from qgis.core import QgsPointXY, QgsFeature, QgsGeometry
-from qgis.core import QgsMarkerSymbol, QgsLineSymbol
-from qgis.core import QgsCategorizedSymbolRenderer, QgsRendererCategory
-from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform
+try:
+    # import os # This is is needed in the pyqgis console also
+    from qgis.PyQt.QtCore import QVariant
+    from qgis.PyQt.QtGui import QColor
+    from qgis.core import QgsProject, QgsVectorLayer, QgsField
+    from qgis.core import QgsPointXY, QgsFeature, QgsGeometry
+    from qgis.core import QgsMarkerSymbol, QgsLineSymbol
+    from qgis.core import QgsCategorizedSymbolRenderer, QgsRendererCategory
+    from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform
+except ImportError:
+    print ('no qgis')
 
 
 class Qgis:
