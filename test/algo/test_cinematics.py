@@ -8,10 +8,10 @@ import unittest
 
 from tracklib import (Obs, ObsTime, ENUCoords, getColorMap,
                       BIAF_ABS_CURV, 
-                      inflection, 
-                      setVertexAF, 
-                      setBendAsAF,
-                      setSwitchbacksAsAF,
+                      computeInflection, 
+                      computeVertex, 
+                      computeBend,
+                      computeSwitchbacks,
                       smoothed_speed_calculation,
                       computeAbsCurv,
                       estimate_heading,
@@ -141,7 +141,7 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         plt.figure(figsize = (8,4))
         self.trace3.plot()
         
-        inflection(self.trace3)
+        computeInflection(self.trace3)
         afIsInflexion = self.trace3.getAnalyticalFeature('inflection')
         #print (afIsInflexion)
         self.trace3.plot(type='POINT', af_name='inflection', append = True, 
@@ -157,7 +157,7 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         plt.figure(figsize = (8,4))
         self.trace3.plot()
         
-        setVertexAF(self.trace3)
+        computeVertex(self.trace3)
         afVertex = self.trace3.getAnalyticalFeature('vertex')
         #print (afVertex)
         self.trace3.plot(type='POINT', af_name='vertex', append = True, 
@@ -173,7 +173,7 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         plt.figure(figsize = (8,4))
         self.trace3.plot()
         
-        setBendAsAF(self.trace3, angle_min = 130*pi/180)
+        computeBend(self.trace3, angle_min = 130*pi/180)
         afBend = self.trace3.getAnalyticalFeature('bend')
         #print (afBend)
         self.trace3.plot(type='POINT', af_name='bend', append = True, 
@@ -189,8 +189,8 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         plt.figure(figsize = (8,4))
         self.trace3.plot()
         
-        setBendAsAF(self.trace3, angle_min = 130*pi/180)
-        setSwitchbacksAsAF(self.trace3, nb_virage_min=3, 
+        computeBend(self.trace3, angle_min = 130*pi/180)
+        computeSwitchbacks(self.trace3, nb_virage_min=3, 
                                       dist_max=200)
         afSwitchbacks = self.trace3.getAnalyticalFeature('switchbacks')
         #print (afSwitchbacks)

@@ -165,7 +165,7 @@ def computeRadialSignature(track, factor=1):
 # =============================================================================
 #  
 
-def inflection(track):
+def computeInflection(track):
     """
     Among the characteristic points, inflection points are those the curvature 
     changes sign. In tracklib, this characteristic is modeled as an AF algorithm to detect 
@@ -248,7 +248,7 @@ def inflection(track):
     
 
 
-def setVertexAF(track):
+def computeVertex(track):
     '''
     Vertices are characteristic points of a track corresponding to 
     the maxima of curvature between two inflexion points.
@@ -272,7 +272,7 @@ def setVertexAF(track):
     track.createAnalyticalFeature('vertex', 0)
     
     if not track.hasAnalyticalFeature('inflection'):
-        inflection(track)
+        computeInflection(track)
     
     for i in range(track.size()):
         
@@ -316,7 +316,7 @@ def setVertexAF(track):
         track.setObsAnalyticalFeature('vertex', iK, 1)
 
 
-def setBendAsAF(track, angle_min = pi/2):
+def computeBend(track, angle_min = pi/2):
     '''
     Attribution des points de la trace qui composent 
     le virage défini par le sommet et les points d'inflexion les plus proches 
@@ -339,9 +339,9 @@ def setBendAsAF(track, angle_min = pi/2):
     
     track.createAnalyticalFeature('bend', 0)
     if not track.hasAnalyticalFeature('inflection'):
-        inflection(track)
+        computeInflection(track)
     if not track.hasAnalyticalFeature('vertex'):
-        setVertexAF(track)
+        computeVertex(track)
     
     for i in range(track.size()):
         # On ne traite que les virages à partir des sommets
@@ -376,7 +376,7 @@ def setBendAsAF(track, angle_min = pi/2):
             
 
 
-def setSwitchbacksAsAF(track, nb_virage_min = 3, dist_max = 150):
+def computeSwitchbacks(track, nb_virage_min = 3, dist_max = 150):
     '''
     Fusion des virages (consécutifs ou pas) si leur nombre est supérieur à 
     nb_virage_min et si la distance maximale entre deux sommets est inférieure 
@@ -397,11 +397,11 @@ def setSwitchbacksAsAF(track, nb_virage_min = 3, dist_max = 150):
     track.createAnalyticalFeature('switchbacks', 0)
     
     if not track.hasAnalyticalFeature('inflection'):
-        inflection(track)
+        computeInflection(track)
     if not track.hasAnalyticalFeature('vertex'):
-        setVertexAF(track)
+        computeVertex(track)
     if not track.hasAnalyticalFeature('bend'):
-        setBendAsAF(track)
+        computeBend(track)
         
     SERIE = False
     deb = 0
