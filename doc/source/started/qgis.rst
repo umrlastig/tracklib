@@ -73,14 +73,14 @@ The example load a CSV file containing routes (geometry defined by a wkt) and di
    
 	import tracklib as tkl
 
-	csvpath = '/home/glagaffe/tracklib/tracklib/data/lacet/ecrins.csv'
-	tracks = tkl.TrackReader.readFromWkt(csvpath, 0, 1, 2, ",", 1, "ENUCoords", None, True)
+    csvpath = '/home/glagaffe/tracklib/tracklib/data/lacet/ecrins.csv'
+    tracks = tkl.TrackReader.readFromWkt(csvpath, 0, 1, 2, ",", 1, "ENUCoords", None, True)
 
-	trace = tracks["917262","%"][0].extract(22, 180)
-	trace.resample(5, tkl.MODE_SPATIAL)
+    trace = tracks["917262","%"][0].extract(22, 180)
+    trace.resample(5, tkl.MODE_SPATIAL)
 
-	vqgis = tkl.QgisVisitor()
-	trace.plotAsMarkers(v=vqgis)
+    vqgis = tkl.QgisVisitor()
+    trace.plotAsMarkers(v=vqgis)
 	
 
 
@@ -88,8 +88,8 @@ The result looks like this:
 
 .. container:: centerside
   
-   .. figure:: ../img/visu_qgis.png
-      :width: 500px
+   .. figure:: ../img/visu_qgis2.png
+      :width: 700px
       :align: center
 		
       Display a track computed by tracklib in QGis
