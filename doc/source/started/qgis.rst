@@ -77,10 +77,10 @@ The example load a CSV file containing routes (geometry defined by a wkt) and di
 	tracks = tkl.TrackReader.readFromWkt(csvpath, 0, 1, 2, ",", 1, "ENUCoords", None, True)
 
 	trace = tracks["917262","%"][0].extract(22, 180)
-	trace.resample(5, MODE_SPATIAL)
+	trace.resample(5, tkl.MODE_SPATIAL)
 
 	vqgis = tkl.QgisVisitor()
-	trace.plotAsMarkers(append=True, v=vqgis)
+	trace.plotAsMarkers(v=vqgis)
 
 
 

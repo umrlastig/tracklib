@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import matplotlib.pyplot as plt
-
 from tracklib.plot import IPlotVisitor
 
 try:
@@ -11,10 +9,16 @@ try:
     from qgis.core import QgsMarkerSymbol, QgsLineSymbol, QgsSimpleLineSymbolLayer
     from qgis.core import QgsFillSymbol
 except ImportError:
-    print ('no qgis')
+    print ('code running in a no qgis environment')
     
 
 class QgisVisitor(IPlotVisitor):
+    
+    def __init__(self):
+        self.symbol = QgsMarkerSymbol.createSimple({'name': 'square', 
+                                                    'color': 'blue', 
+                                                    'size':'0.8'})
+
     
     
     def plotTrackAsMarkers(
@@ -48,8 +52,8 @@ class QgisVisitor(IPlotVisitor):
         
         layerTrack.updateExtents()
         layerTrack.commitChanges()
-        symbol = QgsMarkerSymbol.createSimple({'name': 'square', 'color': 'blue', 'size':'0.8'})
-        layerTrack.renderer().setSymbol(symbol)
+        
+        layerTrack.renderer().setSymbol(self.symbol)
         QgsProject.instance().addMapLayer(layerTrack)
         
         
@@ -181,7 +185,7 @@ class QgisVisitor(IPlotVisitor):
     
 
     def plotNetwork(self, net, edges: str = "k-", nodes: str = "",
-        direct: str = "k--", indirect: str = "k--", size: float = 0.5, append=plt):
+        direct: str = "k--", indirect: str = "k--", size: float = 0.5, append=False):
         """
         Plot network
         """

@@ -17,10 +17,10 @@ try:
     from qgis.core import QgsCategorizedSymbolRenderer, QgsRendererCategory
     from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform
 except ImportError:
-    print ('no qgis')
+    print ('code running in a no qgis environment')
 
 
-class Qgis:
+class QgisUtil:
     '''
     Class to visualize GPS tracks and its AF in Qgis.
     '''
