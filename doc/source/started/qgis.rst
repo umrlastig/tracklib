@@ -71,7 +71,7 @@ The example load a CSV file containing routes (geometry defined by a wkt) and di
 
 .. code-block:: python
    
-	import tracklib as tkl
+    import tracklib as tkl
 
     csvpath = '/home/glagaffe/tracklib/tracklib/data/lacet/ecrins.csv'
     tracks = tkl.TrackReader.readFromWkt(csvpath, 0, 1, 2, ",", 1, "ENUCoords", None, True)
