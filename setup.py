@@ -30,7 +30,7 @@ doc_requirements = (
 
 setup (
     name="tracklib",
-    version="0.6.1",
+    version="0.6.2",
     description="Tracklib library provide a variety of tools, operators and functions to manipulate GPS trajectories",
     long_description="See https://github.com/umrlastig/tracklib",
     url="https://github.com/umrlastig/tracklib",
@@ -45,7 +45,7 @@ setup (
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 3.8",
     ],
-    packages=find_packages(include=["test", "resources"]),
+    packages = ['tracklib'],
     install_requires=requirements,
     test_suite="tests",
     extras_require={
