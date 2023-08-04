@@ -10,6 +10,7 @@ Installation
 Tracklib is supported on Python versions 3.8+.
 
 
+
 Dependencies
 ~~~~~~~~~~~~
 
@@ -19,6 +20,7 @@ The following projects are required dependencies of Tracklib:
 * `matplotlib <https://pypi.org/project/matplotlib/>`_ - Used for colormaps and 2D plotting.
 * `scikit-image <https://pypi.org/project/scikit-image/>`_ - Used for image processing in Python.
 * `progressbar2 <https://pypi.org/project/progressbar2/>`_ - A progress bar to display the progress of a long running operation.
+
 
 
 PyPI
@@ -31,6 +33,7 @@ Tracklib can be installed from `PyPI <https://pypi.org/project/tracklib/>`_
 using ``pip``::
 
     pip install tracklib
+
 
 
 Installing the Current Development Branch from GitHub in current environment
@@ -49,6 +52,7 @@ Alternatively, you can clone the repository with git and install it with pip.
    git clone https://github.com/umrlastig/tracklib.git
    cd tracklib
    pip install -e .
+
 
 
 Installing the Current Development Branch from GitHub in a new python environment
@@ -96,6 +100,7 @@ Installing the Current Development Branch from GitHub in a new python environmen
    deactivate
  
 
+
 Running test
 ~~~~~~~~~~~~
    
@@ -107,6 +112,7 @@ If you want to run unit tests, you have to install these dependencies:
    pip install pytest-runner
    pip install pytest-benchmark
    pip install coverage
+
 
 
 Running documentation
@@ -131,8 +137,8 @@ To launch the documentation:
 
 
 
-Spyder IDE
-~~~~~~~~~~
+Spyder IDE (development mode)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A python IDE make the development more easy. 
 
@@ -152,6 +158,9 @@ To use spyder, you have to create a new project with an existing directory.
         :align: center
       
         Figure 1 - Tracklib project in Spyder
+
+
+Make sure the tracklib directory are in the python path of spyder.
 
 
 
