@@ -6,7 +6,7 @@ import unittest
 from tracklib import (ENUCoords, ObsTime, Obs, 
                       makeDistanceMatrix,
                       computeAbsCurv,
-                      makeRPN,
+                      makeRPN, compLike,
                       Track)
 
 
@@ -57,12 +57,48 @@ class TestUtils(unittest.TestCase):
         tab = makeRPN('a*(b+c/2)')
         self.assertEqual(len(tab), 7)
         self.assertListEqual(['a', 'b', 'c', '2', '/', '+', '*'], tab)
+        
+        
+    def test_comp_like(self):
+        a = compLike("abcdefg", "[abcdefg, abcdefgh, abcd]")
+        self.assertTrue(a)
+        
+        a = compLike("3", "['3', '33', '333']")
+        self.assertTrue(a)
+        
+        a = compLike("3", "['4', '44', '4444']")
+        self.assertFalse(a)
+        
+        a = compLike("3", "['1234', '4567', '9090']")
+        self.assertTrue(a)
+        
+        a = compLike("abcdefg", "%")
+        self.assertTrue(a)
+        
+        a = compLike("abcdefg", "%a")
+        self.assertTrue(a)
+        
+        a = compLike("abcdefg", "%c")
+        self.assertTrue(a)
 
-    
+        a = compLike("abcdefg", "%bcd")
+        self.assertTrue(a)
+        
+        a = compLike("abcdefg", "%fg")
+        self.assertTrue(a)
+        
+        a = compLike("abcdefg", "%ag")
+        self.assertFalse(a)
+        
+        a = compLike("abcdefg", "%z")
+        self.assertFalse(a)
+
+
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     suite.addTest(TestUtils("testMakeDistanceMatrixModeLinear"))
     suite.addTest(TestUtils("test_make_RPN"))
+    suite.addTest(TestUtils("test_comp_like"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

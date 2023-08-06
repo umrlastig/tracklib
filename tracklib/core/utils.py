@@ -69,9 +69,12 @@ def unlistify(input):
     return input
 
 
-# LIKE comparisons
 def compLike(s1, s2) -> bool:   
-    """TODO
+    """LIKE comparisons.
+    
+    Examples:
+        compLike("3", "['1234', '4567', '9090']")
+        compLike("abcdefg", "%bcd")
 
     :param s1: TODO
     :param s2: TODO
@@ -79,7 +82,7 @@ def compLike(s1, s2) -> bool:
     """
     tokens = s2.split("%")
     if len(tokens) == 1:
-        return s1 in s2  # 'in' or 'equal' yet to be decided
+        return s1 in s2  # 'in' ('equal' yet to be decided)
     occ = []
     s = s1
     for tok in tokens:
