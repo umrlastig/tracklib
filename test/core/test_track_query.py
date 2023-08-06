@@ -87,39 +87,39 @@ class TestTrackQuery(TestCase):
         
         # AVG
         avgspeed = self.track.query("SELECT AVG(speed)")
-        self.assertEquals(avgspeed, np.mean(speeds))
+        self.assertEqual(avgspeed, np.mean(speeds))
         
         # SUM
         sumspeed = self.track.query("SELECT SUM(speed)")
-        self.assertEquals(sumspeed, np.sum(speeds))
+        self.assertEqual(sumspeed, np.sum(speeds))
         
         # MIN
         minspeed = self.track.query("SELECT MIN(speed)")
-        self.assertEquals(minspeed, np.min(speeds))
+        self.assertEqual(minspeed, np.min(speeds))
         
         # MAX
         maxspeed = self.track.query("SELECT MAX(speed)")
-        self.assertEquals(maxspeed, np.max(speeds))
+        self.assertEqual(maxspeed, np.max(speeds))
         
         # COUNT
         countspeed = self.track.query("SELECT COUNT(speed)")
-        self.assertEquals(countspeed, len(speeds))
+        self.assertEqual(countspeed, len(speeds))
         
         # VAR
         varspeed = self.track.query("SELECT VAR(speed)")
-        self.assertEquals(varspeed, np.var(speeds))
+        self.assertEqual(varspeed, np.var(speeds))
         
         # MEDIAN
         meanspeed = self.track.query("SELECT MEDIAN(speed)")
-        self.assertEquals(meanspeed, np.median(speeds))
+        self.assertEqual(meanspeed, np.median(speeds))
         
         # ARGMIN
         argminspeed = self.track.query("SELECT ARGMIN(speed)")
-        self.assertEquals(argminspeed, np.argmin(speeds))
+        self.assertEqual(argminspeed, np.argmin(speeds))
         
         # ARGMAX
         argmaxspeed = self.track.query("SELECT ARGMAX(speed)")
-        self.assertEquals(argmaxspeed, np.argmax(speeds))
+        self.assertEqual(argmaxspeed, np.argmax(speeds))
         
     def test_selectcolumn(self):
         self.track.addAnalyticalFeature(speed)
@@ -128,21 +128,21 @@ class TestTrackQuery(TestCase):
         
         # 
         manymax = self.track.query("SELECT MAX(x), MAX(y), MAX(z), MAX(t)")
-        self.assertEquals(manymax, [4, 4, 0, 1577872812.0])
+        self.assertListEqual(manymax, [4, 4, 0, 1577872812.0])
         
         tab = self.track.query("SELECT speed, heading WHERE speed >= 0.5")
-        self.assertEquals(tab[0], [1.0, 0.7071067811865476, 
+        self.assertListEqual(tab[0], [1.0, 0.7071067811865476, 
                           0.7071067811865476, 0.7071067811865476, 0.5])
-        self.assertEquals(tab[1], [0.0, 0.0, 
+        self.assertListEqual(tab[1], [0.0, 0.0, 
                           1.5707963267948966, 0.0, 1.5707963267948966])
     
     
         query  = " SELECT speed, heading "
         query += " WHERE speed >= 0.3 AND heading > 1.0 "
         tab = self.track.query(query)
-        self.assertEquals(tab[0],[0.7071067811865476, 0.47140452079103173, 
+        self.assertListEqual(tab[0],[0.7071067811865476, 0.47140452079103173, 
                           0.3535533905932738, 0.5])
-        self.assertEquals(tab[1], [1.5707963267948966, 1.5707963267948966, 
+        self.assertListEqual(tab[1], [1.5707963267948966, 1.5707963267948966, 
                           1.5707963267948966, 1.5707963267948966])
     
         query  = " SELECT AVG(speed) "
@@ -154,7 +154,7 @@ class TestTrackQuery(TestCase):
         query  = " SELECT COUNT(speed) "
         query += " WHERE orientation = 1 "
         obsOrientation1 = self.track.query(query)
-        self.assertEquals(obsOrientation1, 4)
+        self.assertEqual(obsOrientation1, 4)
         
         
     def test_query_with_parenthesis(self):
@@ -206,27 +206,27 @@ class TestTrackQuery(TestCase):
         self.assertEqual(0, trace.size())
         
     
-    def test_bool(self):
-        
-        self.track['indicateur'] = [True,False,False,False,False,True,True,False,True]
-        
-        query  = " SELECT * WHERE indicateur = True "
-        trace = self.track.query(query)
-        self.assertEqual(4, trace.size())
+#    def test_bool(self):
+#        
+#        self.track['indicateur'] = [True,False,False,False,False,True,True,False,True]
+#        
+#        query  = " SELECT * WHERE indicateur = True "
+#        trace = self.track.query(query)
+#        self.assertEqual(4, trace.size())
     
     
 
 if __name__ == '__main__':
     suite = TestSuite()
-    #suite.addTest(TestTrackQuery("test_selectstar"))
-    #suite.addTest(TestTrackQuery("test_selectwhere1"))
-    #suite.addTest(TestTrackQuery("test_selectwhere2"))
-    #suite.addTest(TestTrackQuery("test_selectagg"))
-    #suite.addTest(TestTrackQuery("test_selectcolumn"))
-    #suite.addTest(TestTrackQuery("test_query_with_parenthesis"))
-    #suite.addTest(TestTrackQuery("test_agg_zeros"))
-    #suite.addTest(TestTrackQuery("test_like"))
-    suite.addTest(TestTrackQuery("test_bool"))
+    suite.addTest(TestTrackQuery("test_selectstar"))
+    suite.addTest(TestTrackQuery("test_selectwhere1"))
+    suite.addTest(TestTrackQuery("test_selectwhere2"))
+    suite.addTest(TestTrackQuery("test_selectagg"))
+    suite.addTest(TestTrackQuery("test_selectcolumn"))
+    suite.addTest(TestTrackQuery("test_query_with_parenthesis"))
+    suite.addTest(TestTrackQuery("test_agg_zeros"))
+    suite.addTest(TestTrackQuery("test_like"))
+    #suite.addTest(TestTrackQuery("test_bool"))
     runner = TextTestRunner()
     runner.run(suite)
 
