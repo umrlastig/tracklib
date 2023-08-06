@@ -6,7 +6,7 @@
 
 
 User Guide
-===========
+==========
 
 .. toctree::
   :maxdepth: 1
@@ -15,11 +15,12 @@ User Guide
   Operation for manipulating track <2_operator>
   Read/Write track(s), network and raster <reader_writer>
   
-  
+
 Features
 --------
 
 Here is a gallery of several examples demonstrating what ``tracklib`` can do.
+
 
 .. nbgallery::
     :name: userguide-features-gallery
@@ -27,19 +28,20 @@ Here is a gallery of several examples demonstrating what ``tracklib`` can do.
     :reversed:
 
     UG_MapOnRaster
+    UG_MapMatchingOnNetwork
     UG_Stdbscan
     UG_Comparison
-    UG_Selection
     UG_Segmentation
+    UG_Selection
     UG_Interpolation
     UG_Simplification
 
 
-
-..  Autres fonctionnalités dans tracklib: stdbscan, etc. <../notebook/UG_OtherFunctionnality>
-.. Querying obstervations in a track <4_trackquery>
+.. UG_Query
 .. Mopsi <Mopsi> (track's comparaison)
 .. Points caractéristiques 
+.. filtrage
+.. synthetics
 
 
 

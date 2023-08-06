@@ -6,6 +6,7 @@ import unittest
 from tracklib import (ENUCoords, ObsTime, Obs, 
                       makeDistanceMatrix,
                       computeAbsCurv,
+                      makeRPN,
                       Track)
 
 
@@ -47,12 +48,21 @@ class TestUtils(unittest.TestCase):
         # makeDistanceMatrixOld
 
 
-    
+    def test_make_RPN(self):
+        
+        tab = makeRPN('3 * (10 + 5 )')
+        self.assertEqual(len(tab), 5)
+        self.assertListEqual(['3', '10', '5', '+', '*'], tab)
+        
+        tab = makeRPN('a*(b+c/2)')
+        self.assertEqual(len(tab), 7)
+        self.assertListEqual(['a', 'b', 'c', '2', '/', '+', '*'], tab)
 
     
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     suite.addTest(TestUtils("testMakeDistanceMatrixModeLinear"))
+    suite.addTest(TestUtils("test_make_RPN"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

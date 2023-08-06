@@ -14,7 +14,7 @@ import numpy as np
 
 from . import (ObsTime, ENUCoords, Obs, 
                isnan, listify, NAN, isfloat,
-               compLike,
+               compLike, makeRPN,
                TrackCollection,
                DiracKernel, GaussianKernel,
                Bbox)
@@ -1230,7 +1230,7 @@ class Track:
         """
         track_tmp = self.copy()
         expression = expression.strip()
-        tab = Track.__makeRPN(expression)
+        tab = makeRPN(expression)
         for e in tab:
             if e[-1] == "°":
                 track_tmp.createAnalyticalFeature(e, track[e[:-1]])
@@ -1481,6 +1481,7 @@ class Track:
     #         id_fin = self.size()-1
     #     return Cinematics.computeCurvAbsBetweenTwoPoints(self, id_ini, id_fin)
 
+    # ==========================================================================
     def __condition(val1, operator, val2):
         """TODO"""
 
@@ -1696,28 +1697,12 @@ class Track:
 
             return OUTPUT
 
+
+    # ==========================================================================
+
     # ------------------------------------------------------------
     #   Applying operators through algebraic expressions
     # ------------------------------------------------------------
-
-    def __makeRPN(expression):
-        """TODO"""
-        s = expression
-        for operator in ["=", "<>", "+-", "!", "*/", "%", "^", "@", "&$"]:
-            depth = 0
-            for p in range(len(s) - 1, -1, -1):
-                if s[p] == ")":
-                    depth += 1
-                if s[p] == "(":
-                    depth -= 1
-                if not depth and s[p] in operator:
-                    return (Track.__makeRPN(s[:p]) + Track.__makeRPN(s[p + 1 :])) + [
-                        s[p]
-                    ]
-        s = s.strip()
-        if s[0] == "(":
-            return Track.__makeRPN(s[1:-1])
-        return [s]
 
     def __applyOperation(self, op1, op2, operator, temp_af_counter):
         """TODO"""
@@ -1899,7 +1884,7 @@ class Track:
         void = "=" in expression
         if not void:
             expression = "#output = " + expression
-        self.__evaluateRPN(Track.__double_prime(Track.__makeRPN(expression)), external)
+        self.__evaluateRPN(Track.__double_prime(makeRPN(expression)), external)
         if not void:
             output = self.getAnalyticalFeature("#output")
             self.removeAnalyticalFeature("#output")

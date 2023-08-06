@@ -18,9 +18,7 @@ from tracklib import (Track, Obs, ENUCoords, ObsTime,
                       generate,
                       diffJourAnneeTrace,
                       MODE_SPATIAL,
-                      makeRPN,
-                      NAN,
-                      co_avg)
+                      NAN)
 
 
 def x(t):
@@ -182,17 +180,6 @@ class TestOperateurMethods(unittest.TestCase):
         self.assertEqual('{:5.3f}'.format(std_n), '116.343')
         #print("U std = " + '{:5.3f}'.format(std_u) + " m")
         self.assertEqual('{:5.3f}'.format(std_u), '8.616')
-        
-        
-    def test_make_RPN(self):
-        
-        tab = makeRPN('3 * (10 + 5 )')
-        self.assertEqual(len(tab), 5)
-        self.assertListEqual(['3', '10', '5', '+', '*'], tab)
-        
-        tab = makeRPN('a*(b+c/2)')
-        self.assertEqual(len(tab), 7)
-        self.assertListEqual(['a', 'b', 'c', '2', '/', '+', '*'], tab)
         
         
     def test_unary_void_operator(self):
@@ -357,7 +344,6 @@ if __name__ == '__main__':
     suite.addTest(TestOperateurMethods("test_generate"))
     suite.addTest(TestOperateurMethods("test_import"))
     suite.addTest(TestOperateurMethods("test_abs_curv1"))
-    suite.addTest(TestOperateurMethods("test_make_RPN"))
     suite.addTest(TestOperateurMethods("test_unary_void_operator"))
     suite.addTest(TestOperateurMethods("test_binary_void_operator"))
     runner = unittest.TextTestRunner()

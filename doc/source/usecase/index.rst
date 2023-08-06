@@ -19,7 +19,6 @@ library.
     :reversed:
 
     StopPoints
-    MapMatchingOnNetwork
     KalmanFiltering
     Switchbacks
     Summarize

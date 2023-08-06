@@ -91,13 +91,39 @@ def compLike(s1, s2) -> bool:
     return True
 
 
-
 def addListToAF(track, af_name, array):
     """TODO"""
     if af_name == None:
         return
     for i in range(track.size()):
         track.setObsAnalyticalFeature(af_name, i, array[i])
+        
+        
+def makeRPN(expression: str) -> str:   
+    """Applying operators through algebraic expressions.
+    
+    .. code-block:: python
+    
+       tab = makeRPN('a*(b+c/2)')
+
+    :param expression: An RPN expression
+    :return: array
+    """
+    s = expression
+    for operator in ["=", "<>", "+-", "!", "*/", "%", "^", "@", "&$"]:
+        depth = 0
+        for p in range(len(s) - 1, -1, -1):
+            if s[p] == ")":
+                depth += 1
+            if s[p] == "(":
+                depth -= 1
+            if not depth and s[p] in operator:
+                return (makeRPN(s[:p]) + makeRPN(s[p + 1 :])) + [s[p]]
+    s = s.strip()
+    if s[0] == "(":
+        return makeRPN(s[1:-1])
+    return [s]
+
         
 
 # --------------------------------------------------------------------------

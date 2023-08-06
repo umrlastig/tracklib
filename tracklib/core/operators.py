@@ -94,38 +94,10 @@ class ScalarVoidOperator:
         sys.exit("Not yet implemented")
 
 
-# =============================================================================
-#   Applying operators through algebraic expressions
-# =============================================================================
-
-
-def makeRPN(expression: str) -> str:   
-    """TODO
-
-    :param expression: An RPN expression
-    :return: TODO
-    """
-    s = expression
-    for operator in ["+-", "*/", "^", "@"]:
-        depth = 0
-        for p in range(len(s) - 1, -1, -1):
-            if s[p] == ")":
-                depth += 1
-            if s[p] == "(":
-                depth -= 1
-            if not depth and s[p] in operator:
-                return (makeRPN(s[:p]) + makeRPN(s[p + 1 :])) + [s[p]]
-    s = s.strip()
-    if s[0] == "(":
-        return makeRPN(s[1:-1])
-    return [s]
-
 
 # -----------------------------------------------------------------------------
 #      UnaryVoidOperator
 # -----------------------------------------------------------------------------
-
-
 class Identity(UnaryVoidOperator):
     """Identity operator"""
 
@@ -558,8 +530,6 @@ class Tan(UnaryVoidOperator):
 # -----------------------------------------------------------------------------
 #      BinaryVoidOperator
 # -----------------------------------------------------------------------------
-
-
 class Adder(BinaryVoidOperator):
     """Adder Operator"""
 
@@ -881,8 +851,6 @@ class Correlator(BinaryVoidOperator):
 # -----------------------------------------------------------------------------
 #      UnaryOperator
 # -----------------------------------------------------------------------------
-
-
 class Min(UnaryOperator):
     """Min Operator"""
 
@@ -1070,8 +1038,6 @@ class Mad(UnaryOperator):
 # -----------------------------------------------------------------------------
 #      BinaryOperator
 # -----------------------------------------------------------------------------
-
-
 class Covariance(BinaryOperator):
     """TODO"""
 
