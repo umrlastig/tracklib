@@ -32,12 +32,13 @@ Here is a gallery of several examples demonstrating what ``tracklib`` can do.
     UG_Stdbscan
     UG_Comparison
     UG_Segmentation
+    UG_Query
     UG_Selection
     UG_Interpolation
     UG_Simplification
 
 
-.. UG_Query
+.. 
 .. Mopsi <Mopsi> (track's comparaison)
 .. Points caractéristiques 
 .. filtrage

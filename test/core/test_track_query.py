@@ -188,16 +188,45 @@ class TestTrackQuery(TestCase):
         self.assertTrue(abs(val - np.median(H)) < 0.001)
         
         
+    def test_like(self):
+        
+        self.track['indicateur'] = ['a','b','b','b','a','a','a','b','a']
+        
+        query  = " SELECT * WHERE indicateur LIKE 'a' "
+        trace = self.track.query(query)
+        self.assertEqual(5, trace.size())
+        
+        query  = " SELECT * WHERE indicateur LIKE 'b' "
+        trace = self.track.query(query)
+        self.assertEqual(4, trace.size())
+        
+        query  = " SELECT * WHERE indicateur LIKE 'z' "
+        trace = self.track.query(query)
+
+        self.assertEqual(0, trace.size())
+        
+    
+    def test_bool(self):
+        
+        self.track['indicateur'] = [True,False,False,False,False,True,True,False,True]
+        
+        query  = " SELECT * WHERE indicateur = True "
+        trace = self.track.query(query)
+        self.assertEqual(4, trace.size())
+    
+    
 
 if __name__ == '__main__':
     suite = TestSuite()
-    suite.addTest(TestTrackQuery("test_selectstar"))
-    suite.addTest(TestTrackQuery("test_selectwhere1"))
-    suite.addTest(TestTrackQuery("test_selectwhere2"))
-    suite.addTest(TestTrackQuery("test_selectagg"))
-    suite.addTest(TestTrackQuery("test_selectcolumn"))
-    suite.addTest(TestTrackQuery("test_query_with_parenthesis"))
-    suite.addTest(TestTrackQuery("test_agg_zeros"))
+    #suite.addTest(TestTrackQuery("test_selectstar"))
+    #suite.addTest(TestTrackQuery("test_selectwhere1"))
+    #suite.addTest(TestTrackQuery("test_selectwhere2"))
+    #suite.addTest(TestTrackQuery("test_selectagg"))
+    #suite.addTest(TestTrackQuery("test_selectcolumn"))
+    #suite.addTest(TestTrackQuery("test_query_with_parenthesis"))
+    #suite.addTest(TestTrackQuery("test_agg_zeros"))
+    #suite.addTest(TestTrackQuery("test_like"))
+    suite.addTest(TestTrackQuery("test_bool"))
     runner = TextTestRunner()
     runner.run(suite)
 

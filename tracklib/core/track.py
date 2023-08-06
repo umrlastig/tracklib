@@ -1481,10 +1481,13 @@ class Track:
     #         id_fin = self.size()-1
     #     return Cinematics.computeCurvAbsBetweenTwoPoints(self, id_ini, id_fin)
 
+
     # ==========================================================================
+    #          QUERY
+    
     def __condition(val1, operator, val2):
         """TODO"""
-
+        
         if operator == "LIKE":
             return compLike(str(val1), val2)
 
@@ -1634,6 +1637,7 @@ class Track:
                         operator = c4[1]
                         for k in range(3, len(c4)):
                             c4[2] += " " + c4[k]
+                        #print (self[c4[0]][i], " ", operator)
                         select = select and Track.__condition(
                             self[c4[0]][i], operator, c4[2]
                         )
@@ -1700,12 +1704,8 @@ class Track:
 
     # ==========================================================================
 
-    # ------------------------------------------------------------
-    #   Applying operators through algebraic expressions
-    # ------------------------------------------------------------
-
     def __applyOperation(self, op1, op2, operator, temp_af_counter):
-        """TODO"""
+        """Applying operators through algebraic expressions"""
         # Handling special case of affectation
         if operator == "=":
             if self.hasAnalyticalFeature(op2):
