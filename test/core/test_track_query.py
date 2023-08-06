@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from unittest import TestCase, TestSuite, TextTestRunner
-
+import math
 import numpy as np
 
 from tracklib import (ENUCoords, ObsTime, Obs, Track,
@@ -121,8 +121,6 @@ class TestTrackQuery(TestCase):
         argmaxspeed = self.track.query("SELECT ARGMAX(speed)")
         self.assertEquals(argmaxspeed, np.argmax(speeds))
         
-        
-        
     def test_selectcolumn(self):
         self.track.addAnalyticalFeature(speed)
         self.track.addAnalyticalFeature(heading)
@@ -158,6 +156,38 @@ class TestTrackQuery(TestCase):
         obsOrientation1 = self.track.query(query)
         self.assertEquals(obsOrientation1, 4)
         
+        
+    def test_query_with_parenthesis(self):
+        self.track.addAnalyticalFeature(speed)
+        self.track.addAnalyticalFeature(heading)
+        self.track.addAnalyticalFeature(orientation)
+        
+        with self.assertRaises(SystemExit):
+            self.track.query("SELECT * WHERE (speed > 0.5 or orientation = 1) and heading > 1")
+        
+        
+    def test_agg_zeros(self):
+        self.track.addAnalyticalFeature(heading)
+        H = self.track.getAnalyticalFeature('heading')
+        
+        query  = " SELECT ZEROS(heading) "
+        tab = self.track.query(query)
+        self.assertListEqual(tab, [0, 1, 3, 5, 7])
+        
+        query  = " SELECT RMSE(heading) "
+        val = self.track.query(query)
+        vale = math.sqrt(4 * 1.57**2 / 9)
+        self.assertTrue(abs(val - vale) < 0.001)
+        
+        query  = " SELECT STDDEV(heading) "
+        val = self.track.query(query)
+        self.assertTrue(abs(val - math.sqrt(np.var(H))) < 0.001)
+        
+        query  = " SELECT MAD(heading) "
+        val = self.track.query(query)
+        self.assertTrue(abs(val - np.median(H)) < 0.001)
+        
+        
 
 if __name__ == '__main__':
     suite = TestSuite()
@@ -166,5 +196,9 @@ if __name__ == '__main__':
     suite.addTest(TestTrackQuery("test_selectwhere2"))
     suite.addTest(TestTrackQuery("test_selectagg"))
     suite.addTest(TestTrackQuery("test_selectcolumn"))
+    suite.addTest(TestTrackQuery("test_query_with_parenthesis"))
+    suite.addTest(TestTrackQuery("test_agg_zeros"))
     runner = TextTestRunner()
     runner.run(suite)
+
+

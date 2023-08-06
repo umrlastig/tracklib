@@ -1610,7 +1610,7 @@ class Track:
                 message = "Error: parenthesis not allowed in conditions."
                 message += "Use boolean algebra rules to reformulate query or use successive queries"
                 print(message)
-                exit()
+                sys.exit()
 
         if not select_part == "*":
             LAF = []
