@@ -8,8 +8,10 @@ from tracklib import (Obs, ObsTime, ENUCoords, TrackCollection,
                       speed,
                       RasterBand, NO_DATA_VALUE,
                       Track, TrackReader,
-                      co_avg, co_max, co_min,
-                      summarize, getMeasureName)
+                      co_avg, co_max, co_min, co_sum, NAN, co_count,
+                      co_dominant,co_median,
+                      summarize, 
+                      getMeasureName)
 
 
 
@@ -196,14 +198,47 @@ class TestSummarising(TestCase):
         raster.plot(getMeasureName(speed, co_max))
         plt.show()
         
-        
     # UID
+    
+    def test_aggregat(self):
+        
+        T = [1,2,3,4,5,6,7,8,9,NAN]
+        somme = co_sum(T)
+        self.assertEqual(somme, 45)
+        compte = co_count(T)
+        self.assertEqual(compte, 9)
+        dominant = co_dominant(T)
+        self.assertEqual(dominant, 1)
+        mediane = co_median(T)
+        self.assertEqual(mediane, 5)
+        
+        T = [1,2,2,3,3,3,4,4,4,4]
+        somme = co_sum(T)
+        self.assertEqual(somme, 30)
+        compte = co_count(T)
+        self.assertEqual(compte, 10)
+        dominant = co_dominant(T)
+        self.assertEqual(dominant, 4)
+        mediane = co_median(T)
+        self.assertEqual(mediane, 3)
+        
+        T = [1,3,7]
+        somme = co_sum(T)
+        self.assertEqual(somme, 11)
+        compte = co_count(T)
+        self.assertEqual(compte, 3)
+        dominant = co_dominant(T)
+        self.assertEqual(dominant, 1)
+        mediane = co_median(T)
+        self.assertEqual(mediane, 3)
+        
 
 
 if __name__ == '__main__':
     suite = TestSuite()
     suite.addTest(TestSummarising("test_summarize_af"))
     suite.addTest(TestSummarising("test_quickstart"))
+    suite.addTest(TestSummarising("test_aggregat"))
     runner = TextTestRunner()
     runner.run(suite)
     

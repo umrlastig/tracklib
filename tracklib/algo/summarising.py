@@ -248,23 +248,33 @@ def co_median(tarray):
     tarray = listify(tarray)
     if len(tarray) <= 0:
         return NAN
+    
+    # On retire les NAN
+    tarray2 = []
+    for i in range(len(tarray)):
+        val = tarray[i]
+        if isnan(val):
+            continue
+        tarray2.append(val)
 
-    n = len(tarray)
+    n = len(tarray2)
     # on tri le tableau pour trouver le milieu
     tab_sort = []
     for i in range(n):
-        valmin = tarray[0]
+        valmin = tarray2[0]
         # Recherche du min
-        for val in tarray:
+        for val in tarray2:
             if val <= valmin:
                 valmin = val
-        tarray.remove(valmin)
+        tarray2.remove(valmin)
         tab_sort.append(valmin)
-
+        
     # Gestion n pair/impair
     if n % 2 == 1:
-        mediane = tab_sort[(n - 1) / 2]
+        mediane = tab_sort[int ((n - 1) / 2)]
     else:
-        mediane = 0.5 * (tab_sort[n / 2] + tab_sort[n / 2 - 1])
+        index1 = int(n/2)
+        index2 = int(n/2 - 1)
+        mediane = 0.5 * (tab_sort[index1] + tab_sort[index2])
 
     return mediane
