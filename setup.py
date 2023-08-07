@@ -37,7 +37,7 @@ setup (
     download_url= 'https://github.com/umrlastig/tracklib/archive/refs/tags/v0.6.1.tar.gz',
     author="Yann Méneroux, Marie-Dominique Van Damme",
     author_email="todo@ign.fr",
-    keywords=['GPS track', 'python', 'map-matching', 'interpolate GPS tracks', 'segmenting GPS tracks','summarizing GPS tracks'],
+    keywords=['GPS track', 'python', 'map-matching', 'interpolate GPS tracks', 'segmenting GPS tracks','summarizing GPS tracks', 'stops points'],
     license="Cecill-C",
     python_requires=">=3.8",
     classifiers=[

@@ -236,9 +236,9 @@ class TestSummarising(TestCase):
 
 if __name__ == '__main__':
     suite = TestSuite()
-    suite.addTest(TestSummarising("test_summarize_af"))
+    #suite.addTest(TestSummarising("test_summarize_af"))
     suite.addTest(TestSummarising("test_quickstart"))
-    suite.addTest(TestSummarising("test_aggregat"))
+    #suite.addTest(TestSummarising("test_aggregat"))
     runner = TextTestRunner()
     runner.run(suite)
     
