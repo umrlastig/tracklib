@@ -384,8 +384,6 @@ def computeSwitchbacks(track, nb_virage_min = 3, dist_max = 150):
     Attention: c'est une structure de fonction particulière qui créée un AF, 
     elle ne s'appelle pas avec la méthode addAnalyticalFeature.
     
-    TODO: a revoir
-    
     Parameters
     -----------
     track : Track
@@ -394,26 +392,30 @@ def computeSwitchbacks(track, nb_virage_min = 3, dist_max = 150):
 
     '''
     #    
+    #track.createAnalyticalFeature('switchbacks', 0)
+    
+    #if not track.hasAnalyticalFeature('inflection'):
+    #    computeInflection(track)
+    #if not track.hasAnalyticalFeature('vertex'):
+    #    computeVertex(track)
+    #if not track.hasAnalyticalFeature('bend'):
+    #    computeBend(track)
+        
     track.createAnalyticalFeature('switchbacks', 0)
     
-    if not track.hasAnalyticalFeature('inflection'):
-        computeInflection(track)
-    if not track.hasAnalyticalFeature('vertex'):
-        computeVertex(track)
-    if not track.hasAnalyticalFeature('bend'):
-        computeBend(track)
-        
     SERIE = False
     deb = 0
     fin = 0
-    
+        
     # Nombre de virage de la série
     nbvirage = 0 
-    
+        
     # Calcul de la distance entre 2 sommets
     dist = 0
-    
-    for i in range(track.size()):
+        
+    #for i in range(trace.size()):
+    # 276, 452
+    for i in range(0, track.size()):
         afsommet = track["vertex", i]
         afvirage = track["bend", i]
         
@@ -428,20 +430,29 @@ def computeSwitchbacks(track, nb_virage_min = 3, dist_max = 150):
         elif SERIE and afvirage != 1:
             # Est-ce qu'on a fini la série ?
             fini = True
+            dist2 = 0
+            idxp = i
             # Sauf si le point suivant 
             for j in range(i+1, track.size()):
-                afprochainvirage = track.getObsAnalyticalFeature('bend', j)
-                if afprochainvirage == 1:
-                    dhorsvirage = track.getObs(j).distanceTo(track.getObs(i))
-                    if dhorsvirage < dist_max:
-                        fini = False
+                dist2 += track.getObs(j).distanceTo(track.getObs(idxp))
+                idxp = j
+                
+                if dist2 > dist_max:
                     break
                 
+                afprochainvirage = track.getObsAnalyticalFeature('bend', j)
+                if afprochainvirage == 1:
+                    #dhorsvirage = track.getObs(j).distanceTo(track.getObs(i))
+                    #if dhorsvirage < dist_max:
+                    if dist2 < dist_max:
+                        fini = False
+                        break
+                    
             if fini:
-                # print ('fin, ', deb, fin, nbvirage)
                 # On a fini la série, on passe les AF de la série à 1
                 fin = i - 1
                 if nbvirage >= nb_virage_min:
+                    #print ('fin, ', deb, fin, nbvirage)
                     for k in range(deb, fin):
                         track.setObsAnalyticalFeature('switchbacks', k, 1)
                 SERIE = False
@@ -449,7 +460,8 @@ def computeSwitchbacks(track, nb_virage_min = 3, dist_max = 150):
                 fin = 0
                 nbvirage = 0
                 dist = 0
-
+            
+       
         if afsommet == 1 and afvirage == 1:
             if nbvirage == 0:
                 dist = 0
