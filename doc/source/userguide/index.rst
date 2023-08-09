@@ -19,7 +19,8 @@ User Guide
 Features
 --------
 
-Here is a gallery of several examples demonstrating what ``tracklib`` can do.
+Here is a gallery of several examples demonstrating what ``tracklib`` can do. The examples are very short
+to get you using tracklib productively as quickly as possible.
 
 
 .. nbgallery::
