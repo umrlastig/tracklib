@@ -497,3 +497,5 @@ class GlobalSelector:
         for s in self.selectors:
             inside = self.__combine(inside, s.contains(track))
         return inside
+
+

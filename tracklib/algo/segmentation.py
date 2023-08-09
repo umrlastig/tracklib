@@ -143,6 +143,12 @@ def split(track, source, limit=0):
     return NEW_TRACES
 
 
+# =============================================================================
+# =============================================================================
+#    Return Trip
+# =============================================================================
+# =============================================================================
+
 def splitAR(track, pt1, pt2=None, radius=10, nb_min_pts=10, verbose=True):
     '''
     # -------------------------------------------------------------------------
@@ -206,23 +212,23 @@ def splitReturnTripExhaustive(track):
     argmin = 0
 
     AVG = Operator.AVERAGER
-    for return_point in progressbar.progressbar(range(1, track.size() - 1)):
-
+    for return_point in progressbar.progressbar(range(0, track.size())):
         T1 = track.extract(0, return_point)
-        T2 = track.extract(return_point, track.size() - 1)
+        T2 = track.extract(return_point, track.size()-1)
 
         avg = (T1 - T2).operate(AVG, "diff") + (T2 - T1).operate(AVG, "diff")
-
         if avg < min_val:
             min_val = avg
             argmin = return_point
-
-    first_part = track.extract(0, argmin - 1)
-    second_part = track.extract(argmin, track.size() - 1)
+            
+    first_part = track.extract(0, argmin-1)
+    second_part = track.extract(argmin, track.size()-1)
 
     TRACKS = tracklib.TrackCollection()
-    TRACKS.addTrack(first_part)
-    TRACKS.addTrack(second_part)
+    if first_part.size() > 0:
+        TRACKS.addTrack(first_part)
+    if second_part.size() > 0:
+        TRACKS.addTrack(second_part)
 
     return TRACKS
 
