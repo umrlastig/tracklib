@@ -485,3 +485,12 @@ class TrackCollection:
                 NEW_TRACES.append(split)
 
         return TrackCollection(NEW_TRACES)
+
+        
+    # =========================================================================
+    #  Adding noise to tracks
+    # =========================================================================
+    def noise(self, sigma=5, kernel=None, force=False, cycle=False):
+        """TODO"""
+        for i in range(len(self)):
+            self.__TRACES[i] = self.__TRACES[i].noise(sigma, kernel, force, cycle)

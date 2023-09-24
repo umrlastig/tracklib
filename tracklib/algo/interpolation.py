@@ -88,8 +88,54 @@ def resample(track, delta, algo: Literal[1, 2, 3, 4]=1, mode:Literal[1, 2]=1):
 
     track.__analyticalFeaturesDico = {}
 
-
 def __resampleSpatial(track, ds):
+    """TODO
+
+    Resampling of a track with linear interpolation
+    ds: curv abs interval (in m) between two samples"""
+
+    S = [0]
+    for i in range(1, track.size()):
+        dl = track.getObs(i - 1).position.distance2DTo(track.getObs(i).position)
+        S.append(S[i - 1] + dl)
+
+    sini = S[0]
+    sfin = S[len(S) - 1]
+    N = (int)((sfin - sini) / ds)
+
+    interp_points = [track.getFirstObs().copy()]
+    interp_points[0].features = []
+    running_id = 0
+
+    for k in range(1, N + 1):
+
+        s = k * ds + sini
+
+        while S[running_id] < s:
+            running_id += 1
+
+        pt_bwd = track.getObs(running_id - 1)
+        pt_fwd = track.getObs(running_id)
+        sbwd = S[running_id - 1]
+        sfwd = S[running_id]
+
+        wbwd = (sfwd - s) / (sfwd - sbwd)
+        wfwd = (s - sbwd) / (sfwd - sbwd)
+
+        X = wbwd * pt_bwd.position.getX() + wfwd * pt_fwd.position.getX()
+        Y = wbwd * pt_bwd.position.getY() + wfwd * pt_fwd.position.getY()
+        Z = wbwd * pt_bwd.position.getZ() + wfwd * pt_fwd.position.getZ()
+        T = wbwd * pt_bwd.timestamp.toAbsTime() + wfwd * pt_fwd.timestamp.toAbsTime()
+
+        pi = Obs(ENUCoords(X, Y, Z), ObsTime.readUnixTime(T))
+
+        interp_points.append(pi)
+
+    track.setObsList(interp_points)
+
+
+
+def __resampleSpatial2(track, ds):
     """
     Resampling of a track with linear interpolation
     ds: curv abs interval (in m) between two samples

@@ -38,7 +38,84 @@ def plotDifferenceProfile(
         plt.plot([x1, x2], [y1, y2], sym, linewidth=2)
 
 
-def differenceProfile(track1, track2, mode: Literal["NN", "DTW", "FDTW"] = "NN", 
+def _minCumul(vec):
+	out = vec.copy()
+	mark = [0]*len(vec)
+	for i in range(1, len(vec)):
+		out[i]  = min(out[i], out[i-1])
+		mark[i] = mark[i-1]*(out[i] >= out[i-1]) + i*(out[i] < out[i-1])
+	return [out, mark]
+
+
+def differenceProfile(track1, track2, weight = lambda A, B : A + B, verbose = True):   
+	
+    """Profile of difference between two traces
+    
+    :return: A track objet, with an analytical feature diff containing shortest distance
+             of each point of track t1, to the points of track t2. We may get profile as
+             a list with :func:`output.getAbsCurv()` and
+             :func:`output.getAnalyticalFeature("diff")` 
+             The selected candidate in registerd in AF "pair" 
+             Set "ends" parameter to True to force end points to
+             meet p is Minkowski's exponent for distance computation. Default value is
+             - 1 for summation of distances, 
+             - 2 for least squares solution 
+             - and 10 for an approximation of Frechet solution.
+    """
+
+    output = track1.copy()
+
+    output.createAnalyticalFeature("diff")
+    output.createAnalyticalFeature("pair")
+    output.createAnalyticalFeature("ex")
+    output.createAnalyticalFeature("ey")
+
+    N1 = track1.size()
+    N2 = track2.size()
+
+    step_to_run = range(1, N1)
+    if verbose:
+        step_to_run = progressbar.progressbar(step_to_run)
+
+    # Forming distance matrix
+    D = np.zeros((N2, N1))
+    for i in range(N2):
+        for j in range(N1):
+            D[i, j] = track2.getObs(i).distance2DTo(track1.getObs(j))
+
+	# ----------------------------------------------------------
+    # Optimal path with dynamic programming
+	# ----------------------------------------------------------
+	
+    T = np.zeros((N2, N1))
+    M = np.zeros((N2, N1))
+    T[:, 0] = D[:, 0]
+        
+    # Forward step
+    for j in step_to_run:
+        MC = _minCumul(T[:, j-1])
+        T[:, j] = weight(MC[0], D[:, j])
+        M[:, j] = MC[1]
+        
+    # Backward step
+    S = [0] * (track1.size())  
+    S[N1-1] = np.argmin(T[:, N1-1])
+    for i in range(N1-2, -1, -1):
+        S[i] = int(M[S[i+1], i+1])
+
+    # plt.plot(S, 'r-')   
+    # plt.imshow(T)
+    # plt.show()
+    
+    __fillAFProfile(track1, track2, output, S)
+    
+    output.score = T[S[N1-1], N1-1]
+
+    return output
+
+
+
+def differenceProfile2(track1, track2, mode: Literal["NN", "DTW", "FDTW"] = "NN", 
                       ends=False, p=1, verbose: bool = True):   
     """Profile of difference between two traces
 
@@ -407,3 +484,50 @@ def medoid (tracks, mode="Hausdorff", verbose=True):
     
     return medoid
     
+    
+ 
+def __meanTrack(cluster):
+    N = len(cluster)
+    x = cluster[0].E
+    y = cluster[0].N
+    z = cluster[0].U
+    for i in range(1, len(cluster)):
+        x += cluster[i].E
+        y += cluster[i].N
+        z += cluster[i].U
+    return tracklib.core.obs_coords.ENUCoords(x/N, y/N, z/N)
+    
+def fusion(tracks, weight=lambda A, B : A + B**2, ref=0):
+
+    ITER_MAX = 100
+
+    central = tracks[ref].copy()    
+    
+
+    for iteration in range(ITER_MAX):
+        
+        print("ITERATION", iteration)
+        
+        profiles = tracklib.TrackCollection()
+        central_before = central.copy()
+    
+        for i in range(len(tracks)):
+            profile = tracklib.algo.comparison.differenceProfile(central, tracks[i], weight, verbose=True)
+            profiles.addTrack(profile)
+            
+        for j in range(len(central)):
+            cluster = []
+            for i in range(len(profiles)):
+                cluster.append(tracks[i][profiles[i]["pair", j]].position)
+            central[j].position = __meanTrack(cluster)
+        
+        profile = tracklib.algo.comparison.differenceProfile(central, central_before, weight, verbose=True)
+        print("CV = ", profile.score)
+        if (profile.score < 1e-16):
+            break
+        
+    print("END OF COMPUTATION")
+                
+    return central
+    
+ 
