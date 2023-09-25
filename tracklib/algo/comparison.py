@@ -47,7 +47,7 @@ def _minCumul(vec):
 	return [out, mark]
 
 
-def differenceProfile(track1, track2, weight = lambda A, B : A + B, verbose = True):   
+def differenceProfile2(track1, track2, weight = lambda A, B : A + B, verbose = True):   
 	
     """Profile of difference between two traces
     
@@ -115,7 +115,7 @@ def differenceProfile(track1, track2, weight = lambda A, B : A + B, verbose = Tr
 
 
 
-def differenceProfile2(track1, track2, mode: Literal["NN", "DTW", "FDTW"] = "NN", 
+def differenceProfile(track1, track2, mode: Literal["NN", "DTW", "FDTW"] = "NN", 
                       ends=False, p=1, verbose: bool = True):   
     """Profile of difference between two traces
 
@@ -512,7 +512,7 @@ def fusion(tracks, weight=lambda A, B : A + B**2, ref=0):
         central_before = central.copy()
     
         for i in range(len(tracks)):
-            profile = tracklib.algo.comparison.differenceProfile(central, tracks[i], weight, verbose=True)
+            profile = tracklib.algo.comparison.differenceProfile2(central, tracks[i], weight, verbose=True)
             profiles.addTrack(profile)
             
         for j in range(len(central)):
@@ -521,7 +521,7 @@ def fusion(tracks, weight=lambda A, B : A + B**2, ref=0):
                 cluster.append(tracks[i][profiles[i]["pair", j]].position)
             central[j].position = __meanTrack(cluster)
         
-        profile = tracklib.algo.comparison.differenceProfile(central, central_before, weight, verbose=True)
+        profile = tracklib.algo.comparison.differenceProfile2(central, central_before, weight, verbose=True)
         print("CV = ", profile.score)
         if (profile.score < 1e-16):
             break
