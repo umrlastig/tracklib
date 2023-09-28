@@ -51,6 +51,7 @@ class Track:
         self.uid = user_id
         self.tid = track_id
         self.base = base  # Base (ECEF coordinates) for ENU projection
+        self.no_data_value = None
 
         self.__analyticalFeaturesDico = {}
 
@@ -218,6 +219,22 @@ class Track:
             base = self.getObs(0).position.copy()
             self.toENUCoords(base)
         return base
+
+    def removeNoDataValues(self, no_data_value = None):
+        if (no_data_value == None):
+            no_data_value = self.no_data_value
+        to_remove = []
+        for i in range(self.size()):
+            if (self.__POINTS[i].position.getX() == no_data_value):
+                to_remove.append(i)
+                continue
+            if (self.__POINTS[i].position.getY() == no_data_value):
+                to_remove.append(i)
+                continue
+            if (self.__POINTS[i].position.getZ() == no_data_value):
+                to_remove.append(i)
+                continue
+        self.removeObsList(to_remove)
 
 
     # =========================================================================
@@ -1892,16 +1909,22 @@ class Track:
 
     # ------------------------------------------------------------
     # Rotation of 2D track (coordinates should be ENU)
-    # Input: track in ENU coords and theta angle (in radians)
+    # Input: track in ENU coords, theta angle (in radians) and
+    # rotation center (default is (0,0)
     # Output: rotated track (in ENU coords)
     # ------------------------------------------------------------
-    def rotate(self, theta):
+    def rotate(self, theta, center=None):
         """TODO"""
+        if not (center == None):
+            center = center.copy()
+            self.translate(-center.E, -center.N)
         if not (self.getSRID() == "ENU"):
             print("Error: track to rotate must be in ENU coordinates")
             exit()
         for i in range(self.size()):
             self.getObs(i).position.rotate(theta)
+        if not (center == None):
+            self.translate(+center.E, +center.N)
 
     # ------------------------------------------------------------
     # Rotation of 3D track (coordinates should be ENU/ECEF)

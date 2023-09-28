@@ -174,24 +174,25 @@ class TrackReader:
 
                 fields = line.strip().split(fmt.separator)
                 fields = [s for s in fields if s]
+                if (verbose):
+                    print(fields)
 
                 if fmt.id_T != -1:
                     if isinstance(fmt.DateIni, int):
-                        time = ObsTime.readTimestamp(fields[fmt.id_T])
+                        time = ObsTime.readTimestamp(fields[fmt.id_T].strip())
                     else:
                         time = fmt.DateIni.addSec((float)(fields[fmt.id_T])*timeUnit)
                 else:
                     time = ObsTime()
                     
                 # Blank fields
-                '''
                 if (fields[fmt.id_E].strip() == ''):
                     fields[fmt.id_E] = fmt.no_data_value
                 if (fields[fmt.id_N].strip() == ''):
                     fields[fmt.id_N] = fmt.no_data_value
                 if (fields[fmt.id_U].strip() == ''):
                     fields[fmt.id_U] = fmt.no_data_value
-                '''
+                
 
                 E = (float)(fields[fmt.id_E])
                 N = (float)(fields[fmt.id_N])
@@ -221,6 +222,10 @@ class TrackReader:
                         point = Obs(ECEFCoords(E, N, U), time)
 
                     track.addObs(point)
+                    
+                else: 
+                    no_data = fmt.no_data_value
+                    track.addObs(Obs(makeCoords(no_data, no_data, no_data, fmt.srid.upper()), time))
 
                 line = fp.readline().strip()
 
@@ -253,6 +258,8 @@ class TrackReader:
 
                     fields = line.split(fmt.separator)
                     fields = [s for s in fields if s]
+                    if (verbose):
+                        print(fields)
                     for i in range(len(fields)):
                         if not (i in id_special):
                             val = fields[i].strip()
@@ -278,6 +285,8 @@ class TrackReader:
         if not selector is None:
             if not selector.contains(track):
                 return None
+
+        track.no_data_value = fmt.no_data_value
 
         if verbose:
             print ("  File " + path + " loaded: "
