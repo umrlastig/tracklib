@@ -2,7 +2,7 @@
 from unittest import TestCase, TestSuite, TextTestRunner
 
 from tracklib import (ENUCoords, ObsTime, Obs, Track, 
-                      Polygon, 
+                      Polygon, TrackCollection,
                       computeAbsCurv,
                       ds, speed, heading)
 
@@ -477,6 +477,129 @@ class TestTrack(TestCase):
         self.assertLessEqual(abs(track.length() - 84.994800), self.__epsilon)
         
         
+        
+    def test_op_truediv(self):
+        track = Track([], 1)
+        track.addObs(Obs(ENUCoords(0, 0, 0), ObsTime()))
+        track.addObs(Obs(ENUCoords(0, 1, 0), ObsTime()))
+        track.addObs(Obs(ENUCoords(0, 2, 0), ObsTime()))
+        track.addObs(Obs(ENUCoords(0, 3, 0), ObsTime()))
+        track.addObs(Obs(ENUCoords(0, 4, 0), ObsTime()))
+        track.addObs(Obs(ENUCoords(0, 5, 0), ObsTime()))
+        track.addObs(Obs(ENUCoords(0, 6, 0), ObsTime()))
+        track.addObs(Obs(ENUCoords(0, 7, 0), ObsTime()))
+        track.addObs(Obs(ENUCoords(0, 8, 0), ObsTime()))
+        track.addObs(Obs(ENUCoords(0, 9, 0), ObsTime()))
+        track.addObs(Obs(ENUCoords(0, 10, 0), ObsTime()))
+        track.addObs(Obs(ENUCoords(0, 11, 0), ObsTime()))
+        track.addObs(Obs(ENUCoords(0, 12, 0), ObsTime()))
+        track.addObs(Obs(ENUCoords(0, 13, 0), ObsTime()))
+        track.addObs(Obs(ENUCoords(0, 14, 0), ObsTime()))
+        track.addObs(Obs(ENUCoords(0, 15, 0), ObsTime()))
+        
+        #print (track.size())
+        T = track / 3
+        self.assertIsInstance(T, TrackCollection)
+        self.assertEqual(len(T), 3)
+        self.assertEqual(T[0].size(), 5)
+        self.assertEqual(T[1].size(), 5)
+        self.assertEqual(T[2].size(), 5)
+        
+        track.removeLastObs()
+        #print (track.size())
+        T = track / 3
+        self.assertIsInstance(T, TrackCollection)
+        self.assertEqual(len(T), 3)
+        self.assertEqual(T[0].size(), 5)
+        self.assertEqual(T[1].size(), 5)
+        self.assertEqual(T[2].size(), 5)
+        
+        
+        track.removeLastObs()
+        #print (track.size())
+        T = track / 3
+        self.assertIsInstance(T, TrackCollection)
+        self.assertEqual(len(T), 3)
+        self.assertEqual(T[0].size(), 4)
+        self.assertEqual(T[1].size(), 4)
+        self.assertEqual(T[2].size(), 4)
+        
+        track.removeLastObs()
+        track.removeLastObs()
+        track.removeLastObs()
+        #print (track.size())
+        T = track / 3
+        self.assertIsInstance(T, TrackCollection)
+        self.assertEqual(len(T), 3)
+        self.assertEqual(T[0].size(), 3)
+        self.assertEqual(T[1].size(), 3)
+        self.assertEqual(T[2].size(), 3)
+        
+        self.assertEqual(T[2][0].position.getY(), 6)
+        self.assertEqual(T[2][1].position.getY(), 7)
+        self.assertEqual(T[2][2].position.getY(), 8)
+        
+        
+    def test_op_gt(self):
+        track1 = Track([], 1)
+        track1.addObs(Obs(ENUCoords(0, 0, 0), ObsTime()))
+        track1.addObs(Obs(ENUCoords(0, 1, 0), ObsTime()))
+        track1.addObs(Obs(ENUCoords(0, 2, 0), ObsTime()))
+        track1.addObs(Obs(ENUCoords(0, 3, 0), ObsTime()))
+        track1.addObs(Obs(ENUCoords(0, 4, 0), ObsTime()))
+        
+        track2 = Track([], 2)
+        track2.addObs(Obs(ENUCoords(0, 5, 0), ObsTime()))
+        track2.addObs(Obs(ENUCoords(0, 6, 0), ObsTime()))
+        track2.addObs(Obs(ENUCoords(0, 7, 0), ObsTime()))
+        track2.addObs(Obs(ENUCoords(0, 8, 0), ObsTime()))
+        
+        T = track1 < track2
+        self.assertIsInstance(T, bool)
+        self.assertFalse(T)
+        
+        T = track1 > track2
+        self.assertIsInstance(T, bool)
+        self.assertFalse(T)
+        
+        
+    def test_op_ge(self):
+        track1 = Track([], 1)
+        track1.addObs(Obs(ENUCoords(0, 0, 0), ObsTime()))
+        track1.addObs(Obs(ENUCoords(0, 1, 0), ObsTime()))
+        track1.addObs(Obs(ENUCoords(0, 2, 0), ObsTime()))
+        track1.addObs(Obs(ENUCoords(0, 3, 0), ObsTime()))
+        track1.addObs(Obs(ENUCoords(0, 4, 0), ObsTime()))
+        
+        track2 = Track([], 2)
+        track2.addObs(Obs(ENUCoords(0, 5, 0), ObsTime()))
+        track2.addObs(Obs(ENUCoords(0, 6, 0), ObsTime()))
+        track2.addObs(Obs(ENUCoords(0, 7, 0), ObsTime()))
+        track2.addObs(Obs(ENUCoords(0, 8, 0), ObsTime()))
+        
+        T = track1 <= track2
+        self.assertIsInstance(T, bool)
+        self.assertTrue(T)
+        
+        T = track1 >= track2
+        self.assertIsInstance(T, bool)
+        self.assertTrue(T)
+        
+        
+    def test_op_mod(self):
+        track = Track([], 1)
+        track.addObs(Obs(ENUCoords(0, 0, 0), ObsTime()))
+        track.addObs(Obs(ENUCoords(0, 1, 0), ObsTime()))
+        track.addObs(Obs(ENUCoords(0, 2, 0), ObsTime()))
+        track.addObs(Obs(ENUCoords(0, 3, 0), ObsTime()))
+        track.addObs(Obs(ENUCoords(0, 4, 0), ObsTime()))
+        track.addObs(Obs(ENUCoords(0, 5, 0), ObsTime()))
+        
+        T = track % [True, False, False, True, False, False]
+        self.assertEqual(T.size(), 2)
+        self.assertEqual(T[0].position.getY(), 0)
+        self.assertEqual(T[1].position.getY(), 3)
+        
 
 if __name__ == '__main__':
     suite = TestSuite()
@@ -508,6 +631,12 @@ if __name__ == '__main__':
     
     suite.addTest(TestTrack("test_insert_obs"))
     suite.addTest(TestTrack("test_insert_obs2"))
+    
+    
+    suite.addTest(TestTrack("test_op_truediv"))
+    suite.addTest(TestTrack("test_op_gt"))
+    suite.addTest(TestTrack("test_op_ge"))
+    suite.addTest(TestTrack("test_op_mod"))
     
     runner = TextTestRunner()
     runner.run(suite)
