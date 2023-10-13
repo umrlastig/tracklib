@@ -2083,14 +2083,16 @@ class Track:
     # [/] Even split of tracks (returns n+1 segments)
     # ------------------------------------------------------------
     def __truediv__(self, number):
-        """TODO"""
+        """
+        [/] Even split of tracks (returns n+1 segments)
+        """
         N = (int)(self.size() / number)
-        R = self.size() - N * number
+        #R = self.size() - N * number
         SPLITS = TrackCollection()
-        for i in range(number + 1):
+        for i in range(number):
             id_ini = i * N
             id_fin = min((i + 1) * N, self.size()) + 1
-            portion = Track(self.__POINTS[id_ini:id_fin], base=self.base)
+            portion = Track(self.__POINTS[id_ini:id_fin-1], base=self.base)
             portion.__transmitAF(self)
             SPLITS.addTrack(portion)
         return SPLITS
@@ -2099,7 +2101,9 @@ class Track:
     # [>] Removes first n points of track or time comp
     # ------------------------------------------------------------
     def __gt__(self, arg):
-        """TODO"""
+        """
+        [>] Removes first n points of track or time comp
+        """
         if isinstance(arg, Track):
             t1i = self.getFirstObs().timestamp
             t2f = arg.getLastObs().timestamp
