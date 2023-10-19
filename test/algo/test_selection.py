@@ -7,7 +7,7 @@ from unittest import TestCase, TestSuite, TextTestRunner
 from tracklib import (Obs, ObsTime, ENUCoords, Track,
                       Circle, Rectangle, TrackReader,
                       Selector, GlobalSelector,
-                      Constraint, TimeConstraint, TrackConstraint,
+                      Constraint, TimeConstraint, TrackConstraint, TollGateConstraint,
                       MODE_INSIDE, MODE_CROSSES, MODE_GETS_IN, MODE_GETS_OUT,
                       MODE_PARALLEL, COMBINATION_OR)
 
@@ -433,6 +433,15 @@ class TestSelection(TestCase):
         
         # ---------------------------------------------------------------------
         
+
+    def test_toll_gate(self):
+        
+        #tg = TollGateConstraint()
+        
+        pass
+
+    
+        
         
 if __name__ == '__main__':
     
@@ -444,7 +453,8 @@ if __name__ == '__main__':
     suite.addTest(TestSelection("test_selection_one_shape_time_constraint"))
     suite.addTest(TestSelection("test_selection_track_constraint"))
     suite.addTest(TestSelection("test_selection_combinaison_constraint"))
-   
+    suite.addTest(TestSelection("test_toll_gate"))
+    
     runner = TextTestRunner()
     runner.run(suite)
     

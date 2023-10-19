@@ -32,11 +32,13 @@ to get you using tracklib productively as quickly as possible.
     UG_MapMatchingOnNetwork
     UG_Stdbscan
     UG_Comparison
-    UG_Segmentation
-    UG_Query
-    UG_Selection
     UG_Interpolation
     UG_Simplification
+    UG_Segmentation
+    UG_Selection
+    UG_Query
+    UG_Operation
+    
 
 
 .. 
