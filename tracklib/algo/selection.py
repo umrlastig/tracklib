@@ -69,7 +69,6 @@ from tracklib.core import (ENUCoords, GeoCoords, Obs, ObsTime,
                       compLike, listify)
 from tracklib.util import intersects, Rectangle
 
-
 MODE_CROSSES = 0
 MODE_INSIDE = 1
 MODE_GETS_IN = 2
@@ -97,11 +96,9 @@ def printMode(constraint):
     if constraint.mode == MODE_GETS_OUT:
         return "GETS OUT"
 
-
 # -----------------------------------------------------------------------------
 #                             CONSTRAINTS 
 # -----------------------------------------------------------------------------
-
 class TimeConstraint:
     """Time constraints"""
 
@@ -358,9 +355,9 @@ class Constraint:
         self.shape.plot(sym)
 
 
-# -----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #                                 SELECTOR 
-# -----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Selector:
     """TODO"""
 
@@ -426,7 +423,7 @@ class Selector:
         return inside
 
 
-# --------------------------- GLOBAL SELECTOR ---------------------------
+# --------------------------- GLOBAL SELECTOR ----------------------------------
 class GlobalSelector:
     """TODO"""
 
