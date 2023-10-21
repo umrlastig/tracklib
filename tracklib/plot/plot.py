@@ -77,7 +77,7 @@ class Plot:
     #  Ax object (may be input into append parameter)
     # ----------------------------------------------------
     def plot(self, type="LINE", af_name=None, cmap=-1, margin=0.1, append=False,
-			 label=None):
+			 label=None, title=""):
         """
         Représentation d'une trace sous forme de ligne ou de point.
         
@@ -144,7 +144,10 @@ class Plot:
             ax1.set_xlim(xmin, xmax)
             ax1.set_ylim(ymin, ymax)
         
-        ax1.set_title("Track " + str(self.track.uid))
+        if title != "":
+            ax1.set_title(title)
+        else:
+            ax1.set_title("Track " + str(self.track.uid))
 
         return ax1
     

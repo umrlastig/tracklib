@@ -74,7 +74,7 @@ class QgisVisitor(IPlotVisitor):
     
     
     def plotTrack(self, track, sym="k-", type="LINE", af_name="", cmap=-1, append=True, 
-             label=None, pointsize=5):
+             label=None, pointsize=5, title=""):
         """
         Method to plot a track (short cut from Plot)
         Append:
