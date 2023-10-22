@@ -495,8 +495,8 @@ class TrackReader:
             return TRACES
         
         elif os.path.isfile(path) or isinstance(io.StringIO(path), io.IOBase):
-            format_old = ObsTime.getReadFormat()
-            ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+            #format_old = ObsTime.getReadFormat()
+            #ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
     
             doc = minidom.parse(path)
             trks = doc.getElementsByTagName(type)
@@ -556,7 +556,7 @@ class TrackReader:
 
             # pourquoi ?
             # --> pour remettre le format comme il etait avant la lecture :)   
-            ObsTime.setReadFormat(format_old)
+            #ObsTime.setReadFormat(format_old)
     
             collection = TrackCollection([trace])
             return collection

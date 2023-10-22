@@ -148,6 +148,28 @@ class TestTrackReader(TestCase):
         self.assertIsInstance(collection, TrackCollection)
         self.assertEqual(collection.size(), 23)
         
+    
+    def test_read_millisecond(self):
+        ObsTime.setReadFormat("4Y-2M-2DT2h:2m:2s.2zZ")
+        
+        path = os.path.join(os.path.split(__file__)[0], '../data/issue231018.gpx')
+        tracks = TrackReader.readFromGpx(path, srid='ENU', type='trk', read_all=True)
+        track = tracks[0]
+        
+        ObsTime.setPrintFormat("4Y-2M-2D 2h:2m:2s.2z")
+        
+        self.assertEqual("2023-10-15 06:33:22", str(track.getObs(0).timestamp)[0:19])
+        self.assertEqual("2023-10-15 06:33:22.50", str(track.getObs(0).timestamp)[0:22])
+        
+        self.assertEqual("2023-10-15 06:33:22", str(track.getObs(1).timestamp)[0:19])
+        self.assertEqual("2023-10-15 06:33:22.75", str(track.getObs(1).timestamp)[0:22])
+        
+        self.assertEqual("2023-10-15 06:33:23", str(track.getObs(2).timestamp)[0:19])
+        self.assertEqual("2023-10-15 06:33:23.00", str(track.getObs(2).timestamp)[0:22])
+        
+        self.assertEqual("2023-10-15 06:33:23", str(track.getObs(3).timestamp)[0:19])
+        self.assertEqual("2023-10-15 06:33:23.25", str(track.getObs(3).timestamp)[0:22])
+       
 
 if __name__ == '__main__':
     #unittest.main()
@@ -169,6 +191,7 @@ if __name__ == '__main__':
     suite.addTest(TestTrackReader("test_read_gpx_geo_rte"))
     suite.addTest(TestTrackReader("test_read_gpx_dir"))
     suite.addTest(TestTrackReader("testReadGpxWithAF"))
+    suite.addTest(TestTrackReader("test_read_millisecond"))
 
     runner = TextTestRunner()
     runner.run(suite)

@@ -301,7 +301,10 @@ class ObsTime:
         if code == "4Y":
             self.year = (int)(value)
         if code[1] == "z":
-            self.ms = (int)(value) * 10 ** (3 - (int)(code[0]))
+            if value != "":
+                self.ms = (int)(value) * 10 ** (3 - (int)(code[0]))
+            else:
+                self.ms = 0
 
     @staticmethod
     def __takeSecond(elem):
