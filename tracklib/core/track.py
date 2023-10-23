@@ -1334,6 +1334,9 @@ class Track:
         for i in range(len(self)):
             self.getObs(i).timestamp = self.getObs(i).timestamp.addSec(i * dt + offset)
 
+    ### -----------------------------------------------------------
+    ### A DEPLACER  -->  SUPPRIMER ?
+    ### -----------------------------------------------------------
     def mapOn(
         self, reference, TP1, TP2=[], init=[], N_ITER_MAX=20, mode="2D", verbose=True
     ):
@@ -1440,6 +1443,11 @@ class Track:
     # =========================================================================
     #    Built-in Analytical Features
     # =========================================================================
+    
+    
+    ### -----------------------------------------------------------
+    ### A DEPLACER  -->  SUPPRIMER ?
+    ### -----------------------------------------------------------
     def estimate_speed(self, kernel=None):
         """Compute and return speed for each points
         2nd order time centered time finite difference
