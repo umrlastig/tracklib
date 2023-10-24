@@ -30,7 +30,7 @@ doc_requirements = (
 
 setup (
     name="tracklib",
-    version="0.6.6",
+    version="0.6.7",
     description="Tracklib library provide a variety of tools, operators and functions to manipulate GPS trajectories",
     long_description="See https://github.com/umrlastig/tracklib",
     url="https://github.com/umrlastig/tracklib",
