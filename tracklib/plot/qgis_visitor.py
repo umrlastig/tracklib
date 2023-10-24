@@ -74,7 +74,7 @@ class QgisVisitor(IPlotVisitor):
     
     
     def plotTrack(self, track, sym="k-", type="LINE", af_name="", cmap=-1, append=True, 
-             label=None, pointsize=5, title=""):
+             label=None, pointsize=5, title="", xlabel="", ylabel="", xlim=None, ylim=None):
         """
         Method to plot a track (short cut from Plot)
         Append:
@@ -87,6 +87,15 @@ class QgisVisitor(IPlotVisitor):
     
         af_name: test si isAFTransition
         """
+        pass
+    
+    
+    def plotFirstObs(self, track, color='r', text='S', dx=0, dy=0, markersize=4, append=False):
+        """TODO"""
+        pass
+    
+    def plotLastObs(self, track, ptcolor="r", pttext="E", dx=0, dy=0, markersize=4, append=False):
+        """TODO"""
         pass
     
     

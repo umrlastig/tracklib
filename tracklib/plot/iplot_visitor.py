@@ -30,7 +30,8 @@ class IPlotVisitor(ABC):
     
     @abstractmethod
     def plotTrack(self, track, sym="k-", type="LINE", af_name="", cmap=-1, append=True, 
-             label=None, pointsize=5, title=""):
+             label=None, pointsize=5, title="", xlabel=None, ylabel=None, 
+             xlim=None, ylim=None):
         """
         Method to plot a track (short cut from Plot)
         Append:
@@ -43,6 +44,18 @@ class IPlotVisitor(ABC):
     
         af_name: test si isAFTransition
         """
+        pass
+    
+    @abstractmethod
+    def plotFirstObs(self, track, ptcolor="r", pttext="S", dx=0, dy=0, markersize=4, 
+                     append=False):
+        """TODO"""
+        pass
+    
+    @abstractmethod
+    def plotLastObs(self, track, ptcolor="r", pttext="E", dx=0, dy=0, markersize=4, 
+                     append=False):
+        """TODO"""
         pass
     
     @abstractmethod

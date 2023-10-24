@@ -100,7 +100,8 @@ class MatplotlibVisitor(IPlotVisitor):
         return plot.plotEllipses(track, sym, factor, af, append)
     
     def plotTrack(self, track, sym="k-", type="LINE", af_name="", cmap=-1, append=True, 
-             label=None, pointsize=5, w=6.4, h=4.8, title=""):
+             label=None, pointsize=5, w=6.4, h=4.8, title="", xlabel=None, ylabel=None,
+             xlim=None, ylim=None):
         """
         Method to plot a track (short cut from Plot)
         Append:
@@ -123,7 +124,9 @@ class MatplotlibVisitor(IPlotVisitor):
         plot.marker = sym[1]
         plot.w = w
         plot.h = h
-        return plot.plot(type, af_name, cmap, append=append, label=label, title=title)
+        return plot.plot(type, af_name, cmap, append=append, label=label, 
+                         title=title, xlabel=xlabel, ylabel=ylabel, xlim=xlim, 
+                         ylim=ylim)
     
     def plotMMLink(self, track):
         """
@@ -178,6 +181,38 @@ class MatplotlibVisitor(IPlotVisitor):
                     polygon.set_facecolor("lightcyan")
                     
                     
+    def plotFirstObs(self, track, ptcolor="r", pttext="S", dx=0, dy=0, markersize=4, 
+                     append=False):
+        """TODO"""
+        if isinstance(append, bool):
+            if append:
+                ax1 = plt.gca()
+            else:
+                fig, ax1 = plt.subplots(figsize=(10, 3))
+        else:
+            ax1 = plt
+            
+        pt = track.getFirstObs().position
+        ax1.plot(pt.getX(), pt.getY(), ptcolor+'o', markersize=markersize)
+        ax1.text(pt.getX() + dx, pt.getY() + dy, pttext)
+        
+    
+    def plotLastObs(self, track, ptcolor="r", pttext="E", dx=0, dy=0, markersize=4, 
+                     append=False):
+        """TODO"""
+        if isinstance(append, bool):
+            if append:
+                ax1 = plt.gca()
+            else:
+                fig, ax1 = plt.subplots(figsize=(10, 3))
+        else:
+            ax1 = plt
+            
+        pt = track.getLastObs().position
+        ax1.plot(pt.getX(), pt.getY(), ptcolor+'o', markersize=markersize)
+        ax1.text(pt.getX() + dx, pt.getY() + dy, pttext)
+                    
+    
     def highlightCellInSpatialIndex(self, si, i, j, sym="r-", size=0.5):
         """
         Plot a specific cell (i,j).

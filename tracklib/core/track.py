@@ -1409,7 +1409,9 @@ class Track:
         return v.plotTrackAsMarkers(self, sym, factor, af, append)
 
     def plot(self, sym="k-", type="LINE", af_name="", cmap=-1, append=True, 
-             label=None, pointsize=5, w=6.4, h=4.8, title='', v:IPlotVisitor=None):
+             label=None, pointsize=5, w=6.4, h=4.8, title='', 
+             xlabel=None, ylabel=None, xlim=None, ylim=None,
+             v:IPlotVisitor=None):
         """
         Method to plot a track (short cut from Plot)
         Append:
@@ -1426,7 +1428,7 @@ class Track:
         if v == None:
             v = MatplotlibVisitor()
         return v.plotTrack(self, sym, type, af_name, cmap, append, 
-             label, pointsize, w, h, title)
+             label, pointsize, w, h, title, xlabel, ylabel, xlim, ylim)
     
     def plotProfil(self, template="SPATIAL_SPEED_PROFIL", afs=[], append=False,
                    linestyle = '-', linewidth=1, v:IPlotVisitor=None):
@@ -1435,6 +1437,20 @@ class Track:
         if v == None:
             v = MatplotlibVisitor()
         return v.plotTrackProfil(self, template, afs, append, linestyle,linewidth)
+    
+    
+    def plotFirstObs(self, color="r", text="S", dx=0, dy=0, markersize=4, 
+                     append=False, v:IPlotVisitor=None):
+        if v == None:
+            v = MatplotlibVisitor()
+        return v.plotFirstObs(self, color, text, dx, dy, markersize, append)
+    
+    
+    def plotLastObs(self, color="r", text="E", dx=0, dy=0, markersize=4, 
+                     append=False, v:IPlotVisitor=None):
+        if v == None:
+            v = MatplotlibVisitor()
+        return v.plotLastObs(self, color, text, dx, dy, markersize, append)
         
 
     # =========================================================================

@@ -77,7 +77,8 @@ class Plot:
     #  Ax object (may be input into append parameter)
     # ----------------------------------------------------
     def plot(self, type="LINE", af_name=None, cmap=-1, margin=0.1, append=False,
-			 label=None, title=""):
+			 label=None, title="", xlabel=None, ylabel=None,
+             xlim=None, ylim=None):
         """
         Représentation d'une trace sous forme de ligne ou de point.
         
@@ -131,18 +132,29 @@ class Plot:
             ax1.plot(X, Y, "-", color=self.color, label=label)
 
         if type != 'CIRCULAR':
-            # tenir compte du type Coord
-            if self.track.getSRID() == "Geo":
-                ax1.set(xlabel="lon (deg)", ylabel="lat (deg)")
-            if self.track.getSRID() == "ENU":
-                ax1.set(xlabel="E (m)", ylabel="N (m)")
-            if self.track.getSRID() == "ECEF":
-                print("Warning: can't plot track in ECEF coordinate system")
-                ax1.set(xlabel="X(m)", ylabel="Y(m)")
+            
+            if xlabel is None and ylabel is None:
+                # tenir compte du type Coord
+                if self.track.getSRID() == "Geo":
+                    ax1.set(xlabel="lon (deg)", ylabel="lat (deg)")
+                if self.track.getSRID() == "ENU":
+                    ax1.set(xlabel="E (m)", ylabel="N (m)")
+                if self.track.getSRID() == "ECEF":
+                    print("Warning: can't plot track in ECEF coordinate system")
+                    ax1.set(xlabel="X(m)", ylabel="Y(m)")
+            else:
+                ax1.set_xlabel(xlabel)
+                ax1.set_ylabel(ylabel)
     
             # decoration
-            ax1.set_xlim(xmin, xmax)
-            ax1.set_ylim(ymin, ymax)
+            if xlim is None:
+                ax1.set_xlim(xmin, xmax)
+            else:
+                ax1.set_xlim(xlim[0], xlim[1])
+            if ylim is None:
+                ax1.set_ylim(ymin, ymax)
+            else:
+                ax1.set_ylim(ylim[0], ylim[1])
         
         if title != "":
             ax1.set_title(title)
