@@ -30,8 +30,8 @@ Constraints may be based on:
 
    - a track t as a reference. Available modes are:
 
-        - MODE_CROSSES : tracks  intersecting t (at least once) are selected
-        - MODE_PARALLEL: tracks  following t are selected
+        - MODE_CROSSES : tracks intersecting t (at least once) are selected
+        - MODE_PARALLEL: tracks following t are selected
 
    - a "toll gate" segment, defined by two Coords objects: tracks crossing 
      (at least once) the toll gate are selected 
@@ -346,6 +346,11 @@ class Constraint:
             output = tracklib.TrackCollection()
             for track in tracks:
                 t = self.shape.select(track)
+                to_remove = []
+                for i in range(len(t)):
+                    if not self.time.contains(track[i].timestamp):
+                        to_remove.append(i)
+                t.removeObsList(to_remove)
                 if t.size() > 0:
                     output.addTrack(t)
             return output

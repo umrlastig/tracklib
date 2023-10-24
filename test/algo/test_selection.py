@@ -12,8 +12,6 @@ from tracklib import (Obs, ObsTime, ENUCoords, Track,
                       MODE_PARALLEL, COMBINATION_OR, COMBINATION_AND)
 
 
-
-
 class TestSelection(TestCase):
 
     def setUp (self):
@@ -461,6 +459,8 @@ class TestSelection(TestCase):
         
         #tg = TollGateConstraint()
         
+        
+        
         pass
 
     
@@ -470,7 +470,7 @@ if __name__ == '__main__':
     
     suite = TestSuite()
     
-    suite.addTest(TestSelection("test_print"))
+    #suite.addTest(TestSelection("test_print"))
     suite.addTest(TestSelection("test_selection_one_timestamp_constraint"))
     suite.addTest(TestSelection("test_selection_one_shape_constraint"))
     suite.addTest(TestSelection("test_selection_one_shape_time_constraint"))
