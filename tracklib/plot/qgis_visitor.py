@@ -17,7 +17,16 @@ except ImportError:
 class QgisVisitor(IPlotVisitor):
     
     def __init__(self):
-        print ('QGIS visualisation')
+        
+        self.StyleLigneGris = QgsLineSymbol.createSimple({
+            'penstyle':'solid',
+            'width':'1.00',
+            'color':QColor.fromRgb(204, 209, 209)})
+    
+        self.StylePointBleu = QgsMarkerSymbol.createSimple({
+            'name': 'square', 
+            'color': 'blue', 
+            'size':'0.8'})
 
     
     def plotTrackAsMarkers(
@@ -25,8 +34,8 @@ class QgisVisitor(IPlotVisitor):
         append=True
     ):
         
-        layerTrackPoint = createPoint(track)
-        layerTrackPoint.renderer().setSymbol(StylePointBleu)
+        layerTrackPoint = self.__createPoint(track)
+        layerTrackPoint.renderer().setSymbol(self.StylePointBleu)
         QgsProject.instance().addMapLayer(layerTrackPoint)
         
         
@@ -65,12 +74,12 @@ class QgisVisitor(IPlotVisitor):
         #print ('---- QGIS  -----')
         
         if type == "POINT":
-            layerTrackPoint = createPoint(track, track.tid)
-            layerTrackPoint.renderer().setSymbol(StylePointBleu)
+            layerTrackPoint = self.__createPoint(track, track.tid)
+            layerTrackPoint.renderer().setSymbol(self.StylePointBleu)
             QgsProject.instance().addMapLayer(layerTrackPoint)
         elif type == "LINE":
-            layerTrackLine = createLigne(track, track.tid)
-            layerTrackLine.renderer().setSymbol(StyleLigneGris)
+            layerTrackLine = self.__createLigne(track, track.tid)
+            layerTrackLine.renderer().setSymbol(self.StyleLigneGris)
             QgsProject.instance().addMapLayer(layerTrackLine)
         
         
@@ -225,80 +234,70 @@ class QgisVisitor(IPlotVisitor):
         symbolL1.appendSymbolLayer(symbol_l2)
 
 
-StyleLigneGris = QgsLineSymbol.createSimple({
-    'penstyle':'solid',
-    'width':'1.00',
-    'color':QColor.fromRgb(204, 209, 209)})
-    
-StylePointBleu = QgsMarkerSymbol.createSimple({
-        'name': 'square', 
-        'color': 'blue', 
-        'size':'0.8'})
 
+    def __createLigne(self, track, titre):
+        layerTrackLine = QgsVectorLayer ("LineString?crs=epsg:2154", titre, "memory")
+        pr = layerTrackLine.dataProvider()
+        pr.addAttributes([QgsField("idtrace", QVariant.Int)])
+        layerTrackLine.updateFields()
     
-def createLigne(track, titre):
-    layerTrackLine = QgsVectorLayer ("LineString?crs=epsg:2154", titre, "memory")
-    pr = layerTrackLine.dataProvider()
-    pr.addAttributes([QgsField("idtrace", QVariant.Int)])
-    layerTrackLine.updateFields()
-
-    for j in range(1, track.size()):
-        obs1 = track.getObs(j-1)
-        X1 = float(obs1.position.getX())
-        Y1 = float(obs1.position.getY())
-            
-        obs2 = track.getObs(j)
-        X2 = float(obs2.position.getX())
-        Y2 = float(obs2.position.getY())
-            
-        pt1 = QgsPointXY(X1, Y1)
-        pt2 = QgsPointXY(X2, Y2)
-        gLine = QgsGeometry.fromPolylineXY([pt1, pt2])
+        for j in range(1, track.size()):
+            obs1 = track.getObs(j-1)
+            X1 = float(obs1.position.getX())
+            Y1 = float(obs1.position.getY())
                 
-        tid = int(track.tid)
-        if tid > 0:
-            attrs = [tid, j]
-        else:
-            attrs = [1, j]
-            
-        fet = QgsFeature()
-        fet.setAttributes(attrs)
-        fet.setGeometry(gLine)
-        pr.addFeatures([fet])
-        
-    layerTrackLine.updateExtents()
-    layerTrackLine.commitChanges()
-        
-    return layerTrackLine
-
-
-def createPoint(track, titre):
-    layerTrackPoint = QgsVectorLayer ("Point?crs=epsg:2154", titre, "memory")
-    pr = layerTrackPoint.dataProvider()
-    pr.addAttributes([QgsField("idtrace", QVariant.Int)])
-    pr.addAttributes([QgsField("idpoint", QVariant.Int)])
-    layerTrackPoint.updateFields()
-
-    for j in range(track.size()):
-        obs = track.getObs(j)
-        X = float(obs.position.getX())
-        Y = float(obs.position.getY())
-        pt = QgsPointXY(X, Y)
-        gPoint = QgsGeometry.fromPointXY(pt)
+            obs2 = track.getObs(j)
+            X2 = float(obs2.position.getX())
+            Y2 = float(obs2.position.getY())
                 
-        tid = int(track.tid)
-        if tid > 0:
-            attrs = [tid, j]
-        else:
-            attrs = [1, j]
+            pt1 = QgsPointXY(X1, Y1)
+            pt2 = QgsPointXY(X2, Y2)
+            gLine = QgsGeometry.fromPolylineXY([pt1, pt2])
+                    
+            tid = int(track.tid)
+            if tid > 0:
+                attrs = [tid, j]
+            else:
+                attrs = [1, j]
+                
+            fet = QgsFeature()
+            fet.setAttributes(attrs)
+            fet.setGeometry(gLine)
+            pr.addFeatures([fet])
             
-        fet = QgsFeature()
-        fet.setAttributes(attrs)
-        fet.setGeometry(gPoint)
-        pr.addFeatures([fet])
-        
-    layerTrackPoint.updateExtents()
-    layerTrackPoint.commitChanges()
+        layerTrackLine.updateExtents()
+        layerTrackLine.commitChanges()
+            
+        return layerTrackLine
+
+
+    def __createPoint(self, track, titre):
+        layerTrackPoint = QgsVectorLayer ("Point?crs=epsg:2154", titre, "memory")
+        pr = layerTrackPoint.dataProvider()
+        pr.addAttributes([QgsField("idtrace", QVariant.Int)])
+        pr.addAttributes([QgsField("idpoint", QVariant.Int)])
+        layerTrackPoint.updateFields()
     
-    return layerTrackPoint
+        for j in range(track.size()):
+            obs = track.getObs(j)
+            X = float(obs.position.getX())
+            Y = float(obs.position.getY())
+            pt = QgsPointXY(X, Y)
+            gPoint = QgsGeometry.fromPointXY(pt)
+                    
+            tid = int(track.tid)
+            if tid > 0:
+                attrs = [tid, j]
+            else:
+                attrs = [1, j]
+                
+            fet = QgsFeature()
+            fet.setAttributes(attrs)
+            fet.setGeometry(gPoint)
+            pr.addFeatures([fet])
+            
+        layerTrackPoint.updateExtents()
+        layerTrackPoint.commitChanges()
+        
+        return layerTrackPoint
 
