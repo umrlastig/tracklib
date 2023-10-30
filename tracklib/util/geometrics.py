@@ -110,7 +110,7 @@ class Circle:
             DESCRIPTION.
 
         """
-        t = tracklib.Track()
+        t = tracklib.Track(user_id=track.uid, track_id=track.tid, base=track.base)
         for obs in track:
             if self.contains(obs.position):
                 t.addObs(obs)
@@ -228,7 +228,7 @@ class Rectangle:
             DESCRIPTION.
 
         """
-        t = tracklib.Track()
+        t = tracklib.Track(user_id=track.uid, track_id=track.tid, base=track.base)
         for obs in track:
             if self.contains(obs.position):
                 t.addObs(obs)
@@ -325,7 +325,7 @@ class Polygon:
             DESCRIPTION.
 
         """
-        t = tracklib.Track()
+        t = tracklib.Track(user_id=track.uid, track_id=track.tid, base=track.base)
         for obs in track:
             if self.contains(obs.position):
                 t.addObs(obs)
