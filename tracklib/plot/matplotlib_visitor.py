@@ -119,7 +119,7 @@ class MatplotlibVisitor(IPlotVisitor):
         if not '-' in sym and type != 'CIRCULAR':
             type = "POINT"
             plot.pointsize = 20
-        plot.pointsize = pointsize
+        plot.pointsize = size
         plot.color = sym[0]
         plot.marker = sym[1]
         plot.w = w
