@@ -18,10 +18,42 @@ class QgisVisitor(IPlotVisitor):
     
     def __init__(self):
         
+        self.StyleLigneNoire = QgsLineSymbol.createSimple({
+            'penstyle':'solid',
+            'width':'1.00',
+            'color':QColor.fromRgb(0, 0, 0)})
         self.StyleLigneGris = QgsLineSymbol.createSimple({
             'penstyle':'solid',
             'width':'1.00',
             'color':QColor.fromRgb(204, 209, 209)})
+        self.StyleLigneRouge = QgsLineSymbol.createSimple({
+            'penstyle':'solid',
+            'width':'1.00',
+            'color':QColor.fromRgb(255, 0, 0)})
+        self.StyleLigneBleue = QgsLineSymbol.createSimple({
+            'penstyle':'solid',
+            'width':'1.00',
+            'color':QColor.fromRgb(22, 73, 229)})
+        self.StyleLigneVerte = QgsLineSymbol.createSimple({
+            'penstyle':'solid',
+            'width':'1.00',
+            'color':QColor.fromRgb(10, 174, 23)})
+        self.StyleLigneCyan = QgsLineSymbol.createSimple({
+            'penstyle':'solid',
+            'width':'1.00',
+            'color':QColor.fromRgb(10, 222, 236)})
+        self.StyleLigneMagenta = QgsLineSymbol.createSimple({
+            'penstyle':'solid',
+            'width':'1.00',
+            'color':QColor.fromRgb(180, 32, 90)})
+        self.StyleLigneJaune = QgsLineSymbol.createSimple({
+            'penstyle':'solid',
+            'width':'1.00',
+            'color':QColor.fromRgb(240, 222, 14)})
+        self.StyleLigneOrange = QgsLineSymbol.createSimple({
+            'penstyle':'solid',
+            'width':'1.00',
+            'color':QColor.fromRgb(253, 176, 32)})
     
         self.StylePointBleu = QgsMarkerSymbol.createSimple({
             'name': 'square', 
@@ -56,7 +88,7 @@ class QgisVisitor(IPlotVisitor):
     
     
     def plotTrack(self, track, sym="k-", type="LINE", af_name="", cmap=-1, append=True, 
-             label=None, pointsize=5, w=6.4, h=4.8, title="", xlabel=None, ylabel=None, 
+             label=None, size=5, w=6.4, h=4.8, title="", xlabel=None, ylabel=None, 
              xlim=None, ylim=None):
         """
         Method to plot a track (short cut from Plot)
@@ -71,15 +103,36 @@ class QgisVisitor(IPlotVisitor):
         af_name: test si isAFTransition
         """
         
-        #print ('---- QGIS  -----')
-        
         if type == "POINT":
             layerTrackPoint = self.__createPoint(track, track.tid)
             layerTrackPoint.renderer().setSymbol(self.StylePointBleu)
             QgsProject.instance().addMapLayer(layerTrackPoint)
+        
         elif type == "LINE":
             layerTrackLine = self.__createLigne(track, track.tid)
-            layerTrackLine.renderer().setSymbol(self.StyleLigneGris)
+            
+            if sym == "k-":
+                symb = self.StyleLigneNoire
+            elif sym == "gr-":
+                symb = self.StyleLigneGris
+            elif sym == "r-":
+                symb = self.StyleLigneRouge
+            elif sym == "b-":
+                symb = self.StyleLigneBleue
+            elif sym == "g-":
+                symb = self.StyleLigneVerte
+            elif sym == "c-":
+                symb = self.StyleLigneCyan
+            elif sym == "m-":
+                symb = self.StyleLigneMagenta
+            elif sym == "o-":
+                symb = self.StyleLigneOrange
+            elif sym == "y-":
+                symb = self.StyleLigneJaune
+            
+            symb.setWidth(size)
+            layerTrackLine.renderer().setSymbol(symb)
+            
             QgsProject.instance().addMapLayer(layerTrackLine)
         
         
