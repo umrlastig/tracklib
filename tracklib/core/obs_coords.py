@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 © Copyright Institut National de l'Information Géographique et Forestière (2020)
 Contributors: 
