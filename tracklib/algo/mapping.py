@@ -38,9 +38,12 @@ same conditions as regards security.
 
 The fact that you are presently reading this means that you have had
 knowledge of the CeCILL-C license and that you accept its terms.
-"""
 
-"""Moduke to manage mapping of GPS tracks on geographic features"""
+
+
+Moduke to manage mapping of GPS tracks on geographic features
+
+"""
 
 # For type annotation
 from __future__ import annotations   

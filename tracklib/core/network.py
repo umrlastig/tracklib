@@ -38,9 +38,12 @@ same conditions as regards security.
 
 The fact that you are presently reading this means that you have had
 knowledge of the CeCILL-C license and that you accept its terms.
-"""
 
-"""This module contains the class to manage Network"""
+
+
+This module contains the class to manage Network
+
+"""
 
 # For type annotation
 from __future__ import annotations

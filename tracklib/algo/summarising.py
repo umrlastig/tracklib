@@ -37,9 +37,12 @@ same conditions as regards security.
 
 The fact that you are presently reading this means that you have had
 knowledge of the CeCILL-C license and that you accept its terms.
-"""
 
-"""Operator to aggregate analytical features and create raster and render image"""
+
+
+Operator to aggregate analytical features and create raster and render image
+
+"""
 
 from __future__ import annotations   
 from typing import Union

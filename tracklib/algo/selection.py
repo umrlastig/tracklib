@@ -38,9 +38,10 @@ same conditions as regards security.
 
 The fact that you are presently reading this means that you have had
 knowledge of the CeCILL-C license and that you accept its terms.
-"""
 
-"""
+
+
+
 Class to manage selection of GPS tracks
 
 Overall picture of selection process : selection is performed by a selector 

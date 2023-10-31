@@ -37,9 +37,11 @@ same conditions as regards security.
 
 The fact that you are presently reading this means that you have had
 knowledge of the CeCILL-C license and that you accept its terms.
-"""
 
-"""Definition of some geometric functions"""
+
+
+Definition of some geometric functions
+
 # -------------------------- Geometry Functions -------------------------------
 # Geometry Functions  like:
 #    - cartesienne
@@ -69,6 +71,8 @@ knowledge of the CeCILL-C license and that you accept its terms.
 #    - angleBetweenThreePoints
 #    -
 # ----------------------------------------------------------------
+"""
+
 
 # For type annotation
 from __future__ import annotations   

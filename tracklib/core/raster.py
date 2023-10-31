@@ -37,11 +37,12 @@ same conditions as regards security.
 
 The fact that you are presently reading this means that you have had
 knowledge of the CeCILL-C license and that you accept its terms.
-"""
 
-"""
+
+
 This module contains the class to manipulate rasters.
 A raster is defined as a collection of RasterBand.
+
 """
 
 # For type annotation

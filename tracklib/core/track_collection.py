@@ -38,9 +38,12 @@ same conditions as regards security.
 
 The fact that you are presently reading this means that you have had
 knowledge of the CeCILL-C license and that you accept its terms.
-"""
 
-"""This module contain a class to manage the collections of tracks"""
+
+
+This module contain a class to manage the collections of tracks
+
+"""
 
 from typing import Literal   
 import matplotlib.pyplot as plt

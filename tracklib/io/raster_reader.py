@@ -37,13 +37,14 @@ same conditions as regards security.
 
 The fact that you are presently reading this means that you have had
 knowledge of the CeCILL-C license and that you accept its terms.
-"""
 
-'''
+
+
     This class offer static methods to load raster data:
     - read raster from ascii files, 
     - get DTM data from IGN web services.    
-    '''
+
+"""
 
 # For type annotation
 from __future__ import annotations   

@@ -37,9 +37,9 @@ same conditions as regards security.
 
 The fact that you are presently reading this means that you have had
 knowledge of the CeCILL-C license and that you accept its terms.
-"""
 
-"""
+
+
 Kernels for filtering, smoothing and stochastics simulations.
 
 An example of Kernel simplification with an 
@@ -63,7 +63,6 @@ An example of Kernel simplification with an
 
    Figure 1: Simplification with a gaussian kernel filter
 
-      
 """
 
 # For type annotation
