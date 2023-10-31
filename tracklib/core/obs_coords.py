@@ -35,9 +35,9 @@ same conditions as regards security.
 
 The fact that you are presently reading this means that you have had
 knowledge of the CeCILL-C license and that you accept its terms.
-"""
 
-"""
+
+
 This Module contains the classes to manage point coordinates:
 
     - :class:`GeoCoords` : For representation og geographic coordinates (lon, lat, alti)
