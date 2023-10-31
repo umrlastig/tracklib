@@ -126,7 +126,7 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         print (bbox)
         bbox.plot()
         self.trace3.plot()
-        plt.plot([0], [0], 'ro', size=10)
+        plt.plot([0], [0], 'ro', markersize=10)
         
         t = bbox.select(self.trace3)
         self.assertEqual(t.size(), 4)

@@ -1412,7 +1412,7 @@ class Track:
         return v.plotTrackAsMarkers(self, sym, factor, af, append)
 
     def plot(self, sym="k-", type="LINE", af_name="", cmap=-1, append=True, 
-             label=None, size=5, w=6.4, h=4.8, title='', 
+             label=None, pointsize=5, w=6.4, h=4.8, title='', 
              xlabel=None, ylabel=None, xlim=None, ylim=None,
              v:IPlotVisitor=None):
         """
@@ -1431,7 +1431,7 @@ class Track:
         if v == None:
             v = MatplotlibVisitor()
         return v.plotTrack(self, sym, type, af_name, cmap, append, 
-             label, size, w, h, title, xlabel, ylabel, xlim, ylim)
+             label, pointsize, w, h, title, xlabel, ylabel, xlim, ylim)
     
     def plotProfil(self, template="SPATIAL_SPEED_PROFIL", afs=[], append=False,
                    linestyle = '-', linewidth=1, v:IPlotVisitor=None):
