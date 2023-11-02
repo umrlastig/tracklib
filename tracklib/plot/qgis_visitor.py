@@ -330,7 +330,7 @@ class QgisVisitor(IPlotVisitor):
     def __createLigne(self, track, titre):
         layerTrackLine = QgsVectorLayer ("LineString?crs=epsg:2154", titre, "memory")
         pr = layerTrackLine.dataProvider()
-        pr.addAttributes([QgsField("idtrace", QVariant.Int)])
+        pr.addAttributes([QgsField("idtrace", QVariant.String)])
         layerTrackLine.updateFields()
     
         for j in range(1, track.size()):
@@ -346,11 +346,8 @@ class QgisVisitor(IPlotVisitor):
             pt2 = QgsPointXY(X2, Y2)
             gLine = QgsGeometry.fromPolylineXY([pt1, pt2])
                     
-            tid = int(track.tid)
-            if tid > 0:
-                attrs = [tid, j]
-            else:
-                attrs = [1, j]
+            tid = str(track.tid)
+            attrs = [tid, j]
                 
             fet = QgsFeature()
             fet.setAttributes(attrs)

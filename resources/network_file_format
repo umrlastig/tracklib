@@ -22,15 +22,15 @@
 #   srid:         coordinate system of points (ENU, Geo or ECEF) 
 #
 # -----------------------------------------------------------------------------
-DEFAULT, 0, 1, 2, 3, -1, 5, c, 1, True, UTF-8, Geo
+DEFAULT, 0, 1, 2, 3, -1, 5, c, 1, True, UTF-8, GEO
 IGN, 0, 1, 2, 4, -1, 3, c, 1, True, UTF-8, ENU
 IGNGEO, 0, 1, 2, 4, -1, 3, c, 1, True, UTF-8, GEO
-TEST1, 0, 2, 3, 6, -1, 0, c, 1, True, UTF-8, Geo
+TEST1, 0, 2, 3, 6, -1, 0, c, 1, True, UTF-8, GEO
 TEST2, 1, 2, 3, 0, -1, 4, c, 1, True, UTF-8, ENU
 TEST3, 1, 2, 3, 0, -1, -1, c, 1, True, UTF-8, ENU
 TEST_UNITAIRE, 0, 1, 2, 5, 4, 3, c, 1, True, UTF-8, ENU
 TSUKUBA, -1, 24, 25, 0, -1, -1, c, 1, True, UTF-8, ENU
-OUTPUT, 0, 1, 2, 4, -1, 3, c, 1, True, UTF-8, Geo
+OUTPUT, 0, 1, 2, 4, -1, 3, c, 1, True, UTF-8, GEO
 VERNIQUET, 0, 2, 3, 4, -1, 0, c, 1, True, UTF-8, ENU
 VTT, 1, 2, 3, 0, -1, 4, c, 1, True, UTF-8, GEO
 PRALO, 0, 2, 3, 4, -1, 0, c, 1, True, UTF-8, ENU

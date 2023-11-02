@@ -268,12 +268,9 @@ class MatplotlibVisitor(IPlotVisitor):
 
 
     def plotNetwork(self, net, edges: str = "k-", nodes: str = "",
-        direct: str = "k--", indirect: str = "k--", size: float = 0.5, append=plt):
+        direct: str = "k--", indirect: str = "k--", size: float = 0.5, append=False):
         """
         Plot network
-        """
-        
-        """Plot the network
 
         :param edges: TODO
         :param nodes: TODO
@@ -282,6 +279,14 @@ class MatplotlibVisitor(IPlotVisitor):
         :param size: TODO
         :param append: TODO
         """
+        
+        if isinstance(append, bool):
+            if append:
+                ax1 = plt.gca()
+            else:
+                fig, ax1 = plt.subplots(figsize=(10, 3))
+        else:
+            ax1 = plt
 
         x1b = []
         y1b = []
@@ -353,11 +358,11 @@ class MatplotlibVisitor(IPlotVisitor):
             eyi.append(None)
 
         if len(edges) > 0:
-            append.plot(exb, eyb, edges, linewidth=size, label="double sens")
+            ax1.plot(exb, eyb, edges, linewidth=size, label="double sens")
         if len(direct) > 0:
-            append.plot(exd, eyd, direct, linewidth=size, label="direct")
+            ax1.plot(exd, eyd, direct, linewidth=size, label="direct")
         if len(indirect) > 0:
-            append.plot(exi, eyi, indirect, linewidth=size, label="indirect")
+            ax1.plot(exi, eyi, indirect, linewidth=size, label="indirect")
         if len(nodes) > 0:
-            append.plot(nx, ny, nodes, markersize=4 * size)
+            ax1.plot(nx, ny, nodes, markersize=4 * size)
         
