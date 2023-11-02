@@ -26,11 +26,12 @@ In tracklib, the core model supports a wide range of trajectory  applications:
 
 2/ trajectory can be seen as a concept of a curve which makes it possible to study trajectory shapes,
 
-3/ a full trajectory dataset can be reduced into a regular grid of summarized features
+3/ a full trajectory dataset can be reduced into a regular grid of summarized features,
 
-4/ with map matching process, trajectories can be seen as a network of routes
+4/ with map matching process, trajectories can be seen as a network of routes.
 
 Furthermore, adding analytical features (e.g. speed, curvilinear abscissa, inflection point, heading, acceleration, speed change, etc.) on a observation or on all observations of a trajectory (function of coordinates or timestamp) is, in general, a complex and a boring task. So, to make it easier, _Tracklib_ module offers a multitude of operators and  predicates to simplify the creation of analytical features on a GPS tracks.
+
 
 
 The official documentation is available at **[ReadTheDocs](https://tracklib.readthedocs.io)**
