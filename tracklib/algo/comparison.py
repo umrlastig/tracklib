@@ -504,7 +504,7 @@ def __meanTrack(cluster):
     return tracklib.core.obs_coords.ENUCoords(x/N, y/N, z/N)
 
 
-def fusion(tracks, weight=lambda A, B : A + B**2, ref=0):
+def fusion(tracks, weight=lambda A, B : A + B**2, ref=0, verbose=True):
 
     ITER_MAX = 100
 
@@ -513,13 +513,14 @@ def fusion(tracks, weight=lambda A, B : A + B**2, ref=0):
 
     for iteration in range(ITER_MAX):
         
-        print("ITERATION", iteration)
+        if verbose:
+            print("ITERATION", iteration)
         
         profiles = tracklib.TrackCollection()
         central_before = central.copy()
     
         for i in range(len(tracks)):
-            profile = tracklib.algo.comparison.differenceProfile2(central, tracks[i], weight, verbose=True)
+            profile = tracklib.algo.comparison.differenceProfile2(central, tracks[i], weight, verbose=verbose)
             profiles.addTrack(profile)
             
         for j in range(len(central)):
@@ -528,12 +529,14 @@ def fusion(tracks, weight=lambda A, B : A + B**2, ref=0):
                 cluster.append(tracks[i][profiles[i]["pair", j]].position)
             central[j].position = __meanTrack(cluster)
         
-        profile = tracklib.algo.comparison.differenceProfile2(central, central_before, weight, verbose=True)
-        print("CV = ", profile.score)
+        profile = tracklib.algo.comparison.differenceProfile2(central, central_before, weight, verbose=verbose)
+        if verbose:
+            print("CV = ", profile.score)
         if (profile.score < 1e-16):
             break
         
-    print("END OF COMPUTATION")
+    if verbose:
+        print("END OF COMPUTATION")
                 
     return central
     
