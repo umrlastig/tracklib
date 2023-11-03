@@ -374,11 +374,8 @@ class QgisVisitor(IPlotVisitor):
             pt = QgsPointXY(X, Y)
             gPoint = QgsGeometry.fromPointXY(pt)
                     
-            tid = int(track.tid)
-            if tid > 0:
-                attrs = [tid, j]
-            else:
-                attrs = [1, j]
+            tid = str(track.tid)
+            attrs = [tid, j]
                 
             fet = QgsFeature()
             fet.setAttributes(attrs)

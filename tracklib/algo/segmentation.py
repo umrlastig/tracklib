@@ -250,25 +250,29 @@ def splitReturnTrip(track, mode):
         return splitReturnTripFast(track)
 
 
-def splitReturnTripExhaustive(track):
+def splitReturnTripExhaustive(track, verbose=True):
     """Split track when there is a return trip to keep only the first part"""
 
     min_val = 1e300
     argmin = 0
 
     AVG = Operator.AVERAGER
-    for return_point in progressbar.progressbar(range(0, track.size())):
+    
+    step_to_run = range(0, track.size())
+    if verbose:
+        step_to_run = progressbar.progressbar(step_to_run)
+    
+    for return_point in step_to_run: 
         T1 = track.extract(0, return_point)
         T2 = track.extract(return_point, track.size()-1)
-
         avg = (T1 - T2).operate(AVG, "diff") + (T2 - T1).operate(AVG, "diff")
         if avg < min_val:
             min_val = avg
             argmin = return_point
-            
+ 
     first_part = track.extract(0, argmin-1)
     second_part = track.extract(argmin, track.size()-1)
-
+    
     TRACKS = tracklib.TrackCollection()
     if first_part.size() > 0:
         TRACKS.addTrack(first_part)
