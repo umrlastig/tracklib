@@ -3,7 +3,8 @@
 
 import math
 import matplotlib.pyplot as plt
-from tracklib import generate, ObsTime, ENUCoords, TrackCollection, Track
+from tracklib import generate, generateDataSet
+from tracklib import ObsTime, ENUCoords, TrackCollection, Track, intersects
 from unittest import TestCase, TestSuite, TextTestRunner
 
 
@@ -180,6 +181,40 @@ class TestSynthetics(TestCase):
         self.assertEqual(t.getObs(18).position.getY(), self.y_t(18/19))
         self.assertEqual(t.getObs(18).position.getZ(), self.z_t(18/19))
     
+
+    def vx(self, x, y):
+        return 1.0 / 100.0
+    def vy(self, x, y):
+        return (x**4 + 3*x**2 - x + 2) / 100.0
+
+    def test_generate_dataset(self):
+        
+        TRACKS = generateDataSet(self.vx, self.vy, 100, (-2, -10), (2, 8), Nbmax=25)
+        
+        self.assertIsInstance(TRACKS, list)
+        self.assertEqual(len(TRACKS), 100)
+        
+        for i in range(len(TRACKS)):
+            t = TRACKS[i]
+            
+            dt = t.getLastObs().timestamp - t.getFirstObs().timestamp
+            self.assertLessEqual(dt, 500)
+            
+            #plt.plot(t.getX(), t.getY(), 'k-', linewidth=0.5)
+            for j in range(t.size()):
+                p = t.getObs(j).position
+                self.assertGreaterEqual(p.getX(), -2)
+                self.assertLessEqual(p.getX(), 2)
+                self.assertGreaterEqual(p.getY(), -10)
+                self.assertLessEqual(p.getY(), 8)
+                
+        # Aucune intersection ?
+        for i in range(len(TRACKS)):
+            t1 = TRACKS[i]
+            for j in range(i+1, len(TRACKS)):
+                t2 = TRACKS[j]
+                self.assertFalse(intersects(t1, t2))
+                    
         
         
 if __name__ == '__main__':
@@ -194,6 +229,8 @@ if __name__ == '__main__':
     suite.addTest(TestSynthetics("test_generate_cercle_dt"))
     suite.addTest(TestSynthetics("test_generate_cercle_date"))
     suite.addTest(TestSynthetics("test_generate_cercle_tot"))
+    
+    suite.addTest(TestSynthetics("test_generate_dataset"))
     
     runner = TextTestRunner()
     runner.run(suite)

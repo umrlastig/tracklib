@@ -102,11 +102,10 @@ def generate (x_t=0.3, y_t=None, z_t=None, date_ini=None, date_fin=None, dt=None
     return track
 
 
-# =========================================================================
-# Generate field of tracks from integral curves of vector field
-# =========================================================================
 def generateDataSet(vx, vy, N=100, pmin=(0, 0), pmax=(100, 100), Nbmax=1000):
-    """TODO"""
+    """
+    Generate field of tracks from integral curves of vector field.
+    """
 
     TRACKS = []
     for i in range(N):
@@ -120,18 +119,22 @@ def generateDataSet(vx, vy, N=100, pmin=(0, 0), pmax=(100, 100), Nbmax=1000):
         yi = yini
         date = date_ini
         track.addObs(Obs(ENUCoords(xi, yi), date))
+        
         while 1:
             dx = vx(xi, yi)
             dy = vy(xi, yi)
             xi += dx
             yi += dy
+            
             if (xi < pmin[0]) or (xi > pmax[0]):
                 break
             if (yi < pmin[1]) or (yi > pmax[1]):
                 break
+            
             date = date.copy()
             date = date.addSec(1)
             track.addObs(Obs(ENUCoords(xi, yi), date))
+            
             if track.size() > Nbmax / 2:
                 break
 
