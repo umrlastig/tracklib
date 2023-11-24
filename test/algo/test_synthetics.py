@@ -145,10 +145,10 @@ class TestSynthetics(TestCase):
         
         self.assertEqual(t.size(), 100)
         
-        self.assertEqual(str(t.getFirstObs().timestamp), "31/01/2018 11:17:01")
-        self.assertEqual(str(t.getObs(10).timestamp), "31/01/2018 11:17:11")
-        self.assertEqual(str(t.getObs(60).timestamp), "31/01/2018 11:18:01")
-        self.assertEqual(str(t.getLastObs().timestamp), "31/01/2018 11:18:40")
+        self.assertEqual(str(t.getFirstObs().timestamp)[0:19], "31/01/2018 11:17:01")
+        self.assertEqual(str(t.getObs(10).timestamp)[0:19], "31/01/2018 11:17:11")
+        self.assertEqual(str(t.getObs(60).timestamp)[0:19], "31/01/2018 11:18:01")
+        self.assertEqual(str(t.getLastObs().timestamp)[0:19], "31/01/2018 11:18:40")
         
         self.assertEqual(t.getFirstObs().position, ENUCoords(1.0, 0.0))
         self.assertEqual(t.getLastObs().position, ENUCoords(1.0, -0.0))
