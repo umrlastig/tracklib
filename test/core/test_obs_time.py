@@ -65,8 +65,8 @@ class TestObsTime(unittest.TestCase):
         date4 = '2018-06-15 14:21:46.057'
         t4 = ObsTime.readTimestamp(date4)
         
-        date4 = '2018-06-16 13:21:46.057'
-        t4 = ObsTime.readTimestamp(date4)
+        date7 = '2018-06-16 13:21:46.057'
+        t7 = ObsTime.readTimestamp(date7)
         
         date5 = '2018-07-15 13:21:46.057'
         t5 = ObsTime.readTimestamp(date5)
@@ -77,14 +77,37 @@ class TestObsTime(unittest.TestCase):
         self.assertTrue(t1 == t2)
         self.assertTrue(t3 == t3)
         self.assertFalse(t1 == t3)
+        
         self.assertFalse(t3 == t4)
         self.assertFalse(t3 == t5)
         self.assertFalse(t3 == t6)
+        self.assertFalse(t3 == t7)
         
         self.assertTrue(not t1 == t3)
         self.assertTrue(not t3 == t4)
         self.assertTrue(not t3 == t5)
         self.assertTrue(not t3 == t6)
+        self.assertTrue(not t3 == t7)
+        
+        
+    def test_add(self):
+        
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s.2z")
+        
+        date1 = '2018-06-15 13:21:46.00'
+        t1 = ObsTime.readTimestamp(date1)
+        t3 = t1.addMin(5)
+        
+        date2 = '2018-06-15 13:26:46.00'
+        t2 = ObsTime.readTimestamp(date2)
+        
+        self.assertTrue(t3 == t2)
+        
+        t4 = t1.addDay(4)
+        date5 = '2018-06-19 13:21:46.00'
+        t5 = ObsTime.readTimestamp(date5)
+        
+        self.assertTrue(t4 == t5)
         
         
 if __name__ == '__main__':
@@ -94,6 +117,7 @@ if __name__ == '__main__':
     suite.addTest(TestObsTime("test_read_with_format"))
     suite.addTest(TestObsTime("test_readunixtime"))
     suite.addTest(TestObsTime("test_equal"))
+    suite.addTest(TestObsTime("test_add"))
     
     runner = unittest.TextTestRunner()
     runner.run(suite)
