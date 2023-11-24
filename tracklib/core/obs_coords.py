@@ -85,7 +85,7 @@ class GeoCoords:
         output += "lat=" + "{:11.9f}".format(self.lat) + ", "
         output += "hgt=" + "{:7.3f}".format(self.hgt) + "]"
         return output
-
+    
     def copy(self) -> GeoCoords:   
         """TODO"""
         return copy.deepcopy(self)
@@ -241,6 +241,8 @@ class GeoCoords:
 
 class ENUCoords:
     """Class for representation of local projection (East, North, Up)"""
+    
+    __epsilon = 0.0001
 
     def __init__(self, E: float, N: float, U: float = 0):   
         """Constructor of class:`ENUCoords`  class
@@ -263,6 +265,13 @@ class ENUCoords:
         output += "U=" + "{:12.3f}".format(self.U) + "]"
         return output
 
+    def __eq__(self, other):
+        iseq = abs(self.E - other.E) < ENUCoords.__epsilon 
+        iseq = iseq and abs(self.N - other.N) < ENUCoords.__epsilon 
+        iseq = iseq and abs(self.U - other.U) < ENUCoords.__epsilon
+        return iseq
+
+    
     def copy(self) -> ENUCoords:   
         """Copy the current object
 
