@@ -91,6 +91,18 @@ class TestObsTime(unittest.TestCase):
         
         self.assertFalse(t3 == None)
         
+        # ---------------------------------
+        self.assertTrue(t4 > t3)
+        self.assertTrue(t5 > t3)
+        self.assertTrue(t3 > t6)
+        self.assertTrue(t7 > t3)
+        
+        # ---------------------------------
+        self.assertTrue(t3 < t4)
+        self.assertTrue(t3 < t5)
+        self.assertTrue(t6 < t3)
+        self.assertTrue(t3 < t7)
+        
         
     def test_add(self):
         
