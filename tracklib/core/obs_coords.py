@@ -266,6 +266,14 @@ class ENUCoords:
         return output
 
     def __eq__(self, other):
+        
+        if self is None:
+            return False
+        if other is None:
+            return False
+        if not isinstance(other, ENUCoords):
+            return False
+        
         iseq = abs(self.E - other.E) < ENUCoords.__epsilon 
         iseq = iseq and abs(self.N - other.N) < ENUCoords.__epsilon 
         iseq = iseq and abs(self.U - other.U) < ENUCoords.__epsilon
