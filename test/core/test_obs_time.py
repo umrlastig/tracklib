@@ -50,7 +50,7 @@ class TestObsTime(unittest.TestCase):
         self.assertEqual(26, d.min)
         self.assertEqual(3, d.sec)
         
-    def test_equal(self):
+    def test_compare(self):
         ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s.2z")
         
         date1 = '2018-06-15 13:21:46.00'
@@ -89,6 +89,8 @@ class TestObsTime(unittest.TestCase):
         self.assertTrue(not t3 == t6)
         self.assertTrue(not t3 == t7)
         
+        self.assertFalse(t3 == None)
+        
         
     def test_add(self):
         
@@ -116,7 +118,7 @@ if __name__ == '__main__':
     
     suite.addTest(TestObsTime("test_read_with_format"))
     suite.addTest(TestObsTime("test_readunixtime"))
-    suite.addTest(TestObsTime("test_equal"))
+    suite.addTest(TestObsTime("test_compare"))
     suite.addTest(TestObsTime("test_add"))
     
     runner = unittest.TextTestRunner()
