@@ -50,11 +50,51 @@ class TestObsTime(unittest.TestCase):
         self.assertEqual(26, d.min)
         self.assertEqual(3, d.sec)
         
+    def test_equal(self):
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s.2z")
+        
+        date1 = '2018-06-15 13:21:46.00'
+        t1 = ObsTime.readTimestamp(date1)
+        
+        date2 = '2018-06-15 13:21:46.00'
+        t2 = ObsTime.readTimestamp(date2)
+        
+        date3 = '2018-06-15 13:21:46.057'
+        t3 = ObsTime.readTimestamp(date3)
+        
+        date4 = '2018-06-15 14:21:46.057'
+        t4 = ObsTime.readTimestamp(date4)
+        
+        date4 = '2018-06-16 13:21:46.057'
+        t4 = ObsTime.readTimestamp(date4)
+        
+        date5 = '2018-07-15 13:21:46.057'
+        t5 = ObsTime.readTimestamp(date5)
+        
+        date6 = '2012-06-15 13:21:46.057'
+        t6 = ObsTime.readTimestamp(date6)
+        
+        self.assertTrue(t1 == t2)
+        self.assertTrue(t3 == t3)
+        self.assertFalse(t1 == t3)
+        self.assertFalse(t3 == t4)
+        self.assertFalse(t3 == t5)
+        self.assertFalse(t3 == t6)
+        
+        self.assertTrue(not t1 == t3)
+        self.assertTrue(not t3 == t4)
+        self.assertTrue(not t3 == t5)
+        self.assertTrue(not t3 == t6)
+        
+        
 if __name__ == '__main__':
-    #unittest.main()
+    
     suite = unittest.TestSuite()
+    
     suite.addTest(TestObsTime("test_read_with_format"))
     suite.addTest(TestObsTime("test_readunixtime"))
+    suite.addTest(TestObsTime("test_equal"))
+    
     runner = unittest.TextTestRunner()
     runner.run(suite)
     

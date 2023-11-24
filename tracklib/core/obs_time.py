@@ -529,6 +529,9 @@ class ObsTime:
 
         :param time: :class:`ObsTime` to compare
         """
+        if not isinstance(time, ObsTime):
+            return False
+        
         if self.ms != time.ms:
             return False
         if self.sec != time.sec:
@@ -543,6 +546,7 @@ class ObsTime:
             return False
         if self.year != time.year:
             return False
+        
         return True
 
     def __ne__(self, time: ObsTime) -> bool:   
