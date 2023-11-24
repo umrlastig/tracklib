@@ -53,27 +53,20 @@ from tracklib.core import (ENUCoords,
                            GaussianKernel)
 
 
-# =========================================================================
-# Generate analytical track
-# =========================================================================
-def generate(
-    x_t=0.3,
-    y_t=None,
-    z_t=None,
-    date_ini=None,
-    date_fin=None,
-    dt=None,
-    verbose=True,
-    N=1,
-):
-    """TODO"""
+def generate (x_t=0.3, y_t=None, z_t=None, date_ini=None, date_fin=None, dt=None, 
+              verbose=True, N=1):
+    """
+    Generate analytical track
+    """
     randomTrack = y_t is None
+    
     if randomTrack:
         if N > 1:
             tracks = tracklib.TrackCollection()
             for i in range(N):
                 tracks.addTrack(generate(x_t, N=1, verbose=verbose))
             return tracks
+    
     if randomTrack:
         scope = 100 * x_t
         x1 = random.random() * 100
@@ -82,12 +75,14 @@ def generate(
         y2 = random.random() * 100
         x_t = lambda t: x1 * (1 - t) + x2 * t
         y_t = lambda t: y1 * (1 - t) + y2 * t
-    if date_ini == None:
+    
+    if date_ini is None:
         date_ini = ObsTime.random()
-    if date_fin == None:
+    if date_fin is None:
         date_fin = date_ini.addHour(1)
-    if dt == None:
+    if dt is None:
         dt = (date_fin - date_ini) / 100
+    
     track = tracklib.Track()
     tps = date_ini.copy()
     N = (date_fin - date_ini) / dt
@@ -103,6 +98,7 @@ def generate(
         track.addObs(obs)
     if randomTrack:
         track = track.noise(50, GaussianKernel(scope))
+    
     return track
 
 
