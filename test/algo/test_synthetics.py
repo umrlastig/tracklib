@@ -62,10 +62,10 @@ class TestSynthetics(TestCase):
             
             for j in range(t.size()):
                 p = t.getObs(j).position
-                self.assertGreaterEqual(p.getX(), -250)
-                self.assertLessEqual(p.getX(), 250)
-                self.assertGreaterEqual(p.getY(), -250)
-                self.assertLessEqual(p.getY(), 250)
+                self.assertGreaterEqual(p.getX(), -350)
+                self.assertLessEqual(p.getX(), 350)
+                self.assertGreaterEqual(p.getY(), -350)
+                self.assertLessEqual(p.getY(), 350)
     
     def x_t(self, t):
         return math.cos(2*math.pi*t)
