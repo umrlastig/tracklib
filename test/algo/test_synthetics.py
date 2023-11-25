@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+'''
+t2 = t.noise(10, tkl.GaussianKernel(25))
+#tracks = tkl.NoiseProcess(5, tkl.GaussianKernel(5)).noise(t, N)
+
+'''
 
 import math
 import matplotlib.pyplot as plt

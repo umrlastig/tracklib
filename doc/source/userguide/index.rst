@@ -14,7 +14,7 @@ User Guide
   Core concept <1_coreconcept>
   Operation for manipulating track <2_operator>
   Read/Write track(s), network and raster <reader_writer>
-  
+
 
 Features
 --------
@@ -37,6 +37,8 @@ to get you using tracklib productively as quickly as possible.
     UG_Segmentation
     UG_Selection
     UG_Query
+    UG_Synthetics
+    UG_TrackPlot
     UG_Operation
     
 
