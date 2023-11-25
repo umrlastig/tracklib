@@ -69,7 +69,7 @@ class IPlotVisitor(ABC):
     
     @abstractmethod
     def plotTrack(self, track, sym="k-", type="LINE", af_name="", cmap=-1, append=True, 
-             label=None, size=5, w=6.4, h=4.8, title="", xlabel=None, ylabel=None, 
+             size=5, w=6.4, h=4.8, title="", xlabel=None, ylabel=None, 
              xlim=None, ylim=None):
         """
         Method to plot a track (short cut from Plot)
@@ -82,6 +82,13 @@ class IPlotVisitor(ABC):
             Ax object (may be input into append parameter)
     
         af_name: test si isAFTransition
+        """
+        pass
+    
+    @abstractmethod
+    def plotAnalyticalFeature(self, track, af_name, template="BOXPLOT", append=False):
+        """
+        Plot AF values by abcisse curvilign.
         """
         pass
     
@@ -99,20 +106,13 @@ class IPlotVisitor(ABC):
     
     @abstractmethod
     def plotTrackProfil(
-        self, track, template="SPATIAL_SPEED_PROFIL", afs=[], append=False,
-                   linestyle = '-', linewidth=1):
+        self, track, template="SPATIAL_SPEED_PROFIL", afs=[], 
+                   linestyle = '-', linewidth=1, color='g', append=False):
         """
         Plot a profil track.
         """
         pass
     
-    @abstractmethod
-    def plotMMLink(self, track):
-        """
-        Plot the map matched track on network links.
-        """
-        pass
-        
     
     @abstractmethod
     def plotSpatialIndex(self, si, base=True, append=True):
@@ -137,3 +137,9 @@ class IPlotVisitor(ABC):
         """
         pass
     
+    @abstractmethod
+    def plotMMLink(self, track):
+        """
+        Plot the map matched track on network links.
+        """
+        pass

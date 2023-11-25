@@ -1449,10 +1449,10 @@ class Track:
         
         if v == None:
             v = MatplotlibVisitor()
-        return v.plotTrackAsMarkers(self, sym, factor, af, append)
+        return v.plotTrackEllipses(self, sym, factor, af, append)
 
     def plot(self, sym="k-", type="LINE", af_name="", cmap=-1, append=True, 
-             label=None, pointsize=5, w=6.4, h=4.8, title='', 
+             pointsize=5, w=6.4, h=4.8, title='', 
              xlabel=None, ylabel=None, xlim=None, ylim=None,
              v:IPlotVisitor=None):
         """
@@ -1471,15 +1471,25 @@ class Track:
         if v == None:
             v = MatplotlibVisitor()
         return v.plotTrack(self, sym, type, af_name, cmap, append, 
-             label, pointsize, w, h, title, xlabel, ylabel, xlim, ylim)
+             pointsize, w, h, title, xlabel, ylabel, xlim, ylim)
     
     def plotProfil(self, template="SPATIAL_SPEED_PROFIL", afs=[], append=False,
-                   linestyle = '-', linewidth=1, v:IPlotVisitor=None):
+                   linestyle = '-', linewidth=1, color='g', v:IPlotVisitor=None):
         """
+        Représentation du profil de la trace.
         """
         if v == None:
             v = MatplotlibVisitor()
-        return v.plotTrackProfil(self, template, afs, append, linestyle,linewidth)
+        return v.plotTrackProfil(self, template, afs, linestyle, linewidth, color, append)
+    
+    def plotAnalyticalFeature(self, af_name, template="BOXPLOT", append=False,
+                              v:IPlotVisitor=None):
+        """
+        Plot AF values by abcisse curvilign.
+        """
+        if v == None:
+            v = MatplotlibVisitor()
+        return v.plotAnalyticalFeature(self, af_name, template, append)
     
     
     def plotFirstObs(self, color="r", text="S", dx=0, dy=0, markersize=4, 
@@ -1495,6 +1505,22 @@ class Track:
             v = MatplotlibVisitor()
         return v.plotLastObs(self, color, text, dx, dy, markersize, append)
         
+
+    def isAFTransition(self, af_name):
+        """
+        Return true if AF is transition marker.
+        For example return true if AF values are like:
+            000000000000010000100000000000000000001000000100000
+        Values are contained in {0, 1}. 1 means there is a regime change
+        """
+        tabmarqueurs = self.getAnalyticalFeature(af_name)
+        marqueurs = set(tabmarqueurs)
+        if NAN in marqueurs:
+            marqueurs.remove(NAN)
+        if len(marqueurs.intersection([0, 1])) == 2:
+            return True
+        else:
+            return False
 
     # =========================================================================
     #    Built-in Analytical Features

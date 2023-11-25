@@ -24,6 +24,8 @@ class TestCoords(TestCase):
 
 if __name__ == '__main__':
     suite = TestSuite()
+    
     suite.addTest(TestCoords("test_azimuth"))
+    
     runner = TextTestRunner()
     runner.run(suite)
