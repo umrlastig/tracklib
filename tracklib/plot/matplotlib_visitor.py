@@ -49,11 +49,14 @@ from PIL import Image
 import progressbar
 import sys
 
+import tracklib as tracklib
 from tracklib.plot import IPlotVisitor
 
 from tracklib.core import isnan, NAN, getColorMap
 from tracklib.algo import BIAF_ABS_CURV, computeAbsCurv
 from tracklib.core import Operator
+
+
 
 
 MARKERS_TYPE_NO_ENTRY = 0
@@ -665,7 +668,7 @@ class MatplotlibVisitor(IPlotVisitor):
         else:
             ax1 = plt
 
-        '''
+
         x1b = []
         y1b = []
         x1i = []
@@ -691,13 +694,13 @@ class MatplotlibVisitor(IPlotVisitor):
         for i in range(len(L)):
             edge = L[i][1]
             for j in range(edge.geom.size() - 1):
-                if edge.orientation == Edge.DOUBLE_SENS:
+                if edge.orientation == tracklib.Edge.DOUBLE_SENS:
                     x1b.append(edge.geom.getX()[j])
                     x2b.append(edge.geom.getX()[j + 1])
                     y1b.append(edge.geom.getY()[j])
                     y2b.append(edge.geom.getY()[j + 1])
                 else:
-                    if edge.orientation == Edge.SENS_DIRECT:
+                    if edge.orientation == tracklib.Edge.SENS_DIRECT:
                         x1d.append(edge.geom.getX()[j])
                         x2d.append(edge.geom.getX()[j + 1])
                         y1d.append(edge.geom.getY()[j])
@@ -743,7 +746,7 @@ class MatplotlibVisitor(IPlotVisitor):
             ax1.plot(exi, eyi, indirect, linewidth=size, label="indirect")
         if len(nodes) > 0:
             ax1.plot(nx, ny, nodes, markersize=4 * size)
-        '''
+
             
     def plotMMLink(self, track):
         """

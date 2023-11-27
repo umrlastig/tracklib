@@ -506,11 +506,9 @@ def __meanTrack(cluster):
 
 def fusion(tracks, weight=lambda A, B : A + B**2, ref=0, verbose=True):
 
-    ITER_MAX = 100
-
-    central = tracks[ref].copy()    
+    central = tracks[ref].copy()
     
-
+    ITER_MAX = 100
     for iteration in range(ITER_MAX):
         
         if verbose:
