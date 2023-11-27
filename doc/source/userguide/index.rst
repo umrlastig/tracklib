@@ -39,7 +39,7 @@ to get you using tracklib productively as quickly as possible.
     UG_Query
     UG_Synthetics
     UG_TrackPlot
-    UG_Operation
+    
     
 
 
@@ -47,7 +47,7 @@ to get you using tracklib productively as quickly as possible.
 .. Mopsi <Mopsi> (track's comparaison)
 .. Points caractéristiques 
 .. filtrage
-.. synthetics
+.. UG_Operation
 
 
 
