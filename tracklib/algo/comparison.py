@@ -95,7 +95,7 @@ def differenceProfile2(track1, track2, weight = lambda A, B : A + B, verbose = T
 	
     """Profile of difference between two traces
     
-    :return: A track objet, with an analytical feature diff containing shortest distance
+    :return: A track objet, with an analytical feature "diff" containing shortest distance
              of each point of track t1, to the points of track t2. We may get profile as
              a list with :func:`output.getAbsCurv()` and
              :func:`output.getAnalyticalFeature("diff")` 

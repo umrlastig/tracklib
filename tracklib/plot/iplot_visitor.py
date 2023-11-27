@@ -69,7 +69,7 @@ class IPlotVisitor(ABC):
     
     @abstractmethod
     def plotTrack(self, track, sym="k-", type="LINE", af_name="", cmap=-1, append=True, 
-             size=5, w=6.4, h=4.8, title="", xlabel=None, ylabel=None, 
+             size=5, style=None, color=None, w=6.4, h=4.8, title="", xlabel=None, ylabel=None, 
              xlim=None, ylim=None):
         """
         Method to plot a track (short cut from Plot)

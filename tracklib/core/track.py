@@ -1452,11 +1452,14 @@ class Track:
         return v.plotTrackEllipses(self, sym, factor, af, append)
 
     def plot(self, sym="k-", type="LINE", af_name="", cmap=-1, append=True, 
-             pointsize=5, w=6.4, h=4.8, title='', 
+             pointsize=5, style=None, color=None, w=6.4, h=4.8, title='', 
              xlabel=None, ylabel=None, xlim=None, ylim=None,
              v:IPlotVisitor=None):
         """
         Method to plot a track (short cut from Plot)
+        
+        style and color has priority over sym.
+        
         Append:
             - True : append to the current plot
             - False: create a new plot
@@ -1471,7 +1474,7 @@ class Track:
         if v == None:
             v = MatplotlibVisitor()
         return v.plotTrack(self, sym, type, af_name, cmap, append, 
-             pointsize, w, h, title, xlabel, ylabel, xlim, ylim)
+             pointsize, style, color, w, h, title, xlabel, ylabel, xlim, ylim)
     
     def plotProfil(self, template="SPATIAL_SPEED_PROFIL", afs=[], append=False,
                    linestyle = '-', linewidth=1, color='g', v:IPlotVisitor=None):

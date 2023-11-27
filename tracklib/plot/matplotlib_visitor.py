@@ -56,9 +56,6 @@ from tracklib.core import isnan, NAN, getColorMap
 from tracklib.algo import BIAF_ABS_CURV, computeAbsCurv
 from tracklib.core import Operator
 
-
-
-
 MARKERS_TYPE_NO_ENTRY = 0
 MARKERS_TYPE_INFORMATION = 1
 MARKERS_TYPE_NO_STOP = 2
@@ -240,7 +237,6 @@ class MatplotlibVisitor(IPlotVisitor):
         tabplot.append(l)
         ax1.set_xlim(xmin, xmax)
 
-
         ax1.set(xlabel=xtitle, ylabel=axe2)
         ax1.set_title("'" + axe2 + "' profil according to " + xtitle)
 
@@ -333,7 +329,7 @@ class MatplotlibVisitor(IPlotVisitor):
         
     
     def plotTrack(self, track, sym="k-", type="LINE", af_name="", cmap=-1, append=True, 
-             size=5, w=6.4, h=4.8, title="", xlabel=None, ylabel=None,
+             size=5, style=None, color=None, w=6.4, h=4.8, title="", xlabel=None, ylabel=None,
              xlim=None, ylim=None):
         """
         Method to plot a track (short cut from Plot).
@@ -363,8 +359,13 @@ class MatplotlibVisitor(IPlotVisitor):
         pointsize = size
         if not '-' in sym:
             type = "POINT"
-        color = sym[0]
+        tcolor = sym[0]
         marker = sym[1]
+        
+        if style is not None:
+            marker = style
+        if color is not None:
+            tcolor = color
 
         if isinstance(append, bool):
             if append:
@@ -398,10 +399,10 @@ class MatplotlibVisitor(IPlotVisitor):
             fig = plt.gcf()
             fig.colorbar(scatter, ax=ax1)
         elif type == "POINT":
-            ax1.scatter(X, Y, s=pointsize, c=color, marker=marker)
+            ax1.scatter(X, Y, s=pointsize, c=tcolor, marker=marker)
         else:
             # type == LINE
-            ax1.plot(X, Y, "-", color=color)
+            ax1.plot(X, Y, color=tcolor, linestyle=marker, linewidth=1)
 
         # AXES: label + limit        
         if xlabel is None and ylabel is None:
