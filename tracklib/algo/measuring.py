@@ -58,19 +58,22 @@ def compareWithDouglasPeuckerSimplification(track, threshold):
     S = []
     for tolerance in range(1, sup):
         track1 = douglas_peucker(track, tolerance)
+        #print (track.size(), track1.size(), tolerance)
+        
         err = compare(track, track1)
-        if err < threshold:
+        if err != None and err < threshold:
             S.append(tolerance)
-            print (err)
         else:
             # La fonction compare est croissante, donc on peut stopper quand
             # on a dépassé le seuil
             break
 
-    index_max = max(range(len(S)), key=S.__getitem__)
-    track1 = douglas_peucker(track, S[index_max])
-    
-    return track1.size()
+    if len(S) > 0:
+        index_max = max(range(len(S)), key=S.__getitem__)
+        track1 = douglas_peucker(track, S[index_max])
+        return track1.size()
+    else:
+        return 
 
 
 def distanceDirectionMatrix():

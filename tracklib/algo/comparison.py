@@ -349,11 +349,14 @@ def compare(track1, track2) -> float:
     trackB = track2.copy()
 
     synchronize(trackA, trackB)
+    
+    if trackA.size() <= 0:
+        return 
 
     rmse = 0
     for i in range(trackA.size()):
         rmse += trackA.getObs(i).distanceTo(trackB.getObs(i)) ** 2
-
+    
     return math.sqrt(rmse / trackA.size())
 
 
