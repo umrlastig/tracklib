@@ -26,22 +26,20 @@ to get you using tracklib productively as quickly as possible.
 .. nbgallery::
     :name: userguide-features-gallery
     :glob:
-    :reversed:
 
-    UG_MapOnRaster
-    UG_MapMatchingOnNetwork
-    UG_Stdbscan
-    UG_Comparison
-    UG_Interpolation
-    UG_Simplification
-    UG_Segmentation
-    UG_Selection
-    UG_Query
-    UG_Synthetics
     UG_TrackPlot
+    UG_Synthetics
+    UG_Query
+    UG_Selection
+    UG_Segmentation
+    UG_Simplification
+    UG_Interpolation
+    UG_Comparison
+    UG_Measures
+    UG_Stdbscan
+    UG_MapMatchingOnNetwork
+    UG_MapOnRaster
     
-    
-
 
 .. 
 .. Mopsi <Mopsi> (track's comparaison)

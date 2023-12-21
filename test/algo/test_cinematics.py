@@ -4,6 +4,7 @@
 
 import matplotlib.pyplot as plt
 from numpy import pi
+import os
 import unittest
 
 from tracklib import (Obs, ObsTime, ENUCoords, getColorMap,
@@ -20,7 +21,8 @@ from tracklib import (Obs, ObsTime, ENUCoords, getColorMap,
                       computeNetDeniv,
                       computeAscDeniv,
                       computeDescDeniv,
-                      Track)
+                      Track,
+                      TrackReader, computeRadialSignature)
 
 
 class TestAlgoCinematicsMethods(unittest.TestCase):
@@ -295,7 +297,17 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         
         
     def testComputeRadialSignature(self):
-        pass
+        resource_path = os.path.join(os.path.split(__file__)[0], "../..")
+        path = os.path.join(resource_path, 'data/wkt/chambord.wkt')
+        TRACES = TrackReader.readFromWkt(path, id_geom=0, separator="#", h=1, doublequote=True)
+
+        trace = TRACES[0]
+        #trace.plot('c-')
+        #plt.show()
+
+        trace1 = computeRadialSignature(trace)
+        R = trace1.getAnalyticalFeature('r')
+        plt.plot(R, color="royalblue", linestyle='--')
         
 
 if __name__ == '__main__':

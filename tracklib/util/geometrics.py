@@ -514,7 +514,9 @@ class Polygon:
     # Radial signature of a polygon
     # --------------------------------------------------
     def signature(self):
-        """TODO"""
+        """
+        Radial signature of a polygon
+        """
         C = self.centroid()
         S = [0]
         R = [math.sqrt((C[0] - self.X[0]) ** 2 + (C[1] - self.Y[0]) ** 2)]
