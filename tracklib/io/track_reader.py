@@ -467,7 +467,7 @@ class TrackReader:
                     print("this type of wkt is not yet implemented")
 
                 for s in wkt:
-                    sl = s.split(" ")
+                    sl = s.strip().split(" ")
                     x = float(sl[0])
                     y = float(sl[1])
                     if len(sl) == 3:
