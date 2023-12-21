@@ -43,10 +43,10 @@ This is what *tracklib* is modestly trying to do. The library provides some conv
 </div>
 
 In *tracklib*, the core model supports a wide range of trajectory applications: 
-1/ trajectory can be seen as a concept of (geo)located timestamps sequence to study for example an athlete's performance,
-2/ trajectory can be seen as a concept of a curve which makes it possible to study trajectory shapes, 
-3/ a full trajectory dataset can be reduced into a regular grid of summarized features, 
-4/ with map matching process, trajectories can be seen as a network of routes.
+1. trajectory can be seen as a concept of (geo)located timestamps sequence to study for example an athlete's performance,
+2. trajectory can be seen as a concept of a curve which makes it possible to study trajectory shapes, 
+3. a full trajectory dataset can be reduced into a regular grid of summarized features, 
+4. with map matching process, trajectories can be seen as a network of routes.
 
 
 <div style="text-align: justify">
