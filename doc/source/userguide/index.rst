@@ -35,7 +35,7 @@ to get you using tracklib productively as quickly as possible.
     UG_Simplification
     UG_Interpolation
     UG_Comparison
-    UG_Measures
+    UG_ShapeMeasures
     UG_Stdbscan
     UG_MapMatchingOnNetwork
     UG_MapOnRaster
