@@ -35,7 +35,7 @@ Welcome to tracklib’s documentation!
 Background
 ***********
 
-<div style="text-align:justify">
+<div style="text-align:justify;">
 More and more datasets of GPS trajectories are now available and they are studied very frequently in many scientific domains. 
 Currently available Python libraries for trajectories can separately load, simplify, interpolate, summarize or visualize them. 
 But, as far as we know, there is no Python library that would contain all these basic functionalities. 
@@ -50,7 +50,7 @@ In *tracklib*, the core model supports a wide range of trajectory applications:
 4. with map matching process, trajectories can be seen as a network of routes.
 
 
-<div style="text-align:justify">
+<div style="text-align:justify;">
 Furthermore, adding analytical features (e.g. speed, curvilinear abscissa, inflection point, heading, acceleration, speed change, etc.) 
 on a observation or on all observations of a trajectory (function of coordinates or timestamp) is, in general, a complex 
 and a boring task. So, to make it easier, *Tracklib* module offers a multitude of operators and predicates 
