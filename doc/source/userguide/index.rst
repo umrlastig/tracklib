@@ -27,16 +27,21 @@ to get you using tracklib productively as quickly as possible.
     :name: userguide-features-gallery
     :glob:
 
+    UG_Operation
     UG_TrackPlot
     UG_Synthetics
     UG_Query
+    
     UG_Selection
     UG_Segmentation
+    UG_Stdbscan
+    UG_Comparison
+    
+    UG_ShapeMeasures
     UG_Simplification
     UG_Interpolation
-    UG_Comparison
-    UG_ShapeMeasures
-    UG_Stdbscan
+    UG_Filtering
+    
     UG_MapMatchingOnNetwork
     UG_MapOnRaster
     
@@ -44,8 +49,7 @@ to get you using tracklib productively as quickly as possible.
 .. 
 .. Mopsi <Mopsi> (track's comparaison)
 .. Points caractéristiques 
-.. filtrage
-.. UG_Operation
+
 
 
 
