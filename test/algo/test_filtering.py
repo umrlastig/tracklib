@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import matplotlib.pyplot as plt
 import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
 from tracklib import (ObsTime, TrackReader,
@@ -28,6 +29,7 @@ class TestFiltering(TestCase):
         
     def view(self, track, sym):
         track.plot(sym)
+        plt.show()
     
     
     # =========================================================================
@@ -140,16 +142,16 @@ if __name__ == '__main__':
     suite = TestSuite()
     
     suite.addTest(TestFiltering("test22"))
-    suite.addTest(TestFiltering("test23"))
-    suite.addTest(TestFiltering("test24"))
-    suite.addTest(TestFiltering("test25"))
-    suite.addTest(TestFiltering("test26"))
-    suite.addTest(TestFiltering("test27"))
-    suite.addTest(TestFiltering("test28"))
-    suite.addTest(TestFiltering("test29"))
-    suite.addTest(TestFiltering("test30"))
-    suite.addTest(TestFiltering("test31"))
-    suite.addTest(TestFiltering("test32"))
+    #suite.addTest(TestFiltering("test23"))
+    #suite.addTest(TestFiltering("test24"))
+    #suite.addTest(TestFiltering("test25"))
+    #suite.addTest(TestFiltering("test26"))
+    #suite.addTest(TestFiltering("test27"))
+    #suite.addTest(TestFiltering("test28"))
+    #suite.addTest(TestFiltering("test29"))
+    #suite.addTest(TestFiltering("test30"))
+    #suite.addTest(TestFiltering("test31"))
+    #suite.addTest(TestFiltering("test32"))
     
     runner = TextTestRunner()
     runner.run(suite)
