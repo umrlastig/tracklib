@@ -161,8 +161,17 @@ class Bbox:
         """
         return self.ur.setY(ymax)
 
-    def plot(self, sym="b-"):
+    def plot(self, sym="b-", append=plt):
         """TODO"""
+        
+        if isinstance(append, bool):
+            if append:
+                ax1 = plt.gca()
+            else:
+                fig, ax1 = plt.subplots(figsize=(12, 6))
+        else:
+            ax1 = append
+            
         X = [
             self.getXmin(),
             self.getXmax(),
@@ -177,7 +186,7 @@ class Bbox:
             self.getYmax(),
             self.getYmin(),
         ]
-        plt.plot(X, Y, sym)
+        ax1.plot(X, Y, sym)
 
     def __add__(self, bbox: Bbox) -> Bbox:
         """Bounding boxes combination

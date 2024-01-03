@@ -542,7 +542,7 @@ class Polygon:
 def boundingShape(track, mode=MODE_ENCLOSING_BBOX):
     """TODO"""
     if mode == MODE_ENCLOSING_BBOX:
-        return track.getBBox()
+        return track.bbox()
     if mode == MODE_ENCLOSING_MBR:
         return minimumBoundingRectangle(track)
     if mode == MODE_ENCLOSING_CIRCLE:

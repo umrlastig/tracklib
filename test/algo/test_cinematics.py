@@ -328,31 +328,34 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         trace1.plot('k-')
         
         ind = averageDeviationPositions(trace1)
+        print (ind)
         self.assertLessEqual(abs(ind - 2.1875), self.__epsilon)
         
         # -----
         
         #computeAbsCurv(trace1)
-        #moyspeed = trace1.operate(Operator.RMSE, "abs_curv", "rmse_abs_curv")
-        #print (moyspeed)
+        #trace1.operate(Operator.DIFFERENTIATOR, "abs_curv", "dist")
+        #print (trace1['dist'])
+        #trace1.operate(Operator.DEBIASER, "dist", "dmd")
+        #trace1.operate(Operator.RMSE, "dist", "rmse_abs_curv")
         
         
 if __name__ == '__main__':
     
     suite = unittest.TestSuite()
-    #suite.addTest(TestAlgoCinematicsMethods("testAFInflexion"))
-    #suite.addTest(TestAlgoCinematicsMethods("testAFvertex"))
-    #suite.addTest(TestAlgoCinematicsMethods("testBends"))
-    #suite.addTest(TestAlgoCinematicsMethods("testSwitchbacks"))
+    suite.addTest(TestAlgoCinematicsMethods("testAFInflexion"))
+    suite.addTest(TestAlgoCinematicsMethods("testAFvertex"))
+    suite.addTest(TestAlgoCinematicsMethods("testBends"))
+    suite.addTest(TestAlgoCinematicsMethods("testSwitchbacks"))
     
-    #suite.addTest(TestAlgoCinematicsMethods("testSmoothedSpeedCalculation"))
-    #suite.addTest(TestAlgoCinematicsMethods("testCompareAbsCurv"))
-    #suite.addTest(TestAlgoCinematicsMethods("testEstimateHeading"))
-    #suite.addTest(TestAlgoCinematicsMethods("testComputeNetDeniv"))
-    #suite.addTest(TestAlgoCinematicsMethods("testComputeAscDeniv"))
-    #suite.addTest(TestAlgoCinematicsMethods("testComputeDescDeniv"))
-    #suite.addTest(TestAlgoCinematicsMethods("testComputeAvgAscSpeed"))
-    #suite.addTest(TestAlgoCinematicsMethods("testComputeRadialSignature"))
+    suite.addTest(TestAlgoCinematicsMethods("testSmoothedSpeedCalculation"))
+    suite.addTest(TestAlgoCinematicsMethods("testCompareAbsCurv"))
+    suite.addTest(TestAlgoCinematicsMethods("testEstimateHeading"))
+    suite.addTest(TestAlgoCinematicsMethods("testComputeNetDeniv"))
+    suite.addTest(TestAlgoCinematicsMethods("testComputeAscDeniv"))
+    suite.addTest(TestAlgoCinematicsMethods("testComputeDescDeniv"))
+    suite.addTest(TestAlgoCinematicsMethods("testComputeAvgAscSpeed"))
+    suite.addTest(TestAlgoCinematicsMethods("testComputeRadialSignature"))
     suite.addTest(TestAlgoCinematicsMethods("testAverageDeviationPositions"))
     
     runner = unittest.TextTestRunner()

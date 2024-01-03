@@ -219,16 +219,20 @@ def averageDeviationPositions(track):
     '''
     
     MD = 0
-    for i in range(track.size()-1):
-        p1 = track.getObs(i).position
-        p2 = track.getObs(i+1).position
-        MD += p1.distanceTo(p2)
+    for i in range(1, track.size()):
+        p1 = track.getObs(i-1).position
+        p2 = track.getObs(i).position
+        d = p1.distanceTo(p2)
+        print (d)
+        MD += d
     MD = MD / (track.size()-1)
     
+    
+    
     ADP = 0
-    for i in range(track.size()-1):
-        p1 = track.getObs(i).position
-        p2 = track.getObs(i+1).position
+    for i in range(1, track.size()):
+        p1 = track.getObs(i-1).position
+        p2 = track.getObs(i).position
         d =  p1.distanceTo(p2)
         ADP += abs(d - MD)
     ADP = ADP / (track.size()-1)
