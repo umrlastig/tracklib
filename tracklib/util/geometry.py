@@ -84,7 +84,7 @@ import tracklib as tracklib
 from tracklib.core import ObsTime, Obs, makeCoords
 
 
-def cartesienne(segment) -> list[float, float, float]:   
+def cartesienne(segment) -> list[float, float, float, float]:   
     """Fonction equation cartesienne
 
     :return: liste de paramètres

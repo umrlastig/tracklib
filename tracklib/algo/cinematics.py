@@ -53,6 +53,7 @@ from . import (anglegeom,
                BIAF_HEADING, heading,
                BIAF_DS, ds,
                BIAF_ABS_CURV)
+
 from tracklib.core import Operator
 
 
@@ -197,6 +198,9 @@ def computeDescDeniv(track, id_ini=0, id_fin=None):
     return dn
 
 
+# =============================================================================
+#    MEASURES  
+
 def computeRadialSignature(track, factor=1):
     track = track.copy(); track.loop()
     R = track.getEnclosedPolygon().signature()
@@ -205,8 +209,52 @@ def computeRadialSignature(track, factor=1):
     return track
 
 
+def averageDeviationPositions(track):
+    '''
+    Répartition des points de la ligne: l'écart moyen rapporté à la moyenne 
+    des distances entre les points. Cette mesure peut donner une indication 
+    plus locale de la sinuosité de la ligne. Comme on l’a vu ci-dessus, plus 
+    une portion est sinueuse, plus elle contient de points et plus les points 
+    sont proches.
+    '''
+    
+    MD = 0
+    for i in range(track.size()-1):
+        p1 = track.getObs(i).position
+        p2 = track.getObs(i+1).position
+        MD += p1.distanceTo(p2)
+    MD = MD / (track.size()-1)
+    
+    ADP = 0
+    for i in range(track.size()-1):
+        p1 = track.getObs(i).position
+        p2 = track.getObs(i+1).position
+        d =  p1.distanceTo(p2)
+        ADP += abs(d - MD)
+    ADP = ADP / (track.size()-1)
+    
+    return ADP
+
+
+def distanceDirectionMatrix():
+    return 0
+    
+def buttenfieldTree():
+    # TODO
+    return 0
+
+# La dimension fractale
+# Mesure d'entropie
+# Analyse des fréquences = ondelettes
+# Changements de direction
+# Curvilinéarité
+# La longueur et largeur du rectangle englobant  
+
+
+
+
 # =============================================================================
-#  
+#  Inlfection, Vertex, Bend, Switchback
 
 def computeInflection(track):
     """

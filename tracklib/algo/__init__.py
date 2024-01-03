@@ -13,7 +13,6 @@ from .comparison import *
 from .segmentation import *
 from .selection import *
 from .simplification import *
-from .measuring import *
 
 from .mapping import *
 from .summarising import *

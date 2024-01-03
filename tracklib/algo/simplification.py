@@ -55,7 +55,8 @@ from tracklib.util import (aire_visval,
                            boundingShape, MODE_ENCLOSING_MBR)
 from tracklib.core import Operator
 from tracklib.algo import (MODE_SEGMENTATION_MINIMIZE, MODE_SEGMENTATION_MAXIMIZE,
-                           optimalSegmentation)
+                           optimalSegmentation, compare)
+
 
 MODE_SIMPLIFY_DOUGLAS_PEUCKER = 1
 MODE_SIMPLIFY_VISVALINGAM = 2
@@ -384,4 +385,70 @@ def squaring (track, eps):
         output[i].position.setY(X[2*i+1])
     #output.loop()
 '''
+
+# =============================================================================
+#    MEASURES
+
+def compareWithDouglasPeuckerSimplification(track, threshold):
+    '''
+    retourne le nombre de points de la ligne la plus généralisée 
+    avec Douglas Peucker et qui respecte une qualité donnée avec threshold.
+    
+    :param track: TODO
+    :param threshold: qualité à ne pas dépasser, détermine le seuil pour DP
+    '''
+    
+    # On prend tous les seuils de 1m à longueur de la bbox ?
+    sup = max(int(track.bbox().getDx()), int(track.bbox().getDy()))
+    
+    S = []
+    for tolerance in range(1, sup):
+        track1 = douglas_peucker(track, tolerance)
+        #print (track.size(), track1.size(), tolerance)
+        
+        err = compare(track, track1)
+        if err != None and err < threshold:
+            S.append(tolerance)
+        else:
+            # La fonction compare est croissante, donc on peut stopper quand
+            # on a dépassé le seuil
+            break
+
+    if len(S) > 0:
+        index_max = max(range(len(S)), key=S.__getitem__)
+        track1 = douglas_peucker(track, S[index_max])
+        return track1.size()
+    else:
+        return 
+
+
+def averageOffsetDistance(track, threshold):
+    '''
+    Strength of Line Simplification.
+    Song, Jia & Miao, Ru. (2016). A Novel Evaluation Approach for Line Simplification 
+    Algorithms towards Vector Map Visualization. ISPRS International Journal of 
+    Geo-Information. 5. 223. 10.3390/ijgi5120223. 
+    '''
+    
+    trackSimplified = douglas_peucker(track, threshold)
+    trackSimplified.plot('r-')
+    
+    offsetDistance = 0
+    for o in track:
+        # On cherche la plus petite distance à TS
+        di = sys.float_info.max
+        for i in range(0, trackSimplified.size()-1):
+            p1ts = trackSimplified.getObs(i).position
+            p2ts = trackSimplified.getObs(i+1).position
+            d = distance_to_segment(o.position.getX(), o.position.getY(), 
+                                    p1ts.getX(), p1ts.getY(), p2ts.getX(), p2ts.getY())
+            if d < di:
+                di = d
+        
+        offsetDistance += di
+    
+    return offsetDistance / track.size()
+
+
+
 

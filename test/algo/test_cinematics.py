@@ -9,6 +9,7 @@ import unittest
 
 from tracklib import (Obs, ObsTime, ENUCoords, getColorMap,
                       BIAF_ABS_CURV, 
+                      Operator,
                       computeInflection, 
                       computeVertex, 
                       computeBend,
@@ -22,7 +23,8 @@ from tracklib import (Obs, ObsTime, ENUCoords, getColorMap,
                       computeAscDeniv,
                       computeDescDeniv,
                       Track,
-                      TrackReader, computeRadialSignature)
+                      TrackReader, computeRadialSignature,
+                      averageDeviationPositions)
 
 
 class TestAlgoCinematicsMethods(unittest.TestCase):
@@ -309,23 +311,49 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         R = trace1.getAnalyticalFeature('r')
         plt.plot(R, color="royalblue", linestyle='--')
         
-
+    
+    def testAverageDeviationPositions(self):
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        trace1 = Track([], 1)
+        trace1.addObs(Obs(ENUCoords(0, 0, 0), ObsTime.readTimestamp("2018-01-01 10:00:00")))
+        trace1.addObs(Obs(ENUCoords(10, 0, 0), ObsTime.readTimestamp("2018-01-01 10:00:12")))
+        trace1.addObs(Obs(ENUCoords(10, 10, 0), ObsTime.readTimestamp("2018-01-01 10:00:40")))
+        trace1.addObs(Obs(ENUCoords(20, 10, 0), ObsTime.readTimestamp("2018-01-01 10:01:50")))
+        trace1.addObs(Obs(ENUCoords(20, 20, 0), ObsTime.readTimestamp("2018-01-01 10:02:10")))
+        trace1.addObs(Obs(ENUCoords(30, 20, 0), ObsTime.readTimestamp("2018-01-01 10:02:35")))
+        trace1.addObs(Obs(ENUCoords(30, 30, 0), ObsTime.readTimestamp("2018-01-01 10:02:43")))
+        trace1.addObs(Obs(ENUCoords(40, 30, 0), ObsTime.readTimestamp("2018-01-01 10:02:55")))
+        trace1.addObs(Obs(ENUCoords(60, 30, 0), ObsTime.readTimestamp("2018-01-01 10:03:25")))
+        
+        trace1.plot('k-')
+        
+        ind = averageDeviationPositions(trace1)
+        self.assertLessEqual(abs(ind - 2.1875), self.__epsilon)
+        
+        # -----
+        
+        #computeAbsCurv(trace1)
+        #moyspeed = trace1.operate(Operator.RMSE, "abs_curv", "rmse_abs_curv")
+        #print (moyspeed)
+        
+        
 if __name__ == '__main__':
     
     suite = unittest.TestSuite()
-    suite.addTest(TestAlgoCinematicsMethods("testAFInflexion"))
-    suite.addTest(TestAlgoCinematicsMethods("testAFvertex"))
-    suite.addTest(TestAlgoCinematicsMethods("testBends"))
-    suite.addTest(TestAlgoCinematicsMethods("testSwitchbacks"))
+    #suite.addTest(TestAlgoCinematicsMethods("testAFInflexion"))
+    #suite.addTest(TestAlgoCinematicsMethods("testAFvertex"))
+    #suite.addTest(TestAlgoCinematicsMethods("testBends"))
+    #suite.addTest(TestAlgoCinematicsMethods("testSwitchbacks"))
     
-    suite.addTest(TestAlgoCinematicsMethods("testSmoothedSpeedCalculation"))
-    suite.addTest(TestAlgoCinematicsMethods("testCompareAbsCurv"))
-    suite.addTest(TestAlgoCinematicsMethods("testEstimateHeading"))
-    suite.addTest(TestAlgoCinematicsMethods("testComputeNetDeniv"))
-    suite.addTest(TestAlgoCinematicsMethods("testComputeAscDeniv"))
-    suite.addTest(TestAlgoCinematicsMethods("testComputeDescDeniv"))
-    suite.addTest(TestAlgoCinematicsMethods("testComputeAvgAscSpeed"))
-    suite.addTest(TestAlgoCinematicsMethods("testComputeRadialSignature"))
+    #suite.addTest(TestAlgoCinematicsMethods("testSmoothedSpeedCalculation"))
+    #suite.addTest(TestAlgoCinematicsMethods("testCompareAbsCurv"))
+    #suite.addTest(TestAlgoCinematicsMethods("testEstimateHeading"))
+    #suite.addTest(TestAlgoCinematicsMethods("testComputeNetDeniv"))
+    #suite.addTest(TestAlgoCinematicsMethods("testComputeAscDeniv"))
+    #suite.addTest(TestAlgoCinematicsMethods("testComputeDescDeniv"))
+    #suite.addTest(TestAlgoCinematicsMethods("testComputeAvgAscSpeed"))
+    #suite.addTest(TestAlgoCinematicsMethods("testComputeRadialSignature"))
+    suite.addTest(TestAlgoCinematicsMethods("testAverageDeviationPositions"))
     
     runner = unittest.TextTestRunner()
     runner.run(suite)
