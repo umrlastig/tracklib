@@ -402,7 +402,7 @@ class MatplotlibVisitor(IPlotVisitor):
             ax1.scatter(X, Y, s=pointsize, c=tcolor, marker=marker)
         else:
             # type == LINE
-            ax1.plot(X, Y, color=tcolor, linestyle=marker, linewidth=1)
+            ax1.plot(X, Y, color=tcolor, linestyle=marker, linewidth=1.5)
 
         # AXES: label + limit        
         if xlabel is None and ylabel is None:
