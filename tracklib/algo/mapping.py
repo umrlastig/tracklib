@@ -369,10 +369,11 @@ def mapOn(
             f = reference.operate(Operator.AVERAGER, "ds") / track_copy.operate(
                 Operator.AVERAGER, "ds"
             )
+
             track_copy.scale(f)
 
             # Match data by rough translation
-            t = track_copy.getCentroid() - reference.getCentroid()
+            t = reference.getCentroid() - track_copy.getCentroid() 
             track_copy.translate(t.getX(), t.getY())
 
             resolution_steps = range(N_ITER_MAX)
