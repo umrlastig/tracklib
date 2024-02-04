@@ -47,7 +47,7 @@ Class to manage cinematic computations on GPS tracks
 
 from numpy import pi
 
-from tracklib.util import angleBetweenThreePoints
+from tracklib.util import angleBetweenThreePoints, distance_to_segment
 from . import (anglegeom,
                BIAF_SPEED, speed,
                BIAF_HEADING, heading,
@@ -348,7 +348,7 @@ def computeVertex(track):
     Vertices are characteristic points of a track corresponding to 
     the maxima of curvature between two inflexion points.
     
-    "sommet" dans la thèse de Plazannet
+    "sommet" in the Plazannet thesis.
     
     This function is an AF algorithm to detect if the observation obs(i) 
     is a vertex point of the track or not.
@@ -362,9 +362,13 @@ def computeVertex(track):
     :type i: int
     :returns: 1 if obs(i) is a vertex point, 0 else.
     :rtype: int
+    
     '''
 
     track.createAnalyticalFeature('vertex', 0)
+    track.createAnalyticalFeature('height_vertex', 0)
+    track.createAnalyticalFeature('base_vertex', 0)
+    #track.createAnalyticalFeature('curve_length_vertex', 0)
     
     if not track.hasAnalyticalFeature('inflection'):
         computeInflection(track)
@@ -406,9 +410,24 @@ def computeVertex(track):
             if kj < K:
                 K = kj
                 iK = j
+                
+        # On peut calculer les indicateurs: base, hauteur, lcurv:
+        vbase = track.getObs(imin).distanceTo(track.getObs(imax))
+        
+        # La heuteur (perpendiculaire à la base)
+        xi = track.getObs(iK).position.getX()
+        yi = track.getObs(iK).position.getY()
+        x1 = track.getObs(imin).position.getX()
+        y1 = track.getObs(imin).position.getY()
+        x2 = track.getObs(imax).position.getX()
+        y2 = track.getObs(imax).position.getY()
+        d = distance_to_segment(xi, yi, x1, y1, x2, y2)
     
         #print ('   ', i, iK)
         track.setObsAnalyticalFeature('vertex', iK, 1)
+        track.setObsAnalyticalFeature('base_vertex', iK, vbase)
+        track.setObsAnalyticalFeature('height_vertex', iK, d)
+        # print (iK, vbase, d)
 
 
 def computeBend(track, angle_min = pi/2):
