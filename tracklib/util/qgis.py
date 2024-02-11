@@ -1,5 +1,44 @@
 # -*- coding: utf-8 -*-
 
+"""
+© Copyright Institut National de l'Information Géographique et Forestière (2020)
+Contributors: 
+    Marie-Dominique Van Damme
+Creation date: 1th november 2020
+
+tracklib library provides a variety of tools, operators and 
+functions to manipulate GPS trajectories. It is a open source contribution 
+of the LASTIG laboratory at the Institut National de l'Information 
+Géographique et Forestière (the French National Mapping Agency).
+See: https://tracklib.readthedocs.io
+ 
+This software is governed by the CeCILL-C license under French law and
+abiding by the rules of distribution of free software. You can  use, 
+modify and/ or redistribute the software under the terms of the CeCILL-C
+license as circulated by CEA, CNRS and INRIA at the following URL
+"http://www.cecill.info". 
+
+As a counterpart to the access to the source code and rights to copy,
+modify and redistribute granted by the license, users are provided only
+with a limited warranty  and the software's author,  the holder of the
+economic rights,  and the successive licensors  have only  limited
+liability. 
+
+In this respect, the user's attention is drawn to the risks associated
+with loading,  using,  modifying and/or developing or reproducing the
+software by the user in light of its specific status of free software,
+that may mean  that it is complicated to manipulate,  and  that  also
+therefore means  that it is reserved for developers  and  experienced
+professionals having in-depth computer knowledge. Users are therefore
+encouraged to load and test the software's suitability as regards their
+requirements in conditions enabling the security of their systems and/or 
+data to be ensured and,  more generally, to use and operate it in the 
+same conditions as regards security. 
+
+The fact that you are presently reading this means that you have had
+knowledge of the CeCILL-C license and that you accept its terms.
+"""
+
 from tracklib import Track, TrackCollection
 
 try:
@@ -14,6 +53,20 @@ try:
 except ImportError:
     print ('Code running in a no qgis environment')
     
+    
+#vertFonce = '51,160,44'   # vertex
+#orange = '255,127,0'
+#jaune = '246,240,44'
+#bleu = '68,174,240'       # bend
+#rose = '237,55,234'       # switchbacks : 0
+#turquoise = '54,202,202'  # switchbacks : 1
+    
+# bleu QColor.fromRgb(22, 73, 229)
+# vert QColor.fromRgb(10, 174, 23)
+# cyan QColor.fromRgb(10, 222, 236)
+# magenat QColor.fromRgb(180, 32, 90)
+# jaune QColor.fromRgb(240, 222, 14)
+# orange QColor.fromRgb(253, 176, 32)
     
 class LineStyle:
     @staticmethod
@@ -52,7 +105,9 @@ class PointStyle:
     @staticmethod
     def simpleBlack(layerPoint):
         symbol = QgsMarkerSymbol.createSimple({
+            'name': 'circle',
             'color': 'black', 
+            # 'outline_color': '0,0,0'
             'size':'1.4'})
         layerPoint.renderer().setSymbol(symbol)
         
@@ -249,5 +304,125 @@ class QGIS:
         layerLinkMM.updateExtents()
         QgsProject.instance().addMapLayer(layerLinkMM)
         
+
+'''
+    # SpatialIndex
+    def plotSpatialIndex(self, si, base:bool=True, append=True):
+        """
+        Plot spatial index and collection structure together in the
+        same reference frame (geographic reference frame)
+            - base: plot support network or track collection if True
+        """
         
+        layerGrid = QgsVectorLayer("LineString?crs=2154", "Grid", "memory")
+        pr = layerGrid.dataProvider()
+        layerGrid.updateFields()
         
+        layerIndex = QgsVectorLayer("Polygon?crs=2154", "Index", "memory")
+        pr2 = layerIndex.dataProvider()
+        layerIndex.updateFields()
+            
+        for i in range(0, si.csize):
+            xi = i * si.dX + si.xmin
+            # ax1.plot([xi, xi], [si.ymin, si.ymax], "-", color="gray")
+            
+            pt1 = QgsPointXY(xi, si.ymin)
+            pt2 = QgsPointXY(xi, si.ymax)
+            fet = QgsFeature()
+            #fet.setAttributes(attrs)
+            fet.setGeometry(QgsGeometry.fromPolylineXY([pt1, pt2]))
+            pr.addFeatures([fet])
+        
+        for j in range(0, si.lsize):
+            yj = j * si.dY + si.ymin
+            pt1 = QgsPointXY(si.xmin, yj)
+            pt2 = QgsPointXY(si.xmax, yj)
+            fet = QgsFeature()
+            #fet.setAttributes(attrs)
+            fet.setGeometry(QgsGeometry.fromPolylineXY([pt1, pt2]))
+            pr.addFeatures([fet])
+
+
+        for i in range(si.csize):
+            xi1 = i * si.dX + si.xmin
+            xi2 = xi1 + si.dX
+            for j in range(si.lsize):
+                yj1 = j * si.dY + si.ymin
+                yj2 = yj1 + si.dY
+                if len(si.grid[i][j]) > 0:
+                    
+                    p = QgsGeometry.fromPolygonXY( [[
+                            QgsPointXY( xi1, yj1 ),
+                            QgsPointXY( xi2, yj1 ),
+                            QgsPointXY( xi2, yj2 ),
+                            QgsPointXY( xi1, yj2 ),
+                            QgsPointXY( xi1, yj1 ) ]] )
+                    fet = QgsFeature()
+                    #fet.setAttributes(attrs)
+                    fet.setGeometry(p)
+                    pr2.addFeatures([fet])
+                    
+        layerGrid.updateExtents()
+        QgsProject.instance().addMapLayer(layerGrid)
+        
+        symbolL1 = QgsLineSymbol.createSimple({
+            'penstyle':'solid',
+            'width':'0.8',
+            'color':'gray'})
+        layerGrid.renderer().setSymbol(symbolL1)
+        
+        layerIndex.updateExtents()
+        QgsProject.instance().addMapLayer(layerIndex)
+        
+        props3 = {'color': '180,180,180', 'size':'1', 'color_border' : '180,180,180'}
+        symbol3 = QgsFillSymbol.createSimple(props3)
+        layerIndex.renderer().setSymbol(symbol3)
+'''
+    
+    
+        
+    '''
+    @staticmethod
+    def getStylePointAF(af, colors, values = [1]):
+        categories = []
+            
+        for k in range(len(values)):
+            symbolEdge = QgsMarkerSymbol.createSimple({'name': 'square', 
+                                                   'color': colors[k], 
+                                                   'size': '0.8', 
+                                                   'outline_color': colors[k],
+                                                   'color_border': colors[k]})
+            #symbolEdge.setColor(QColor.fromRgb(31, 120, 180))
+            symbolEdge.setSize(1.8)
+            categoryEdge = QgsRendererCategory(values[k], symbolEdge, str(values[k]))
+            categories.append(categoryEdge)
+            
+        # On construit une expression pour appliquer les categories
+        expression = af # field name
+        renderer = QgsCategorizedSymbolRenderer(expression, categories)
+        
+        return renderer
+        
+    @staticmethod
+    def getStyleLigneAF(af, colors, values = [0,1]):
+        
+        # virage: getStyleLigneAF('bend', [bleu], [0])
+        # lacet: getStyleLigneAF('switchbacks', [rose,turquoise], [0,1])
+        
+        categories = []
+        
+        for k in range(len(values)):
+            symbolL = QgsLineSymbol.createSimple({
+                'penstyle':'solid', 
+                'width':'0.6',
+                'color': colors[k],  # '255,127,0'
+                'line_style':'dash'})
+            categoryEdge = QgsRendererCategory(values[k], symbolL, str(values[k]))
+            categories.append(categoryEdge)
+        
+        expression = af # field name
+        renderer = QgsCategorizedSymbolRenderer(expression, categories)
+        
+        return renderer
+    
+ '''   

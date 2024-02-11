@@ -114,18 +114,4 @@ class IPlotVisitor(ABC):
         pass
     
     
-    @abstractmethod
-    def plotSpatialIndex(self, si, base=True, append=True):
-        """
-        Plot a spatial index.
-        """
-        pass
-    
-    @abstractmethod
-    def highlightCellInSpatialIndex(self, si, i, j, sym="r-", size=0.5):
-        """
-        Plot a specific cell (i,j)
-        """
-        pass
-    
     
