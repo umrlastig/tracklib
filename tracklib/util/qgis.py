@@ -381,7 +381,7 @@ class QGIS:
     
     
         
-    '''
+'''
     @staticmethod
     def getStylePointAF(af, colors, values = [1]):
         categories = []
