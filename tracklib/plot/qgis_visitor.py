@@ -51,7 +51,7 @@ try:
     from qgis.PyQt.QtCore import QVariant
     from qgis.core import QgsProject, QgsVectorLayer, QgsField
     from qgis.core import QgsPointXY, QgsFeature, QgsGeometry
-    from qgis.core import QgsMarkerSymbol, QgsLineSymbol, QgsSimpleLineSymbolLayer
+    from qgis.core import QgsMarkerSymbol, QgsLineSymbol
     from qgis.core import QgsFillSymbol
     from PyQt5.QtGui import QColor
     from qgis.core import QgsCategorizedSymbolRenderer, QgsRendererCategory
@@ -196,22 +196,7 @@ class QgisVisitor(IPlotVisitor):
         pass
     
     
-    def plotMMLink(self, track):
-        """
-        Plot the map matched track on network links.
-        """
-        layerLinkMM = QgsVectorLayer("LineString?crs=2154", "Link MM", "memory")
-        pr = layerLinkMM.dataProvider()
-        layerLinkMM.updateFields()
-        for k in range(len(track)):
-            pt1 = QgsPointXY(track[k].position.getX(), track[k].position.getY())
-            pt2 = QgsPointXY(track["hmm_inference", k][0].getX(), track["hmm_inference", k][0].getY())
-            fet = QgsFeature()
-            #fet.setAttributes(attrs)
-            fet.setGeometry(QgsGeometry.fromPolylineXY([pt1, pt2]))
-            pr.addFeatures([fet])
-        layerLinkMM.updateExtents()
-        QgsProject.instance().addMapLayer(layerLinkMM)
+    
             
 
 
@@ -296,45 +281,7 @@ class QgisVisitor(IPlotVisitor):
         pass
     
 
-    def plotNetwork(self, net, edges: str = "k-", nodes: str = "",
-        direct: str = "k--", indirect: str = "k--", size: float = 0.5, append=False):
-        """
-        Plot network
-        """
-        layerNetwork = QgsVectorLayer("LineString?crs=2154", "Network", "memory")
-        pr = layerNetwork.dataProvider()
-        layerNetwork.updateFields()
-
-        L = list(net.EDGES.items())
-        for i in range(len(L)):
-            edge = L[i][1]
-            for j in range(edge.geom.size() - 1):
-                pt1 = QgsPointXY(edge.geom.getX()[j], edge.geom.getY()[j])
-                pt2 = QgsPointXY(edge.geom.getX()[j + 1], edge.geom.getY()[j + 1])
-                fet = QgsFeature()
-                #fet.setAttributes(attrs)
-                fet.setGeometry(QgsGeometry.fromPolylineXY([pt1, pt2]))
-                pr.addFeatures([fet])
-        
-        layerNetwork.updateExtents()
-        QgsProject.instance().addMapLayer(layerNetwork)
-        
-        symbolL1 = QgsLineSymbol.createSimple({
-            'penstyle':'solid',
-            'width':'0.8',
-            'color':'blue'})
-        layerNetwork.renderer().setSymbol(symbolL1)
-        
-        symbolL1 = QgsLineSymbol.createSimple({
-            'penstyle':'solid',
-            'width':'1.06',
-            'color':'black'})
-        layerNetwork.renderer().setSymbol(symbolL1)
-        symbol_l2 = QgsSimpleLineSymbolLayer.create ({
-            'color':'white',
-            'width':'0.8',
-            'line_style':'solid'})
-        symbolL1.appendSymbolLayer(symbol_l2)
+    
 
 
 

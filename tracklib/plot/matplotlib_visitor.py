@@ -391,15 +391,34 @@ class MatplotlibVisitor(IPlotVisitor):
         ymax = ymax + dy * margin
         
         if af_name != None and af_name != "":
-            if cmap == -1:
-                cmap = getColorMap((255, 0, 0), (32, 178, 170))
-            values = track.getAnalyticalFeature(af_name)
-            s = [pointsize + values[n] for n in range(len(X))]
-            scatter = ax1.scatter(X, Y, c=values, cmap=cmap, s=s)
-            fig = plt.gcf()
-            fig.colorbar(scatter, ax=ax1)
+            
+            if track.isAFTransition(af_name):
+                tabmarqueurs = track.getAnalyticalFeature(af_name)
+                xaf = []
+                yaf = []
+                for i in range(len(tabmarqueurs)):
+                    val = tabmarqueurs[i]
+                    if val == 1:
+                        xaf.append(track.getObs(i).position.getX())
+                        yaf.append(track.getObs(i).position.getY())
+
+                ax1.plot(xaf, yaf, "o", color=color, markersize=size,
+                    label=af_name )
+                #tabplot.append(l)
+                #tablegend.append(af_name)
+            else:
+                if cmap == -1:
+                    cmap = getColorMap((255, 0, 0), (32, 178, 170))
+                
+                values = track.getAnalyticalFeature(af_name)
+                s = [pointsize + values[n] for n in range(len(X))]
+                scatter = ax1.scatter(X, Y, c=values, cmap=cmap, s=s)
+                fig = plt.gcf()
+                fig.colorbar(scatter, ax=ax1)
+        
         elif type == "POINT":
             ax1.scatter(X, Y, s=pointsize, c=tcolor, marker=marker)
+        
         else:
             # type == LINE
             ax1.plot(X, Y, color=tcolor, linestyle=marker, linewidth=1.5)
@@ -648,113 +667,6 @@ class MatplotlibVisitor(IPlotVisitor):
     # ==========================================================================
     # ==========================================================================
 
-    def plotNetwork(self, net, edges: str = "k-", nodes: str = "",
-        direct: str = "k--", indirect: str = "k--", size: float = 0.5, append=False):
-        """
-        Plot network
-
-        :param edges: TODO
-        :param nodes: TODO
-        :param direct: TODO
-        :param indirect: TODO
-        :param size: TODO
-        :param append: TODO
-        """
-        
-        if isinstance(append, bool):
-            if append:
-                ax1 = plt.gca()
-            else:
-                fig, ax1 = plt.subplots(figsize=(10, 3))
-        else:
-            ax1 = plt
-
-
-        x1b = []
-        y1b = []
-        x1i = []
-        y1i = []
-        x1d = []
-        y1d = []
-        x2b = []
-        y2b = []
-        x2i = []
-        y2i = []
-        x2d = []
-        y2d = []
-        exb = []
-        eyb = []
-        exi = []
-        eyi = []
-        exd = []
-        eyd = []
-        nx = []
-        ny = []
-        
-        L = list(net.EDGES.items())
-        for i in range(len(L)):
-            edge = L[i][1]
-            for j in range(edge.geom.size() - 1):
-                if edge.orientation == tracklib.Edge.DOUBLE_SENS:
-                    x1b.append(edge.geom.getX()[j])
-                    x2b.append(edge.geom.getX()[j + 1])
-                    y1b.append(edge.geom.getY()[j])
-                    y2b.append(edge.geom.getY()[j + 1])
-                else:
-                    if edge.orientation == tracklib.Edge.SENS_DIRECT:
-                        x1d.append(edge.geom.getX()[j])
-                        x2d.append(edge.geom.getX()[j + 1])
-                        y1d.append(edge.geom.getY()[j])
-                        y2d.append(edge.geom.getY()[j + 1])
-                    else:
-                        x1i.append(edge.geom.getX()[j])
-                        x2i.append(edge.geom.getX()[j + 1])
-                        y1i.append(edge.geom.getY()[j])
-                        y2i.append(edge.geom.getY()[j + 1])
-            nx.append(edge.geom.getX()[0])
-            nx.append(edge.geom.getX()[-1])
-            ny.append(edge.geom.getY()[0])
-            ny.append(edge.geom.getY()[-1])
-        
-        for s, t, u, v in zip(x1b, y1b, x2b, y2b):
-            exb.append(s)
-            exb.append(u)
-            exb.append(None)
-            eyb.append(t)
-            eyb.append(v)
-            eyb.append(None)
-        for s, t, u, v in zip(x1d, y1d, x2d, y2d):
-            exd.append(s)
-            exd.append(u)
-            exd.append(None)
-            eyd.append(t)
-            eyd.append(v)
-            eyd.append(None)
-
-        for s, t, u, v in zip(x1i, y1i, x2i, y2i):
-            exi.append(s)
-            exi.append(u)
-            exi.append(None)
-            eyi.append(t)
-            eyi.append(v)
-            eyi.append(None)
-
-        if len(edges) > 0:
-            ax1.plot(exb, eyb, edges, linewidth=size, label="double sens")
-        if len(direct) > 0:
-            ax1.plot(exd, eyd, direct, linewidth=size, label="direct")
-        if len(indirect) > 0:
-            ax1.plot(exi, eyi, indirect, linewidth=size, label="indirect")
-        if len(nodes) > 0:
-            ax1.plot(nx, ny, nodes, markersize=4 * size)
-
-            
-    def plotMMLink(self, track):
-        """
-        Plot the map matched track on network links.
-        """
-        pass
-        
     
     
 def plotOnImage(track, image_path, sym="r.", markersize=1):
