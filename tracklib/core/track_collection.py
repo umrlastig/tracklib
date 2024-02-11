@@ -141,6 +141,12 @@ class TrackCollection:
     # =========================================================================
     # Track collection coordinate transformation
     # =========================================================================
+    def getSRID(self) -> int:
+        """Return the SRID of collection
+
+        :return: SRID of current collection
+        """
+        return self.__TRACES[0].getSRID()
 
     def toECEFCoords(self, base=None):
         """TODO"""
