@@ -109,7 +109,7 @@ class TrackFormat:
             self.separator = fields[7].strip()
             self.h = int(fields[8].strip())
             self.com = fields[9].strip()
-            self.no_data_value = float(fields[10].strip())
+            self.no_data_value = fields[10].strip()  # cast float ?
             self.srid = fields[11].strip()
             self.read_all = fields[13].strip().upper() == "TRUE"
 
