@@ -173,7 +173,8 @@ class TestTrackReader(TestCase):
         
     def test_read_csv_format_date(self):
         ObsTime.setPrintFormat("4Y-2M-2D 2h:2m:2s.2z")
-        track = TrackReader.readFromCsv('../data/csv_format.csv', "CHAMOIS")
+        csvpath = os.path.join(self.resource_path, 'test/data/csv_format.csv')
+        track = TrackReader.readFromCsv(csvpath, "CHAMOIS")
         
         self.assertEqual(track.size(), 3)
         
@@ -212,7 +213,6 @@ if __name__ == '__main__':
 
     # TrackFormat
     suite.addTest(TestTrackReader("test_read_csv_format_date"))
-    
 
     runner = TextTestRunner()
     runner.run(suite)
