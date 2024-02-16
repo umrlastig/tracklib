@@ -191,7 +191,7 @@ class TestTrackReader(TestCase):
 if __name__ == '__main__':
     #unittest.main()
     suite = TestSuite()
-    '''
+
     # CSV
     suite.addTest(TestTrackReader("testReadCsvWithAFTrack"))
     suite.addTest(TestTrackReader("testReadCsvDir"))
@@ -209,7 +209,7 @@ if __name__ == '__main__':
     suite.addTest(TestTrackReader("test_read_gpx_dir"))
     suite.addTest(TestTrackReader("testReadGpxWithAF"))
     suite.addTest(TestTrackReader("test_read_millisecond"))
-    '''
+
     # TrackFormat
     suite.addTest(TestTrackReader("test_read_csv_format_date"))
     
