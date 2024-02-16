@@ -218,41 +218,41 @@ class TrackReader:
                 fields = [s for s in fields if s]
                 if (verbose):
                     print(fields)
-
+                    
                 if fmt.id_T != -1:
                     if isinstance(fmt.DateIni, int):
-                        time = ObsTime.readTimestamp(fields[fmt.id_T].strip())
+                        try:
+                            T = fields[fmt.id_T].strip().replace('"', '')
+                            time = ObsTime.readTimestamp(T)
+                        except ValueError:
+                            time = ObsTime()
+                            if verbose:
+                                print (fields[fmt.id_T].strip().replace('"', ''))
                     else:
                         time = fmt.DateIni.addSec((float)(fields[fmt.id_T])*timeUnit)
                 else:
                     time = ObsTime()
-                    
+                
                 # Blank fields
-                if (fields[fmt.id_E].strip() == ''):
+                if (fields[fmt.id_E].strip() == '' or fields[fmt.id_E].strip() == 'NA'):
                     fields[fmt.id_E] = fmt.no_data_value
-                if (fields[fmt.id_N].strip() == ''):
+                if (fields[fmt.id_N].strip() == '' or fields[fmt.id_N].strip() == 'NA'):
                     fields[fmt.id_N] = fmt.no_data_value
-                if (fields[fmt.id_U].strip() == ''):
+                if (fmt.id_U >= 0 and fields[fmt.id_U].strip() == ''):
                     fields[fmt.id_U] = fmt.no_data_value
                 
-
                 E = (float)(fields[fmt.id_E])
                 N = (float)(fields[fmt.id_N])
-
+    
                 if (int(E) != fmt.no_data_value) and (int(N) != fmt.no_data_value):
-
+    
                     if fmt.id_U >= 0:
                         U = (float)(fields[fmt.id_U])
                     else:
                         U = 0
-
+    
                     if not fmt.srid.upper() in [
-                        "ENUCOORDS",
-                        "ENU",
-                        "GEOCOORDS",
-                        "GEO",
-                        "ECEFCOORDS",
-                        "ECEF",
+                        "ENUCOORDS", "ENU", "GEOCOORDS", "GEO", "ECEFCOORDS", "ECEF",
                     ]:
                         print("Error: unknown coordinate type [" + str(srid) + "]")
                         exit()
@@ -262,9 +262,9 @@ class TrackReader:
                         point = Obs(GeoCoords(E, N, U), time)
                     if fmt.srid.upper() in ["ECEFCOORDS", "ECEF"]:
                         point = Obs(ECEFCoords(E, N, U), time)
-
+    
                     track.addObs(point)
-                    
+                        
                 else: 
                     no_data = fmt.no_data_value
                     track.addObs(Obs(makeCoords(no_data, no_data, no_data, fmt.srid.upper()), time))

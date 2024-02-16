@@ -11,7 +11,7 @@
 #   sep:       separating characters (can be multiple characters). Can be c (comma), b (blankspace), s (semi-column)
 #   header:    number of heading line in format 
 #   cmt:       comment character (lines starting with cmt on the top left are skipped)
-#   no_data:   a special float, integer or str indicating that record is non-valid and should be skipped (value not record)
+#   no_data:   a special float or integer indicating that record is non-valid and should be skipped
 #   srid:      coordinate system of points (ENU, Geo or ECEF) 
 #   time_fmt:  timestamp format (format definition according to GPSTime class)
 #   read_all:  read all fields in data file (registered as analytical features) 
@@ -24,4 +24,4 @@ IMU_STEREOPOLIS, imu, 1, 2, 3, 0, 2019-09-08 00:00:00, b, 1 , %, -999999, ENU, 4
 MAPMATCHER, dat, 2, 3, -1, 1, -1, c, 1, #, -1, ENU, 2D/2M/4Y 2h:2m:2s, TRUE
 COTATION_RANDO, csv, 1, 2, -1, 3, -1, c, 0, #, -999999, ENU, 2D/2M/4Y 2h:2m:2s, FALSE
 COLLIER_N4, n4, 3, 2, 4, 1, -1, c, 1, #, 0, GEO, 2D/2M/4Y 2h:2m:2s, TRUE 
-CHAMOIS, csv, 5, 6, -1, 4, -1, c, 1, #, NA, ENU, 4Y-2M-2D 2h:2m:2s, FALSE
+CHAMOIS, csv, 5, 6, -1, 4, -1, c, 1, #, -999999, ENU, 4Y-2M-2D 2h:2m:2s, FALSE
