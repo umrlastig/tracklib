@@ -236,6 +236,25 @@ class TrackCollection:
         output += "  Nb of pt(s):   " + str(SIZES) + "\n"
         # output += "  Nb of pt(s):   " + str(len(self.__POINTS)) + "\n"
         print(output)
+        
+    def toWKT(self) -> str:
+        """Transforms collection into WKT string, one linestring per track"""
+        output = "MULTILINESTRING ("
+        
+        for track in self.__TRACES:
+            output += "("
+            for i in range(track.size()):
+                if self.getSRID() == "Geo":
+                    output += (str)(track[i].position.lon) + " "
+                    output += (str)(track[i].position.lat)
+                elif self.getSRID() == "ENU":
+                    output += (str)(track[i].position.E) + " "
+                    output += (str)(track[i].position.N)
+                if i != track.size() - 1:
+                    output += ","
+            output += ")"
+        output += ")"
+        return output
 
     def addAnalyticalFeature(self, algorithm, name=None):
         """TODO"""
