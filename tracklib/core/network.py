@@ -894,7 +894,8 @@ class Network:
         else:
             return [(n[1].poids < 0) * 1e300 + n[1].poids for n in self.NODES.items()]
 
-    def all_shortest_distances(self, cut: float = 1e300, output_dict: dict = None) -> Dict[Tuple[int, int], float]:
+    def all_shortest_distances(self, cut: float = 1e300,
+                               output_dict: dict = None, verbose=False) -> Dict[Tuple[int, int], float]:
         """Computes all shortest distances between pairs of nodes
 
         The results are saved in a dictionnary `{key=(source, n), value=d}`.
@@ -917,10 +918,19 @@ class Network:
             it is possble tocall 'all_shortest_distances' successively with the same
             output dictionnary structure.
         """
-        print("Computing all pairs shortest distances...")
+        if verbose:
+            print("Map-matching preparation...")
+
         if output_dict is None:
             output_dict = dict()
-        for id_source in progressbar.progressbar(self.getNodesId()):
+
+        to_run = self.getNodesId()
+        if verbose:
+            to_run = progressbar.progressbar(to_run)
+
+        #print("Computing all pairs shortest distances...")
+        for id_source in to_run:
+        #for id_source in progressbar.progressbar(self.getNodesId()):
             self.run_routing_forward(id_source, cut=cut, output_dict=output_dict)
         return output_dict
 
@@ -1005,7 +1015,7 @@ class Network:
 
         return min(min(d1, d2), min(d3, d4))
 
-    def prepare(self, cut: Union[float, None] = 1e300):
+    def prepare(self, cut: Union[float, None] = 1e300, verbose=False):
         """Precomputes shortest distances between all pairs of nodes and saves the
         result in :attr:`DISTANCES` attribute.
 
@@ -1013,7 +1023,7 @@ class Network:
         """
         if self.DISTANCES is None:
             self.DISTANCES = dict()
-        self.all_shortest_distances(cut=cut, output_dict=self.DISTANCES)
+        self.all_shortest_distances(cut=cut, output_dict=self.DISTANCES, verbose=verbose)
 
     def has_prepared_shortest_distance(self, source: Union[int, Node], target: Union[int, Node]) -> bool:
         """Tests if a shortest distance has been precomputed
