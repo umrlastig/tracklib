@@ -252,11 +252,11 @@ class QGIS:
         FEATURES = []
         for i in range(collection.size()):
             track = collection.getTrack(i)
-            tid = int(track.tid)
-            if tid > 0:
-                id = tid
-            else:
-                id = i
+            #tid = int(track.tid)
+            #if tid > 0:
+            #    id = tid
+            #else:
+            id = i
             POINTS = []
             for j in range(track.size()):
                 obs = track.getObs(j)
@@ -287,14 +287,14 @@ class QGIS:
         return FEATURES
     
     
-    def plotMMLink(self, track):
+    def plotMMLink(track):
         """
         Plot the map matched track on network links.
         """
         layerLinkMM = QgsVectorLayer("LineString?crs=2154", "Link MM", "memory")
         pr = layerLinkMM.dataProvider()
         layerLinkMM.updateFields()
-        for k in range(len(track)):
+        for k in range(track.size()):
             pt1 = QgsPointXY(track[k].position.getX(), track[k].position.getY())
             pt2 = QgsPointXY(track["hmm_inference", k][0].getX(), track["hmm_inference", k][0].getY())
             fet = QgsFeature()
