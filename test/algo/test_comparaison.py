@@ -12,7 +12,8 @@ from tracklib import (Obs, ObsTime, ENUCoords,
                       plotDifferenceProfile,
                       premiereComposanteHausdorff,
                       hausdorff, discreteFrechet,
-                      centralTrack)
+                      centralTrack,
+                      averageDistance)
 
 
 
@@ -264,9 +265,35 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         plt.ylim([-1, 7])
         plt.show()   
 
-    
-
-
+    def testAverageDistance(self):
+        trace4 = Track([], 1)
+        trace4.addObs(Obs(ENUCoords(0, 50, 0), ObsTime()))
+        trace4.addObs(Obs(ENUCoords(10, 50, 0), ObsTime()))
+        trace4.addObs(Obs(ENUCoords(10, 60, 0), ObsTime()))
+        trace4.addObs(Obs(ENUCoords(20, 60, 0), ObsTime()))
+        trace4.addObs(Obs(ENUCoords(20, 50, 0), ObsTime()))
+        trace4.addObs(Obs(ENUCoords(30, 50, 0), ObsTime()))
+        trace4.plot('k-')
+        
+        
+        trace3 = Track([], 1)
+        trace3.addObs(Obs(ENUCoords(0, 40, 0), ObsTime()))
+        trace3.addObs(Obs(ENUCoords(10, 40, 0), ObsTime()))
+        trace3.addObs(Obs(ENUCoords(10, 30, 0), ObsTime()))
+        trace3.addObs(Obs(ENUCoords(20, 30, 0), ObsTime()))
+        trace3.addObs(Obs(ENUCoords(20, 40, 0), ObsTime()))
+        trace3.addObs(Obs(ENUCoords(30, 40, 0), ObsTime()))
+        trace3.plot('k-', append=True)
+        
+        plt.xlim([-10, 40])
+        plt.ylim([20, 70])
+        
+        S1 = averageDistance(trace3, trace4)
+        S2 = averageDistance(trace4, trace3)
+        
+        self.assertEqual(S1, 10.0)
+        self.assertEqual(S2, 10.0)
+        
     
 if __name__ == '__main__':
     suite = unittest.TestSuite()
@@ -279,6 +306,7 @@ if __name__ == '__main__':
     suite.addTest(TestAlgoComparaisonMethods("testFrechetSimilarity"))
     suite.addTest(TestAlgoComparaisonMethods("testCentralNNTrack"))
     suite.addTest(TestAlgoComparaisonMethods("testCentralDTWTrack"))
+    suite.addTest(TestAlgoComparaisonMethods("testAverageDistance"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

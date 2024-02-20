@@ -53,7 +53,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import tracklib as tracklib
-from tracklib.util import dist_point_to_segment
+from tracklib.util import dist_point_to_segment, Polygon
 from . import computeAbsCurv, synchronize, HMM, MODE_OBS_AS_2D_POSITIONS
 
 
@@ -396,6 +396,29 @@ def centralTrack(tracks, mode="NN", verbose=True):
         central.toGeoCoords(base)
 
     return central
+
+
+def averageDistance(track1, track2):
+    '''
+    Average distance between two lines
+    On divise par la moyenne des longueurs des arcs pour rendre cette mesure
+    indépendante de la longueur des lignes.
+    Ecart moyen entre deux lignes.
+    '''
+    
+    # create polygon
+    d1 = track1.getLastObs().distanceTo(track2.getFirstObs())
+    d2 = track1.getLastObs().distanceTo(track2.getLastObs())
+    if (d1 < d2):
+        X = track1.getX() + track2.getX()
+        Y = track1.getY() + track2.getY()
+    else:
+        nt = track2.reverse()
+        X = track1.getX() + nt.getX()
+        Y = track1.getY() + nt.getY()
+    p = Polygon(X, Y)
+    
+    return 2*p.area() / (track1.length() + track2.length())
 
 
 def premiereComposanteHausdorff(track1, track2):
