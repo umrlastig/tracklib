@@ -254,7 +254,7 @@ def buttenfieldTree():
 
 def averageDistanceBetweenInflectionPoint(track):
     # calculer les points d'inflexion
-    computeInflectionLevel2(track)
+    computeInflection(track)
     # calculer l'abscisse curviligne
     computeAbsCurv(track)
     
