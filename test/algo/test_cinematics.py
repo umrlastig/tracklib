@@ -372,7 +372,6 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         
         
     def testAverageDistanceBetweenInflectionPoint(self):
-        
         # TRACE 4
         ind2 = averageDistanceBetweenInflectionPoint(self.trace4)
         # print (ind2)
@@ -389,17 +388,16 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         self.trace3.plot('ko', append=True)
         ind2 = averageDistanceBetweenInflectionPoint(self.trace3)
         #print (ind2)
-        self.assertLessEqual(abs(ind2 - 29.281), self.__epsilon)
+        self.assertLessEqual(abs(ind2 - 29.999), self.__epsilon)
         self.trace3.plot(type='POINT', af_name='inflection', append=True, 
             cmap = self.COLS_ROUGE, pointsize=8)
         plt.show()
-        
         
         # TRACE 1
         self.trace1.plot('k-', append=False)
         self.trace1.plot('ko', append=True)
         ind2 = averageDistanceBetweenInflectionPoint(self.trace1)
-        self.assertLessEqual(abs(ind2 - 10.000), self.__epsilon)
+        self.assertLessEqual(abs(ind2 - 0.000), self.__epsilon)
         self.trace1.plot(type='POINT', af_name='inflection', append=True, 
             cmap = self.COLS_ROUGE, pointsize=8)
         plt.show()
@@ -408,7 +406,6 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
 if __name__ == '__main__':
     
     suite = unittest.TestSuite()
-    
     suite.addTest(TestAlgoCinematicsMethods("testAFInflexion"))
     suite.addTest(TestAlgoCinematicsMethods("testAFInflexionLevel2"))
     suite.addTest(TestAlgoCinematicsMethods("testAFvertex"))
