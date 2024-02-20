@@ -254,7 +254,7 @@ def buttenfieldTree():
 
 def averageDistanceBetweenInflectionPoint(track):
     # calculer les points d'inflexion
-    computeInflection(track)
+    computeInflectionLevel2(track)
     # calculer l'abscisse curviligne
     computeAbsCurv(track)
     
@@ -266,7 +266,8 @@ def averageDistanceBetweenInflectionPoint(track):
         if track.getObsAnalyticalFeature('inflection', i) == 1:
             im2 = i
             if im1 >= 0:
-                # On en a 2, on peut calculer la distance
+                # We have two consecutive inflection points
+                #   so we calculate distance between them
                 si1 = track.getObsAnalyticalFeature(BIAF_ABS_CURV, im1)
                 si2 = track.getObsAnalyticalFeature(BIAF_ABS_CURV, im2)
                 #print (im1, si1, im2, si2)
@@ -278,6 +279,64 @@ def averageDistanceBetweenInflectionPoint(track):
     if cpt > 0:
         return DPi / cpt
     return 0
+
+
+def computeDeviation(track):
+    '''
+    '''
+    track.createAnalyticalFeature('deviation', -9999)
+    track.createAnalyticalFeature('sign_deviation', -9999)
+    
+    M = averageDistanceBetweenInflectionPoint(track)
+    
+    im1 = -1
+    for i in range(track.size()):
+        if track.getObsAnalyticalFeature('inflection', i) == 1:
+            im2 = i
+            if im1 >= 0:
+                # We have two consecutive inflection points
+                #   so we calculate deviation and the sign of deviation
+                si1 = track.getObsAnalyticalFeature(BIAF_ABS_CURV, im1)
+                si2 = track.getObsAnalyticalFeature(BIAF_ABS_CURV, im2)
+                di = (si2 - si1) - M
+                track.setObsAnalyticalFeature('deviation', i, di)
+                if di > 0:
+                    sign = 1
+                elif di < 0:
+                    sign = -1
+                else:
+                    sign = 0
+                track.setObsAnalyticalFeature('sign_deviation', i, sign)
+            im1 = im2
+
+
+def computeCriticalPoints(track):
+    '''
+    '''
+    track.createAnalyticalFeature('critical', 0)
+    
+    computeDeviation(track)
+    
+    im1 = -1
+    im2 = -1
+    cptIP = 0
+    for i in range(track.size()):
+        if track.getObsAnalyticalFeature('inflection', i) == 1:
+            cptIP += 1
+            im3 = i
+            
+            if cptIP >= 4:
+                # We have two consecutive inflection points
+                #   so we can identify if obs(i) is a critical point
+                sign1 = track.getObsAnalyticalFeature('sign_deviation', im1)
+                sign2 = track.getObsAnalyticalFeature('sign_deviation', im2)
+                sign3 = track.getObsAnalyticalFeature('sign_deviation', im3)
+                
+                if sign1 == sign2 and sign2 != sign3:
+                    track.setObsAnalyticalFeature('critical', i, 1)
+                
+            im1 = im2
+            im2 = im3
 
 
 # =============================================================================
