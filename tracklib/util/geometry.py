@@ -148,6 +148,10 @@ def dist_point_droite(param, x, y):
     c = param[2]
 
     distance = math.fabs(a * x + b * y + c)
+    
+    # TODO: ajouter test si a = 0 et b = 0
+    #if a * a + b * b == 0:
+    #    return -1
     distance /= math.sqrt(a * a + b * b)
 
     return distance

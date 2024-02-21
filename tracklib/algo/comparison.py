@@ -55,7 +55,7 @@ import matplotlib.pyplot as plt
 import tracklib as tracklib
 from tracklib.util import dist_point_to_segment, Polygon
 from . import computeAbsCurv, synchronize, HMM, MODE_OBS_AS_2D_POSITIONS
-
+from tracklib.core import ENUCoords
 
 MODE_COMPARAISON_NEAREST_NEIGHBOUR = 1
 MODE_COMPARAISON_DTW = 2
@@ -447,6 +447,11 @@ def premiereComposanteHausdorff(track1, track2):
         for i in range(0, track2.size() - 1): 
             obs2i = track2.getObs(i)
             obs2ip1 = track2.getObs(i+1)
+            
+            if isinstance(obs2ip1.position, ENUCoords):
+                if obs2ip1.position == obs2i.position:
+                    continue
+            
             dist = dist_point_to_segment(point.position, 
                         [obs2i.position.getX(), obs2i.position.getY(), 
                         obs2ip1.position.getX(), obs2ip1.position.getY()])
