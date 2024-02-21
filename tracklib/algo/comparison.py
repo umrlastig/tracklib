@@ -398,12 +398,14 @@ def centralTrack(tracks, mode="NN", verbose=True):
     return central
 
 
-def averageDistance(track1, track2):
+def arealStandardizedBetweenTwoTracks(track1, track2):
     '''
-    Average distance between two lines
-    On divise par la moyenne des longueurs des arcs pour rendre cette mesure
-    indépendante de la longueur des lignes.
-    Ecart moyen entre deux lignes.
+    Areal between track1 and track2. We divide by the average of the tracks lengths 
+    to make the measure independent with any other tracks.
+    
+    Robert B. McMaster (1986) A Statistical Analysis of Mathematical Measures 
+    for Linear Simplification, The American Cartographer, 13:2, 103-116, 
+    DOI: 10.1559/152304086783900059
     '''
     
     # create polygon
