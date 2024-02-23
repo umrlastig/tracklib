@@ -39,8 +39,9 @@ The fact that you are presently reading this means that you have had
 knowledge of the CeCILL-C license and that you accept its terms.
 
 
-
-to manage comparisons of GPS tracks
+to manage:
+    - comparisons of GPS tracks 
+    - track distance measures 
 
 """
 
@@ -60,6 +61,43 @@ from tracklib.core import ENUCoords
 MODE_COMPARAISON_NEAREST_NEIGHBOUR = 1
 MODE_COMPARAISON_DTW = 2
 MODE_COMPARAISON_FDTW = 3
+MODE_COMPARAISON_HAUSDORFF = 4
+MODE_COMPARAISON_DISTANCE_MOYENNE = 5
+MODE_COMPARAISON_RMSE = 6
+
+
+def compare(track1, track2, mode=5) -> float:   
+    """
+    Track distance measures.
+    :param track1: track to compare with
+    :param track2: track to compare with
+
+    :return: float
+    """
+
+    if mode == MODE_COMPARAISON_HAUSDORFF:
+        return hausdorff(track1, track2)
+    elif mode == MODE_COMPARAISON_DISTANCE_MOYENNE:
+        return arealStandardizedBetweenTwoTracks(track1, track2)
+    elif mode == MODE_COMPARAISON_DTW:
+        p = differenceProfile2(track1, track2)
+        return p.score
+    elif mode == MODE_COMPARAISON_RMSE:
+        trackA = track1.copy()
+        trackB = track2.copy()
+        synchronize(trackA, trackB)
+    
+        if trackA.size() <= 0:
+            return 
+        
+        rmse = 0
+        for i in range(trackA.size()):
+            rmse += trackA.getObs(i).distanceTo(trackB.getObs(i)) ** 2
+        return math.sqrt(rmse / trackA.size())
+
+    else:
+        sys.exit("Error: track comparaison mode " + (str)(mode) + " not implemented yet")
+
 
 
 def plotDifferenceProfile(
@@ -92,7 +130,6 @@ def _minCumul(vec):
 
 
 def differenceProfile2(track1, track2, weight = lambda A, B : A + B, verbose = True):   
-	
     """Profile of difference between two traces
     
     :return: A track objet, with an analytical feature "diff" containing shortest distance
@@ -325,30 +362,7 @@ def __fillAFProfile(track1, track2, output, S):
 
 
 
-def compare(track1, track2) -> float:   
-    """Comparison of 2 tracks.
 
-    Tracks are interpolated linearly on a common base of timestamps
-
-    :param track1: track to compare with
-    :param track2: track to compare with
-
-    :return: TODO
-    """
-
-    trackA = track1.copy()
-    trackB = track2.copy()
-
-    synchronize(trackA, trackB)
-    
-    if trackA.size() <= 0:
-        return 
-
-    rmse = 0
-    for i in range(trackA.size()):
-        rmse += trackA.getObs(i).distanceTo(trackB.getObs(i)) ** 2
-    
-    return math.sqrt(rmse / trackA.size())
 
 
 # Union[TrackCollection, Iterable[Track]]
@@ -472,48 +486,48 @@ def hausdorff(track1, track2):
         premiereComposanteHausdorff(track2, track1))
 
 
-def discreteFrechet(track1, track2):
-    
-    sizeP = track1.size()
-    sizeQ = track2.size()
-    
-    ca = []
-    for i in range(sizeP):
-        ca.append([])
-        for j in range(sizeQ):
-            ca[i].append(-1)
-    
-    d = discreteFrechetCouplingMeasure(track1, track2, sizeP - 1, sizeQ - 1, ca);
-    return d;
-
-
-def discreteFrechetCouplingMeasure(track1, track2, i, j, ca):
-    if ca[i][j] > -1:
-        return ca[i][j]
-
-    d = track1.getObs(i).distanceTo(track2.getObs(j))
-    if i == 0 and j == 0:
-        ca[i][j] = d
-        return d
-
-    if i > 0 and j == 0:
-       ca[i][j] = max(
-           discreteFrechetCouplingMeasure(track1, track2, i - 1, j, ca), d)
-       return ca[i][j]
-   
-    if i == 0 and j > 0:
-        ca[i][j] = max(discreteFrechetCouplingMeasure(track1, track2, i, j - 1, ca), d)
-        return ca[i][j]
-    
-    if i > 0 and j > 0:
-         ca[i][j] = max(
-           min(discreteFrechetCouplingMeasure(track1, track2, i - 1, j, ca), 
-               min(discreteFrechetCouplingMeasure(track1, track2, i - 1, j - 1, ca),
-                   discreteFrechetCouplingMeasure(track1, track2, i, j - 1, ca))), d)
-         return ca[i][j]
-
-    ca[i][j] = sys.float_info.max
-    return ca[i][j]
+#def discreteFrechet(track1, track2):
+#    
+#    sizeP = track1.size()
+#    sizeQ = track2.size()
+#    
+#    ca = []
+#    for i in range(sizeP):
+#        ca.append([])
+#        for j in range(sizeQ):
+#            ca[i].append(-1)
+#    
+#    d = __discreteFrechetCouplingMeasure(track1, track2, sizeP - 1, sizeQ - 1, ca);
+#    return d;
+#
+#
+#def __discreteFrechetCouplingMeasure(track1, track2, i, j, ca):
+#    if ca[i][j] > -1:
+#        return ca[i][j]
+#
+#    d = track1.getObs(i).distanceTo(track2.getObs(j))
+#    if i == 0 and j == 0:
+#        ca[i][j] = d
+#        return d
+#
+#    if i > 0 and j == 0:
+#       ca[i][j] = max(
+#           __discreteFrechetCouplingMeasure(track1, track2, i - 1, j, ca), d)
+#       return ca[i][j]
+#   
+#    if i == 0 and j > 0:
+#        ca[i][j] = max(__discreteFrechetCouplingMeasure(track1, track2, i, j - 1, ca), d)
+#        return ca[i][j]
+#    
+#    if i > 0 and j > 0:
+#         ca[i][j] = max(
+#           min(__discreteFrechetCouplingMeasure(track1, track2, i - 1, j, ca), 
+#               min(__discreteFrechetCouplingMeasure(track1, track2, i - 1, j - 1, ca),
+#                   __discreteFrechetCouplingMeasure(track1, track2, i, j - 1, ca))), d)
+#         return ca[i][j]
+#
+#    ca[i][j] = sys.float_info.max
+#    return ca[i][j]
 
 
 def __chebyshev(coordSet):
@@ -571,7 +585,6 @@ def averagingCoordSet(coordSet, p=2, constraint=False):
         x += coordSet[i].E**p
         y += coordSet[i].N**p
         z += coordSet[i].U**p
-    print (x, y, z, N)
     center = ENUCoords((x/N)**(1.0/p), (y/N)**(1.0/p), (z/N)**(1.0/p))
     
     if not constraint:
@@ -590,7 +603,8 @@ def averagingCoordSet(coordSet, p=2, constraint=False):
     
 
 
-def fusion(tracks, weight=lambda A, B : A + B**2, ref=0, verbose=True):
+def fusion(tracks, weight=lambda A, B : A + B**2, ref=0, 
+           p=1, constraint=False, verbose=True):
 
     central = tracks[ref].copy()
     
@@ -611,7 +625,7 @@ def fusion(tracks, weight=lambda A, B : A + B**2, ref=0, verbose=True):
             cluster = []
             for i in range(len(profiles)):
                 cluster.append(tracks[i][profiles[i]["pair", j]].position)
-            central[j].position = averagingCoordSet(cluster)
+            central[j].position = averagingCoordSet(cluster, p=p, constraint=constraint)
         
         profile = tracklib.algo.comparison.differenceProfile2(central, central_before, weight, verbose=verbose)
         if verbose:
