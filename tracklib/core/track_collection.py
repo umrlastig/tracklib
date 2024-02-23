@@ -564,3 +564,13 @@ class TrackCollection:
         """TODO"""
         for i in range(len(self)):
             self.__TRACES[i] = self.__TRACES[i].noise(sigma, kernel, force, cycle)
+            
+            
+            
+    # =========================================================================
+    #    Measures
+    def getLenth(self):
+        L = []
+        for i in range(len(self)):
+            L.append(self.__TRACES[i].length())
+        return L
