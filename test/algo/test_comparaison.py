@@ -2,9 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-import math
 import matplotlib.pyplot as plt
-
+import math
 from tracklib import (Obs, ObsTime, ENUCoords, 
                       Track, TrackCollection,
                       compare, 
@@ -14,7 +13,7 @@ from tracklib import (Obs, ObsTime, ENUCoords,
                       hausdorff, discreteFrechet,
                       centralTrack,
                       arealStandardizedBetweenTwoTracks,
-                      summarizeCoordSet)
+                      averagingCoordSet)
 
 
 
@@ -320,43 +319,47 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         trackC.addObs(Obs(ENUCoords(1, 0), ObsTime()))
         trackC.addObs(Obs(ENUCoords(1, 1), ObsTime()))
         trackC.addObs(Obs(ENUCoords(0, 1), ObsTime()))
-        
         coords = trackC.getCoord()
-        d1 = summarizeCoordSet(coords, p=1, constraint=False)
+
+        d1 = averagingCoordSet(coords, p=1, constraint=False)
         self.assertEqual(d1.E, 0.5)
         self.assertEqual(d1.N, 0.5)
         self.assertEqual(d1.U, 0.0)
-        d8 = summarizeCoordSet(coords, p=1, constraint=True)
+        
+        d8 = averagingCoordSet(coords, p=1, constraint=True)
         self.assertEqual(d8.E, 0.0)
         self.assertEqual(d8.N, 0.0)
         self.assertEqual(d8.U, 0.0)
         
-        d2 = summarizeCoordSet(coords, p=2, constraint=False)
+        d2 = averagingCoordSet(coords, p=2, constraint=False)
         self.assertEqual(d2.E, math.sqrt(2)/2)
         self.assertEqual(d2.N, math.sqrt(2)/2)
         self.assertEqual(d2.U, 0.0)
-        d7 = summarizeCoordSet(coords, p=2, constraint=True)
+        
+        d7 = averagingCoordSet(coords, p=2, constraint=True)
         self.assertEqual(d7.E, 1.0)
         self.assertEqual(d7.N, 1.0)
         self.assertEqual(d7.U, 0.0)
         
-        d3 = summarizeCoordSet(coords, p=3, constraint=False)
+        d3 = averagingCoordSet(coords, p=3, constraint=False)
         self.assertEqual(d3.E, (1/2)**(1.0/3))
         self.assertEqual(d3.N, (2/4)**(1.0/3))
         self.assertEqual(d3.U, 0.0)
-        d6 = summarizeCoordSet(coords, p=3, constraint=True)
+        d6 = averagingCoordSet(coords, p=3, constraint=True)
         self.assertEqual(d6.E, 1.0)
         self.assertEqual(d6.N, 1.0)
         self.assertEqual(d6.U, 0.0)
         
-        d4 = summarizeCoordSet(coords, p=math.inf, constraint=False)
+        d4 = averagingCoordSet(coords, p=math.inf, constraint=False)
         self.assertEqual(d4.E, 1.0)
         self.assertEqual(d4.N, 1.0)
         self.assertEqual(d4.U, 0.0)
-        d5 = summarizeCoordSet(coords, p=math.inf, constraint=True)
+        d5 = averagingCoordSet(coords, p=math.inf, constraint=True)
         self.assertEqual(d5.E, 1.0)
         self.assertEqual(d5.N, 1.0)
         self.assertEqual(d4.U, 0.0)
+        
+        
     
 if __name__ == '__main__':
     suite = unittest.TestSuite()

@@ -516,18 +516,6 @@ def discreteFrechetCouplingMeasure(track1, track2, i, j, ca):
     return ca[i][j]
 
 
-#def __meanTrack(cluster):
-#    N = len(cluster)
-#    x = cluster[0].E
-#    y = cluster[0].N
-#    z = cluster[0].U
-#    for i in range(1, len(cluster)):
-#        x += cluster[i].E
-#        y += cluster[i].N
-#        z += cluster[i].U
-#    return tracklib.core.obs_coords.ENUCoords(x/N, y/N, z/N)
-
-
 def __chebyshev(coordSet):
     N = len(coordSet)
     x = -sys.float_info.max
@@ -540,7 +528,7 @@ def __chebyshev(coordSet):
     return ENUCoords(x, y, z)
 
 
-def summarizeCoordSet(coordSet, p=2, constraint=False):
+def averagingCoordSet(coordSet, p=2, constraint=False):
     '''
     For a set of coordinates, a representative coordinate can be defined 
     as the center. Center can be computed with the Minkowski distance of all 
@@ -583,6 +571,7 @@ def summarizeCoordSet(coordSet, p=2, constraint=False):
         x += coordSet[i].E**p
         y += coordSet[i].N**p
         z += coordSet[i].U**p
+    print (x, y, z, N)
     center = ENUCoords((x/N)**(1.0/p), (y/N)**(1.0/p), (z/N)**(1.0/p))
     
     if not constraint:
@@ -622,7 +611,7 @@ def fusion(tracks, weight=lambda A, B : A + B**2, ref=0, verbose=True):
             cluster = []
             for i in range(len(profiles)):
                 cluster.append(tracks[i][profiles[i]["pair", j]].position)
-            central[j].position = summarizeCoordSet(cluster)
+            central[j].position = averagingCoordSet(cluster)
         
         profile = tracklib.algo.comparison.differenceProfile2(central, central_before, weight, verbose=verbose)
         if verbose:
