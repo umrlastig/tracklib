@@ -301,6 +301,16 @@ class Track:
         if i < 0:
             raise IndexError
         return self.__POINTS[i]
+    
+    def getCoord(self, i=None):
+        if i is None:
+            COORDS = []
+            for i in range(self.size()):
+                COORDS.append(self.__POINTS[i].position)
+            return COORDS
+        else:
+            position = self.__POINTS[i].position
+            return position
 
     def getX(self, i=None):
         """TODO"""
