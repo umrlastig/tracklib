@@ -66,9 +66,11 @@ MODE_COMPARAISON_DISTANCE_MOYENNE = 5
 MODE_COMPARAISON_RMSE = 6
 
 
-def compare(track1, track2, mode=5) -> float:   
+def compare(track1, track2, mode=MODE_COMPARAISON_RMSE) -> float:   
     """
     Track distance measures.
+    For developers: leave as default: mode = MODE_COMPARAISON_RMSE
+    
     :param track1: track to compare with
     :param track2: track to compare with
 
