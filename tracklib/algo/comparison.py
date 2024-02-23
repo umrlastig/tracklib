@@ -100,8 +100,8 @@ def differenceProfile2(track1, track2, weight = lambda A, B : A + B, verbose = T
              a list with :func:`output.getAbsCurv()` and
              :func:`output.getAnalyticalFeature("diff")` 
              The selected candidate in registerd in AF "pair" 
-             Set "ends" parameter to True to force end points to
-             meet p is Minkowski's exponent for distance computation. Default value is
+             Set "ends" parameter to True to force end points to meet
+              p is Minkowski's exponent for distance computation. Default value is
              - 1 for summation of distances, 
              - 2 for least squares solution 
              - and 10 for an approximation of Frechet solution.
@@ -324,15 +324,6 @@ def __fillAFProfile(track1, track2, output, S):
         output.setObsAnalyticalFeature("ey", i, ey)
 
 
-#def synchronize(track1, track2):
-#    """Resampling of 2 tracks with linear interpolation on a common base of
-#    timestamps
-#
-#    :param track: track to synchronize with
-#    """
-#
-#    synchronize(track1, track2)
-#
 
 def compare(track1, track2) -> float:   
     """Comparison of 2 tracks.
@@ -525,16 +516,59 @@ def discreteFrechetCouplingMeasure(track1, track2, i, j, ca):
     return ca[i][j]
 
 
-def __meanTrack(cluster):
-    N = len(cluster)
-    x = cluster[0].E
-    y = cluster[0].N
-    z = cluster[0].U
-    for i in range(1, len(cluster)):
-        x += cluster[i].E
-        y += cluster[i].N
-        z += cluster[i].U
-    return tracklib.core.obs_coords.ENUCoords(x/N, y/N, z/N)
+#def __meanTrack(cluster):
+#    N = len(cluster)
+#    x = cluster[0].E
+#    y = cluster[0].N
+#    z = cluster[0].U
+#    for i in range(1, len(cluster)):
+#        x += cluster[i].E
+#        y += cluster[i].N
+#        z += cluster[i].U
+#    return tracklib.core.obs_coords.ENUCoords(x/N, y/N, z/N)
+
+
+def aggregateCoordSet(coordSet, p=2, constraint=False):
+    '''
+    For a set of coordinates, a representative coordinate can be defined 
+    as the center. Center can be computed with the Minkowski distance of all 
+    coordinates.
+    
+    :param float p : Minkowski's exponent for distance computation: 
+        1 for summation of distances, 2 for least squares solution, etc. 
+    :param boolean constraint : if True, then the center be a coordinate 
+        of the set. 
+    :return ENUCoords
+
+    '''
+    p = max(min(p, 15), 1e-2)
+    
+    N = len(coordSet)
+    x = coordSet[0].E**p
+    y = coordSet[0].N**p
+    z = coordSet[0].U**p
+    for i in range(1, N):
+        x += coordSet[i].E**p
+        y += coordSet[i].N**p
+        z += coordSet[i].U**p
+    center = ENUCoords((x/N)**(1.0/p), (y/N)**(1.0/p), (z/N)**(1.0/p))
+    
+    if not constraint:
+        return center
+    else:
+        iMin = -1
+        dMin = sys.float_info.max
+        for i in range(N):
+            xi = coordSet[i].E
+            yi = coordSet[i].N
+            zi = coordSet[i].U
+            d = (abs(xi-center.getX())** p + abs(yi-center.getY())**p + abs(zi-center.getZ())**p)
+            d = d**(1.0/p)
+            if d < dMin:
+                dMin = d
+                iMin = i
+        return coordSet[iMin]
+    
 
 
 def fusion(tracks, weight=lambda A, B : A + B**2, ref=0, verbose=True):
@@ -558,7 +592,7 @@ def fusion(tracks, weight=lambda A, B : A + B**2, ref=0, verbose=True):
             cluster = []
             for i in range(len(profiles)):
                 cluster.append(tracks[i][profiles[i]["pair", j]].position)
-            central[j].position = __meanTrack(cluster)
+            central[j].position = aggregateCoordSet(cluster)
         
         profile = tracklib.algo.comparison.differenceProfile2(central, central_before, weight, verbose=verbose)
         if verbose:

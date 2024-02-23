@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import unittest
+import math
 import matplotlib.pyplot as plt
-#import numpy as np
 
 from tracklib import (Obs, ObsTime, ENUCoords, 
                       Track, TrackCollection,
@@ -13,7 +13,8 @@ from tracklib import (Obs, ObsTime, ENUCoords,
                       premiereComposanteHausdorff,
                       hausdorff, discreteFrechet,
                       centralTrack,
-                      arealStandardizedBetweenTwoTracks)
+                      arealStandardizedBetweenTwoTracks,
+                      aggregateCoordSet)
 
 
 
@@ -230,7 +231,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         trackB.addObs(p)
 
         self.assertEqual(discreteFrechet(trackA, trackB), 2.0)
-    
+        
     def testCentralNNTrack(self):
         TRACES = []
         TRACES.append(self.trace1)
@@ -312,6 +313,30 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         S = arealStandardizedBetweenTwoTracks(trace3, trace4)
         self.assertEqual(S, 0.0)
         
+        
+    def testAggregatCluster(self):
+        trackC = Track([], 1)
+        trackC.addObs(Obs(ENUCoords(0, 0), ObsTime()))
+        trackC.addObs(Obs(ENUCoords(1, 0), ObsTime()))
+        trackC.addObs(Obs(ENUCoords(1, 1), ObsTime()))
+        trackC.addObs(Obs(ENUCoords(0, 1), ObsTime()))
+        
+        coords = trackC.getCoord()
+        d1 = aggregateCoordSet(coords, p=1, constraint=False)
+        self.assertEqual(d1.E, 0.5)
+        self.assertEqual(d1.N, 0.5)
+        self.assertEqual(d1.U, 0.0)
+        
+        d2 = aggregateCoordSet(coords, p=2, constraint=False)
+        self.assertEqual(d2.E, math.sqrt(2)/2)
+        self.assertEqual(d2.N, math.sqrt(2)/2)
+        self.assertEqual(d2.U, 0.0)
+        
+        d3 = aggregateCoordSet(coords, p=3, constraint=False)
+        self.assertEqual(d3.E, (1/2)**(1.0/3))
+        self.assertEqual(d3.N, (2/4)**(1.0/3))
+        self.assertEqual(d3.U, 0.0)
+        
     
 if __name__ == '__main__':
     suite = unittest.TestSuite()
@@ -325,6 +350,8 @@ if __name__ == '__main__':
     suite.addTest(TestAlgoComparaisonMethods("testCentralNNTrack"))
     suite.addTest(TestAlgoComparaisonMethods("testCentralDTWTrack"))
     suite.addTest(TestAlgoComparaisonMethods("testArealStandardizedBetweenTwoTracks"))
+    suite.addTest(TestAlgoComparaisonMethods("testAggregatCluster"))
+    
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
