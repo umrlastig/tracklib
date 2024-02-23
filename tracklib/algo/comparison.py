@@ -528,7 +528,19 @@ def discreteFrechetCouplingMeasure(track1, track2, i, j, ca):
 #    return tracklib.core.obs_coords.ENUCoords(x/N, y/N, z/N)
 
 
-def aggregateCoordSet(coordSet, p=2, constraint=False):
+def __chebyshev(coordSet):
+    N = len(coordSet)
+    x = -sys.float_info.max
+    y = -sys.float_info.max
+    z = -sys.float_info.max
+    for i in range(N):
+        x = max(x, abs(coordSet[i].E))
+        y = max(y, abs(coordSet[i].N))
+        z = max(z, abs(coordSet[i].U))
+    return ENUCoords(x, y, z)
+
+
+def summarizeCoordSet(coordSet, p=2, constraint=False):
     '''
     For a set of coordinates, a representative coordinate can be defined 
     as the center. Center can be computed with the Minkowski distance of all 
@@ -541,9 +553,29 @@ def aggregateCoordSet(coordSet, p=2, constraint=False):
     :return ENUCoords
 
     '''
-    p = max(min(p, 15), 1e-2)
     
     N = len(coordSet)
+    
+    # Chebyshev distance
+    if p == math.inf:
+        center = __chebyshev(coordSet)
+        if not constraint:
+            return center
+        else:
+            iMin = -1
+            dMin = sys.float_info.max
+            for i in range(N):
+                d = max(max(abs(coordSet[i].E - center.E), 
+                        abs(coordSet[i].N - center.N)),
+                        abs(coordSet[i].U - center.U))
+                if d < dMin:
+                    dMin = d
+                    iMin = i
+            return coordSet[iMin]
+    
+    # Minkowski distance, p != Infini
+    p = max(min(p, 15), 1e-2)
+    
     x = coordSet[0].E**p
     y = coordSet[0].N**p
     z = coordSet[0].U**p
@@ -559,11 +591,9 @@ def aggregateCoordSet(coordSet, p=2, constraint=False):
         iMin = -1
         dMin = sys.float_info.max
         for i in range(N):
-            xi = coordSet[i].E
-            yi = coordSet[i].N
-            zi = coordSet[i].U
-            d = (abs(xi-center.getX())** p + abs(yi-center.getY())**p + abs(zi-center.getZ())**p)
-            d = d**(1.0/p)
+            d = (abs(coordSet[i].E - center.E)**p +  
+                 abs(coordSet[i].N - center.N)**p +
+                 abs(coordSet[i].U - center.U)**p) **1.0/p
             if d < dMin:
                 dMin = d
                 iMin = i
@@ -592,7 +622,7 @@ def fusion(tracks, weight=lambda A, B : A + B**2, ref=0, verbose=True):
             cluster = []
             for i in range(len(profiles)):
                 cluster.append(tracks[i][profiles[i]["pair", j]].position)
-            central[j].position = aggregateCoordSet(cluster)
+            central[j].position = summarizeCoordSet(cluster)
         
         profile = tracklib.algo.comparison.differenceProfile2(central, central_before, weight, verbose=verbose)
         if verbose:
