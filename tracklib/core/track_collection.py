@@ -141,6 +141,12 @@ class TrackCollection:
     # =========================================================================
     # Track collection coordinate transformation
     # =========================================================================
+    def getSRID(self) -> int:
+        """Return the SRID of collection
+
+        :return: SRID of current collection
+        """
+        return self.__TRACES[0].getSRID()
 
     def toECEFCoords(self, base=None):
         """TODO"""
@@ -230,6 +236,25 @@ class TrackCollection:
         output += "  Nb of pt(s):   " + str(SIZES) + "\n"
         # output += "  Nb of pt(s):   " + str(len(self.__POINTS)) + "\n"
         print(output)
+        
+    def toWKT(self) -> str:
+        """Transforms collection into WKT string, one linestring per track"""
+        output = "MULTILINESTRING ("
+        
+        for track in self.__TRACES:
+            output += "("
+            for i in range(track.size()):
+                if self.getSRID() == "Geo":
+                    output += (str)(track[i].position.lon) + " "
+                    output += (str)(track[i].position.lat)
+                elif self.getSRID() == "ENU":
+                    output += (str)(track[i].position.E) + " "
+                    output += (str)(track[i].position.N)
+                if i != track.size() - 1:
+                    output += ","
+            output += ")"
+        output += ")"
+        return output
 
     def addAnalyticalFeature(self, algorithm, name=None):
         """TODO"""
@@ -539,3 +564,13 @@ class TrackCollection:
         """TODO"""
         for i in range(len(self)):
             self.__TRACES[i] = self.__TRACES[i].noise(sigma, kernel, force, cycle)
+            
+            
+            
+    # =========================================================================
+    #    Measures
+    def getLenth(self):
+        L = []
+        for i in range(len(self)):
+            L.append(self.__TRACES[i].length())
+        return L

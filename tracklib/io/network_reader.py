@@ -200,8 +200,13 @@ class NetworkReader:
 
         cptNode = 0
 
-        if proj == None:
+        if proj == "EPSG:4326":
+            srid = "GEO"
+        elif proj == "EPSG:2154":
+            srid = "ENU"
+        else:
             proj = "EPSG:4326"
+            srid = "GEO"
 
         fmt = NetworkFormat()
         fmt.createFromDict(
@@ -213,7 +218,7 @@ class NetworkReader:
                 "pos_wkt": 1,
                 "pos_poids": 3,
                 "pos_sens": 4,
-                "srid": "GEO",
+                "srid": srid,
             }
         )
 

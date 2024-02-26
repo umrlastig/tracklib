@@ -11,6 +11,7 @@ from tracklib import (Obs, ObsTime, ENUCoords, getColorMap,
                       BIAF_ABS_CURV, 
                       Operator,
                       computeInflection, 
+                      computeInflectionLevel2,
                       computeVertex, 
                       computeBend,
                       computeSwitchbacks,
@@ -23,8 +24,10 @@ from tracklib import (Obs, ObsTime, ENUCoords, getColorMap,
                       computeAscDeniv,
                       computeDescDeniv,
                       Track,
-                      TrackReader, computeRadialSignature,
-                      averageDeviationPositions)
+                      TrackReader, 
+                      computeRadialSignature,
+                      averageDeviationPositions,
+                      averageDistanceBetweenInflectionPoint)
 
 
 class TestAlgoCinematicsMethods(unittest.TestCase):
@@ -139,13 +142,42 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         self.COLS_ROUGE = getColorMap((220, 220, 220), (255, 0, 0))
         self.COLS_BLEU = getColorMap((220, 220, 220), (0, 0, 255))
         self.COLS_VERT = getColorMap((220, 220, 220), (0, 255, 0))
+        
+        # ---------------------------------------------------------------------
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        self.trace4 = Track([], 1)
+        self.trace4.addObs(Obs(ENUCoords(-50, 55, 0), ObsTime()))
+        self.trace4.addObs(Obs(ENUCoords(0, 50, 0), ObsTime()))
+        self.trace4.addObs(Obs(ENUCoords(30, 40, 0), ObsTime()))
+        self.trace4.addObs(Obs(ENUCoords(50, 20, 0), ObsTime()))
+        self.trace4.addObs(Obs(ENUCoords(60, 0, 0), ObsTime()))
+        self.trace4.addObs(Obs(ENUCoords(70, -2, 0), ObsTime()))
+        self.trace4.addObs(Obs(ENUCoords(80, 0, 0), ObsTime()))
+        self.trace4.addObs(Obs(ENUCoords(90, 20, 0), ObsTime()))
+        self.trace4.addObs(Obs(ENUCoords(110, 40, 0), ObsTime()))
+        self.trace4.addObs(Obs(ENUCoords(140, 50, 0), ObsTime()))
+        self.trace4.addObs(Obs(ENUCoords(190, 55, 0), ObsTime()))
+        self.trace4.addObs(Obs(ENUCoords(260, 60, 0), ObsTime()))
 
-    
     def testAFInflexion(self):
         plt.figure(figsize = (8,4))
-        self.trace3.plot()
         
-        computeInflection(self.trace3)
+        self.trace1.plot()
+        computeInflection(self.trace1)
+        afIsInflexion = self.trace1.getAnalyticalFeature('inflection')
+        #print (afIsInflexion)
+        self.trace1.plot(type='POINT', af_name='inflection', append = True, 
+            cmap = self.COLS_ROUGE, pointsize=40)
+        plt.show()
+        
+        T = [0, 1, 1, 1, 1, 1, 0, 0, 0]
+        self.assertEqual(afIsInflexion, T) 
+        
+    def testAFInflexionLevel2(self):
+        plt.figure(figsize = (8,4))
+        
+        self.trace3.plot()
+        computeInflectionLevel2(self.trace3)
         afIsInflexion = self.trace3.getAnalyticalFeature('inflection')
         #print (afIsInflexion)
         self.trace3.plot(type='POINT', af_name='inflection', append = True, 
@@ -156,11 +188,25 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
              0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0]
         self.assertEqual(afIsInflexion, T) 
         
+        # ----------------------------------------------------------------------
+        
+        self.trace1.plot()
+        computeInflectionLevel2(self.trace1)
+        afIsInflexion = self.trace1.getAnalyticalFeature('inflection')
+        #print (afIsInflexion)
+        self.trace1.plot(type='POINT', af_name='inflection', append = True, 
+            cmap = self.COLS_ROUGE, pointsize=40)
+        plt.show()
+        
+        T = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+        self.assertEqual(afIsInflexion, T) 
+        
         
     def testAFvertex(self):
         plt.figure(figsize = (8,4))
         self.trace3.plot()
         
+        computeInflectionLevel2(self.trace3)
         computeVertex(self.trace3)
         afVertex = self.trace3.getAnalyticalFeature('vertex')
         #print (afVertex)
@@ -177,6 +223,7 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         plt.figure(figsize = (8,4))
         self.trace3.plot()
         
+        computeInflectionLevel2(self.trace3)
         computeBend(self.trace3, angle_min = 130*pi/180)
         afBend = self.trace3.getAnalyticalFeature('bend')
         #print (afBend)
@@ -193,6 +240,7 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         plt.figure(figsize = (8,4))
         self.trace3.plot()
         
+        computeInflectionLevel2(self.trace3)
         computeBend(self.trace3, angle_min = 130*pi/180)
         computeSwitchbacks(self.trace3, nb_virage_min=3, 
                                       dist_max=200)
@@ -313,26 +361,9 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         
     
     def testAverageDeviationPositions(self):
-        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
-        trace1 = Track([], 1)
-        trace1.addObs(Obs(ENUCoords(0, 0, 0), ObsTime.readTimestamp("2018-01-01 10:00:00")))
-        trace1.addObs(Obs(ENUCoords(10, 0, 0), ObsTime.readTimestamp("2018-01-01 10:00:12")))
-        trace1.addObs(Obs(ENUCoords(10, 10, 0), ObsTime.readTimestamp("2018-01-01 10:00:40")))
-        trace1.addObs(Obs(ENUCoords(20, 10, 0), ObsTime.readTimestamp("2018-01-01 10:01:50")))
-        trace1.addObs(Obs(ENUCoords(20, 20, 0), ObsTime.readTimestamp("2018-01-01 10:02:10")))
-        trace1.addObs(Obs(ENUCoords(30, 20, 0), ObsTime.readTimestamp("2018-01-01 10:02:35")))
-        trace1.addObs(Obs(ENUCoords(30, 30, 0), ObsTime.readTimestamp("2018-01-01 10:02:43")))
-        trace1.addObs(Obs(ENUCoords(40, 30, 0), ObsTime.readTimestamp("2018-01-01 10:02:55")))
-        trace1.addObs(Obs(ENUCoords(60, 30, 0), ObsTime.readTimestamp("2018-01-01 10:03:25")))
-        
-        trace1.plot('k-')
-        
-        ind = averageDeviationPositions(trace1)
-        print (ind)
+        ind = averageDeviationPositions(self.trace1)
         self.assertLessEqual(abs(ind - 2.1875), self.__epsilon)
-        
-        # -----
-        
+
         #computeAbsCurv(trace1)
         #trace1.operate(Operator.DIFFERENTIATOR, "abs_curv", "dist")
         #print (trace1['dist'])
@@ -340,14 +371,46 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         #trace1.operate(Operator.RMSE, "dist", "rmse_abs_curv")
         
         
+    def testAverageDistanceBetweenInflectionPoint(self):
+        # TRACE 4
+        ind2 = averageDistanceBetweenInflectionPoint(self.trace4)
+        # print (ind2)
+        self.assertLessEqual(abs(ind2 - 42.757), self.__epsilon)
+        self.trace4.plot('k-', append=False)
+        self.trace4.plot('ko', append=True)
+        self.trace4.plot(type='POINT', af_name='inflection', append=True, 
+            cmap = self.COLS_ROUGE, pointsize=8)
+        plt.show()
+        
+        
+        # TRACE 3
+        self.trace3.plot('k-', append=False)
+        self.trace3.plot('ko', append=True)
+        ind2 = averageDistanceBetweenInflectionPoint(self.trace3)
+        #print (ind2)
+        self.assertLessEqual(abs(ind2 - 29.999), self.__epsilon)
+        self.trace3.plot(type='POINT', af_name='inflection', append=True, 
+            cmap = self.COLS_ROUGE, pointsize=8)
+        plt.show()
+        
+        # TRACE 1
+        self.trace1.plot('k-', append=False)
+        self.trace1.plot('ko', append=True)
+        ind2 = averageDistanceBetweenInflectionPoint(self.trace1)
+        self.assertLessEqual(abs(ind2 - 0.000), self.__epsilon)
+        self.trace1.plot(type='POINT', af_name='inflection', append=True, 
+            cmap = self.COLS_ROUGE, pointsize=8)
+        plt.show()
+        
+        
 if __name__ == '__main__':
     
     suite = unittest.TestSuite()
     suite.addTest(TestAlgoCinematicsMethods("testAFInflexion"))
+    suite.addTest(TestAlgoCinematicsMethods("testAFInflexionLevel2"))
     suite.addTest(TestAlgoCinematicsMethods("testAFvertex"))
     suite.addTest(TestAlgoCinematicsMethods("testBends"))
     suite.addTest(TestAlgoCinematicsMethods("testSwitchbacks"))
-    
     suite.addTest(TestAlgoCinematicsMethods("testSmoothedSpeedCalculation"))
     suite.addTest(TestAlgoCinematicsMethods("testCompareAbsCurv"))
     suite.addTest(TestAlgoCinematicsMethods("testEstimateHeading"))
@@ -357,6 +420,7 @@ if __name__ == '__main__':
     suite.addTest(TestAlgoCinematicsMethods("testComputeAvgAscSpeed"))
     suite.addTest(TestAlgoCinematicsMethods("testComputeRadialSignature"))
     suite.addTest(TestAlgoCinematicsMethods("testAverageDeviationPositions"))
+    suite.addTest(TestAlgoCinematicsMethods("testAverageDistanceBetweenInflectionPoint"))
     
     runner = unittest.TextTestRunner()
     runner.run(suite)

@@ -169,6 +169,24 @@ class TestTrackReader(TestCase):
         
         self.assertEqual("2023-10-15 06:33:23", str(track.getObs(3).timestamp)[0:19])
         self.assertEqual("2023-10-15 06:33:23.25", str(track.getObs(3).timestamp)[0:22])
+        
+        
+    def test_read_csv_format_date(self):
+        ObsTime.setPrintFormat("4Y-2M-2D 2h:2m:2s.2z")
+        csvpath = os.path.join(self.resource_path, 'test/data/csv_format.csv')
+        track = TrackReader.readFromCsv(csvpath, "CHAMOIS")
+        
+        self.assertEqual(track.size(), 3)
+        
+        self.assertEqual("1970-01-01", str(track.getObs(0).timestamp)[0:10])
+        
+        self.assertEqual("1970-01-01", str(track.getObs(1).timestamp)[0:10])
+        self.assertEqual(-999999, track.getObs(1).position.getX())
+        self.assertEqual(-999999, track.getObs(1).position.getY())
+        
+        self.assertEqual("2017-12-06 04:01:00", str(track.getObs(2).timestamp)[0:19])
+        self.assertEqual(972940.7050129613, track.getObs(2).position.getX())
+        self.assertEqual(6418873.1726411795, track.getObs(2).position.getY())
        
 
 if __name__ == '__main__':
@@ -192,6 +210,9 @@ if __name__ == '__main__':
     suite.addTest(TestTrackReader("test_read_gpx_dir"))
     suite.addTest(TestTrackReader("testReadGpxWithAF"))
     suite.addTest(TestTrackReader("test_read_millisecond"))
+
+    # TrackFormat
+    suite.addTest(TestTrackReader("test_read_csv_format_date"))
 
     runner = TextTestRunner()
     runner.run(suite)

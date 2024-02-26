@@ -47,7 +47,7 @@ Class to manage cinematic computations on GPS tracks
 
 from numpy import pi
 
-from tracklib.util import angleBetweenThreePoints
+from tracklib.util import angleBetweenThreePoints, distance_to_segment
 from . import (anglegeom,
                BIAF_SPEED, speed,
                BIAF_HEADING, heading,
@@ -223,11 +223,8 @@ def averageDeviationPositions(track):
         p1 = track.getObs(i-1).position
         p2 = track.getObs(i).position
         d = p1.distanceTo(p2)
-        print (d)
         MD += d
     MD = MD / (track.size()-1)
-    
-    
     
     ADP = 0
     for i in range(1, track.size()):
@@ -255,6 +252,91 @@ def buttenfieldTree():
 # La longueur et largeur du rectangle englobant  
 
 
+def averageDistanceBetweenInflectionPoint(track):
+    # calculer les points d'inflexion
+    computeInflectionLevel2(track)
+    # calculer l'abscisse curviligne
+    computeAbsCurv(track)
+    
+    # Moyenne des distances entre chaque
+    DPi = 0
+    cpt = 0
+    im1 = -1
+    for i in range(track.size()):
+        if track.getObsAnalyticalFeature('inflection', i) == 1:
+            im2 = i
+            if im1 >= 0:
+                # We have two consecutive inflection points
+                #   so we calculate distance between them
+                si1 = track.getObsAnalyticalFeature(BIAF_ABS_CURV, im1)
+                si2 = track.getObsAnalyticalFeature(BIAF_ABS_CURV, im2)
+                #print (im1, si1, im2, si2)
+                DPi += (si2 - si1)
+                cpt += 1
+            im1 = im2
+            
+    #print ('cpt', cpt)
+    if cpt > 0:
+        return DPi / cpt
+    return 0
+
+
+def computeDeviation(track):
+    '''
+    '''
+    track.createAnalyticalFeature('deviation', -9999)
+    track.createAnalyticalFeature('sign_deviation', -9999)
+    
+    M = averageDistanceBetweenInflectionPoint(track)
+    
+    im1 = -1
+    for i in range(track.size()):
+        if track.getObsAnalyticalFeature('inflection', i) == 1:
+            im2 = i
+            if im1 >= 0:
+                # We have two consecutive inflection points
+                #   so we calculate deviation and the sign of deviation
+                si1 = track.getObsAnalyticalFeature(BIAF_ABS_CURV, im1)
+                si2 = track.getObsAnalyticalFeature(BIAF_ABS_CURV, im2)
+                di = (si2 - si1) - M
+                track.setObsAnalyticalFeature('deviation', i, di)
+                if di > 0:
+                    sign = 1
+                elif di < 0:
+                    sign = -1
+                else:
+                    sign = 0
+                track.setObsAnalyticalFeature('sign_deviation', i, sign)
+            im1 = im2
+
+
+def computeCriticalPoints(track):
+    '''
+    '''
+    track.createAnalyticalFeature('critical', 0)
+    
+    computeDeviation(track)
+    
+    im1 = -1
+    im2 = -1
+    cptIP = 0
+    for i in range(track.size()):
+        if track.getObsAnalyticalFeature('inflection', i) == 1:
+            cptIP += 1
+            im3 = i
+            
+            if cptIP >= 4:
+                # We have two consecutive inflection points
+                #   so we can identify if obs(i) is a critical point
+                sign1 = track.getObsAnalyticalFeature('sign_deviation', im1)
+                sign2 = track.getObsAnalyticalFeature('sign_deviation', im2)
+                sign3 = track.getObsAnalyticalFeature('sign_deviation', im3)
+                
+                if sign1 == sign2 and sign2 != sign3:
+                    track.setObsAnalyticalFeature('critical', i, 1)
+                
+            im1 = im2
+            im2 = im3
 
 
 # =============================================================================
@@ -263,8 +345,60 @@ def buttenfieldTree():
 def computeInflection(track):
     """
     Among the characteristic points, inflection points are those the curvature 
-    changes sign. In tracklib, this characteristic is modeled as an AF algorithm to detect 
-    if the observation obs(i) is an inflection point or not.
+    changes sign. In tracklib, this characteristic is modeled as an AF algorithm 
+    to detect if the observation obs(i) is an inflection point or not.
+    
+    Le principe de détection est fondé sur l'étude de la variation 
+    des produits vectoriels le long de la ligne. Les points d'inflexion sont 
+    détectés aux changements de signe de ces produits. 
+
+    Normalement, le point d'inflexion est le milieu de [oi, oi+1]. 
+    TODO : Pour ne pas avoir à ajouter de points, on prend oi, à changer.
+    
+    
+    Parameters
+    -----------
+    
+    :param track: a track to compute inflection point
+    :param i: the th point
+    :type track: Track
+    :type i: int
+    :returns: 1 if obs(i) is a inflection point, 0 else.
+    :rtype: int
+    
+    """
+    
+    track.createAnalyticalFeature('inflection', 0)
+    
+    for i in range(track.size()):
+        if i == 0:
+            continue
+        if i == track.size()-1 or i == track.size()-2:
+            continue
+        
+        x1 = track.getObs(i-1).position.getX()
+        y1 = track.getObs(i-1).position.getY()
+        x2 = track.getObs(i).position.getX()
+        y2 = track.getObs(i).position.getY()
+        x3 = track.getObs(i+1).position.getX()
+        y3 = track.getObs(i+1).position.getY()
+        x4 = track.getObs(i+2).position.getX()
+        y4 = track.getObs(i+2).position.getY()
+        
+        d1 = (x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1)
+        d2 = (x3 - x2) * (y4 - y2) - (y3 - y2) * (x4 - x2)
+        
+        if (d1 > 0 and d2 < 0) or (d1 < 0 and d2 > 0):
+            track.setObsAnalyticalFeature('inflection', i, 1)
+        else:
+            track.setObsAnalyticalFeature('inflection', i, 0)
+        
+    
+def computeInflectionLevel2(track):
+    """
+    Among the characteristic points, inflection points are those the curvature 
+    changes sign. In tracklib, this characteristic is modeled as an AF algorithm 
+    to detect if the observation obs(i) is an inflection point or not.
     
     Le principe de détection est fondé sur l'étude de la variation 
     des produits vectoriels le long de la ligne. Les points d'inflexion sont 
@@ -291,7 +425,6 @@ def computeInflection(track):
     track.createAnalyticalFeature('inflection', 0)
     
     for i in range(track.size()):
-    
         if i == 0 or i == 1 or i == 2:
             continue
     
@@ -340,15 +473,14 @@ def computeInflection(track):
                 if (d2 > 0 and d22 > 0) or (d2 < 0 and d22 < 0):
                     #print (i)
                     track.setObsAnalyticalFeature('inflection', i, 1)
-    
-
+        
 
 def computeVertex(track):
     '''
     Vertices are characteristic points of a track corresponding to 
     the maxima of curvature between two inflexion points.
     
-    "sommet" dans la thèse de Plazannet
+    "sommet" in the Plazannet thesis.
     
     This function is an AF algorithm to detect if the observation obs(i) 
     is a vertex point of the track or not.
@@ -362,9 +494,13 @@ def computeVertex(track):
     :type i: int
     :returns: 1 if obs(i) is a vertex point, 0 else.
     :rtype: int
+    
     '''
 
     track.createAnalyticalFeature('vertex', 0)
+    track.createAnalyticalFeature('height_vertex', 0)
+    track.createAnalyticalFeature('base_vertex', 0)
+    #track.createAnalyticalFeature('curve_length_vertex', 0)
     
     if not track.hasAnalyticalFeature('inflection'):
         computeInflection(track)
@@ -406,9 +542,24 @@ def computeVertex(track):
             if kj < K:
                 K = kj
                 iK = j
+                
+        # On peut calculer les indicateurs: base, hauteur, lcurv:
+        vbase = track.getObs(imin).distanceTo(track.getObs(imax))
+        
+        # La heuteur (perpendiculaire à la base)
+        xi = track.getObs(iK).position.getX()
+        yi = track.getObs(iK).position.getY()
+        x1 = track.getObs(imin).position.getX()
+        y1 = track.getObs(imin).position.getY()
+        x2 = track.getObs(imax).position.getX()
+        y2 = track.getObs(imax).position.getY()
+        d = distance_to_segment(xi, yi, x1, y1, x2, y2)
     
         #print ('   ', i, iK)
         track.setObsAnalyticalFeature('vertex', iK, 1)
+        track.setObsAnalyticalFeature('base_vertex', iK, vbase)
+        track.setObsAnalyticalFeature('height_vertex', iK, d)
+        # print (iK, vbase, d)
 
 
 def computeBend(track, angle_min = pi/2):

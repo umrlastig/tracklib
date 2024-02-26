@@ -61,10 +61,8 @@ from tracklib.core import (ECEFCoords, ENUCoords, GeoCoords,
                       priority_dict,
                       TrackCollection,
                       Bbox)
-from tracklib.plot import IPlotVisitor, MatplotlibVisitor
 from tracklib.algo import simplify
 from tracklib.core import Track
-
 
 
 class Node:
@@ -568,19 +566,105 @@ class Network:
     # Graphics
     # ------------------------------------------------------------
 
-    def plot(self,
-        edges: str = "k-",
-        nodes: str = "",
-        direct: str = "k--",
-        indirect: str = "k--",
-        size: float = 0.5,
-        append=plt,
-        v:IPlotVisitor=None):
+    def plot(self, edges:str="k-", nodes:str="", 
+             direct:str="k--", indirect:str="k--", size:float=0.5, append=False):
+        """
+        Plot network
 
-        if v == None:
-            v = MatplotlibVisitor()
+        :param edges: TODO
+        :param nodes: TODO
+        :param direct: TODO
+        :param indirect: TODO
+        :param size: TODO
+        :param append: TODO
+        """
+        
+        if isinstance(append, bool):
+            if append:
+                ax1 = plt.gca()
+            else:
+                fig, ax1 = plt.subplots(figsize=(10, 3))
+        else:
+            ax1 = plt
 
-        v.plotNetwork(self, edges, nodes, direct, indirect, size, append)
+
+        x1b = []
+        y1b = []
+        x1i = []
+        y1i = []
+        x1d = []
+        y1d = []
+        x2b = []
+        y2b = []
+        x2i = []
+        y2i = []
+        x2d = []
+        y2d = []
+        exb = []
+        eyb = []
+        exi = []
+        eyi = []
+        exd = []
+        eyd = []
+        nx = []
+        ny = []
+        
+        L = list(self.EDGES.items())
+        for i in range(len(L)):
+            edge = L[i][1]
+            for j in range(edge.geom.size() - 1):
+                if edge.orientation == tracklib.Edge.DOUBLE_SENS:
+                    x1b.append(edge.geom.getX()[j])
+                    x2b.append(edge.geom.getX()[j + 1])
+                    y1b.append(edge.geom.getY()[j])
+                    y2b.append(edge.geom.getY()[j + 1])
+                else:
+                    if edge.orientation == tracklib.Edge.SENS_DIRECT:
+                        x1d.append(edge.geom.getX()[j])
+                        x2d.append(edge.geom.getX()[j + 1])
+                        y1d.append(edge.geom.getY()[j])
+                        y2d.append(edge.geom.getY()[j + 1])
+                    else:
+                        x1i.append(edge.geom.getX()[j])
+                        x2i.append(edge.geom.getX()[j + 1])
+                        y1i.append(edge.geom.getY()[j])
+                        y2i.append(edge.geom.getY()[j + 1])
+            nx.append(edge.geom.getX()[0])
+            nx.append(edge.geom.getX()[-1])
+            ny.append(edge.geom.getY()[0])
+            ny.append(edge.geom.getY()[-1])
+        
+        for s, t, u, v in zip(x1b, y1b, x2b, y2b):
+            exb.append(s)
+            exb.append(u)
+            exb.append(None)
+            eyb.append(t)
+            eyb.append(v)
+            eyb.append(None)
+        for s, t, u, v in zip(x1d, y1d, x2d, y2d):
+            exd.append(s)
+            exd.append(u)
+            exd.append(None)
+            eyd.append(t)
+            eyd.append(v)
+            eyd.append(None)
+
+        for s, t, u, v in zip(x1i, y1i, x2i, y2i):
+            exi.append(s)
+            exi.append(u)
+            exi.append(None)
+            eyi.append(t)
+            eyi.append(v)
+            eyi.append(None)
+
+        if len(edges) > 0:
+            ax1.plot(exb, eyb, edges, linewidth=size, label="double sens")
+        if len(direct) > 0:
+            ax1.plot(exd, eyd, direct, linewidth=size, label="direct")
+        if len(indirect) > 0:
+            ax1.plot(exi, eyi, indirect, linewidth=size, label="indirect")
+        if len(nodes) > 0:
+            ax1.plot(nx, ny, nodes, markersize=4 * size)
 
     # ------------------------------------------------------------
     # Routing methods
@@ -810,7 +894,8 @@ class Network:
         else:
             return [(n[1].poids < 0) * 1e300 + n[1].poids for n in self.NODES.items()]
 
-    def all_shortest_distances(self, cut: float = 1e300, output_dict: dict = None) -> Dict[Tuple[int, int], float]:
+    def all_shortest_distances(self, cut: float = 1e300,
+                               output_dict: dict = None, verbose=False) -> Dict[Tuple[int, int], float]:
         """Computes all shortest distances between pairs of nodes
 
         The results are saved in a dictionnary `{key=(source, n), value=d}`.
@@ -833,10 +918,19 @@ class Network:
             it is possble tocall 'all_shortest_distances' successively with the same
             output dictionnary structure.
         """
-        print("Computing all pairs shortest distances...")
+        if verbose:
+            print("Map-matching preparation...")
+
         if output_dict is None:
             output_dict = dict()
-        for id_source in progressbar.progressbar(self.getNodesId()):
+
+        to_run = self.getNodesId()
+        if verbose:
+            to_run = progressbar.progressbar(to_run)
+
+        #print("Computing all pairs shortest distances...")
+        for id_source in to_run:
+        #for id_source in progressbar.progressbar(self.getNodesId()):
             self.run_routing_forward(id_source, cut=cut, output_dict=output_dict)
         return output_dict
 
@@ -921,7 +1015,7 @@ class Network:
 
         return min(min(d1, d2), min(d3, d4))
 
-    def prepare(self, cut: Union[float, None] = 1e300):
+    def prepare(self, cut: Union[float, None] = 1e300, verbose=False):
         """Precomputes shortest distances between all pairs of nodes and saves the
         result in :attr:`DISTANCES` attribute.
 
@@ -929,7 +1023,7 @@ class Network:
         """
         if self.DISTANCES is None:
             self.DISTANCES = dict()
-        self.all_shortest_distances(cut=cut, output_dict=self.DISTANCES)
+        self.all_shortest_distances(cut=cut, output_dict=self.DISTANCES, verbose=verbose)
 
     def has_prepared_shortest_distance(self, source: Union[int, Node], target: Union[int, Node]) -> bool:
         """Tests if a shortest distance has been precomputed

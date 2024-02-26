@@ -44,12 +44,12 @@ from __future__ import annotations
 from typing import Any
 
 import math
+import matplotlib.pyplot as plt
 import pickle
 import progressbar
 
 from tracklib.core import (GeoCoords, ENUCoords, TrackCollection)
 from tracklib.util import isSegmentIntersects
-from tracklib.plot import IPlotVisitor, MatplotlibVisitor
 
 from tracklib.core import (Bbox, Track)
 from tracklib.core import Edge
@@ -240,15 +240,63 @@ class SpatialIndex:
         return (idx, idy)
     
     
-    def plot(self, base:bool=True, append=True, v:IPlotVisitor=None):
-        if v == None:
-            v = MatplotlibVisitor()
-        v.plotSpatialIndex(self, base, append)
+    def plot(self, base:bool=True, append=True):
+        """
+        Plot spatial index and collection structure together in the
+        same reference frame (geographic reference frame)
+            - base: plot support network or track collection if True
+        """
+        
+        if isinstance(append, bool):
+            if append:
+                ax1 = plt.gca()
+            else:
+                fig, ax1 = plt.subplots(figsize=(10, 3))
+        else:
+            ax1 = plt
+            
+        #fig = plt.figure()
+        #ax = fig.add_subplot(
+        #    111, xlim=(si.xmin, si.xmax), ylim=(si.ymin, si.ymax)
+        #)
 
-    def highlight(self, i, j, v:IPlotVisitor=None, sym="r-", size=0.5):
-        if v == None:
-            v = MatplotlibVisitor()
-        v.highlightCellInSpatialIndex(self, i, j, sym, size)
+        for i in range(0, self.csize):
+            xi = i * self.dX + self.xmin
+            ax1.plot([xi, xi], [self.ymin, self.ymax], "-", color="gray")
+        
+        for j in range(0, self.lsize):
+            yj = j * self.dY + self.ymin
+            ax1.plot([self.xmin, self.xmax], [yj, yj], "-", color="gray")
+
+
+        if base:
+            self.collection.plot(append=ax1)
+
+        for i in range(self.csize):
+            xi1 = i * self.dX + self.xmin
+            xi2 = xi1 + self.dX
+            for j in range(self.lsize):
+                yj1 = j * self.dY + self.ymin
+                yj2 = yj1 + self.dY
+                if len(self.grid[i][j]) > 0:
+                    polygon = plt.Polygon(
+                        [[xi1, yj1], [xi2, yj1], [xi2, yj2], [xi1, yj2], [xi1, yj1]]
+                    )
+                    ax1.add_patch(polygon)
+                    polygon.set_facecolor("lightcyan")
+
+
+    def highlight(self, i, j, sym="r-", size=0.5):
+        """
+        Plot a specific cell (i,j).
+        """
+        x0 = self.xmin + i * self.dX
+        x1 = x0 + self.dX
+        y0 = self.ymin + j * self.dY
+        y1 = y0 + self.dY
+        X = [x0, x1, x1, x0, x0]
+        Y = [y0, y0, y1, y1, y0]
+        plt.plot(X, Y, sym, linewidth=size)
     
     
     def request(self, obj, j=None) -> list[Any]:   

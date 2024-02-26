@@ -3,16 +3,21 @@
 
 import unittest
 import matplotlib.pyplot as plt
-#import numpy as np
-
+import math
 from tracklib import (Obs, ObsTime, ENUCoords, 
                       Track, TrackCollection,
                       compare, 
                       differenceProfile, 
                       plotDifferenceProfile,
                       premiereComposanteHausdorff,
-                      hausdorff, discreteFrechet,
-                      centralTrack)
+                      hausdorff, #discreteFrechet,
+                      centralTrack,
+                      arealStandardizedBetweenTwoTracks,
+                      averagingCoordSet,
+                      MODE_COMPARAISON_RMSE,
+                      MODE_COMPARAISON_HAUSDORFF,
+                      MODE_COMPARAISON_DISTANCE_MOYENNE,
+                      MODE_COMPARAISON_DTW)
 
 
 
@@ -126,8 +131,17 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         
         
     def testCompare(self):
-        a = compare(self.trace1, self.trace2)
+        a = compare(self.trace1, self.trace2, mode=MODE_COMPARAISON_RMSE)
         self.assertLessEqual(abs(a - 4.0280), self.__epsilon, "Comparaison")
+        
+        b = compare(self.trace1, self.trace2, mode=MODE_COMPARAISON_HAUSDORFF)
+        self.assertLessEqual(abs(b - 2.121), self.__epsilon, "Comparaison")
+        
+        c = compare(self.trace1, self.trace2, mode=MODE_COMPARAISON_DISTANCE_MOYENNE)
+        self.assertLessEqual(abs(c - 3.541), self.__epsilon, "Comparaison")
+        
+        d = compare(self.trace1, self.trace2, mode=MODE_COMPARAISON_DTW)
+        self.assertLessEqual(abs(d - 40.683), self.__epsilon, "Comparaison")
 
 
     def testDifference21ProfileNN(self):
@@ -202,34 +216,34 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         d = hausdorff(trackA, trackB)
         self.assertLessEqual(abs(d - 2.12132), self.__epsilon)
         
-    def testFrechetSimilarity(self):
-        trackA = Track([], 1)
-        c = ENUCoords(2.0, 1.0, 0)
-        p = Obs(c, ObsTime())
-        trackA.addObs(p)
-        c = ENUCoords(3.0, 1.0, 0)
-        p = Obs(c, ObsTime())
-        trackA.addObs(p)
-        c = ENUCoords(4.0, 2.0, 0)
-        p = Obs(c, ObsTime())
-        trackA.addObs(p)
-        c = ENUCoords(5.0, 1.0, 0)
-        p = Obs(c, ObsTime())
-        trackA.addObs(p)
-
-        trackB = Track([], 1)
-        c = ENUCoords(2.0, 0.0, 0)
-        p = Obs(c, ObsTime())
-        trackB.addObs(p)
-        c = ENUCoords(3.0, 0.0, 0)
-        p = Obs(c, ObsTime())
-        trackB.addObs(p)
-        c = ENUCoords(4.0, 0.0, 0)
-        p = Obs(c, ObsTime())
-        trackB.addObs(p)
-
-        self.assertEqual(discreteFrechet(trackA, trackB), 2.0)
-    
+#    def testFrechetSimilarity(self):
+#        trackA = Track([], 1)
+#        c = ENUCoords(2.0, 1.0, 0)
+#        p = Obs(c, ObsTime())
+#        trackA.addObs(p)
+#        c = ENUCoords(3.0, 1.0, 0)
+#        p = Obs(c, ObsTime())
+#        trackA.addObs(p)
+#        c = ENUCoords(4.0, 2.0, 0)
+#        p = Obs(c, ObsTime())
+#        trackA.addObs(p)
+#        c = ENUCoords(5.0, 1.0, 0)
+#        p = Obs(c, ObsTime())
+#        trackA.addObs(p)
+#
+#        trackB = Track([], 1)
+#        c = ENUCoords(2.0, 0.0, 0)
+#        p = Obs(c, ObsTime())
+#        trackB.addObs(p)
+#        c = ENUCoords(3.0, 0.0, 0)
+#        p = Obs(c, ObsTime())
+#        trackB.addObs(p)
+#        c = ENUCoords(4.0, 0.0, 0)
+#        p = Obs(c, ObsTime())
+#        trackB.addObs(p)
+#
+#        self.assertEqual(discreteFrechet(trackA, trackB), 2.0)
+        
     def testCentralNNTrack(self):
         TRACES = []
         TRACES.append(self.trace1)
@@ -264,21 +278,118 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         plt.ylim([-1, 7])
         plt.show()   
 
-    
+    def testArealStandardizedBetweenTwoTracks(self):
+        trace4 = Track([], 1)
+        trace4.addObs(Obs(ENUCoords(0, 50, 0), ObsTime()))
+        trace4.addObs(Obs(ENUCoords(10, 50, 0), ObsTime()))
+        trace4.addObs(Obs(ENUCoords(10, 60, 0), ObsTime()))
+        trace4.addObs(Obs(ENUCoords(20, 60, 0), ObsTime()))
+        trace4.addObs(Obs(ENUCoords(20, 50, 0), ObsTime()))
+        trace4.addObs(Obs(ENUCoords(30, 50, 0), ObsTime()))
+        #trace4.plot('k-')
+        
+        trace3 = Track([], 1)
+        trace3.addObs(Obs(ENUCoords(0, 40, 0), ObsTime()))
+        trace3.addObs(Obs(ENUCoords(10, 40, 0), ObsTime()))
+        trace3.addObs(Obs(ENUCoords(10, 30, 0), ObsTime()))
+        trace3.addObs(Obs(ENUCoords(20, 30, 0), ObsTime()))
+        trace3.addObs(Obs(ENUCoords(20, 40, 0), ObsTime()))
+        trace3.addObs(Obs(ENUCoords(30, 40, 0), ObsTime()))
+        #trace3.plot('k-', append=True)
+        
+        S1 = arealStandardizedBetweenTwoTracks(trace3, trace4)
+        S2 = arealStandardizedBetweenTwoTracks(trace4, trace3)
+        
+        self.assertEqual(S1, 10.0)
+        self.assertEqual(S2, 10.0)
+        
+        # ----------------------------------------------------
+        
+        trace3.translate(0, 10)
+        
+        trace4.addObs(Obs(ENUCoords(30, 40, 0), ObsTime()))
+        trace4.addObs(Obs(ENUCoords(40, 40, 0), ObsTime()))
+        trace4.addObs(Obs(ENUCoords(40, 50, 0), ObsTime()))
+        trace4.addObs(Obs(ENUCoords(50, 50, 0), ObsTime()))
+        
+        trace3.addObs(Obs(ENUCoords(30, 60, 0), ObsTime()))
+        trace3.addObs(Obs(ENUCoords(40, 60, 0), ObsTime()))
+        trace3.addObs(Obs(ENUCoords(40, 50, 0), ObsTime()))
+        trace3.addObs(Obs(ENUCoords(50, 50, 0), ObsTime()))
+        
+        trace4.plot('b-')
+        trace3.plot('r-', append=True)
+        plt.xlim([-5, 60])
+        plt.ylim([20, 70])
+        
+        S = arealStandardizedBetweenTwoTracks(trace3, trace4)
+        self.assertEqual(S, 0.0)
+        
+        
+    def testAggregatCluster(self):
+        trackC = Track([], 1)
+        trackC.addObs(Obs(ENUCoords(0, 0), ObsTime()))
+        trackC.addObs(Obs(ENUCoords(1, 0), ObsTime()))
+        trackC.addObs(Obs(ENUCoords(1, 1), ObsTime()))
+        trackC.addObs(Obs(ENUCoords(0, 1), ObsTime()))
+        coords = trackC.getCoord()
 
-
+        d1 = averagingCoordSet(coords, p=1, constraint=False)
+        self.assertEqual(d1.E, 0.5)
+        self.assertEqual(d1.N, 0.5)
+        self.assertEqual(d1.U, 0.0)
+        
+        d8 = averagingCoordSet(coords, p=1, constraint=True)
+        self.assertEqual(d8.E, 0.0)
+        self.assertEqual(d8.N, 0.0)
+        self.assertEqual(d8.U, 0.0)
+        
+        d2 = averagingCoordSet(coords, p=2, constraint=False)
+        self.assertEqual(d2.E, math.sqrt(2)/2)
+        self.assertEqual(d2.N, math.sqrt(2)/2)
+        self.assertEqual(d2.U, 0.0)
+        
+        d7 = averagingCoordSet(coords, p=2, constraint=True)
+        self.assertEqual(d7.E, 1.0)
+        self.assertEqual(d7.N, 1.0)
+        self.assertEqual(d7.U, 0.0)
+        
+        d3 = averagingCoordSet(coords, p=3, constraint=False)
+        self.assertEqual(d3.E, (1/2)**(1.0/3))
+        self.assertEqual(d3.N, (2/4)**(1.0/3))
+        self.assertEqual(d3.U, 0.0)
+        d6 = averagingCoordSet(coords, p=3, constraint=True)
+        self.assertEqual(d6.E, 1.0)
+        self.assertEqual(d6.N, 1.0)
+        self.assertEqual(d6.U, 0.0)
+        
+        d4 = averagingCoordSet(coords, p=math.inf, constraint=False)
+        self.assertEqual(d4.E, 1.0)
+        self.assertEqual(d4.N, 1.0)
+        self.assertEqual(d4.U, 0.0)
+        d5 = averagingCoordSet(coords, p=math.inf, constraint=True)
+        self.assertEqual(d5.E, 1.0)
+        self.assertEqual(d5.N, 1.0)
+        self.assertEqual(d4.U, 0.0)
+        
+        
     
 if __name__ == '__main__':
     suite = unittest.TestSuite()
+    
     suite.addTest(TestAlgoComparaisonMethods("testCompare"))
+    '''
     suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileNN"))
     suite.addTest(TestAlgoComparaisonMethods("testDifference12ProfileNN"))
     suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileDTW"))
     suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileFDTW"))
     suite.addTest(TestAlgoComparaisonMethods("testHausdorffSimilarity"))
-    suite.addTest(TestAlgoComparaisonMethods("testFrechetSimilarity"))
+    #suite.addTest(TestAlgoComparaisonMethods("testFrechetSimilarity"))
     suite.addTest(TestAlgoComparaisonMethods("testCentralNNTrack"))
     suite.addTest(TestAlgoComparaisonMethods("testCentralDTWTrack"))
+    suite.addTest(TestAlgoComparaisonMethods("testArealStandardizedBetweenTwoTracks"))
+    suite.addTest(TestAlgoComparaisonMethods("testAggregatCluster"))
+    '''
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

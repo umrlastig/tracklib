@@ -114,32 +114,4 @@ class IPlotVisitor(ABC):
         pass
     
     
-    @abstractmethod
-    def plotSpatialIndex(self, si, base=True, append=True):
-        """
-        Plot a spatial index.
-        """
-        pass
     
-    @abstractmethod
-    def highlightCellInSpatialIndex(self, si, i, j, sym="r-", size=0.5):
-        """
-        Plot a specific cell (i,j)
-        """
-        pass
-    
-    
-    @abstractmethod
-    def plotNetwork(self, network, edges:str="k-", nodes:str="",
-        direct:str="k--", indirect:str="k--", size:float=0.5, append=None):
-        """
-        Plot a network.
-        """
-        pass
-    
-    @abstractmethod
-    def plotMMLink(self, track):
-        """
-        Plot the map matched track on network links.
-        """
-        pass

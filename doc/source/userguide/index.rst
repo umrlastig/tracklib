@@ -45,8 +45,13 @@ to get you using tracklib productively as quickly as possible.
     UG_MapMatchingOnNetwork
     UG_MapOnRaster
     
+    
+.. Useful tools
+.. -------------
 
-.. 
+
+
+.. Coding with tracklib in QGIS <qgis>
 .. Mopsi <Mopsi> (track's comparaison)
 .. Points caractéristiques 
 
