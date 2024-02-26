@@ -236,7 +236,7 @@ def makeCovarianceMatrixFromKernelOld(kernel, T1: list[tuple[float, float]], T2:
     return SIGMA
 
 
-def makeCovarianceMatrixFromKernel(kernel, track, factor = 1.0, mode = 'linear', force = False):   
+def makeCovarianceMatrixFromKernel(kernel, track, factor = 1.0, mode = 'linear', force = False, control = False):   
     """Function to form covariance matrix from kernel
 
     :param kernel: A function describing statistical similarity between points
@@ -244,8 +244,11 @@ def makeCovarianceMatrixFromKernel(kernel, track, factor = 1.0, mode = 'linear',
 	:mode: computation mode ('linear', 'circular' or 'euclidian')
     :param factor: Unit factor of std dev (default 1.0)
     """
+    track2 = track.copy()
+    for icp in range(len(control)-1,-1,-1):
+        track2.insertObs(track[control[icp][0]].copy(), i=0)
+    D = makeDistanceMatrix(track2, mode)
 
-    D = makeDistanceMatrix(track, mode)
     kfunc = np.vectorize(kernel.getFunction())
     SIGMA = factor ** 2 * kfunc(D)
     if force:

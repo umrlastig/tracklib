@@ -59,7 +59,7 @@ def generate (x_t=0.3, y_t=None, z_t=None, date_ini=None, date_fin=None, dt=None
     Generate analytical track
     """
     randomTrack = y_t is None
-    
+
     if randomTrack:
         if N > 1:
             tracks = tracklib.TrackCollection()
@@ -86,8 +86,7 @@ def generate (x_t=0.3, y_t=None, z_t=None, date_ini=None, date_fin=None, dt=None
     track = tracklib.Track()
     tps = date_ini.copy()
     N = (date_fin - date_ini) / dt
-    if verbose:
-        print("Generating track from", date_ini, "to", date_fin)
+
     for i in range((int)(N)):
         t = i / (N - 1.0)
         tps = tps.addSec(dt)
@@ -98,6 +97,8 @@ def generate (x_t=0.3, y_t=None, z_t=None, date_ini=None, date_fin=None, dt=None
         track.addObs(obs)
     if randomTrack:
         track = track.noise(50, GaussianKernel(scope))
+    if verbose:
+        print("Generated track from", date_ini, "to", date_fin, "["+str(len(track))+" pts]")
     
     return track
 

@@ -263,6 +263,56 @@ class ExponentialKernel(Kernel):
         return "Exponential kernel (tau=" + str(self.support / 3) + ")"
 
 
+class CubicKernel(Kernel):
+    """Define a Cubic Kernel"""
+
+    def __init__(self, sigma: float):   
+        """Constructor of Cubic Kernel
+
+        The Kernel function is:
+
+            .. math::
+
+                f(x) = \\1-\Big[7\Big(\frac{x}{a}\Big)^2-\frac{35}{4}\Big(\frac{x}{a}\Big)^3 + \frac{7}{2}\Big(\frac{x}{a}\Big)^5-\frac{3}{4}\Big(\frac{x}{a}\Big)^7\Big]
+
+        :param sigma: The sigma value (:math:`\\sigma`) for the kernel
+
+        """
+        f = lambda x: 1-(7*math.pow((abs(x)/sigma),2) - 35/4*math.pow((abs(x)/sigma),3)   +   7/2*math.pow((abs(x)/sigma),5)  - 3/4*math.pow((abs(x)/sigma),7)                       )
+        self.setFunction(f)
+        self.support = sigma
+
+    def __str__(self) -> str:   
+        """Print the kernel type"""
+        return "Cubic kernel (tau=" + str(self.support) + ")"
+
+
+class SphericKernel(Kernel):
+    """Define a Spheric Kernel"""
+
+    def __init__(self, sigma: float):   
+        """Constructor of Cubic Kernel
+
+        The Kernel function is:
+
+            .. math::
+
+                f(x) = \\1-\Big[\frac{3}{2}\Big(\frac{x}{a}\Big) - \frac{1}{2}\Big(\frac{x}{a}\Big)^3\Big]
+
+        :param sigma: The sigma value (:math:`\\sigma`) for the kernel
+
+        """
+        f = lambda x: 1-(3/2*abs(x)/sigma - 1/2*math.pow(abs(x)/sigma,3))
+        self.setFunction(f)
+        self.support = sigma
+
+    def __str__(self) -> str:   
+        """Print the kernel type"""
+        return "Spheric kernel (tau=" + str(self.support) + ")"
+
+
+
+
 class EpanechnikovKernel(Kernel):
     """Define a Epanechnikov Kernel"""
 
