@@ -1430,11 +1430,11 @@ class Track:
     # =========================================================================
     #  Adding noise to tracks
     # =========================================================================
-    def noise(self, sigma=5, kernel=None, force=False, cycle=False):
+    def noise(self, sigma=5, kernel=None, force=False, cycle=False, control=[], n=1):
         """TODO"""
         if kernel is None:
             kernel = DiracKernel()
-        return noise(self, sigma, kernel, force=force, cycle=cycle)
+        return noise(self, sigma, kernel, force=force, cycle=cycle, control=control, n=1)
 
     # =========================================================================
     # Graphical methods
