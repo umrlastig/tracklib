@@ -575,6 +575,21 @@ class Track:
         """TODO"""
         for i in range(self.size()):
             self.getObs(i).timestamp = self.getObsAnalyticalFeature(af_name, i)
+            
+    def setXFromFunction(self, function):
+        """TODO"""
+        for i in range(self.size()):
+            self.getObs(i).position.setX(function(self, i))
+            
+    def setYFromFunction(self, function):
+        """TODO"""
+        for i in range(self.size()):
+            self.getObs(i).position.setY(function(self, i))
+            
+    def setZFromFunction(self, function):
+        """TODO"""
+        for i in range(self.size()):
+            self.getObs(i).position.setZ(function(self, i))
 
     def setOrder(self, name="order", start=0):
         """TODO"""
@@ -2396,6 +2411,12 @@ class Track:
                 self.removeAnalyticalFeature(n)
                 return
             if (str(type(obs))[8:16] == "function"):
+                if n == "x":
+                    return self.setXFromFunction(obs)
+                if n == "y":
+                    return self.setYFromFunction(obs)
+                if n == "z":
+                    return self.setZFromFunction(obs)
                 self.addAnalyticalFeature(obs, n)
                 return
             if self.hasAnalyticalFeature(n):
