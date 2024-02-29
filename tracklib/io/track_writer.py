@@ -359,6 +359,7 @@ class TrackWriter:
             f.write("        </LineStyle>\n")
             f.write("      </Style>\n")
             f.write("      <LineString>\n")
+            f.write("        <altitudeMode>relativeToGround</altitudeMode>\n")
             f.write("        <coordinates>\n")
 
             for i in range(track.size()):

@@ -56,7 +56,7 @@ import matplotlib.pyplot as plt
 import tracklib as tracklib
 from tracklib.util import dist_point_to_segment, Polygon
 from . import computeAbsCurv, synchronize, HMM, MODE_OBS_AS_2D_POSITIONS
-from tracklib.core import ENUCoords
+from tracklib.core import ENUCoords, TrackCollection
 
 MODE_COMPARAISON_NEAREST_NEIGHBOUR = 1
 MODE_COMPARAISON_DTW = 2
@@ -604,8 +604,10 @@ def averagingCoordSet(coordSet, p=2, constraint=False):
         return coordSet[iMin]
     
 
-
-def fusion(tracks, weight=lambda A, B : A + B**2, ref=0, 
+# ------------------------------------------------------------------------
+# Algorithme fusion L. Etienne : trajectoire médiane
+# ------------------------------------------------------------------------
+def __fusion(tracks, weight=lambda A, B : A + B**2, ref=0, 
            p=1, constraint=False, verbose=True):
 
     central = tracks[ref].copy()
@@ -640,4 +642,20 @@ def fusion(tracks, weight=lambda A, B : A + B**2, ref=0,
                 
     return central
     
- 
+# ------------------------------------------------------------------------
+# Algorithme récursif fusion L. Etienne : trajectoire médiane
+# ------------------------------------------------------------------------ 
+def fusion(tracks, weight=lambda A, B : A + B**2, ref=0, p=1, constraint=False, recursive=1e300, verbose=True):
+    N = len(tracks)
+    if N <= recursive:
+        return __fusion(tracks, weight=weight, ref=ref, p=p, constraint=constraint, verbose=verbose)
+    else:
+       Npg = int(N/recursive)
+       subtracks = TrackCollection()
+       for i in range(recursive):
+           ini = Npg*i
+           fin = Npg*(i+1)
+           if i == (recursive-1):
+               fin = len(tracks)
+           subtracks.addTrack(fusion(tracks[ini:fin], weight=weight, ref=ref, p=p, constraint=constraint, recursive=recursive, verbose=verbose))
+       return fusion(subtracks, weight=weight, ref=ref, p=p, constraint=constraint, recursive=recursive, verbose=verbose)
