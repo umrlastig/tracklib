@@ -637,6 +637,7 @@ def __fusion(tracks, weight=lambda A, B : A + B**2, ref=0,
         if (profile.score < 1e-16):
             break
         
+    central.iteration = iteration
     if verbose:
         print("END OF COMPUTATION")
                 
