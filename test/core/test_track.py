@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
+
+import matplotlib.pyplot as plt
+import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
 
 from tracklib import (ENUCoords, ObsTime, Obs, Track, 
                       Polygon, TrackCollection,
                       computeAbsCurv,
-                      ds, speed, heading)
+                      ds, speed, heading,
+                      TrackReader)
 
 
 class TestTrack(TestCase):
@@ -14,6 +18,7 @@ class TestTrack(TestCase):
     __epsilon = 0.001
     
     def setUp (self):
+        self.resource_path = os.path.join(os.path.split(__file__)[0], "../..")
         ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         
         # ---------------------------------------------------------------------
@@ -600,10 +605,57 @@ class TestTrack(TestCase):
         self.assertEqual(T[0].position.getY(), 0)
         self.assertEqual(T[1].position.getY(), 3)
         
+        
+    def test_getCentroid(self):
+        chemin1 = os.path.join(self.resource_path, './data/demicercle.csv')
+        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        trace1.plot('b-')
+        trace1.plot('bs')
+        
+        g = trace1.getCentroid()
+        plt.plot(g.getX(), g.getY(), 'ro')
+        self.assertIsInstance(g, ENUCoords)
+        self.assertLessEqual(abs(g.getX() - 0.0), self.__epsilon, "x of centroid")
+        self.assertLessEqual(abs(g.getY() - 0.690), self.__epsilon, "y of centroid")
+        
+        plt.show()
+    
+    def test_getFurthestObs(self):
+        chemin1 = os.path.join(self.resource_path, './data/demicercle.csv')
+        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        trace1.plot('b-')
+        trace1.plot('bs')
+        
+        o = Obs(ENUCoords(0, 0, 0), ObsTime.readTimestamp("2018-01-01 10:00:01"))
+        plt.plot(o.position.getX(), o.position.getY(), 'ks', markersize=5)
+        g = trace1.getFurthestObs(o)
+        plt.plot(g.position.getX(), g.position.getY(), 'g<', markersize=10)
+        self.assertIsInstance(g, Obs)
+        self.assertLessEqual(abs(g.position.getX() + 0.2), self.__epsilon, "x of furthest obs")
+        self.assertLessEqual(abs(g.position.getY() - 0.98), self.__epsilon, "y of furthest obs")
+    
+        plt.show()
+    
+    def test_getMedianObsInTime(self):
+        chemin1 = os.path.join(self.resource_path, './data/demicercle.csv')
+        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        trace1.plot('b-')
+        trace1.plot('bs')
+        
+        o = Obs(ENUCoords(0, 0, 0), ObsTime.readTimestamp("2018-01-01 10:00:01"))
+        plt.plot(o.position.getX(), o.position.getY(), 'ks', markersize=5)
+        g = trace1.getMedianObsInTime(o)
+        plt.plot(g.position.getX(), g.position.getY(), 'g<', markersize=10)
+
+        self.assertIsInstance(g, Obs)
+        self.assertLessEqual(abs(g.position.getX() - 0.0), self.__epsilon, "x of MedianObsInTime")
+        self.assertLessEqual(abs(g.position.getY() - 1.0), self.__epsilon, "y of MedianObsInTime")
+        
+        plt.show()
 
 if __name__ == '__main__':
     suite = TestSuite()
-    
+
     suite.addTest(TestTrack("test_str"))
     suite.addTest(TestTrack("test_timezone"))
     suite.addTest(TestTrack("test_interval"))
@@ -632,11 +684,14 @@ if __name__ == '__main__':
     suite.addTest(TestTrack("test_insert_obs"))
     suite.addTest(TestTrack("test_insert_obs2"))
     
-    
     suite.addTest(TestTrack("test_op_truediv"))
     suite.addTest(TestTrack("test_op_gt"))
     suite.addTest(TestTrack("test_op_ge"))
     suite.addTest(TestTrack("test_op_mod"))
+
+    suite.addTest(TestTrack("test_getCentroid"))
+    suite.addTest(TestTrack("test_getFurthestObs"))
+    suite.addTest(TestTrack("test_getMedianObsInTime"))
     
     runner = TextTestRunner()
     runner.run(suite)
