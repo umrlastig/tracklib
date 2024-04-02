@@ -259,6 +259,9 @@ def makeCovarianceMatrixFromKernel(kernel, track, factor = 1.0, mode = 'linear',
         SIGMA = v @ np.diag(w) @ v.transpose()
     return SIGMA
 
+def randomColor():
+    """TODO"""
+    return [random.random(), random.random(), random.random()]
 
 def rgbToHex(color: list[float, float, float, Optional[float]]) -> str:   
     """Function to convert RGBA color to hexadecimal
