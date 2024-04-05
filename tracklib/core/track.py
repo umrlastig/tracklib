@@ -68,8 +68,14 @@ from tracklib.algo import (BIAF_SPEED, BIAF_ABS_CURV,
                            noise,
                            estimate_speed,
                            smoothed_speed_calculation,
+<<<<<<< HEAD
                            compare,
                            MODE_TEMPORAL)                     
+=======
+                           differenceProfile,
+                           MODE_TEMPORAL,
+                           co_median)                     
+>>>>>>> ef1edb486d81fc8da4afd5762ccfa2b4df84cad3
 from . import (UnaryOperator, BinaryOperator, 
                ScalarOperator, ScalarVoidOperator, 
                BinaryVoidOperator, UnaryVoidOperator,
@@ -370,6 +376,21 @@ class Track:
         if not isnan(m.getZ()):
             m.setZ(self.operate(Operator.AVERAGER, 'z'))
         return m
+    
+    def getFurthestObs(self, o):
+        ''' '''
+        pos = 0
+        d = o.distanceTo(self.getFirstObs())
+        for i in range(1, self.size()):
+            if o.distanceTo(self.getObs(i)) > d:
+                pos = i
+                d = o.distanceTo(self.getObs(i))
+        return self.getObs(pos)
+    
+    def getMedianObsInTime(self, o):
+        T = self.getT()
+        t1 = co_median(T)
+        return self.getObs(T.index(t1))
 
     def getEnclosedPolygon(self):
         """TODO"""

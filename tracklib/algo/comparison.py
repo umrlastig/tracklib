@@ -657,4 +657,3 @@ def averagingCoordSet(coordSet, p=2, constraint=False):
 #       return fusion(subtracks, weight=weight, ref=ref, p=p, constraint=constraint, recursive=recursive, verbose=verbose)
 #
 #
-
