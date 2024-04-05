@@ -311,14 +311,15 @@ class MatplotlibVisitor(IPlotVisitor):
         
         
         for k in range(len(track)):
-
             P = track.getObsAnalyticalFeature(af, k)[0:2, 0:2]
             [V, D] = np.linalg.eig(P)
-            alpha = math.atan(-D[0][1] / D[0][0]) * 180 / math.pi
+
+            alpha = math.atan(-D[0,1] / D[0,0]) * 180 / math.pi
             Xhat = track[k].position.getX()
             Yhat = track[k].position.getY()
-            SDXhat = D[0, 0]
-            SDYhat = D[1, 1]
+            SDXhat = math.sqrt(V[0])
+            SDYhat = math.sqrt(V[1])
+            
 
             e = Ellipse((Xhat, Yhat), factor * SDXhat, factor * SDYhat, angle=alpha)
             e.set_fill(False)

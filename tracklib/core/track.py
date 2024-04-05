@@ -68,7 +68,7 @@ from tracklib.algo import (BIAF_SPEED, BIAF_ABS_CURV,
                            noise,
                            estimate_speed,
                            smoothed_speed_calculation,
-                           differenceProfile,
+                           compare,
                            MODE_TEMPORAL)                     
 from . import (UnaryOperator, BinaryOperator, 
                ScalarOperator, ScalarVoidOperator, 
@@ -2316,7 +2316,7 @@ class Track:
         return self.size()
 
     # ------------------------------------------------------------
-    # [-] Computes difference profile of 2 tracks
+    # [-] Computes difference between two tracks
     # ------------------------------------------------------------
     def __sub__(self, arg):
         """TODO"""
@@ -2324,7 +2324,7 @@ class Track:
             print("Available operator not implemented yet")
             return None
         else:
-            return differenceProfile(self, arg)
+            return compare(self, arg)
 
     # ------------------------------------------------------------
     # [*] Temporal resampling of track or track intersections
