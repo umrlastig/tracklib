@@ -7,7 +7,9 @@ import math
 from tracklib import (Obs, ObsTime, ENUCoords, Track,
                       averagingCoordSet, compare,
                       MODE_COMPARISON_HAUSDORFF,
-                      MODE_COMPARISON_POINTWISE)
+                      MODE_COMPARISON_POINTWISE,
+                      MODE_COMPARISON_AREAL,
+                      MODE_COMPARISON_DTW)
 
 
 
@@ -164,48 +166,12 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
                                              mode=MODE_COMPARISON_POINTWISE, p=2)
         self.assertLessEqual(abs(a - 4.11483), self.__epsilon, "Comparaison")
         
+        #d = compare(self.trace1, self.trace2, mode=MODE_COMPARISON_DTW, p=1)
+        #self.assertLessEqual(abs(d - 40.683), self.__epsilon, "Comparaison")
         
-    '''
-        c = compare(self.trace1, self.trace2, mode=MODE_COMPARAISON_DISTANCE_MOYENNE)
-        self.assertLessEqual(abs(c - 3.541), self.__epsilon, "Comparaison")
-        
-        d = compare(self.trace1, self.trace2, mode=MODE_COMPARAISON_DTW)
-        self.assertLessEqual(abs(d - 40.683), self.__epsilon, "Comparaison")
+        #c = compare(self.trace1, self.trace2, mode=MODE_COMPARAISON_DISTANCE_MOYENNE)
+        #self.assertLessEqual(abs(c - 3.541), self.__epsilon, "Comparaison")
 
-
-    def testCentralNNTrack(self):
-        TRACES = []
-        TRACES.append(self.trace1)
-        TRACES.append(self.trace2)
-        collection = TrackCollection(TRACES)
-        self.plot()
-        
-        central = centralTrack(collection)
-        
-        central.plot()
-        central.plotAsMarkers(frg="k", bkg="w", sym_frg=" ", sym_bkg="o")
-        
-        plt.title('central NN')
-        plt.xlim([0, 14])
-        plt.ylim([-1, 7])
-        plt.show()        
-        
-    def testCentralDTWTrack(self):
-        TRACES = []
-        TRACES.append(self.trace1)
-        TRACES.append(self.trace2)
-        collection = TrackCollection(TRACES)
-        self.plot()
-        
-        central = centralTrack(collection, mode = "DTW")
-        
-        central.plot()
-        central.plotAsMarkers(frg="k", bkg="w", sym_frg=" ", sym_bkg="o")
-        
-        plt.title('central DTW')
-        plt.xlim([0, 14])
-        plt.ylim([-1, 7])
-        plt.show()   
 
     def testArealStandardizedBetweenTwoTracks(self):
         trace4 = Track([], 1)
@@ -226,8 +192,8 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         trace3.addObs(Obs(ENUCoords(30, 40, 0), ObsTime()))
         #trace3.plot('k-', append=True)
         
-        S1 = arealStandardizedBetweenTwoTracks(trace3, trace4)
-        S2 = arealStandardizedBetweenTwoTracks(trace4, trace3)
+        S1 = compare(trace3, trace4, mode=MODE_COMPARISON_AREAL)
+        S2 = compare(trace4, trace3, mode=MODE_COMPARISON_AREAL)
         
         self.assertEqual(S1, 10.0)
         self.assertEqual(S2, 10.0)
@@ -251,9 +217,8 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         plt.xlim([-5, 60])
         plt.ylim([20, 70])
         
-        S = arealStandardizedBetweenTwoTracks(trace3, trace4)
+        S = compare(trace3, trace4, mode=MODE_COMPARISON_AREAL)
         self.assertEqual(S, 0.0)
-    '''
         
     def testAggregatCluster(self):
         trackC = Track([], 1)
@@ -308,9 +273,7 @@ if __name__ == '__main__':
     
     suite.addTest(TestAlgoComparaisonMethods("testCompare"))
     suite.addTest(TestAlgoComparaisonMethods("testHausdorffSimilarity"))
-    #suite.addTest(TestAlgoComparaisonMethods("testCentralNNTrack"))
-    #suite.addTest(TestAlgoComparaisonMethods("testCentralDTWTrack"))
-    #suite.addTest(TestAlgoComparaisonMethods("testArealStandardizedBetweenTwoTracks"))
+    suite.addTest(TestAlgoComparaisonMethods("testArealStandardizedBetweenTwoTracks"))
     suite.addTest(TestAlgoComparaisonMethods("testAggregatCluster"))
     
     runner = unittest.TextTestRunner()
