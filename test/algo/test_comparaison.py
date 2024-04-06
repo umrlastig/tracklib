@@ -3,9 +3,9 @@
 
 import unittest
 import matplotlib.pyplot as plt
-#import math
+import math
 from tracklib import (Obs, ObsTime, ENUCoords, Track,
-                      compare,
+                      averagingCoordSet, compare,
                       MODE_COMPARISON_HAUSDORFF,
                       MODE_COMPARISON_POINTWISE)
 
@@ -166,10 +166,6 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         
         
     '''
-        
-        
-        
-        
         c = compare(self.trace1, self.trace2, mode=MODE_COMPARAISON_DISTANCE_MOYENNE)
         self.assertLessEqual(abs(c - 3.541), self.__epsilon, "Comparaison")
         
@@ -177,46 +173,6 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         self.assertLessEqual(abs(d - 40.683), self.__epsilon, "Comparaison")
 
 
-    def testDifference21ProfileNN(self):
-        profile = differenceProfile(self.trace2, self.trace1, 
-                                               mode = "NN", p=2)
-        self.trace1.plot('b-')
-        self.trace2.plot('r-')
-        plotDifferenceProfile(profile, self.trace1)
-        plt.show()
-        
-        
-    def testDifference12ProfileNN(self):
-        profile = differenceProfile(self.trace1, self.trace2, 
-                                               mode = "NN", p=2)
-        self.trace1.plot('r-')
-        self.trace2.plot('r-')
-        plotDifferenceProfile(profile, self.trace2)
-        plt.show()
-        
-        
-    def testDifference21ProfileDTW(self):
-        profile = differenceProfile(self.trace2, self.trace1, 
-                                               mode = "DTW", p=2)
-        self.trace1.plot('r-')
-        self.trace2.plot('r-')
-        plotDifferenceProfile(profile, self.trace1)
-        plt.show()
-    
-    
-    def testDifference21ProfileFDTW(self):
-        profile = differenceProfile(self.trace2, self.trace1, 
-                                               mode = "FDTW", p=2)
-        self.trace1.plot('r-')
-        self.trace2.plot('r-')
-        plotDifferenceProfile(profile, self.trace1)
-        plt.show()
-        
-        
-    
-        
-
-        
     def testCentralNNTrack(self):
         TRACES = []
         TRACES.append(self.trace1)
@@ -297,7 +253,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         
         S = arealStandardizedBetweenTwoTracks(trace3, trace4)
         self.assertEqual(S, 0.0)
-        
+    '''
         
     def testAggregatCluster(self):
         trackC = Track([], 1)
@@ -344,22 +300,18 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         self.assertEqual(d5.E, 1.0)
         self.assertEqual(d5.N, 1.0)
         self.assertEqual(d4.U, 0.0)
-    '''
+    
         
     
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     
     suite.addTest(TestAlgoComparaisonMethods("testCompare"))
-    #suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileNN"))
-    #suite.addTest(TestAlgoComparaisonMethods("testDifference12ProfileNN"))
-    #suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileDTW"))
-    #suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileFDTW"))
     suite.addTest(TestAlgoComparaisonMethods("testHausdorffSimilarity"))
     #suite.addTest(TestAlgoComparaisonMethods("testCentralNNTrack"))
     #suite.addTest(TestAlgoComparaisonMethods("testCentralDTWTrack"))
     #suite.addTest(TestAlgoComparaisonMethods("testArealStandardizedBetweenTwoTracks"))
-    #suite.addTest(TestAlgoComparaisonMethods("testAggregatCluster"))
+    suite.addTest(TestAlgoComparaisonMethods("testAggregatCluster"))
     
     runner = unittest.TextTestRunner()
     runner.run(suite)
