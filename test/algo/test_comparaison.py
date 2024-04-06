@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 #import math
 from tracklib import (Obs, ObsTime, ENUCoords, Track,
                       compare,
-                      MODE_COMPARISON_HAUSDORFF)
+                      MODE_COMPARISON_HAUSDORFF,
+                      MODE_COMPARISON_POINTWISE)
 
 
 
@@ -159,11 +160,13 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         b = compare(self.trace1, self.trace2, mode=MODE_COMPARISON_HAUSDORFF)
         self.assertLessEqual(abs(b - 2.121), self.__epsilon, "Comparaison")
         
+        a = compare(self.trace1, self.trace2[0:self.trace1.size()], 
+                                             mode=MODE_COMPARISON_POINTWISE, p=2)
+        self.assertLessEqual(abs(a - 4.11483), self.__epsilon, "Comparaison")
         
         
     '''
-        a = compare(self.trace1, self.trace2, mode=MODE_COMPARAISON_RMSE)
-        self.assertLessEqual(abs(a - 4.0280), self.__epsilon, "Comparaison")
+        
         
         
         
