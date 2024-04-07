@@ -56,7 +56,7 @@ import matplotlib.pyplot as plt
 import tracklib as tracklib
 from tracklib.util import dist_point_to_segment, Polygon
 from . import computeAbsCurv, synchronize, HMM, MODE_OBS_AS_2D_POSITIONS, computeRadialSignature
-from tracklib.core import ENUCoords, TrackCollection
+from tracklib.core import ENUCoords, TrackCollection, priority_dict
 
 
 # ------------------------------------------------------------------------------
@@ -64,6 +64,7 @@ from tracklib.core import ENUCoords, TrackCollection
 # Methods indexed by [p] are parameterized with Lp norm (default p = 1)
 # Methods indexed by [s] are symetric (match(t1, t2) = match(t2, t1))
 # For infinite norm: set p = float('inf')
+# All methods are parameterized by a distance d.
 # ------------------------------------------------------------------------------
 MODE_MATCHING_NN      = 1   # Nearest Neighbour                           
 MODE_MATCHING_DTW     = 2   # Dynamic Time Warping (with Lp norm)      [p][s]
@@ -77,6 +78,7 @@ MODE_MATCHING_FRECHET = 4   # Discrete Frechet macthing                   [s]
 # Methods indexed by [m] are based on the output of a matching
 # Methods indexed by [s] are symetric (compare(t1, t2) = compare(t2, t1))
 # For infinite norm: set p = float('inf')
+# All methods (except aeral distance) are parameterized by a distance d.
 # ------------------------------------------------------------------------------
 MODE_COMPARISON_POINTWISE = 101 # Distances btw points at each index [p][m][s]
 MODE_COMPARISON_NN        = 102 # Distances btw nearest neighbours   [p][m]
@@ -99,13 +101,13 @@ MODE_COMPARISON_SYNC      = 109 # Time-synchronized comparison       [p][m][s]
 # comparison (no distance property). Note that dicrete frechet distance is 
 # obtained equivalently by DTW with Lp norm set to p = float('inf'). 
 # ------------------------------------------------------------------------------
-def compare(track1, track2, mode=MODE_COMPARISON_POINTWISE, p=1, verbose=True) -> float:
+def compare(track1, track2, mode=MODE_COMPARISON_POINTWISE, p=1, dim=2, verbose=True, plot=False) -> float:
     if (mode == MODE_COMPARISON_POINTWISE):
-        return _compare_pointwise(track1, track2, p)
+        return _compare_pointwise(track1, track2, p, dim)
     if (mode == MODE_COMPARISON_SYNC):
-        return _synchronized_comparison(track1, track2, p)       
+        return _synchronized_comparison(track1, track2, p, dim)       
     if (mode == MODE_COMPARISON_NN):
-        return _nn_comparison(track1, track2, p, verbose)
+        return _nn_comparison(track1, track2, p, dim, verbose)
     if (mode == MODE_COMPARISON_HAUSDORFF):
         return _hausdorff(track1, track2)
     if (mode == MODE_COMPARISON_AREAL):
@@ -113,11 +115,11 @@ def compare(track1, track2, mode=MODE_COMPARISON_POINTWISE, p=1, verbose=True) -
     if (mode == MODE_COMPARISON_RADIAL):
         return _radial_comparison(track1, track2)
     if (mode == MODE_COMPARISON_FRECHET):
-        return _dtw_comparison(track1, track2, float('inf'), verbose)
+        return _dtw_comparison(track1, track2, float('inf'), dim, verbose, plot)
     if (mode == MODE_COMPARISON_DTW):
-        return _dtw_comparison(track1, track2, p, verbose)
+        return _dtw_comparison(track1, track2, p, dim, verbose, plot)
     if (mode == MODE_COMPARISON_FDTW):
-        return _fdtw_comparison(track1, track2, p, verbose)
+        return _fdtw_comparison(track1, track2, p, dim, verbose, plot)
     print("Unavailable mode for comparison of 2 tracks")
     sys.exit(0)
 
@@ -128,27 +130,43 @@ def compare(track1, track2, mode=MODE_COMPARISON_POINTWISE, p=1, verbose=True) -
 # (discrete) Frechet distance, dynamic time warping and fast approximate dynamic
 # time warping. Note that dicrete Frechet matching is obtained equivalently by 
 # DTW matching with Lp norm set to p = float('inf'). 
-# Output:
+# Output: a track with size of track1 and with links towards track2
 # ------------------------------------------------------------------------------
-def match(track1, track2, mode=MODE_MATCHING_DTW, p=1, verbose=True) -> float:
+def match(track1, track2, mode=MODE_MATCHING_DTW, p=1, dim=2, verbose=True, plot=False) -> float:
     if (mode == MODE_MATCHING_NN):
-        return _nn(track1, track2, verbose)
+        return _nn(track1, track2, dim, verbose)
     if (mode == MODE_MATCHING_FRECHET):
-        return _dtw_matching(track1, track2, float('inf'), verbose)
+        return _dtw_matching(track1, track2, float('inf'), dim, verbose, plot)
     if (mode == MODE_MATCHING_DTW):
-        return _dtw_matching(track1, track2, p, verbose)
+        return _dtw_matching(track1, track2, p, dim, verbose, plot)
     if (mode == MODE_MATCHING_FDTW):
-        return _fdtw_matching(track1, track2, p, verbose)
+        return _fdtw_matching(track1, track2, p, dim, verbose, plot)
     print("Unavailable mode for matching of 2 tracks")
     sys.exit(0)
 
 
+# ------------------------------------------------------------------------------
+# Generic function for geometric distance between 2 points p1 and p2
+# dim = 1: D altimetric euclidian distance
+# dim = 2: 2D planimetric euclidian distance
+# dim = 3: 3D distance euclidian distance
+# lambda function between ENUCoords: direct application of lambda function
+# ------------------------------------------------------------------------------
+def _distance(p1, p2, dim):
+    if (dim == 1):
+        return abs(p1.U - p2.U)
+    if (dim == 2): 
+        return p1.distance2DTo(p2)
+    if (dim == 3):
+        return p1.distanceTo(p2)
+    if ('function' in str(type(dim))):
+        return dim(p1, p2)
 
 # ------------------------------------------------------------------------------
 # Pointwise distance: Lp norm average of pointwised distances
 # Exponent p should nominally be in [0, Inf], but negative values are accepted
 # ------------------------------------------------------------------------------
-def _compare_pointwise(track1, track2, p=1) -> float:
+def _compare_pointwise(track1, track2, p, dim) -> float:
     if (len(track1) != len(track2)):
         print("Error: tracks must have same size to be compared with pointwise method")
         sys.exit(1)
@@ -156,14 +174,14 @@ def _compare_pointwise(track1, track2, p=1) -> float:
     d = 0
     if p == 0:
         for i in range(N):
-            d += (track1[i].position.distance2DTo(track2[i].position) > 0)*1
+            d += (_distance(track1[i].position, track2[i].position, dim) > 0)*1
         return d
     if p == float('inf'): 
         for i in range(N):
-            d = max(d, track1[i].position.distance2DTo(track2[i].position))
+            d = max(d, _distance(track1[i].position, track2[i].position, dim))
         return d
     for i in range(N):
-        d += track1[i].position.distance2DTo(track2[i].position)**p
+        d += _distance(track1[i].position, track2[i].position, dim)**p
     return (d/N)**(1.0/p)
             
 
@@ -230,7 +248,7 @@ def _arealStandardizedBetweenTwoTracks(track1, track2):
 # ------------------------------------------------------------------------------
 # Synchronization of two track for pointwise comparison
 # ------------------------------------------------------------------------------
-def _synchronized_comparison(track1, track2, p):
+def _synchronized_comparison(track1, track2, p, dim):
     trackA = track1.copy()
     trackB = track2.copy()
     synchronize(trackA, trackB)
@@ -244,14 +262,14 @@ def _synchronized_comparison(track1, track2, p):
 
     if p == 0:
         for i in range(N):
-            d += (trackA.getObs(i).distanceTo(trackB.getObs(i)) > 0)*1
+            d += (_distance(trackA.getObs(i).position, trackB.getObs(i).position, dim) > 0)*1
         return d
     if p == float('inf'): 
         for i in range(N):
-            d = max(d, trackA.getObs(i).distanceTo(trackB.getObs(i)))
+            d = max(d, _distance(trackA.getObs(i).position, trackB.getObs(i).position, dim))
         return d
     for i in range(N):
-        d += trackA.getObs(i).distanceTo(trackB.getObs(i))**p
+        d += _distance(trackA.getObs(i).position, trackB.getObs(i).position, dim)**p
     return (d/N)**(1.0/p)
     
 
@@ -267,8 +285,8 @@ def _radial_comparison(track1, track2):
 # ------------------------------------------------------------------------------
 # Comparison based on Nearest Neighbor
 # ------------------------------------------------------------------------------
-def _nn_comparison(track1, track2, p, verbose):
-    matching = _nn(track1, track2, verbose)
+def _nn_comparison(track1, track2, p, dim, verbose):
+    matching = _nn(track1, track2, dim, verbose)
     N = len(matching)
     d = 0
     if p == 0:
@@ -285,9 +303,28 @@ def _nn_comparison(track1, track2, p, verbose):
 
 
 # ------------------------------------------------------------------------------
-# Nearest Neighbor computation
+# Bi-directional Nearest Neighbor computation
 # ------------------------------------------------------------------------------
-def _nn(track1, track2, verbose):
+def _nn(track1, track2, dim, verbose):
+    # 1 -> 2 matching
+    matching = _nn_mono(track1, track2, dim, verbose)
+
+    # 2 -> 1 matching
+    matching_reverse = _nn_mono(track2, track1, dim, verbose)
+   
+    matching_in_2 = {}
+    for i in range(len(matching)):
+        matching_in_2[matching[i, "pair"][0]] = 0
+    for j in range(len(matching_reverse)):
+        if not j in matching_in_2:
+            matching[matching_reverse[j, "pair"][0], "pair"].append(j)
+  
+    return matching
+
+# ------------------------------------------------------------------------------
+# Mono-directional Nearest Neighbor computation
+# ------------------------------------------------------------------------------
+def _nn_mono(track1, track2, dim, verbose):
 
     output = track1.copy()
     output.createAnalyticalFeature("diff")
@@ -308,7 +345,7 @@ def _nn(track1, track2, verbose):
         val_min = sys.float_info.max
         id_min = 0
         for j in range(track2.size()):
-            distance = output.getObs(i).distance2DTo(track2.getObs(j))
+            distance = _distance(output.getObs(i).position, track2.getObs(j).position, dim)
             if distance < val_min:
                 val_min = distance
                 id_min = j
@@ -318,14 +355,29 @@ def _nn(track1, track2, verbose):
         ey = track1.getObs(i).position.getY() - track2.getObs(id_min).position.getY()
         output.setObsAnalyticalFeature("ex", i, ex)
         output.setObsAnalyticalFeature("ey", i, ey)
+
     return output
 
 
 # ------------------------------------------------------------------------------
+# Weight (possible) conversion auxiliary function: p -> weight
+# ------------------------------------------------------------------------------
+def _p2weight(p):
+    if 'function' in str(type(p)):
+        weight = p
+    if 'int' in str(type(p)):
+        weight = lambda A, B : A + B**p
+    if (p == 0):
+        weight = lambda A, B : A + (B != 0)*1
+    if (p == float('inf')):
+        weight = lambda A, B : max(A, B) 
+    return weight
+
+# ------------------------------------------------------------------------------
 # Comparison based on Fast Dynamic Time Warping
 # ------------------------------------------------------------------------------
-def _fdtw_comparison(track1, track2, p, verbose):
-    matching = _fdtw_matching(track1, track2, p, verbose)
+def _fdtw_comparison(track1, track2, p, dim, verbose, plot):
+    matching = _fdtw_matching(track1, track2, p, dim, verbose, plot)
     if ((p == 0) or (p == float('inf'))):
         return matching.score
     return (matching.score/matching.nb_links)**(1.0/p)
@@ -333,13 +385,8 @@ def _fdtw_comparison(track1, track2, p, verbose):
 # ------------------------------------------------------------------------------
 # Matching based on Fast Dynamic Time Warping
 # ------------------------------------------------------------------------------
-def _fdtw_matching(track1, track2, p, verbose):
-    weight = lambda A, B : A + B**p
-    if (p == 0):
-        weight = lambda A, B : A + (B != 0)*1
-    if (p == float('inf')):
-        weight = lambda A, B : max(A, B)
-    return _fdtw(track1, track2, weight, verbose)
+def _fdtw_matching(track1, track2, p, dim, verbose, plot):
+    return _fdtw(track1, track2, _p2weight(p), dim, verbose, plot)
 
 # ------------------------------------------------------------------------------
 # Fast Dynamic Time Warping computation
@@ -349,7 +396,7 @@ def _fdtw_matching(track1, track2, p, verbose):
 #    - p = 2                  weight = lambda A, B : A + B**2
 #    - p = float('inf')       weight = lambda A, B : max(A, B)
 # ------------------------------------------------------------------------------
-def _fdtw(track1, track2, weight = lambda A, B : A + B, verbose = True):   
+def _fdtw(track1, track2, weight = lambda A, B : A + B, dim=2, verbose = True, plot=False):   
     
     output = track1.copy()
 
@@ -360,62 +407,74 @@ def _fdtw(track1, track2, weight = lambda A, B : A + B, verbose = True):
 
     N1 = track1.size()
     N2 = track2.size()
-
-    step_to_run = range(1, N1)
-    if verbose:
-        step_to_run = progressbar.progressbar(step_to_run)
+    
+    if (plot):
+        D = np.zeros((N2, N1))
 
     # ----------------------------------------------------------
     # Optimal path with dynamic programming
     # ----------------------------------------------------------
-    T = np.zeros((N2, N1))
-    M = np.ones( (N2, N1)) * (-1 + (-1)*1j)
+    T = np.zeros((N2, N1)); T[0,0] = _distance(track2.getObs(0).position, track1.getObs(0).position, dim)
+    F = priority_dict({(0,0): 0})
+    V =  priority_dict()
+    A = dict({(0,0): (-1, -1)})
+    if (plot):
+        D[0,0] = T[0,0]
 
-    for i in range(1, N2):
-        T[i,0] = weight(T[i-1,0], track2.getObs(i).distance2DTo(track1.getObs(0)))
-        M[i,0] = (i-1) + 0*1j
-    for j in range(1, N1):
-        T[0,j] = weight(T[0,j-1], track2.getObs(0).distance2DTo(track1.getObs(j)))
-        M[0,j] = 0 + (j-1)*1j
-
-    # Forward step
-    for j in step_to_run:
-        for i in range(1, N2):
-            l = T[i, j-1]; u = T[i-1,j]; ul = T[i-1,j-1]
-            T[i,j] = weight(min(ul, min(u, l)), track2.getObs(i).distance2DTo(track1.getObs(j)))
-            M[i,j] = (i-(l>=min(ul, u))) + (j-(u>=min(ul, l)))*1j
-
+    # Forward step 
+    while(1):
+        node = F.pop_smallest(); i = node[0]; j = node[1]; 
+        V[node] = 1
+        if ((i == N2-1) and (j == N1-1)):
+            break
+        if ((i < N2-1) and (j < N1-1)): 
+            dist = _distance(track2.getObs(i+1).position, track1.getObs(j+1).position, dim)
+            _update_node(F, T, (i+1, j+1), weight(T[i,j], dist), V, A, node)
+            if (plot):
+                D[i+1, j+1] = dist
+        if (j < N1-1):
+            dist = _distance(track2.getObs(i  ).position, track1.getObs(j+1).position, dim)
+            _update_node(F, T, (i  , j+1), weight(T[i,j], dist), V, A, node)
+            if (plot):
+                D[i, j+1] = dist
+        if (i < N2-1):       
+            dist =  _distance(track2.getObs(i+1).position, track1.getObs(j  ).position, dim)
+            _update_node(F, T, (i+1, j  ), weight(T[i,j], dist), V, A, node) 
+            if (plot):
+                D[i+1, j] = dist
+    
     # Backward step
     S = [(N2-1, N1-1)] 
-
     while((S[-1][0] > 0) or (S[-1][1] > 0)):
-        m = M[S[-1][0], S[-1][1]]
-        S.append((int(np.real(m)), int(np.imag(m))))
+        S.append(A[S[-1]])
 
-    output.nb_links = 0 
-    for i in range(len(output)):
-        output.setObsAnalyticalFeature("pair", i, [])
-    for i in range(len(S)):
-        d = track1.getObs(S[i][1]).distance2DTo(track2.getObs(S[i][0]))
-        ex = track1.getObs(S[i][1]).position.getX() - track2.getObs(S[i][0]).position.getX()
-        ey = track1.getObs(S[i][1]).position.getY() - track2.getObs(S[i][0]).position.getY()
-        output.setObsAnalyticalFeature("diff", S[i][1], d)
-        output.getObsAnalyticalFeature("pair", S[i][1]).append(S[i][0]); output.nb_links += 1
-        output.setObsAnalyticalFeature("ex", S[i][1], ex)
-        output.setObsAnalyticalFeature("ey", S[i][1], ey)
+    if (plot):
+        plt.imshow(D)
+        for i in range(len(S)):
+            plt.plot(S[i][1], S[i][0], 'r+')
+        plt.show()
+
+    return _fillAF_dtw(output, track1, track2, S, T, dim)
     
-    output.score = T[-1, -1]
-
-    return output
-    
-
+# ------------------------------------------------------------------------------
+# Auxiliary function for Fast Dynamic Time Warping
+# ------------------------------------------------------------------------------    
+def _update_node(F, T, node, new_cost, V, A, ant):
+    if node in V:
+        return
+    if not node in F:
+        F[node] = 1e300
+    if new_cost < F[node]:
+        F[node] = new_cost 
+        A[node] = ant
+        T[node[0], node[1]] = new_cost
 
 
 # ------------------------------------------------------------------------------
 # Comparison based on Dynamic Time Warping
 # ------------------------------------------------------------------------------
-def _dtw_comparison(track1, track2, p, verbose):
-    matching = _dtw_matching(track1, track2, p, verbose)
+def _dtw_comparison(track1, track2, p, dim, verbose, plot):
+    matching = _dtw_matching(track1, track2, p, dim, verbose, plot)
     if ((p == 0) or (p == float('inf'))):
         return matching.score
     return (matching.score/matching.nb_links)**(1.0/p)
@@ -423,13 +482,8 @@ def _dtw_comparison(track1, track2, p, verbose):
 # ------------------------------------------------------------------------------
 # Matching based on Dynamic Time Warping
 # ------------------------------------------------------------------------------
-def _dtw_matching(track1, track2, p, verbose):
-    weight = lambda A, B : A + B**p
-    if (p == 0):
-        weight = lambda A, B : A + (B != 0)*1
-    if (p == float('inf')):
-        weight = lambda A, B : max(A, B)
-    return _dtw(track1, track2, weight, verbose)
+def _dtw_matching(track1, track2, p, dim, verbose, plot):
+    return _dtw(track1, track2, _p2weight(p), dim, verbose, plot)
 
 # ------------------------------------------------------------------------------
 # Dynamic Time Warping computation
@@ -439,7 +493,7 @@ def _dtw_matching(track1, track2, p, verbose):
 #    - p = 2                  weight = lambda A, B : A + B**2
 #    - p = float('inf')       weight = lambda A, B : max(A, B)
 # ------------------------------------------------------------------------------
-def _dtw(track1, track2, weight = lambda A, B : A + B, verbose = True):   
+def _dtw(track1, track2, weight = lambda A, B : A + B, dim=2, verbose = True, plot=False):   
     
     output = track1.copy()
 
@@ -459,7 +513,7 @@ def _dtw(track1, track2, weight = lambda A, B : A + B, verbose = True):
     D = np.zeros((N2, N1))
     for i in range(N2):
         for j in range(N1):
-            D[i, j] = track2.getObs(i).distance2DTo(track1.getObs(j))
+            D[i, j] = _distance(track2.getObs(i).position, track1.getObs(j).position, dim)
 
     # ----------------------------------------------------------
     # Optimal path with dynamic programming
@@ -488,28 +542,32 @@ def _dtw(track1, track2, weight = lambda A, B : A + B, verbose = True):
         m = M[S[-1][0], S[-1][1]]
         S.append((int(np.real(m)), int(np.imag(m))))
 
-    #plt.imshow(D)
-    #for i in range(len(S)):
-    #    plt.plot(S[i][1], S[i][0], 'r+')
-    #plt.show()
+    if (plot):
+        plt.imshow(T)
+        for i in range(len(S)):
+            plt.plot(S[i][1], S[i][0], 'r+')
+        plt.show()
 
+    return _fillAF_dtw(output, track1, track2, S, T, dim)
+    
+
+# ------------------------------------------------------------------------------
+# Auxiliary function for Dynamic Time Warping and Fast Dynamic Time Warping
+# ------------------------------------------------------------------------------    
+def _fillAF_dtw(output, track1, track2, S, T, dim):
     output.nb_links = 0 
     for i in range(len(output)):
         output.setObsAnalyticalFeature("pair", i, [])
     for i in range(len(S)):
-        d = track1.getObs(S[i][1]).distance2DTo(track2.getObs(S[i][0]))
+        d =  _distance(track1.getObs(S[i][1]).position, track2.getObs(S[i][0]).position, dim)
         ex = track1.getObs(S[i][1]).position.getX() - track2.getObs(S[i][0]).position.getX()
         ey = track1.getObs(S[i][1]).position.getY() - track2.getObs(S[i][0]).position.getY()
         output.setObsAnalyticalFeature("diff", S[i][1], d)
         output.getObsAnalyticalFeature("pair", S[i][1]).append(S[i][0]); output.nb_links += 1
         output.setObsAnalyticalFeature("ex", S[i][1], ex)
         output.setObsAnalyticalFeature("ey", S[i][1], ey)
-    
     output.score = T[-1, -1]
-
     return output
-    
-
 
 # ------------------------------------------------------------------------------
 # Function to plot matching output from 'match' method

@@ -68,14 +68,9 @@ from tracklib.algo import (BIAF_SPEED, BIAF_ABS_CURV,
                            noise,
                            estimate_speed,
                            smoothed_speed_calculation,
-<<<<<<< HEAD
                            compare,
-                           MODE_TEMPORAL)                     
-=======
-                           differenceProfile,
                            MODE_TEMPORAL,
                            co_median)                     
->>>>>>> ef1edb486d81fc8da4afd5762ccfa2b4df84cad3
 from . import (UnaryOperator, BinaryOperator, 
                ScalarOperator, ScalarVoidOperator, 
                BinaryVoidOperator, UnaryVoidOperator,
