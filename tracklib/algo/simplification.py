@@ -418,6 +418,7 @@ def compareWithDouglasPeuckerSimplification(track, threshold):
 
     if len(S) > 0:
         index_max = max(range(len(S)), key=S.__getitem__)
+        print ('index max:', index_max)
         track1 = douglas_peucker(track, S[index_max])
         return track1.size()
     else:
