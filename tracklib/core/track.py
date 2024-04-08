@@ -68,7 +68,7 @@ from tracklib.algo import (BIAF_SPEED, BIAF_ABS_CURV,
                            noise,
                            estimate_speed,
                            smoothed_speed_calculation,
-                           compare,
+                           match,
                            MODE_TEMPORAL)
 
 from . import (UnaryOperator, BinaryOperator, 
@@ -2340,7 +2340,7 @@ class Track:
             print("Available operator not implemented yet")
             return None
         else:
-            return compare(self, arg)
+            return match(self, arg)
 
     # ------------------------------------------------------------
     # [*] Temporal resampling of track or track intersections
