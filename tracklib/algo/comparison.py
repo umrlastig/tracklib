@@ -132,7 +132,7 @@ def compare(track1, track2, mode=MODE_COMPARISON_POINTWISE, p=1, dim=2, verbose=
 # DTW matching with Lp norm set to p = float('inf'). 
 # Output: a track with size of track1 and with links towards track2
 # ------------------------------------------------------------------------------
-def match(track1, track2, mode=MODE_MATCHING_DTW, p=1, dim=2, verbose=True, plot=False) -> float:
+def match(track1, track2, mode=MODE_MATCHING_DTW, p=1, dim=2, verbose=True, plot=False):
     if (mode == MODE_MATCHING_NN):
         return _nn(track1, track2, dim, verbose)
     if (mode == MODE_MATCHING_FRECHET):
@@ -147,7 +147,7 @@ def match(track1, track2, mode=MODE_MATCHING_DTW, p=1, dim=2, verbose=True, plot
 
 # ------------------------------------------------------------------------------
 # Generic function for geometric distance between 2 points p1 and p2
-# dim = 1: D altimetric euclidian distance
+# dim = 1: 1D altimetric euclidian distance
 # dim = 2: 2D planimetric euclidian distance
 # dim = 3: 3D distance euclidian distance
 # lambda function between ENUCoords: direct application of lambda function
