@@ -71,6 +71,7 @@ from tracklib.algo import (BIAF_SPEED, BIAF_ABS_CURV,
                            compare,
                            MODE_TEMPORAL,
                            co_median)                     
+
 from . import (UnaryOperator, BinaryOperator, 
                ScalarOperator, ScalarVoidOperator, 
                BinaryVoidOperator, UnaryVoidOperator,
@@ -384,8 +385,8 @@ class Track:
     
     def getMedianObsInTime(self, o):
         T = self.getT()
-        t1 = co_median(T)
-        return self.getObs(T.index(t1))
+        r = self.operate(Operator.MEDIAN, "t")
+        return self.getObs(T.index(r))
 
     def getEnclosedPolygon(self):
         """TODO"""

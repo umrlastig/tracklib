@@ -123,7 +123,7 @@ class TestSimplificationMethods(TestCase):
         self.assertEqual(borneinf, 7.5)
         
         ind1 = compareWithDouglasPeuckerSimplification(trace1, borneinf)
-        self.assertEqual(ind1, 4)
+        self.assertEqual(ind1, 8)
         
         
     def testAverageOffsetDistance(self):

@@ -4,20 +4,12 @@
 import unittest
 import matplotlib.pyplot as plt
 import math
-from tracklib import (Obs, ObsTime, ENUCoords, 
-                      Track, TrackCollection,
-                      compare, 
-                      differenceProfile, 
-                      plotDifferenceProfile,
-                      premiereComposanteHausdorff,
-                      hausdorff, #discreteFrechet,
-                      centralTrack,
-                      arealStandardizedBetweenTwoTracks,
-                      averagingCoordSet,
-                      MODE_COMPARAISON_RMSE,
-                      MODE_COMPARAISON_HAUSDORFF,
-                      MODE_COMPARAISON_DISTANCE_MOYENNE,
-                      MODE_COMPARAISON_DTW)
+from tracklib import (Obs, ObsTime, ENUCoords, Track,
+                      averagingCoordSet, compare,
+                      MODE_COMPARISON_HAUSDORFF,
+                      MODE_COMPARISON_POINTWISE,
+                      MODE_COMPARISON_AREAL,
+                      MODE_COMPARISON_DTW)
 
 
 
@@ -120,64 +112,17 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         r13 = Obs(d13, ObsTime.readTimestamp("2018-01-01 10:00:55"))
         self.trace2.addObs(r13)
         
+        self.plot()
+        
+        
     def plot(self):
         self.trace1.plot()
         self.trace1.plotAsMarkers()
         self.trace2.plot()
         self.trace2.plotAsMarkers()
 
-        plt.xlim([0, 6])
-        plt.ylim([0, 3.25])
-        
-        
-    def testCompare(self):
-        a = compare(self.trace1, self.trace2, mode=MODE_COMPARAISON_RMSE)
-        self.assertLessEqual(abs(a - 4.0280), self.__epsilon, "Comparaison")
-        
-        b = compare(self.trace1, self.trace2, mode=MODE_COMPARAISON_HAUSDORFF)
-        self.assertLessEqual(abs(b - 2.121), self.__epsilon, "Comparaison")
-        
-        c = compare(self.trace1, self.trace2, mode=MODE_COMPARAISON_DISTANCE_MOYENNE)
-        self.assertLessEqual(abs(c - 3.541), self.__epsilon, "Comparaison")
-        
-        d = compare(self.trace1, self.trace2, mode=MODE_COMPARAISON_DTW)
-        self.assertLessEqual(abs(d - 40.683), self.__epsilon, "Comparaison")
-
-
-    def testDifference21ProfileNN(self):
-        profile = differenceProfile(self.trace2, self.trace1, 
-                                               mode = "NN", p=2)
-        self.trace1.plot('b-')
-        self.trace2.plot('r-')
-        plotDifferenceProfile(profile, self.trace1)
-        plt.show()
-        
-        
-    def testDifference12ProfileNN(self):
-        profile = differenceProfile(self.trace1, self.trace2, 
-                                               mode = "NN", p=2)
-        self.trace1.plot('r-')
-        self.trace2.plot('r-')
-        plotDifferenceProfile(profile, self.trace2)
-        plt.show()
-        
-        
-    def testDifference21ProfileDTW(self):
-        profile = differenceProfile(self.trace2, self.trace1, 
-                                               mode = "DTW", p=2)
-        self.trace1.plot('r-')
-        self.trace2.plot('r-')
-        plotDifferenceProfile(profile, self.trace1)
-        plt.show()
-    
-    
-    def testDifference21ProfileFDTW(self):
-        profile = differenceProfile(self.trace2, self.trace1, 
-                                               mode = "FDTW", p=2)
-        self.trace1.plot('r-')
-        self.trace2.plot('r-')
-        plotDifferenceProfile(profile, self.trace1)
-        plt.show()
+        plt.xlim([0, 14])
+        plt.ylim([-1, 7])
         
         
     def testHausdorffSimilarity(self):
@@ -209,74 +154,24 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         p = Obs(c, ObsTime())
         trackB.addObs(p)
 
-        dAB = premiereComposanteHausdorff(trackA, trackB)
-        dBA = premiereComposanteHausdorff(trackB, trackA)
-        self.assertLessEqual(abs(dBA-2.12132), self.__epsilon)
-        self.assertLessEqual(abs(dAB-1.34164), self.__epsilon)
-        d = hausdorff(trackA, trackB)
+        d = compare(trackA, trackB, mode=MODE_COMPARISON_HAUSDORFF)
         self.assertLessEqual(abs(d - 2.12132), self.__epsilon)
         
-#    def testFrechetSimilarity(self):
-#        trackA = Track([], 1)
-#        c = ENUCoords(2.0, 1.0, 0)
-#        p = Obs(c, ObsTime())
-#        trackA.addObs(p)
-#        c = ENUCoords(3.0, 1.0, 0)
-#        p = Obs(c, ObsTime())
-#        trackA.addObs(p)
-#        c = ENUCoords(4.0, 2.0, 0)
-#        p = Obs(c, ObsTime())
-#        trackA.addObs(p)
-#        c = ENUCoords(5.0, 1.0, 0)
-#        p = Obs(c, ObsTime())
-#        trackA.addObs(p)
-#
-#        trackB = Track([], 1)
-#        c = ENUCoords(2.0, 0.0, 0)
-#        p = Obs(c, ObsTime())
-#        trackB.addObs(p)
-#        c = ENUCoords(3.0, 0.0, 0)
-#        p = Obs(c, ObsTime())
-#        trackB.addObs(p)
-#        c = ENUCoords(4.0, 0.0, 0)
-#        p = Obs(c, ObsTime())
-#        trackB.addObs(p)
-#
-#        self.assertEqual(discreteFrechet(trackA, trackB), 2.0)
+    
+    def testCompare(self):
+        b = compare(self.trace1, self.trace2, mode=MODE_COMPARISON_HAUSDORFF)
+        self.assertLessEqual(abs(b - 2.121), self.__epsilon, "Comparaison")
         
-    def testCentralNNTrack(self):
-        TRACES = []
-        TRACES.append(self.trace1)
-        TRACES.append(self.trace2)
-        collection = TrackCollection(TRACES)
-        self.plot()
+        a = compare(self.trace1, self.trace2[0:self.trace1.size()], 
+                                             mode=MODE_COMPARISON_POINTWISE, p=2)
+        self.assertLessEqual(abs(a - 4.11483), self.__epsilon, "Comparaison")
         
-        central = centralTrack(collection)
+        #d = compare(self.trace1, self.trace2, mode=MODE_COMPARISON_DTW, p=1)
+        #self.assertLessEqual(abs(d - 40.683), self.__epsilon, "Comparaison")
         
-        central.plot()
-        central.plotAsMarkers(frg="k", bkg="w", sym_frg=" ", sym_bkg="o")
-        
-        plt.title('central NN')
-        plt.xlim([0, 14])
-        plt.ylim([-1, 7])
-        plt.show()        
-        
-    def testCentralDTWTrack(self):
-        TRACES = []
-        TRACES.append(self.trace1)
-        TRACES.append(self.trace2)
-        collection = TrackCollection(TRACES)
-        self.plot()
-        
-        central = centralTrack(collection, mode = "DTW")
-        
-        central.plot()
-        central.plotAsMarkers(frg="k", bkg="w", sym_frg=" ", sym_bkg="o")
-        
-        plt.title('central DTW')
-        plt.xlim([0, 14])
-        plt.ylim([-1, 7])
-        plt.show()   
+        #c = compare(self.trace1, self.trace2, mode=MODE_COMPARAISON_DISTANCE_MOYENNE)
+        #self.assertLessEqual(abs(c - 3.541), self.__epsilon, "Comparaison")
+
 
     def testArealStandardizedBetweenTwoTracks(self):
         trace4 = Track([], 1)
@@ -297,8 +192,8 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         trace3.addObs(Obs(ENUCoords(30, 40, 0), ObsTime()))
         #trace3.plot('k-', append=True)
         
-        S1 = arealStandardizedBetweenTwoTracks(trace3, trace4)
-        S2 = arealStandardizedBetweenTwoTracks(trace4, trace3)
+        S1 = compare(trace3, trace4, mode=MODE_COMPARISON_AREAL)
+        S2 = compare(trace4, trace3, mode=MODE_COMPARISON_AREAL)
         
         self.assertEqual(S1, 10.0)
         self.assertEqual(S2, 10.0)
@@ -322,9 +217,8 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         plt.xlim([-5, 60])
         plt.ylim([20, 70])
         
-        S = arealStandardizedBetweenTwoTracks(trace3, trace4)
+        S = compare(trace3, trace4, mode=MODE_COMPARISON_AREAL)
         self.assertEqual(S, 0.0)
-        
         
     def testAggregatCluster(self):
         trackC = Track([], 1)
@@ -371,25 +265,17 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         self.assertEqual(d5.E, 1.0)
         self.assertEqual(d5.N, 1.0)
         self.assertEqual(d4.U, 0.0)
-        
+    
         
     
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     
     suite.addTest(TestAlgoComparaisonMethods("testCompare"))
-    '''
-    suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileNN"))
-    suite.addTest(TestAlgoComparaisonMethods("testDifference12ProfileNN"))
-    suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileDTW"))
-    suite.addTest(TestAlgoComparaisonMethods("testDifference21ProfileFDTW"))
     suite.addTest(TestAlgoComparaisonMethods("testHausdorffSimilarity"))
-    #suite.addTest(TestAlgoComparaisonMethods("testFrechetSimilarity"))
-    suite.addTest(TestAlgoComparaisonMethods("testCentralNNTrack"))
-    suite.addTest(TestAlgoComparaisonMethods("testCentralDTWTrack"))
     suite.addTest(TestAlgoComparaisonMethods("testArealStandardizedBetweenTwoTracks"))
     suite.addTest(TestAlgoComparaisonMethods("testAggregatCluster"))
-    '''
+    
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

@@ -99,7 +99,7 @@ class TestAlgoSegmentation(unittest.TestCase):
         
         trace1.plot(type='POINT', sym='mo', pointsize=30, append=True)
         trace2.plot(type='POINT', sym='bo', pointsize=30, append=True)
-        
+
         plt.xlim([1,8])
         plt.ylim([1,8])
         plt.show()
@@ -109,16 +109,20 @@ class TestAlgoSegmentation(unittest.TestCase):
         
         ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         trace = Track([], 1)
-        trace.addObs(Obs(ENUCoords(0*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:00:00")))
-        trace.addObs(Obs(ENUCoords(2*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:10:00")))
-        trace.addObs(Obs(ENUCoords(3*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:20:00")))
-        trace.addObs(Obs(ENUCoords(6*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:30:00")))
-        trace.addObs(Obs(ENUCoords(8*600, 0, 0), ObsTime.readTimestamp("2018-01-01 10:40:00")))
+        trace.addObs(Obs(ENUCoords(1, 0, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(2, 0, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(3, 0, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(3, 2, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(3, 0, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(4, 0, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(5, 0, 0), ObsTime()))
+        trace.plot('b-')
         
         tracks = splitReturnTripExhaustive(trace)
         print ('nombre sous-traces=', len(tracks))
         trace1 = tracks.getTrack(0)
         print (len(trace), len(trace1))
+
 
     def testSplitReturnTripFast(self):
         pass

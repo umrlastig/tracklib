@@ -55,7 +55,8 @@ from tracklib.util import (aire_visval,
                            boundingShape, MODE_ENCLOSING_MBR)
 from tracklib.core import Operator
 from tracklib.algo import (MODE_SEGMENTATION_MINIMIZE, MODE_SEGMENTATION_MAXIMIZE,
-                           optimalSegmentation, compare)
+                           optimalSegmentation, compare,
+                           MODE_COMPARISON_POINTWISE)
 
 
 MODE_SIMPLIFY_DOUGLAS_PEUCKER = 1
@@ -405,8 +406,9 @@ def compareWithDouglasPeuckerSimplification(track, threshold):
     for tolerance in range(1, sup):
         track1 = douglas_peucker(track, tolerance)
         #print (track.size(), track1.size(), tolerance)
-        
-        err = compare(track, track1)
+        # TODO: à revoir (modif dans comparaison)
+        m = min(track.size(), track1.size())
+        err = compare(track[0:m], track1[0:m], mode=MODE_COMPARISON_POINTWISE, p=2)
         if err != None and err < threshold:
             S.append(tolerance)
         else:
@@ -416,6 +418,7 @@ def compareWithDouglasPeuckerSimplification(track, threshold):
 
     if len(S) > 0:
         index_max = max(range(len(S)), key=S.__getitem__)
+        print ('index max:', index_max)
         track1 = douglas_peucker(track, S[index_max])
         return track1.size()
     else:
