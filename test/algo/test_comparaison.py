@@ -13,6 +13,7 @@ from tracklib import (Obs, ObsTime, ENUCoords, Track,
                       MODE_COMPARISON_POINTWISE,
                       MODE_COMPARISON_AREAL,
                       MODE_COMPARISON_DTW,
+                      MODE_COMPARISON_FRECHET,
                       MODE_MATCHING_DTW,
                       MODE_MATCHING_FRECHET,
                       MODE_MATCHING_FDTW)
@@ -362,7 +363,24 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         self.assertLessEqual(diff, self.__epsilon, "Score")
 
     
-    def testCompare(self):
+    def testCompare2(self):
+        chemin1 = os.path.join(self.resource_path, 'test/data/compare/dtw1.csv')
+        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        chemin2 = os.path.join(self.resource_path, 'test/data/compare/dtw2.csv')
+        trace2 = TrackReader.readFromCsv(chemin2, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        
+        a = compare(trace1, trace2, mode=MODE_COMPARISON_FRECHET, 
+                    dim=2)
+        diff = abs(a - 2.502)
+        self.assertLessEqual(diff, self.__epsilon, "Distance")
+        
+        b = compare(trace1, trace2, mode=MODE_COMPARISON_DTW,
+                    p=math.inf, dim=2)
+        diff = abs(b - 2.502)
+        self.assertLessEqual(diff, self.__epsilon, "Distance")
+    
+    
+    def testCompare1(self):
         # Hausdorff
         b = compare(self.trace1, self.trace2, mode=MODE_COMPARISON_HAUSDORFF)
         self.assertLessEqual(abs(b - 2.121), self.__epsilon, "Comparaison")
@@ -478,10 +496,11 @@ if __name__ == '__main__':
     suite = unittest.TestSuite()
     
     suite.addTest(TestAlgoComparaisonMethods("testMatch"))
-    #suite.addTest(TestAlgoComparaisonMethods("testCompare"))
-    #suite.addTest(TestAlgoComparaisonMethods("testHausdorffSimilarity"))
-    #suite.addTest(TestAlgoComparaisonMethods("testArealStandardizedBetweenTwoTracks"))
-    #suite.addTest(TestAlgoComparaisonMethods("testAggregatCluster"))
+    suite.addTest(TestAlgoComparaisonMethods("testCompare1"))
+    suite.addTest(TestAlgoComparaisonMethods("testCompare2"))
+    suite.addTest(TestAlgoComparaisonMethods("testHausdorffSimilarity"))
+    suite.addTest(TestAlgoComparaisonMethods("testArealStandardizedBetweenTwoTracks"))
+    suite.addTest(TestAlgoComparaisonMethods("testAggregatCluster"))
     
     runner = unittest.TextTestRunner()
     runner.run(suite)
