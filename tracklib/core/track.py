@@ -69,8 +69,7 @@ from tracklib.algo import (BIAF_SPEED, BIAF_ABS_CURV,
                            estimate_speed,
                            smoothed_speed_calculation,
                            compare,
-                           MODE_TEMPORAL,
-                           co_median)                     
+                           MODE_TEMPORAL)
 
 from . import (UnaryOperator, BinaryOperator, 
                ScalarOperator, ScalarVoidOperator, 
@@ -383,7 +382,7 @@ class Track:
                 d = o.distanceTo(self.getObs(i))
         return self.getObs(pos)
     
-    def getMedianObsInTime(self, o):
+    def getMedianObsInTime(self):
         T = self.getT()
         r = self.operate(Operator.MEDIAN, "t")
         return self.getObs(T.index(r))

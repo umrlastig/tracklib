@@ -642,9 +642,7 @@ class TestTrack(TestCase):
         trace1.plot('b-')
         trace1.plot('bs')
         
-        o = Obs(ENUCoords(0, 0, 0), ObsTime.readTimestamp("2018-01-01 10:00:01"))
-        plt.plot(o.position.getX(), o.position.getY(), 'ks', markersize=5)
-        g = trace1.getMedianObsInTime(o)
+        g = trace1.getMedianObsInTime()
         plt.plot(g.position.getX(), g.position.getY(), 'g<', markersize=10)
 
         self.assertIsInstance(g, Obs)
@@ -655,7 +653,7 @@ class TestTrack(TestCase):
 
 if __name__ == '__main__':
     suite = TestSuite()
-    
+
     suite.addTest(TestTrack("test_str"))
     suite.addTest(TestTrack("test_timezone"))
     suite.addTest(TestTrack("test_interval"))
@@ -688,7 +686,7 @@ if __name__ == '__main__':
     suite.addTest(TestTrack("test_op_gt"))
     suite.addTest(TestTrack("test_op_ge"))
     suite.addTest(TestTrack("test_op_mod"))
-
+    
     suite.addTest(TestTrack("test_getCentroid"))
     suite.addTest(TestTrack("test_getFurthestObs"))
     suite.addTest(TestTrack("test_getMedianObsInTime"))
