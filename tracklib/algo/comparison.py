@@ -414,7 +414,7 @@ def _fdtw(track1, track2, weight = lambda A, B : A + B, dim=2, verbose = True, p
     # ----------------------------------------------------------
     # Optimal path with dynamic programming
     # ----------------------------------------------------------
-    T = np.zeros((N2, N1)); T[0,0] = _distance(track2.getObs(0).position, track1.getObs(0).position, dim)
+    T = np.zeros((N2, N1)); T[0,0] = weight(0, _distance(track2.getObs(0).position, track1.getObs(0).position, dim))
     F = priority_dict({(0,0): 0})
     V =  priority_dict()
     A = dict({(0,0): (-1, -1)})
@@ -554,7 +554,7 @@ def _dtw(track1, track2, weight = lambda A, B : A + B, dim=2, verbose = True, pl
     if (plot):
         plt.imshow(T)
         for i in range(len(S)):
-            plt.plot(S[i][1], S[i][0], 'r+')
+            plt.plot(S[i][1], S[i][0], 'r.', markersize=2)
         plt.show()
 
     return _fillAF_dtw(output, track1, track2, S, T, dim)
