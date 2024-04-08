@@ -419,8 +419,19 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
     def testComparePointWise(self):
         # Pointwise
         a = compare(self.trace1, self.trace2[0:self.trace1.size()], 
-                                             mode=MODE_COMPARISON_POINTWISE, p=2)
+                                             mode=MODE_COMPARISON_POINTWISE, 
+                                             p=2)
         self.assertLessEqual(abs(a - 4.11483), self.__epsilon, "Comparaison")
+        
+        b = compare(self.trace1, self.trace2[0:self.trace1.size()], 
+                                             mode=MODE_COMPARISON_POINTWISE, 
+                                             p=1)
+        self.assertLessEqual(abs(b - 4.045), self.__epsilon, "Comparaison")
+        
+        c = compare(self.trace1, self.trace2[0:self.trace1.size()], 
+                                             mode=MODE_COMPARISON_POINTWISE, 
+                                             p=math.inf)
+        self.assertLessEqual(abs(c - 5.0), self.__epsilon, "Comparaison")
         
     def testCompareWithAreal(self):
         c = compare(self.trace1, self.trace2, mode=MODE_COMPARISON_AREAL)
