@@ -147,7 +147,7 @@ def match(track1, track2, mode=MODE_MATCHING_DTW, p=1, dim=2, verbose=True, plot
 
 # ------------------------------------------------------------------------------
 # Generic function for geometric distance between 2 points p1 and p2
-# dim = 1: D altimetric euclidian distance
+# dim = 1: 1D altimetric euclidian distance
 # dim = 2: 2D planimetric euclidian distance
 # dim = 3: 3D distance euclidian distance
 # lambda function between ENUCoords: direct application of lambda function
@@ -426,7 +426,7 @@ def _fdtw(track1, track2, weight = lambda A, B : A + B, dim=2, verbose = True, p
     step_to_run = range(1, N1)
     if verbose:
         counter = 0
-        bar = progressbar.ProgressBar(max_value=N1)
+        bar = progressbar.ProgressBar(max_value=N1-1)
 
     while(1):
         node = F.pop_smallest(); i = node[0]; j = node[1]; 
@@ -458,9 +458,9 @@ def _fdtw(track1, track2, weight = lambda A, B : A + B, dim=2, verbose = True, p
         S.append(A[S[-1]])
 
     if (plot):
-        plt.imshow(D)
+        plt.imshow(T)
         for i in range(len(S)):
-            plt.plot(S[i][1], S[i][0], 'r+')
+            plt.plot(S[i][1], S[i][0], 'r.', markersize=2)
         plt.show()
 
     return _fillAF_dtw(output, track1, track2, S, T, dim)
@@ -474,7 +474,7 @@ def _update_node(F, T, node, new_cost, V, A, ant):
     if not node in F:
         F[node] = 1e300
     if new_cost < F[node]:
-        F[node] = new_cost 
+        F[node] = new_cost
         A[node] = ant
         T[node[0], node[1]] = new_cost
 
