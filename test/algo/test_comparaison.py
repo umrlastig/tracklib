@@ -5,19 +5,20 @@ import unittest
 import matplotlib.pyplot as plt
 import math
 import os.path
+import random
 from tracklib import (Obs, ObsTime, ENUCoords, Track,
                       TrackReader,
                       averagingCoordSet, compare, match,
                       plotMatching, MARKERS_TYPE_WARNING,
                       MODE_COMPARISON_HAUSDORFF,
                       MODE_COMPARISON_POINTWISE,
-                      MODE_COMPARISON_AREAL,
                       MODE_COMPARISON_DTW,
                       MODE_COMPARISON_FRECHET,
                       MODE_COMPARISON_AREAL,
                       MODE_MATCHING_DTW,
                       MODE_MATCHING_FRECHET,
-                      MODE_MATCHING_FDTW)
+                      MODE_MATCHING_FDTW,
+                      generate, GaussianKernel)
 
 
 class TestAlgoComparaisonMethods(unittest.TestCase):
@@ -339,6 +340,16 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         
         diff = abs(profile.score - 14.52)
         self.assertLessEqual(diff, self.__epsilon, "Score")
+        
+    def testTestEqualFDTWandDTW(self):
+        for i in range(1000):
+            track1 = generate(0.2, dt=500, verbose=False)
+            track2 = track1.noise(10, GaussianKernel(10))
+            prand = 10*random.random()
+            m1 = match(track1, track2, MODE_MATCHING_DTW, p=prand, verbose=False)
+            m2 = match(track1, track2, MODE_MATCHING_FDTW, p=prand, verbose=False)
+            # print(i, "[p = "+str(prand)+"]", m1.score == m2.score)
+            self.assertTrue(m1.score == m2.score)
 
     def testMatchFrechet(self):
         chemin1 = os.path.join(self.resource_path, 'test/data/compare/dtw1.csv')
@@ -541,7 +552,7 @@ if __name__ == '__main__':
     suite.addTest(TestAlgoComparaisonMethods("testMatchDTWLInf"))
     suite.addTest(TestAlgoComparaisonMethods("testMatchFDTWL2"))
     suite.addTest(TestAlgoComparaisonMethods("testMatchFrechet"))
-    
+    suite.addTest(TestAlgoComparaisonMethods("testTestEqualFDTWandDTW"))
     suite.addTest(TestAlgoComparaisonMethods("testCompareWithAreal"))
     suite.addTest(TestAlgoComparaisonMethods("testCompareDTW"))
     suite.addTest(TestAlgoComparaisonMethods("testCompareFrechet"))
