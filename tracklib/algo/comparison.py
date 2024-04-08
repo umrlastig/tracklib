@@ -658,51 +658,82 @@ def averagingCoordSet(coordSet, p=2, constraint=False):
         return coordSet[iMin]
     
 
-## ------------------------------------------------------------------------
-## Algorithme fusion L. Etienne : trajectoire médiane
-## ------------------------------------------------------------------------
-#def __fusion(tracks, weight=lambda A, B : A + B**2, ref=0, 
-#           p=1, constraint=False, verbose=True):
-#
-#    central = tracks[ref].copy()
-#    
-#    ITER_MAX = 100
-#    for iteration in range(ITER_MAX):
-#        
-#        if verbose:
-#            print("ITERATION", iteration)
-#        
-#        profiles = tracklib.TrackCollection()
-#        central_before = central.copy()
-#    
-#        for i in range(len(tracks)):
-#            profile = tracklib.algo.comparison.differenceProfile2(central, tracks[i], weight, verbose=verbose)
-#            profiles.addTrack(profile)
-#            
-#        for j in range(len(central)):
-#            cluster = []
-#            for i in range(len(profiles)):
-#                cluster.append(tracks[i][profiles[i]["pair", j]].position)
-#            central[j].position = averagingCoordSet(cluster, p=p, constraint=constraint)
-#        
-#        profile = tracklib.algo.comparison.differenceProfile2(central, central_before, weight, verbose=verbose)
-#        if verbose:
-#            print("CV = ", profile.score)
-#        if (profile.score < 1e-16):
-#            break
-#        
-#    if verbose:
-#        print("END OF COMPUTATION")
-#                
-#    return central
-#    
-## ------------------------------------------------------------------------
-## Algorithme récursif fusion L. Etienne : trajectoire médiane
-## ------------------------------------------------------------------------ 
-#def fusion(tracks, weight=lambda A, B : A + B**2, ref=0, p=1, constraint=False, recursive=1e300, verbose=True):
-#    N = len(tracks)
-#    if N <= recursive:
-#        return __fusion(tracks, weight=weight, ref=ref, p=p, constraint=constraint, verbose=verbose)
+# ------------------------------------------------------------------------------
+# List of available methods to choose representative point selection
+MODE_BARYCENTRE   = 201
+MODE_MEDIAN_TIME  = 202
+MODE_FURTHEST_OBS = 203
+
+# ------------------------------------------------------------------------
+# Algorithme fusion L. Etienne : trajectoire médiane
+# ------------------------------------------------------------------------
+def __fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,
+             represent_method=MODE_BARYCENTRE, constraint=False, 
+             verbose=True, plot=True):
+
+    central = tracks[ref].copy()
+    
+    ITER_MAX = 100
+    for iteration in range(ITER_MAX):
+        if verbose:
+            print("ITERATION", iteration)
+        
+        profiles = tracklib.TrackCollection()
+        central_before = central.copy()
+    
+        for i in range(len(tracks)):
+            profile = match(central, tracks[i], mode=mode, p=p, dim=dim, 
+                            verbose=verbose, plot=plot)
+            profile.createAnalyticalFeature("homologous")
+            for j in range(len(central)):
+                # On sélecionne le sous-ensemble Pi des positions de CTm appariés à pri
+                PAIRS = profile[j, "pair"]
+                if len(PAIRS) == 1:
+                    profile[j, "homologous"] = tracks[i].getObs(PAIRS[0]).position
+                elif len(PAIRS) > 1:
+                    Pi = tracklib.Track()
+                    for ind in PAIRS:
+                        Pi.addObs(tracks[i].getObs(ind))
+                    profile[j, "homologous"] = Pi.getCentroid()
+                else:
+                    profile[j, "homologous"] = profile[j, "pair"]
+            profiles.addTrack(profile)
+            
+        for j in range(len(central)):
+            cluster = []
+            for i in range(len(profiles)):
+                cluster.append(profiles[i]["homologous", j])
+            central[j].position = averagingCoordSet(cluster, p=p, constraint=constraint)
+        
+        profile = match(central, central_before, mode=mode, p=p, dim=dim, 
+                        verbose=verbose, plot=plot)
+        if verbose:
+            print("CV = ", profile.score)
+        if (profile.score < 1e-16):
+            break
+            
+    if verbose:
+        print("END OF COMPUTATION")
+                
+    return central
+
+
+    
+# ------------------------------------------------------------------------
+# Algorithme récursif fusion L. Etienne : trajectoire médiane
+# ------------------------------------------------------------------------ 
+
+
+# ------------------------------------------------------------------------------
+def fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,  
+           represent_method=MODE_BARYCENTRE, constraint=False,
+           recursive=1e300, verbose=True, plot=True):
+    
+    N = len(tracks)
+    if N <= recursive:
+        return __fusion(tracks, mode=mode, ref=ref, p=p, dim=dim, 
+                        represent_method=represent_method, constraint=constraint,
+                        verbose=verbose, plot=plot)
 #    else:
 #       Npg = int(N/recursive)
 #       subtracks = TrackCollection()
