@@ -365,7 +365,7 @@ def _nn_mono(track1, track2, dim, verbose):
 def _p2weight(p):
     if 'function' in str(type(p)):
         weight = p
-    if 'int' in str(type(p)):
+    if ('int' in str(type(p))) or ('float' in str(type(p))):
         weight = lambda A, B : A + B**p
     if (p == 0):
         weight = lambda A, B : A + (B != 0)*1
