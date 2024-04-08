@@ -4,13 +4,18 @@
 import unittest
 import matplotlib.pyplot as plt
 import math
+import os.path
 from tracklib import (Obs, ObsTime, ENUCoords, Track,
-                      averagingCoordSet, compare,
+                      TrackReader,
+                      averagingCoordSet, compare, match,
+                      plotMatching, MARKERS_TYPE_WARNING,
                       MODE_COMPARISON_HAUSDORFF,
                       MODE_COMPARISON_POINTWISE,
                       MODE_COMPARISON_AREAL,
-                      MODE_COMPARISON_DTW)
-
+                      MODE_COMPARISON_DTW,
+                      MODE_MATCHING_DTW,
+                      MODE_MATCHING_FRECHET,
+                      MODE_MATCHING_FDTW)
 
 
 class TestAlgoComparaisonMethods(unittest.TestCase):
@@ -18,6 +23,8 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
     __epsilon = 0.001
     
     def setUp (self):
+        self.resource_path = os.path.join(os.path.split(__file__)[0], "../..")
+        
         ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         
         # ---------------------------------------------------------------------
@@ -123,6 +130,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
 
         plt.xlim([0, 14])
         plt.ylim([-1, 7])
+        plt.show()
         
         
     def testHausdorffSimilarity(self):
@@ -157,11 +165,209 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         d = compare(trackA, trackB, mode=MODE_COMPARISON_HAUSDORFF)
         self.assertLessEqual(abs(d - 2.12132), self.__epsilon)
         
+        
+    def testMatch(self):
+        chemin1 = os.path.join(self.resource_path, 'test/data/compare/dtw1.csv')
+        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        trace1.plot('m-')
+        trace1.plotAsMarkers(type=MARKERS_TYPE_WARNING)
+        
+        chemin2 = os.path.join(self.resource_path, 'test/data/compare/dtw2.csv')
+        trace2 = TrackReader.readFromCsv(chemin2, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        trace2.plot('c-')
+        trace2.plotAsMarkers(bkg='w', frg='c', sym_frg = " ", sym_bkg = "v")
+
+        profile = match(trace1, trace2, mode=MODE_MATCHING_DTW, 
+                        p=2, dim=2, verbose=False, plot=False)
+        plotMatching(profile, trace2)
+        plt.xlim([-1, 12])
+        plt.ylim([-1, 5.5])
+        plt.show()
+
+        self.assertCountEqual([0], profile[0, "pair"])
+        self.assertListEqual([0], profile[0, "pair"])
+        
+        self.assertCountEqual([2,1], profile[1, "pair"])
+        self.assertListEqual([2,1], profile[1, "pair"])
+        
+        self.assertCountEqual([3], profile[2, "pair"])
+        self.assertListEqual([3], profile[2, "pair"])
+        
+        self.assertCountEqual([4], profile[3, "pair"])
+        self.assertListEqual([4], profile[3, "pair"])
+        self.assertCountEqual([4], profile[4, "pair"])
+        self.assertListEqual([4], profile[4, "pair"])
+        self.assertCountEqual([4], profile[5, "pair"])
+        self.assertListEqual([4], profile[5, "pair"])
+        
+        self.assertCountEqual([5], profile[6, "pair"])
+        self.assertListEqual([5], profile[6, "pair"])
+        
+        self.assertCountEqual([6], profile[7, "pair"])
+        self.assertListEqual([6], profile[7, "pair"])
+        
+        diff = abs(profile.score - 14.52)
+        self.assertLessEqual(diff, self.__epsilon, "Score")
+        
+        # ======================================================================
+        trace1.plot('m-')
+        trace1.plotAsMarkers(type=MARKERS_TYPE_WARNING)
+        trace2.plot('c-')
+        trace2.plotAsMarkers(bkg='w', frg='c', sym_frg = " ", sym_bkg = "v")
+
+        profile = match(trace1, trace2, mode=MODE_MATCHING_DTW, 
+                        p=1, dim=2, verbose=False, plot=False)
+        plotMatching(profile, trace2)
+        plt.xlim([-1, 12])
+        plt.ylim([-1, 5.5])
+        plt.show()
+        
+        self.assertCountEqual([0], profile[0, "pair"])
+        self.assertListEqual([0], profile[0, "pair"])
+        
+        self.assertCountEqual([2,1], profile[1, "pair"])
+        self.assertListEqual([2,1], profile[1, "pair"])
+        
+        self.assertCountEqual([3], profile[2, "pair"])
+        self.assertListEqual([3], profile[2, "pair"])
+        
+        self.assertCountEqual([4], profile[3, "pair"])
+        self.assertListEqual([4], profile[3, "pair"])
+        self.assertCountEqual([4], profile[4, "pair"])
+        self.assertListEqual([4], profile[4, "pair"])
+        self.assertCountEqual([4], profile[5, "pair"])
+        self.assertListEqual([4], profile[5, "pair"])
+        
+        self.assertCountEqual([5], profile[6, "pair"])
+        self.assertListEqual([5], profile[6, "pair"])
+        
+        self.assertCountEqual([6], profile[7, "pair"])
+        self.assertListEqual([6], profile[7, "pair"])
+        
+        diff = abs(profile.score - 10.357)
+        self.assertLessEqual(diff, self.__epsilon, "Score")
+        
+        # ======================================================================
+        trace1.plot('m-')
+        trace1.plotAsMarkers(type=MARKERS_TYPE_WARNING)
+        trace2.plot('c-')
+        trace2.plotAsMarkers(bkg='w', frg='c', sym_frg = " ", sym_bkg = "v")
+
+        profile = match(trace1, trace2, mode=MODE_MATCHING_DTW, 
+                        p=math.inf, dim=2, verbose=False, plot=False)
+        plotMatching(profile, trace2)
+        plt.xlim([-1, 12])
+        plt.ylim([-1, 5.5])
+        plt.show()
+        
+        self.assertCountEqual([0], profile[0, "pair"])
+        self.assertListEqual([0], profile[0, "pair"])
+        
+        self.assertCountEqual([2,1], profile[1, "pair"])
+        self.assertListEqual([2,1], profile[1, "pair"])
+        
+        self.assertCountEqual([3], profile[2, "pair"])
+        self.assertListEqual([3], profile[2, "pair"])
+        
+        self.assertCountEqual([4], profile[3, "pair"])
+        self.assertListEqual([4], profile[3, "pair"])
+        self.assertCountEqual([4], profile[4, "pair"])
+        self.assertListEqual([4], profile[4, "pair"])
+        self.assertCountEqual([4], profile[5, "pair"])
+        self.assertListEqual([4], profile[5, "pair"])
+        
+        self.assertCountEqual([5], profile[6, "pair"])
+        self.assertListEqual([5], profile[6, "pair"])
+        
+        self.assertCountEqual([6], profile[7, "pair"])
+        self.assertListEqual([6], profile[7, "pair"])
+        
+        diff = abs(profile.score - 2.502)
+        self.assertLessEqual(diff, self.__epsilon, "Score")
+        
+        # ======================================================================
+        trace1.plot('m-')
+        trace1.plotAsMarkers(type=MARKERS_TYPE_WARNING)
+        trace2.plot('c-')
+        trace2.plotAsMarkers(bkg='w', frg='c', sym_frg = " ", sym_bkg = "v")
+
+        profile = match(trace1, trace2, mode=MODE_MATCHING_FDTW, 
+                        p=2, dim=2, verbose=False, plot=False)
+        plotMatching(profile, trace2)
+        plt.xlim([-1, 12])
+        plt.ylim([-1, 5.5])
+        plt.show()
+        
+        self.assertCountEqual([0], profile[0, "pair"])
+        self.assertListEqual([0], profile[0, "pair"])
+        
+        self.assertCountEqual([2,1], profile[1, "pair"])
+        self.assertListEqual([2,1], profile[1, "pair"])
+        
+        self.assertCountEqual([3], profile[2, "pair"])
+        self.assertListEqual([3], profile[2, "pair"])
+        
+        self.assertCountEqual([4], profile[3, "pair"])
+        self.assertListEqual([4], profile[3, "pair"])
+        self.assertCountEqual([4], profile[4, "pair"])
+        self.assertListEqual([4], profile[4, "pair"])
+        self.assertCountEqual([4], profile[5, "pair"])
+        self.assertListEqual([4], profile[5, "pair"])
+        
+        self.assertCountEqual([5], profile[6, "pair"])
+        self.assertListEqual([5], profile[6, "pair"])
+        
+        self.assertCountEqual([6], profile[7, "pair"])
+        self.assertListEqual([6], profile[7, "pair"])
+        
+        diff = abs(profile.score - 14.64)
+        self.assertLessEqual(diff, self.__epsilon, "Score")
+
+        # ======================================================================
+        trace1.plot('m-')
+        trace1.plotAsMarkers(type=MARKERS_TYPE_WARNING)
+        trace2.plot('c-')
+        trace2.plotAsMarkers(bkg='w', frg='c', sym_frg = " ", sym_bkg = "v")
+
+        profile = match(trace1, trace2, mode=MODE_MATCHING_FRECHET, 
+                        dim=2, verbose=False, plot=False)
+        plotMatching(profile, trace2)
+        plt.xlim([-1, 12])
+        plt.ylim([-1, 5.5])
+        plt.show()
+        
+        self.assertCountEqual([0], profile[0, "pair"])
+        self.assertListEqual([0], profile[0, "pair"])
+        
+        self.assertCountEqual([2,1], profile[1, "pair"])
+        self.assertListEqual([2,1], profile[1, "pair"])
+        
+        self.assertCountEqual([3], profile[2, "pair"])
+        self.assertListEqual([3], profile[2, "pair"])
+        
+        self.assertCountEqual([4], profile[3, "pair"])
+        self.assertListEqual([4], profile[3, "pair"])
+        self.assertCountEqual([4], profile[4, "pair"])
+        self.assertListEqual([4], profile[4, "pair"])
+        self.assertCountEqual([4], profile[5, "pair"])
+        self.assertListEqual([4], profile[5, "pair"])
+        
+        self.assertCountEqual([5], profile[6, "pair"])
+        self.assertListEqual([5], profile[6, "pair"])
+        
+        self.assertCountEqual([6], profile[7, "pair"])
+        self.assertListEqual([6], profile[7, "pair"])
+        
+        diff = abs(profile.score - 2.502)
+        self.assertLessEqual(diff, self.__epsilon, "Score")
+
     
     def testCompare(self):
+        # Hausdorff
         b = compare(self.trace1, self.trace2, mode=MODE_COMPARISON_HAUSDORFF)
         self.assertLessEqual(abs(b - 2.121), self.__epsilon, "Comparaison")
         
+        # Pointwise
         a = compare(self.trace1, self.trace2[0:self.trace1.size()], 
                                              mode=MODE_COMPARISON_POINTWISE, p=2)
         self.assertLessEqual(abs(a - 4.11483), self.__epsilon, "Comparaison")
@@ -271,10 +477,11 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     
-    suite.addTest(TestAlgoComparaisonMethods("testCompare"))
-    suite.addTest(TestAlgoComparaisonMethods("testHausdorffSimilarity"))
-    suite.addTest(TestAlgoComparaisonMethods("testArealStandardizedBetweenTwoTracks"))
-    suite.addTest(TestAlgoComparaisonMethods("testAggregatCluster"))
+    suite.addTest(TestAlgoComparaisonMethods("testMatch"))
+    #suite.addTest(TestAlgoComparaisonMethods("testCompare"))
+    #suite.addTest(TestAlgoComparaisonMethods("testHausdorffSimilarity"))
+    #suite.addTest(TestAlgoComparaisonMethods("testArealStandardizedBetweenTwoTracks"))
+    #suite.addTest(TestAlgoComparaisonMethods("testAggregatCluster"))
     
     runner = unittest.TextTestRunner()
     runner.run(suite)
