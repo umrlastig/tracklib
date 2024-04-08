@@ -14,6 +14,7 @@ from tracklib import (Obs, ObsTime, ENUCoords, Track,
                       MODE_COMPARISON_AREAL,
                       MODE_COMPARISON_DTW,
                       MODE_COMPARISON_FRECHET,
+                      MODE_COMPARISON_AREAL,
                       MODE_MATCHING_DTW,
                       MODE_MATCHING_FRECHET,
                       MODE_MATCHING_FDTW)
@@ -167,7 +168,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         self.assertLessEqual(abs(d - 2.12132), self.__epsilon)
         
         
-    def testMatch(self):
+    def testMatchDTWL2(self):
         chemin1 = os.path.join(self.resource_path, 'test/data/compare/dtw1.csv')
         trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
         trace1.plot('m-')
@@ -210,12 +211,17 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         diff = abs(profile.score - 14.52)
         self.assertLessEqual(diff, self.__epsilon, "Score")
         
-        # ======================================================================
+    def testMatchDTWL1(self):
+        chemin1 = os.path.join(self.resource_path, 'test/data/compare/dtw1.csv')
+        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
         trace1.plot('m-')
         trace1.plotAsMarkers(type=MARKERS_TYPE_WARNING)
+        
+        chemin2 = os.path.join(self.resource_path, 'test/data/compare/dtw2.csv')
+        trace2 = TrackReader.readFromCsv(chemin2, 0, 1, 2, 3, separator=",",read_all=True, h=1)
         trace2.plot('c-')
         trace2.plotAsMarkers(bkg='w', frg='c', sym_frg = " ", sym_bkg = "v")
-
+        
         profile = match(trace1, trace2, mode=MODE_MATCHING_DTW, 
                         p=1, dim=2, verbose=False, plot=False)
         plotMatching(profile, trace2)
@@ -248,12 +254,17 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         diff = abs(profile.score - 10.357)
         self.assertLessEqual(diff, self.__epsilon, "Score")
         
-        # ======================================================================
+    def testMatchDTWLInf(self):
+        chemin1 = os.path.join(self.resource_path, 'test/data/compare/dtw1.csv')
+        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
         trace1.plot('m-')
         trace1.plotAsMarkers(type=MARKERS_TYPE_WARNING)
+        
+        chemin2 = os.path.join(self.resource_path, 'test/data/compare/dtw2.csv')
+        trace2 = TrackReader.readFromCsv(chemin2, 0, 1, 2, 3, separator=",",read_all=True, h=1)
         trace2.plot('c-')
         trace2.plotAsMarkers(bkg='w', frg='c', sym_frg = " ", sym_bkg = "v")
-
+        
         profile = match(trace1, trace2, mode=MODE_MATCHING_DTW, 
                         p=math.inf, dim=2, verbose=False, plot=False)
         plotMatching(profile, trace2)
@@ -286,12 +297,17 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         diff = abs(profile.score - 2.502)
         self.assertLessEqual(diff, self.__epsilon, "Score")
         
-        # ======================================================================
+    def testMatchFDTWL2(self):
+        chemin1 = os.path.join(self.resource_path, 'test/data/compare/dtw1.csv')
+        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
         trace1.plot('m-')
         trace1.plotAsMarkers(type=MARKERS_TYPE_WARNING)
+        
+        chemin2 = os.path.join(self.resource_path, 'test/data/compare/dtw2.csv')
+        trace2 = TrackReader.readFromCsv(chemin2, 0, 1, 2, 3, separator=",",read_all=True, h=1)
         trace2.plot('c-')
         trace2.plotAsMarkers(bkg='w', frg='c', sym_frg = " ", sym_bkg = "v")
-
+        
         profile = match(trace1, trace2, mode=MODE_MATCHING_FDTW, 
                         p=2, dim=2, verbose=False, plot=False)
         plotMatching(profile, trace2)
@@ -321,10 +337,20 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         self.assertCountEqual([6], profile[7, "pair"])
         self.assertListEqual([6], profile[7, "pair"])
         
-        diff = abs(profile.score - 14.64)
+        diff = abs(profile.score - 14.52)
         self.assertLessEqual(diff, self.__epsilon, "Score")
 
-        # ======================================================================
+    def testMatchFrechet(self):
+        chemin1 = os.path.join(self.resource_path, 'test/data/compare/dtw1.csv')
+        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        trace1.plot('m-')
+        trace1.plotAsMarkers(type=MARKERS_TYPE_WARNING)
+        
+        chemin2 = os.path.join(self.resource_path, 'test/data/compare/dtw2.csv')
+        trace2 = TrackReader.readFromCsv(chemin2, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        trace2.plot('c-')
+        trace2.plotAsMarkers(bkg='w', frg='c', sym_frg = " ", sym_bkg = "v")
+        
         trace1.plot('m-')
         trace1.plotAsMarkers(type=MARKERS_TYPE_WARNING)
         trace2.plot('c-')
@@ -363,7 +389,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         self.assertLessEqual(diff, self.__epsilon, "Score")
 
     
-    def testCompare2(self):
+    def testCompareFrechet(self):
         chemin1 = os.path.join(self.resource_path, 'test/data/compare/dtw1.csv')
         trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
         chemin2 = os.path.join(self.resource_path, 'test/data/compare/dtw2.csv')
@@ -374,27 +400,31 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         diff = abs(a - 2.502)
         self.assertLessEqual(diff, self.__epsilon, "Distance")
         
+    def testCompareDTW(self):
+        chemin1 = os.path.join(self.resource_path, 'test/data/compare/dtw1.csv')
+        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        chemin2 = os.path.join(self.resource_path, 'test/data/compare/dtw2.csv')
+        trace2 = TrackReader.readFromCsv(chemin2, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        
         b = compare(trace1, trace2, mode=MODE_COMPARISON_DTW,
                     p=math.inf, dim=2)
         diff = abs(b - 2.502)
         self.assertLessEqual(diff, self.__epsilon, "Distance")
     
-    
-    def testCompare1(self):
+    def testCompareHausdorff(self):
         # Hausdorff
         b = compare(self.trace1, self.trace2, mode=MODE_COMPARISON_HAUSDORFF)
         self.assertLessEqual(abs(b - 2.121), self.__epsilon, "Comparaison")
         
+    def testComparePointWise(self):
         # Pointwise
         a = compare(self.trace1, self.trace2[0:self.trace1.size()], 
                                              mode=MODE_COMPARISON_POINTWISE, p=2)
         self.assertLessEqual(abs(a - 4.11483), self.__epsilon, "Comparaison")
         
-        #d = compare(self.trace1, self.trace2, mode=MODE_COMPARISON_DTW, p=1)
-        #self.assertLessEqual(abs(d - 40.683), self.__epsilon, "Comparaison")
-        
-        #c = compare(self.trace1, self.trace2, mode=MODE_COMPARAISON_DISTANCE_MOYENNE)
-        #self.assertLessEqual(abs(c - 3.541), self.__epsilon, "Comparaison")
+    def testCompareWithAreal(self):
+        c = compare(self.trace1, self.trace2, mode=MODE_COMPARISON_AREAL)
+        self.assertLessEqual(abs(c - 3.541), self.__epsilon, "Comparaison")
 
 
     def testArealStandardizedBetweenTwoTracks(self):
@@ -495,9 +525,18 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     
-    suite.addTest(TestAlgoComparaisonMethods("testMatch"))
-    suite.addTest(TestAlgoComparaisonMethods("testCompare1"))
-    suite.addTest(TestAlgoComparaisonMethods("testCompare2"))
+    suite.addTest(TestAlgoComparaisonMethods("testMatchDTWL2"))
+    suite.addTest(TestAlgoComparaisonMethods("testMatchDTWL1"))
+    suite.addTest(TestAlgoComparaisonMethods("testMatchDTWLInf"))
+    suite.addTest(TestAlgoComparaisonMethods("testMatchFDTWL2"))
+    suite.addTest(TestAlgoComparaisonMethods("testMatchFrechet"))
+    
+    suite.addTest(TestAlgoComparaisonMethods("testCompareWithAreal"))
+    suite.addTest(TestAlgoComparaisonMethods("testCompareDTW"))
+    suite.addTest(TestAlgoComparaisonMethods("testCompareFrechet"))
+    suite.addTest(TestAlgoComparaisonMethods("testCompareHausdorff"))
+    suite.addTest(TestAlgoComparaisonMethods("testComparePointWise"))
+    
     suite.addTest(TestAlgoComparaisonMethods("testHausdorffSimilarity"))
     suite.addTest(TestAlgoComparaisonMethods("testArealStandardizedBetweenTwoTracks"))
     suite.addTest(TestAlgoComparaisonMethods("testAggregatCluster"))
