@@ -422,8 +422,17 @@ def _fdtw(track1, track2, weight = lambda A, B : A + B, dim=2, verbose = True, p
         D[0,0] = T[0,0]
 
     # Forward step 
+    counter = 0
+    step_to_run = range(1, N1)
+    if verbose:
+        counter = 0
+        bar = progressbar.ProgressBar(max_value=N1)
+
     while(1):
         node = F.pop_smallest(); i = node[0]; j = node[1]; 
+        if verbose:
+            counter = max(i, counter); 
+            bar.update(counter)
         V[node] = 1
         if ((i == N2-1) and (j == N1-1)):
             break
