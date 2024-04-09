@@ -132,6 +132,19 @@ def resample(track, delta, algo: Literal[1, 2, 3, 4]=1, mode:Literal[1, 2]=1):
 
     track.__analyticalFeaturesDico = {}
 
+
+
+# -----------------------------------------------------------------------------
+# Method to estimate trajectory at a particular point 
+# Inputs: track (with timestamps) and obs_time t
+# Output: Obs object resampled at t
+# -----------------------------------------------------------------------------
+def sample(track, timestamp, algo=ALGO_LINEAR):
+    t2 = track.copy()
+    resample(t2, delta=[timestamp], algo=algo, mode=MODE_TEMPORAL)
+    return t2[0]
+
+
 def __resampleSpatial(track, ds):
     """TODO
 
