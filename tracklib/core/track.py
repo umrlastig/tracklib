@@ -70,7 +70,7 @@ from tracklib.algo import (BIAF_SPEED, BIAF_ABS_CURV,
                            smoothed_speed_calculation,
                            match,
                            MODE_TEMPORAL,
-                           co_median)
+                           co_median, sample)
 
 from . import (UnaryOperator, BinaryOperator, 
                ScalarOperator, ScalarVoidOperator, 
@@ -394,33 +394,13 @@ class Track:
         return self.getObs(pos)
     
     def getMedianObs(self):
-        '''
-        On suppose que les points sont ordonnés chronologiquement
-        '''
+        ''' '''
+        # TODO: Test if timestamp exists
         T = self.getT()
         t1 = co_median(T)
-        if t1 in T:
-            return self.getObs(T.index(t1))
-        else:
-            imin = 0
-            imax = -1
-            for i in range(0, self.size()):
-                ti = T[i]
-                if ti < t1:
-                    imin = i
-                elif imax == -1:
-                    imax = i
-            pmin = self.getObs(imin).position
-            pmax = self.getObs(imax).position
-            E = (pmax.getX() + pmin.getX())/2
-            N = (pmax.getY() + pmin.getY())/2
-            U = (pmax.getZ() + pmin.getZ())/2
-            if self.getSRID() == "Geo":
-                point = Obs(GeoCoords(E, N, U), t1)
-            if self.getSRID() == "ENU":
-                point = Obs(ENUCoords(E, N, U), t1)
-            return point
-
+        s = sample(self, ObsTime.readUnixTime(t1))
+        return s
+        
     def getEnclosedPolygon(self):
         """TODO"""
         return Polygon(self.getX(), self.getY())

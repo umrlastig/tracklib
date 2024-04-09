@@ -8,7 +8,7 @@ from tracklib import (ENUCoords, ObsTime, Obs, Track,
                       Polygon, TrackCollection,
                       computeAbsCurv,
                       ds, speed, heading,
-                      TrackReader)
+                      TrackReader, co_median, sample)
 
 
 class TestTrack(TestCase):
@@ -667,10 +667,24 @@ class TestTrack(TestCase):
         self.assertLessEqual(abs(g.position.getX() - 0.0), self.__epsilon, "x of MedianObsInTime")
         self.assertLessEqual(abs(g.position.getY() - 0.76), self.__epsilon, "y of MedianObsInTime")        
         
+        # ======================================================================
+        # Cas 3
+        # 
+        '''
+        trace1.plot('c-')
+        trace1.plot('cs')
+        
+        T = trace1.getT()
+        t1 = co_median(T)
+        s = sample(trace1, ObsTime.readUnixTime(t1))
+        plt.plot(s.position.getX(), s.position.getY(), 'g<', markersize=10)
+        plt.show()
+        '''
+        
 
 if __name__ == '__main__':
     suite = TestSuite()
-    
+    '''
     suite.addTest(TestTrack("test_str"))
     suite.addTest(TestTrack("test_timezone"))
     suite.addTest(TestTrack("test_interval"))
@@ -706,6 +720,7 @@ if __name__ == '__main__':
     
     suite.addTest(TestTrack("test_getCentroid"))
     suite.addTest(TestTrack("test_getFurthestObs"))
+    '''
     suite.addTest(TestTrack("test_getMedianObs"))
     
     runner = TextTestRunner()
