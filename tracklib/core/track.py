@@ -400,7 +400,6 @@ class Track:
                     imin = i
                 elif imax == -1:
                     imax = i
-                    break
             pmin = self.getObs(imin).position
             pmax = self.getObs(imax).position
             E = (pmax.getX() + pmin.getX())/2
