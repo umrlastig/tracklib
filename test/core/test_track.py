@@ -718,7 +718,7 @@ class TestTrack(TestCase):
 
 if __name__ == '__main__':
     suite = TestSuite()
-    '''
+
     suite.addTest(TestTrack("test_str"))
     suite.addTest(TestTrack("test_timezone"))
     suite.addTest(TestTrack("test_interval"))
@@ -754,7 +754,6 @@ if __name__ == '__main__':
     
     suite.addTest(TestTrack("test_getCentroid"))
     suite.addTest(TestTrack("test_getFurthestObs"))
-    '''
     suite.addTest(TestTrack("test_getMedianObs"))
     suite.addTest(TestTrack("test_getMedianObsInTime"))
     
