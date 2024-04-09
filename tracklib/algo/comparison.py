@@ -700,9 +700,11 @@ def __fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,
                 if len(PAIRS) == 1:
                     profile[j, "homologous"] = tracks[i].getObs(PAIRS[0]).position
                 elif len(PAIRS) > 1:
+                    PAIRS.sort()
                     Pi = tracklib.Track()
                     for ind in PAIRS:
                         Pi.addObs(tracks[i].getObs(ind))
+                    
                     if represent_method == MODE_BARYCENTRE:
                         profile[j, "homologous"] = Pi.getCentroid()
                     elif represent_method == MODE_MEDIAN:
@@ -729,7 +731,9 @@ def __fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,
         
     if verbose:
         print("END OF COMPUTATION")
-                
+    
+    central.score = profile.score
+    central.iteration = iteration
     return central
 
 
