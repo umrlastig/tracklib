@@ -684,6 +684,7 @@ class TestTrack(TestCase):
         self.assertLessEqual(abs(g.position.getY() - 0.76), self.__epsilon, "y of MedianObsInTime")        
         
     def test_getMedianObsInTime(self):
+        # Cas 1
         chemin1 = os.path.join(self.resource_path, 'test/data/demicercle1.csv')
         trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
         trace1.plot('r-')
@@ -693,14 +694,13 @@ class TestTrack(TestCase):
         plt.plot(g.position.getX(), g.position.getY(), 'g<', markersize=10)
         plt.show()
         
-        #self.assertIsInstance(g, Obs)
-        #self.assertLessEqual(abs(g.position.getX() - 0.0), self.__epsilon, "x of MedianObsInTime")
-        #self.assertLessEqual(abs(g.position.getY() - 0.76), self.__epsilon, "y of MedianObsInTime")        
+        self.assertIsInstance(g, Obs)
+        self.assertLessEqual(abs(g.position.getX() - 0.65), self.__epsilon, "x of MedianObsInTime")
+        self.assertLessEqual(abs(g.position.getY() - 0.555), self.__epsilon, "y of MedianObsInTime")        
         
         # ======================================================================
-        # Cas 3
+        # Cas 2
         # 
-        
         chemin1 = os.path.join(self.resource_path, 'test/data/demicercle2.csv')
         trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
         trace1.plot('g-')
@@ -710,9 +710,9 @@ class TestTrack(TestCase):
         plt.plot(g.position.getX(), g.position.getY(), 'r<', markersize=10)
         plt.show()
         
-        #self.assertIsInstance(g, Obs)
-        #self.assertLessEqual(abs(g.position.getX() - 0.0), self.__epsilon, "x of MedianObsInTime")
-        #self.assertLessEqual(abs(g.position.getY() - 0.76), self.__epsilon, "y of MedianObsInTime")        
+        self.assertIsInstance(g, Obs)
+        self.assertLessEqual(abs(g.position.getX() + 0.82), self.__epsilon, "x of MedianObsInTime")
+        self.assertLessEqual(abs(g.position.getY() - 0.54), self.__epsilon, "y of MedianObsInTime")        
         
         
 
@@ -755,7 +755,7 @@ if __name__ == '__main__':
     suite.addTest(TestTrack("test_getCentroid"))
     suite.addTest(TestTrack("test_getFurthestObs"))
     '''
-    #suite.addTest(TestTrack("test_getMedianObs"))
+    suite.addTest(TestTrack("test_getMedianObs"))
     suite.addTest(TestTrack("test_getMedianObsInTime"))
     
     runner = TextTestRunner()
