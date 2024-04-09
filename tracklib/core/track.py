@@ -400,6 +400,14 @@ class Track:
         t1 = co_median(T)
         s = sample(self, ObsTime.readUnixTime(t1))
         return s
+    
+    def getMedianObsInTime(self):
+        ''' '''
+        # TODO: Test if timestamp exists
+        med = (self.getLastObs().timestamp - self.getFirstObs().timestamp) / 2
+        tm = self.getFirstObs().timestamp.addSec(med)
+        s = sample(self, tm)
+        return s
         
     def getEnclosedPolygon(self):
         """TODO"""

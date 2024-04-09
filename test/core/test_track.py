@@ -670,16 +670,50 @@ class TestTrack(TestCase):
         # ======================================================================
         # Cas 3
         # 
-        '''
-        trace1.plot('c-')
-        trace1.plot('cs')
+        chemin1 = os.path.join(self.resource_path, 'test/data/demicercle2.csv')
+        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        trace1.plot('g-')
+        trace1.plot('gs')
         
-        T = trace1.getT()
-        t1 = co_median(T)
-        s = sample(trace1, ObsTime.readUnixTime(t1))
-        plt.plot(s.position.getX(), s.position.getY(), 'g<', markersize=10)
+        g = trace1.getMedianObs()
+        plt.plot(g.position.getX(), g.position.getY(), 'r<', markersize=10)
         plt.show()
-        '''
+        
+        self.assertIsInstance(g, Obs)
+        self.assertLessEqual(abs(g.position.getX() - 0.0), self.__epsilon, "x of MedianObsInTime")
+        self.assertLessEqual(abs(g.position.getY() - 0.76), self.__epsilon, "y of MedianObsInTime")        
+        
+    def test_getMedianObsInTime(self):
+        chemin1 = os.path.join(self.resource_path, 'test/data/demicercle1.csv')
+        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        trace1.plot('r-')
+        trace1.plot('rs')
+        
+        g = trace1.getMedianObsInTime()
+        plt.plot(g.position.getX(), g.position.getY(), 'g<', markersize=10)
+        plt.show()
+        
+        #self.assertIsInstance(g, Obs)
+        #self.assertLessEqual(abs(g.position.getX() - 0.0), self.__epsilon, "x of MedianObsInTime")
+        #self.assertLessEqual(abs(g.position.getY() - 0.76), self.__epsilon, "y of MedianObsInTime")        
+        
+        # ======================================================================
+        # Cas 3
+        # 
+        
+        chemin1 = os.path.join(self.resource_path, 'test/data/demicercle2.csv')
+        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        trace1.plot('g-')
+        trace1.plot('gs')
+        
+        g = trace1.getMedianObsInTime()
+        plt.plot(g.position.getX(), g.position.getY(), 'r<', markersize=10)
+        plt.show()
+        
+        #self.assertIsInstance(g, Obs)
+        #self.assertLessEqual(abs(g.position.getX() - 0.0), self.__epsilon, "x of MedianObsInTime")
+        #self.assertLessEqual(abs(g.position.getY() - 0.76), self.__epsilon, "y of MedianObsInTime")        
+        
         
 
 if __name__ == '__main__':
@@ -721,7 +755,8 @@ if __name__ == '__main__':
     suite.addTest(TestTrack("test_getCentroid"))
     suite.addTest(TestTrack("test_getFurthestObs"))
     '''
-    suite.addTest(TestTrack("test_getMedianObs"))
+    #suite.addTest(TestTrack("test_getMedianObs"))
+    suite.addTest(TestTrack("test_getMedianObsInTime"))
     
     runner = TextTestRunner()
     runner.run(suite)
