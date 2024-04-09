@@ -383,6 +383,16 @@ class Track:
                 d = o.distanceTo(self.getObs(i))
         return self.getObs(pos)
     
+    def getNearestObs(self, o):
+        ''' '''
+        pos = 0
+        d = o.distanceTo(self.getFirstObs())
+        for i in range(1, self.size()):
+            if o.distanceTo(self.getObs(i)) < d:
+                pos = i
+                d = o.distanceTo(self.getObs(i))
+        return self.getObs(pos)
+    
     def getMedianObs(self):
         '''
         On suppose que les points sont ordonnés chronologiquement

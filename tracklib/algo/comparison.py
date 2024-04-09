@@ -623,7 +623,7 @@ def averagingCoordSet(coordSet, averaging_method=MEDIANE_MARGINALE, constraint=F
     if not constraint:
         return mm
     
-    # On cherche la position réelle proche
+    # On cherche la position réelle la plus proche
     d = sys.float_info.max
     pos = -1
     for i in range(N):

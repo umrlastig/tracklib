@@ -524,7 +524,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         S = compare(trace3, trace4, mode=MODE_COMPARISON_AREAL)
         self.assertEqual(S, 0.0)
         
-    '''
+    
     def testAggregatCluster(self):
         trackC = Track([], 1)
         trackC.addObs(Obs(ENUCoords(0, 0), ObsTime()))
@@ -532,12 +532,14 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         trackC.addObs(Obs(ENUCoords(1, 1), ObsTime()))
         trackC.addObs(Obs(ENUCoords(0, 1), ObsTime()))
         coords = trackC.getCoord()
-
-        d1 = averagingCoordSet(coords, p=1, constraint=False)
+        
+        
+        d1 = averagingCoordSet(coords, constraint=False)
         self.assertEqual(d1.E, 0.5)
         self.assertEqual(d1.N, 0.5)
         self.assertEqual(d1.U, 0.0)
         
+        '''
         d8 = averagingCoordSet(coords, p=1, constraint=True)
         self.assertEqual(d8.E, 0.0)
         self.assertEqual(d8.N, 0.0)
@@ -570,7 +572,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         self.assertEqual(d5.E, 1.0)
         self.assertEqual(d5.N, 1.0)
         self.assertEqual(d4.U, 0.0)
-    '''
+        '''
         
     
 if __name__ == '__main__':
@@ -592,7 +594,7 @@ if __name__ == '__main__':
     
     suite.addTest(TestAlgoComparaisonMethods("testHausdorffSimilarity"))
     suite.addTest(TestAlgoComparaisonMethods("testArealStandardizedBetweenTwoTracks"))
-    #suite.addTest(TestAlgoComparaisonMethods("testAggregatCluster"))
+    suite.addTest(TestAlgoComparaisonMethods("testAggregatCluster"))
     
     runner = unittest.TextTestRunner()
     runner.run(suite)
