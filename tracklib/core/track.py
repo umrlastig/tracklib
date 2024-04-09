@@ -385,7 +385,7 @@ class Track:
     
     def getMedianObs(self):
         '''
-        On suppose que l'ordre des points est chronologiquement croissant
+        On suppose que les points sont ordonnés chronologiquement
         '''
         T = self.getT()
         t1 = co_median(T)

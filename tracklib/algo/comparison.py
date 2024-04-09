@@ -55,9 +55,10 @@ import matplotlib.pyplot as plt
 
 import tracklib as tracklib
 from tracklib.util import dist_point_to_segment, Polygon
-from . import computeAbsCurv, synchronize, HMM, MODE_OBS_AS_2D_POSITIONS, computeRadialSignature
+# computeAbsCurv, MODE_OBS_AS_2D_POSITIONS, HMM
+from . import synchronize, computeRadialSignature
 from tracklib.core import ENUCoords, TrackCollection, priority_dict, Obs, ObsTime
-
+from tracklib.algo import co_median
 
 # ------------------------------------------------------------------------------
 # List of available matching methods
@@ -595,76 +596,43 @@ def plotMatching(matching, track2, af_name="pair", sym="k--", linewidth=.5, NO_D
 
 
 
-def __chebyshev(coordSet):
+
+# ------------------------------------------------------------------------------
+# List of available methods to choose representative point selection
+MEDIANE_MARGINALE   = 301
+
+
+def averagingCoordSet(coordSet, averaging_method=MEDIANE_MARGINALE, constraint=False):
+    '''TODO : 
+        averag_method
+        constraint
+        
+    '''
+    # Calcul de la médiane marginale
     N = len(coordSet)
-    x = -sys.float_info.max
-    y = -sys.float_info.max
-    z = -sys.float_info.max
+    X = []; Y = []; Z = []
     for i in range(N):
-        x = max(x, abs(coordSet[i].E))
-        y = max(y, abs(coordSet[i].N))
-        z = max(z, abs(coordSet[i].U))
-    return ENUCoords(x, y, z)
-
-
-def averagingCoordSet(coordSet, p=2, constraint=False):
-    '''
-    For a set of coordinates, a representative coordinate can be defined 
-    as the center. Center can be computed with the Minkowski distance of all 
-    coordinates.
-    
-    :param float p : Minkowski's exponent for distance computation: 
-        1 for summation of distances, 2 for least squares solution, etc. 
-    :param boolean constraint : if True, then the center be a coordinate 
-        of the set. 
-    :return ENUCoords
-
-    '''
-    
-    N = len(coordSet)
-    
-    # Chebyshev distance
-    if p == math.inf:
-        center = __chebyshev(coordSet)
-        if not constraint:
-            return center
-        else:
-            iMin = -1
-            dMin = sys.float_info.max
-            for i in range(N):
-                d = max(max(abs(coordSet[i].E - center.E), 
-                        abs(coordSet[i].N - center.N)),
-                        abs(coordSet[i].U - center.U))
-                if d < dMin:
-                    dMin = d
-                    iMin = i
-            return coordSet[iMin]
-    
-    # Minkowski distance, p != Infini
-    p = max(min(p, 15), 1e-2)
-    
-    x = coordSet[0].E**p
-    y = coordSet[0].N**p
-    z = coordSet[0].U**p
-    for i in range(1, N):
-        x += coordSet[i].E**p
-        y += coordSet[i].N**p
-        z += coordSet[i].U**p
-    center = ENUCoords((x/N)**(1.0/p), (y/N)**(1.0/p), (z/N)**(1.0/p))
+        X.append(coordSet[i].E)
+        Y.append(coordSet[i].N)
+        Z.append(coordSet[i].U)
+    x = co_median(X)
+    y = co_median(Y)
+    z = co_median(Z)
+    mm = ENUCoords(x, y, z)
     
     if not constraint:
-        return center
-    else:
-        iMin = -1
-        dMin = sys.float_info.max
-        for i in range(N):
-            d = (abs(coordSet[i].E - center.E)**p +  
-                 abs(coordSet[i].N - center.N)**p +
-                 abs(coordSet[i].U - center.U)**p) **1.0/p
-            if d < dMin:
-                dMin = d
-                iMin = i
-        return coordSet[iMin]
+        return mm
+    
+    # On cherche la position réelle proche
+    d = sys.float_info.max
+    pos = -1
+    for i in range(N):
+        if _distance(coordSet[i], mm, 2) < d:
+            pos = i
+            d = _distance(coordSet[i], mm, 2)
+    return coordSet[pos]
+        
+    
     
 
 # ------------------------------------------------------------------------------
@@ -682,7 +650,9 @@ def __fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,
 
     central = tracks[ref].copy()
     
-    ITER_MAX = 99
+    ITER_MAX = 100
+    TAB_CLS = {} # logging
+    TAB_FUSION = {} # logging
     for iteration in range(ITER_MAX):
         if verbose:
             print("ITERATION", iteration)
@@ -716,14 +686,21 @@ def __fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,
                     profile[j, "homologous"] = profile[j, "pair"]
             profiles.addTrack(profile)
             
+        CLS = []
         for j in range(len(central)):
             cluster = []
             for i in range(len(profiles)):
                 cluster.append(profiles[i]["homologous", j])
-            central[j].position = averagingCoordSet(cluster, p=p, constraint=constraint)
+            CLS.append(cluster)
+            # central[j].position = averagingCoordSet(cluster, p=p, constraint=constraint)
+            central[j].position = averagingCoordSet(cluster, constraint=constraint)
+        TAB_CLS[iteration] = CLS
         
         profile = match(central, central_before, mode=mode, p=p, dim=dim, 
                         verbose=verbose, plot=plot)
+        TAB_FUSION[iteration] = profile
+        # central.plot('c--', append=True, pointsize=1.0)
+        
         if verbose:
             print("CV = ", profile.score)
         if (profile.score < 1e-16):
@@ -734,6 +711,9 @@ def __fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,
     
     central.score = profile.score
     central.iteration = iteration
+    central.fusions = TAB_FUSION
+    central.clusters = TAB_CLS
+    
     return central
 
 
