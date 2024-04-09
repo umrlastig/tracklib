@@ -56,7 +56,7 @@ import matplotlib.pyplot as plt
 import tracklib as tracklib
 from tracklib.util import dist_point_to_segment, Polygon
 from . import computeAbsCurv, synchronize, HMM, MODE_OBS_AS_2D_POSITIONS, computeRadialSignature
-from tracklib.core import ENUCoords, TrackCollection, priority_dict
+from tracklib.core import ENUCoords, TrackCollection, priority_dict, Obs, ObsTime
 
 
 # ------------------------------------------------------------------------------
@@ -670,7 +670,7 @@ def averagingCoordSet(coordSet, p=2, constraint=False):
 # ------------------------------------------------------------------------------
 # List of available methods to choose representative point selection
 MODE_BARYCENTRE   = 201
-MODE_MEDIAN_TIME  = 202
+MODE_MEDIAN       = 202
 MODE_FURTHEST_OBS = 203
 
 # ------------------------------------------------------------------------
@@ -682,7 +682,7 @@ def __fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,
 
     central = tracks[ref].copy()
     
-    ITER_MAX = 100
+    ITER_MAX = 99
     for iteration in range(ITER_MAX):
         if verbose:
             print("ITERATION", iteration)
@@ -703,7 +703,13 @@ def __fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,
                     Pi = tracklib.Track()
                     for ind in PAIRS:
                         Pi.addObs(tracks[i].getObs(ind))
-                    profile[j, "homologous"] = Pi.getCentroid()
+                    if represent_method == MODE_BARYCENTRE:
+                        profile[j, "homologous"] = Pi.getCentroid()
+                    elif represent_method == MODE_MEDIAN:
+                        profile[j, "homologous"] = Pi.getMedianObs().position
+                    elif represent_method == MODE_FURTHEST_OBS:
+                        o = central.getObs(j)
+                        profile[j, "homologous"] = Pi.getFurthestObs(o).position
                 else:
                     profile[j, "homologous"] = profile[j, "pair"]
             profiles.addTrack(profile)
@@ -720,7 +726,7 @@ def __fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,
             print("CV = ", profile.score)
         if (profile.score < 1e-16):
             break
-            
+        
     if verbose:
         print("END OF COMPUTATION")
                 

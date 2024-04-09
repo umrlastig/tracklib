@@ -122,7 +122,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         r13 = Obs(d13, ObsTime.readTimestamp("2018-01-01 10:00:55"))
         self.trace2.addObs(r13)
         
-        self.plot()
+        #self.plot()
         
         
     def plot(self):
@@ -350,6 +350,34 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
             m2 = match(track1, track2, MODE_MATCHING_FDTW, p=prand, verbose=False)
             # print(i, "[p = "+str(prand)+"]", m1.score == m2.score)
             self.assertTrue(m1.score == m2.score)
+            
+    def testDTWDim1L2(self):
+        
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+
+        chemin1 = os.path.join(self.resource_path, 'test/data/compare/dtw3.csv')
+        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+
+        chemin2 = os.path.join(self.resource_path, 'test/data/compare/dtw4.csv')
+        trace2 = TrackReader.readFromCsv(chemin2, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+
+        trace1.plot('m-')
+        trace1.plotAsMarkers(type=MARKERS_TYPE_WARNING)
+        trace2.plot('c-')
+        trace2.plotAsMarkers(bkg='w', frg='c', sym_frg = " ", sym_bkg = "v")
+        
+        profile = match(trace1, trace2, mode=MODE_MATCHING_DTW, 
+                        p=2, dim=1, verbose=False, plot=False)
+        plotMatching(profile, trace2)
+        
+        d = match(trace1, trace2, mode=MODE_MATCHING_DTW, 
+                        p=2, dim=1, verbose=False, plot=False)
+        print (d)
+        print (profile.score)
+        
+        plt.xlim([0, 7.5])
+        plt.ylim([-0.5, 2.5])
+        plt.show()
 
     def testMatchFrechet(self):
         chemin1 = os.path.join(self.resource_path, 'test/data/compare/dtw1.csv')
@@ -553,6 +581,8 @@ if __name__ == '__main__':
     suite.addTest(TestAlgoComparaisonMethods("testMatchFDTWL2"))
     suite.addTest(TestAlgoComparaisonMethods("testMatchFrechet"))
     suite.addTest(TestAlgoComparaisonMethods("testTestEqualFDTWandDTW"))
+    suite.addTest(TestAlgoComparaisonMethods("testDTWDim1L2"))
+    
     suite.addTest(TestAlgoComparaisonMethods("testCompareWithAreal"))
     suite.addTest(TestAlgoComparaisonMethods("testCompareDTW"))
     suite.addTest(TestAlgoComparaisonMethods("testCompareFrechet"))
