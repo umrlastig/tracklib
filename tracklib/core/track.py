@@ -52,7 +52,7 @@ import math
 import copy
 import numpy as np
 
-from . import (ObsTime, ENUCoords, Obs, 
+from . import (ObsTime, ENUCoords, GeoCoords, Obs, 
                isnan, listify, NAN, isfloat,
                compLike, makeRPN,
                TrackCollection,
@@ -69,7 +69,8 @@ from tracklib.algo import (BIAF_SPEED, BIAF_ABS_CURV,
                            estimate_speed,
                            smoothed_speed_calculation,
                            match,
-                           MODE_TEMPORAL)
+                           MODE_TEMPORAL,
+                           co_median)
 
 from . import (UnaryOperator, BinaryOperator, 
                ScalarOperator, ScalarVoidOperator, 
@@ -382,10 +383,33 @@ class Track:
                 d = o.distanceTo(self.getObs(i))
         return self.getObs(pos)
     
-    def getMedianObsInTime(self):
+    def getMedianObs(self):
+        '''
+        On suppose que l'ordre des points est chronologiquement croissant
+        '''
         T = self.getT()
-        r = self.operate(Operator.MEDIAN, "t")
-        return self.getObs(T.index(r))
+        t1 = co_median(T)
+        if t1 in T:
+            return self.getObs(T.index(t1))
+        else:
+            imin = 0
+            imax = -1
+            for i in range(0, self.size()):
+                ti = T[i]
+                if ti < t1:
+                    imin = i
+                elif imax == -1:
+                    imax = i
+            pmin = self.getObs(imin).position
+            pmax = self.getObs(imax).position
+            E = (pmax.getX() + pmin.getX())/2
+            N = (pmax.getY() + pmin.getY())/2
+            U = (pmax.getZ() + pmin.getZ())/2
+            if self.getSRID() == "Geo":
+                point = Obs(GeoCoords(E, N, U), t1)
+            if self.getSRID() == "ENU":
+                point = Obs(ENUCoords(E, N, U), t1)
+            return point
 
     def getEnclosedPolygon(self):
         """TODO"""
