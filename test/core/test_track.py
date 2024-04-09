@@ -8,7 +8,7 @@ from tracklib import (ENUCoords, ObsTime, Obs, Track,
                       Polygon, TrackCollection,
                       computeAbsCurv,
                       ds, speed, heading,
-                      TrackReader, co_median, sample)
+                      TrackReader)
 
 
 class TestTrack(TestCase):
