@@ -392,18 +392,22 @@ class MatplotlibVisitor(IPlotVisitor):
         ymax = ymax + dy * margin
         
         if af_name != None and af_name != "":
-            
             if track.isAFTransition(af_name):
                 tabmarqueurs = track.getAnalyticalFeature(af_name)
-                xaf = []
-                yaf = []
+                xaf = []; xnaf = []
+                yaf = []; ynaf = []
                 for i in range(len(tabmarqueurs)):
                     val = tabmarqueurs[i]
                     if val == 1:
                         xaf.append(track.getObs(i).position.getX())
                         yaf.append(track.getObs(i).position.getY())
-
+                    else:
+                        xnaf.append(track.getObs(i).position.getX())
+                        ynaf.append(track.getObs(i).position.getY())
+                        
                 ax1.plot(xaf, yaf, "o", color=color, markersize=size,
+                    label=af_name )
+                ax1.plot(xnaf, ynaf, "o", color='darkgray', markersize=size,
                     label=af_name )
                 #tabplot.append(l)
                 #tablegend.append(af_name)
