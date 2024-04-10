@@ -678,7 +678,7 @@ def __fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,
                     if represent_method == MODE_BARYCENTRE:
                         profile[j, "homologous"] = Pi.getCentroid()
                     elif represent_method == MODE_MEDIAN_TIME:
-                        profile[j, "homologous"] = Pi.getMedianObs().position
+                        profile[j, "homologous"] = Pi.getMedianObsInTime().position
                     elif represent_method == MODE_FURTHEST_OBS:
                         o = central.getObs(j)
                         profile[j, "homologous"] = Pi.getFurthestObs(o).position
