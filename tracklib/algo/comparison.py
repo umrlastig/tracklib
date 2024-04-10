@@ -638,7 +638,7 @@ def averagingCoordSet(coordSet, averaging_method=MEDIANE_MARGINALE, constraint=F
 # ------------------------------------------------------------------------------
 # List of available methods to choose representative point selection
 MODE_BARYCENTRE   = 201
-MODE_MEDIAN       = 202
+MODE_MEDIAN_TIME  = 202
 MODE_FURTHEST_OBS = 203
 
 # ------------------------------------------------------------------------
@@ -677,7 +677,7 @@ def __fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,
                     
                     if represent_method == MODE_BARYCENTRE:
                         profile[j, "homologous"] = Pi.getCentroid()
-                    elif represent_method == MODE_MEDIAN:
+                    elif represent_method == MODE_MEDIAN_TIME:
                         profile[j, "homologous"] = Pi.getMedianObs().position
                     elif represent_method == MODE_FURTHEST_OBS:
                         o = central.getObs(j)
