@@ -54,12 +54,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import tracklib as tracklib
-from tracklib.util import dist_point_to_segment, Polygon
-# computeAbsCurv, MODE_OBS_AS_2D_POSITIONS, HMM
+from tracklib.util import dist_point_to_segment, Polygon, centerOfPoints
 from . import synchronize, computeRadialSignature
 from tracklib.core import (ENUCoords, TrackCollection, 
                            Obs, ObsTime,
                            priority_dict, co_median)
+
 
 # ------------------------------------------------------------------------------
 # List of available matching methods
@@ -93,6 +93,21 @@ MODE_COMPARISON_FRECHET   = 108 # Distance between Frechet pairs        [m][s]
 MODE_COMPARISON_SYNC      = 109 # Time-synchronized comparison       [p][m][s]
 # ------------------------------------------------------------------------------
 
+
+# ------------------------------------------------------------------------
+# Parameters for fusion algorithm
+# ------------------------------------------------------------------------
+# List of available methods to choose representative point selection
+MODE_BARYCENTRE   = 201      # Average of coordinates
+MODE_MEDIAN_TIME  = 202      # Position at median time of observations
+MODE_FURTHEST_OBS = 203      # Furthest point from master track 
+# ------------------------------------------------------------------------
+# List of available methods to choose representative point selection
+MODE_MEDIAN = 300            # Component-wise median of coordinates
+MODE_L1     = 301            # Geometric median of points
+MODE_L2     = 302            # Standard barycenter of points
+MODE_LInf   = 303            # Center of minimum enclosing circle
+# ------------------------------------------------------------------------
 
 
 # ------------------------------------------------------------------------------
@@ -624,30 +639,25 @@ def averagingCoordSet(coordSet, averaging_method=MEDIANE_MARGINALE, constraint=F
     if not constraint:
         return mm
     
-    # On cherche la position réelle la plus proche
-    d = sys.float_info.max
-    pos = -1
+
+# ------------------------------------------------------------------------
+# Auxiliary function to map center of cluster on existing point
+# ------------------------------------------------------------------------
+def _constrain_center(position, cluster):
+    d = sys.float_info.max; pos = -1
     for i in range(N):
-        if _distance(coordSet[i], mm, 2) < d:
+        if _distance(cluster[i], position, 2) < d:
             pos = i
-            d = _distance(coordSet[i], mm, 2)
-    return coordSet[pos]
-        
-    
-    
+            d = _distance(cluster[i], position, 2)
+    return cluster[pos].copy()
 
-# ------------------------------------------------------------------------------
-# List of available methods to choose representative point selection
-MODE_BARYCENTRE   = 201
-MODE_MEDIAN_TIME  = 202
-MODE_FURTHEST_OBS = 203
 
-# --------------------------------s----------------------------------------
+# ------------------------------------------------------------------------
 # Algorithme fusion L. Etienne : trajectoire médiane
 # ------------------------------------------------------------------------
 def __fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,
-             represent_method=MODE_BARYCENTRE, constraint=False, 
-             verbose=True, plot=True):
+             represent_method=MODE_BARYCENTRE, agg_method=MODE_L2, 
+             constraint=False, verbose=True, plot=False):
 
     central = tracks[ref].copy()
     
@@ -694,7 +704,10 @@ def __fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,
                 cluster.append(profiles[i]["homologous", j])
             CLS.append(cluster)
             # central[j].position = averagingCoordSet(cluster, p=p, constraint=constraint)
-            central[j].position = averagingCoordSet(cluster, constraint=constraint)
+            # central[j].position = averagingCoordSet(cluster, constraint=constraint)
+            central[j].position =  centerOfPoints(cluster, mode=agg_method)
+            if constraint:
+                central[j].position = _constrain_center(central[j].position)
         TAB_CLS[iteration] = CLS
         
         profile = match(central, central_before, mode=mode, p=p, dim=dim, 
@@ -722,27 +735,24 @@ def __fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,
 # ------------------------------------------------------------------------
 # Algorithme récursif fusion L. Etienne : trajectoire médiane
 # ------------------------------------------------------------------------ 
-
-
-# ------------------------------------------------------------------------------
 def fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,  
-           represent_method=MODE_BARYCENTRE, constraint=False,
-           recursive=1e300, verbose=True, plot=True):
+           represent_method=MODE_BARYCENTRE, agg_method=MODE_L2, constraint=False,
+           recursive=1e300, verbose=True, plot=False):
     
     N = len(tracks)
     if N <= recursive:
         return __fusion(tracks, mode=mode, ref=ref, p=p, dim=dim, 
                         represent_method=represent_method, constraint=constraint,
                         verbose=verbose, plot=plot)
-#    else:
-#       Npg = int(N/recursive)
-#       subtracks = TrackCollection()
-#       for i in range(recursive):
-#           ini = Npg*i
-#           fin = Npg*(i+1)
-#           if i == (recursive-1):
-#               fin = len(tracks)
-#           subtracks.addTrack(fusion(tracks[ini:fin], weight=weight, ref=ref, p=p, constraint=constraint, recursive=recursive, verbose=verbose))
-#       return fusion(subtracks, weight=weight, ref=ref, p=p, constraint=constraint, recursive=recursive, verbose=verbose)
-#
-#
+    else:
+       Npg = int(N/recursive)
+       subtracks = TrackCollection()
+       for i in range(recursive):
+           ini = Npg*i
+           fin = Npg*(i+1)
+           if i == (recursive-1):
+               fin = len(tracks)
+           subtracks.addTrack(fusion(tracks[ini:fin], weight=weight, ref=ref, p=p, constraint=constraint, agg_method=agg_method, recursive=recursive, verbose=verbose))
+       return fusion(subtracks, weight=weight, ref=ref, p=p, constraint=constraint, agg_method=agg_method, recursive=recursive, verbose=verbose)
+
+

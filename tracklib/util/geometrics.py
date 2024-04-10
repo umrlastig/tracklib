@@ -989,10 +989,10 @@ def geometricMedian(points, N_ITER_MAX = 100, epsilon_factor = 1e-10):
 # ------------------------------------------------------------
 # Generic function to get center of a set of points
 # ------------------------------------------------------------
-MODE_MEDIAN = 0    # Component-wise median of coordinates
-MODE_L1     = 1    # Geometric median of points
-MODE_L2     = 2    # Standard barycenter of points
-MODE_LInf   = 3    # Center of minimum enclosing circle
+MODE_MEDIAN = 300    # Component-wise median of coordinates
+MODE_L1     = 301    # Geometric median of points
+MODE_L2     = 302    # Standard barycenter of points
+MODE_LInf   = 303    # Center of minimum enclosing circle
 # ------------------------------------------------------------
 # MODE_MEDIAN and MODE_L2 are computed in 3D. MODE_L1 and 
 # MODE_L2 are computed in 2D. MODE_Lp is the "generalized 
