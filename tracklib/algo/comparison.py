@@ -57,8 +57,9 @@ import tracklib as tracklib
 from tracklib.util import dist_point_to_segment, Polygon
 # computeAbsCurv, MODE_OBS_AS_2D_POSITIONS, HMM
 from . import synchronize, computeRadialSignature
-from tracklib.core import ENUCoords, TrackCollection, priority_dict, Obs, ObsTime
-from tracklib.algo import co_median
+from tracklib.core import (ENUCoords, TrackCollection, 
+                           Obs, ObsTime,
+                           priority_dict, co_median)
 
 # ------------------------------------------------------------------------------
 # List of available matching methods
