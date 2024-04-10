@@ -397,6 +397,7 @@ class Track:
     def getMedianObs(self):
         ''' '''
         # TODO: Test if timestamp exists
+        self.sort()
         T = self.getT()
         t1 = co_median(T)
         s = sample(self, ObsTime.readUnixTime(t1))
@@ -405,6 +406,7 @@ class Track:
     def getMedianObsInTime(self):
         ''' '''
         # TODO: Test if timestamp exists
+        self.sort()
         med = (self.getLastObs().timestamp - self.getFirstObs().timestamp) / 2
         tm = self.getFirstObs().timestamp.addSec(med)
         s = sample(self, tm)

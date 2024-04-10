@@ -6,7 +6,7 @@ from unittest import TestCase, TestSuite, TextTestRunner
 
 from tracklib import (ENUCoords, ObsTime, Obs, Track, 
                       Polygon, TrackCollection,
-                      computeAbsCurv,
+                      computeAbsCurv, sample,
                       ds, speed, heading,
                       TrackReader)
 
@@ -714,18 +714,30 @@ class TestTrack(TestCase):
         self.assertLessEqual(abs(g.position.getX() + 0.82), self.__epsilon, "x of MedianObsInTime")
         self.assertLessEqual(abs(g.position.getY() - 0.54), self.__epsilon, "y of MedianObsInTime")        
         
-        
         # ======================================================================
         # Cas 3
         # 
-        #[1562943669.0, 1562943641.0]
-        #2
-        #0
+        t = Track([], 1)
+        c = ENUCoords(989416.725, 6478926.327, 1902.727)
+        p1 = Obs(c, ObsTime.readTimestamp("2019-07-12 15:00:41"))
+        c = ENUCoords(989399.273, 6478905.608, 1905.992)
+        p2 = Obs(c, ObsTime.readTimestamp("2019-07-12 15:01:09"))
+        
+        t.addObs(p1)
+        t.addObs(p2)
+        t.sort()
+        
+        tm = ObsTime.readTimestamp("2019-07-12 15:00:55")
+        s = sample(t, tm)
+        self.assertLessEqual(abs(s.position.getX() - 989407.999), self.__epsilon)
+        self.assertLessEqual(abs(s.position.getY() - 6478915.967), self.__epsilon)
+        self.assertLessEqual(abs(s.position.getZ() - 1904.360), self.__epsilon)
+        self.assertEqual(str(s.timestamp).strip()[0:19], "12/07/2019 15:00:55")
         
 
 if __name__ == '__main__':
     suite = TestSuite()
-    
+
     suite.addTest(TestTrack("test_str"))
     suite.addTest(TestTrack("test_timezone"))
     suite.addTest(TestTrack("test_interval"))
