@@ -612,34 +612,6 @@ def plotMatching(matching, track2, af_name="pair", sym="k--", linewidth=.5, NO_D
 
 
 
-
-# ------------------------------------------------------------------------------
-# List of available methods to choose representative point selection
-MEDIANE_MARGINALE   = 301
-
-
-def averagingCoordSet(coordSet, averaging_method=MEDIANE_MARGINALE, constraint=False):
-    '''TODO : 
-        averag_method
-        constraint
-        
-    '''
-    # Calcul de la médiane marginale
-    N = len(coordSet)
-    X = []; Y = []; Z = []
-    for i in range(N):
-        X.append(coordSet[i].E)
-        Y.append(coordSet[i].N)
-        Z.append(coordSet[i].U)
-    x = co_median(X)
-    y = co_median(Y)
-    z = co_median(Z)
-    mm = ENUCoords(x, y, z)
-    
-    if not constraint:
-        return mm
-    
-
 # ------------------------------------------------------------------------
 # Auxiliary function to map center of cluster on existing point
 # ------------------------------------------------------------------------
@@ -703,8 +675,6 @@ def __fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,
             for i in range(len(profiles)):
                 cluster.append(profiles[i]["homologous", j])
             CLS.append(cluster)
-            # central[j].position = averagingCoordSet(cluster, p=p, constraint=constraint)
-            # central[j].position = averagingCoordSet(cluster, constraint=constraint)
             central[j].position =  centerOfPoints(cluster, mode=agg_method)
             if constraint:
                 central[j].position = _constrain_center(central[j].position)
