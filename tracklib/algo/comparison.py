@@ -641,7 +641,7 @@ MODE_BARYCENTRE   = 201
 MODE_MEDIAN_TIME  = 202
 MODE_FURTHEST_OBS = 203
 
-# ------------------------------------------------------------------------
+# --------------------------------s----------------------------------------
 # Algorithme fusion L. Etienne : trajectoire médiane
 # ------------------------------------------------------------------------
 def __fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,

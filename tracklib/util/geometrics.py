@@ -620,7 +620,6 @@ def __circle(p1, p2=None, p3=None):
     Finds circle through 1, 2 or 3 points
     Returns Circle(C, R)
     """
-
     if not isinstance(p1, ENUCoords):
         print("Error: ENU coordinates are required for min circle computation")
         exit()
@@ -630,6 +629,7 @@ def __circle(p1, p2=None, p3=None):
         centre = p1 + p2
         centre.scale(0.5)
         return Circle(centre, p1.distance2DTo(p2) / 2)
+        
     if collinear(
         [p1.getX(), p1.getY()], [p2.getX(), p2.getY()], [p3.getX(), p3.getY()]
     ):
@@ -687,7 +687,7 @@ def __welzl(C):
     """
     Finds minimal bounding circle with Welzl's algorithm
     """
-    
+
     P = C.center
     P = P.copy()
     R = C.radius
@@ -704,7 +704,6 @@ def __welzl(C):
         return __circle(R[0], R[1], R[2])
     
     id = random.randint(0, len(P) - 1)
-
     p = P[id]
     P2 = []
     for i in range(len(P)):
@@ -719,7 +718,8 @@ def __welzl(C):
     elif p.distance2DTo(D.center) < D.radius:
         return D
     else:
-        R.append(p)
+        if not p in R:
+            R.append(p)
         return __welzl(Circle(P, R))
 
 
@@ -1036,7 +1036,7 @@ def centerOfPoints(coordSet, mode=MODE_L2):
         return ENUCoords(x/N, y/N, z/N)
     
     # ----------------------------------------------
-    # LInf (Radius of enclosing circle)
+    # LInf (Radius of enclosing circle) -> 
     # ----------------------------------------------
     if mode == MODE_LInf:
         return minCircleOfPoints(coordSet).center
