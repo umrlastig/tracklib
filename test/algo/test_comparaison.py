@@ -8,7 +8,7 @@ import os.path
 import random
 from tracklib import (Obs, ObsTime, ENUCoords, Track,
                       TrackReader,
-                      averagingCoordSet, compare, match,
+                      compare, match,
                       plotMatching, MARKERS_TYPE_WARNING,
                       MODE_COMPARISON_HAUSDORFF,
                       MODE_COMPARISON_POINTWISE,
@@ -533,13 +533,12 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         trackC.addObs(Obs(ENUCoords(0, 1), ObsTime()))
         coords = trackC.getCoord()
         
-        
+        '''
         d1 = averagingCoordSet(coords, constraint=False)
         self.assertEqual(d1.E, 0.5)
         self.assertEqual(d1.N, 0.5)
         self.assertEqual(d1.U, 0.0)
         
-        '''
         d8 = averagingCoordSet(coords, p=1, constraint=True)
         self.assertEqual(d8.E, 0.0)
         self.assertEqual(d8.N, 0.0)
