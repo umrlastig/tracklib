@@ -57,8 +57,9 @@ import tracklib as tracklib
 from tracklib.util import dist_point_to_segment, Polygon
 # computeAbsCurv, MODE_OBS_AS_2D_POSITIONS, HMM
 from . import synchronize, computeRadialSignature
-from tracklib.core import ENUCoords, TrackCollection, priority_dict, Obs, ObsTime
-from tracklib.algo import co_median
+from tracklib.core import (ENUCoords, TrackCollection, 
+                           Obs, ObsTime,
+                           priority_dict, co_median)
 
 # ------------------------------------------------------------------------------
 # List of available matching methods
@@ -678,7 +679,7 @@ def __fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,
                     if represent_method == MODE_BARYCENTRE:
                         profile[j, "homologous"] = Pi.getCentroid()
                     elif represent_method == MODE_MEDIAN_TIME:
-                        profile[j, "homologous"] = Pi.getMedianObs().position
+                        profile[j, "homologous"] = Pi.getMedianObsInTime().position
                     elif represent_method == MODE_FURTHEST_OBS:
                         o = central.getObs(j)
                         profile[j, "homologous"] = Pi.getFurthestObs(o).position

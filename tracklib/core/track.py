@@ -57,7 +57,8 @@ from . import (ObsTime, ENUCoords, GeoCoords, Obs,
                compLike, makeRPN,
                TrackCollection,
                DiracKernel, GaussianKernel,
-               Bbox)
+               Bbox,
+               co_median)
 from tracklib.util import intersection, Polygon
 from tracklib.plot import IPlotVisitor, MatplotlibVisitor
 from tracklib.algo import (BIAF_SPEED, BIAF_ABS_CURV, 
@@ -70,7 +71,7 @@ from tracklib.algo import (BIAF_SPEED, BIAF_ABS_CURV,
                            smoothed_speed_calculation,
                            match,
                            MODE_TEMPORAL,
-                           co_median, sample)
+                           sample)
 
 from . import (UnaryOperator, BinaryOperator, 
                ScalarOperator, ScalarVoidOperator, 

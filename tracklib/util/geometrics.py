@@ -53,7 +53,7 @@ import random
 import sys
 
 import tracklib as tracklib
-from tracklib.core import ENUCoords
+from tracklib.core import ENUCoords, co_median
 from . import (right, inclusion, collinear, isSegmentIntersects,
                       transform, transform_inverse)
 

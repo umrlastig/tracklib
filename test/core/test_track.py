@@ -715,10 +715,17 @@ class TestTrack(TestCase):
         self.assertLessEqual(abs(g.position.getY() - 0.54), self.__epsilon, "y of MedianObsInTime")        
         
         
+        # ======================================================================
+        # Cas 3
+        # 
+        #[1562943669.0, 1562943641.0]
+        #2
+        #0
+        
 
 if __name__ == '__main__':
     suite = TestSuite()
-
+    
     suite.addTest(TestTrack("test_str"))
     suite.addTest(TestTrack("test_timezone"))
     suite.addTest(TestTrack("test_interval"))
