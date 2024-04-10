@@ -409,17 +409,17 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         ax = 10*random.random(); bx = 10*random.random()
         ay = 10*random.random(); by = 10*random.random()
         for i in range(N):
-            coord = tkl.ENUCoords(ax + (bx-ax)*random.random(), ay + (by-ay)*random.random(),0)
+            coord = ENUCoords(ax + (bx-ax)*random.random(), ay + (by-ay)*random.random(),0)
             points.append(coord)
             
-        g_median = tkl.geometricMedian(points, N_ITER_MAX = 100, epsilon_factor = 1e-10)
+        g_median = geometricMedian(points, N_ITER_MAX = 100, epsilon_factor = 1e-10)
         
-        u = tkl.ENUCoords(0,0)
+        u = ENUCoords(0,0)
         for p in points:
         	n = (p-g_median).norm2D()
-        	u = u + tkl.ENUCoords((p-g_median).E/n, (p-g_median).N/n)
+        	u = u + ENUCoords((p-g_median).E/n, (p-g_median).N/n)
  
-        self.assertLessEqual(u.norm2D()), 1e-6, "l")
+        self.assertLessEqual(u.norm2D(), 1e-6, "l")
 
         
     def testcenterOfPoints(self):
