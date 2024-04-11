@@ -670,7 +670,7 @@ def __fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,
             for i in range(len(profiles)):
                 cluster.append(profiles[i]["homologous", j])
             CLS.append(cluster)
-            central[j].position =  centerOfPoints(cluster, mode=agg_method)
+            central[j].position = centerOfPoints(cluster, mode=agg_method)
             if constraint:
                 central[j].position = _constrain_center(cluster, central[j].position)
         TAB_CLS[iteration] = CLS
@@ -706,7 +706,9 @@ def fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,
     N = len(tracks)
     if N <= recursive:
         return __fusion(tracks, mode=mode, ref=ref, p=p, dim=dim, 
-                        represent_method=represent_method, constraint=constraint,
+                        represent_method=represent_method, 
+                        agg_method=agg_method,
+                        constraint=constraint,
                         verbose=verbose, plot=plot)
     else:
        Npg = int(N/recursive)
