@@ -53,7 +53,7 @@ import random
 import sys
 
 import tracklib as tracklib
-from tracklib.core import ENUCoords, co_median
+from tracklib.core import ENUCoords, co_median, co_avg
 from . import (right, inclusion, collinear, isSegmentIntersects,
                       transform, transform_inverse)
 
@@ -1028,12 +1028,16 @@ def centerOfPoints(coordSet, mode=MODE_L2):
     # ----------------------------------------------
     if mode == MODE_L2:
         N = len(coordSet)
-        x = 0; y = 0; z = 0
+        X = []; Y = []; Z = []
         for i in range(N):
-            x += coordSet[i].E
-            y += coordSet[i].N
-            z += coordSet[i].U
-        return ENUCoords(x/N, y/N, z/N)
+            X.append(coordSet[i].E)
+            Y.append(coordSet[i].N)
+            Z.append(coordSet[i].U)
+        x = co_avg(X)
+        y = co_avg(Y)
+        z = co_avg(Z)
+        return ENUCoords(x, y, z)
+        
     
     # ----------------------------------------------
     # LInf (Radius of enclosing circle) -> 
