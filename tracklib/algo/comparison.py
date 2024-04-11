@@ -54,7 +54,7 @@ import tracklib as tracklib
 from tracklib.util import dist_point_to_segment, Polygon, centerOfPoints
 from . import synchronize, computeRadialSignature
 from tracklib.core import (ENUCoords, TrackCollection, 
-                           priority_dict)
+                           priority_dict, co_median)
 
 # ------------------------------------------------------------------------------
 # List of available matching methods
@@ -699,9 +699,25 @@ def __fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,
 # ------------------------------------------------------------------------
 # Algorithme récursif fusion L. Etienne : trajectoire médiane
 # ------------------------------------------------------------------------ 
-def fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,  
+def fusion(tracks, mode=MODE_MATCHING_DTW, ref=-1, p=2, dim=2,  
            represent_method=MODE_BARYCENTRE, agg_method=MODE_L2, constraint=False,
            recursive=1e300, verbose=True, plot=False):
+    
+    if ref == -1:
+        # Sélection de la trajectoire initiale de référence
+        L = tracks.getLenth()
+        m = co_median(L)
+        # print ('longueur mediane = ', m)
+        # On cherche l'index de la trace dont la longueur est la plus proche
+        # de la valeur médiane des longueurs de la collection des traces
+        imed = 0
+        dmed = abs(tracks.getTrack(0).length() - m)
+        for k in range(1, tracks.size()):
+            t = tracks.getTrack(k)
+            d = abs(t.length() - m)
+            if d < dmed:
+                imed = k
+        ref = imed
     
     N = len(tracks)
     if N <= recursive:
