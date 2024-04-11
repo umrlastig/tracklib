@@ -610,7 +610,7 @@ def plotMatching(matching, track2, af_name="pair", sym="k--", linewidth=.5, NO_D
 # ------------------------------------------------------------------------
 # Auxiliary function to map center of cluster on existing point
 # ------------------------------------------------------------------------
-def _constrain_center(position, cluster):
+def _constrain_center(cluster, position):
     d = sys.float_info.max; pos = -1
     for i in range(len(cluster)):
         if _distance(cluster[i], position, 2) < d:
@@ -672,7 +672,7 @@ def __fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,
             CLS.append(cluster)
             central[j].position =  centerOfPoints(cluster, mode=agg_method)
             if constraint:
-                central[j].position = _constrain_center(central[j].position)
+                central[j].position = _constrain_center(cluster, central[j].position)
         TAB_CLS[iteration] = CLS
         
         profile = match(central, central_before, mode=mode, p=p, dim=dim, 
