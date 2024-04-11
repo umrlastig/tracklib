@@ -45,21 +45,16 @@ to manage:
 
 """
 
-
-import sys
-import math
-from typing import Literal
-import progressbar
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import progressbar
+import sys
 
 import tracklib as tracklib
 from tracklib.util import dist_point_to_segment, Polygon, centerOfPoints
 from . import synchronize, computeRadialSignature
 from tracklib.core import (ENUCoords, TrackCollection, 
-                           Obs, ObsTime,
-                           priority_dict, co_median)
-
+                           priority_dict)
 
 # ------------------------------------------------------------------------------
 # List of available matching methods
@@ -617,7 +612,7 @@ def plotMatching(matching, track2, af_name="pair", sym="k--", linewidth=.5, NO_D
 # ------------------------------------------------------------------------
 def _constrain_center(position, cluster):
     d = sys.float_info.max; pos = -1
-    for i in range(N):
+    for i in range(len(cluster)):
         if _distance(cluster[i], position, 2) < d:
             pos = i
             d = _distance(cluster[i], position, 2)
@@ -701,7 +696,6 @@ def __fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,
     return central
 
 
-    
 # ------------------------------------------------------------------------
 # Algorithme récursif fusion L. Etienne : trajectoire médiane
 # ------------------------------------------------------------------------ 
@@ -722,7 +716,7 @@ def fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,
            fin = Npg*(i+1)
            if i == (recursive-1):
                fin = len(tracks)
-           subtracks.addTrack(fusion(tracks[ini:fin], weight=weight, ref=ref, p=p, constraint=constraint, agg_method=agg_method, recursive=recursive, verbose=verbose))
-       return fusion(subtracks, weight=weight, ref=ref, p=p, constraint=constraint, agg_method=agg_method, recursive=recursive, verbose=verbose)
+           subtracks.addTrack(fusion(tracks[ini:fin], mode=mode, ref=ref, p=p, dim=dim, represent_method=represent_method, constraint=constraint, agg_method=agg_method, recursive=recursive, verbose=verbose, plot=plot))
+       return fusion(subtracks, mode=mode, ref=ref, p=p, dim=dim, represent_method=represent_method, constraint=constraint, agg_method=agg_method, recursive=recursive, verbose=verbose, plot=plot)
 
 
