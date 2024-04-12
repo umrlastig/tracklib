@@ -713,6 +713,7 @@ def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constrai
     
     central.clusters    = []       # logging
     central.iterations  = []       # logging
+    central.convergence = []       # logging
 
     for iteration in range(iter_max):
 
@@ -725,13 +726,13 @@ def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constrai
         _fusion_iteration(central, tracks, mode, p, dim, represent_method, agg_method, constraint, verbose)
 
         evolution = compare(central, central_before, mode=MODE_COMPARISON_POINTWISE, p=1)
+        central.convergence.append(evolution)
         
         if verbose:
             print("CV = ", evolution)
         if (evolution < 1e-16):
             break
-        
-    central.convergence = evolution  
+         
     
     if (iteration == iter_max-1):
         print("WARNING: TRAJECTORY FUSION HAS NOT CONVERGED (NITER = " + str(iter_max) + " - CV = " + str(central.convergence) + ")")    
