@@ -434,7 +434,7 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         ctrls.append(ENUCoords(0.9375135062720457, 0.8637580443006666, 0.0))
         ctrls.append(ENUCoords(2.5469297933871173, 2.5141737382610030, 0.0))
     
-        MODES = [MODE_L1, MODE_L2, MODE_LInf]
+        MODES = [MODE_AGG_L1, MODE_AGG_L2, MODE_AGG_LInf]
         for i in range(len(MODES)):
             center = centerOfPoints(points, mode=MODES[i])
             self.assertLessEqual((center-ctrls[i]).norm(), 1e-9, "")
