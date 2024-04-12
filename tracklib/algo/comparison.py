@@ -46,6 +46,7 @@ to manage:
 """
 import sys
 import random
+import datetime
 import numpy as np
 import progressbar
 import matplotlib.pyplot as plt
@@ -451,7 +452,7 @@ def _fdtw(track1, track2, weight = lambda A, B : A + B, dim=2, verbose = True, p
         node = F.pop_smallest(); i = node[0]; j = node[1]; 
         if verbose:
             counter = max(i, counter); 
-            bar.update(counter)
+            #bar.update(counter)
         V[node] = 1
         if ((i == N2-1) and (j == N1-1)):
             break
@@ -613,34 +614,8 @@ def plotMatching(matching, track2, af_name="pair", sym="k--", linewidth=.5, NO_D
             plt.plot([x1, x2], [y1, y2], sym, linewidth=linewidth)
 
 
-
 # ------------------------------------------------------------------------
-# Auxiliary function to map center of cluster on existing point
-# ------------------------------------------------------------------------
-def _constrain_center(cluster, position):
-    d = sys.float_info.max; pos = -1
-    for i in range(len(cluster)):
-        if _distance(cluster[i], position, 2) < d:
-            pos = i
-            d = _distance(cluster[i], position, 2)
-    return cluster[pos].copy()
-    
-# ------------------------------------------------------------------------
-# Auxiliary function for aggregation and potential constraint
-# Constraint = map on existing point in cluster. Available modes are:
-# MODE_AGG_MEDIAN: median of coordinates in x and y
-# MODE_AGG_L1: geometric median
-# MODE_AGG_L2: geometric mean
-# MODE_AGG_LInf: center of smallest enclosing circle
-# ------------------------------------------------------------------------
-def _aggregate(cluster, mode=MODE_AGG_MEDIAN, constraint=False):
-    center = centerOfPoints(cluster, mode=mode)
-    if constraint:
-        center = _constrain_center(cluster, center)
-    return center
-
-# ------------------------------------------------------------------------
-# On cherche l'index de la trace dont la longueur est la plus proche
+# [B1] On cherche l'index de la trace dont la longueur est la plus proche
 # de la valeur médiane des longueurs de la collection des traces
 # Inputs:
 #   - a collection of tracks
@@ -664,9 +639,8 @@ def _getMasterTrack(tracks, mode):
         return random.sample(range(len(tracks)), 1)[0]
     return mode
 
-
 # ------------------------------------------------------------------------
-# Method to find representative center for fusion algorithm
+# [B3] Method to find representative center for fusion algorithm
 # Inputs: a list of matched index in an homologue track
 # Input pos is an optional ENUCoords for MODE_REP_FURTHEST_OBS
 # Output: ENUCoords of aggregated point
@@ -684,6 +658,32 @@ def _representative(pairs, track, represent_method=MODE_REP_BARYCENTRE, pos=None
         return P.getFurthestObs(pos).position
     print("Unknown mode " + str(represent_method) +" for representative of track section")
     sys.exit(1)
+    
+# ------------------------------------------------------------------------
+# [B4] Auxiliary function for aggregation and potential constraint
+# Constraint = map on existing point in cluster. Available modes are:
+# MODE_AGG_MEDIAN: median of coordinates in x and y
+# MODE_AGG_L1: geometric median
+# MODE_AGG_L2: geometric mean
+# MODE_AGG_LInf: center of smallest enclosing circle
+# ------------------------------------------------------------------------
+def _aggregate(cluster, mode=MODE_AGG_MEDIAN, constraint=False):
+    center = centerOfPoints(cluster, mode=mode)
+    if constraint:
+        center = _constrain_center(cluster, center)
+    return center
+    
+# ------------------------------------------------------------------------
+# [B4] Auxiliary function to map center of cluster on existing point
+# ------------------------------------------------------------------------
+def _constrain_center(cluster, position):
+    d = sys.float_info.max; pos = -1
+    for i in range(len(cluster)):
+        if _distance(cluster[i], position, 2) < d:
+            pos = i
+            d = _distance(cluster[i], position, 2)
+    return cluster[pos].copy()
+
 
 # ------------------------------------------------------------------------
 # One iteration for fusion algorithm
@@ -699,17 +699,19 @@ def _fusion_iteration(central, tracks, mode, p, dim, represent_method, agg_metho
             matching[j, "homologous"] = _representative(matching[j, "pair"], tracks[i], represent_method, pos=central.getObs(j))
         matchings.addTrack(matching)
 
-    CLS = []
+    #CLS = []
     for j in range(len(central)):
         cluster = [matchings[i]["homologous", j] for i in range(len(matchings))]
         central[j].position = _aggregate(cluster, agg_method, constraint)
-        CLS.append(cluster)
-    central.clusters.append(CLS)
+        #CLS.append(cluster)
+    #central.clusters.append(CLS)
 
 # ------------------------------------------------------------------------
 # Algorithme fusion L. Etienne : trajectoire médiane
 # ------------------------------------------------------------------------
 def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constraint, iter_max, verbose):
+
+    start_time = datetime.datetime.now()
 
     central = tracks[_getMasterTrack(tracks, mode=master)].copy()
     
@@ -720,11 +722,11 @@ def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constrai
     for iteration in range(iter_max):
 
         if verbose:
-            print("ITERATION", iteration)
+            print("[" + str(datetime.datetime.now()) + "]   ITERATION", iteration)
             
-        central.iterations.append(central.copy())
+        #central.iterations.append(central.copy())
         central_before = central.copy()
-        
+
         _fusion_iteration(central, tracks, mode, p, dim, represent_method, agg_method, constraint, verbose)
 
         evolution = compare(central, central_before, mode=MODE_COMPARISON_POINTWISE, p=1)
@@ -737,10 +739,12 @@ def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constrai
          
     
     if (iteration == iter_max-1):
-        print("WARNING: TRAJECTORY FUSION HAS NOT CONVERGED (NITER = " + str(iter_max) + " - CV = " + str(central.convergence) + ")")    
+        print("WARNING: TRAJECTORY FUSION HAS NOT CONVERGED (#ITER = " + str(iter_max) + " - CV = " + str(central.convergence) + ")")    
+    
+    end_time = datetime.datetime.now()
     
     if verbose:
-        print("END OF COMPUTATION")
+        print("[" + str(end_time) + "]    COMPUTATION DONE IN " + str(end_time-start_time))
     
 
     
@@ -751,7 +755,7 @@ def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constrai
 # ------------------------------------------------------------------------
 # Algorithme récursif fusion L. Etienne : trajectoire médiane
 # ------------------------------------------------------------------------ 
-def fusion(tracks, mode=MODE_MATCHING_DTW, master=MODE_MASTER_MEDIAN, p=2, dim=2,  
+def fusion(tracks, mode=MODE_MATCHING_DTW, master=MODE_MASTER_MEDIAN, p=1, dim=2,  
            represent_method=MODE_REP_BARYCENTRE, agg_method=MODE_AGG_MEDIAN, constraint=False,
            recursive=1e300, iter_max=100, verbose=True):
     

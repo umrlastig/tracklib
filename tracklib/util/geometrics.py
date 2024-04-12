@@ -949,6 +949,15 @@ def minimumBoundingRectangle(track):
 # Output is the median of points as an ENUCoords point
 # ------------------------------------------------------------
 def geometricMedian(points, N_ITER_MAX = 100, epsilon_factor = 1e-10):
+	
+    if (len(points) == 1):
+        return points[0].copy
+    if (len(points) == 2):
+        x0 = 0.5*(points[0].E + points[1].E)
+        y0 = 0.5*(points[0].N + points[1].N)
+        return ENUCoords(x0, y0)
+	
+    # Initialization
     xmin = points[0].getX()
     ymin = points[0].getY()
     xmax = points[0].getX()
@@ -959,8 +968,6 @@ def geometricMedian(points, N_ITER_MAX = 100, epsilon_factor = 1e-10):
         ymin = min(ymin, points[i].getY())
         ymax = max(ymax, points[i].getY())     
     epsilon = epsilon_factor*math.sqrt((xmax-xmin)**2 + (ymax-ymin)**2)
-    
-    # Initialization
     x0 = xmin + (xmax-xmin)*random.random()
     y0 = ymin + (ymax-ymin)*random.random()
     
@@ -975,7 +982,7 @@ def geometricMedian(points, N_ITER_MAX = 100, epsilon_factor = 1e-10):
         xnew /= Z
         ynew /= Z
         disp = max(abs(xnew-x0), abs(ynew-y0))
-         
+
         if (disp < epsilon):
             return ENUCoords(xnew, ynew)
          
