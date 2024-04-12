@@ -691,7 +691,6 @@ def _constrain_center(cluster, position):
 def _fusion_iteration(central, tracks, mode, p, dim, represent_method, agg_method, constraint, verbose):
 
     matchings = tracklib.TrackCollection()
-    
     for i in range(len(tracks)):
         matching = match(central, tracks[i], mode=mode, p=p, dim=dim, verbose=verbose)
         matching.createAnalyticalFeature("homologous")
@@ -739,7 +738,7 @@ def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constrai
          
     
     if (iteration == iter_max-1):
-        print("WARNING: TRAJECTORY FUSION HAS NOT CONVERGED (#ITER = " + str(iter_max) + " - CV = " + str(central.convergence) + ")")    
+        print("WARNING: TRAJECTORY FUSION HAS NOT CONVERGED (#ITER = " + str(iter_max) + " - CV = " + str(central.convergence[-1]) + ")")    
     
     end_time = datetime.datetime.now()
     

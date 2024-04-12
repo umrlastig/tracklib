@@ -970,7 +970,7 @@ def geometricMedian(points, N_ITER_MAX = 100, epsilon_factor = 1e-10):
     epsilon = epsilon_factor*math.sqrt((xmax-xmin)**2 + (ymax-ymin)**2)
     x0 = xmin + (xmax-xmin)*random.random()
     y0 = ymin + (ymax-ymin)*random.random()
-    
+
     # Median computation
     for k in range(N_ITER_MAX):
         xnew = 0; ynew = 0; Z = 0
@@ -988,7 +988,7 @@ def geometricMedian(points, N_ITER_MAX = 100, epsilon_factor = 1e-10):
          
         x0 = xnew
         y0 = ynew
-             
+        
     print("WARNING: geometric median did not reach convergence")     
     return ENUCoords(xnew, ynew)
      
