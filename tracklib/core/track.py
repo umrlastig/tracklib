@@ -382,7 +382,7 @@ class Track:
             if o.distanceTo(self.getObs(i)) > d:
                 pos = i
                 d = o.distanceTo(self.getObs(i))
-        return self.getObs(pos)
+        return self.getObs(pos).copy()
     
     def getNearestObs(self, o):
         ''' '''
@@ -392,7 +392,7 @@ class Track:
             if o.distanceTo(self.getObs(i)) < d:
                 pos = i
                 d = o.distanceTo(self.getObs(i))
-        return self.getObs(pos)
+        return self.getObs(pos).copy()
     
     def getMedianObs(self):
         ''' '''

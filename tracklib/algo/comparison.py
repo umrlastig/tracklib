@@ -44,11 +44,12 @@ to manage:
     - track distance measures 
 
 """
-
-import matplotlib.pyplot as plt
+import sys
+import random
 import numpy as np
 import progressbar
-import sys
+import matplotlib.pyplot as plt
+
 
 import tracklib as tracklib
 from tracklib.util import dist_point_to_segment, Polygon, centerOfPoints
@@ -90,20 +91,23 @@ MODE_COMPARISON_SYNC      = 109 # Time-synchronized comparison       [p][m][s]
 
 
 # ------------------------------------------------------------------------
-# Parameters for fusion algorithm
+# Specific parameters for fusion algorithm
 # ------------------------------------------------------------------------
 # List of available methods to choose representative point selection
-MODE_BARYCENTRE   = 201      # Average of coordinates
-MODE_MEDIAN_TIME  = 202      # Position at median time of observations
-MODE_FURTHEST_OBS = 203      # Furthest point from master track 
+MODE_REP_BARYCENTRE   = 201   # Average of coordinates
+MODE_REP_MEDIAN_TIME  = 202   # Position at median time of observations
+MODE_REP_FURTHEST_OBS = 203   # Furthest point from master track 
+# ------------------------------------------------------------------------
+# List of available aggregate points in cluster
+MODE_AGG_MEDIAN = 300         # Component-wise median of coordinates
+MODE_AGG_L1     = 301         # Geometric median of points
+MODE_AGG_L2     = 302         # Standard barycenter of points
+MODE_AGG_LInf   = 303         # Center of minimum enclosing circle
 # ------------------------------------------------------------------------
 # List of available methods to choose representative point selection
-MODE_MEDIAN = 300            # Component-wise median of coordinates
-MODE_L1     = 301            # Geometric median of points
-MODE_L2     = 302            # Standard barycenter of points
-MODE_LInf   = 303            # Center of minimum enclosing circle
+MODE_MASTER_RANDOM = -200   # Random track
+MODE_MASTER_MEDIAN = -100   # Closest to the median of track lengths
 # ------------------------------------------------------------------------
-
 
 # ------------------------------------------------------------------------------
 # Compare two tracks to measure a distance (or pseudo-distance) between them.
@@ -617,81 +621,126 @@ def _constrain_center(cluster, position):
             pos = i
             d = _distance(cluster[i], position, 2)
     return cluster[pos].copy()
+    
+# ------------------------------------------------------------------------
+# Auxiliary function for aggregation and potential constraint
+# Constraint = map on existing point in cluster. Available modes are:
+# MODE_AGG_MEDIAN: median of coordinates in x and y
+# MODE_AGG_L1: geometric median
+# MODE_AGG_L2: geometric mean
+# MODE_AGG_LInf: center of smallest enclosing circle
+# ------------------------------------------------------------------------
+def _aggregate(cluster, mode=MODE_AGG_MEDIAN, constraint=False):
+    center = centerOfPoints(cluster, mode=mode)
+    if constraint:
+        center = _constrain_center(cluster, center)
+    return center
 
+# ------------------------------------------------------------------------
+# On cherche l'index de la trace dont la longueur est la plus proche
+# de la valeur médiane des longueurs de la collection des traces
+# Inputs:
+#   - a collection of tracks
+#   - ref: index of track in list or:
+# MODE_MASTER_RANDOM: random master track
+# MODE_MASTER_MEDIAN: track with length closest to median of lengths
+# ------------------------------------------------------------------------ 
+def _getMasterTrack(tracks, mode):
+    if mode == MODE_MASTER_MEDIAN:
+        L = tracks.getLenth()
+        m = co_median(L)
+        imed = 0
+        dmed = abs(L[0] - m)
+        for k in range(1, tracks.size()):
+            d = abs(L[k] - m)
+            if d < dmed:
+                imed = k
+        ref = imed
+        return ref
+    if mode == MODE_MASTER_RANDOM:
+        return random.sample(range(len(tracks)), 1)[0]
+    return mode
+
+
+# ------------------------------------------------------------------------
+# Method to find representative center for fusion algorithm
+# Inputs: a list of matched index in an homologue track
+# Output: ENUCoords of aggregated point
+# ------------------------------------------------------------------------
+def _representative(pairs, track, represent_method=MODE_REP_BARYCENTRE):
+    if len(pairs) == 1: # Necessaire ?
+        return track.getObs(pairs[0]).position.copy()
+    pairs.sort()   # Necessaire ?
+
+    P = tracklib.Track([track[i] for i in pairs])
+
+    if represent_method == MODE_REP_BARYCENTRE:
+        return P.getCentroid()
+    if represent_method == MODE_REP_MEDIAN_TIME:
+        return P.getMedianObsInTime().position
+    if represent_method == MODE_REP_FURTHEST_OBS:
+        return P.getFurthestObs(central.getObs(j)).position
+    print("Unknown mode " + str(represent_method) +" for representative of track section")
+    sys.exit(1)
+
+# ------------------------------------------------------------------------
+# One iteration for fusion algorithm
+# ------------------------------------------------------------------------
+def _fusion_iteration(central, tracks, mode, p, dim, represent_method, agg_method, constraint, verbose):
+
+    matchings = tracklib.TrackCollection()
+    
+    for i in range(len(tracks)):
+        matching = match(central, tracks[i], mode=mode, p=p, dim=dim, verbose=verbose)
+        matching.createAnalyticalFeature("homologous")
+        for j in range(len(central)):
+            matching[j, "homologous"] = _representative(matching[j, "pair"], tracks[i], represent_method)
+        matchings.addTrack(matching)
+
+    CLS = []
+    for j in range(len(central)):
+        cluster = [matchings[i]["homologous", j] for i in range(len(matchings))]
+        central[j].position = _aggregate(cluster, agg_method, constraint)
+        CLS.append(cluster)
+    central.clusters.append(CLS)
 
 # ------------------------------------------------------------------------
 # Algorithme fusion L. Etienne : trajectoire médiane
 # ------------------------------------------------------------------------
-def __fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,
-             represent_method=MODE_BARYCENTRE, agg_method=MODE_L2, 
-             constraint=False, verbose=True, plot=False):
+def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constraint, iter_max, verbose):
 
-    central = tracks[ref].copy()
+    central = tracks[_getMasterTrack(tracks, mode=master)].copy()
     
-    ITER_MAX = 100
-    TAB_CLS = {} # logging
-    TAB_FUSION = {} # logging
-    for iteration in range(ITER_MAX):
+    central.clusters    = []       # logging
+    central.iterations  = []       # logging
+
+    for iteration in range(iter_max):
+
         if verbose:
             print("ITERATION", iteration)
-        
-        profiles = tracklib.TrackCollection()
-        central_before = central.copy()
-    
-        for i in range(len(tracks)):
-            profile = match(central, tracks[i], mode=mode, p=p, dim=dim, 
-                            verbose=verbose, plot=plot)
-            profile.createAnalyticalFeature("homologous")
-            for j in range(len(central)):
-                # On sélecionne le sous-ensemble Pi des positions de CTm appariés à pri
-                PAIRS = profile[j, "pair"]
-                if len(PAIRS) == 1:
-                    profile[j, "homologous"] = tracks[i].getObs(PAIRS[0]).position
-                elif len(PAIRS) > 1:
-                    PAIRS.sort()
-                    Pi = tracklib.Track()
-                    for ind in PAIRS:
-                        Pi.addObs(tracks[i].getObs(ind))
-                    
-                    if represent_method == MODE_BARYCENTRE:
-                        profile[j, "homologous"] = Pi.getCentroid()
-                    elif represent_method == MODE_MEDIAN_TIME:
-                        profile[j, "homologous"] = Pi.getMedianObsInTime().position
-                    elif represent_method == MODE_FURTHEST_OBS:
-                        o = central.getObs(j)
-                        profile[j, "homologous"] = Pi.getFurthestObs(o).position
-                else:
-                    profile[j, "homologous"] = profile[j, "pair"]
-            profiles.addTrack(profile)
             
-        CLS = []
-        for j in range(len(central)):
-            cluster = []
-            for i in range(len(profiles)):
-                cluster.append(profiles[i]["homologous", j])
-            CLS.append(cluster)
-            central[j].position = centerOfPoints(cluster, mode=agg_method)
-            if constraint:
-                central[j].position = _constrain_center(cluster, central[j].position)
-        TAB_CLS[iteration] = CLS
+        central.iterations.append(central.copy())
+        central_before = central.copy()
         
-        profile = match(central, central_before, mode=mode, p=p, dim=dim, 
-                        verbose=verbose, plot=plot)
-        TAB_FUSION[iteration] = profile
-        # central.plot('c--', append=True, pointsize=1.0)
+        _fusion_iteration(central, tracks, mode, p, dim, represent_method, agg_method, constraint, verbose)
+
+        evolution = compare(central, central_before, mode=MODE_COMPARISON_POINTWISE, p=1)
         
         if verbose:
-            print("CV = ", profile.score)
-        if (profile.score < 1e-16):
+            print("CV = ", evolution)
+        if (evolution < 1e-16):
             break
         
+    central.convergence = evolution  
+    
+    if (iteration == iter_max-1):
+        print("WARNING: TRAJECTORY FUSION HAS NOT CONVERGED (NITER = " + str(iter_max) + " - CV = " + str(central.convergence) + ")")    
+    
     if verbose:
         print("END OF COMPUTATION")
     
-    central.score = profile.score
-    central.iteration = iteration
-    central.fusions = TAB_FUSION
-    central.clusters = TAB_CLS
+
+    
     
     return central
 
@@ -699,42 +748,25 @@ def __fusion(tracks, mode=MODE_MATCHING_DTW, ref=0, p=2, dim=2,
 # ------------------------------------------------------------------------
 # Algorithme récursif fusion L. Etienne : trajectoire médiane
 # ------------------------------------------------------------------------ 
-def fusion(tracks, mode=MODE_MATCHING_DTW, ref=-1, p=2, dim=2,  
-           represent_method=MODE_BARYCENTRE, agg_method=MODE_L2, constraint=False,
-           recursive=1e300, verbose=True, plot=False):
-    
-    if ref == -1:
-        # Sélection de la trajectoire initiale de référence
-        L = tracks.getLenth()
-        m = co_median(L)
-        # print ('longueur mediane = ', m)
-        # On cherche l'index de la trace dont la longueur est la plus proche
-        # de la valeur médiane des longueurs de la collection des traces
-        imed = 0
-        dmed = abs(tracks.getTrack(0).length() - m)
-        for k in range(1, tracks.size()):
-            t = tracks.getTrack(k)
-            d = abs(t.length() - m)
-            if d < dmed:
-                imed = k
-        ref = imed
+def fusion(tracks, mode=MODE_MATCHING_DTW, master=MODE_MASTER_MEDIAN, p=2, dim=2,  
+           represent_method=MODE_REP_BARYCENTRE, agg_method=MODE_AGG_MEDIAN, constraint=False,
+           recursive=1e300, iter_max=100, verbose=True):
     
     N = len(tracks)
+
+    # Terminal case
     if N <= recursive:
-        return __fusion(tracks, mode=mode, ref=ref, p=p, dim=dim, 
-                        represent_method=represent_method, 
-                        agg_method=agg_method,
-                        constraint=constraint,
-                        verbose=verbose, plot=plot)
-    else:
+        return _fusion(tracks, mode=mode, master=master, p=p, dim=dim, represent_method=represent_method, agg_method=agg_method, constraint=constraint, iter_max=iter_max, verbose=verbose)
+
+    # Recursive call
+    else: 
        Npg = int(N/recursive)
        subtracks = TrackCollection()
        for i in range(recursive):
-           ini = Npg*i
-           fin = Npg*(i+1)
+           ini = Npg*i; fin = Npg*(i+1)
            if i == (recursive-1):
                fin = len(tracks)
-           subtracks.addTrack(fusion(tracks[ini:fin], mode=mode, ref=ref, p=p, dim=dim, represent_method=represent_method, constraint=constraint, agg_method=agg_method, recursive=recursive, verbose=verbose, plot=plot))
-       return fusion(subtracks, mode=mode, ref=ref, p=p, dim=dim, represent_method=represent_method, constraint=constraint, agg_method=agg_method, recursive=recursive, verbose=verbose, plot=plot)
+           subtracks.addTrack(fusion(tracks[ini:fin], mode=mode, master=master, p=p, dim=dim, represent_method=represent_method, constraint=constraint, agg_method=agg_method, recursive=recursive, verbose=verbose))
+       return fusion(subtracks, mode=mode, master=master, p=p, dim=dim, represent_method=represent_method, constraint=constraint, agg_method=agg_method, recursive=recursive, verbose=verbose)
 
 

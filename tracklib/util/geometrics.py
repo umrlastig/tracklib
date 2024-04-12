@@ -989,10 +989,10 @@ def geometricMedian(points, N_ITER_MAX = 100, epsilon_factor = 1e-10):
 # ------------------------------------------------------------
 # Generic function to get center of a set of points
 # ------------------------------------------------------------
-MODE_MEDIAN = 300    # Component-wise median of coordinates
-MODE_L1     = 301    # Geometric median of points
-MODE_L2     = 302    # Standard barycenter of points
-MODE_LInf   = 303    # Center of minimum enclosing circle
+MODE_AGG_MEDIAN = 300  # Component-wise median of coordinates
+MODE_AGG_L1     = 301  # Geometric median of points
+MODE_AGG_L2     = 302  # Standard barycenter of points
+MODE_AGG_LInf   = 303  # Center of minimum enclosing circle
 # ------------------------------------------------------------
 # MODE_MEDIAN and MODE_L2 are computed in 3D. MODE_L1 and 
 # MODE_L2 are computed in 2D. MODE_Lp is the "generalized 
@@ -1000,12 +1000,12 @@ MODE_LInf   = 303    # Center of minimum enclosing circle
 # (in 2D or 3D space) minimizing the sum of p-th power of 
 # distances towards all points in the dataset.
 # ------------------------------------------------------------
-def centerOfPoints(coordSet, mode=MODE_L2):
+def centerOfPoints(coordSet, mode=MODE_AGG_L2):
 
     # ----------------------------------------------
     # Calcul de la médiane marginale
     # ----------------------------------------------
-    if mode == MODE_MEDIAN:
+    if mode == MODE_AGG_MEDIAN:
         N = len(coordSet)
         X = []; Y = []; Z = []
         for i in range(N):
@@ -1020,13 +1020,13 @@ def centerOfPoints(coordSet, mode=MODE_L2):
     # ----------------------------------------------
     # L1 (geometric median) -> Weiszfeld's algorithm
     # ----------------------------------------------
-    if mode == MODE_L1:
+    if mode == MODE_AGG_L1:
         return geometricMedian(coordSet)
 
     # ----------------------------------------------
     # L2 (geometric mean) -> simple average
     # ----------------------------------------------
-    if mode == MODE_L2:
+    if mode == MODE_AGG_L2:
         N = len(coordSet)
         X = []; Y = []; Z = []
         for i in range(N):
@@ -1042,7 +1042,7 @@ def centerOfPoints(coordSet, mode=MODE_L2):
     # ----------------------------------------------
     # LInf (Radius of enclosing circle) -> 
     # ----------------------------------------------
-    if mode == MODE_LInf:
+    if mode == MODE_AGG_LInf:
         return minCircleOfPoints(coordSet).center
 
     print("Unknown mode in 'centerOfPoints' function")
