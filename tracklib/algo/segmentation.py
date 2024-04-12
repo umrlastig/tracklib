@@ -55,7 +55,7 @@ from tracklib.core import (ENUCoords, Obs, isnan)
 from tracklib.util import Circle, minCircle
 from tracklib.algo import (acceleration, 
                            ALGO_LINEAR, MODE_SPATIAL,
-                           match)
+                           match, MODE_MATCHING_NN)
 from tracklib.core import Operator
 
 
@@ -268,11 +268,13 @@ def splitReturnTripExhaustive(track, verbose=True):
         T2 = track.extract(return_point, track.size()-1)
         
         #avg = (T1 - T2).operate(AVG, "diff") + (T2 - T1).operate(AVG, "diff")
-        avg = match(T1, T2, verbose=False).operate(AVG, "diff") - match(T2, T1, verbose=False).operate(AVG, "diff")
+        d1 = match(T1, T2, verbose=False, mode=MODE_MATCHING_NN).operate(AVG, "diff")
+        d2 = match(T2, T1, verbose=False, mode=MODE_MATCHING_NN).operate(AVG, "diff")
+        avg = d1 - d2
         if avg < min_val:
             min_val = avg
             argmin = return_point
-    
+    #print (argmin)
     first_part = track.extract(0, argmin-1)
     second_part = track.extract(argmin, track.size()-1)
     
