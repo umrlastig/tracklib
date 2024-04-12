@@ -334,6 +334,9 @@ def _nn(track1, track2, dim, verbose):
     for j in range(len(matching_reverse)):
         if not j in matching_in_2:
             matching[matching_reverse[j, "pair"][0], "pair"].append(j)
+            
+    for j in range(len(matching)):
+        matching["pair", j] = sorted(matching["pair", j])
   
     return matching
 
@@ -583,7 +586,7 @@ def _fillAF_dtw(output, track1, track2, S, T, dim):
     output.nb_links = 0 
     for i in range(len(output)):
         output.setObsAnalyticalFeature("pair", i, [])
-    for i in range(len(S)):
+    for i in range(len(S)-1, -1, -1):
         d =  _distance(track1.getObs(S[i][1]).position, track2.getObs(S[i][0]).position, dim)
         ex = track1.getObs(S[i][1]).position.getX() - track2.getObs(S[i][0]).position.getX()
         ey = track1.getObs(S[i][1]).position.getY() - track2.getObs(S[i][0]).position.getY()
@@ -665,21 +668,20 @@ def _getMasterTrack(tracks, mode):
 # ------------------------------------------------------------------------
 # Method to find representative center for fusion algorithm
 # Inputs: a list of matched index in an homologue track
+# Input pos is an optional ENUCoords for MODE_REP_FURTHEST_OBS
 # Output: ENUCoords of aggregated point
 # ------------------------------------------------------------------------
-def _representative(pairs, track, represent_method=MODE_REP_BARYCENTRE):
-    if len(pairs) == 1: # Necessaire ?
-        return track.getObs(pairs[0]).position.copy()
-    pairs.sort()   # Necessaire ?
-
+def _representative(pairs, track, represent_method=MODE_REP_BARYCENTRE, pos=None):
     P = tracklib.Track([track[i] for i in pairs])
-
     if represent_method == MODE_REP_BARYCENTRE:
         return P.getCentroid()
     if represent_method == MODE_REP_MEDIAN_TIME:
         return P.getMedianObsInTime().position
     if represent_method == MODE_REP_FURTHEST_OBS:
-        return P.getFurthestObs(central.getObs(j)).position
+        if pos is None:
+            print("Reference position must be specified for MODE_REP_FURTHEST_OBS in _representative")
+            sys.exit(0)
+        return P.getFurthestObs(pos).position
     print("Unknown mode " + str(represent_method) +" for representative of track section")
     sys.exit(1)
 
@@ -694,7 +696,7 @@ def _fusion_iteration(central, tracks, mode, p, dim, represent_method, agg_metho
         matching = match(central, tracks[i], mode=mode, p=p, dim=dim, verbose=verbose)
         matching.createAnalyticalFeature("homologous")
         for j in range(len(central)):
-            matching[j, "homologous"] = _representative(matching[j, "pair"], tracks[i], represent_method)
+            matching[j, "homologous"] = _representative(matching[j, "pair"], tracks[i], represent_method, pos=central.getObs(j))
         matchings.addTrack(matching)
 
     CLS = []
