@@ -190,8 +190,8 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         self.assertCountEqual([0], profile[0, "pair"])
         self.assertListEqual([0], profile[0, "pair"])
         
-        self.assertCountEqual([2,1], profile[1, "pair"])
-        self.assertListEqual([2,1], profile[1, "pair"])
+        self.assertCountEqual([1,2], profile[1, "pair"])
+        self.assertListEqual([1,2], profile[1, "pair"])
         
         self.assertCountEqual([3], profile[2, "pair"])
         self.assertListEqual([3], profile[2, "pair"])
@@ -233,8 +233,8 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         self.assertCountEqual([0], profile[0, "pair"])
         self.assertListEqual([0], profile[0, "pair"])
         
-        self.assertCountEqual([2,1], profile[1, "pair"])
-        self.assertListEqual([2,1], profile[1, "pair"])
+        self.assertCountEqual([1,2], profile[1, "pair"])
+        self.assertListEqual([1,2], profile[1, "pair"])
         
         self.assertCountEqual([3], profile[2, "pair"])
         self.assertListEqual([3], profile[2, "pair"])
@@ -276,8 +276,8 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         self.assertCountEqual([0], profile[0, "pair"])
         self.assertListEqual([0], profile[0, "pair"])
         
-        self.assertCountEqual([2,1], profile[1, "pair"])
-        self.assertListEqual([2,1], profile[1, "pair"])
+        self.assertCountEqual([1,2], profile[1, "pair"])
+        self.assertListEqual([1,2], profile[1, "pair"])
         
         self.assertCountEqual([3], profile[2, "pair"])
         self.assertListEqual([3], profile[2, "pair"])
@@ -319,8 +319,8 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         self.assertCountEqual([0], profile[0, "pair"])
         self.assertListEqual([0], profile[0, "pair"])
         
-        self.assertCountEqual([2,1], profile[1, "pair"])
-        self.assertListEqual([2,1], profile[1, "pair"])
+        self.assertCountEqual([1,2], profile[1, "pair"])
+        self.assertListEqual([1,2], profile[1, "pair"])
         
         self.assertCountEqual([3], profile[2, "pair"])
         self.assertListEqual([3], profile[2, "pair"])
@@ -405,8 +405,8 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         self.assertCountEqual([0], profile[0, "pair"])
         self.assertListEqual([0], profile[0, "pair"])
         
-        self.assertCountEqual([2,1], profile[1, "pair"])
-        self.assertListEqual([2,1], profile[1, "pair"])
+        self.assertCountEqual([1,2], profile[1, "pair"])
+        self.assertListEqual([1,2], profile[1, "pair"])
         
         self.assertCountEqual([3], profile[2, "pair"])
         self.assertListEqual([3], profile[2, "pair"])
@@ -577,11 +577,12 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     
-    suite.addTest(TestAlgoComparaisonMethods("testMatchDTWL2"))
-    suite.addTest(TestAlgoComparaisonMethods("testMatchDTWL1"))
-    suite.addTest(TestAlgoComparaisonMethods("testMatchDTWLInf"))
-    suite.addTest(TestAlgoComparaisonMethods("testMatchFDTWL2"))
     suite.addTest(TestAlgoComparaisonMethods("testMatchFrechet"))
+    suite.addTest(TestAlgoComparaisonMethods("testMatchDTWLInf"))
+    suite.addTest(TestAlgoComparaisonMethods("testMatchDTWL1"))
+    suite.addTest(TestAlgoComparaisonMethods("testMatchDTWL2"))
+    suite.addTest(TestAlgoComparaisonMethods("testMatchFDTWL2"))
+    
     suite.addTest(TestAlgoComparaisonMethods("testTestEqualFDTWandDTW"))
     suite.addTest(TestAlgoComparaisonMethods("testDTWDim1L2"))
     
