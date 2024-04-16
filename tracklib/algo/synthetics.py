@@ -157,7 +157,6 @@ def generateReturnTrip(track, kernelNoise=None):
     end = t2.getFirstObs().position
     
     d = start.distanceTo(end)
-    #print (d)
 
     segment = tracklib.Track()
     segment.addObs(t1.getLastObs().copy())
@@ -166,13 +165,14 @@ def generateReturnTrip(track, kernelNoise=None):
     segment.resample(d/4, mode=tracklib.MODE_SPATIAL)
     segment.addObs(t2.getFirstObs().copy())
     segment.removeObs(-2)
+    
     segment.getObs(1).position.translate(d/5, 0)
     segment.getObs(2).position.translate(-d/5, 0)
     segment.resample(factor=2, mode=tracklib.MODE_SPATIAL)
     segment.addObs(t2.getFirstObs().copy())
 
-    trace3 = t1 + segment + t2
-    return trace3
+    t3 = t1 + segment + t2
+    return t3
 
     
     
