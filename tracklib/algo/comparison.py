@@ -667,22 +667,22 @@ def _representative(pairs, track, represent_method=MODE_REP_BARYCENTRE, pos=None
 # MODE_AGG_L2: geometric mean
 # MODE_AGG_LInf: center of smallest enclosing circle
 # ------------------------------------------------------------------------
-def _aggregate(cluster, mode=MODE_AGG_MEDIAN, constraint=False):
+def _aggregate(cluster, mode=MODE_AGG_MEDIAN, constraint=False, anchors=None):
     center = centerOfPoints(cluster, mode=mode)
     if constraint:
-        center = _constrain_center(cluster, center)
+       center = _constrain_center(center, anchors)
     return center
     
 # ------------------------------------------------------------------------
-# [B4] Auxiliary function to map center of cluster on existing point
+# [B4] Auxiliary function to map center on on anchors
 # ------------------------------------------------------------------------
-def _constrain_center(cluster, position):
+def _constrain_center(position, anchors):
     d = sys.float_info.max; pos = -1
-    for i in range(len(cluster)):
-        if _distance(cluster[i], position, 2) < d:
+    for i in range(len(anchors)):
+        if _distance(anchors[i], position, 2) < d:
             pos = i
-            d = _distance(cluster[i], position, 2)
-    return cluster[pos].copy()
+            d = _distance(anchors[i], position, 2)
+    return anchors[pos].copy()
 
 
 # ------------------------------------------------------------------------
@@ -701,7 +701,8 @@ def _fusion_iteration(central, tracks, mode, p, dim, represent_method, agg_metho
     #CLS = []
     for j in range(len(central)):
         cluster = [matchings[i]["homologous", j] for i in range(len(matchings))]
-        central[j].position = _aggregate(cluster, agg_method, constraint)
+        anchors = [tracks[k][i].position for k in range(len(tracks)) for i in matchings[k][j, "pair"]]
+        central[j].position = _aggregate(cluster, agg_method, constraint, anchors)
         #CLS.append(cluster)
     #central.clusters.append(CLS)
 
