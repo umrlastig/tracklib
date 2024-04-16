@@ -278,13 +278,10 @@ def splitReturnTripExhaustive(track, verbose=True):
     second_part = track.extract(argmin, track.size()-1)
     
     TRACKS = tracklib.TrackCollection()
-    if first_part.size() > 1:
+    if first_part.size() > 0:
         TRACKS.addTrack(first_part)
     if second_part.size() > 0:
-        if first_part.size() == 1:
-            TRACKS.addTrack(track)
-        else:
-            TRACKS.addTrack(second_part)
+        TRACKS.addTrack(second_part)
 
     return TRACKS
 
@@ -294,7 +291,8 @@ def splitReturnTripFast(track, side_effect=0.1, sampling=1):
     Second version with Fast Fourier Transform"""
 
     track = track.copy()
-    track.toENUCoords(track.getFirstObs().position)
+    if track.getSRID() != "ENU":
+        track.toENUCoords(track.getFirstObs().position)
     track_test = track.copy()
     track_test.resample(
         (track_test.length() / track_test.size()) / sampling, ALGO_LINEAR, MODE_SPATIAL
