@@ -120,6 +120,8 @@ def khi2test(X, SIGMA, prob=0.05):
 
 class NoiseProcess:
     """TODO"""
+    
+    SEED = None
 
     def __init__(self, amps=None, kernels=None, distribution=DISTRIBUTION_NORMAL):
         """TODO"""
@@ -183,13 +185,24 @@ class NoiseProcess:
         plt.show()
 
 
-def seed(integer):
+# ----------------------------------------------------------------------
+# Method to generate seed for random generation. If no seed is specified 
+# the seed is chosen at random at function call, and can then be 
+# retrieved with getseed function
+# ----------------------------------------------------------------------
+def seed(integer = None):
     """
     Initialize the random number generator.
-    :param integer: number generator
+    :param integer: number (optional)
     """
+    if integer is None:
+        integer = random.randrange(2**32)
     random.seed(integer)
     np.random.seed(integer)
+    NoiseProcess.SEED = integer
+
+def getseed():
+    return NoiseProcess.SEED
 
 
 def __randomSampler(N, distribution):

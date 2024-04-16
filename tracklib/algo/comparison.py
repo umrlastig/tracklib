@@ -504,7 +504,7 @@ def _update_node(F, T, node, new_cost, V, A, ant):
 # ------------------------------------------------------------------------------
 def _dtw_comparison(track1, track2, p, dim, verbose, plot):
     matching = _dtw_matching(track1, track2, p, dim, verbose, plot)
-    if ((p == 0) or (p == float('inf'))):
+    if ((p == 0) or (p == float('inf')) or ('function' in str(type(p)))):
         return matching.score
     return (matching.score/matching.nb_links)**(1.0/p)
 
@@ -723,7 +723,7 @@ def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constrai
         if verbose:
             print("[" + str(datetime.datetime.now()) + "]   ITERATION", iteration)
             
-        #central.iterations.append(central.copy())
+        central.iterations.append(tracklib.Track([obs.copy() for obs in central]))
         central_before = central.copy()
 
         _fusion_iteration(central, tracks, mode, p, dim, represent_method, agg_method, constraint, verbose)
@@ -755,7 +755,7 @@ def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constrai
 # Algorithme récursif fusion L. Etienne : trajectoire médiane
 # ------------------------------------------------------------------------ 
 def fusion(tracks, mode=MODE_MATCHING_DTW, master=MODE_MASTER_MEDIAN, p=1, dim=2,  
-           represent_method=MODE_REP_BARYCENTRE, agg_method=MODE_AGG_MEDIAN, constraint=False,
+           represent_method=MODE_REP_BARYCENTRE, agg_method=MODE_AGG_MEDIAN, constraint=True,
            recursive=1e300, iter_max=100, verbose=True):
     
     N = len(tracks)
