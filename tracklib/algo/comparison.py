@@ -686,6 +686,18 @@ def _constrain_center(position, anchors):
 
 
 # ------------------------------------------------------------------------
+# Debugging tool to print details of matching
+# ------------------------------------------------------------------------
+def printMatching(matching):
+    print("----------------------------------------------------")
+    print("MATCHING DETAILS")
+    print("----------------------------------------------------")
+    for i in range(len(matching)):
+        print(i, "->", matching[i, "pair"])
+    print("----------------------------------------------------")
+
+
+# ------------------------------------------------------------------------
 # One iteration for fusion algorithm
 # ------------------------------------------------------------------------
 def _fusion_iteration(central, tracks, mode, p, dim, represent_method, agg_method, constraint, verbose):
@@ -702,7 +714,7 @@ def _fusion_iteration(central, tracks, mode, p, dim, represent_method, agg_metho
     for j in range(len(central)):
         cluster = [matchings[i]["homologous", j] for i in range(len(matchings))]
         anchors = [tracks[k][i].position for k in range(len(tracks)) for i in matchings[k][j, "pair"]]
-        central[j].position = _aggregate(cluster, agg_method, constraint, anchors)
+        central[j].position = _aggregate(cluster, agg_method, constraint, anchors)				
         #CLS.append(cluster)
     #central.clusters.append(CLS)
 
@@ -738,7 +750,7 @@ def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constrai
             break
          
     
-    if (iteration == iter_max-1):
+    if ((iteration == iter_max-1) and (evolution > 0)):
         print("WARNING: TRAJECTORY FUSION HAS NOT CONVERGED (#ITER = " + str(iter_max) + " - CV = " + str(central.convergence[-1]) + ")")    
     
     end_time = datetime.datetime.now()
