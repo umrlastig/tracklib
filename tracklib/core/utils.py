@@ -212,8 +212,6 @@ def makeDistanceMatrix(track, mode = 'linear'):
     D = abs(m-n)
     if mode == 'circular':
         D = np.minimum(D, np.max(D)-D)
-    #import matplotlib.pyplot as plt
-    #plt.imshow(D)
     return D
 
 

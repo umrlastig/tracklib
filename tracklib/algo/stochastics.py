@@ -215,8 +215,12 @@ def __randomSampler(N, distribution):
 
 
 
+MODE_NOISE_LINEAR    = 'linear'
+MODE_NOISE_EUCLIDIAN = 'euclidian'
+MODE_NOISE_CIRCULAR  = 'circular'
+
 def noise(
-    track, sigma=[1], kernel=[DiracKernel()], distribution=DISTRIBUTION_NORMAL, mode='linear', force=False, cycle=False, control=[], n=1
+    track, sigma=[1], kernel=[DiracKernel()], distribution=DISTRIBUTION_NORMAL, mode=MODE_NOISE_LINEAR, force=False, cycle=False, control=[], n=1
 ):
     """Track noising with Cholesky factorization of gaussian process covariance matrix:
 
