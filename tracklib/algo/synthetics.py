@@ -50,11 +50,12 @@ import tracklib as tracklib
 from tracklib.core import (ENUCoords, 
                            ObsTime, 
                            Obs, 
+                           TrackCollection,
                            GaussianKernel)
 
 
 def generate (x_t=0.3, y_t=None, z_t=None, date_ini=None, date_fin=None, dt=None, 
-              verbose=True, N=1):
+              verbose=True, kernel=None, N=1):
     """
     Generate analytical track
     """
@@ -66,8 +67,6 @@ def generate (x_t=0.3, y_t=None, z_t=None, date_ini=None, date_fin=None, dt=None
             for i in range(N):
                 tracks.addTrack(generate(x_t, N=1, verbose=verbose))
             return tracks
-    
-    if randomTrack:
         scope = 100 * x_t
         x1 = random.random() * 100
         y1 = random.random() * 100
@@ -75,6 +74,8 @@ def generate (x_t=0.3, y_t=None, z_t=None, date_ini=None, date_fin=None, dt=None
         y2 = random.random() * 100
         x_t = lambda t: x1 * (1 - t) + x2 * t
         y_t = lambda t: y1 * (1 - t) + y2 * t
+        if kernel is None:
+            kernel = GaussianKernel(scope)
     
     if date_ini is None:
         date_ini = ObsTime.random()
@@ -86,8 +87,7 @@ def generate (x_t=0.3, y_t=None, z_t=None, date_ini=None, date_fin=None, dt=None
     track = tracklib.Track()
     tps = date_ini.copy()
     N = (date_fin - date_ini) / dt
-    if verbose:
-        print("Generating track from", date_ini, "to", date_fin)
+
     for i in range((int)(N)):
         t = i / (N - 1.0)
         tps = tps.addSec(dt)
@@ -97,7 +97,9 @@ def generate (x_t=0.3, y_t=None, z_t=None, date_ini=None, date_fin=None, dt=None
             obs = Obs(ENUCoords(x_t(t), y_t(t), z_t(t)), tps)
         track.addObs(obs)
     if randomTrack:
-        track = track.noise(50, GaussianKernel(scope))
+        track = track.noise(50, kernel)
+    if verbose:
+        print("Generated track from", date_ini, "to", date_fin, "["+str(len(track))+" pts]")
     
     return track
 
@@ -141,3 +143,39 @@ def generateDataSet(vx, vy, N=100, pmin=(0, 0), pmax=(100, 100), Nbmax=1000):
         TRACKS.append(track)
 
     return TRACKS
+
+
+def generateReturnTrip(track, kernelNoise=None):
+
+    tracks1 = TrackCollection([track]*2)
+    tracks1.noise(3, kernelNoise)
+
+    
+    t1 = tracks1[0]
+    start = t1.getLastObs().position
+
+    t2 = tracks1[1].reverse()
+    end = t2.getFirstObs().position
+    
+    d = start.distanceTo(end)
+
+    segment = tracklib.Track()
+    segment.addObs(t1.getLastObs().copy())
+    segment.addObs(t2.getFirstObs().copy())
+
+    segment.resample(d/4, mode=tracklib.MODE_SPATIAL)
+    segment.addObs(t2.getFirstObs().copy())
+    segment.removeObs(-2)
+    
+    #segment.getObs(1).position.translate(d/5, 0)
+    #segment.getObs(2).position.translate(-d/5, 0)
+    #segment.resample(factor=2, mode=tracklib.MODE_SPATIAL)
+    #segment.addObs(t2.getFirstObs().copy())
+
+    t3 = t1 + segment + t2
+    return t3
+
+    
+    
+    
+    

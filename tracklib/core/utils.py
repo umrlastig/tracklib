@@ -200,13 +200,12 @@ def makeDistanceMatrix(track, mode = 'linear'):
 	:mode: computation mode ('linear', 'circular' or 'euclidian')
     :return: numpy distance matrix with a track
     """
-	
     if mode not in ['linear', 'circular', 'euclidian']:
         print("Error: unknown mode: "+str(mode))
         sys.exit(1)
     if mode in ['linear', 'circular']:
         S = np.array(track.getAnalyticalFeature("abs_curv"))
-        z = np.array([complex(s, 0) for s in S])
+        z = np.array([complex(s, 0) for s in S])	
     if mode == 'euclidian':
 	    z = np.array([complex(obs.position.getX(), obs.position.getY()) for obs in track])
     m, n = np.meshgrid(z, z)
@@ -236,7 +235,7 @@ def makeCovarianceMatrixFromKernelOld(kernel, T1: list[tuple[float, float]], T2:
     return SIGMA
 
 
-def makeCovarianceMatrixFromKernel(kernel, track, factor = 1.0, mode = 'linear', force = False):   
+def makeCovarianceMatrixFromKernel(kernel, track, factor = 1.0, mode = 'linear', force = False, control = False):   
     """Function to form covariance matrix from kernel
 
     :param kernel: A function describing statistical similarity between points
@@ -244,8 +243,11 @@ def makeCovarianceMatrixFromKernel(kernel, track, factor = 1.0, mode = 'linear',
 	:mode: computation mode ('linear', 'circular' or 'euclidian')
     :param factor: Unit factor of std dev (default 1.0)
     """
+    track2 = track.copy()
+    for icp in range(len(control)-1,-1,-1):
+        track2.insertObs(track[control[icp][0]].copy(), i=0)
+    D = makeDistanceMatrix(track2, mode)
 
-    D = makeDistanceMatrix(track, mode)
     kfunc = np.vectorize(kernel.getFunction())
     SIGMA = factor ** 2 * kfunc(D)
     if force:
@@ -256,6 +258,9 @@ def makeCovarianceMatrixFromKernel(kernel, track, factor = 1.0, mode = 'linear',
         SIGMA = v @ np.diag(w) @ v.transpose()
     return SIGMA
 
+def randomColor():
+    """TODO"""
+    return [random.random(), random.random(), random.random()]
 
 def rgbToHex(color: list[float, float, float, Optional[float]]) -> str:   
     """Function to convert RGBA color to hexadecimal
@@ -444,3 +449,141 @@ class priority_dict(dict):
 
         while self:
             yield self.pop_smallest()
+
+
+# ------------------------------------------------------------------------------
+#    Aggregate array values Functions 
+# ------------------------------------------------------------------------------
+def co_sum(tarray):
+    """TODO"""
+    tarray = listify(tarray)
+    somme = 0
+    for i in range(len(tarray)):
+        val = tarray[i]
+        if isnan(val):
+            continue
+        somme += val
+    return somme
+
+
+def co_min(tarray):
+    """TODO"""
+    tarray = listify(tarray)
+    if len(tarray) <= 0:
+        return NAN
+    min = tarray[0]
+    for i in range(1, len(tarray)):
+        val = tarray[i]
+        if isnan(val):
+            continue
+        if val < min:
+            min = val
+    return min
+
+
+def co_max(tarray):
+    """TODO"""
+    tarray = listify(tarray)
+    if len(tarray) <= 0:
+        return NAN
+    max = tarray[0]
+    for i in range(1, len(tarray)):
+        val = tarray[i]
+        if isnan(val):
+            continue
+        if val > max:
+            max = val
+    return max
+
+
+def co_count(tarray):
+    """TODO"""
+    tarray = listify(tarray)
+    count = 0
+    for i in range(len(tarray)):
+        val = tarray[i]
+        if isnan(val):
+            continue
+        count += 1
+    return count
+
+
+def co_avg(tarray):
+    """TODO"""
+    tarray = listify(tarray)
+    if len(tarray) <= 0:
+        return NAN
+    mean = 0
+    count = 0
+    for i in range(len(tarray)):
+        val = tarray[i]
+        if isnan(val):
+            continue
+        count += 1
+        mean += val
+    if count == 0:
+        return NAN
+    return mean / count
+
+
+def co_dominant(tarray):
+    """TODO"""
+    tarray = listify(tarray)
+    if len(tarray) <= 0:
+        return NAN
+
+    # Dico : clé - nb occurence
+    cles_count_dictionnary = {}
+
+    # On alimente le dictionnaire
+    for val in tarray:
+        if val not in cles_count_dictionnary:
+            cles_count_dictionnary[val] = 1
+        else:
+            cles_count_dictionnary[val] += 1
+
+    # On cherche le plus fréquent i.e. celui qui a le max d'occurence
+    nbocc = 0
+    dominant_value = ""
+    for val in cles_count_dictionnary:
+        if cles_count_dictionnary[val] > nbocc:
+            nbocc = cles_count_dictionnary[val]
+            dominant_value = val
+    return dominant_value
+
+
+def co_median(tarray):
+    """TODO""" 
+    tarray = listify(tarray)
+    if len(tarray) <= 0:
+        return NAN
+    
+    # On retire les NAN
+    tarray2 = []
+    for i in range(len(tarray)):
+        val = tarray[i]
+        if isnan(val):
+            continue
+        tarray2.append(val)
+
+    n = len(tarray2)
+    # on tri le tableau pour trouver le milieu
+    tab_sort = []
+    for i in range(n):
+        valmin = tarray2[0]
+        # Recherche du min
+        for val in tarray2:
+            if val <= valmin:
+                valmin = val
+        tarray2.remove(valmin)
+        tab_sort.append(valmin)
+        
+    # Gestion n pair/impair
+    if n % 2 == 1:
+        mediane = tab_sort[int ((n - 1) / 2)]
+    else:
+        index1 = int(n/2)
+        index2 = int(n/2 - 1)
+        mediane = 0.5 * (tab_sort[index1] + tab_sort[index2])
+
+    return mediane

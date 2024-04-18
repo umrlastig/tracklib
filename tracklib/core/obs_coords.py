@@ -419,6 +419,7 @@ class ENUCoords:
         """
         return (point - self).norm()
 
+
     def rotate(self, theta: float):   
         """Rotation (2D) of point
 

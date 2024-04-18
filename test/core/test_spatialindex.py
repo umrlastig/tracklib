@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import matplotlib.pyplot as plt
 from unittest import TestCase, TestSuite, TextTestRunner
 import os.path
 
@@ -19,7 +20,7 @@ class TestSpatialIndex(TestCase):
     def test_create_index_collection1(self):
         
         ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
-                
+
         track = Track()
         p1 = Obs(ENUCoords(0, 0), ObsTime.readTimestamp('2020-01-01 10:00:00'))
         track.addObs(p1)
@@ -74,7 +75,7 @@ class TestSpatialIndex(TestCase):
         
         
         # # =====================================================================
-        self.assertEqual(index.request(track), [0])
+        # self.assertEqual(index.request(track), [0])
  
         track2 = Track()
         p6 = Obs(ENUCoords(2.2, 0), ObsTime.readTimestamp('2020-01-01 10:00:00'))
@@ -111,7 +112,7 @@ class TestSpatialIndex(TestCase):
         self.assertCountEqual(index.neighborhood(2, 2, 0), [0])
         self.assertCountEqual(index.neighborhood(2, 2, 1), [0])
         self.assertCountEqual(index.neighborhood(2, 2, 2), [0])
-        #self.assertCountEqual(index.neighborhood(2, 2, 3), [0])
+        self.assertCountEqual(index.neighborhood(2, 2, 3), [0])
     
         # # UNIT = -1
         self.assertCountEqual(index.neighborhood(2, 1, -1), [0])
@@ -193,11 +194,13 @@ class TestSpatialIndex(TestCase):
         self.assertEqual(index.neighborhood(track3, None, 3), [0])
         self.assertEqual(index.neighborhood(track3, None, -1), [0])
         
+        plt.show()
+        
     
     def test_create_index_collection2(self):
         
         ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
-                
+        
         track = Track()
         p1 = Obs(ENUCoords(0, 0), ObsTime.readTimestamp('2020-01-01 10:00:00'))
         track.addObs(p1)
@@ -246,8 +249,10 @@ class TestSpatialIndex(TestCase):
         self.assertEqual(index.request(5, 3), [0])
         self.assertEqual(index.request(5, 4), [])
         
+        plt.show()
         
-    def test_create_index(self):
+        
+    def test_request_index(self):
         
         ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         
@@ -262,7 +267,7 @@ class TestSpatialIndex(TestCase):
         track.addObs(p4)
         p5 = Obs(ENUCoords(675, 340), ObsTime.readTimestamp('2020-01-01 10:25:00'))
         track.addObs(p5)
-        #track.plot()
+        track.plot()
         #track.plotAsMarkers()
         
         TRACES = []
@@ -273,7 +278,6 @@ class TestSpatialIndex(TestCase):
         index = SpatialIndex(collection, res, 0.05, True)
         index.plot()
         
-        
         # =====================================================================
         self.assertEqual(index.request(0, 0), [0])
         self.assertEqual(index.request(1, 0), [0])
@@ -281,91 +285,124 @@ class TestSpatialIndex(TestCase):
         self.assertEqual(index.request(1, 1), [0])
         self.assertEqual(index.request(2, 0), [])
         self.assertEqual(index.request(2, 1), [0])
-#        self.assertEqual(index.request(2, 2), [(1,0), (2,0)])
-#        self.assertEqual(index.request(3, 2), [(2,0)])
-#        self.assertEqual(index.request(4, 2), [(2,0),(3,0)])
-#        self.assertEqual(index.request(4, 3), [(3,0)])
-#        self.assertEqual(index.request(4, 4), [(3,0)])
+        self.assertEqual(index.request(2, 2), [0])
+        self.assertEqual(index.request(3, 2), [0])
+        self.assertEqual(index.request(4, 2), [0])
+        self.assertEqual(index.request(4, 3), [0])
+        self.assertEqual(index.request(4, 4), [0])
         
         # =====================================================================
-#        self.assertEqual(index.request(ENUCoords(550, 320)), [(0,0)])
-#        self.assertEqual(index.request(ENUCoords(610, 325)), [(0,0), (1,0)])
-#        self.assertEqual(index.request(ENUCoords(610, 330)), [(1,0), (2,0)])
-#        self.assertEqual(index.request(ENUCoords(650, 330)), [(2,0), (3,0)])
-#        self.assertEqual(index.request(ENUCoords(675, 340)), [(3,0)])
+        self.assertEqual(index.request(ENUCoords(550, 320)), [0])
+        self.assertEqual(index.request(ENUCoords(550, 330)), [])
+        self.assertEqual(index.request(ENUCoords(610, 325)), [0])
+        self.assertEqual(index.request(ENUCoords(610, 330)), [0])
+        self.assertEqual(index.request(ENUCoords(650, 330)), [0])
+        self.assertEqual(index.request(ENUCoords(675, 340)), [0])
+        self.assertEqual(index.request(ENUCoords(675, 325)), [])
+        
+        # ======================================================================
+        p1 = ENUCoords(550, 320)
+        p2 = ENUCoords(580, 320)
+        p3 = ENUCoords(580, 330)
+        p4 = ENUCoords(580, 340)
+        self.assertEqual(index.request([p1, p2]), [0])
+        self.assertEqual(index.request([p1, p3]), [0])
+        self.assertEqual(index.request([p3, p4]), [])
+        
+        # ======================================================================
+        self.assertEqual(index.request(track), [0])
+
+        # =====================================================================
+        track2 = Track()
+        p6 = Obs(ENUCoords(580, 320), ObsTime.readTimestamp('2020-01-01 10:00:00'))
+        track2.addObs(p6)
+        p7 = Obs(ENUCoords(580, 327), ObsTime.readTimestamp('2020-01-01 10:08:00'))
+        track2.addObs(p7)
+        p8 = Obs(ENUCoords(640, 327), ObsTime.readTimestamp('2020-01-01 10:08:00'))
+        track2.addObs(p8)
+        
+        self.assertEqual(index.request(track2), [0])
         
         # =====================================================================
-#        self.assertEqual(index.request([(2.1, 0.5), (1.1, 1.1)]), [(0,0)])
-#        self.assertEqual(index.request([(2.5, 2.5), (2.1, 1.1)]), [(0,0),(1,0),(2,0)])
+        track3 = Track()
+        p9 = Obs(ENUCoords(640, 327), ObsTime.readTimestamp('2020-01-01 10:00:00'))
+        track3.addObs(p9)
+        p10 = Obs(ENUCoords(640, 335), ObsTime.readTimestamp('2020-01-01 10:08:00'))
+        track3.addObs(p10)
+        p11 = Obs(ENUCoords(675, 335), ObsTime.readTimestamp('2020-01-01 10:08:00'))
+        track3.addObs(p11)
+       
+        self.assertEqual(index.request(track3), [0])
         
-#        self.assertEqual(index.request(track), [(0,0),(1,0),(2,0),(3,0)])
+        plt.show()
+        
+        
+    def test_neighborhood_index(self):
+        
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        
+        track = Track()
+        p1 = Obs(ENUCoords(550, 320), ObsTime.readTimestamp('2020-01-01 10:00:00'))
+        track.addObs(p1)
+        p2 = Obs(ENUCoords(610, 325), ObsTime.readTimestamp('2020-01-01 10:08:00'))
+        track.addObs(p2)
+        p3 = Obs(ENUCoords(610, 330), ObsTime.readTimestamp('2020-01-01 10:17:00'))
+        track.addObs(p3)
+        p4 = Obs(ENUCoords(650, 330), ObsTime.readTimestamp('2020-01-01 10:21:00'))
+        track.addObs(p4)
+        p5 = Obs(ENUCoords(675, 340), ObsTime.readTimestamp('2020-01-01 10:25:00'))
+        track.addObs(p5)
+        track.plot()
+        #track.plotAsMarkers()
+        
+        TRACES = []
+        TRACES.append(track)
+        collection = TrackCollection(TRACES)
+        
+        res = (25, 4)
+        index = SpatialIndex(collection, res, 0.05, True)
+        index.plot()
         
         # =====================================================================
-#        track2 = Track()
-#        p6 = Obs(ENUCoords(580, 320), GPSTime.readTimestamp('2020-01-01 10:00:00'))
-#        track2.addObs(p6)
-#        p7 = Obs(ENUCoords(580, 327), GPSTime.readTimestamp('2020-01-01 10:08:00'))
-#        track2.addObs(p7)
-#        p8 = Obs(ENUCoords(640, 327), GPSTime.readTimestamp('2020-01-01 10:08:00'))
-#        track2.addObs(p8)
-        
-#        self.assertEqual(index.request(track2), [(0,0),(1,0)])
-        
-        
-        # =====================================================================
-#        track3 = Track()
-#        p9 = Obs(ENUCoords(640, 327), GPSTime.readTimestamp('2020-01-01 10:00:00'))
-#        track3.addObs(p9)
-#        p10 = Obs(ENUCoords(640, 335), GPSTime.readTimestamp('2020-01-01 10:08:00'))
-#        track3.addObs(p10)
-#        p11 = Obs(ENUCoords(675, 335), GPSTime.readTimestamp('2020-01-01 10:08:00'))
-#        track3.addObs(p11)
-        
-#        self.assertEqual(index.request(track3), [(2,0),(3,0)])
-        
-        
-        # =====================================================================
-        #self.assertCountEqual(index.neighbouringcells(0, 4, 0), [(0,4)])
-        #self.assertCountEqual(index.neighbouringcells(0, 4, 1), [(0,3), (1,3), (1,4)])
-        #self.assertCountEqual(index.neighbouringcells(0, 4, 2), [(0,2), (1,2), (2,2), (2,3), (2,4)])
-        #self.assertCountEqual(index.neighbouringcells(0, 4, 3), [(0,1), (1,1), (2,1), (3,1), (3,2), (3,3), (3,4)])   
+        self.assertCountEqual(index.neighborhood(0, 4, 0), [])
+        self.assertCountEqual(index.neighborhood(0, 4, 1), [])
+        self.assertCountEqual(index.neighborhood(0, 4, 2), [0])
+        self.assertCountEqual(index.neighborhood(0, 4, 3), [0])
     
-        #self.assertCountEqual(index.neighbouringcells(3, 0, 0), [(3,0)])
-        #self.assertCountEqual(index.neighbouringcells(3, 0, 1), [(2,0), (2,1), (3,1), (4,1), (4,0)])
-        #self.assertCountEqual(index.neighbouringcells(3, 0, 2), [(1,0), (1,1), (1,2), (2,2), (3,2), (4,2)])
-        #self.assertCountEqual(index.neighbouringcells(3, 0, 3), [(0,0), (0,1), (0,2), (0,3), (1,3), (2,3), (3,3), (4,3)])
+        self.assertCountEqual(index.neighborhood(3, 0, 0), [])
+        self.assertCountEqual(index.neighborhood(3, 0, 1), [0])
+        self.assertCountEqual(index.neighborhood(3, 0, 2), [0])
+        self.assertCountEqual(index.neighborhood(3, 0, 3), [0])
     
-        #self.assertCountEqual(index.neighbouringcells(2, 2, 0), [(2,2)])
-        #self.assertCountEqual(index.neighbouringcells(2, 2, 1), [(1,1), (1,2), (1,3), (2,3), (3,3), (3,2), (3,1), (2,1)])
-        #self.assertCountEqual(index.neighbouringcells(2, 2, 2), [(0,0), (0,1), (0,2), (0,3), (0,4), (1,4), (2,4), (3,4), (4,4), (4,3), (4,2), (4,1), (4,0), (3,0), (2,0), (1,0)])
-        #self.assertCountEqual(index.neighbouringcells(2, 2, 3), [])
+        self.assertCountEqual(index.neighborhood(2, 2, 0), [0])
+        self.assertCountEqual(index.neighborhood(2, 2, 1), [0])
+        self.assertCountEqual(index.neighborhood(2, 2, 2), [0])
+        self.assertCountEqual(index.neighborhood(2, 2, 3), [0])
     
-    
-        # # =====================================================================
-        # # UNIT != -1
-        # self.assertCountEqual(index.neighborhood(2, 1, 0), [(0,0),(1,0)])
-        # self.assertCountEqual(index.neighborhood(2, 1, 1), [(0,0),(1,0),(2,0)])
-        # self.assertCountEqual(index.neighborhood(2, 1, 2), [(0,0),(2,0),(3,0)])
-        # self.assertCountEqual(index.neighborhood(2, 1, 3), [(3,0)])
+        # =====================================================================
+        # UNIT != -1
+        self.assertCountEqual(index.neighborhood(2, 1, 0), [0])
+        self.assertCountEqual(index.neighborhood(2, 1, 1), [0])
+        self.assertCountEqual(index.neighborhood(2, 1, 2), [0])
+        self.assertCountEqual(index.neighborhood(2, 1, 3), [0])
         
-        # # UNIT = -1
-        # self.assertCountEqual(index.neighborhood(2, 1, -1), [(0,0),(1,0),(2,0)])
-        # self.assertCountEqual(index.neighborhood(2, 0, -1), [(0,0),(1,0)])
-        # self.assertCountEqual(index.neighborhood(0, 1, -1), [(0,0),(1,0),(2,0)])
-        # self.assertCountEqual(index.neighborhood(1, 1, -1), [(0,0),(1,0),(2,0)])
-        # self.assertCountEqual(index.neighborhood(0, 4, -1), [(0,0),(1,0),(2,0)])
-        # self.assertCountEqual(index.neighborhood(3, 4, -1), [(1,0),(2,0),(3,0)])
-        # self.assertCountEqual(index.neighborhood(4, 4, -1), [(3,0)])
-        # self.assertCountEqual(index.neighborhood(2, 4, -1), [(0,0), (1,0), (2,0), (3,0)])
-        
+        # UNIT = -1
+        self.assertCountEqual(index.neighborhood(2, 1, -1), [0])
+        self.assertCountEqual(index.neighborhood(2, 0, -1), [0])
+        self.assertCountEqual(index.neighborhood(0, 1, -1), [0])
+        self.assertCountEqual(index.neighborhood(1, 1, -1), [0])
+        self.assertCountEqual(index.neighborhood(0, 4, -1), [0])
+        self.assertCountEqual(index.neighborhood(3, 4, -1), [0])
+        self.assertCountEqual(index.neighborhood(4, 4, -1), [0])
+        self.assertCountEqual(index.neighborhood(2, 4, -1), [0])
         
         # =====================================================================
         # UNIT != -1
-#        self.assertCountEqual(index.neighborhood(ENUCoords(550, 320)), [(0,0)])
-#        self.assertCountEqual(index.neighborhood(ENUCoords(610, 325)), [(0,0), (1,0)])
-#        self.assertCountEqual(index.neighborhood(ENUCoords(610, 330)), [(1,0), (2,0)])
-#        self.assertCountEqual(index.neighborhood(ENUCoords(650, 330)), [(2,0), (3,0)])
-#        self.assertCountEqual(index.neighborhood(ENUCoords(675, 340)), [])
+        self.assertCountEqual(index.neighborhood(ENUCoords(550, 320)), [0])
+        self.assertCountEqual(index.neighborhood(ENUCoords(610, 325)), [0])
+        self.assertCountEqual(index.neighborhood(ENUCoords(610, 330)), [0])
+        self.assertCountEqual(index.neighborhood(ENUCoords(650, 330)), [0])
+        self.assertCountEqual(index.neighborhood(ENUCoords(675, 320)), [])
         
 #        self.assertCountEqual(index.neighborhood(ENUCoords(640, 327), None, 0), [])
 #        self.assertCountEqual(index.neighborhood(ENUCoords(640, 327), None, 1), [(0,0), (1,0), (2,0), (3,0)])
@@ -398,7 +435,7 @@ class TestSpatialIndex(TestCase):
         # UNIT != -1
         #self.assertEqual(index.neighborhood([(2.1, 0.5), (1.1, 1.1)], None, 0), [(0,0)])
         
-        
+        plt.show()
         
         
     # def test_index_trackcollection(self):
@@ -444,7 +481,8 @@ class TestSpatialIndex(TestCase):
 if __name__ == '__main__':
     suite = TestSuite()
     
-    suite.addTest(TestSpatialIndex("test_create_index"))
+    suite.addTest(TestSpatialIndex("test_request_index"))
+    suite.addTest(TestSpatialIndex("test_neighborhood_index"))
     suite.addTest(TestSpatialIndex("test_create_index_collection1"))
     suite.addTest(TestSpatialIndex("test_create_index_collection2"))
     

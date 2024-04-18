@@ -44,368 +44,200 @@ to manage:
     - track distance measures 
 
 """
-
-
 import sys
-import math
-from typing import Literal
-import progressbar
+import random
+import datetime
 import numpy as np
+import progressbar
 import matplotlib.pyplot as plt
 
+
 import tracklib as tracklib
-from tracklib.util import dist_point_to_segment, Polygon
-from . import computeAbsCurv, synchronize, HMM, MODE_OBS_AS_2D_POSITIONS
-from tracklib.core import ENUCoords
-
-MODE_COMPARAISON_NEAREST_NEIGHBOUR = 1
-MODE_COMPARAISON_DTW = 2
-MODE_COMPARAISON_FDTW = 3
-MODE_COMPARAISON_HAUSDORFF = 4
-MODE_COMPARAISON_DISTANCE_MOYENNE = 5
-MODE_COMPARAISON_RMSE = 6
-
-
-def compare(track1, track2, mode=MODE_COMPARAISON_RMSE) -> float:   
-    """
-    Track distance measures.
-    For developers: leave as default: mode = MODE_COMPARAISON_RMSE
-    
-    :param track1: track to compare with
-    :param track2: track to compare with
-
-    :return: float
-    """
-
-    if mode == MODE_COMPARAISON_HAUSDORFF:
-        return hausdorff(track1, track2)
-    elif mode == MODE_COMPARAISON_DISTANCE_MOYENNE:
-        return arealStandardizedBetweenTwoTracks(track1, track2)
-    elif mode == MODE_COMPARAISON_DTW:
-        p = differenceProfile2(track1, track2)
-        return p.score
-    elif mode == MODE_COMPARAISON_RMSE:
-        trackA = track1.copy()
-        trackB = track2.copy()
-        synchronize(trackA, trackB)
-    
-        if trackA.size() <= 0:
-            return 
-        
-        rmse = 0
-        for i in range(trackA.size()):
-            rmse += trackA.getObs(i).distanceTo(trackB.getObs(i)) ** 2
-        return math.sqrt(rmse / trackA.size())
-
-    else:
-        sys.exit("Error: track comparaison mode " + (str)(mode) + " not implemented yet")
-
-
-
-def plotDifferenceProfile(
-    profile, track2, af_name="pair", sym="g--", NO_DATA_VALUE: int = -1):
-    """Difference profile plot
-
-    :param profile: TODO
-    :param track2: TODO
-    :param af_name: TODO
-    :param sym: TODO
-    :param NO_DATA_VALUE: TODO
-    """
-    for i in range(profile.size()):
-        if profile.getObsAnalyticalFeature(af_name, i) == NO_DATA_VALUE:
-            continue
-        x1 = profile.getObs(i).position.getX()
-        y1 = profile.getObs(i).position.getY()
-        x2 = track2.getObs(profile.getObsAnalyticalFeature(af_name, i)).position.getX()
-        y2 = track2.getObs(profile.getObsAnalyticalFeature(af_name, i)).position.getY()
-        plt.plot([x1, x2], [y1, y2], sym, linewidth=2)
-
-
-def _minCumul(vec):
-	out = vec.copy()
-	mark = [0]*len(vec)
-	for i in range(1, len(vec)):
-		out[i]  = min(out[i], out[i-1])
-		mark[i] = mark[i-1]*(out[i] >= out[i-1]) + i*(out[i] < out[i-1])
-	return [out, mark]
-
-
-def differenceProfile2(track1, track2, weight = lambda A, B : A + B, verbose = True):   
-    """Profile of difference between two traces
-    
-    :return: A track objet, with an analytical feature "diff" containing shortest distance
-             of each point of track t1, to the points of track t2. We may get profile as
-             a list with :func:`output.getAbsCurv()` and
-             :func:`output.getAnalyticalFeature("diff")` 
-             The selected candidate in registerd in AF "pair" 
-             Set "ends" parameter to True to force end points to meet
-              p is Minkowski's exponent for distance computation. Default value is
-             - 1 for summation of distances, 
-             - 2 for least squares solution 
-             - and 10 for an approximation of Frechet solution.
-    """
-
-    output = track1.copy()
-
-    output.createAnalyticalFeature("diff")
-    output.createAnalyticalFeature("pair")
-    output.createAnalyticalFeature("ex")
-    output.createAnalyticalFeature("ey")
-
-    N1 = track1.size()
-    N2 = track2.size()
-
-    step_to_run = range(1, N1)
-    if verbose:
-        step_to_run = progressbar.progressbar(step_to_run)
-
-    # Forming distance matrix
-    D = np.zeros((N2, N1))
-    for i in range(N2):
-        for j in range(N1):
-            D[i, j] = track2.getObs(i).distance2DTo(track1.getObs(j))
-
-	# ----------------------------------------------------------
-    # Optimal path with dynamic programming
-	# ----------------------------------------------------------
-	
-    T = np.zeros((N2, N1))
-    M = np.zeros((N2, N1))
-    T[:, 0] = D[:, 0]
-        
-    # Forward step
-    for j in step_to_run:
-        MC = _minCumul(T[:, j-1])
-        T[:, j] = weight(MC[0], D[:, j])
-        M[:, j] = MC[1]
-        
-    # Backward step
-    S = [0] * (track1.size())  
-    S[N1-1] = np.argmin(T[:, N1-1])
-    for i in range(N1-2, -1, -1):
-        S[i] = int(M[S[i+1], i+1])
-
-    # plt.plot(S, 'r-')   
-    # plt.imshow(T)
-    # plt.show()
-    
-    __fillAFProfile(track1, track2, output, S)
-    
-    output.score = T[S[N1-1], N1-1]
-
-    return output
-
-
-
-def differenceProfile(track1, track2, mode: Literal["NN", "DTW", "FDTW"] = "NN", 
-                      ends=False, p=1, verbose: bool = True):   
-    """Profile of difference between two traces
-
-    Three possible modes:
-
-    - **NN** (Nearest Neighbour): :math:`O(n^2)` time and :math:`O(n)` space
-    - **DTW** (Dynamic Time Warping): :math:`O(n^3)` time and :math:`O(n^2)` space
-    - **FDTW** (Fast Dynamic Time Warping): same as DTW with reduced search space. In this
-      particular case, 'ends' parameter is an integer giving the number of points to
-      search for a match ahead and behind the current point. E.g. for ends=0, there is a
-      strict matching track1[i] <-> track2[i] for each epoch i. For ends=10 for example,
-      each point track[i] can be matched with any point chronologically between the
-      bounds track2[i-10] and track2[i+10]. Default is equal to 3, meaning that track1
-      may be at most 3 times faster or slower than track2 on ant given sub-interval.
-      Note that this method is designed for pairs of tracks having about same number of
-      points. Otherwise, it is strongly advised to perform a spatial resampling before
-      applying FDTW
-
-    :param track1: TODO
-    :param track2: TODO
-    :param mode: Mode for the interpolation. Three modes are possible : NN, DTW and FDTW
-    :param ends: TODO
-    :param p: TODO
-    :param verbose: Verbose mode
-    
-    :return: A track objet, with an analytical feature diff containing shortest distance
-             of each point of track t1, to the points of track t2. We may get profile as
-             a list with :func:`output.getAbsCurv()` and
-             :func:`output.getAnalyticalFeature("diff")` 
-             The selected candidate in registerd in AF "pair" 
-             Set "ends" parameter to True to force end points to
-             meet p is Minkowski's exponent for distance computation. Default value is
-             - 1 for summation of distances, 
-             - 2 for least squares solution 
-             - and 10 for an approximation of Frechet solution.
-    """
-
-    output = track1.copy()
-    output.createAnalyticalFeature("diff")
-    output.createAnalyticalFeature("pair")
-    output.createAnalyticalFeature("ex")
-    output.createAnalyticalFeature("ey")
-
-    # --------------------------------------------------------
-    # Nearest Neighbor (NN) algorithm
-    # --------------------------------------------------------
-    if mode == "NN":
-        to_run = range(output.size())
-        if verbose:
-            to_run = progressbar.progressbar(to_run)
-        for i in to_run:
-            val_min = sys.float_info.max
-            id_min = 0
-            for j in range(track2.size()):
-                distance = output.getObs(i).distance2DTo(track2.getObs(j))
-                if distance < val_min:
-                    val_min = distance
-                    id_min = j
-            output.setObsAnalyticalFeature("diff", i, val_min)
-            output.setObsAnalyticalFeature("pair", i, id_min)
-            ex = track1.getObs(i).position.getX() - track2.getObs(id_min).position.getX()
-            ey = track1.getObs(i).position.getY() - track2.getObs(id_min).position.getY()
-            output.setObsAnalyticalFeature("ex", i, ex)
-            output.setObsAnalyticalFeature("ey", i, ey)
-
-    # --------------------------------------------------------
-    # Dynamic time warping (DTW) algorithm
-    # --------------------------------------------------------
-    if mode == "DTW":
-
-        p = max(min(p, 15), 1e-2)
-
-        track1 = track1.copy()
-        track2 = track2.copy()
-
-        # Forming distance matrix
-        D = np.zeros((track1.size(), track2.size()))
-        for i in range(track1.size()):
-            for j in range(track2.size()):
-                D[i, j] = track1.getObs(i).distance2DTo(track2.getObs(j)) ** p
-
-        # Optimal path with dynamic programming
-        T = np.zeros((track1.size(), track2.size()))
-        M = np.zeros((track1.size(), track2.size()))
-        T[0, 0] = D[0, 0]
-        M[0, 0] = -1
-
-        # Forward step
-        step_to_run = range(1, T.shape[0])
-        if verbose:
-            step_to_run = progressbar.progressbar(step_to_run)
-        for i in step_to_run:
-            T[i, 0] = T[i - 1, 0] + D[i, 0]
-            M[i, 0] = 0
-            for j in range(1, T.shape[1]):
-                K = D[i, 0 : (j + 1)]
-                for k in range(j - 1, -1, -1):
-                    K[k] = K[k] + K[k + 1]
-                V = T[i - 1, 0 : (j + 1)] + K
-                M[i, j] = np.argmin(V)
-                T[i, j] = V[int(M[i, j])]
-
-        # Backward step
-        S = [0] * (track1.size())
-        if ends:
-            S[track1.size() - 1] = int(M[track1.size() - 1, track2.size() - 1])
-        else:
-            S[track1.size() - 1] = np.argmin(T[track1.size() - 1, :])
-        for i in range(track1.size() - 2, -1, -1):
-            S[i] = int(M[i + 1, S[i + 1]])
-
-        # print((T[track1.size()-1, S[track1.size()-1]] / track1.size())**(1.0/p))
-
-        # plt.plot(S, 'r-')
-        # plt.imshow(M)
-
-        __fillAFProfile(track1, track2, output, S)
-
-    # --------------------------------------------------------
-    # Fast Dynamic time warping (FDTW) algorithm
-    # --------------------------------------------------------
-    if mode == "FDTW":
-
-        if isinstance(ends, bool):
-            if not ends:
-                ends = 12
-
-        S = lambda track, k: [
-            p for p in range(max(0, k - ends), min(len(track2) - 1, k + ends))
-        ]
-        Q = lambda i, j, k, t: (j < i + 30) * (j >= i) * 1
-        P = lambda s, y, k, t: math.exp(-track2[s].position.distance2DTo(y))
-
-        HMM(S, Q, P).estimate(
-            output,
-            ["x", "y"],
-            mode=MODE_OBS_AS_2D_POSITIONS,
-            verbose=2 * verbose,
-        )
-
-        __fillAFProfile(track1, track2, output, output["hmm_inference"])
-
-    computeAbsCurv(output)
-    return output
-
-
-def __fillAFProfile(track1, track2, output, S):
-    """TODO
-
-    :param track1: TODO
-    :param track2: TODO
-    :param output: TODO
-    :param S: TODO
-    """
-    for i in range(track1.size()):
-        d = track1.getObs(i).distance2DTo(track2.getObs(S[i]))
-        ex = track1.getObs(i).position.getX() - track2.getObs(S[i]).position.getX()
-        ey = track1.getObs(i).position.getY() - track2.getObs(S[i]).position.getY()
-        output.setObsAnalyticalFeature("diff", i, d)
-        output.setObsAnalyticalFeature("pair", i, S[i])
-        output.setObsAnalyticalFeature("ex", i, ex)
-        output.setObsAnalyticalFeature("ey", i, ey)
-
-
-
-
-
-
-# Union[TrackCollection, Iterable[Track]]
-# Literal["NN", "DTW", "FDTW"]
-# bool
-# -> Track
-def centralTrack(tracks, mode="NN", verbose=True):   
-    """Computes central track of a track collection
-
-    :param tracks: TrackCollection or list of tracks
-    :param mode: "NN", "DTW" or "FDTW" for track pair matching (see the documentation
-                  of :func:`differenceProfile` function for more infos on modes)
-    :return: The central track
-    """
-
-    tracks = tracks.copy()
-
-    if isinstance(tracks, list):
-        tracks = tracklib.TrackCollection(tracks)
-    base = tracks.toENUCoordsIfNeeded()
-    central = tracks[0].copy()
-
-    for i in range(1, len(tracks)):
-        diff = differenceProfile(tracks[0], tracks[i], mode=mode, verbose=verbose)
-
-        for j in range(len(central)):
-            dx = tracks[i][diff["pair", j]].position.getX()
-            dy = tracks[i][diff["pair", j]].position.getY()
-            dz = tracks[i][diff["pair", j]].position.getZ()
-            central[j].position.translate(dx, dy, dz)
-
-    for j in range(len(central)):
-        central[j].position.scale(1.0 / len(tracks))
-
-    if not base is None:
-        central.toGeoCoords(base)
-
-    return central
-
-
-def arealStandardizedBetweenTwoTracks(track1, track2):
+from tracklib.util import dist_point_to_segment, Polygon, centerOfPoints
+from . import synchronize, computeRadialSignature
+from tracklib.core import (ENUCoords, TrackCollection, 
+                           priority_dict, co_median)
+
+# ------------------------------------------------------------------------------
+# List of available matching methods
+# Methods indexed by [p] are parameterized with Lp norm (default p = 1)
+# Methods indexed by [s] are symetric (match(t1, t2) = match(t2, t1))
+# For infinite norm: set p = float('inf')
+# All methods are parameterized by a distance d.
+# ------------------------------------------------------------------------------
+MODE_MATCHING_NN      = 1   # Nearest Neighbour                           
+MODE_MATCHING_DTW     = 2   # Dynamic Time Warping (with Lp norm)      [p][s]
+MODE_MATCHING_FDTW    = 3   # Fast (and approximate) DTW               [p][s]
+MODE_MATCHING_FRECHET = 4   # Discrete Frechet macthing                   [s]
+# ------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+# List of available distances (or pseudo-distances) between tracks
+# Methods indexed by [p] are parameterized with Lp norm (default p = 1)
+# Methods indexed by [m] are based on the output of a matching
+# Methods indexed by [s] are symetric (compare(t1, t2) = compare(t2, t1))
+# For infinite norm: set p = float('inf')
+# All methods (except aeral distance) are parameterized by a distance d.
+# ------------------------------------------------------------------------------
+MODE_COMPARISON_POINTWISE = 101 # Distances btw points at each index [p][m][s]
+MODE_COMPARISON_NN        = 102 # Distances btw nearest neighbours   [p][m]
+MODE_COMPARISON_HAUSDORFF = 103 # Haussdorf distance                       [s]
+MODE_COMPARISON_AREAL     = 104 # Mac Master aeral distance                [s]
+MODE_COMPARISON_RADIAL    = 105 # Radial distance (for closed loops)       [s]
+MODE_COMPARISON_DTW       = 106 # Distances between DTW pairs        [p][m][s]
+MODE_COMPARISON_FDTW      = 107 # Distances between FDTW pairs       [p][m][s]
+MODE_COMPARISON_FRECHET   = 108 # Distance between Frechet pairs        [m][s] 
+MODE_COMPARISON_SYNC      = 109 # Time-synchronized comparison       [p][m][s]
+# ------------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------
+# Specific parameters for fusion algorithm
+# ------------------------------------------------------------------------
+# List of available methods to choose representative point selection
+MODE_REP_BARYCENTRE   = 201   # Average of coordinates
+MODE_REP_MEDIAN_TIME  = 202   # Position at median time of observations
+MODE_REP_FURTHEST_OBS = 203   # Furthest point from master track 
+# ------------------------------------------------------------------------
+# List of available aggregate points in cluster
+MODE_AGG_MEDIAN = 300         # Component-wise median of coordinates
+MODE_AGG_L1     = 301         # Geometric median of points
+MODE_AGG_L2     = 302         # Standard barycenter of points
+MODE_AGG_LInf   = 303         # Center of minimum enclosing circle
+# ------------------------------------------------------------------------
+# List of available methods to choose representative point selection
+MODE_MASTER_RANDOM = -200   # Random track
+MODE_MASTER_MEDIAN = -100   # Closest to the median of track lengths
+# ------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+# Compare two tracks to measure a distance (or pseudo-distance) between them.
+# Available distances are: pointwise comparison, haussdorf and discrete Frechet.
+# Other available methods are: radial distance (pseudo-distance), aeral distance 
+# (semi-distance) and dynamic time warping (semi-distance) and nearest neigbour 
+# comparison (no distance property). Note that dicrete frechet distance is 
+# obtained equivalently by DTW with Lp norm set to p = float('inf'). 
+# ------------------------------------------------------------------------------
+def compare(track1, track2, mode=MODE_COMPARISON_POINTWISE, p=1, dim=2, verbose=True, plot=False) -> float:
+    if (mode == MODE_COMPARISON_POINTWISE):
+        return _compare_pointwise(track1, track2, p, dim)
+    if (mode == MODE_COMPARISON_SYNC):
+        return _synchronized_comparison(track1, track2, p, dim)       
+    if (mode == MODE_COMPARISON_NN):
+        return _nn_comparison(track1, track2, p, dim, verbose)
+    if (mode == MODE_COMPARISON_HAUSDORFF):
+        return _hausdorff(track1, track2)
+    if (mode == MODE_COMPARISON_AREAL):
+        return _arealStandardizedBetweenTwoTracks(track1, track2)
+    if (mode == MODE_COMPARISON_RADIAL):
+        return _radial_comparison(track1, track2)
+    if (mode == MODE_COMPARISON_FRECHET):
+        return _dtw_comparison(track1, track2, float('inf'), dim, verbose, plot)
+    if (mode == MODE_COMPARISON_DTW):
+        return _dtw_comparison(track1, track2, p, dim, verbose, plot)
+    if (mode == MODE_COMPARISON_FDTW):
+        return _fdtw_comparison(track1, track2, p, dim, verbose, plot)
+    print("Unavailable mode for comparison of 2 tracks")
+    sys.exit(0)
+
+
+# ------------------------------------------------------------------------------
+# Match two tracks: returns an n:m coupling between track points. Each point has 
+# at least one homologue point. Available methods are: Nearest Neihbour, 
+# (discrete) Frechet distance, dynamic time warping and fast approximate dynamic
+# time warping. Note that dicrete Frechet matching is obtained equivalently by 
+# DTW matching with Lp norm set to p = float('inf'). 
+# Output: a track with size of track1 and with links towards track2
+# ------------------------------------------------------------------------------
+def match(track1, track2, mode=MODE_MATCHING_DTW, p=1, dim=2, verbose=True, plot=False):
+    if (mode == MODE_MATCHING_NN):
+        return _nn(track1, track2, dim, verbose)
+    if (mode == MODE_MATCHING_FRECHET):
+        return _dtw_matching(track1, track2, float('inf'), dim, verbose, plot)
+    if (mode == MODE_MATCHING_DTW):
+        return _dtw_matching(track1, track2, p, dim, verbose, plot)
+    if (mode == MODE_MATCHING_FDTW):
+        return _fdtw_matching(track1, track2, p, dim, verbose, plot)
+    print("Unavailable mode for matching of 2 tracks")
+    sys.exit(0)
+
+
+# ------------------------------------------------------------------------------
+# Generic function for geometric distance between 2 points p1 and p2
+# dim = 1: 1D altimetric euclidian distance
+# dim = 2: 2D planimetric euclidian distance
+# dim = 3: 3D distance euclidian distance
+# lambda function between ENUCoords: direct application of lambda function
+# ------------------------------------------------------------------------------
+def _distance(p1, p2, dim):
+    if (dim == 1):
+        return abs(p1.U - p2.U)
+    if (dim == 2): 
+        return p1.distance2DTo(p2)
+    if (dim == 3):
+        return p1.distanceTo(p2)
+    if ('function' in str(type(dim))):
+        return dim(p1, p2)
+
+# ------------------------------------------------------------------------------
+# Pointwise distance: Lp norm average of pointwised distances
+# Exponent p should nominally be in [0, Inf], but negative values are accepted
+# ------------------------------------------------------------------------------
+def _compare_pointwise(track1, track2, p, dim) -> float:
+    if (len(track1) != len(track2)):
+        print("Error: tracks must have same size to be compared with pointwise method")
+        sys.exit(1)
+    N = len(track1)
+    d = 0
+    if p == 0:
+        for i in range(N):
+            d += (_distance(track1[i].position, track2[i].position, dim) > 0)*1
+        return d
+    if p == float('inf'): 
+        for i in range(N):
+            d = max(d, _distance(track1[i].position, track2[i].position, dim))
+        return d
+    for i in range(N):
+        d += _distance(track1[i].position, track2[i].position, dim)**p
+    return (d/N)**(1.0/p)
+            
+
+
+# ------------------------------------------------------------------------------
+# Auxiliary function for Haussdorf computation
+# ------------------------------------------------------------------------------
+def _premiereComposanteHausdorff(track1, track2):
+    result = 0
+    for p in range(track1.size()):
+        point = track1.getObs(p)
+        distmin = track2.getFirstObs().distance2DTo(point);
+        for i in range(0, track2.size() - 1): 
+            obs2i = track2.getObs(i)
+            obs2ip1 = track2.getObs(i+1)
+            
+            if isinstance(obs2ip1.position, ENUCoords):
+                if obs2ip1.position == obs2i.position:
+                    continue
+            
+            dist = dist_point_to_segment(point.position, 
+                        [obs2i.position.getX(), obs2i.position.getY(), 
+                        obs2ip1.position.getX(), obs2ip1.position.getY()])
+            distmin = min(dist, distmin)
+        result = max(distmin, result)
+    return result
+  
+
+# ------------------------------------------------------------------------------
+# Haussdorf distance computation
+# ------------------------------------------------------------------------------
+def _hausdorff(track1, track2):
+    return max(_premiereComposanteHausdorff(track1, track2),
+        _premiereComposanteHausdorff(track2, track1))
+
+# ------------------------------------------------------------------------------
+# Aeral distance computation
+# ------------------------------------------------------------------------------
+def _arealStandardizedBetweenTwoTracks(track1, track2):
     '''
     Areal between track1 and track2. We divide by the average of the tracks lengths 
     to make the measure independent with any other tracks.
@@ -430,214 +262,530 @@ def arealStandardizedBetweenTwoTracks(track1, track2):
     return 2*p.area() / (track1.length() + track2.length())
 
 
-def premiereComposanteHausdorff(track1, track2):
-    '''
-    Première composante de Hausdorff.
-
-    Parameters
-    ----------
-    track1 : Track
-        the first track
-    track2 : Track
-        the second track
-
-    Returns
-    -------
-    double
-        directed Hausdorff distance
-
-    '''
-    result = 0
-    for p in range(track1.size()):
-        point = track1.getObs(p)
-        distmin = track2.getFirstObs().distanceTo(point);
-        for i in range(0, track2.size() - 1): 
-            obs2i = track2.getObs(i)
-            obs2ip1 = track2.getObs(i+1)
-            
-            if isinstance(obs2ip1.position, ENUCoords):
-                if obs2ip1.position == obs2i.position:
-                    continue
-            
-            dist = dist_point_to_segment(point.position, 
-                        [obs2i.position.getX(), obs2i.position.getY(), 
-                        obs2ip1.position.getX(), obs2ip1.position.getY()])
-            distmin = min(dist, distmin)
-        result = max(distmin, result)
-    return result
-  
-
-def hausdorff(track1, track2):
-    '''
-    General Hausdorff distance between two tracks.
-
-    Parameters
-    ----------
-    track1 : Track
-        the first track
-    track2 : Track
-        the second track
-
-    Returns
-    -------
-    double
-        Hausdorff distance
-
-    '''
-    return max(premiereComposanteHausdorff(track1, track2),
-        premiereComposanteHausdorff(track2, track1))
-
-
-#def discreteFrechet(track1, track2):
-#    
-#    sizeP = track1.size()
-#    sizeQ = track2.size()
-#    
-#    ca = []
-#    for i in range(sizeP):
-#        ca.append([])
-#        for j in range(sizeQ):
-#            ca[i].append(-1)
-#    
-#    d = __discreteFrechetCouplingMeasure(track1, track2, sizeP - 1, sizeQ - 1, ca);
-#    return d;
-#
-#
-#def __discreteFrechetCouplingMeasure(track1, track2, i, j, ca):
-#    if ca[i][j] > -1:
-#        return ca[i][j]
-#
-#    d = track1.getObs(i).distanceTo(track2.getObs(j))
-#    if i == 0 and j == 0:
-#        ca[i][j] = d
-#        return d
-#
-#    if i > 0 and j == 0:
-#       ca[i][j] = max(
-#           __discreteFrechetCouplingMeasure(track1, track2, i - 1, j, ca), d)
-#       return ca[i][j]
-#   
-#    if i == 0 and j > 0:
-#        ca[i][j] = max(__discreteFrechetCouplingMeasure(track1, track2, i, j - 1, ca), d)
-#        return ca[i][j]
-#    
-#    if i > 0 and j > 0:
-#         ca[i][j] = max(
-#           min(__discreteFrechetCouplingMeasure(track1, track2, i - 1, j, ca), 
-#               min(__discreteFrechetCouplingMeasure(track1, track2, i - 1, j - 1, ca),
-#                   __discreteFrechetCouplingMeasure(track1, track2, i, j - 1, ca))), d)
-#         return ca[i][j]
-#
-#    ca[i][j] = sys.float_info.max
-#    return ca[i][j]
-
-
-def __chebyshev(coordSet):
-    N = len(coordSet)
-    x = -sys.float_info.max
-    y = -sys.float_info.max
-    z = -sys.float_info.max
-    for i in range(N):
-        x = max(x, abs(coordSet[i].E))
-        y = max(y, abs(coordSet[i].N))
-        z = max(z, abs(coordSet[i].U))
-    return ENUCoords(x, y, z)
-
-
-def averagingCoordSet(coordSet, p=2, constraint=False):
-    '''
-    For a set of coordinates, a representative coordinate can be defined 
-    as the center. Center can be computed with the Minkowski distance of all 
-    coordinates.
+# ------------------------------------------------------------------------------
+# Synchronization of two track for pointwise comparison
+# ------------------------------------------------------------------------------
+def _synchronized_comparison(track1, track2, p, dim):
+    trackA = track1.copy()
+    trackB = track2.copy()
+    synchronize(trackA, trackB)
     
-    :param float p : Minkowski's exponent for distance computation: 
-        1 for summation of distances, 2 for least squares solution, etc. 
-    :param boolean constraint : if True, then the center be a coordinate 
-        of the set. 
-    :return ENUCoords
+    N = len(trackA)
 
-    '''
-    
-    N = len(coordSet)
-    
-    # Chebyshev distance
-    if p == math.inf:
-        center = __chebyshev(coordSet)
-        if not constraint:
-            return center
-        else:
-            iMin = -1
-            dMin = sys.float_info.max
-            for i in range(N):
-                d = max(max(abs(coordSet[i].E - center.E), 
-                        abs(coordSet[i].N - center.N)),
-                        abs(coordSet[i].U - center.U))
-                if d < dMin:
-                    dMin = d
-                    iMin = i
-            return coordSet[iMin]
-    
-    # Minkowski distance, p != Infini
-    p = max(min(p, 15), 1e-2)
-    
-    x = coordSet[0].E**p
-    y = coordSet[0].N**p
-    z = coordSet[0].U**p
-    for i in range(1, N):
-        x += coordSet[i].E**p
-        y += coordSet[i].N**p
-        z += coordSet[i].U**p
-    center = ENUCoords((x/N)**(1.0/p), (y/N)**(1.0/p), (z/N)**(1.0/p))
-    
-    if not constraint:
-        return center
-    else:
-        iMin = -1
-        dMin = sys.float_info.max
+    if N <= 0:
+        return 
+
+    d = 0
+
+    if p == 0:
         for i in range(N):
-            d = (abs(coordSet[i].E - center.E)**p +  
-                 abs(coordSet[i].N - center.N)**p +
-                 abs(coordSet[i].U - center.U)**p) **1.0/p
-            if d < dMin:
-                dMin = d
-                iMin = i
-        return coordSet[iMin]
+            d += (_distance(trackA.getObs(i).position, trackB.getObs(i).position, dim) > 0)*1
+        return d
+    if p == float('inf'): 
+        for i in range(N):
+            d = max(d, _distance(trackA.getObs(i).position, trackB.getObs(i).position, dim))
+        return d
+    for i in range(N):
+        d += _distance(trackA.getObs(i).position, trackB.getObs(i).position, dim)**p
+    return (d/N)**(1.0/p)
     
 
+# ------------------------------------------------------------------------------
+# Radial (semi) distance comparison
+# ------------------------------------------------------------------------------
+def _radial_comparison(track1, track2):
+    signature1 = computeRadialSignature(track1)
+    signature2 = computeRadialSignature(track2)
+    plt.plot(signature1['s'], signature1['r'], 'r-')
+    plt.plot(signature2['s'], signature2['r'], 'b-')
 
-def fusion(tracks, weight=lambda A, B : A + B**2, ref=0, 
-           p=1, constraint=False, verbose=True):
+# ------------------------------------------------------------------------------
+# Comparison based on Nearest Neighbor
+# ------------------------------------------------------------------------------
+def _nn_comparison(track1, track2, p, dim, verbose):
+    matching = _nn(track1, track2, dim, verbose)
+    N = len(matching)
+    d = 0
+    if p == 0:
+        for i in range(N):
+            d += (matching["diff", i] > 0)*1
+        return d
+    if p == float('inf'): 
+        for i in range(N):
+            d = max(d, matching["diff", i])
+        return d
+    for i in range(N):
+        d += matching["diff", i]**p
+    return (d/N)**(1.0/p)
 
-    central = tracks[ref].copy()
-    
-    ITER_MAX = 100
-    for iteration in range(ITER_MAX):
-        
-        if verbose:
-            print("ITERATION", iteration)
-        
-        profiles = tracklib.TrackCollection()
-        central_before = central.copy()
-    
-        for i in range(len(tracks)):
-            profile = tracklib.algo.comparison.differenceProfile2(central, tracks[i], weight, verbose=verbose)
-            profiles.addTrack(profile)
+
+# ------------------------------------------------------------------------------
+# Bi-directional Nearest Neighbor computation
+# ------------------------------------------------------------------------------
+def _nn(track1, track2, dim, verbose):
+    # 1 -> 2 matching
+    matching = _nn_mono(track1, track2, dim, verbose)
+
+    # 2 -> 1 matching
+    matching_reverse = _nn_mono(track2, track1, dim, verbose)
+   
+    matching_in_2 = {}
+    for i in range(len(matching)):
+        matching_in_2[matching[i, "pair"][0]] = 0
+    for j in range(len(matching_reverse)):
+        if not j in matching_in_2:
+            matching[matching_reverse[j, "pair"][0], "pair"].append(j)
             
-        for j in range(len(central)):
-            cluster = []
-            for i in range(len(profiles)):
-                cluster.append(tracks[i][profiles[i]["pair", j]].position)
-            central[j].position = averagingCoordSet(cluster, p=p, constraint=constraint)
-        
-        profile = tracklib.algo.comparison.differenceProfile2(central, central_before, weight, verbose=verbose)
-        if verbose:
-            print("CV = ", profile.score)
-        if (profile.score < 1e-16):
-            break
-        
+    for j in range(len(matching)):
+        matching["pair", j] = sorted(matching["pair", j])
+  
+    return matching
+
+# ------------------------------------------------------------------------------
+# Mono-directional Nearest Neighbor computation
+# ------------------------------------------------------------------------------
+def _nn_mono(track1, track2, dim, verbose):
+
+    output = track1.copy()
+    output.createAnalyticalFeature("diff")
+    output.createAnalyticalFeature("pair")
+    output.createAnalyticalFeature("ex")
+    output.createAnalyticalFeature("ey")
+  
+    N1 = track1.size()
+    N2 = track2.size()
+   
+    step_to_run = range(1, N1)
     if verbose:
-        print("END OF COMPUTATION")
-                
-    return central
+       step_to_run = progressbar.progressbar(step_to_run)
+    to_run = range(output.size())
+    if verbose:
+        to_run = progressbar.progressbar(to_run)
+    for i in to_run:
+        val_min = sys.float_info.max
+        id_min = 0
+        for j in range(track2.size()):
+            distance = _distance(output.getObs(i).position, track2.getObs(j).position, dim)
+            if distance < val_min:
+                val_min = distance
+                id_min = j
+        output.setObsAnalyticalFeature("diff", i, val_min)
+        output.setObsAnalyticalFeature("pair", i, [id_min])
+        ex = track1.getObs(i).position.getX() - track2.getObs(id_min).position.getX()
+        ey = track1.getObs(i).position.getY() - track2.getObs(id_min).position.getY()
+        output.setObsAnalyticalFeature("ex", i, ex)
+        output.setObsAnalyticalFeature("ey", i, ey)
+
+    return output
+
+
+# ------------------------------------------------------------------------------
+# Weight (possible) conversion auxiliary function: p -> weight
+# ------------------------------------------------------------------------------
+def _p2weight(p):
+    if 'function' in str(type(p)):
+        weight = p
+    if ('int' in str(type(p))) or ('float' in str(type(p))):
+        weight = lambda A, B : A + B**p
+    if (p == 0):
+        weight = lambda A, B : A + (B != 0)*1
+    if (p == float('inf')):
+        weight = lambda A, B : max(A, B) 
+    return weight
+
+# ------------------------------------------------------------------------------
+# Comparison based on Fast Dynamic Time Warping
+# ------------------------------------------------------------------------------
+def _fdtw_comparison(track1, track2, p, dim, verbose, plot):
+    matching = _fdtw_matching(track1, track2, p, dim, verbose, plot)
+    if ((p == 0) or (p == float('inf'))):
+        return matching.score
+    return (matching.score/matching.nb_links)**(1.0/p)
+
+# ------------------------------------------------------------------------------
+# Matching based on Fast Dynamic Time Warping
+# ------------------------------------------------------------------------------
+def _fdtw_matching(track1, track2, p, dim, verbose, plot):
+    return _fdtw(track1, track2, _p2weight(p), dim, verbose, plot)
+
+# ------------------------------------------------------------------------------
+# Fast Dynamic Time Warping computation
+# For classical Lp norm, set the weight function as follows:
+#    - p = 0                  weight = lambda A, B : A + (B != 0)*1
+#    - p = 1                  weight = lambda A, B : A + B**1
+#    - p = 2                  weight = lambda A, B : A + B**2
+#    - p = float('inf')       weight = lambda A, B : max(A, B)
+# ------------------------------------------------------------------------------
+def _fdtw(track1, track2, weight = lambda A, B : A + B, dim=2, verbose = True, plot=False):   
     
- 
+    output = track1.copy()
+
+    output.createAnalyticalFeature("diff")
+    output.createAnalyticalFeature("pair")
+    output.createAnalyticalFeature("ex")
+    output.createAnalyticalFeature("ey")
+
+    N1 = track1.size()
+    N2 = track2.size()
+    
+    if (plot):
+        D = np.zeros((N2, N1))
+
+    # ----------------------------------------------------------
+    # Optimal path with dynamic programming
+    # ----------------------------------------------------------
+    T = np.zeros((N2, N1)); T[0,0] = weight(0, _distance(track2.getObs(0).position, track1.getObs(0).position, dim))
+    F = priority_dict({(0,0): 0})
+    V =  priority_dict()
+    A = dict({(0,0): (-1, -1)})
+    if (plot):
+        D[0,0] = T[0,0]
+
+    # Forward step 
+    counter = 0
+    step_to_run = range(1, N1)
+    if verbose:
+        counter = 0
+        bar = progressbar.ProgressBar(max_value=N1-1)
+
+    while(1):
+        node = F.pop_smallest(); i = node[0]; j = node[1]; 
+        if verbose:
+            counter = max(i, counter); 
+            #bar.update(counter)
+        V[node] = 1
+        if ((i == N2-1) and (j == N1-1)):
+            break
+        if ((i < N2-1) and (j < N1-1)): 
+            dist = _distance(track2.getObs(i+1).position, track1.getObs(j+1).position, dim)
+            _update_node(F, T, (i+1, j+1), weight(T[i,j], dist), V, A, node)
+            if (plot):
+                D[i+1, j+1] = dist
+        if (j < N1-1):
+            dist = _distance(track2.getObs(i  ).position, track1.getObs(j+1).position, dim)
+            _update_node(F, T, (i  , j+1), weight(T[i,j], dist), V, A, node)
+            if (plot):
+                D[i, j+1] = dist
+        if (i < N2-1):       
+            dist =  _distance(track2.getObs(i+1).position, track1.getObs(j  ).position, dim)
+            _update_node(F, T, (i+1, j  ), weight(T[i,j], dist), V, A, node) 
+            if (plot):
+                D[i+1, j] = dist
+    
+    # Backward step
+    S = [(N2-1, N1-1)] 
+    while((S[-1][0] > 0) or (S[-1][1] > 0)):
+        S.append(A[S[-1]])
+
+    if (plot):
+        plt.imshow(T)
+        for i in range(len(S)):
+            plt.plot(S[i][1], S[i][0], 'r.', markersize=2)
+        plt.show()
+
+    return _fillAF_dtw(output, track1, track2, S, T, dim)
+    
+# ------------------------------------------------------------------------------
+# Auxiliary function for Fast Dynamic Time Warping
+# ------------------------------------------------------------------------------    
+def _update_node(F, T, node, new_cost, V, A, ant):
+    if node in V:
+        return
+    if not node in F:
+        F[node] = 1e300
+    if new_cost < F[node]:
+        F[node] = new_cost
+        A[node] = ant
+        T[node[0], node[1]] = new_cost
+
+
+# ------------------------------------------------------------------------------
+# Comparison based on Dynamic Time Warping
+# ------------------------------------------------------------------------------
+def _dtw_comparison(track1, track2, p, dim, verbose, plot):
+    matching = _dtw_matching(track1, track2, p, dim, verbose, plot)
+    if ((p == 0) or (p == float('inf')) or ('function' in str(type(p)))):
+        return matching.score
+    return (matching.score/matching.nb_links)**(1.0/p)
+
+# ------------------------------------------------------------------------------
+# Matching based on Dynamic Time Warping
+# ------------------------------------------------------------------------------
+def _dtw_matching(track1, track2, p, dim, verbose, plot):
+    return _dtw(track1, track2, _p2weight(p), dim, verbose, plot)
+
+# ------------------------------------------------------------------------------
+# Dynamic Time Warping computation
+# For classical Lp norm, set the weight function as follows:
+#    - p = 0                  weight = lambda A, B : A + (B != 0)*1
+#    - p = 1                  weight = lambda A, B : A + B**1
+#    - p = 2                  weight = lambda A, B : A + B**2
+#    - p = float('inf')       weight = lambda A, B : max(A, B)
+# ------------------------------------------------------------------------------
+def _dtw(track1, track2, weight = lambda A, B : A + B, dim=2, verbose = True, plot=False):   
+    
+    output = track1.copy()
+
+    output.createAnalyticalFeature("diff")
+    output.createAnalyticalFeature("pair")
+    output.createAnalyticalFeature("ex")
+    output.createAnalyticalFeature("ey")
+
+    N1 = track1.size()
+    N2 = track2.size()
+
+    step_to_run = range(1, N1)
+    if verbose:
+        step_to_run = progressbar.progressbar(step_to_run)
+
+    # Forming distance matrix
+    D = np.zeros((N2, N1))
+    for i in range(N2):
+        for j in range(N1):
+            D[i, j] = _distance(track2.getObs(i).position, track1.getObs(j).position, dim)
+
+    # ----------------------------------------------------------
+    # Optimal path with dynamic programming
+    # ----------------------------------------------------------
+    T = np.zeros((N2, N1))
+    M = np.ones( (N2, N1)) * (-1 + (-1)*1j)
+
+    T[0, 0] = weight(0, D[0, 0])
+    for i in range(1, N2):
+        T[i,0] = weight(T[i-1,0], D[i,0])
+        M[i,0] = (i-1) + 0*1j
+    for j in range(1, N1):
+        T[0,j] = weight(T[0,j-1], D[0,j])
+        M[0,j] = 0 + (j-1)*1j
+
+    # Forward step
+    for j in step_to_run:
+        for i in range(1, N2):
+            l = T[i, j-1]; u = T[i-1,j]; ul = T[i-1,j-1]
+            T[i,j] = weight(min(ul, min(u, l)), D[i,j])
+            M[i,j] = (i-(l>=min(ul, u))) + (j-(u>=min(ul, l)))*1j
+
+    # Backward step
+    S = [(N2-1, N1-1)] 
+    while((S[-1][0] > 0) or (S[-1][1] > 0)):
+        m = M[S[-1][0], S[-1][1]]
+        S.append((int(np.real(m)), int(np.imag(m))))
+
+    if (plot):
+        plt.imshow(T)
+        for i in range(len(S)):
+            plt.plot(S[i][1], S[i][0], 'r.', markersize=2)
+        plt.show()
+
+    return _fillAF_dtw(output, track1, track2, S, T, dim)
+    
+
+# ------------------------------------------------------------------------------
+# Auxiliary function for Dynamic Time Warping and Fast Dynamic Time Warping
+# ------------------------------------------------------------------------------    
+def _fillAF_dtw(output, track1, track2, S, T, dim):
+    output.nb_links = 0 
+    for i in range(len(output)):
+        output.setObsAnalyticalFeature("pair", i, [])
+    for i in range(len(S)-1, -1, -1):
+        d =  _distance(track1.getObs(S[i][1]).position, track2.getObs(S[i][0]).position, dim)
+        ex = track1.getObs(S[i][1]).position.getX() - track2.getObs(S[i][0]).position.getX()
+        ey = track1.getObs(S[i][1]).position.getY() - track2.getObs(S[i][0]).position.getY()
+        output.setObsAnalyticalFeature("diff", S[i][1], d)
+        output.getObsAnalyticalFeature("pair", S[i][1]).append(S[i][0]); output.nb_links += 1
+        output.setObsAnalyticalFeature("ex", S[i][1], ex)
+        output.setObsAnalyticalFeature("ey", S[i][1], ey)
+    output.score = T[-1, -1]
+    return output
+
+# ------------------------------------------------------------------------------
+# Function to plot matching output from 'match' method
+# ------------------------------------------------------------------------------
+def plotMatching(matching, track2, af_name="pair", sym="k--", linewidth=.5, NO_DATA_VALUE: int = -1):
+    for i in range(matching.size()):
+        if matching.getObsAnalyticalFeature(af_name, i) == NO_DATA_VALUE:
+            continue
+        x1 = matching.getObs(i).position.getX()
+        y1 = matching.getObs(i).position.getY()
+        pairs = matching.getObsAnalyticalFeature(af_name, i)
+        for pair in pairs:
+            x2 = track2.getObs(pair).position.getX()
+            y2 = track2.getObs(pair).position.getY()
+            plt.plot([x1, x2], [y1, y2], sym, linewidth=linewidth)
+
+
+# ------------------------------------------------------------------------
+# [B1] On cherche l'index de la trace dont la longueur est la plus proche
+# de la valeur médiane des longueurs de la collection des traces
+# Inputs:
+#   - a collection of tracks
+#   - ref: index of track in list or:
+# MODE_MASTER_RANDOM: random master track
+# MODE_MASTER_MEDIAN: track with length closest to median of lengths
+# ------------------------------------------------------------------------ 
+def _getMasterTrack(tracks, mode):
+    if mode == MODE_MASTER_MEDIAN:
+        L = tracks.getLenth()
+        m = co_median(L)
+        imed = 0
+        dmed = abs(L[0] - m)
+        for k in range(1, tracks.size()):
+            d = abs(L[k] - m)
+            if d < dmed:
+                imed = k
+        ref = imed
+        return ref
+    if mode == MODE_MASTER_RANDOM:
+        return random.sample(range(len(tracks)), 1)[0]
+    return mode
+
+# ------------------------------------------------------------------------
+# [B3] Method to find representative center for fusion algorithm
+# Inputs: a list of matched index in an homologue track
+# Input pos is an optional ENUCoords for MODE_REP_FURTHEST_OBS
+# Output: ENUCoords of aggregated point
+# ------------------------------------------------------------------------
+def _representative(pairs, track, represent_method=MODE_REP_BARYCENTRE, pos=None):
+    P = tracklib.Track([track[i] for i in pairs])
+    if represent_method == MODE_REP_BARYCENTRE:
+        return P.getCentroid()
+    if represent_method == MODE_REP_MEDIAN_TIME:
+        return P.getMedianObsInTime().position
+    if represent_method == MODE_REP_FURTHEST_OBS:
+        if pos is None:
+            print("Reference position must be specified for MODE_REP_FURTHEST_OBS in _representative")
+            sys.exit(0)
+        return P.getFurthestObs(pos).position
+    print("Unknown mode " + str(represent_method) +" for representative of track section")
+    sys.exit(1)
+    
+# ------------------------------------------------------------------------
+# [B4] Auxiliary function for aggregation and potential constraint
+# Constraint = map on existing point in cluster. Available modes are:
+# MODE_AGG_MEDIAN: median of coordinates in x and y
+# MODE_AGG_L1: geometric median
+# MODE_AGG_L2: geometric mean
+# MODE_AGG_LInf: center of smallest enclosing circle
+# ------------------------------------------------------------------------
+def _aggregate(cluster, mode=MODE_AGG_MEDIAN, constraint=False, anchors=None):
+    center = centerOfPoints(cluster, mode=mode)
+    if constraint:
+       center = _constrain_center(center, anchors)
+    return center
+    
+# ------------------------------------------------------------------------
+# [B4] Auxiliary function to map center on on anchors
+# ------------------------------------------------------------------------
+def _constrain_center(position, anchors):
+    d = sys.float_info.max; pos = -1
+    for i in range(len(anchors)):
+        if _distance(anchors[i], position, 2) < d:
+            pos = i
+            d = _distance(anchors[i], position, 2)
+    return anchors[pos].copy()
+
+
+# ------------------------------------------------------------------------
+# Debugging tool to print details of matching
+# ------------------------------------------------------------------------
+def printMatching(matching):
+    print("----------------------------------------------------")
+    print("MATCHING DETAILS")
+    print("----------------------------------------------------")
+    for i in range(len(matching)):
+        print(i, "->", matching[i, "pair"])
+    print("----------------------------------------------------")
+
+
+# ------------------------------------------------------------------------
+# One iteration for fusion algorithm
+# ------------------------------------------------------------------------
+def _fusion_iteration(central, tracks, mode, p, dim, represent_method, agg_method, constraint, verbose):
+
+    matchings = tracklib.TrackCollection()
+    for i in range(len(tracks)):
+        matching = match(central, tracks[i], mode=mode, p=p, dim=dim, verbose=verbose)
+        matching.createAnalyticalFeature("homologous")
+        for j in range(len(central)):
+            matching[j, "homologous"] = _representative(matching[j, "pair"], tracks[i], represent_method, pos=central.getObs(j))
+        matchings.addTrack(matching)
+
+    #CLS = []
+    for j in range(len(central)):
+        cluster = [matchings[i]["homologous", j] for i in range(len(matchings))]
+        anchors = [tracks[k][i].position for k in range(len(tracks)) for i in matchings[k][j, "pair"]]
+        central[j].position = _aggregate(cluster, agg_method, constraint, anchors)				
+        #CLS.append(cluster)
+    #central.clusters.append(CLS)
+
+# ------------------------------------------------------------------------
+# Algorithme fusion L. Etienne : trajectoire médiane
+# ------------------------------------------------------------------------
+def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constraint, iter_max, verbose):
+
+    start_time = datetime.datetime.now()
+
+    central = tracks[_getMasterTrack(tracks, mode=master)].copy()
+    
+    central.clusters    = []       # logging
+    central.iterations  = []       # logging
+    central.convergence = []       # logging
+
+    for iteration in range(iter_max):
+
+        if verbose:
+            print("[" + str(datetime.datetime.now()) + "]   ITERATION", iteration)
+            
+        central.iterations.append(tracklib.Track([obs.copy() for obs in central]))
+        central_before = central.copy()
+
+        _fusion_iteration(central, tracks, mode, p, dim, represent_method, agg_method, constraint, verbose)
+
+        evolution = compare(central, central_before, mode=MODE_COMPARISON_POINTWISE, p=1)
+        central.convergence.append(evolution)
+        
+        if verbose:
+            print("CV = ", evolution)
+        if (evolution < 1e-16):
+            break
+         
+    
+    if ((iteration == iter_max-1) and (evolution > 0)):
+        print("WARNING: TRAJECTORY FUSION HAS NOT CONVERGED (#ITER = " + str(iter_max) + " - CV = " + str(central.convergence[-1]) + ")")    
+    
+    end_time = datetime.datetime.now()
+    
+    if verbose:
+        print("[" + str(end_time) + "]    COMPUTATION DONE IN " + str(end_time-start_time))
+    
+
+    
+    
+    return central
+
+
+# ------------------------------------------------------------------------
+# Algorithme récursif fusion L. Etienne : trajectoire médiane
+# ------------------------------------------------------------------------ 
+def fusion(tracks, mode=MODE_MATCHING_DTW, master=MODE_MASTER_MEDIAN, p=1, dim=2,  
+           represent_method=MODE_REP_BARYCENTRE, agg_method=MODE_AGG_MEDIAN, constraint=True,
+           recursive=1e300, iter_max=100, verbose=True):
+    
+    N = len(tracks)
+
+    # Terminal case
+    if N <= recursive:
+        return _fusion(tracks, mode=mode, master=master, p=p, dim=dim, represent_method=represent_method, agg_method=agg_method, constraint=constraint, iter_max=iter_max, verbose=verbose)
+
+    # Recursive call
+    else: 
+       Npg = int(N/recursive)
+       subtracks = TrackCollection()
+       for i in range(recursive):
+           ini = Npg*i; fin = Npg*(i+1)
+           if i == (recursive-1):
+               fin = len(tracks)
+           subtracks.addTrack(fusion(tracks[ini:fin], mode=mode, master=master, p=p, dim=dim, represent_method=represent_method, constraint=constraint, agg_method=agg_method, recursive=recursive, verbose=verbose))
+       return fusion(subtracks, mode=mode, master=master, p=p, dim=dim, represent_method=represent_method, constraint=constraint, agg_method=agg_method, recursive=recursive, verbose=verbose)
+
+

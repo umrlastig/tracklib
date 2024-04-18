@@ -54,7 +54,9 @@ import tracklib as tracklib
 from tracklib.core import (ENUCoords, Obs, isnan)
 from tracklib.util import Circle, minCircle
 from tracklib.algo import (acceleration, 
-                           ALGO_LINEAR, MODE_SPATIAL)
+                           ALGO_LINEAR, MODE_SPATIAL,
+                           compare, match, MODE_COMPARISON_DTW, MODE_MATCHING_NN,
+                           MODE_MATCHING_DTW, MODE_COMPARISON_HAUSDORFF)
 from tracklib.core import Operator
 
 
@@ -256,20 +258,22 @@ def splitReturnTripExhaustive(track, verbose=True):
     min_val = 1e300
     argmin = 0
 
-    AVG = Operator.AVERAGER
-    
-    step_to_run = range(0, track.size())
+    step_to_run = range(1, track.size()-1)
     if verbose:
         step_to_run = progressbar.progressbar(step_to_run)
-    
+
     for return_point in step_to_run: 
         T1 = track.extract(0, return_point)
         T2 = track.extract(return_point, track.size()-1)
-        avg = (T1 - T2).operate(AVG, "diff") + (T2 - T1).operate(AVG, "diff")
-        if avg < min_val:
-            min_val = avg
+        
+        # avg = (T1 - T2).operate(AVG, "diff") + (T2 - T1).operate(AVG, "diff")
+        d1 = compare(T1, T2, verbose=False, mode=MODE_COMPARISON_DTW, p=1)
+        d2 = compare(T2, T1, verbose=False, mode=MODE_COMPARISON_DTW, p=1)
+        avg = min(d1, d2)
+        if avg <= min_val:
+            min_val = float(avg)
             argmin = return_point
- 
+
     first_part = track.extract(0, argmin-1)
     second_part = track.extract(argmin, track.size()-1)
     
@@ -287,7 +291,8 @@ def splitReturnTripFast(track, side_effect=0.1, sampling=1):
     Second version with Fast Fourier Transform"""
 
     track = track.copy()
-    track.toENUCoords(track.getFirstObs().position)
+    if track.getSRID() != "ENU":
+        track.toENUCoords(track.getFirstObs().position)
     track_test = track.copy()
     track_test.resample(
         (track_test.length() / track_test.size()) / sampling, ALGO_LINEAR, MODE_SPATIAL

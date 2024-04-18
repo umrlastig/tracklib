@@ -120,6 +120,8 @@ def khi2test(X, SIGMA, prob=0.05):
 
 class NoiseProcess:
     """TODO"""
+    
+    SEED = None
 
     def __init__(self, amps=None, kernels=None, distribution=DISTRIBUTION_NORMAL):
         """TODO"""
@@ -183,47 +185,42 @@ class NoiseProcess:
         plt.show()
 
 
-def seed(integer):
-    """TODO"""
+# ----------------------------------------------------------------------
+# Method to generate seed for random generation. If no seed is specified 
+# the seed is chosen at random at function call, and can then be 
+# retrieved with getseed function
+# ----------------------------------------------------------------------
+def seed(integer = None):
+    """
+    Initialize the random number generator.
+    :param integer: number (optional)
+    """
+    if integer is None:
+        integer = random.randrange(2**32)
     random.seed(integer)
     np.random.seed(integer)
+    NoiseProcess.SEED = integer
+
+def getseed():
+    return NoiseProcess.SEED
 
 
-#def gaussian_process(self, timestamps, kernel, factor=1.0, sigma=0.0, cp_var=False):
-#    """Track interpolation and smoothing with Gaussian Process (GP)
-#
-#    :param timestamps: points where interpolation must be computed. May be a list of
-#        timestamps, a track or a number of seconds
-#    :param kernel: a symetric function k(xi-xj) describing the statistical similarity
-#        between the coordinates X,Y,Z taken in two points :
-#
-#        .. math::
-#
-#            k(t2-t1) = Cov(X(t1), X(t2))
-#
-#            k(t2-t1) = Cov(X(t1), X(t2))
-#
-#            k(t2-t1) = Cov(Z(t1), Z(t2))
-#
-#
-#    :param factor: unit factor of variance if the kernel must be scaled
-#    :param sigma: observation noise standard deviation (in coords units)
-#    :param cp_var: compute covariance matrix and store pointwise sigmas
-#
-#    :return: interpolated/smoothed track (without AF)"""
-#
-#    return gaussian_process(
-#        self, timestamps, kernel, factor, sigma, cp_var
-#    )
+def __randomSampler(N, distribution):
+    if distribution == DISTRIBUTION_NORMAL:
+        return np.random.normal(0.0, 1.0, N)
+    if distribution == DISTRIBUTION_UNIFORM:
+        return np.random.uniform(-1.73205, 1.73205, N)
+    if distribution == DISTRIBUTION_LAPLACE:
+        return np.random.laplace(0.0, 0.5, N)
 
 
-def randomColor():
-    """TODO"""
-    return [random.random(), random.random(), random.random()]
 
+MODE_NOISE_LINEAR    = 'linear'
+MODE_NOISE_EUCLIDIAN = 'euclidian'
+MODE_NOISE_CIRCULAR  = 'circular'
 
 def noise(
-    track, sigma=[1], kernel=[DiracKernel()], distribution=DISTRIBUTION_NORMAL, mode='linear', force=False, cycle=False
+    track, sigma=[1], kernel=[DiracKernel()], distribution=DISTRIBUTION_NORMAL, mode=MODE_NOISE_LINEAR, force=False, cycle=False, control=[], n=1
 ):
     """Track noising with Cholesky factorization of gaussian process covariance matrix:
 
@@ -239,57 +236,100 @@ def noise(
     :param sigma: noise amplitude(s) (in observation coordinate units)
     :param kernel: noise autocovariance function(s)
 	:param mode: 'linear' (default), 'circular' or 'euclidian'
-	:param force: force definite-positive matrix with removal of negative eigen values"""
+	:param force: force definite-positive matrix with removal of negative eigen values
+    :param control: control points (list of coords) for conditional simulations 
+    :param N: number of tracks to generate (returns track collection if N > 1)"""
+
+    if n == 1:
+        return __noise(track, sigma, kernel, distribution, mode, force, cycle, control)
+    else:
+        tracks = TrackCollection()
+        for i in range(n):
+            tracks.addTrack(__noise(track, sigma, kernel, distribution, mode, force, cycle, control))
+        return tracks
+
+
+def __noise(
+    track, sigma=[1], kernel=[DiracKernel()], distribution=DISTRIBUTION_NORMAL, mode='linear', force=False, cycle=False, control=[]
+):
+    """Track noising with Cholesky factorization of gaussian process covariance matrix:
+
+    .. math::
+
+        h(x2-x1)=\\exp-\\left(\\frac{x2-x1}{scope}\\right)^2
+
+    If :math:`X` is a gaussian white noise, :math:`Cov(LX) = L^t*L` => if :math:`L` is a
+    Cholesky factorization of a semi-postive-definite matrix :math:`S`,
+    :math:`then Cov(LX) = L^T*L = S` and :math:`Y=LX`` has :math:`S` as covariance matrix.
+
+    :param track: the track to be smoothed (input track is not modified)
+    :param sigma: noise amplitude(s) (in observation coordinate units)
+    :param kernel: noise autocovariance function(s)
+	:param mode: 'linear' (default), 'circular' or 'euclidian'
+	:param force: force definite-positive matrix with removal of negative eigen values
+    :param control: control points (list of coords) for conditional simulations """
 
     sigma = listify(sigma)
     kernel = listify(kernel)
+    
+    if (len(control) > 0):
+        if not ('tuple' in str(type(control[0]))):
+            control_bis = []
+            for cp in control:
+                control_bis.append((cp, track[cp].position))
+            control = control_bis
 
     if len(sigma) != len(kernel):
         sys.exit(
             "Error: amplitude and kernel arrays must have same size in 'noise' function"
         )
 
-    N = track.size()
-    computeAbsCurv(track)
-
+    N  = track.size()
+    Nc = len(control)
     noised_track = track.copy()
+    computeAbsCurv(noised_track)
+    Xc = np.zeros(Nc)
+    Yc = np.zeros(Nc)
+    Zc = np.zeros(Nc)
+    
+    # Constraints (if any)
+    for ip in range(len(control)):
+        if (control[ip][1] is not None):
+            Xc[ip] = control[ip][1].getX() - track[control[ip][0]].position.getX()
+            Yc[ip] = control[ip][1].getY() - track[control[ip][0]].position.getY()
+            Zc[ip] = control[ip][1].getZ() - track[control[ip][0]].position.getZ()
 
-    for n in range(len(sigma)):
+	# Loop on kernel models
+    for ik in range(len(sigma)):
 
-        SIGMA_S = makeCovarianceMatrixFromKernel(kernel[n], track, force=force, mode=mode)
-        SIGMA_S += np.identity(N) * 1e-12
-        SIGMA_S *= sigma[n] ** 2 / SIGMA_S[0, 0]
+        # Zero-amplitude case
+        if (sigma[ik] == 0):
+            continue
+
+        # Building covariance matrix
+        SIGMA_S  = makeCovarianceMatrixFromKernel(kernel[ik], noised_track, force=force, mode=mode, control=control)
+        SIGMA_S += np.identity(SIGMA_S.shape[0]) * 1e-12
+        SIGMA_S *= sigma[ik] ** 2 / SIGMA_S[0, 0]
 
         # Cholesky decomposition
         L = np.linalg.cholesky(SIGMA_S)
-
+        L22 = L[Nc:  , Nc:  ]
+        L11 = L[  :Nc,   :Nc]
+        L12 = L[Nc:  ,   :Nc] 
+        
         # Noise simulation
-        if distribution == DISTRIBUTION_NORMAL:
-            Xx = np.random.normal(0.0, 1.0, N)
-            Xy = np.random.normal(0.0, 1.0, N)
-            Xz = np.random.normal(0.0, 1.0, N)
-        if distribution == DISTRIBUTION_UNIFORM:
-            Xx = np.random.uniform(-1.73205, 1.73205, N)
-            Xy = np.random.uniform(-1.73205, 1.73205, N)
-            Xz = np.random.uniform(-1.73205, 1.73205, N)
-        if distribution == DISTRIBUTION_LAPLACE:
-            Xx = np.random.laplace(0.0, 0.5, N)
-            Xy = np.random.laplace(0.0, 0.5, N)
-            Xz = np.random.laplace(0.0, 0.5, N)
-        Yx = np.matmul(L, Xx)
-        Yy = np.matmul(L, Xy)
-        Yz = np.matmul(L, Xz)
-
+        Yx = np.matmul(L22, __randomSampler(N, distribution)) + np.matmul(L12, np.linalg.solve(L11, Xc))
+        Yy = np.matmul(L22, __randomSampler(N, distribution)) + np.matmul(L12, np.linalg.solve(L11, Yc))
+        Yz = np.matmul(L22, __randomSampler(N, distribution)) + np.matmul(L12, np.linalg.solve(L11, Zc))
+        
         # Building noised track
         for i in range(N):
-            pt = noised_track.getObs(i).position
-            pt.setX(pt.getX() + Yx[i])
-            pt.setY(pt.getY() + Yy[i])
-            pt.setZ(pt.getZ() + Yz[i])
-            obs = Obs(pt, track.getObs(i).timestamp)
+            noised_track.getObs(i).position.translate(Yx[i], Yy[i], Yz[i])
 			
         if mode == 'circular':
             noised_track.loop()
+            
+    noised_track.removeAnalyticalFeature("abs_curv")
 		   
     return noised_track
 

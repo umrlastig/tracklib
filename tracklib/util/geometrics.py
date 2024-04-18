@@ -53,7 +53,7 @@ import random
 import sys
 
 import tracklib as tracklib
-from tracklib.core import ENUCoords
+from tracklib.core import ENUCoords, co_median, co_avg
 from . import (right, inclusion, collinear, isSegmentIntersects,
                       transform, transform_inverse)
 
@@ -620,7 +620,6 @@ def __circle(p1, p2=None, p3=None):
     Finds circle through 1, 2 or 3 points
     Returns Circle(C, R)
     """
-
     if not isinstance(p1, ENUCoords):
         print("Error: ENU coordinates are required for min circle computation")
         exit()
@@ -630,6 +629,7 @@ def __circle(p1, p2=None, p3=None):
         centre = p1 + p2
         centre.scale(0.5)
         return Circle(centre, p1.distance2DTo(p2) / 2)
+        
     if collinear(
         [p1.getX(), p1.getY()], [p2.getX(), p2.getY()], [p3.getX(), p3.getY()]
     ):
@@ -687,7 +687,7 @@ def __welzl(C):
     """
     Finds minimal bounding circle with Welzl's algorithm
     """
-    
+
     P = C.center
     P = P.copy()
     R = C.radius
@@ -704,7 +704,6 @@ def __welzl(C):
         return __circle(R[0], R[1], R[2])
     
     id = random.randint(0, len(P) - 1)
-
     p = P[id]
     P2 = []
     for i in range(len(P)):
@@ -719,7 +718,8 @@ def __welzl(C):
     elif p.distance2DTo(D.center) < D.radius:
         return D
     else:
-        R.append(p)
+        if not p in R:
+            R.append(p)
         return __welzl(Circle(P, R))
 
 
@@ -734,6 +734,22 @@ def plotPolygon(P, color=[1, 0, 0, 1]):
     plt.plot(XR, YR, color=color)
 
 
+def minCircleOfPoints(points):
+    """
+    Finds minimal bounding circle with Welzl's recursive
+    algorithm in O(n) complexity. 
+    Output is given as a list [p, R], where p is a Coords object defining circle center
+    and R is its radius. Due to recursion limits, only tracks
+    with fewer than 800 points can be processed
+    """
+    if len(points) > 0.5 * sys.getrecursionlimit():
+        message = ("Error: too many points in dataset to compute minimal enclosing circle. ")
+        message += 'Downsample dataset size, or use "sys.setrecursionlimit('
+        message += str(int((2 * len(points)) / 1000) * 1000 + 1000) + ') or higher"'
+        print(message)
+        exit()
+    return __welzl(Circle(points, []))
+
 def minCircle(track):
     """
     Finds minimal bounding circle with Welzl's recursive
@@ -746,24 +762,10 @@ def minCircle(track):
     if not track.getSRID() == "ENU":
         print("Error: ENU coordinates are required for min circle computation")
         exit()
-    if track.size() > 0.5 * sys.getrecursionlimit():
-        message = (
-            "Error: too many points in track to compute minimal enclosing circle. "
-        )
-        message += 'Downsample track, or use "sys.setrecursionlimit('
-        message += str(int((2 * track.size()) / 1000) * 1000 + 1000) + ') or higher"'
-        print(message)
-        exit()
 
     # centre = track.getFirstObs().position.copy()
 
-    P = [obs.position for obs in track]
-    if track.getFirstObs() == track.getLastObs():
-        # Si la ligne est fermée ?
-        P = P[:-1]
-    R = []
-
-    return __welzl(Circle(P, R))
+    return minCircleOfPoints([obs.position for obs in track])
 
 
 def minCircleMatrix(track):
@@ -939,3 +941,116 @@ def minimumBoundingRectangle(track):
         T.append([track[i].position.getX(), track[i].position.getY()])
 
     return __mbr(T)
+    
+# ------------------------------------------------------------
+# Geometric median of a set of points (ENUCoords) is a point 
+# in 2D space whose L1 sum of L2 distances to all other points 
+# is minimal. Computation is done with Weiszfeld's algorithm.
+# Output is the median of points as an ENUCoords point
+# ------------------------------------------------------------
+def geometricMedian(points, N_ITER_MAX = 100, epsilon_factor = 1e-10):
+	
+    if (len(points) == 1):
+        return points[0].copy
+    if (len(points) == 2):
+        x0 = 0.5*(points[0].E + points[1].E)
+        y0 = 0.5*(points[0].N + points[1].N)
+        return ENUCoords(x0, y0)
+	
+    # Initialization
+    xmin = points[0].getX()
+    ymin = points[0].getY()
+    xmax = points[0].getX()
+    ymax = points[0].getY()
+    for i in range(1, len(points)):
+        xmin = min(xmin, points[i].getX())
+        xmax = max(xmax, points[i].getX())
+        ymin = min(ymin, points[i].getY())
+        ymax = max(ymax, points[i].getY())     
+    epsilon = epsilon_factor*math.sqrt((xmax-xmin)**2 + (ymax-ymin)**2)
+    x0 = xmin + (xmax-xmin)*random.random()
+    y0 = ymin + (ymax-ymin)*random.random()
+
+    # Median computation
+    for k in range(N_ITER_MAX):
+        xnew = 0; ynew = 0; Z = 0
+        for i in range(len(points)):
+            di = math.sqrt((x0-points[i].getX())**2 + (y0-points[i].getY())**2)
+            xnew += points[i].getX()/di
+            ynew += points[i].getY()/di
+            Z += 1.0/di
+        xnew /= Z
+        ynew /= Z
+        disp = max(abs(xnew-x0), abs(ynew-y0))
+
+        if (disp < epsilon):
+            return ENUCoords(xnew, ynew)
+         
+        x0 = xnew
+        y0 = ynew
+        
+    print("WARNING: geometric median did not reach convergence")     
+    return ENUCoords(xnew, ynew)
+     
+
+# ------------------------------------------------------------
+# Generic function to get center of a set of points
+# ------------------------------------------------------------
+MODE_AGG_MEDIAN = 300  # Component-wise median of coordinates
+MODE_AGG_L1     = 301  # Geometric median of points
+MODE_AGG_L2     = 302  # Standard barycenter of points
+MODE_AGG_LInf   = 303  # Center of minimum enclosing circle
+# ------------------------------------------------------------
+# MODE_MEDIAN and MODE_L2 are computed in 3D. MODE_L1 and 
+# MODE_L2 are computed in 2D. MODE_Lp is the "generalized 
+# barycenter" of a set of points, and refers to the point 
+# (in 2D or 3D space) minimizing the sum of p-th power of 
+# distances towards all points in the dataset.
+# ------------------------------------------------------------
+def centerOfPoints(coordSet, mode=MODE_AGG_L2):
+
+    # ----------------------------------------------
+    # Calcul de la médiane marginale
+    # ----------------------------------------------
+    if mode == MODE_AGG_MEDIAN:
+        N = len(coordSet)
+        X = []; Y = []; Z = []
+        for i in range(N):
+            X.append(coordSet[i].E)
+            Y.append(coordSet[i].N)
+            Z.append(coordSet[i].U)
+        x = co_median(X)
+        y = co_median(Y)
+        z = co_median(Z)
+        return ENUCoords(x, y, z)
+
+    # ----------------------------------------------
+    # L1 (geometric median) -> Weiszfeld's algorithm
+    # ----------------------------------------------
+    if mode == MODE_AGG_L1:
+        return geometricMedian(coordSet)
+
+    # ----------------------------------------------
+    # L2 (geometric mean) -> simple average
+    # ----------------------------------------------
+    if mode == MODE_AGG_L2:
+        N = len(coordSet)
+        X = []; Y = []; Z = []
+        for i in range(N):
+            X.append(coordSet[i].E)
+            Y.append(coordSet[i].N)
+            Z.append(coordSet[i].U)
+        x = co_avg(X)
+        y = co_avg(Y)
+        z = co_avg(Z)
+        return ENUCoords(x, y, z)
+        
+    
+    # ----------------------------------------------
+    # LInf (Radius of enclosing circle) -> 
+    # ----------------------------------------------
+    if mode == MODE_AGG_LInf:
+        return minCircleOfPoints(coordSet).center
+
+    print("Unknown mode in 'centerOfPoints' function")
+    sys.exit(1)

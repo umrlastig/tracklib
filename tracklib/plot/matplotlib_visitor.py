@@ -311,14 +311,15 @@ class MatplotlibVisitor(IPlotVisitor):
         
         
         for k in range(len(track)):
-
             P = track.getObsAnalyticalFeature(af, k)[0:2, 0:2]
             [V, D] = np.linalg.eig(P)
-            alpha = math.atan(-D[0][1] / D[0][0]) * 180 / math.pi
+
+            alpha = math.atan(-D[0,1] / D[0,0]) * 180 / math.pi
             Xhat = track[k].position.getX()
             Yhat = track[k].position.getY()
-            SDXhat = D[0, 0]
-            SDYhat = D[1, 1]
+            SDXhat = math.sqrt(V[0])
+            SDYhat = math.sqrt(V[1])
+            
 
             e = Ellipse((Xhat, Yhat), factor * SDXhat, factor * SDYhat, angle=alpha)
             e.set_fill(False)
@@ -391,18 +392,22 @@ class MatplotlibVisitor(IPlotVisitor):
         ymax = ymax + dy * margin
         
         if af_name != None and af_name != "":
-            
             if track.isAFTransition(af_name):
                 tabmarqueurs = track.getAnalyticalFeature(af_name)
-                xaf = []
-                yaf = []
+                xaf = []; xnaf = []
+                yaf = []; ynaf = []
                 for i in range(len(tabmarqueurs)):
                     val = tabmarqueurs[i]
                     if val == 1:
                         xaf.append(track.getObs(i).position.getX())
                         yaf.append(track.getObs(i).position.getY())
-
+                    else:
+                        xnaf.append(track.getObs(i).position.getX())
+                        ynaf.append(track.getObs(i).position.getY())
+                        
                 ax1.plot(xaf, yaf, "o", color=color, markersize=size,
+                    label=af_name )
+                ax1.plot(xnaf, ynaf, "o", color='darkgray', markersize=size,
                     label=af_name )
                 #tabplot.append(l)
                 #tablegend.append(af_name)

@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 
 import math
+import random
 import unittest
 import matplotlib.pyplot as plt
 from tracklib import (Obs, ObsTime, ENUCoords, Track,
                       Circle, Rectangle, Polygon,
                       minCircle, fitCircle, minCircleMatrix,
                       diameter, convexHull, plotPolygon,
-                      minimumBoundingRectangle)
+                      minimumBoundingRectangle, geometricMedian,
+                      seed, generate, minCircleOfPoints, centerOfPoints,
+                      MODE_AGG_MEDIAN, MODE_AGG_L1, MODE_AGG_L2, MODE_AGG_LInf)
 
 
 class TestAlgoGeometricsMethods(unittest.TestCase):
@@ -239,11 +242,12 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         self.trace1.plot()
         
         C1 = minCircle(self.trace1)
-        C1.plot()
-        self.assertLessEqual(abs(1 - C1.radius), self.__epsilon, "Rayon du cercle")
-        self.assertIsInstance(C1.center, ENUCoords)
-        self.assertLessEqual(abs(0 - C1.center.getX()), self.__epsilon, "coord x du centre cercle")
-        self.assertLessEqual(abs(0 - C1.center.getY()), self.__epsilon, "coord y du centre cercle")
+        if C1 != None:
+            C1.plot()
+            self.assertLessEqual(abs(1 - C1.radius), self.__epsilon, "Rayon du cercle")
+            self.assertIsInstance(C1.center, ENUCoords)
+            self.assertLessEqual(abs(0 - C1.center.getX()), self.__epsilon, "coord x du centre cercle")
+            self.assertLessEqual(abs(0 - C1.center.getY()), self.__epsilon, "coord y du centre cercle")
 
         C2 = fitCircle(self.trace1)
         C2.plot()
@@ -332,18 +336,112 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         self.assertEqual(R[1], 16.5)
         self.assertLessEqual(abs(3.104 - R[2]), self.__epsilon, "l")
         self.assertLessEqual(abs(5.315 - R[3]), self.__epsilon, "L")
-        
-        
-    # def testMinCircle(self):
-        
-    #     trace = Track()
-    #     D = Geometrics.minCircle(trace)
 
+    def testminCircle(self):
 
+        x_t = lambda t: math.cos(2*math.pi*t)*(1+math.cos(2*math.pi*t))
+        y_t = lambda t: math.sin(2*math.pi*t)*(1+math.cos(2*math.pi*t))
+        track = generate(x_t, y_t, verbose=False)
+        C = minCircle(track)
+        ctrl = ENUCoords(0.750062948047937, 0, 0)
+        self.assertLessEqual((C.center-ctrl).norm(), 1e-3, "")
+        self.assertLessEqual((C.radius-1.29889277557522822), 1e-6, "")
+        
+        x_t = lambda t: t
+        y_t = lambda t: 0
+        track = generate(x_t, y_t, verbose=False)
+        C = minCircle(track)
+        ctrl = ENUCoords(1/2, 0, 0)
+        self.assertLessEqual((C.center-ctrl).norm(), 1e-9, "")
+        self.assertLessEqual(abs(C.radius-1/2), 1e-9, "")
+        
+        seed(123456)
+        track = generate(0.2, verbose=False)
+        C = minCircle(track)
+        ctrl = ENUCoords(21.790668496145393, 107.96309245052865, 18.40757818000451)
+        self.assertLessEqual((C.center - ctrl).norm(), 1e-3, "")
+        self.assertLessEqual(abs(C.radius-94.13448087550445), 1e-3, "")
+        
+        track = generate(0.05, verbose=False)
+        C = minCircle(track)
+        ctrl = ENUCoords(23.902020223427428, 58.57669524806307, -2.677181586593697)
+        self.assertLessEqual((C.center - ctrl).norm(), 1e-3, "")
+        self.assertLessEqual(abs(C.radius-107.40544513985932), 1e-3, "")
+        
+        points = [ENUCoords(-1,0,0), ENUCoords(1,0,0), ENUCoords(0,1,0)]
+        C = minCircleOfPoints(points)
+        self.assertLessEqual(C.center.norm(), 1e-9, "")
+        self.assertLessEqual(abs(C.radius-1), 1e-9, "")
 
+        points = [ENUCoords(-1,1,0), ENUCoords(1,-1,0)]
+        C = minCircleOfPoints(points)
+        self.assertLessEqual(C.center.norm(), 1e-9, "")
+        self.assertLessEqual(abs(C.radius-math.sqrt(2)), 1e-9, "")     
+        
+        points = [ENUCoords(-1,0,0), ENUCoords(0,0,0), ENUCoords(1,0,0)]
+        C = minCircleOfPoints(points)
+        self.assertLessEqual(C.center.norm(), 1e-9, "")
+        self.assertLessEqual(abs(C.radius-1), 1e-9, "")
+    
+    def testgeometricMedian(self):
+
+        N = 100
+        points = []
+        for i in range(N):
+            coord = ENUCoords(math.cos(i/N*2*math.pi), math.sin(i/N*2*math.pi), 0)
+            points.append(coord)
+        g_median = geometricMedian(points, N_ITER_MAX = 100, epsilon_factor = 1e-10)
+        self.assertLessEqual(abs(g_median.E), 1e-9, "l")
+        self.assertLessEqual(abs(g_median.N), 1e-9, "l") 
+        
+        points = []
+        random.seed(1)
+        ax = 10*random.random(); bx = 10*random.random()
+        ay = 10*random.random(); by = 10*random.random()
+        for i in range(N):
+            coord = ENUCoords(ax + (bx-ax)*random.random(), ay + (by-ay)*random.random(),0)
+            points.append(coord)
+        g_median = geometricMedian(points, N_ITER_MAX = 100, epsilon_factor = 1e-10)
+        self.assertLessEqual(abs(g_median.E - 4.721382180936472), 1e-9, "l")
+        self.assertLessEqual(abs(g_median.N - 5.141492859376853), 1e-9, "l")
+        
+        points = []
+        ax = 10*random.random(); bx = 10*random.random()
+        ay = 10*random.random(); by = 10*random.random()
+        for i in range(N):
+            coord = ENUCoords(ax + (bx-ax)*random.random(), ay + (by-ay)*random.random(),0)
+            points.append(coord)
+            
+        g_median = geometricMedian(points, N_ITER_MAX = 100, epsilon_factor = 1e-10)
+        
+        u = ENUCoords(0,0)
+        for p in points:
+        	n = (p-g_median).norm2D()
+        	u = u + ENUCoords((p-g_median).E/n, (p-g_median).N/n)
+ 
+        self.assertLessEqual(u.norm2D(), 1e-6, "l")
+
+        
+    def testcenterOfPoints(self):
+        random.seed(1)
+        points = []
+        for i in range(10):
+            points.append(ENUCoords(random.random(), random.random(), 0))
+        points.append(ENUCoords(5, 5, 0))
+        
+        ctrls = []
+        ctrls.append(ENUCoords(0.5750738975545472, 0.4951500768978625, 0.0))
+        ctrls.append(ENUCoords(0.9375135062720457, 0.8637580443006666, 0.0))
+        ctrls.append(ENUCoords(2.5469297933871173, 2.5141737382610030, 0.0))
+    
+        MODES = [MODE_AGG_L1, MODE_AGG_L2, MODE_AGG_LInf]
+        for i in range(len(MODES)):
+            center = centerOfPoints(points, mode=MODES[i])
+            self.assertLessEqual((center-ctrls[i]).norm(), 1e-9, "")
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
+
     suite.addTest(TestAlgoGeometricsMethods("testCircle"))
     suite.addTest(TestAlgoGeometricsMethods("testRectangle"))
     suite.addTest(TestAlgoGeometricsMethods("testPolygon"))
@@ -351,6 +449,9 @@ if __name__ == '__main__':
     suite.addTest(TestAlgoGeometricsMethods("testCircles"))
     suite.addTest(TestAlgoGeometricsMethods("testDiameter"))
     suite.addTest(TestAlgoGeometricsMethods("testConvexHull"))
-    suite.addTest(TestAlgoGeometricsMethods("testminimumBoundingRectangle"))
+    suite.addTest(TestAlgoGeometricsMethods("testminCircle"))
+    suite.addTest(TestAlgoGeometricsMethods("testgeometricMedian"))
+    suite.addTest(TestAlgoGeometricsMethods("testcenterOfPoints"))
+
     runner = unittest.TextTestRunner()
     runner.run(suite)

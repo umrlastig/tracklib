@@ -52,12 +52,13 @@ import math
 import copy
 import numpy as np
 
-from . import (ObsTime, ENUCoords, Obs, 
+from . import (ObsTime, ENUCoords, GeoCoords, Obs, 
                isnan, listify, NAN, isfloat,
                compLike, makeRPN,
                TrackCollection,
                DiracKernel, GaussianKernel,
-               Bbox)
+               Bbox,
+               co_median)
 from tracklib.util import intersection, Polygon
 from tracklib.plot import IPlotVisitor, MatplotlibVisitor
 from tracklib.algo import (BIAF_SPEED, BIAF_ABS_CURV, 
@@ -68,8 +69,10 @@ from tracklib.algo import (BIAF_SPEED, BIAF_ABS_CURV,
                            noise,
                            estimate_speed,
                            smoothed_speed_calculation,
-                           differenceProfile,
-                           MODE_TEMPORAL)                     
+                           match,
+                           MODE_TEMPORAL,
+                           sample)
+
 from . import (UnaryOperator, BinaryOperator, 
                ScalarOperator, ScalarVoidOperator, 
                BinaryVoidOperator, UnaryVoidOperator,
@@ -370,7 +373,45 @@ class Track:
         if not isnan(m.getZ()):
             m.setZ(self.operate(Operator.AVERAGER, 'z'))
         return m
-
+    
+    def getFurthestObs(self, o):
+        ''' '''
+        pos = 0
+        d = o.distanceTo(self.getFirstObs())
+        for i in range(1, self.size()):
+            if o.distanceTo(self.getObs(i)) > d:
+                pos = i
+                d = o.distanceTo(self.getObs(i))
+        return self.getObs(pos).copy()
+    
+    def getNearestObs(self, o):
+        ''' '''
+        pos = 0
+        d = o.distanceTo(self.getFirstObs())
+        for i in range(1, self.size()):
+            if o.distanceTo(self.getObs(i)) < d:
+                pos = i
+                d = o.distanceTo(self.getObs(i))
+        return self.getObs(pos).copy()
+    
+    def getMedianObs(self):
+        ''' '''
+        # TODO: Test if timestamp exists
+        self.sort()
+        T = self.getT()
+        t1 = co_median(T)
+        s = sample(self, ObsTime.readUnixTime(t1))
+        return s
+    
+    def getMedianObsInTime(self):
+        ''' '''
+        # TODO: Test if timestamp exists
+        self.sort()
+        med = (self.getLastObs().timestamp - self.getFirstObs().timestamp) / 2
+        tm = self.getFirstObs().timestamp.addSec(med)
+        s = sample(self, tm)
+        return s
+        
     def getEnclosedPolygon(self):
         """TODO"""
         return Polygon(self.getX(), self.getY())
@@ -575,6 +616,21 @@ class Track:
         """TODO"""
         for i in range(self.size()):
             self.getObs(i).timestamp = self.getObsAnalyticalFeature(af_name, i)
+            
+    def setXFromFunction(self, function):
+        """TODO"""
+        for i in range(self.size()):
+            self.getObs(i).position.setX(function(self, i))
+            
+    def setYFromFunction(self, function):
+        """TODO"""
+        for i in range(self.size()):
+            self.getObs(i).position.setY(function(self, i))
+            
+    def setZFromFunction(self, function):
+        """TODO"""
+        for i in range(self.size()):
+            self.getObs(i).position.setZ(function(self, i))
 
     def setOrder(self, name="order", start=0):
         """TODO"""
@@ -1430,11 +1486,11 @@ class Track:
     # =========================================================================
     #  Adding noise to tracks
     # =========================================================================
-    def noise(self, sigma=5, kernel=None, force=False, cycle=False):
+    def noise(self, sigma=5, kernel=None, force=False, cycle=False, control=[], n=1):
         """TODO"""
         if kernel is None:
             kernel = DiracKernel()
-        return noise(self, sigma, kernel, force=force, cycle=cycle)
+        return noise(self, sigma, kernel, force=force, cycle=cycle, control=control, n=1)
 
     # =========================================================================
     # Graphical methods
@@ -2301,7 +2357,7 @@ class Track:
         return self.size()
 
     # ------------------------------------------------------------
-    # [-] Computes difference profile of 2 tracks
+    # [-] Computes difference between two tracks
     # ------------------------------------------------------------
     def __sub__(self, arg):
         """TODO"""
@@ -2309,7 +2365,7 @@ class Track:
             print("Available operator not implemented yet")
             return None
         else:
-            return differenceProfile(self, arg)
+            return match(self, arg)
 
     # ------------------------------------------------------------
     # [*] Temporal resampling of track or track intersections
@@ -2396,6 +2452,12 @@ class Track:
                 self.removeAnalyticalFeature(n)
                 return
             if (str(type(obs))[8:16] == "function"):
+                if n == "x":
+                    return self.setXFromFunction(obs)
+                if n == "y":
+                    return self.setYFromFunction(obs)
+                if n == "z":
+                    return self.setZFromFunction(obs)
                 self.addAnalyticalFeature(obs, n)
                 return
             if self.hasAnalyticalFeature(n):
