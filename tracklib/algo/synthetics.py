@@ -146,10 +146,11 @@ def generateDataSet(vx, vy, N=100, pmin=(0, 0), pmax=(100, 100), Nbmax=1000):
 
 
 def generateReturnTrip(track, kernelNoise=None):
-    
+
     tracks1 = TrackCollection([track]*2)
     tracks1.noise(3, kernelNoise)
 
+    
     t1 = tracks1[0]
     start = t1.getLastObs().position
 
@@ -166,10 +167,10 @@ def generateReturnTrip(track, kernelNoise=None):
     segment.addObs(t2.getFirstObs().copy())
     segment.removeObs(-2)
     
-    segment.getObs(1).position.translate(d/5, 0)
-    segment.getObs(2).position.translate(-d/5, 0)
-    segment.resample(factor=2, mode=tracklib.MODE_SPATIAL)
-    segment.addObs(t2.getFirstObs().copy())
+    #segment.getObs(1).position.translate(d/5, 0)
+    #segment.getObs(2).position.translate(-d/5, 0)
+    #segment.resample(factor=2, mode=tracklib.MODE_SPATIAL)
+    #segment.addObs(t2.getFirstObs().copy())
 
     t3 = t1 + segment + t2
     return t3

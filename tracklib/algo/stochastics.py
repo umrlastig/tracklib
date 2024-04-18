@@ -298,6 +298,10 @@ def __noise(
 	# Loop on kernel models
     for ik in range(len(sigma)):
 
+        # Zero-amplitude case
+        if (sigma[ik] == 0):
+            continue
+
         # Building covariance matrix
         SIGMA_S  = makeCovarianceMatrixFromKernel(kernel[ik], noised_track, force=force, mode=mode, control=control)
         SIGMA_S += np.identity(SIGMA_S.shape[0]) * 1e-12
@@ -320,6 +324,8 @@ def __noise(
 			
         if mode == 'circular':
             noised_track.loop()
+            
+    noised_track.removeAnalyticalFeature("abs_curv")
 		   
     return noised_track
 

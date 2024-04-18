@@ -200,19 +200,20 @@ def makeDistanceMatrix(track, mode = 'linear'):
 	:mode: computation mode ('linear', 'circular' or 'euclidian')
     :return: numpy distance matrix with a track
     """
-	
     if mode not in ['linear', 'circular', 'euclidian']:
         print("Error: unknown mode: "+str(mode))
         sys.exit(1)
     if mode in ['linear', 'circular']:
         S = np.array(track.getAnalyticalFeature("abs_curv"))
-        z = np.array([complex(s, 0) for s in S])
+        z = np.array([complex(s, 0) for s in S])	
     if mode == 'euclidian':
 	    z = np.array([complex(obs.position.getX(), obs.position.getY()) for obs in track])
     m, n = np.meshgrid(z, z)
     D = abs(m-n)
     if mode == 'circular':
         D = np.minimum(D, np.max(D)-D)
+    #import matplotlib.pyplot as plt
+    #plt.imshow(D)
     return D
 
 
