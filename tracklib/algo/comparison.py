@@ -601,7 +601,17 @@ def _fillAF_dtw(output, track1, track2, S, T, dim):
 # ------------------------------------------------------------------------------
 # Function to plot matching output from 'match' method
 # ------------------------------------------------------------------------------
-def plotMatching(matching, track2, af_name="pair", sym="k--", linewidth=.5, NO_DATA_VALUE: int = -1):
+def plotMatching(matching, track2, af_name="pair", sym="k--", linewidth=.5, 
+                 NO_DATA_VALUE: int = -1, append=False):
+    # 
+    if isinstance(append, bool):
+        if append:
+            ax1 = plt.gca()
+        else:
+            fig, ax1 = plt.subplots(figsize=(10, 3))
+    else:
+        ax1 = plt
+
     for i in range(matching.size()):
         if matching.getObsAnalyticalFeature(af_name, i) == NO_DATA_VALUE:
             continue
@@ -611,7 +621,7 @@ def plotMatching(matching, track2, af_name="pair", sym="k--", linewidth=.5, NO_D
         for pair in pairs:
             x2 = track2.getObs(pair).position.getX()
             y2 = track2.getObs(pair).position.getY()
-            plt.plot([x1, x2], [y1, y2], sym, linewidth=linewidth)
+            ax1.plot([x1, x2], [y1, y2], sym, linewidth=linewidth)
 
 
 # ------------------------------------------------------------------------
@@ -667,7 +677,7 @@ def _representative(pairs, track, represent_method=MODE_REP_BARYCENTRE, pos=None
 # MODE_AGG_L2: geometric mean
 # MODE_AGG_LInf: center of smallest enclosing circle
 # ------------------------------------------------------------------------
-def _aggregate(cluster, mode=MODE_AGG_MEDIAN, constraint=False, anchors=None):
+def aggregate(cluster, mode=MODE_AGG_MEDIAN, constraint=False, anchors=None):
     center = centerOfPoints(cluster, mode=mode)
     if constraint:
        center = _constrain_center(center, anchors)
@@ -710,13 +720,13 @@ def _fusion_iteration(central, tracks, mode, p, dim, represent_method, agg_metho
             matching[j, "homologous"] = _representative(matching[j, "pair"], tracks[i], represent_method, pos=central.getObs(j))
         matchings.addTrack(matching)
 
-    #CLS = []
+    CLS = []
     for j in range(len(central)):
         cluster = [matchings[i]["homologous", j] for i in range(len(matchings))]
         anchors = [tracks[k][i].position for k in range(len(tracks)) for i in matchings[k][j, "pair"]]
-        central[j].position = _aggregate(cluster, agg_method, constraint, anchors)				
-        #CLS.append(cluster)
-    #central.clusters.append(CLS)
+        central[j].position = aggregate(cluster, agg_method, constraint, anchors)
+        CLS.append(cluster)
+    central.clusters.append(CLS)
 
 # ------------------------------------------------------------------------
 # Algorithme fusion L. Etienne : trajectoire médiane
@@ -757,9 +767,6 @@ def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constrai
     
     if verbose:
         print("[" + str(end_time) + "]    COMPUTATION DONE IN " + str(end_time-start_time))
-    
-
-    
     
     return central
 
