@@ -759,7 +759,7 @@ def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constrai
         if (evolution < 1e-16):
             break
          
-    
+    central.iteration = iteration
     if ((iteration == iter_max-1) and (evolution > 0)):
         print("WARNING: TRAJECTORY FUSION HAS NOT CONVERGED (#ITER = " + str(iter_max) + " - CV = " + str(central.convergence[-1]) + ")")    
     
