@@ -353,7 +353,7 @@ def _nn_mono(track1, track2, dim, verbose):
     output.createAnalyticalFeature("ey")
   
     N1 = track1.size()
-    N2 = track2.size()
+    #N2 = track2.size()
    
     step_to_run = range(1, N1)
     if verbose:
@@ -443,10 +443,10 @@ def _fdtw(track1, track2, weight = lambda A, B : A + B, dim=2, verbose = True, p
 
     # Forward step 
     counter = 0
-    step_to_run = range(1, N1)
+    #step_to_run = range(1, N1)
     if verbose:
         counter = 0
-        bar = progressbar.ProgressBar(max_value=N1-1)
+        #bar = progressbar.ProgressBar(max_value=N1-1)
 
     while(1):
         node = F.pop_smallest(); i = node[0]; j = node[1]; 
@@ -601,7 +601,17 @@ def _fillAF_dtw(output, track1, track2, S, T, dim):
 # ------------------------------------------------------------------------------
 # Function to plot matching output from 'match' method
 # ------------------------------------------------------------------------------
-def plotMatching(matching, track2, af_name="pair", sym="k--", linewidth=.5, NO_DATA_VALUE: int = -1):
+def plotMatching(matching, track2, af_name="pair", sym="k--", linewidth=.5, 
+                 NO_DATA_VALUE: int = -1, append=False):
+    # 
+    if isinstance(append, bool):
+        if append:
+            ax1 = plt.gca()
+        else:
+            fig, ax1 = plt.subplots(figsize=(10, 3))
+    else:
+        ax1 = plt
+
     for i in range(matching.size()):
         if matching.getObsAnalyticalFeature(af_name, i) == NO_DATA_VALUE:
             continue
@@ -611,7 +621,7 @@ def plotMatching(matching, track2, af_name="pair", sym="k--", linewidth=.5, NO_D
         for pair in pairs:
             x2 = track2.getObs(pair).position.getX()
             y2 = track2.getObs(pair).position.getY()
-            plt.plot([x1, x2], [y1, y2], sym, linewidth=linewidth)
+            ax1.plot([x1, x2], [y1, y2], sym, linewidth=linewidth)
 
 
 # ------------------------------------------------------------------------
@@ -710,13 +720,13 @@ def _fusion_iteration(central, tracks, mode, p, dim, represent_method, agg_metho
             matching[j, "homologous"] = _representative(matching[j, "pair"], tracks[i], represent_method, pos=central.getObs(j))
         matchings.addTrack(matching)
 
-    #CLS = []
+    CLS = []
     for j in range(len(central)):
         cluster = [matchings[i]["homologous", j] for i in range(len(matchings))]
         anchors = [tracks[k][i].position for k in range(len(tracks)) for i in matchings[k][j, "pair"]]
-        central[j].position = _aggregate(cluster, agg_method, constraint, anchors)				
-        #CLS.append(cluster)
-    #central.clusters.append(CLS)
+        central[j].position = _aggregate(cluster, agg_method, constraint, anchors)
+        CLS.append(cluster)
+    central.clusters.append(CLS)
 
 # ------------------------------------------------------------------------
 # Algorithme fusion L. Etienne : trajectoire médiane
@@ -725,7 +735,8 @@ def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constrai
 
     start_time = datetime.datetime.now()
 
-    central = tracks[_getMasterTrack(tracks, mode=master)].copy()
+    master = _getMasterTrack(tracks, mode=master)
+    central = tracks[master].copy()
     
     central.clusters    = []       # logging
     central.iterations  = []       # logging
@@ -749,7 +760,6 @@ def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constrai
         if (evolution < 1e-16):
             break
          
-    
     if ((iteration == iter_max-1) and (evolution > 0)):
         print("WARNING: TRAJECTORY FUSION HAS NOT CONVERGED (#ITER = " + str(iter_max) + " - CV = " + str(central.convergence[-1]) + ")")    
     
@@ -758,8 +768,8 @@ def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constrai
     if verbose:
         print("[" + str(end_time) + "]    COMPUTATION DONE IN " + str(end_time-start_time))
     
-
-    
+    central.iteration = iteration
+    central.master = master
     
     return central
 
