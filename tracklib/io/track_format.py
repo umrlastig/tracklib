@@ -45,6 +45,7 @@ File format to read and write GPS tracks to CSV file(s).
 """
 
 import os.path
+from tracklib.util.exceptions import *
 
 from tracklib.core import ObsTime
 

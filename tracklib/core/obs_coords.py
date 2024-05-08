@@ -49,6 +49,7 @@ This Module contains the classes to manage point coordinates:
 # For type annotation
 from __future__ import annotations   
 from typing import Union
+from tracklib.util.exceptions import *
 
 import math
 import copy

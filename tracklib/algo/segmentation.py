@@ -49,6 +49,7 @@ import sys
 import math
 import progressbar
 import numpy as np
+from tracklib.util.exceptions import *
 
 import tracklib as tracklib
 from tracklib.core import (ENUCoords, Obs, isnan)

@@ -48,6 +48,7 @@ knowledge of the CeCILL-C license and that you accept its terms.
 import sys
 import math
 import numpy as np
+from tracklib.util.exceptions import *
 
 import tracklib as tracklib
 from tracklib.util import (aire_visval, 
@@ -118,7 +119,7 @@ def simplify(track, tolerance, mode=MODE_SIMPLIFY_DOUGLAS_PEUCKER, verbose=True)
     if mode == MODE_SIMPLIFY_FREE_MAXIMIZE:
         max = MODE_SEGMENTATION_MAXIMIZE
         return optimalSimplification(track, tolerance, None, max, verbose)
-    sys.exit("Error: track simplification mode " + (str)(mode) + " not implemented yet")
+    raise NotYetImplementedError("Error: track simplification mode " + (str)(mode) + " not implemented yet")
 
 
 

@@ -47,6 +47,7 @@ Kernels for filtering, smoothing and stochastics simulations.
 # For type annotation
 from __future__ import annotations   
 from typing import Any
+from tracklib.util.exceptions import *
 
 from collections.abc import Callable
 import sys
@@ -132,7 +133,7 @@ class Kernel:
         :return: A sliding windows
         """
         if self.support < 1:
-            sys.exit(
+            raise KernelError(
                 "Error: kernel size must be > 1 to be transformed to sliding window"
             )
         size = 2 * (int)(self.support) + 1

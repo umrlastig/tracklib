@@ -47,6 +47,7 @@ Moduke to manage mapping of GPS tracks on geographic features
 
 # For type annotation
 from __future__ import annotations   
+from tracklib.util.exceptions import *
 
 import math
 import progressbar

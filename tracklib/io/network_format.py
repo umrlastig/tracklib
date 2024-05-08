@@ -44,6 +44,7 @@ Write Networks
 """
 
 import os.path
+from tracklib.util.exceptions import *
 
 
 class NetworkFormat:

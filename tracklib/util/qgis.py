@@ -40,6 +40,7 @@ knowledge of the CeCILL-C license and that you accept its terms.
 """
 
 from tracklib import Track, TrackCollection
+from tracklib.util.exceptions import *
 
 try:
     from qgis.PyQt.QtCore import QVariant

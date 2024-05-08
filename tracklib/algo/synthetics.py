@@ -45,6 +45,7 @@ Class to manage GPS tracks synthetic generations
 """
 
 import random
+from tracklib.util.exceptions import *
 
 import tracklib as tracklib
 from tracklib.core import (ENUCoords, 

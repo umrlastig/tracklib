@@ -1052,5 +1052,4 @@ def centerOfPoints(coordSet, mode=MODE_AGG_L2):
     if mode == MODE_AGG_LInf:
         return minCircleOfPoints(coordSet).center
 
-    print("Unknown mode in 'centerOfPoints' function")
-    sys.exit(1)
+    raise UnknownModeError("Unknown mode in 'centerOfPoints' function")

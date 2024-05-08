@@ -106,6 +106,7 @@ General constraint syntax:
 """
 
 import matplotlib.pyplot as plt
+from tracklib.util.exceptions import *
 
 import tracklib as tracklib
 from tracklib.core import (ENUCoords, GeoCoords, Obs, ObsTime,

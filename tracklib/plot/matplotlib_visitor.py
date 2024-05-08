@@ -50,6 +50,7 @@ import progressbar
 import sys
 
 import tracklib as tracklib
+from tracklib.util.exceptions import *
 from tracklib.plot import IPlotVisitor
 
 from tracklib.core import isnan, NAN, getColorMap

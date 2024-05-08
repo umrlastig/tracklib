@@ -47,6 +47,7 @@ Points are referenced in geodetic coordinates
 
 # For type annotation
 from __future__ import annotations
+from tracklib.util.exceptions import *
 
 import sys
 import copy
@@ -106,7 +107,7 @@ class Obs:
         if isinstance(obs1.position, ECEFCoords) or (
             isinstance(obs2.position, ECEFCoords)
         ):
-            sys.exit("Error: cannot call " + fname + " with ECEF coordinates")
+            raise CoordTypeError("Error: cannot call " + fname + " with ECEF coordinates")
 
     def __check_call_geom2(fname, obs1: Obs, obs2: Obs):
         """TODO
@@ -120,7 +121,7 @@ class Obs:
         nc1 = (str)(c1)[7:-1]
         nc2 = (str)(c2)[7:-1]
         if c1 != c2:
-            sys.exit(
+            raise CoordTypeError(
                 "Error: cannot call "
                 + fname
                 + " method with "

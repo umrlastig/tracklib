@@ -53,6 +53,7 @@ import matplotlib.pyplot as plt
 
 
 import tracklib as tracklib
+from tracklib.util.exceptions import *
 from tracklib.util import dist_point_to_segment, Polygon, centerOfPoints
 from . import synchronize, computeRadialSignature
 from tracklib.core import (ENUCoords, TrackCollection, 
@@ -137,8 +138,8 @@ def compare(track1, track2, mode=MODE_COMPARISON_POINTWISE, p=1, dim=2, verbose=
         return _dtw_comparison(track1, track2, p, dim, verbose, plot)
     if (mode == MODE_COMPARISON_FDTW):
         return _fdtw_comparison(track1, track2, p, dim, verbose, plot)
-    print("Unavailable mode for comparison of 2 tracks")
-    sys.exit(0)
+    raise UnknownModeError("Unavailable mode for comparison of 2 tracks")
+
 
 
 # ------------------------------------------------------------------------------
@@ -158,8 +159,7 @@ def match(track1, track2, mode=MODE_MATCHING_DTW, p=1, dim=2, verbose=True, plot
         return _dtw_matching(track1, track2, p, dim, verbose, plot)
     if (mode == MODE_MATCHING_FDTW):
         return _fdtw_matching(track1, track2, p, dim, verbose, plot)
-    print("Unavailable mode for matching of 2 tracks")
-    sys.exit(0)
+    raise UnknownModeError("Unavailable mode for matching of 2 tracks")
 
 
 # ------------------------------------------------------------------------------
@@ -185,8 +185,7 @@ def _distance(p1, p2, dim):
 # ------------------------------------------------------------------------------
 def _compare_pointwise(track1, track2, p, dim) -> float:
     if (len(track1) != len(track2)):
-        print("Error: tracks must have same size to be compared with pointwise method")
-        sys.exit(1)
+        raise SizeError("Error: tracks must have same size to be compared with pointwise method")
     N = len(track1)
     d = 0
     if p == 0:
@@ -663,11 +662,9 @@ def _representative(pairs, track, represent_method=MODE_REP_BARYCENTRE, pos=None
         return P.getMedianObsInTime().position
     if represent_method == MODE_REP_FURTHEST_OBS:
         if pos is None:
-            print("Reference position must be specified for MODE_REP_FURTHEST_OBS in _representative")
-            sys.exit(0)
+            raise MissingArgumentError("Reference position must be specified for MODE_REP_FURTHEST_OBS in _representative")
         return P.getFurthestObs(pos).position
-    print("Unknown mode " + str(represent_method) +" for representative of track section")
-    sys.exit(1)
+    raise UnknownModeError("Unknown mode " + str(represent_method) +" for representative of track section")
     
 # ------------------------------------------------------------------------
 # [B4] Auxiliary function for aggregation and potential constraint

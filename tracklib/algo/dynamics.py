@@ -47,6 +47,7 @@ Class to manage cinematic computations on GPS tracks
 import math
 import progressbar
 import numpy as np
+from tracklib.util.exceptions import *
 
 from tracklib.core import makeCoords, unlistify
 from . import khi2test
