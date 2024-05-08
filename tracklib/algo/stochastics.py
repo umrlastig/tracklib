@@ -215,12 +215,92 @@ def __randomSampler(N, distribution):
 
 
 
-MODE_NOISE_LINEAR    = 'linear'
-MODE_NOISE_EUCLIDIAN = 'euclidian'
-MODE_NOISE_CIRCULAR  = 'circular'
+# Modes for distance computation
+MODE_DISTANCE_LINEAR    = 'linear'
+MODE_DISTANCE_EUCLIDIAN = 'euclidian'
+MODE_DISTANCE_CIRCULAR  = 'circular'
 
+# Modes for direction of noise
+MODE_DIRECTION_X     = 4   # 0100
+MODE_DIRECTION_Y     = 2   # 0010
+MODE_DIRECTION_Z     = 1   # 0001
+MODE_DIRECTION_XY    = 6   # 0110
+MODE_DIRECTION_YZ    = 3   # 0011
+MODE_DIRECTION_XZ    = 5   # 0101
+MODE_DIRECTION_XYZ   = 7   # 0111
+MODE_DIRECTION_ORTHO = 8   # 1000
+
+# ----------------------------------------------------------------------
+# Function to add noise to a Track. A new track is returned. 
+# Inputs:
+#    - sigma: amplitude of noise (in track coordinate units). 
+#    - kernel: a model of kernel (a kernel shape, accepting as parameter 
+#      the length of auto-correlation in track coordinate units). Any 
+#      object deriving from core.Kernel class is accepted. If kernel 
+#      function is not definite-postive, it can be forced as so with 
+#      'force' argument set to True ; in that case, all negative 
+#      eigen values of the covariance matrix generated from the kernel
+#      on the dataset, are thresholded to zero. Example: a kernel model 
+#      set to GaussianKernel(200) means that correlation of noise values 
+#      on points in the track will follow a gaussian function and that 
+#      noise values are started to get decorelated as distance between 
+#      points is above 200 m (assuming track coordinate unit is meters).
+#      How distance is computed bewteen points is specified in mode 
+#      argument.  
+#    - distribution: probability distribution of individual noise. Can
+#      be one of the three followong models:
+#          - DISTRIBUTION_NORMAL (default)
+#          - DISTRIBUTION_UNIFORM
+#          - DISTRIBUTION_LAPLACE (symetric decreasing exponential)
+#    - mode: specifies how distances between points are computed to 
+#      generate covariance matrix from kernel. Available modes are:
+#		   - MODE_DISTANCE_LINEAR: distance is compued as difference of 
+#            curvilinear abscissa on track. The value d(p,q) corresponds 
+#            to the distance along the track between points p and q. 
+#            This parameter is useful to model spatio-temporal 
+#            correlation noise (noise values are getting decorelated 
+#            between points in track as much as they are separated by a 
+#            a long spatial distance or a long time interval). 
+#          - MODE_DISTANCE_EUCLIDIAN: distance d(p,q) is computed as 
+#            the 2D euclidian distance between p and q. This models a 
+#            noise with purely geometric decorrelation pattern.
+#          - MODE_DISTANCE_CIRCULAR: similar to MODE_DISTANCE_LINEAR, 
+#            but distance is computed modulo half-length of track. It 
+#            is useful to model noise on a loop. 
+#    - force: if True, all negative eigen values of covariance matrix 
+#      generated from the kernel on the dataset, are thresholded to zero 
+#      Enables to consider non definite positive "kernel" model and to 
+#      deal with numerical errors in matrice algebraic operations. 
+#    - cycle: if True, first and last position of track share same noise 
+#      values. Enables to keep consistent noise generation on loops, and 
+#      must be used with MODE_DISTANCE_CIRCULAR.
+#    - control: an array of tuples to specify point control points on
+#      the noise model. Each tuple has the form (i, p) where i is an 
+#      integer specifying the index of the point on which the constrain 
+#      is enforced and p is an ENUCoords specifying the value of the 
+#      point of index i after noise. Note that control points are
+#      applied on a per-component basis, i.e. each noise contribution 
+#      will be constrained so that point of index i passes through p. 
+#      As a default, p=None, means that point of index i should not be 
+#      modified by noise. Then, for noising a track (i, None) is 
+#      equivalent to (i, track[i].position). For example:
+#      [(0, None), [97, ENUCoords(10, 10, 10), (-1, None)] means that: 
+#      (1) first point in track (index 0) and last point in track (index
+#      -1) must not be modified by noise and (2) that the noise on point
+#      of index 97 must be constrained so that noised point has coords 
+#      (E = 10, N = 10, U = 10).
+#      - direction: the direction in wich noise is applied. Direction is
+#      given in the 3D local reference frame, except for special mode 
+#      MODE_DIRECTION_ORTHO, where noise is added in an orthonormal 
+#      direction with respect to the track.
+#      - n: number of noised tracks to generate (default 1). Returns 
+#      a TrackCollection otherwise. 
+# If multiple noises are to be added to the track, sigma and kernel 
+# arguments are given as arrays (array of floats for sigma, and array of 
+# kernel models for kernel).
+# ----------------------------------------------------------------------
 def noise(
-    track, sigma=[1], kernel=[DiracKernel()], distribution=DISTRIBUTION_NORMAL, mode=MODE_NOISE_LINEAR, force=False, cycle=False, control=[], n=1
+    track, sigma=[1], kernel=[DiracKernel()], distribution=DISTRIBUTION_NORMAL, mode=MODE_DISTANCE_LINEAR, force=False, cycle=False, control=[], direction=MODE_DIRECTION_XYZ, n=1
 ):
     """Track noising with Cholesky factorization of gaussian process covariance matrix:
 
@@ -241,16 +321,16 @@ def noise(
     :param N: number of tracks to generate (returns track collection if N > 1)"""
 
     if n == 1:
-        return __noise(track, sigma, kernel, distribution, mode, force, cycle, control)
+        return __noise(track, sigma, kernel, distribution, mode, force, cycle, control, direction)
     else:
         tracks = TrackCollection()
         for i in range(n):
-            tracks.addTrack(__noise(track, sigma, kernel, distribution, mode, force, cycle, control))
+            tracks.addTrack(__noise(track, sigma, kernel, distribution, mode, force, cycle, control, direction))
         return tracks
 
 
 def __noise(
-    track, sigma=[1], kernel=[DiracKernel()], distribution=DISTRIBUTION_NORMAL, mode='linear', force=False, cycle=False, control=[]
+    track, sigma=[1], kernel=[DiracKernel()], distribution=DISTRIBUTION_NORMAL, mode='linear', force=False, cycle=False, control=[], direction = MODE_DIRECTION_XYZ
 ):
     """Track noising with Cholesky factorization of gaussian process covariance matrix:
 
@@ -265,8 +345,8 @@ def __noise(
     :param track: the track to be smoothed (input track is not modified)
     :param sigma: noise amplitude(s) (in observation coordinate units)
     :param kernel: noise autocovariance function(s)
-	:param mode: 'linear' (default), 'circular' or 'euclidian'
-	:param force: force definite-positive matrix with removal of negative eigen values
+    :param mode: 'linear' (default), 'circular' or 'euclidian'
+    :param force: force definite-positive matrix with removal of negative eigen values
     :param control: control points (list of coords) for conditional simulations """
 
     sigma = listify(sigma)
@@ -299,7 +379,7 @@ def __noise(
             Yc[ip] = control[ip][1].getY() - track[control[ip][0]].position.getY()
             Zc[ip] = control[ip][1].getZ() - track[control[ip][0]].position.getZ()
 
-	# Loop on kernel models
+    # Loop on kernel models
     for ik in range(len(sigma)):
 
         # Zero-amplitude case
@@ -315,24 +395,39 @@ def __noise(
         L = np.linalg.cholesky(SIGMA_S)
         L22 = L[Nc:  , Nc:  ]
         L11 = L[  :Nc,   :Nc]
-        L12 = L[Nc:  ,   :Nc] 
+        L12 = L[Nc:  ,   :Nc]
         
+        # Noise initialization
+        Yx = np.zeros((N,))
+        Yy = np.zeros((N,))
+        Yz = np.zeros((N,))
+       
         # Noise simulation
-        Yx = np.matmul(L22, __randomSampler(N, distribution)) + np.matmul(L12, np.linalg.solve(L11, Xc))
-        Yy = np.matmul(L22, __randomSampler(N, distribution)) + np.matmul(L12, np.linalg.solve(L11, Yc))
-        Yz = np.matmul(L22, __randomSampler(N, distribution)) + np.matmul(L12, np.linalg.solve(L11, Zc))
+        if (direction in [MODE_DIRECTION_X, MODE_DIRECTION_XY, MODE_DIRECTION_XZ, MODE_DIRECTION_XYZ]):   
+            Yx = np.matmul(L22, __randomSampler(N, distribution)) + np.matmul(L12, np.linalg.solve(L11, Xc))
+        if (direction in [MODE_DIRECTION_Y, MODE_DIRECTION_XY, MODE_DIRECTION_YZ, MODE_DIRECTION_XYZ]):
+            Yy = np.matmul(L22, __randomSampler(N, distribution)) + np.matmul(L12, np.linalg.solve(L11, Yc))
+        if (direction in [MODE_DIRECTION_Z, MODE_DIRECTION_YZ, MODE_DIRECTION_XZ, MODE_DIRECTION_XYZ, MODE_DIRECTION_ORTHO]):
+            Yz = np.matmul(L22, __randomSampler(N, distribution)) + np.matmul(L12, np.linalg.solve(L11, Zc))
         
         # Building noised track
-        for i in range(N):
-            noised_track.getObs(i).position.translate(Yx[i], Yy[i], Yz[i])
-			
+        if (direction == MODE_DIRECTION_ORTHO):
+            for i in range(N-1):
+                dE = track[i+1].position.E - track[i].position.E
+                dN = track[i+1].position.N - track[i].position.N
+                norm = (dE**2 + dN**2)**0.5
+                noised_track.getObs(i).position.translate(Yz[i]*dN/norm, -Yz[i]*dE/norm, 0)
+            noised_track.getObs(N-1).position.translate(Yz[i]*dN/norm, -Yz[i]*dE/norm, 0)
+        else:
+            for i in range(N):
+                noised_track.getObs(i).position.translate(Yx[i], Yy[i], Yz[i])
+           
         if mode == 'circular':
             noised_track.loop()
             
     noised_track.removeAnalyticalFeature("abs_curv")
-		   
+          
     return noised_track
-
 
 def randomizer(input, f, sigma=[7], kernel=[GaussianKernel(650)], N=10):
     """Randomizing traces for sensitivity analysis on output `f`
