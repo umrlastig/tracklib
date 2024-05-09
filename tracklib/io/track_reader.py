@@ -529,6 +529,7 @@ class TrackReader:
             TRACES = TrackCollection()
             LISTFILE = os.listdir(path)
             for f in LISTFILE:
+                print(f)
                 if path[len(path)-1:] == '/':
                     collection = TrackReader.readFromGpx(path + f)
                 else:

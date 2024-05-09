@@ -46,7 +46,7 @@ Algorithm to create Analytical features: ds, speed, abs_curv.
 """
 
 #from typing import Iterable, Literal, Union   
-from tracklib.util.exceptions import *
+#from tracklib.util.exceptions import *
 
 import math
 import numpy as np

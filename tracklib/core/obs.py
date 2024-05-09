@@ -47,7 +47,7 @@ Points are referenced in geodetic coordinates
 
 # For type annotation
 from __future__ import annotations
-from tracklib.util.exceptions import *
+#from tracklib.util.exceptions import *
 
 import sys
 import copy

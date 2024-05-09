@@ -48,7 +48,7 @@ knowledge of the CeCILL-C license and that you accept its terms.
 import sys
 import math
 import numpy as np
-from tracklib.util.exceptions import *
+#from tracklib.util.exceptions import *
 
 import tracklib as tracklib
 from tracklib.util import (aire_visval, 

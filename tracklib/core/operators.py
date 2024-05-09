@@ -49,7 +49,7 @@ import sys
 import math
 import numpy as np
 from abc import abstractmethod
-from tracklib.util.exceptions import *
+#from tracklib.util.exceptions import *
 
 from . import NAN, isnan, addListToAF, Kernel
 

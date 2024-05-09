@@ -48,7 +48,7 @@ import sys
 import random
 import numpy as np
 import matplotlib.pyplot as plt
-from tracklib.util.exceptions import *
+#from tracklib.util.exceptions import *
 
 from tracklib.core import (Obs, 
                            listify, 

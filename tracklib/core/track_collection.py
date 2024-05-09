@@ -47,7 +47,7 @@ This module contain a class to manage the collections of tracks
 
 from typing import Literal   
 import matplotlib.pyplot as plt
-from tracklib.util.exceptions import *
+#from tracklib.util.exceptions import *
 
 import tracklib as tracklib
 from tracklib.core import removeNan, listify, compLike

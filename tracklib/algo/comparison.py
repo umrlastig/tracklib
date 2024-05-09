@@ -53,7 +53,7 @@ import matplotlib.pyplot as plt
 
 
 import tracklib as tracklib
-from tracklib.util.exceptions import *
+#from tracklib.util.exceptions import *
 from tracklib.util import dist_point_to_segment, Polygon, centerOfPoints
 from . import synchronize, computeRadialSignature
 from tracklib.core import (ENUCoords, TrackCollection, 

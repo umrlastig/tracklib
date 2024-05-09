@@ -45,7 +45,7 @@ Class to manage filtering of GPS tracks
 """
 
 import numpy as np
-from tracklib.util.exceptions import *
+#from tracklib.util.exceptions import *
 
 from . import (MODE_OBS_AND_STATES_AS_3D_POSITIONS, 
                DYN_MAT_2D_CST_SPEED,

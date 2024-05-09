@@ -47,7 +47,7 @@ Class to manage interpolation and smoothing functions
 # For type annotation
 from __future__ import annotations   
 from typing import Literal   
-from tracklib.util.exceptions import *
+#from tracklib.util.exceptions import *
 
 import sys
 import math

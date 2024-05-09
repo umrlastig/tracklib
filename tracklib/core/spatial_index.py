@@ -42,7 +42,7 @@ knowledge of the CeCILL-C license and that you accept its terms.
 
 from __future__ import annotations   
 from typing import Any
-from tracklib.util.exceptions import *
+#from tracklib.util.exceptions import *
 
 import math
 import matplotlib.pyplot as plt

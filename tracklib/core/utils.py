@@ -47,7 +47,7 @@ some utility functions.
 # For type annotation
 from __future__ import annotations   
 from typing import Any, Optional, Union
-from tracklib.util.exceptions import *
+#from tracklib.util.exceptions import *
 
 import json
 import sys
