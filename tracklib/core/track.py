@@ -46,7 +46,6 @@ Class to manage GPS tracks. Points are referenced in geodetic coordinates
 # For type annotation
 from __future__ import annotations
 from typing import Any, Literal#, Union
-#from tracklib.util.exceptions import *
 
 import sys
 import math
@@ -61,6 +60,7 @@ from . import (ObsTime, ENUCoords, GeoCoords, Obs,
                Bbox,
                co_median)
 from tracklib.util import intersection, Polygon
+from tracklib.util.exceptions import QueryError 
 from tracklib.plot import IPlotVisitor, MatplotlibVisitor
 from tracklib.algo import (BIAF_SPEED, BIAF_ABS_CURV, 
                            computeAbsCurv, 

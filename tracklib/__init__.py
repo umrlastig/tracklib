@@ -5,6 +5,7 @@
 
 
 __version__ = '0.6.9'
+__credits__ = 'IGN'
 
 
 from tracklib.core import *
