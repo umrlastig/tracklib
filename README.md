@@ -53,7 +53,6 @@ Yann Méneroux, Marie-Dominique van Damme. Tracklib: a python library with a var
 
 ## About
 
-|                |                                                           |
 | -------------- | --------------------------------------------------------- |
 | _version_      | See [pypi](https://pypi.org/project/tracklib/#history)    |
 | _status_       | Since 2020 November 1st, 2020                             |
