@@ -45,9 +45,6 @@ The official documentation is available at **[ReadTheDocs](https://tracklib.read
 pip install tracklib
 ```
 
-## Features
-
-
 ## Citation
 
 If you use tracklib, please cite the following references:
