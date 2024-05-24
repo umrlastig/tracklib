@@ -107,8 +107,9 @@ MODE_AGG_L2     = 302         # Standard barycenter of points
 MODE_AGG_LInf   = 303         # Center of minimum enclosing circle
 # ------------------------------------------------------------------------
 # List of available methods to choose representative point selection
-MODE_MASTER_RANDOM = -200   # Random track
-MODE_MASTER_MEDIAN = -100   # Closest to the median of track lengths
+MODE_MASTER_RANDOM = -200       # Random track
+MODE_MASTER_MEDIAN_LEN = -100   # Closest to the median of track lengths
+MODE_MASTER_MEDIAN_GEOM = -300  # Minimizes the sum of distances to other tracks
 # ------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
@@ -623,17 +624,18 @@ def plotMatching(matching, track2, af_name="pair", sym="k--", linewidth=.5,
             ax1.plot([x1, x2], [y1, y2], sym, linewidth=linewidth)
 
 
-# ------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # [B1] On cherche l'index de la trace dont la longueur est la plus proche
 # de la valeur médiane des longueurs de la collection des traces
 # Inputs:
 #   - a collection of tracks
 #   - ref: index of track in list or:
 # MODE_MASTER_RANDOM: random master track
-# MODE_MASTER_MEDIAN: track with length closest to median of lengths
-# ------------------------------------------------------------------------ 
-def _getMasterTrack(tracks, mode):
-    if mode == MODE_MASTER_MEDIAN:
+# MODE_MASTER_MEDIAN_LEN: track with length closest to median of lengths
+# MODE_MASTER_MEDIAN_GEOM: track that minimizes the sum of distances to the others
+# -----------------------------------------------------------------------------
+def _getMasterTrack(tracks, mode, mode_compare=MODE_COMPARISON_DTW, p=1):
+    if mode == MODE_MASTER_MEDIAN_LEN:
         L = tracks.getLenth()
         m = co_median(L)
         imed = 0
@@ -646,6 +648,22 @@ def _getMasterTrack(tracks, mode):
         return ref
     if mode == MODE_MASTER_RANDOM:
         return random.sample(range(len(tracks)), 1)[0]
+    if mode == MODE_MASTER_MEDIAN_GEOM:
+        smax = sys.float_info.max
+        ref = -1
+        for k in range(0, tracks.size()):
+            S = 0
+            for l in range(0, tracks.size()):
+                if l == k:
+                    continue
+                track1 = tracks[k]
+                track2 = tracks[l]
+                d = compare(track1, track2, mode=mode_compare, p=p, verbose=False)
+                S += d
+            if S < smax:
+                smax = S
+                ref = k
+        return ref
     return mode
 
 # ------------------------------------------------------------------------
@@ -774,7 +792,7 @@ def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constrai
 # ------------------------------------------------------------------------
 # Algorithme récursif fusion L. Etienne : trajectoire médiane
 # ------------------------------------------------------------------------ 
-def fusion(tracks, mode=MODE_MATCHING_DTW, master=MODE_MASTER_MEDIAN, p=1, dim=2,  
+def fusion(tracks, mode=MODE_MATCHING_DTW, master=MODE_MASTER_MEDIAN_LEN, p=1, dim=2,
            represent_method=MODE_REP_BARYCENTRE, agg_method=MODE_AGG_MEDIAN, constraint=True,
            recursive=1e300, iter_max=100, verbose=True):
     
