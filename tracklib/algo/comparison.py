@@ -49,6 +49,7 @@ import random
 import datetime
 import numpy as np
 import progressbar
+import matplotlib
 import matplotlib.pyplot as plt
 
 
@@ -609,6 +610,8 @@ def plotMatching(matching, track2, af_name="pair", sym="k--", linewidth=.5,
             ax1 = plt.gca()
         else:
             fig, ax1 = plt.subplots(figsize=(10, 3))
+    elif isinstance(append, matplotlib.axes._axes.Axes):
+        ax1 = append
     else:
         ax1 = plt
 
