@@ -68,7 +68,7 @@ class NetworkWriter:
 
         for idedge in network.EDGES:
             edge = network.EDGES[idedge]
-            output += edge.id + separator
+            output += str(edge.id) + separator
             output += edge.source.id + separator
             output += edge.target.id + separator
             output += str(edge.orientation) + separator
