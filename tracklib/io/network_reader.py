@@ -50,9 +50,10 @@ import json
 import os.path
 import progressbar
 import requests
+import psycopg2
 from xml.dom import minidom
-from tracklib.util.exceptions import *
 
+from tracklib.util.exceptions import *
 from tracklib.core import ObsTime, ENUCoords, ECEFCoords, GeoCoords, Obs
 from tracklib.algo import computeAbsCurv
 from tracklib.core import Bbox, Track, Network, Node, Edge, SpatialIndex
@@ -345,8 +346,166 @@ class NetworkReader:
             network.spatial_index = SpatialIndex(
                 network, resolution=(dx / 1e3, dy / 1e3), margin=0.4
             )
-            
-            
+        return network
+    @staticmethod
+    def requestFromBDD(emprise:Bbox, user="ibrahim", DB = "PDI", proj = None, margin=0.0, tolerance=0.1, spatialIndex=False)-> Network:
+        """_summary_
+
+        Args:
+            emprise (Bbox): _description_
+            user (str, optional): _description_. Defaults to "ibrahim".
+            DB (str, optional): _description_. Defaults to "PDI".
+            proj (_type_, optional): _description_. Defaults to None.
+            margin (float, optional): _description_. Defaults to 0.0.
+            tolerance (float, optional): _description_. Defaults to 0.1.
+            spatialIndex (bool, optional): _description_. Defaults to False.
+
+        Returns:
+            Network: _description_
+        """      
+        network = Network()
+        cptNode = 0
+        fmt = NetworkFormat()
+        fmt.createFromDict(
+            {
+                "name": "BDD",
+                "pos_edge_id": 0,
+                "pos_source": 5,
+                "pos_target": 6,
+                "pos_wkt": 1,
+                "pos_poids": 3,
+                "pos_sens": 4,
+                "srid": "GEO",
+            }
+        )
+        if proj == "EPSG:4326":
+            srid = "GEO"
+        elif proj == "EPSG:2154":
+            srid = "ENU"
+        else:
+            proj = "EPSG:4326"
+            srid = "GEO"
+        try:
+            conn = psycopg2.connect(
+                user = user,
+                password = "postgres",
+                host = "localhost",
+                port = "5432",
+                database = DB
+            )
+            cur = conn.cursor()
+            # Requête renvoyant les tronçons de route contenus dans l'emprise
+            cur.execute("""
+                        SELECT json_build_object(
+                        'type', 'FeatureCollection',
+                        'crs',  json_build_object(
+                            'type',      'name',
+                            'properties', json_build_object(
+                            'name', 'EPSG:4326')),
+                        'features', json_agg(
+                            json_build_object(
+                                'type',       'Feature',
+                                'id',         cleabs,
+                                'geometry',   ST_AsGeoJSON(geometrie)::json,
+                                'properties', json_build_object(
+                                    'fictif', fictif,
+                                    'sens_de_circulation', sens_de_circulation
+                                    
+                                )
+                            )
+                        )
+                        ) AS objet_geojson FROM
+                        
+                                    (SELECT cleabs, geometrie, fictif, sens_de_circulation
+                                    FROM troncon_de_route 
+                                    WHERE ST_Intersects(geometrie, ST_MakeEnvelope(%s, %s, %s, %s, 4326 )) ) as t1;
+                """, (emprise.getXmin(), emprise.getYmin(), emprise.getXmax(), emprise.getYmax())
+            )
+
+            response = cur.fetchall()
+            data = json.loads(json.dumps(response[0][0]))
+            features = data["features"]
+            #fermeture de la connexion à la base de données
+            cur.close()
+            conn.close()
+            print("La connexion PostgreSQL est fermée")
+        except (Exception, psycopg2.Error) as error :
+            print ("Erreur lors de la connexion à PostgreSQL", error)
+
+        for feature in progressbar.progressbar(features):
+
+            row = []
+
+            idd = feature["id"]
+            # nature = feature['properties']['nature']
+            fictif = feature["properties"]["fictif"]
+            if fictif == "True":
+                continue
+            row.append(idd)
+
+            # TODO
+            # pos = feature['properties']['position_par_rapport_au_sol']
+
+            TAB_OBS = []
+            coords = feature["geometry"]["coordinates"]
+            if feature["geometry"]["type"] == "LineString":
+                # print (str(len(coords)))
+                # geom = coords
+                # print (coords)
+
+                typeCoord = "GEOCOORDS"
+                if proj == "EPSG:2154":
+                    typeCoord = "ENUCoords"
+                TAB_OBS = tabCoordsLineStringToObs(coords, typeCoord)
+
+            if len(TAB_OBS) < 2:
+                continue
+
+            track = Track(TAB_OBS)
+            row.append(track.toWKT())
+            row.append("ENU")
+
+            row.append(track.length())
+
+            # Orientation
+            sens = feature["properties"]["sens_de_circulation"]
+            orientation = Edge.DOUBLE_SENS
+            if sens == None or sens == "":
+                orientation = Edge.DOUBLE_SENS
+            elif sens == "Double sens" or sens == "Sans objet":
+                orientation = Edge.DOUBLE_SENS
+            elif sens == "Direct" or sens == "Sens direct":
+                orientation = Edge.SENS_DIRECT
+            elif sens == "Indirect" or sens == "Sens inverse":
+                orientation = Edge.SENS_INVERSE
+            else:
+                print(sens)
+            row.append(orientation)
+
+            # Source node
+            idNoeudIni = str(cptNode)
+            p1 = track.getFirstObs().position
+            candidates = selectNodes(network, Node("0", p1), tolerance)
+            if len(candidates) > 0:
+                c = candidates[0]
+                idNoeudIni = c.id
+            else:
+                cptNode += 1
+
+            # Target node
+            idNoeudFin = str(cptNode)
+            p2 = track.getLastObs().position
+            candidates = selectNodes(network, Node("0", p2), tolerance)
+            if len(candidates) > 0:
+                c = candidates[0]
+                idNoeudFin = c.id
+            else:
+                cptNode += 1
+
+            row.append(idNoeudIni)
+            row.append(idNoeudFin)
+            (edge, noeudIni, noeudFin) = readLineAndAddToNetwork(row, fmt)
+            network.addEdge(edge, noeudIni, noeudFin)
         return network
 
     # --------------------------------------------------------------------------
