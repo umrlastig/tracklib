@@ -1088,6 +1088,6 @@ class Network:
         """
         if len(filename) < 4:
             filename = filename + ".npy"
-        if filename[:-4] != ".npy":
+        if filename[-4:] != ".npy":
             filename = filename + ".npy"
         self.DISTANCES = read_dictionary = np.load(filename, allow_pickle="TRUE").item()
