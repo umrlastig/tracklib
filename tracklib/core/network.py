@@ -362,7 +362,12 @@ class Network:
         :parma filename: File to import
         """
         self.spatial_index = tracklib.SpatialIndex.load(filename)
-
+        
+    def getSpatialIndex(self):
+        """Get the spatial index"""
+        if self.spatial_index is None:
+            return None
+        return self.spatial_index
     # ------------------------------------------------------------
     # Topologic methods
     # ------------------------------------------------------------
