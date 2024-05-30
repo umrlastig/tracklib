@@ -100,11 +100,27 @@ class LineStyle:
         
 
     @staticmethod
-    def simpleLightRed(layerLine):
+    def simpleLightOrange(layerLine):
         symbolL1 = QgsLineSymbol.createSimple({
             'penstyle':'solid',
             'width':'0.6',
-            'color': QColor.fromRgb(255, 0, 0)})
+            'color': QColor.fromRgb(253, 176, 32)})
+        layerLine.renderer().setSymbol(symbolL1)
+
+    @staticmethod
+    def simpleLightCyan(layerLine):
+        symbolL1 = QgsLineSymbol.createSimple({
+            'penstyle':'solid',
+            'width':'0.6',
+            'color': QColor.fromRgb(10, 222, 236)})
+        layerLine.renderer().setSymbol(symbolL1)
+
+    @staticmethod
+    def simpleLightVertFonce(layerLine):
+        symbolL1 = QgsLineSymbol.createSimple({
+            'penstyle':'solid',
+            'width':'0.6',
+            'color': QColor.fromRgb(51, 160, 44)})
         layerLine.renderer().setSymbol(symbolL1)
 
 
