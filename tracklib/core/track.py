@@ -406,6 +406,8 @@ class Track:
     
     def getMedianObsInTime(self):
         ''' '''
+        if self.size() == 1:
+            return self.getFirstObs()
         # TODO: Test if timestamp exists
         self.sort()
         med = (self.getLastObs().timestamp - self.getFirstObs().timestamp) / 2
