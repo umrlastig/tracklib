@@ -266,6 +266,16 @@ class ENUCoords:
         output += "U=" + "{:12.3f}".format(self.U) + "]"
         return output
 
+    def __repr__(self):
+        """Transform the object in string
+
+        :return: String representation of coordinates to be printable
+        """
+        output = "[E=" + "{:12.3f}".format(self.E) + ", "
+        output += "N=" + "{:12.3f}".format(self.N) + ", "
+        output += "U=" + "{:12.3f}".format(self.U) + "]"
+        return output
+
     def __eq__(self, other):
         
         if self is None:
