@@ -67,7 +67,7 @@ from tracklib.core import (ENUCoords, TrackCollection,
 # For infinite norm: set p = float('inf')
 # All methods are parameterized by a distance d.
 # ------------------------------------------------------------------------------
-MODE_MATCHING_NN      = 1   # Nearest Neighbour                           
+MODE_MATCHING_NN      = 1   # Nearest Neighbour
 MODE_MATCHING_DTW     = 2   # Dynamic Time Warping (with Lp norm)      [p][s]
 MODE_MATCHING_FDTW    = 3   # Fast (and approximate) DTW               [p][s]
 MODE_MATCHING_FRECHET = 4   # Discrete Frechet macthing                   [s]
@@ -788,7 +788,8 @@ def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constrai
     
     central.iteration = iteration
     central.master = master
-    
+    central.time = str(end_time-start_time)
+
     return central
 
 
