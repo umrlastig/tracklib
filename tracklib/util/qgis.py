@@ -40,7 +40,6 @@ knowledge of the CeCILL-C license and that you accept its terms.
 """
 
 from tracklib import Track, TrackCollection
-from tracklib.util.exceptions import *
 
 try:
     from qgis.PyQt.QtCore import QVariant
@@ -100,6 +99,13 @@ class LineStyle:
         layerLine.renderer().setSymbol(symbolL1)
         
 
+    @staticmethod
+    def simpleLightRed(layerLine):
+        symbolL1 = QgsLineSymbol.createSimple({
+            'penstyle':'solid',
+            'width':'0.6',
+            'color': QColor.fromRgb(255, 0, 0)})
+        layerLine.renderer().setSymbol(symbolL1)
 
 
 class PointStyle:
@@ -191,7 +197,8 @@ class QGIS:
 
 
     @staticmethod
-    def plotTracks(collection, type="LINE", AF=False, style=None):
+    def plotTracks(collection, type="LINE", AF=False, style=None,
+                   title=None):
         '''
         Plot a track or a collection of tracks.
         
@@ -210,10 +217,15 @@ class QGIS:
         else:
             crs = 'crs=EPSG:2154'
             
+        if title is None and type == 'LINE':
+            title = "Tracks"
+        elif title is None and type == 'POINT':
+            title = "Tracks points"
+            
         FEATURES = QGIS.__createTablePoints(collection, type)
         
         if type == 'POINT':
-            layer = QgsVectorLayer("Point?" + crs, "Tracks points", "memory")
+            layer = QgsVectorLayer("Point?" + crs, title, "memory")
             pr = layer.dataProvider()
             pr.addAttributes([QgsField("idtrace", QVariant.Int)])
             pr.addAttributes([QgsField("idpoint", QVariant.Int)])
@@ -233,7 +245,7 @@ class QGIS:
             QgsProject.instance().addMapLayer(layer)
         
         elif type == 'LINE':
-            layer = QgsVectorLayer("LineString?" + crs, "Tracks", "memory")
+            layer = QgsVectorLayer("LineString?" + crs, title, "memory")
             pr = layer.dataProvider()
             pr.addAttributes([QgsField("idtrace", QVariant.Int)])
             pr.addAttributes([QgsField("nbpoint", QVariant.Int)])
@@ -427,3 +439,39 @@ class QGIS:
         return renderer
     
  '''   
+ 
+COLORS_PALETTE = {
+ 'dimgray': '#696969', 'gray': '#808080', 'darkgray': '#a9a9a9', 'silver': '#c0c0c0',
+'gainsboro': '#dcdcdc', 'darkslategray': '#2f4f4f', 'darkolivegreen': '#556b2f',
+'saddlebrown': '#8b4513', 'olivedrab': '#6b8e23', 'sienna': '#a0522d',
+'brown': '#a52a2a', 'seagreen': '#2e8b57', 'midnightblue': '#191970',
+'darkgreen': '#006400', 'slategray': '#708090', 'darkred': '#8b0000',
+'olive': '#808000', 'darkslateblue': '#483d8b', 'firebrick': '#b22222',
+'cadetblue': '#5f9ea0', 'green': '#008000', 'mediumseagreen': '#3cb371',
+'rosybrown': '#bc8f8f', 'rebeccapurple': '#663399', 'darkgoldenrod': '#b8860b',
+'darkkhaki': '#bdb76b', 'darkcyan': '#008b8b', 'peru': '#cd853f',
+'steelblue': '#4682b4', 'chocolate': '#d2691e', 'yellowgreen': '#9acd32',
+'lightseagreen': '#20b2aa', 'indianred': '#cd5c5c', 'darkblue': '#00008b',
+'indigo': '#4b0082', 'limegreen': '#32cd32', 'goldenrod': '#daa520',
+'purple2': '#7f007f', 'darkseagreen': '#8fbc8f', 'maroon3': '#b03060',
+'mediumaquamarine': '#66cdaa', 'darkorchid': '#9932cc', 'red': '#ff0000',
+'orangered': '#ff4500', 'darkturquoise': '#00ced1', 'darkorange': '#ff8c00',
+'orange': '#ffa500', 'gold': '#ffd700', 'slateblue': '#6a5acd',
+'yellow': '#ffff00', 'mediumvioletred': '#c71585', 'mediumblue': '#0000cd',
+'lawngreen': '#7cfc00', 'burlywood': '#deb887', 'turquoise': '#40e0d0',
+'lime': '#00ff00', 'darkviolet': '#9400d3', 'mediumorchid': '#ba55d3',
+'mediumspringgreen': '#00fa9a', 'blueviolet': '#8a2be2', 'springgreen': '#00ff7f',
+'royalblue': '#4169e1', 'darksalmon': '#e9967a', 'crimson': '#dc143c',
+'aqua': '#00ffff', 'deepskyblue': '#00bfff', 'sandybrown': '#f4a460',
+'mediumpurple': '#9370db', 'blue': '#0000ff', 'purple3': '#a020f0',
+'lightcoral': '#f08080', 'greenyellow':'#adff2f', 'tomato': '#ff6347',
+'orchid': '#da70d6', 'thistle': '#d8bfd8', 'lightsteelblue': '#b0c4de',
+'coral': '#ff7f50', 'fuchsia': '#ff00ff', 'dodgerblue': '#1e90ff',
+'palevioletred': '#db7093', 'khaki': '#f0e68c', 'salmon': '#fa8072',
+'palegoldenrod': '#eee8aa', 'laserlemon': '#ffff54', 'cornflower': '#6495ed',
+'plum': '#dda0dd', 'lightgreen': '#90ee90', 'lightblue': '#add8e6',
+'skyblue': '#87ceeb', 'deeppink': '#ff1493', 'mediumslateblue': '#7b68ee',
+'lightsalmon': '#ffa07a', 'paleturquoise': '#afeeee', 'violet': '#ee82ee',
+'lightskyblue': '#87cefa', 'aquamarine': '#7fffd4', 'moccasin': '#ffe4b5',
+'peachpuff': '#ffdab9', 'hotpink': '#ff69b4', 'pink': '#ffc0cb'}
+
