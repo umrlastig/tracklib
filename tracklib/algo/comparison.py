@@ -789,6 +789,8 @@ def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constrai
     central.iteration = iteration
     central.master = master
     central.time = str(end_time-start_time)
+    central.start_time = start_time
+    central.end_time = end_time
 
     return central
 
