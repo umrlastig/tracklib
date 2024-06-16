@@ -97,7 +97,30 @@ class LineStyle:
             'width':'0.6',
             'color': QColor.fromRgb(190, 207, 80)})
         layerLine.renderer().setSymbol(symbolL1)
-        
+
+
+    @staticmethod
+    def simpleVert1(layerLine):
+        symbolL1 = QgsLineSymbol.createSimple({
+            'penstyle':'solid',
+            'width':'0.6',
+            'color': QColor.fromRgb(157, 193, 131)})
+        layerLine.renderer().setSymbol(symbolL1)
+    @staticmethod
+    def simpleVert2(layerLine):
+        symbolL1 = QgsLineSymbol.createSimple({
+            'penstyle':'solid',
+            'width':'0.6',
+            'color': QColor.fromRgb(41, 171, 135)})
+        layerLine.renderer().setSymbol(symbolL1)
+    @staticmethod
+    def simpleVert3(layerLine):
+        symbolL1 = QgsLineSymbol.createSimple({
+            'penstyle':'solid',
+            'width':'0.6',
+            'color': QColor.fromRgb(208, 240, 192)})
+        layerLine.renderer().setSymbol(symbolL1)
+
 
     @staticmethod
     def simpleLightOrange(layerLine):
@@ -121,6 +144,14 @@ class LineStyle:
             'penstyle':'solid',
             'width':'0.6',
             'color': QColor.fromRgb(51, 160, 44)})
+        layerLine.renderer().setSymbol(symbolL1)
+
+    @staticmethod
+    def simpleRed(layerLine):
+        symbolL1 = QgsLineSymbol.createSimple({
+            'penstyle':'solid',
+            'width':'0.6',
+            'color': QColor.fromRgb(255, 0, 0)})
         layerLine.renderer().setSymbol(symbolL1)
 
 
@@ -150,6 +181,8 @@ class PointStyle:
             'size':'1.4'})
         layerPoint.renderer().setSymbol(symbol)
 
+
+# =============================================================================
 
 class QGIS:
     '''
@@ -332,7 +365,64 @@ class QGIS:
             pr.addFeatures([fet])
         layerLinkMM.updateExtents()
         QgsProject.instance().addMapLayer(layerLinkMM)
-        
+
+
+    @staticmethod
+    def plotMatching(matching, track2, af_name="pair", NO_DATA_VALUE:int=-1):
+        '''
+        plot matching output from 'match' method between two tracks.
+
+        Parameters
+        ----------
+        matching : Track
+            matching output.
+        track2 : Track
+            DESCRIPTION.
+        af_name : TYPE, optional
+            DESCRIPTION. The default is "pair".
+        NO_DATA_VALUE : int, optional
+            DESCRIPTION. The default is -1.
+
+        Returns
+        -------
+        None.
+
+        '''
+        layerMatching = QgsVectorLayer("LineString?crs=2154", "Matching", "memory")
+        pr = layerMatching.dataProvider()
+        layerMatching.updateFields()
+
+        for i in range(matching.size()):
+
+            if matching.getObsAnalyticalFeature(af_name, i) == NO_DATA_VALUE:
+                continue
+
+            x1 = matching.getObs(i).position.getX()
+            y1 = matching.getObs(i).position.getY()
+            pt1 = QgsPointXY(x1, y1)
+
+            pairs = matching.getObsAnalyticalFeature(af_name, i)
+            for pair in pairs:
+                x2 = track2.getObs(pair).position.getX()
+                y2 = track2.getObs(pair).position.getY()
+                pt2 = QgsPointXY(x2, y2)
+                fet = QgsFeature()
+                fet.setGeometry(QgsGeometry.fromPolylineXY([pt1, pt2]))
+                pr.addFeatures([fet])
+
+                #ax1.plot([x1, x2], [y1, y2], sym, linewidth=linewidth)
+
+        layerMatching.updateExtents()
+
+        symbolL = QgsLineSymbol.createSimple({
+            'penstyle':'solid', 
+            'width':'0.6',
+            'color': '150,150,150',
+            'line_style':'dash'})
+        layerMatching.renderer().setSymbol(symbolL)
+
+        QgsProject.instance().addMapLayer(layerMatching)
+
 
 '''
     # SpatialIndex
