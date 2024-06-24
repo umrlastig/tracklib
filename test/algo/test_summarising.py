@@ -8,8 +8,8 @@ from tracklib import (Obs, ObsTime, ENUCoords, TrackCollection,
                       speed,
                       RasterBand, NO_DATA_VALUE,
                       Track, TrackReader,
-                      co_avg, co_max, co_min, co_sum, NAN, co_count,
-                      co_dominant,co_median,
+                      co_avg, co_max, co_count,
+                      co_min,#co_dominant,co_median,
                       summarize, 
                       getMeasureName)
 
@@ -64,25 +64,36 @@ class TestSummarising(TestCase):
         TRACES.append(trace2)
         
         collection = TrackCollection(TRACES)
+        collection.plot('k-')
+        plt.show()
         
         # ---------------------------------------------------------------------
-    
-        collection.addAnalyticalFeature(speed)
-        
-        af_algos = ['speed', 'speed'] #, utils.stop_point]
-        cell_operators = [co_avg, co_max] #, utils.sum]
-        
-        #  Construction du raster
-        marge = 0.0
-        raster = summarize(collection, 
-                                       af_algos, cell_operators, (60, 60), marge)
-        
-        name = getMeasureName('speed', co_avg)
-        self.assertEqual(name, 'speed#co_avg')
+
+        name = getMeasureName('speed', co_max)
+        self.assertEqual(name, 'speed#co_max')
+
         name = getMeasureName(speed, co_avg)
         self.assertEqual(name, 'speed#co_avg')
-                         
-        grille = raster.getRasterBand(name)
+
+        name = getMeasureName('uid', co_count)
+        self.assertEqual(name, 'uid#co_count')
+
+
+        # ---------------------------------------------------------------------
+
+        collection.addAnalyticalFeature(speed)
+        
+        af_algos = ['speed', 'speed', 'uid'] #, utils.stop_point]
+        cell_operators = [co_avg, co_max, co_count] #, utils.sum]
+
+        #  Construction du raster
+        marge = 0.0
+        raster = summarize(collection, af_algos, cell_operators,
+                               (60, 60), marge)
+
+        raster.plot('uid#co_count')
+
+        grille = raster.getRasterBand(getMeasureName(speed, co_avg))
         self.assertIsInstance(grille, RasterBand)
         
         self.assertEqual(grille.getNoDataValue(), NO_DATA_VALUE)
@@ -92,18 +103,21 @@ class TestSummarising(TestCase):
         
         grille.plotAsImage()
         plt.show()
+
+
+        # ---------------------------------------------------------------------
         
         raster = summarize(collection, 
                            af_algos, cell_operators, (60, 60), marge)
-        grille = raster.getRasterBand(name)
+        grille = raster.getRasterBand(getMeasureName(speed, co_avg))
         grille.setNoDataValue(0)
         self.assertEqual(grille.getNoDataValue(), 0)
         grille.plotAsImage()
         plt.show()
-        
+
         # ---------------------------------------------------------------------
         # On teste la construction de la grille
-        
+
         self.assertEqual(grille.xmin, 10.0 - marge*(370-10))
         self.assertEqual(grille.xmax, 370.0 + marge*(370-10))
         self.assertEqual(grille.ymin, 10.0 - marge*(190-10))
@@ -118,7 +132,7 @@ class TestSummarising(TestCase):
         
         # ---------------------------------------------------------------------
         # On teste les valeurs de la grille
-        
+
         speedTrace1 = collection.getTrack(0).getAnalyticalFeature('speed')
         speedTrace2 = collection.getTrack(1).getAnalyticalFeature('speed')
         
@@ -147,7 +161,7 @@ class TestSummarising(TestCase):
         self.assertEqual(grille.grid[2][5], speedTrace2[2])
     
 
-        raster.plot(name)
+        raster.plot(getMeasureName(speed, co_avg))
         plt.show()
         
         raster.plot(0)
@@ -163,9 +177,22 @@ class TestSummarising(TestCase):
         grille.bandStatistics()
         grille2.bandStatistics()
         
-        #print (grille.grid[2][0], grille2.grid[2][0])
+        # ---------------------------------------------------------------------
 
-    
+        grille3 = raster.getRasterBand(getMeasureName('uid', co_count))
+
+        self.assertEqual(grille3.grid[2][0], 2)
+        self.assertEqual(grille3.grid[1][0], 1)
+        self.assertEqual(grille3.grid[0][0], 0)
+
+        self.assertEqual(grille3.grid[0][4], 0)
+        self.assertEqual(grille3.grid[1][4], 2)
+        self.assertEqual(grille3.grid[2][4], 0)
+
+        self.assertEqual(grille3.grid[2][5], 1)
+        self.assertEqual(grille3.grid[1][5], 0)
+        self.assertEqual(grille3.grid[0][5], 1)
+
 
     def test_quickstart(self):
 
@@ -183,62 +210,29 @@ class TestSummarising(TestCase):
         trace.estimate_speed()
         
         collection = TrackCollection([trace])
-        
+
         af_algos = [speed, speed, speed]
         cell_operators = [co_avg, co_min, co_max]
         marge = 0.000005
-        raster = summarize(collection, af_algos, cell_operators, margin=marge)
+        raster = summarize(collection, af_algos, cell_operators, (5, 5), margin=marge)
         raster.getRasterBand(0).noDataValue = 0
-        
+
+        raster.getRasterBand(0).plotAsGraphic()
         raster.getRasterBand(0).summary()
         raster.plot(0)
-
+        
         raster.plot(getMeasureName(speed, co_avg))
         raster.plot(getMeasureName(speed, co_min))
         raster.plot(getMeasureName(speed, co_max))
         plt.show()
-        
-    # UID
-    
-    def test_aggregat(self):
-        
-        T = [1,2,3,4,5,6,7,8,9,NAN]
-        somme = co_sum(T)
-        self.assertEqual(somme, 45)
-        compte = co_count(T)
-        self.assertEqual(compte, 9)
-        dominant = co_dominant(T)
-        self.assertEqual(dominant, 1)
-        mediane = co_median(T)
-        self.assertEqual(mediane, 5)
-        
-        T = [1,2,2,3,3,3,4,4,4,4]
-        somme = co_sum(T)
-        self.assertEqual(somme, 30)
-        compte = co_count(T)
-        self.assertEqual(compte, 10)
-        dominant = co_dominant(T)
-        self.assertEqual(dominant, 4)
-        mediane = co_median(T)
-        self.assertEqual(mediane, 3)
-        
-        T = [1,3,7]
-        somme = co_sum(T)
-        self.assertEqual(somme, 11)
-        compte = co_count(T)
-        self.assertEqual(compte, 3)
-        dominant = co_dominant(T)
-        self.assertEqual(dominant, 1)
-        mediane = co_median(T)
-        self.assertEqual(mediane, 3)
-        
+
+
 
 
 if __name__ == '__main__':
     suite = TestSuite()
-    #suite.addTest(TestSummarising("test_summarize_af"))
+    suite.addTest(TestSummarising("test_summarize_af"))
     suite.addTest(TestSummarising("test_quickstart"))
-    #suite.addTest(TestSummarising("test_aggregat"))
     runner = TextTestRunner()
     runner.run(suite)
     
