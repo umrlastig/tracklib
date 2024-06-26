@@ -66,7 +66,7 @@ class NetworkReader:
     """
 
     @staticmethod
-    def readFromFile(path:str, formatfile:str="DEFAULT", verbose=True)->Network:
+    def readFromFile(path:str, formatfile:Union[str, NetworkFormat]="DEFAULT", verbose=True)->Network:
         """
         Read a network from CSV file with geometry structured in coordinates.
         
@@ -101,16 +101,22 @@ class NetworkReader:
         :param formatfile: name of format which describes metadata of the file
         :return: network.
         
-        """
-        
+        """        
         if not os.path.isfile(path):
             print ('Error: file not exists')
             return None
 
         network = Network()
-        fmt = NetworkFormat(formatfile)
-
+        
+        # Use format or read from resources
+        if 'NetworkFormat' in str(type(formatfile)):
+            fmt = formatfile
+        else:
+            fmt = NetworkFormat(formatfile)
+            
         num_lines = sum(1 for line in open(path))
+
+        fmt.controlFormat()
 
         if verbose:
             print("Loading network...")
@@ -122,7 +128,7 @@ class NetworkReader:
             cpt = 0
             for row in spamreader:
                 cpt += 1
-                if cpt >= fmt.h:
+                if cpt >= fmt.header:
                     break
 
             if verbose:
@@ -217,8 +223,8 @@ class NetworkReader:
                 "pos_source": 5,
                 "pos_target": 6,
                 "pos_wkt": 1,
-                "pos_poids": 3,
-                "pos_sens": 4,
+                "pos_weight": 3,
+                "pos_direction": 4,
                 "srid": srid,
             }
         )
@@ -388,9 +394,6 @@ class NetworkReader:
         
         
 
-        
-
-
 def readLineAndAddToNetwork(row, fmt):
     """TODO"""
     edge_id = str(row[fmt.pos_edge_id])
@@ -411,16 +414,19 @@ def readLineAndAddToNetwork(row, fmt):
     edge = Edge(edge_id, track)
 
     # Orientation
-    orientation = int(row[fmt.pos_sens])
-    if orientation not in [Edge.DOUBLE_SENS, Edge.SENS_DIRECT, Edge.SENS_INVERSE]:
-        orientation = Edge.DOUBLE_SENS
-    edge.orientation = orientation
+    if (fmt.pos_direction == -1):
+        edge.orientation = Edge.DOUBLE_SENS
+    else:        
+        orientation = int(row[fmt.pos_direction])
+        if orientation not in [Edge.DOUBLE_SENS, Edge.SENS_DIRECT, Edge.SENS_INVERSE]:
+            orientation = Edge.DOUBLE_SENS
+        edge.orientation = orientation
 
     # Poids
-    if fmt.pos_poids == -1:
+    if fmt.pos_weight == -1:
         poids = track.length()
     else:
-        poids = float(row[fmt.pos_poids])
+        poids = float(row[fmt.pos_weight])
     edge.weight = poids
 
     # Source node

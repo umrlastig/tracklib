@@ -59,10 +59,29 @@ class NetworkFormat:
     def __init__(self, name=None):
         """TODO"""
 
-        if name != None and name != "":
+        # Base default features
+        self.name = "UNDEFINED"
+        self.pos_edge_id = -1
+        self.pos_source = -1
+        self.pos_target = -1
+        self.pos_wkt = -1
+        self.pos_weight = -1
+        self.pos_direction = -1
+        self.separator = ","
+        self.header = 1
+        self.doublequote = -1
+        self.encoding = "UTF-8"
+        self.srid = "ENU"
+        
+        # Features updated from file
+        if 'str' in str(type(name)):
             self.createFromFile(name)
-        else:
-            self.name = "UNDEFINED"
+            return
+         
+        # Features updated from hash   
+        if 'dict' in str(type(name)):    
+            self.createFromDict(name)
+            return
 
     def createFromFile(self, name):
         """TODO"""
@@ -90,12 +109,12 @@ class NetworkFormat:
         self.pos_source = int(FIELDS[2].strip())
         self.pos_target = int(FIELDS[3].strip())
         self.pos_wkt = int(FIELDS[4].strip())
-        self.pos_poids = int(FIELDS[5].strip())
-        self.pos_sens = int(FIELDS[6].strip())
+        self.pos_weight = int(FIELDS[5].strip())
+        self.pos_direction = int(FIELDS[6].strip())
 
-        self.h = int(FIELDS[8].strip())
+        self.header = int(FIELDS[8].strip())
         self.doublequote = True
-        self.encode = "utf-8"
+        self.encoding = "utf-8"
 
         self.srid = FIELDS[11].strip()
 
@@ -109,27 +128,59 @@ class NetworkFormat:
 
     def createFromDict(self, param):
         """TODO"""
-
-        if param["name"] != None and param["name"] != "":
+        list_of_fields = []
+        if "name" in param:
             self.name = param["name"]
-
-        if param["pos_edge_id"] != None and param["pos_edge_id"] != "":
+        if "pos_edge_id" in param:
             self.pos_edge_id = param["pos_edge_id"]
-
-        if param["pos_source"] != None and param["pos_source"] != "":
+        if "pos_source" in param:
             self.pos_source = param["pos_source"]
+        if "pos_target" in param:
+            self.pos_target = param["pos_target"]            
+        if "pos_wkt" in param:
+            self.pos_wkt = param["pos_wkt"]                  
+        if "pos_weight" in param:
+            self.pos_weight = param["pos_weight"]            
+        if "pos_direction" in param:
+            self.pos_direction = param["pos_direction"]            
+        if "separator" in param:
+            self.separator = param["separator"]            
+        if "header" in param:
+            self.header = param["header"]
+        if "doublequote" in param:
+            self.doublequote = param["doublequote"]
+        if "encoding" in param:
+            self.encoding = param["encoding"]            
+        if "srid" in param:
+            self.srid = param["srid"]                      
 
-        if param["pos_target"] != None and param["pos_target"] != "":
-            self.pos_target = param["pos_target"]
+    def __str__(self):
+        output  = "----------------------------------------\n"
+        output += "Network file format:\n"
+        output += "----------------------------------------\n"
+        output += "Name:         " + str(self.name) + "\n"
+        output += "Edge:         " + str(self.pos_edge_id) + "\n"
+        output += "Source:       " + str(self.pos_source) + "\n"
+        output += "Target:       " + str(self.pos_target) + "\n"
+        output += "Geom:         " + str(self.pos_wkt) + "\n"
+        output += "Weight:       " + str(self.pos_weight) + "\n"
+        output += "Direction:    " + str(self.pos_direction) + "\n"
+        output += "Seperator:    [" + str(self.separator) + "]\n"
+        output += "Header:       " + str(self.header) + "\n"
+        output += "Double-quote: " + str(self.doublequote) + "\n"
+        output += "Encoding:     " + str(self.encoding) + "\n"
+        output += "SRID:         " + str(self.srid) + "\n"
+        output += "----------------------------------------\n"
+        return output
 
-        if param["pos_wkt"] != None and param["pos_wkt"] != "":
-            self.pos_wkt = param["pos_wkt"]
-
-        if param["pos_poids"] != None and param["pos_poids"] != "":
-            self.pos_poids = param["pos_poids"]
-
-        if param["pos_sens"] != None and param["pos_sens"] != "":
-            self.pos_sens = param["pos_sens"]
-
-        if param["srid"] != None and param["srid"] != "":
-            self.srid = param["srid"]
+    def controlFormat(self):
+        if self.pos_edge_id < 0:
+            raise WrongArgumentError("Incorrect value for 'pos_edge_id' in network file format: " + str(self.pos_edge_id))
+        if self.pos_source < 0:
+            raise WrongArgumentError("Incorrect value for 'pos_source' in network file format: " + str(self.pos_source))
+        if self.pos_target < 0:
+            raise WrongArgumentError("Incorrect value for 'pos_target' in network file format: " + str(self.pos_target))
+        if self.pos_wkt < 0:
+            raise WrongArgumentError("Incorrect value for 'pos_wkt' in network file format: " + str(self.pos_wkt))
+        if self.separator == "":
+            raise WrongArgumentError("Incorrect value for 'separator' in network file format: " + str(self.separator))

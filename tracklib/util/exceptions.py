@@ -28,3 +28,5 @@ class MissingArgumentError(Exception):
     pass
 class IOPathError(Exception):
     pass
+class WrongArgumentError(Exception):
+    pass
