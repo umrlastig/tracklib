@@ -172,6 +172,27 @@ class NetworkFormat:
         output += "SRID:         " + str(self.srid) + "\n"
         output += "----------------------------------------\n"
         return output
+        
+    def asString(self):
+        sep = self.separator 
+        sep = sep.replace(" ", "b")
+        sep = sep.replace(",", "c")
+        sep = sep.replace(";", "s")
+        out  = str(self.name) +", "
+        out += str(self.pos_edge_id) +", "
+        out += str(self.pos_source) +", "     
+        out += str(self.pos_edge_id) +", "      
+        out += str(self.pos_target) +", "      
+        out += str(self.pos_wkt) +", "     
+        out += str(self.pos_weight) +", "      
+        out += str(self.pos_direction) +", "     
+        out += str(sep) +", "     
+        out += str(self.header) +", "     
+        out += str(self.doublequote) +", "      
+        out += str(self.encoding) +", "     
+        out += str(self.srid)
+        return out      
+
 
     def controlFormat(self):
         if self.pos_edge_id < 0:
