@@ -254,7 +254,7 @@ MODE_DIRECTION_ORTHO = 8   # 1000
 #          - DISTRIBUTION_LAPLACE (symetric decreasing exponential)
 #    - mode: specifies how distances between points are computed to 
 #      generate covariance matrix from kernel. Available modes are:
-#		   - MODE_DISTANCE_LINEAR: distance is compued as difference of 
+#		   - MODE_DISTANCE_LINEAR: distance is computed as difference of 
 #            curvilinear abscissa on track. The value d(p,q) corresponds 
 #            to the distance along the track between points p and q. 
 #            This parameter is useful to model spatio-temporal 

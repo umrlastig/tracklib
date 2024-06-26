@@ -508,7 +508,7 @@ class TrackReader:
     def readFromGpx(path:str, 
                     srid:Literal["GEO", "ENU"] ="GEO", 
                     type: Literal["trk", "rte"]="trk",
-                    read_all=False) -> TrackCollection:
+                    read_all=False, verbose=False) -> TrackCollection:
         """
         Reads (multiple) tracks or routes from gpx file(s).
         
@@ -528,6 +528,8 @@ class TrackReader:
             TRACES = TrackCollection()
             LISTFILE = os.listdir(path)
             for f in LISTFILE:
+                if verbose:
+                    print(f)
                 if path[len(path)-1:] == '/':
                     collection = TrackReader.readFromGpx(path + f)
                 else:

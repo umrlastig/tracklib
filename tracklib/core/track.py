@@ -301,8 +301,6 @@ class Track:
 
     def getObs(self, i):
         """TODO"""
-        if i < 0:
-            raise IndexError
         return self.__POINTS[i]
     
     def getCoord(self, i=None):
