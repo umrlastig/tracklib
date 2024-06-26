@@ -200,7 +200,7 @@ class TrackWriter:
 
     
     @staticmethod
-    def writeToFiles(trackCollection, pathDir, ext, id_E=-1, id_N=-1, id_U=-1, 
+    def writeToFiles(trackCollection, pathDir, ext='csv', id_E=-1, id_N=-1, id_U=-1, 
                      id_T=-1, separator=",", h=0):
         """TODO"""
 
