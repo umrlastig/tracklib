@@ -48,6 +48,7 @@ import sys
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+#from tracklib.util.exceptions import *
 
 from tracklib.core import (Obs, 
                            listify, 
@@ -360,7 +361,7 @@ def __noise(
             control = control_bis
 
     if len(sigma) != len(kernel):
-        sys.exit(
+        raise SizeError(
             "Error: amplitude and kernel arrays must have same size in 'noise' function"
         )
 

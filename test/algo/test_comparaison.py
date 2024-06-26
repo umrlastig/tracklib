@@ -15,9 +15,11 @@ from tracklib import (Obs, ObsTime, ENUCoords, Track,
                       MODE_COMPARISON_DTW,
                       MODE_COMPARISON_FRECHET,
                       MODE_COMPARISON_AREAL,
+                      MODE_COMPARISON_NN,
                       MODE_MATCHING_DTW,
                       MODE_MATCHING_FRECHET,
                       MODE_MATCHING_FDTW,
+                      MODE_MATCHING_NN,
                       generate, GaussianKernel)
 
 
@@ -573,15 +575,104 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         self.assertEqual(d4.U, 0.0)
         '''
         
+    def testCompareNN(self):
+        '''
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        trace = Track([], 1)
+        trace.addObs(Obs(ENUCoords(1, 0, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(2, 0, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(3, 0, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(4, 0, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(5, 0, 0), ObsTime()))
+
+        # ----------------------------------------------------------------------        
+        # Cas 1
+        T1 = trace.extract(0, 1)
+        T2 = trace.extract(1, trace.size()-1)
+        T1.plot('r-')
+        T2.plot('b-')
+        
+        d = compare(T1, T2, mode=MODE_COMPARISON_NN, verbose=False)
+        print (d)
+        
+        
+        plt.xlim([0, 6])
+        plt.ylim([-1, 1])
+        
+        '''
+        
+        # ----------------------------------------------------------------------        
+        # Cas 2
+    
+        chemin1 = os.path.join(self.resource_path, 'test/data/compare/dtw1.csv')
+        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        trace1.plot('m-')
+        trace1.plotAsMarkers(type=MARKERS_TYPE_WARNING)
+        
+        chemin2 = os.path.join(self.resource_path, 'test/data/compare/dtw2.csv')
+        trace2 = TrackReader.readFromCsv(chemin2, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        trace2.plot('c-')
+        trace2.plotAsMarkers(bkg='w', frg='c', sym_frg = " ", sym_bkg = "v")
+        
+        trace1.plot('m-')
+        trace1.plotAsMarkers(type=MARKERS_TYPE_WARNING)
+        trace2.plot('c-')
+        trace2.plotAsMarkers(bkg='w', frg='c', sym_frg = " ", sym_bkg = "v")
+
+        
+        profile = match(trace1, trace2, mode=MODE_MATCHING_NN, 
+                        dim=2, verbose=False, plot=False)
+        plotMatching(profile, trace2)
+        
+        plt.xlim([-1, 12])
+        plt.ylim([-1, 5.5])
+        plt.show()
+        
+        self.assertCountEqual([0], profile[0, "pair"])
+        self.assertListEqual([0], profile[0, "pair"])
+        
+        self.assertCountEqual([1,2], profile[1, "pair"])
+        self.assertListEqual([1,2], profile[1, "pair"])
+        
+        self.assertCountEqual([3], profile[2, "pair"])
+        self.assertListEqual([3], profile[2, "pair"])
+        
+        self.assertCountEqual([4], profile[3, "pair"])
+        self.assertListEqual([4], profile[3, "pair"])
+        self.assertCountEqual([4], profile[4, "pair"])
+        self.assertListEqual([4], profile[4, "pair"])
+        self.assertCountEqual([4], profile[5, "pair"])
+        self.assertListEqual([4], profile[5, "pair"])
+        
+        self.assertCountEqual([5], profile[6, "pair"])
+        self.assertListEqual([5], profile[6, "pair"])
+        
+        self.assertCountEqual([6], profile[7, "pair"])
+        self.assertListEqual([6], profile[7, "pair"])
+
+        #diff = abs(profile.score - 2.502)
+        #self.assertLessEqual(diff, self.__epsilon, "Score")
+        
+        
+    def testMasterTrack(self):
+
+        #self.assertTrue(set(a).issuperset(set(b)))
+
+
+        pass
+    
+    
     
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    
+
     suite.addTest(TestAlgoComparaisonMethods("testMatchFrechet"))
     suite.addTest(TestAlgoComparaisonMethods("testMatchDTWLInf"))
     suite.addTest(TestAlgoComparaisonMethods("testMatchDTWL1"))
     suite.addTest(TestAlgoComparaisonMethods("testMatchDTWL2"))
     suite.addTest(TestAlgoComparaisonMethods("testMatchFDTWL2"))
+
+    suite.addTest(TestAlgoComparaisonMethods("testCompareNN"))
     
     suite.addTest(TestAlgoComparaisonMethods("testTestEqualFDTWandDTW"))
     suite.addTest(TestAlgoComparaisonMethods("testDTWDim1L2"))
@@ -595,6 +686,8 @@ if __name__ == '__main__':
     suite.addTest(TestAlgoComparaisonMethods("testHausdorffSimilarity"))
     suite.addTest(TestAlgoComparaisonMethods("testArealStandardizedBetweenTwoTracks"))
     suite.addTest(TestAlgoComparaisonMethods("testAggregatCluster"))
+
+    suite.addTest(TestAlgoComparaisonMethods("testMasterTrack"))
     
     runner = unittest.TextTestRunner()
     runner.run(suite)

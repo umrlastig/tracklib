@@ -45,6 +45,7 @@ knowledge of the CeCILL-C license and that you accept its terms.
 # For type annotation
 from __future__ import annotations   
 from typing import Literal, Union   
+from tracklib.util.exceptions import *
 
 import json
 import os
@@ -518,15 +519,13 @@ class TrackWriter:
         
         if not oneFile:
             if not os.path.isdir(path):
-                print ("Error: path need to be a directory")
-                sys.exit()
+                raise IOPathError("Error: path need to be a directory")
             if path != '' and path[len(path) - 1:] != '/':
                 path += '/'
         else:
             tabpath = path.split(".")
             if not path.split(".")[len(tabpath) - 1]  in TrackWriter.gpxfile_extension:
-                print ("Error: path variable need to contain a file path")
-                sys.exit()
+                raise IOPathError("Error: path variable need to contain a file path")
             f = open(path, "w")
 
         # Time output management

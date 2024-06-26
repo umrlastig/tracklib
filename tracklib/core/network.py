@@ -48,6 +48,7 @@ This module contains the class to manage Network
 # For type annotation
 from __future__ import annotations
 from typing import Literal, Union, Dict, Tuple
+#from tracklib.util.exceptions import *
 
 import random
 #from typing import Union
@@ -1087,6 +1088,6 @@ class Network:
         """
         if len(filename) < 4:
             filename = filename + ".npy"
-        if filename[:-4] != ".npy":
+        if filename[-4:] != ".npy":
             filename = filename + ".npy"
         self.DISTANCES = read_dictionary = np.load(filename, allow_pickle="TRUE").item()

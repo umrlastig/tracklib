@@ -51,6 +51,7 @@ import os.path
 import progressbar
 import requests
 from xml.dom import minidom
+from tracklib.util.exceptions import *
 
 from tracklib.core import ObsTime, ENUCoords, ECEFCoords, GeoCoords, Obs
 from tracklib.algo import computeAbsCurv

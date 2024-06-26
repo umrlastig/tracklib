@@ -7,6 +7,7 @@ from tracklib import (ENUCoords, ObsTime, Obs,
                       makeDistanceMatrix,
                       computeAbsCurv,
                       makeRPN, compLike,
+                      NAN, co_sum, co_count, co_dominant, co_median,
                       Track)
 
 
@@ -93,12 +94,45 @@ class TestUtils(unittest.TestCase):
         a = compLike("abcdefg", "%z")
         self.assertFalse(a)
 
+    def test_aggregat(self):
+        
+        T = [1,2,3,4,5,6,7,8,9,NAN]
+        somme = co_sum(T)
+        self.assertEqual(somme, 45)
+        compte = co_count(T)
+        self.assertEqual(compte, 9)
+        dominant = co_dominant(T)
+        self.assertEqual(dominant, 1)
+        mediane = co_median(T)
+        self.assertEqual(mediane, 5)
+        
+        T = [1,2,2,3,3,3,4,4,4,4]
+        somme = co_sum(T)
+        self.assertEqual(somme, 30)
+        compte = co_count(T)
+        self.assertEqual(compte, 10)
+        dominant = co_dominant(T)
+        self.assertEqual(dominant, 4)
+        mediane = co_median(T)
+        self.assertEqual(mediane, 3)
+        
+        T = [1,3,7]
+        somme = co_sum(T)
+        self.assertEqual(somme, 11)
+        compte = co_count(T)
+        self.assertEqual(compte, 3)
+        dominant = co_dominant(T)
+        self.assertEqual(dominant, 1)
+        mediane = co_median(T)
+        self.assertEqual(mediane, 3)
+
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     suite.addTest(TestUtils("testMakeDistanceMatrixModeLinear"))
     suite.addTest(TestUtils("test_make_RPN"))
     suite.addTest(TestUtils("test_comp_like"))
+    suite.addTest(TestUtils("test_aggregat"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

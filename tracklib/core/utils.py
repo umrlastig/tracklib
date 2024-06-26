@@ -47,6 +47,7 @@ some utility functions.
 # For type annotation
 from __future__ import annotations   
 from typing import Any, Optional, Union
+#from tracklib.util.exceptions import *
 
 import json
 import sys
@@ -55,6 +56,7 @@ import numpy as np
 import matplotlib.colors as mcolors
 
 from heapq import heapify, heappush, heappop
+
 
 
 # =============================================================================
@@ -201,8 +203,7 @@ def makeDistanceMatrix(track, mode = 'linear'):
     :return: numpy distance matrix with a track
     """
     if mode not in ['linear', 'circular', 'euclidian']:
-        print("Error: unknown mode: "+str(mode))
-        sys.exit(1)
+       raise UnknownModeError("Error: unknown mode: "+str(mode))
     if mode in ['linear', 'circular']:
         S = np.array(track.getAnalyticalFeature("abs_curv"))
         z = np.array([complex(s, 0) for s in S])	

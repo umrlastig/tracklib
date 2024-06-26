@@ -60,6 +60,7 @@ from . import (ObsTime, ENUCoords, GeoCoords, Obs,
                Bbox,
                co_median)
 from tracklib.util import intersection, Polygon
+from tracklib.util.exceptions import QueryError 
 from tracklib.plot import IPlotVisitor, MatplotlibVisitor
 from tracklib.algo import (BIAF_SPEED, BIAF_ABS_CURV, 
                            computeAbsCurv, 
@@ -403,6 +404,8 @@ class Track:
     
     def getMedianObsInTime(self):
         ''' '''
+        if self.size() == 1:
+            return self.getFirstObs()
         # TODO: Test if timestamp exists
         self.sort()
         med = (self.getLastObs().timestamp - self.getFirstObs().timestamp) / 2
@@ -536,9 +539,7 @@ class Track:
                 AF.append(i)
             return AF
         if not self.hasAnalyticalFeature(af_name):
-            sys.exit(
-                "Error: track does not contain analytical feature '" + af_name + "'"
-            )
+            raise AnalyticalFeatureError("track does not contain analytical feature '" + af_name + "'")
         index = self.__analyticalFeaturesDico[af_name]
         for i in range(self.size()):
             AF.append(self.__POINTS[i].features[index])
@@ -567,9 +568,7 @@ class Track:
         if af_name == "idx":
             return i
         if not af_name in self.__analyticalFeaturesDico:
-            sys.exit(
-                "Error: track does not contain analytical feature '" + af_name + "'"
-            )
+            raise AnalyticalFeatureError("track does not contain analytical feature '" + af_name + "'")
         index = self.__analyticalFeaturesDico[af_name]
         return self.__POINTS[i].features[index]
 
@@ -585,9 +584,7 @@ class Track:
             self.getObs(i).position.setZ(val)
             return
         if not af_name in self.__analyticalFeaturesDico:
-            sys.exit(
-                "Error: track does not contain analytical feature '" + af_name + "'"
-            )
+            raise AnalyticalFeatureError("track does not contain analytical feature '" + af_name + "'")
         index = self.__analyticalFeaturesDico[af_name]
         self.__POINTS[i].features[index] = val
 
@@ -1050,7 +1047,7 @@ class Track:
     def __controlName(name):
         """TODO"""
         if name in ["x", "y", "z", "t", "timestamp", "idx"]:
-            sys.exit("Error: analytical feature name '" + name + "' is not available")
+            raise AnalyticalFeatureError("Error: analytical feature name '" + name + "' is not available")
 
     def addAnalyticalFeature(self, algorithm, name=None):
         """
@@ -1085,9 +1082,7 @@ class Track:
             return
         Track.__controlName(name)
         if self.size() <= 0:
-            sys.exit(
-                "Error: can't add AF '" + name + "', there is no observation in track"
-            )
+            raise AnalyticalFeatureError("Error: can't add AF '" + name + "', there is no observation in track")
         if self.hasAnalyticalFeature(name):
             return
         idAF = len(self.__analyticalFeaturesDico)
@@ -1104,11 +1099,9 @@ class Track:
         Update values of an AF.
         """
         if not self.hasAnalyticalFeature(name):
-            sys.exit("Error: track does not contain analytical feature '" + name + "'")
+            raise AnalyticalFeatureError("Error: track does not contain analytical feature '" + name + "'")
         if self.size() <= 0:
-            sys.exit(
-                "Error: can't add AF '" + name + "', there is no observation in track"
-            )
+            raise AnalyticalFeatureError("Error: can't add AF '" + name + "', there is no observation in track")
         idAF = self.__analyticalFeaturesDico[name] 
         if isinstance(new_val, list):
             for i in range(self.size()):
@@ -1120,7 +1113,7 @@ class Track:
     def removeAnalyticalFeature(self, name):
         """TODO"""
         if not self.hasAnalyticalFeature(name):
-            sys.exit("Error: track does not contain analytical feature '" + name + "'")
+            raise AnalyticalFeatureError("Error: track does not contain analytical feature '" + name + "'")
         idAF = self.__analyticalFeaturesDico[name]
         for i in range(self.size()):
             del self.getObs(i).features[idAF]
@@ -1261,7 +1254,7 @@ class Track:
             if isinstance(arg1, str):
                 return operator.execute(self, arg1, arg2)
             if len(arg1) != len(arg2):
-                sys.exit(
+                raise OperatorError(
                     "Error in "
                     + type(operator).__name__
                     + ": non-concordant number in input features"
@@ -1287,7 +1280,7 @@ class Track:
             if isinstance(arg1, str):
                 return operator.execute(self, arg1, arg2)
             if len(arg1) != len(arg2):
-                sys.exit(
+                raise OperatorError(
                     "Error in "
                     + type(operator).__name__
                     + ": non-concordant number in input and output features"
@@ -1302,13 +1295,13 @@ class Track:
             if isinstance(arg1, str):
                 return operator.execute(self, arg1, arg2, arg3)
             if len(arg1) != len(arg2):
-                sys.exit(
+                raise OperatorError(
                     "Error in "
                     + type(operator).__name__
                     + ": non-concordant number in input features"
                 )
             if len(arg1) != len(arg3):
-                sys.exit(
+                raise OperatorError(
                     "Error in "
                     + type(operator).__name__
                     + ": non-concordant number in input and output features"
@@ -1323,7 +1316,7 @@ class Track:
             if isinstance(arg1, str):
                 return operator.execute(self, arg1, arg2, arg3)
             if len(arg1) != len(arg3):
-                sys.exit(
+                raise OperatorError(
                     "Error in "
                     + type(operator).__name__
                     + ": non-concordant number in input and output features"
@@ -1627,7 +1620,7 @@ class Track:
         if self.hasAnalyticalFeature(BIAF_SPEED):
             return self.getAnalyticalFeature(BIAF_SPEED)
         else:
-            sys.exit("Error: 'estimate_speed' has not been called yet")
+            raise AnalyticalFeatureError("Error: 'estimate_speed' has not been called yet")
 
     # DEPRECATED
     # def compute_abscurv(self):
@@ -1643,7 +1636,7 @@ class Track:
         if self.hasAnalyticalFeature(BIAF_ABS_CURV):
             return self.getAnalyticalFeature(BIAF_ABS_CURV)
         else:
-            sys.exit("Error: 'compute_abscurv' has not been called yet")
+            raise AnalyticalFeatureError("Error: 'compute_abscurv' has not been called yet")
 
     # # DEPRECATED
     # def getCurvAbsBetweenTwoPoints(self, id_ini=0, id_fin=None):
@@ -1786,8 +1779,7 @@ class Track:
             if ("(" in where_part) or (")" in where_part):
                 message = "Error: parenthesis not allowed in conditions."
                 message += "Use boolean algebra rules to reformulate query or use successive queries"
-                print(message)
-                sys.exit()
+                raise QueryError(message)
 
         if not select_part == "*":
             LAF = []

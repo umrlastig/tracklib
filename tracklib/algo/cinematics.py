@@ -46,6 +46,7 @@ Class to manage cinematic computations on GPS tracks
 """
 
 from numpy import pi
+#from tracklib.util.exceptions import *
 
 from tracklib.util import angleBetweenThreePoints, distance_to_segment
 from . import (anglegeom,

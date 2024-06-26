@@ -49,6 +49,7 @@ import sys
 import math
 import progressbar
 import numpy as np
+#from tracklib.util.exceptions import *
 
 import tracklib as tracklib
 from tracklib.core import (ENUCoords, Obs, isnan)
@@ -264,7 +265,7 @@ def splitReturnTripExhaustive(track, verbose=True):
 
     for return_point in step_to_run: 
         T1 = track.extract(0, return_point)
-        T2 = track.extract(return_point, track.size()-1)
+        T2 = track.extract(return_point, track.size()-1).reverse()
         
         # avg = (T1 - T2).operate(AVG, "diff") + (T2 - T1).operate(AVG, "diff")
         d1 = compare(T1, T2, verbose=False, mode=MODE_COMPARISON_DTW, p=1)

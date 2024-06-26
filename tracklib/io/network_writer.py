@@ -44,6 +44,7 @@ knowledge of the CeCILL-C license and that you accept its terms.
 # For type annotation
 from __future__ import annotations   
 from typing import Literal   
+from tracklib.util.exceptions import *
 
 from tracklib.core import Network
 

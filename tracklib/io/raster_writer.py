@@ -59,6 +59,7 @@ The header data includes the following keywords and values:
 
 import math
 from tracklib.core import NO_DATA_VALUE
+from tracklib.util.exceptions import *
 
 class RasterWriter:
     

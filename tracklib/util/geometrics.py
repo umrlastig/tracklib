@@ -948,7 +948,7 @@ def minimumBoundingRectangle(track):
 # is minimal. Computation is done with Weiszfeld's algorithm.
 # Output is the median of points as an ENUCoords point
 # ------------------------------------------------------------
-def geometricMedian(points, N_ITER_MAX = 100, epsilon_factor = 1e-10):
+def geometricMedian(points, N_ITER_MAX = 1000, epsilon_factor = 1e-10):
 	
     if (len(points) == 1):
         return points[0].copy
@@ -989,7 +989,7 @@ def geometricMedian(points, N_ITER_MAX = 100, epsilon_factor = 1e-10):
         x0 = xnew
         y0 = ynew
         
-    print("WARNING: geometric median did not reach convergence")     
+    print("WARNING: geometric median did not reach convergence")
     return ENUCoords(xnew, ynew)
      
 
@@ -1052,5 +1052,4 @@ def centerOfPoints(coordSet, mode=MODE_AGG_L2):
     if mode == MODE_AGG_LInf:
         return minCircleOfPoints(coordSet).center
 
-    print("Unknown mode in 'centerOfPoints' function")
-    sys.exit(1)
+    raise UnknownModeError("Unknown mode in 'centerOfPoints' function")

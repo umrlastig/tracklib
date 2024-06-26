@@ -48,6 +48,7 @@ A raster is defined as a collection of RasterBand.
 # For type annotation
 from __future__ import annotations   
 from typing import Union
+#from tracklib.util.exceptions import *
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable

@@ -40,6 +40,7 @@ knowledge of the CeCILL-C license and that you accept its terms.
 """
 
 from abc import ABC, abstractmethod
+from tracklib.util.exceptions import *
 #from typing import Iterable, Literal
 
 

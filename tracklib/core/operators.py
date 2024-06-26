@@ -49,6 +49,7 @@ import sys
 import math
 import numpy as np
 from abc import abstractmethod
+#from tracklib.util.exceptions import *
 
 from . import NAN, isnan, addListToAF, Kernel
 
@@ -63,7 +64,7 @@ class UnaryOperator:
         :param track: TODO
         :param af_input: TODO
         """
-        sys.exit("Not yet implemented")
+        raise NotYetImplementedError("Not yet implemented")
 
 
 class BinaryOperator:
@@ -77,7 +78,7 @@ class BinaryOperator:
         :param af_input1: TODO
         :param af_input2: TODO
         """
-        sys.exit("Not yet implemented")
+        raise NotYetImplementedError("Not yet implemented")
 
 
 class UnaryVoidOperator:
@@ -91,7 +92,7 @@ class UnaryVoidOperator:
         :param af_input: TODO
         :param af_output: TODO
         """
-        sys.exit("Not yet implemented")
+        raise NotYetImplementedError("Not yet implemented")
 
 
 class BinaryVoidOperator:
@@ -106,7 +107,7 @@ class BinaryVoidOperator:
         :param af_input2: TODO
         :param af_output: TODO
         """
-        sys.exit("Not yet implemented")
+        raise NotYetImplementedError("Not yet implemented")
 
 
 class ScalarOperator:
@@ -120,7 +121,7 @@ class ScalarOperator:
         :param af_input1: TODO
         :param arg: TODO
         """
-        sys.exit("Not yet implemented")
+        NotYetImplementedError("Not yet implemented")
 
 
 class ScalarVoidOperator:
@@ -135,7 +136,7 @@ class ScalarVoidOperator:
         :param arg: TODO
         :param af_output:
         """
-        sys.exit("Not yet implemented")
+        NotYetImplementedError("Not yet implemented")
 
 
 
@@ -1476,7 +1477,7 @@ class Filter(ScalarVoidOperator):
                 kernel[i] /= norm
         N = len(kernel)
         if N % 2 == 0:
-            sys.exit(
+            raise KernelError(
                 "Error: kernel must contain an odd number of values in '"
                 + type(self).__name__
                 + "' operator"
@@ -1534,7 +1535,7 @@ class Filter_FFT(ScalarVoidOperator):
                 kernel[i] /= norm
         N = len(kernel)
         if N % 2 == 0:
-            sys.exit(
+            raise KernelError(
                 "Error: kernel must contain an odd number of values in '"
                 + type(self).__name__
                 + "' operator"

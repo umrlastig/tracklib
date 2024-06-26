@@ -47,6 +47,7 @@ Class to manage interpolation and smoothing functions
 # For type annotation
 from __future__ import annotations   
 from typing import Literal   
+#from tracklib.util.exceptions import *
 
 import sys
 import math
@@ -109,7 +110,7 @@ def resample(track, delta, algo: Literal[1, 2, 3, 4]=1, mode:Literal[1, 2]=1):
             __bsplines_spatial(track, delta, B_SPLINE_DEGREE, B_SPLINE_RESOL)
         if algo == ALGO_GAUSSIAN_PROCESS:
             if GP_KERNEL == None:
-                sys.exit(
+                raise KernelError(
                     "Kernel must be defined with 'GP_KERNEL' before using gaussian process interpolation"
                 )
             t = gaussian_process(track, delta, GP_KERNEL, 1, GP_SMOOTHING, mode=MODE_SPATIAL)
@@ -124,7 +125,7 @@ def resample(track, delta, algo: Literal[1, 2, 3, 4]=1, mode:Literal[1, 2]=1):
             __bsplines_temporal(track, delta, B_SPLINE_DEGREE, B_SPLINE_RESOL)
         if algo == ALGO_GAUSSIAN_PROCESS:
             if GP_KERNEL == None:
-                sys.exit(
+                raise KernelError(
                     "Kernel must be defined with 'GP_KERNEL' before using gaussian process interpolation"
                 )
             t = gaussian_process(track, delta, GP_KERNEL, 1, GP_SMOOTHING)
@@ -664,7 +665,7 @@ def __bsplines_temporal(track, reference, degree=3, knots_nb=None):
     reference: list of timestamps, track or sec interval"""
 
     if degree > 3:
-        sys.exit("Error: B-spline of order > 3 is not supported")
+        raise NotYetImplementedError("Error: B-spline of order > 3 is not supported")
 
     T = track.getT()
 
@@ -701,7 +702,7 @@ def __bsplines_temporal(track, reference, degree=3, knots_nb=None):
     if knots_nb > T[-1] - T[0]:
         message = "Error: spline basis resolution (" + (str)(knots_nb) + ") "
         message += "is greater than track time duration (" + (str)(T[-1] - T[0]) + "). "
-        sys.exit(message)
+        raise MathError(message)
 
     BP = np.arange(0, T[-1], knots_nb)
 
@@ -751,7 +752,7 @@ def __bsplines_spatial(track, ds, degree=3, knots_nb=None):
     ds: curv abs interval (in m) between two samples"""
 
     if degree > 3:
-        sys.exit("Error: B-spline of order > 3 is not supported")
+        raise NotYetImplementedError("Error: B-spline of order > 3 is not supported")
 
     S = [0]
     for i in range(1, track.size()):
@@ -798,7 +799,7 @@ def __bsplines_spatial(track, ds, degree=3, knots_nb=None):
     if knots_nb > S[-1] - S[0]:
         message = "Error: spline basis resolution (" + (str)(knots_nb) + ") "
         message += "is greater than track length (" + (str)(S[-1] - S[0]) + "). "
-        sys.exit(message)
+        raise MathError(message)
 
     BP = np.arange(0, S[-1], knots_nb)
 

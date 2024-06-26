@@ -5,7 +5,7 @@ import math
 import numpy as np
 
 from tracklib import (ENUCoords, ObsTime, Obs, Track,
-                      speed, heading, orientation)
+                      speed, heading, orientation, QueryError)
 
 
 class TestTrackQuery(TestCase):
@@ -162,7 +162,7 @@ class TestTrackQuery(TestCase):
         self.track.addAnalyticalFeature(heading)
         self.track.addAnalyticalFeature(orientation)
         
-        with self.assertRaises(SystemExit):
+        with self.assertRaises(QueryError):
             self.track.query("SELECT * WHERE (speed > 0.5 or orientation = 1) and heading > 1")
         
         

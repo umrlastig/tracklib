@@ -49,10 +49,12 @@ import random
 import datetime
 import numpy as np
 import progressbar
+import matplotlib
 import matplotlib.pyplot as plt
 
 
 import tracklib as tracklib
+#from tracklib.util.exceptions import *
 from tracklib.util import dist_point_to_segment, Polygon, centerOfPoints
 from . import synchronize, computeRadialSignature
 from tracklib.core import (ENUCoords, TrackCollection, 
@@ -65,7 +67,7 @@ from tracklib.core import (ENUCoords, TrackCollection,
 # For infinite norm: set p = float('inf')
 # All methods are parameterized by a distance d.
 # ------------------------------------------------------------------------------
-MODE_MATCHING_NN      = 1   # Nearest Neighbour                           
+MODE_MATCHING_NN      = 1   # Nearest Neighbour
 MODE_MATCHING_DTW     = 2   # Dynamic Time Warping (with Lp norm)      [p][s]
 MODE_MATCHING_FDTW    = 3   # Fast (and approximate) DTW               [p][s]
 MODE_MATCHING_FRECHET = 4   # Discrete Frechet macthing                   [s]
@@ -106,8 +108,9 @@ MODE_AGG_L2     = 302         # Standard barycenter of points
 MODE_AGG_LInf   = 303         # Center of minimum enclosing circle
 # ------------------------------------------------------------------------
 # List of available methods to choose representative point selection
-MODE_MASTER_RANDOM = -200   # Random track
-MODE_MASTER_MEDIAN = -100   # Closest to the median of track lengths
+MODE_MASTER_RANDOM = -200       # Random track
+MODE_MASTER_MEDIAN_LEN = -100   # Closest to the median of track lengths
+MODE_MASTER_MEDIAN_GEOM = -300  # Minimizes the sum of distances to other tracks
 # ------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
@@ -137,8 +140,8 @@ def compare(track1, track2, mode=MODE_COMPARISON_POINTWISE, p=1, dim=2, verbose=
         return _dtw_comparison(track1, track2, p, dim, verbose, plot)
     if (mode == MODE_COMPARISON_FDTW):
         return _fdtw_comparison(track1, track2, p, dim, verbose, plot)
-    print("Unavailable mode for comparison of 2 tracks")
-    sys.exit(0)
+    raise UnknownModeError("Unavailable mode for comparison of 2 tracks")
+
 
 
 # ------------------------------------------------------------------------------
@@ -158,8 +161,7 @@ def match(track1, track2, mode=MODE_MATCHING_DTW, p=1, dim=2, verbose=True, plot
         return _dtw_matching(track1, track2, p, dim, verbose, plot)
     if (mode == MODE_MATCHING_FDTW):
         return _fdtw_matching(track1, track2, p, dim, verbose, plot)
-    print("Unavailable mode for matching of 2 tracks")
-    sys.exit(0)
+    raise UnknownModeError("Unavailable mode for matching of 2 tracks")
 
 
 # ------------------------------------------------------------------------------
@@ -185,8 +187,7 @@ def _distance(p1, p2, dim):
 # ------------------------------------------------------------------------------
 def _compare_pointwise(track1, track2, p, dim) -> float:
     if (len(track1) != len(track2)):
-        print("Error: tracks must have same size to be compared with pointwise method")
-        sys.exit(1)
+        raise SizeError("Error: tracks must have same size to be compared with pointwise method")
     N = len(track1)
     d = 0
     if p == 0:
@@ -609,6 +610,8 @@ def plotMatching(matching, track2, af_name="pair", sym="k--", linewidth=.5,
             ax1 = plt.gca()
         else:
             fig, ax1 = plt.subplots(figsize=(10, 3))
+    elif isinstance(append, matplotlib.axes._axes.Axes):
+        ax1 = append
     else:
         ax1 = plt
 
@@ -624,17 +627,18 @@ def plotMatching(matching, track2, af_name="pair", sym="k--", linewidth=.5,
             ax1.plot([x1, x2], [y1, y2], sym, linewidth=linewidth)
 
 
-# ------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # [B1] On cherche l'index de la trace dont la longueur est la plus proche
 # de la valeur médiane des longueurs de la collection des traces
 # Inputs:
 #   - a collection of tracks
 #   - ref: index of track in list or:
 # MODE_MASTER_RANDOM: random master track
-# MODE_MASTER_MEDIAN: track with length closest to median of lengths
-# ------------------------------------------------------------------------ 
-def _getMasterTrack(tracks, mode):
-    if mode == MODE_MASTER_MEDIAN:
+# MODE_MASTER_MEDIAN_LEN: track with length closest to median of lengths
+# MODE_MASTER_MEDIAN_GEOM: track that minimizes the sum of distances to the others
+# -----------------------------------------------------------------------------
+def _getMasterTrack(tracks, mode, mode_compare=MODE_COMPARISON_DTW, p=1):
+    if mode == MODE_MASTER_MEDIAN_LEN:
         L = tracks.getLenth()
         m = co_median(L)
         imed = 0
@@ -647,6 +651,22 @@ def _getMasterTrack(tracks, mode):
         return ref
     if mode == MODE_MASTER_RANDOM:
         return random.sample(range(len(tracks)), 1)[0]
+    if mode == MODE_MASTER_MEDIAN_GEOM:
+        smax = sys.float_info.max
+        ref = -1
+        for k in range(0, tracks.size()):
+            S = 0
+            for l in range(0, tracks.size()):
+                if l == k:
+                    continue
+                track1 = tracks[k]
+                track2 = tracks[l]
+                d = compare(track1, track2, mode=mode_compare, p=p, verbose=False)
+                S += d
+            if S < smax:
+                smax = S
+                ref = k
+        return ref
     return mode
 
 # ------------------------------------------------------------------------
@@ -663,11 +683,9 @@ def _representative(pairs, track, represent_method=MODE_REP_BARYCENTRE, pos=None
         return P.getMedianObsInTime().position
     if represent_method == MODE_REP_FURTHEST_OBS:
         if pos is None:
-            print("Reference position must be specified for MODE_REP_FURTHEST_OBS in _representative")
-            sys.exit(0)
+            raise MissingArgumentError("Reference position must be specified for MODE_REP_FURTHEST_OBS in _representative")
         return P.getFurthestObs(pos).position
-    print("Unknown mode " + str(represent_method) +" for representative of track section")
-    sys.exit(1)
+    raise UnknownModeError("Unknown mode " + str(represent_method) +" for representative of track section")
     
 # ------------------------------------------------------------------------
 # [B4] Auxiliary function for aggregation and potential constraint
@@ -770,14 +788,17 @@ def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constrai
     
     central.iteration = iteration
     central.master = master
-    
+    central.time = str(end_time-start_time)
+    central.start_time = start_time
+    central.end_time = end_time
+
     return central
 
 
 # ------------------------------------------------------------------------
 # Algorithme récursif fusion L. Etienne : trajectoire médiane
 # ------------------------------------------------------------------------ 
-def fusion(tracks, mode=MODE_MATCHING_DTW, master=MODE_MASTER_MEDIAN, p=1, dim=2,  
+def fusion(tracks, mode=MODE_MATCHING_DTW, master=MODE_MASTER_MEDIAN_LEN, p=1, dim=2,
            represent_method=MODE_REP_BARYCENTRE, agg_method=MODE_AGG_MEDIAN, constraint=True,
            recursive=1e300, iter_max=100, verbose=True):
     

@@ -49,6 +49,7 @@ This Module contains the classes to manage point coordinates:
 # For type annotation
 from __future__ import annotations   
 from typing import Union
+#from tracklib.util.exceptions import *
 
 import math
 import copy
@@ -259,6 +260,16 @@ class ENUCoords:
         """Transform the object in string
 
         :return: String representation of coordinates
+        """
+        output = "[E=" + "{:12.3f}".format(self.E) + ", "
+        output += "N=" + "{:12.3f}".format(self.N) + ", "
+        output += "U=" + "{:12.3f}".format(self.U) + "]"
+        return output
+
+    def __repr__(self):
+        """Transform the object in string
+
+        :return: String representation of coordinates to be printable
         """
         output = "[E=" + "{:12.3f}".format(self.E) + ", "
         output += "N=" + "{:12.3f}".format(self.N) + ", "
