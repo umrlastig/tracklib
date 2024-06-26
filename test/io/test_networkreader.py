@@ -59,7 +59,7 @@ class TestNetworkReader(TestCase):
                                    tolerance=tolerance, spatialIndex=True, nomproxy=self.nomproxy)
 
 
-        network.plot('k-', '', 'g-', 'r-', 0.5, plt)
+        # network.plot('k-', '', 'g-', 'r-', 0.5, plt)
         #self.assertEqual(235, len(network.EDGES))
         #self.assertEqual(185, len(network.NODES))
 
