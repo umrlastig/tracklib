@@ -76,12 +76,24 @@ class TrackWriter:
         return elem[0]
 
     def __printInOrder(E, N, U, T, headerAF, O, sep):
-        D = [E, N, U, T]
+        D = [E, N]
+        if U is not None:
+            D.append(U)
+        if T is not None:
+            D.append(T)
+        # D = [E, N, U, T]
         output = ""
         output += str(D[O[0][1]]).strip() + sep
-        output += str(D[O[1][1]]).strip() + sep
-        output += str(D[O[2][1]]).strip() + sep
-        output += str(D[O[3][1]]).strip()
+        output += str(D[O[1][1]]).strip()
+        if U is not None:
+            output +=  sep + str(D[O[2][1]]).strip()
+            if T is not None:
+                output += sep + str(D[O[3][1]]).strip()
+        else:
+            if T is not None:
+                #print (O[2][1], D, U, T, O)
+                output += sep + str(D[O[2][1]]).strip()
+
         output += headerAF
         return output
 
@@ -131,11 +143,21 @@ class TrackWriter:
         # -------------------------------------------------------
         # Data order
         # -------------------------------------------------------
-        O = [(fmt.id_E, 0), (fmt.id_N, 1), (fmt.id_U, 2), (fmt.id_T, 3)]
+        O = [(fmt.id_E, 0), (fmt.id_N, 1)]
+        start = 2
+        if fmt.id_U != -1:
+            O.append((fmt.id_U, 2))
+            start += 1
+        if fmt.id_T != -1:
+            if fmt.id_U != -1:
+                O.append((fmt.id_T, 3))
+            else:
+                O.append((fmt.id_T, 2))
+            start += 1
         headerAF = ""
         if len(af_names) > 0:
             for idx, af_name in enumerate(af_names):
-                O.append((4 + idx, 4 + idx))
+                O.append((start + idx, start + idx))
                 headerAF += fmt.separator + af_name
         O.sort(key=TrackWriter.__takeFirst)
 
@@ -151,26 +173,53 @@ class TrackWriter:
                 f.write(fmt.com + "Reference epoch: " + fmt.DateIni + "\n")
             
             if track.getSRID().upper() == "ENU":
-                f.write(
-                    fmt.com
-                    + TrackWriter.__printInOrder(
-                        "E", "N", "U", "time", headerAF, O, fmt.separator)
-                    + "\n"
-                )
+                if fmt.id_U == -1:
+                    if fmt.id_T == -1:
+                        f.write(fmt.com+ TrackWriter.__printInOrder(
+                                "E", "N", None, None, headerAF, O, fmt.separator)+ "\n")
+                    else:
+                        f.write(fmt.com+ TrackWriter.__printInOrder(
+                                "E", "N", None, "time", headerAF, O, fmt.separator)+ "\n")
+                else:
+                    if fmt.id_T == -1:
+                        f.write(fmt.com+ TrackWriter.__printInOrder(
+                                "E", "N", "U", None, headerAF, O, fmt.separator)+ "\n")
+                    else:
+                        f.write(fmt.com+ TrackWriter.__printInOrder(
+                                "E", "N", "U", "time", headerAF, O, fmt.separator)+ "\n")
+
             if track.getSRID().upper() == "GEO":
-                f.write(
-                    fmt.com
-                    + TrackWriter.__printInOrder(
-                        "lon", "lat", "h", "time", headerAF, O, fmt.separator)
-                    + "\n"
-                )
+                if fmt.id_U == -1:
+                    if fmt.id_T == -1:
+                        f.write(fmt.com+ TrackWriter.__printInOrder(
+                                "lon", "lat", None, None, headerAF, O, fmt.separator)+ "\n")
+                    else:
+                        f.write(fmt.com+ TrackWriter.__printInOrder(
+                                "lon", "lat", None, "time", headerAF, O, fmt.separator)+ "\n")
+                else:
+                    if fmt.id_T == -1:
+                        f.write(fmt.com+ TrackWriter.__printInOrder(
+                                "lon", "lat", "h", None, headerAF, O, fmt.separator)+ "\n")
+                    else:
+                        f.write(fmt.com+ TrackWriter.__printInOrder(
+                                "lon", "lat", "h", "time", headerAF, O, fmt.separator)+ "\n")
+
             if track.getSRID().upper() == "ECEF":
-                f.write(
-                    fmt.com
-                    + TrackWriter.__printInOrder("X", "Y", "Z", "time", 
-                                                headerAF, O, fmt.separator)
-                    + "\n"
-                )
+                if fmt.id_U == -1:
+                    if fmt.id_T == -1:
+                        f.write(fmt.com+ TrackWriter.__printInOrder(
+                                "X", "Y", None, None, headerAF, O, fmt.separator)+ "\n")
+                    else:
+                        f.write(fmt.com+ TrackWriter.__printInOrder(
+                                "X", "Y", None, "time", headerAF, O, fmt.separator)+ "\n")
+                else:
+                    if fmt.id_T == -1:
+                        f.write(fmt.com+ TrackWriter.__printInOrder(
+                                "X", "Y", "Z", None, headerAF, O, fmt.separator)+ "\n")
+                    else:
+                        f.write(fmt.com+ TrackWriter.__printInOrder(
+                                "X", "Y", "Z", "time", headerAF, O, fmt.separator)+ "\n")
+
 
         # Data
         if track.getSRID().upper() == "ENU":
@@ -183,8 +232,14 @@ class TrackWriter:
         for i in range(track.size()):
             x = float_fmt.format(track.getObs(i).position.getX())
             y = float_fmt.format(track.getObs(i).position.getY())
-            z = float_fmt.format(track.getObs(i).position.getZ())
-            t = track.getObs(i).timestamp
+            if fmt.id_U == -1:
+                z = None
+            else:
+                z = float_fmt.format(track.getObs(i).position.getZ())
+            if fmt.id_T == -1:
+                t = None
+            else:
+                t = track.getObs(i).timestamp
             if isinstance(fmt.DateIni, ObsTime):
                 t = t.toAbsTime() - fmt.DateIni.toAbsTime()
             
@@ -200,7 +255,7 @@ class TrackWriter:
 
     
     @staticmethod
-    def writeToFiles(trackCollection, pathDir, ext='csv', id_E=-1, id_N=-1, id_U=-1, 
+    def writeToFiles(trackCollection, pathDir, ext='csv', id_E=-1, id_N=-1, id_U=-1,
                      id_T=-1, separator=",", h=0):
         """TODO"""
 
@@ -208,16 +263,17 @@ class TrackWriter:
 
         for i in range(trackCollection.size()):
             track = trackCollection.getTrack(i)
-            path = pathDir + "/" + root + "{:04d}" + "." + ext
-        if id_N == -1:
-            if id_E == -1:
-                TrackWriter.writeToFile(track, path)  # Read by extension
+            path = pathDir + "/" + root + "_" + str(i) + "." + ext
+
+            if id_N == -1:
+                if id_E == -1:
+                    TrackWriter.writeToFile(track, path)  # Write by extension
+                else:
+                    TrackWriter.writeToFile(track, path, id_E)  # Write by name
             else:
-                TrackWriter.writeToFile(track, path, id_E)  # Read by name
-        else:
-            TrackWriter.writeToFile(
-                track, path, id_E, id_N, id_U, id_T, separator, h
-            )  # Read from input parameters
+                TrackWriter.writeToFile(
+                    track, path, id_E, id_N, id_U, id_T, separator, h
+                )  # Write from input parameters
 
 
     # =========================================================================
