@@ -410,10 +410,9 @@ class ObsTime:
 
         :param timeAsString: Timestamp in string format
         """
-
         time = ObsTime()
         PCL = ObsTime.__PRECOMPILED_READ_FMT
-
+  
         for i in range(len(PCL)):
             index = PCL[i][1]
             time.__fillMember(

@@ -505,6 +505,53 @@ class TrackReader:
     # =========================================================================
     #   GPX
     #
+    
+    def readFromGpxFast(path:str,
+                        srid:Literal["GEO", "ENU"] ="GEO", 
+                        type: Literal["trk", "rte"]="trk",
+                        read_all=False, verbose=False) -> TrackCollection:					
+        if os.path.isdir(path):
+            TRACES = TrackCollection()
+            LISTFILE = os.listdir(path)
+            for f in LISTFILE:
+                if verbose:
+                    print(f)
+                if path[len(path)-1:] == '/':
+                    collection = TrackReader.readFromGpxFast(path + f)
+                else:
+                    collection = TrackReader.readFromGpxFast(path + '/' + f)
+                for i in range(collection.size()):
+                    TRACES.addTrack(collection[i])
+            return TRACES
+            
+        fichier = open(path, 'r')
+        LINES = fichier.readlines()
+        tracks = TrackCollection()
+        new_track = False
+        for line in LINES:
+            if ('<trk>' in line):
+                new_track = True
+                new_point = False
+                tracks.addTrack(Track())
+            if ('</trk>' in line):
+                new_track = False
+            if new_track:
+                if ('<trkpt ' in line):
+                    new_point = True
+                    splits = line.split("\"")
+                    pos = GeoCoords(float(splits[3]), float(splits[1]), 0)
+                if ('</trkpt>' in line):
+                    new_point = False
+                    tracks[-1].addObs(Obs(pos, tps))
+                if new_point:
+                    if '<ele>' in line:
+                        pos.hgt = float(line.split('>')[1].split('<')[0])
+                    if '<time>' in line:
+                        tps = ObsTime(line.split('>')[1].split('<')[0])             
+        fichier.close()
+        return tracks
+							
+					
     @staticmethod
     def readFromGpx(path:str, 
                     srid:Literal["GEO", "ENU"] ="GEO", 

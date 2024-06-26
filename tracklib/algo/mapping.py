@@ -123,7 +123,7 @@ def __mapOnNetwork (
         #f2 = open("transition.dat", "a")
 
     track.createAnalyticalFeature("obs_noise", obs_noise)
-    verbose = True
+    verbose = False
     global STATES
     global net
     STATES = []
