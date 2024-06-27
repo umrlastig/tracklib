@@ -539,7 +539,7 @@ class TrackReader:
                 if ('<trkpt ' in line):
                     new_point = True
                     splits = line.split("\"")
-                    pos = GeoCoords(float(splits[3]), float(splits[1]), 0)
+                    pos = makeCoords(float(splits[3]), float(splits[1]), 0, srid)
                 if ('</trkpt>' in line):
                     new_point = False
                     tracks[-1].addObs(Obs(pos, tps))
