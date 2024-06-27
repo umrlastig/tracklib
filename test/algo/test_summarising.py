@@ -222,8 +222,8 @@ class TestSummarising(TestCase):
         raster.plot('uid#co_count')
         plt.show()
 
-        RasterWriter.writeToFile('/home/md_vandamme/',
-                raster, raster.getRasterBand('uid#co_count'), 'testraster')
+        #RasterWriter.writeToFile('/home/md_vandamme/',
+        #        raster, raster.getRasterBand('uid#co_count'), 'testraster')
 
 
 
