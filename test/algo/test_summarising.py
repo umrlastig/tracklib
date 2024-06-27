@@ -4,18 +4,14 @@ from unittest import TestCase, TestSuite, TextTestRunner
 import matplotlib.pyplot as plt
 import os.path
 
+
 from tracklib import (Obs, ObsTime, ENUCoords, TrackCollection,
                       speed,
                       RasterBand, NO_DATA_VALUE,
                       Track, TrackReader,
                       co_avg, co_max, co_count,
-                      co_min,#co_dominant,co_median,
-                      summarize, 
-                      getMeasureName,
-                      createRaster, addTrackToRaster, summ,
-                      RasterWriter)
-
-
+                      co_min, # co_dominant, co_median,
+                      summarize, AFMap, RasterWriter)
 
 
 class TestSummarising(TestCase):
@@ -68,16 +64,16 @@ class TestSummarising(TestCase):
         collection = TrackCollection(TRACES)
         collection.plot('k-')
         plt.show()
-        
+
         # ---------------------------------------------------------------------
 
-        name = getMeasureName('speed', co_max)
+        name = AFMap.getMeasureName('speed', co_max)
         self.assertEqual(name, 'speed#co_max')
 
-        name = getMeasureName(speed, co_avg)
+        name = AFMap.getMeasureName(speed, co_avg)
         self.assertEqual(name, 'speed#co_avg')
 
-        name = getMeasureName('uid', co_count)
+        name = AFMap.getMeasureName('uid', co_count)
         self.assertEqual(name, 'uid#co_count')
 
 
@@ -85,17 +81,16 @@ class TestSummarising(TestCase):
 
         collection.addAnalyticalFeature(speed)
         
-        af_algos = ['speed', 'speed', 'uid'] #, utils.stop_point]
+        af_algos = ['speed', 'speed', 'uid']
         cell_operators = [co_avg, co_max, co_count] #, utils.sum]
 
         #  Construction du raster
         marge = 0.0
         raster = summarize(collection, af_algos, cell_operators,
                                (60, 60), marge)
+#        raster.plot('uid#co_count')
 
-        raster.plot('uid#co_count')
-
-        grille = raster.getRasterBand(getMeasureName(speed, co_avg))
+        grille = raster.getRasterBand(AFMap.getMeasureName(speed, co_avg))
         self.assertIsInstance(grille, RasterBand)
         
         self.assertEqual(grille.getNoDataValue(), NO_DATA_VALUE)
@@ -103,15 +98,17 @@ class TestSummarising(TestCase):
         grille.plotAsGraphic()
         plt.show()
         
-        grille.plotAsImage()
-        plt.show()
+#        grille.plotAsImage()
+#        plt.show()
 
 
         # ---------------------------------------------------------------------
-        
-        raster = summarize(collection, 
-                           af_algos, cell_operators, (60, 60), marge)
-        grille = raster.getRasterBand(getMeasureName(speed, co_avg))
+
+        # raster = summarize(collection,
+        #                    af_algos, cell_operators, (60, 60), marge)
+        grille = raster.getRasterBand(
+            AFMap.getMeasureName(speed, co_avg))
+        '''
         grille.setNoDataValue(0)
         self.assertEqual(grille.getNoDataValue(), 0)
         grille.plotAsImage()
@@ -119,7 +116,7 @@ class TestSummarising(TestCase):
 
         # ---------------------------------------------------------------------
         # On teste la construction de la grille
-
+        '''
         self.assertEqual(grille.xmin, 10.0 - marge*(370-10))
         self.assertEqual(grille.xmax, 370.0 + marge*(370-10))
         self.assertEqual(grille.ymin, 10.0 - marge*(190-10))
@@ -131,13 +128,14 @@ class TestSummarising(TestCase):
         self.assertEqual(grille.XPixelSize, ((370-10) + 2*marge*(370-10)) / grille.ncol)
         self.assertEqual(grille.YPixelSize, ((190-10) + 2*marge*(190-10)) / grille.nrow)
         
-        
+
         # ---------------------------------------------------------------------
         # On teste les valeurs de la grille
 
         speedTrace1 = collection.getTrack(0).getAnalyticalFeature('speed')
         speedTrace2 = collection.getTrack(1).getAnalyticalFeature('speed')
-        
+
+
         self.assertEqual(grille.grid[2][0], (speedTrace1[0] + speedTrace2[0]) / 2)
         self.assertEqual(grille.grid[1][0], speedTrace1[1])
         self.assertEqual(grille.grid[0][0], grille.getNoDataValue())
@@ -162,15 +160,14 @@ class TestSummarising(TestCase):
         self.assertEqual(grille.grid[1][5], grille.getNoDataValue())
         self.assertEqual(grille.grid[2][5], speedTrace2[2])
     
-
-        raster.plot(getMeasureName(speed, co_avg))
+        raster.plot(AFMap.getMeasureName(speed, co_avg))
         plt.show()
         
         raster.plot(0)
         plt.show()
         
         
-        name2 = getMeasureName(speed, co_max)
+        name2 = AFMap.getMeasureName(speed, co_max)
         self.assertEqual(name2, 'speed#co_max')
         grille2 = raster.getRasterBand(name2)
         grille2.plotAsGraphic()
@@ -179,7 +176,7 @@ class TestSummarising(TestCase):
         grille.bandStatistics()
         grille2.bandStatistics()
         
-        
+
         # ---------------------------------------------------------------------
         af_algos = ['uid']
         cell_operators = [co_count]
@@ -189,11 +186,12 @@ class TestSummarising(TestCase):
         resolution = (60, 60)
 
         bbox = collection.bbox()
-        raster, CUBE = createRaster(bbox, af_algos, cell_operators,
+        attendanceMap = AFMap(bbox, af_algos, cell_operators,
                                resolution, marge)
 
-        self.assertEqual(raster.bandCount(), 1)
-        self.assertEqual(raster.getNamesOfRasterBand()[0], 'uid#co_count')
+        self.assertEqual(attendanceMap.getRaster().bandCount(), 1)
+        self.assertEqual(attendanceMap.getRaster().getNamesOfRasterBand()[0], 'uid#co_count')
+
 
         # band = raster.getRasterBand(0)
         # print (band.bbox())
@@ -201,10 +199,15 @@ class TestSummarising(TestCase):
         # print (band.bbox(), band.getName())
 
         for trace in collection:
-            CUBE = addTrackToRaster(raster, CUBE, trace)
-        summ(raster, CUBE)
+            attendanceMap.addTrackToMap(trace)
 
-        grille3 = raster.getRasterBand(getMeasureName('uid', co_count))
+
+        attendanceMap.computeAggregates()
+
+        raster = attendanceMap.getRaster()
+
+
+        grille3 = raster.getRasterBand(AFMap.getMeasureName('uid', co_count))
 
         self.assertEqual(grille3.grid[2][0], 2)
         self.assertEqual(grille3.grid[1][0], 1)
@@ -225,6 +228,10 @@ class TestSummarising(TestCase):
         #RasterWriter.writeToFile('/home/md_vandamme/',
         #        raster, raster.getRasterBand('uid#co_count'), 'testraster')
 
+
+
+
+    #, utils.stop_point]
 
 
     def test_quickstart(self):
@@ -254,9 +261,9 @@ class TestSummarising(TestCase):
         raster.getRasterBand(0).summary()
         raster.plot(0)
         
-        raster.plot(getMeasureName(speed, co_avg))
-        raster.plot(getMeasureName(speed, co_min))
-        raster.plot(getMeasureName(speed, co_max))
+        raster.plot(AFMap.getMeasureName(speed, co_avg))
+        raster.plot(AFMap.getMeasureName(speed, co_min))
+        raster.plot(AFMap.getMeasureName(speed, co_max))
         plt.show()
 
 

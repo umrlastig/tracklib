@@ -53,184 +53,59 @@ import math
 from tracklib.core import (listify, isnan, NAN,
                            TrackCollection,
                            Raster, RasterBand, NO_DATA_VALUE,
-                           co_count)
+                           co_count, co_sum, co_min, co_max, co_avg,
+                           co_dominant, co_median)
 
 
-def getMeasureName(af_algo:Union[int, str], aggregate=None):
-    """
-    Return the identifier of the measure defined by: af + aggregate operator
-    """
-    if af_algo != "uid":
-        if isinstance(af_algo, str):
-            cle = af_algo + "#" + aggregate.__name__
-        else:
-            cle = af_algo.__name__ + "#" + aggregate.__name__
-    else:
-        cle = "uid" + "#" + aggregate.__name__
-            
-    return cle
+class AFMap:
 
+    def __init__(self, bbox, af_algos, aggregates,
+                           resolution, margin:float=0.05):
 
-def createRaster(bbox, af_algos, aggregates,
-                       resolution, margin:float=0.05):
-
-    af_algos = listify(af_algos)
-    aggregates = listify(aggregates)
+        af_algos = listify(af_algos)
+        aggregates = listify(aggregates)
     
-    if len(af_algos) == 0:
-        print("Error: af_algos is empty")
-        return 0
-    
-    if len(af_algos) != len(aggregates):
-        print("Error: af_names and aggregates must have the same number elements")
-        return 0
-    
-    # Pour chaque algo-agg on crée une grille
-    grilles = []
-    for idx, af_algo in enumerate(af_algos):
+        if len(af_algos) == 0:
+            print("Error: af_algos is empty")
+            return 0
         
-        aggregate = aggregates[idx]
-        cle = getMeasureName(af_algo, aggregate)
-
-        grille = RasterBand(bbox, resolution, margin, name = cle)
-
-        # ---------------------------------------------------------------------
-        #  On ajoute les valeurs des af dans les cellules
-        CUBE = []
-        for i in range(grille.nrow):
-            CUBE.append([])
-            for j in range(grille.ncol):
-                CUBE[i].append([])
-
-        # ---------------------------------------------------------------------
-        grilles.append(grille)
+        if len(af_algos) != len(aggregates):
+            print("Error: af_names and aggregates must have the same number elements")
+            return 0
     
-    raster = Raster(grilles)
-    return (raster, CUBE)
-
-
-def addTrackToRaster(raster, CUBE, trace):
-
-    for i in range(raster.bandCount()):
-        grille = raster.getRasterBand(i)
-        names = grille.getName().split('#')
-        af_algo = names[0]
-        # aggregate = names[1]
-
-        if not isinstance(af_algo, str):
-            # On calcule l'AF si ce n'est pas fait
-            trace.addAnalyticalFeature(af_algo)
-        
-        # On eparpille dans les cellules
-        for i in range(trace.size()):
-            obs = trace.getObs(i)
+        # Pour chaque algo-agg on crée une grille
+        grilles = []
+        self.CUBES = {}
+        for idx, af_algo in enumerate(af_algos):
             
-            (idx, idy) = grille.getCell(obs.position)
-            # Cas des bordures
-            if idx == grille.ncol:
-                column = math.floor(idx) - 1
-            else:
-                column = math.floor(idx)
-            
-            if idy.is_integer() and int(idy) > -1:
-                line = int(idy)
-            elif idy.is_integer() and int(idy) == -1:
-                line = int(idy) + 1
-            else:
-                line = math.floor(idy) + 1 # il faut arrondir par le dessus!
-            
-            if (
-                    0 <= column
-                    and column <= grille.ncol
-                    and 0 <= line
-                    and line <= grille.nrow
-                ):
-                if not isinstance(af_algo, str):
-                    val = trace.getObsAnalyticalFeature(af_algo.__name__, i)
-                elif af_algo != "uid":
-                    val = trace.getObsAnalyticalFeature(af_algo, i)
-                else:
-                    val = trace.uid
-                    # val = int(startpixel + (255 - startpixel) * (valmax - val) / valmax)
-                    
-                CUBE[line][column].append(val)
-
-        return CUBE
-
-def summ (raster, CUBE):
-
-    for i in range(raster.bandCount()):
-        grille = raster.getRasterBand(i)
-        names = grille.getName().split('#')
-        af_algo = names[0]
-        aggregate = names[1]
-
-        # On calcule les agregats
-        # print (aggregates[0].__name__)
-        for i in range(grille.nrow):
-            for j in range(grille.ncol):
-                #ii = grille.nrow - 1 - i
-                tarray = CUBE[i][j]
-                sumval = eval(aggregate + '(tarray)')
-                
-                # print (sumval)
-                if isnan(sumval):
-                    grille.grid[i][j] = NO_DATA_VALUE
-                # # elif valmax != None and val > valmax:
-                else:
-                    grille.grid[i][j] = sumval
-
-
-
-def summarize(collection: TrackCollection, af_algos, aggregates,
-              resolution=None, margin:float=0.05, verbose:bool=True):
-    """
-    Example:
-        af_algos = [algo.speed, algo.speed]
-        cell_operators = [celloperator.co_avg, celloperator.co_max]
+            aggregate = aggregates[idx]
+            cle = AFMap.getMeasureName(af_algo, aggregate)
+            grille = RasterBand(bbox, resolution, margin, name=cle)
+            grilles.append(grille)
     
-    """
-    
-    af_algos = listify(af_algos)
-    aggregates = listify(aggregates)
-    
-    if len(af_algos) == 0:
-        print("Error: af_algos is empty")
-        return 0
-    
-    if len(af_algos) != len(aggregates):
-        print("Error: af_names and aggregates must have the same number elements")
-        return 0
-    
-    # Pour chaque algo-agg on crée une grille
-    grilles = []
-    for idx, af_algo in enumerate(af_algos):
-        
-        aggregate = aggregates[idx]
-        
-#        if isinstance(af_algo, str):
-#            name = af_algo
-#        else:
-#            name = af_algo.__name__
-#        cle = name + "#" + aggregate.__name__
-        cle = getMeasureName(af_algo, aggregate)
-        #print (cle)
-            
-        grille = RasterBand(collection.bbox(), resolution, margin, name = cle)
-        #print (grille.name)
-        
-        # ---------------------------------------------------------------------
-        #  On ajoute les valeurs des af dans les cellules
-        CUBE = []
-        for i in range(grille.nrow):
-            CUBE.append([])
-            for j in range(grille.ncol):
-                CUBE[i].append([])
-    
-        #  On dispatch les valeurs de l'AF dans les cellules.
-        #  Avant on vérifie si l'AF existe, sinon on la calcule.
-        for trace in collection.getTracks():
-            
+            # ---------------------------------------------------------------------
+            #  On ajoute les valeurs des af dans les cellules
+            CUBE = []
+            for i in range(grille.nrow):
+                CUBE.append([])
+                for j in range(grille.ncol):
+                    CUBE[i].append([])
+            self.CUBES[cle] = CUBE
+
+        self.raster = Raster(grilles)
+
+    def getRaster(self):
+        return self.raster
+
+
+    def addTrackToMap(self, trace):
+
+        for i in range(self.raster.bandCount()):
+            grille = self.raster.getRasterBand(i)
+            names = grille.getName().split('#')
+            af_algo = names[0]
+            # aggregate = names[1]
+
             if not isinstance(af_algo, str):
                 # On calcule l'AF si ce n'est pas fait
                 trace.addAnalyticalFeature(af_algo)
@@ -240,8 +115,6 @@ def summarize(collection: TrackCollection, af_algos, aggregates,
                 obs = trace.getObs(i)
                 
                 (idx, idy) = grille.getCell(obs.position)
-                # print (obs.position, idx, idy)
-                
                 # Cas des bordures
                 if idx == grille.ncol:
                     column = math.floor(idx) - 1
@@ -254,8 +127,6 @@ def summarize(collection: TrackCollection, af_algos, aggregates,
                     line = int(idy) + 1
                 else:
                     line = math.floor(idy) + 1 # il faut arrondir par le dessus!
-                
-                # print ('  ', obs.position, column, line)
                 
                 if (
                         0 <= column
@@ -271,34 +142,73 @@ def summarize(collection: TrackCollection, af_algos, aggregates,
                         val = trace.uid
                         # val = int(startpixel + (255 - startpixel) * (valmax - val) / valmax)
                         
-                    CUBE[line][column].append(val)
-        
-        # print (CUBE[0][0])
+                    self.CUBES[grille.getName()][line][column].append(val)
 
-        # ---------------------------------------------------------------------
-        # On calcule les agregats
-        # print (aggregates[0].__name__)
-        for i in range(grille.nrow):
-            for j in range(grille.ncol):
-                #ii = grille.nrow - 1 - i
-                tarray = CUBE[i][j]
-                sumval = aggregate(tarray)
+
+    def computeAggregates(self):
+
+        for i in range(self.raster.bandCount()):
+            grille = self.raster.getRasterBand(i)
+            names = grille.getName().split('#')
+            af_algo = names[0]
+            aggregate = names[1]
+
+            # On calcule les agregats
+            # print (aggregates[0].__name__)
+            for i in range(grille.nrow):
+                for j in range(grille.ncol):
+                    #ii = grille.nrow - 1 - i
+                    tarray = self.CUBES[grille.getName()][i][j]
+                    sumval = eval(aggregate + '(tarray)')
+                    
+                    # print (sumval)
+                    if isnan(sumval):
+                        grille.grid[i][j] = NO_DATA_VALUE
+                    # # elif valmax != None and val > valmax:
+                    else:
+                        grille.grid[i][j] = sumval
+
+
+    @staticmethod
+    def getMeasureName(af_algo:Union[int, str], aggregate=None):
+        """
+        Return the identifier of the measure defined by: af + aggregate operator
+        """
+        if af_algo != "uid":
+            if isinstance(af_algo, str):
+                cle = af_algo + "#" + aggregate.__name__
+            else:
+                cle = af_algo.__name__ + "#" + aggregate.__name__
+        else:
+            cle = "uid" + "#" + aggregate.__name__
                 
-                # print (sumval)
-                if isnan(sumval):
-                    grille.grid[i][j] = NO_DATA_VALUE
-                # # elif valmax != None and val > valmax:
-                else:
-                    grille.grid[i][j] = sumval
-        
-        # ---------------------------------------------------------------------
-        #   On ajoute la grille au tableau de grilles
-        # print (grille.grid)
-        grilles.append(grille)
-        
-    raster = Raster(grilles)
+        return cle
+
+
+
+def summarize(collection: TrackCollection, af_algos, aggregates,
+              resolution=None, margin:float=0.05, verbose:bool=True):
+    """
+    Example:
+        af_algos = [algo.speed, algo.speed]
+        cell_operators = [celloperator.co_avg, celloperator.co_max]
+    
+    """
+
+    #
+    attendanceMap = AFMap(collection.bbox(), af_algos, aggregates,
+                           resolution, margin)
+    
+    #
+    for trace in collection.getTracks():
+        attendanceMap.addTrackToMap(trace)
+
+    #
+    attendanceMap.computeAggregates()
+
+    raster = attendanceMap.getRaster()
     return raster
-    #return None
+
 
 
 
