@@ -11,7 +11,9 @@ from tracklib import (Obs, ObsTime, ENUCoords, TrackCollection,
                       co_avg, co_max, co_count,
                       co_min,#co_dominant,co_median,
                       summarize, 
-                      getMeasureName)
+                      getMeasureName,
+                      createRaster, addTrackToRaster, summ,
+                      RasterWriter)
 
 
 
@@ -177,7 +179,30 @@ class TestSummarising(TestCase):
         grille.bandStatistics()
         grille2.bandStatistics()
         
+        
         # ---------------------------------------------------------------------
+        af_algos = ['uid']
+        cell_operators = [co_count]
+
+        #  Construction du raster
+        marge = 0.0
+        resolution = (60, 60)
+
+        bbox = collection.bbox()
+        raster, CUBE = createRaster(bbox, af_algos, cell_operators,
+                               resolution, marge)
+
+        self.assertEqual(raster.bandCount(), 1)
+        self.assertEqual(raster.getNamesOfRasterBand()[0], 'uid#co_count')
+
+        # band = raster.getRasterBand(0)
+        # print (band.bbox())
+        # band = raster.getRasterBand('uid#co_count')
+        # print (band.bbox(), band.getName())
+
+        for trace in collection:
+            CUBE = addTrackToRaster(raster, CUBE, trace)
+        summ(raster, CUBE)
 
         grille3 = raster.getRasterBand(getMeasureName('uid', co_count))
 
@@ -192,6 +217,14 @@ class TestSummarising(TestCase):
         self.assertEqual(grille3.grid[2][5], 1)
         self.assertEqual(grille3.grid[1][5], 0)
         self.assertEqual(grille3.grid[0][5], 1)
+
+
+        raster.plot('uid#co_count')
+        plt.show()
+
+        RasterWriter.writeToFile('/home/md_vandamme/',
+                raster, raster.getRasterBand('uid#co_count'), 'testraster')
+
 
 
     def test_quickstart(self):

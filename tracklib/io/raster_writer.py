@@ -64,7 +64,7 @@ from tracklib.util.exceptions import *
 class RasterWriter:
     
     @staticmethod
-    def writeToFile(path, grid, name, no_data_values = None):
+    def writeToFile(path, raster, rasterband, name, no_data_values=None):
         """Write to Ascii File
 
         :param path: File path
@@ -76,23 +76,28 @@ class RasterWriter:
         #filepath += "_" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") 
         filepath += ".asc"
 
-        ascContent = 'ncols\t\t' + str(grid.ncol) + '\n'
-        ascContent = ascContent + 'nrows\t\t' + str(grid.nrow) + '\n'
-        ascContent = ascContent + 'xllcorner\t' + str(grid.xmin) + '\n'
-        ascContent = ascContent + 'yllcorner\t' + str(grid.ymin) + '\n'
-        ascContent = ascContent + 'cellsize\t' + str(math.floor(grid.XPixelSize)) + '\n'
+        ascContent = 'ncols\t\t' + str(rasterband.ncol) + '\n'
+        ascContent = ascContent + 'nrows\t\t' + str(rasterband.nrow) + '\n'
+        ascContent = ascContent + 'xllcorner\t' + str(rasterband.xmin) + '\n'
+        ascContent = ascContent + 'yllcorner\t' + str(rasterband.ymin) + '\n'
+        ascContent = ascContent + 'cellsize\t' + str(math.floor(rasterband.XPixelSize)) + '\n'
         ascContent = ascContent + 'NODATA_value\t' + str(NO_DATA_VALUE) + '\n'
-        
-        if no_data_values != None:
-            grid.grid[grid.grid == grid.NO_DATA_VALUE] = no_data_values
 
-        for i in range(grid.nrow):
-            for j in range(grid.ncol):
+        for i in range(rasterband.nrow):
+            for j in range(rasterband.ncol):
                 if j > 0:
                     ascContent = ascContent + '\t'
-                val = grid.grid[i][j]
+                if no_data_values != None:
+                    print (rasterband.grid[i][j])
+                    if rasterband.grid[i][j] == rasterband.getNoDataValue():
+                        val = no_data_values
+                    else:
+                        val = rasterband.grid[i][j]
+                else:
+                    val = rasterband.grid[i][j]
                 ascContent = ascContent + str(val)
             ascContent = ascContent + '\n'
+
 
         try:
             f = open(filepath, "w")

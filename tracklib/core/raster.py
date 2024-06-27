@@ -264,7 +264,8 @@ class RasterBand:
 
 
     def plotAsImage(self, append=False, 
-                    color1 = (0, 0, 0), color2 = (255, 255, 255), novaluecolor='white'):
+                    color1 = (0, 0, 0), color2 = (255, 255, 255),
+                    novaluecolor='white'):
         """ Plot raster band as an image. """
       
         if isinstance(append, bool):
@@ -283,7 +284,7 @@ class RasterBand:
 
         cmap = getOffsetColorMap(color1, color2, 0)
         cmap.set_bad(color=novaluecolor)
-        
+
         im = ax1.imshow(tab, cmap=cmap)
         ax1.set_title(self.getName())
         
