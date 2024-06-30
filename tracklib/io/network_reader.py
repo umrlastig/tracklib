@@ -4,7 +4,7 @@
 © Copyright Institut National de l'Information Géographique et Forestière (2020)
 Contributors: 
     Yann Méneroux
-    Marie-Dominique
+    Marie-Dominique Van Damme
 Creation date: 1th november 2020
 
 tracklib library provides a variety of tools, operators and 
@@ -38,7 +38,6 @@ same conditions as regards security.
 
 The fact that you are presently reading this means that you have had
 knowledge of the CeCILL-C license and that you accept its terms.
-
 
 
 Read network files
@@ -102,12 +101,15 @@ class NetworkReader:
         :return: network.
         
         """        
-        if not os.path.isfile(path):
-            print ('Error: file not exists')
-            return None
 
-        network = Network()
-        
+        if not os.path.isfile(path):
+            raise WrongArgumentError("First parameter (path) doesn't refers to a file.")
+
+        if not isinstance(formatfile, Union[str, NetworkFormat]):
+            raise WrongArgumentError("The second parameter is not an instantiation of a str or a NetworkFormat")
+
+        #print ("!!!", formatfile)
+
         # Use format or read from resources
         if 'NetworkFormat' in str(type(formatfile)):
             fmt = formatfile
@@ -120,6 +122,9 @@ class NetworkReader:
 
         if verbose:
             print("Loading network...")
+
+
+        network = Network()
 
         with open(path, encoding="utf-8") as csvfile:
             spamreader = csv.reader(csvfile, delimiter=fmt.separator, doublequote=True)
@@ -138,11 +143,12 @@ class NetworkReader:
                 (edge, noeudIni, noeudFin) = readLineAndAddToNetwork(row, fmt)
                 network.addEdge(edge, noeudIni, noeudFin)
 
-        csvfile.close()
+
+
 
         # Return network loaded
         return network
-    
+        
     
     counter = 0
 
@@ -173,7 +179,7 @@ class NetworkReader:
     # ===========================
     @staticmethod
     def requestFromIgnGeoportail(
-        bbox:Bbox, proj=None, margin=0.0, tolerance=0.1, spatialIndex=True, nomproxy=None
+        bbox:Bbox, margin=0.0, tolerance=0.1, spatialIndex=True, nomproxy=None
     ) -> Network:
         """
         
@@ -207,13 +213,8 @@ class NetworkReader:
 
         cptNode = 0
 
-        if proj == "EPSG:4326":
-            srid = "GEO"
-        elif proj == "EPSG:2154":
-            srid = "ENU"
-        else:
-            proj = "EPSG:4326"
-            srid = "GEO"
+        proj = "EPSG:4326"
+        srid = "GEO"
 
         fmt = NetworkFormat()
         fmt.createFromDict(
@@ -246,7 +247,6 @@ class NetworkReader:
             ffmt.close()
 
         nbRoute = NetworkReader.__getNbRouteEmprise(emprise, proxyDict)
-        
         if nbRoute == 0:
             return None
         
@@ -373,12 +373,12 @@ class NetworkReader:
         URL_HITS += "BBOX=" + str(bbox[2]) + "," + str(bbox[0])
         URL_HITS += "," + str(bbox[3]) + "," + str(bbox[1])
         URL_HITS += "&resulttype=hits"
-        #print (URL_HITS)
+        # print (URL_HITS)
 
         try:
             res = requests.get(URL_HITS, proxies=proxyDict)
             status = res.raise_for_status()
-            print (status, type(status))
+            # print (status, type(status))
         except requests.exceptions.RequestException: 
             print("ERROR: Failed to establish connection")
             return 0
