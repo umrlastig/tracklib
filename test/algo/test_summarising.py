@@ -11,7 +11,7 @@ from tracklib import (Obs, ObsTime, ENUCoords, TrackCollection,
                       Track, TrackReader,
                       co_avg, co_max, co_count,
                       co_min, # co_dominant, co_median,
-                      summarize, AFMap, RasterWriter)
+                      summarize, AFMap)
 
 
 class TestSummarising(TestCase):
@@ -225,8 +225,7 @@ class TestSummarising(TestCase):
         raster.plot('uid#co_count')
         plt.show()
 
-        #RasterWriter.writeToFile('/home/md_vandamme/',
-        #        raster, raster.getRasterBand('uid#co_count'), 'testraster')
+        
 
 
 
