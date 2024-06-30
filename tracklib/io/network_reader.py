@@ -105,7 +105,7 @@ class NetworkReader:
         if not os.path.isfile(path):
             raise WrongArgumentError("First parameter (path) doesn't refers to a file.")
 
-        if not isinstance(formatfile, Union[str, NetworkFormat]):
+        if not isinstance(formatfile, str) and not isinstance(formatfile, NetworkFormat):
             raise WrongArgumentError("The second parameter is not an instantiation of a str or a NetworkFormat")
 
         #print ("!!!", formatfile)
