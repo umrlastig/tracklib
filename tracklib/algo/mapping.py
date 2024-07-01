@@ -113,7 +113,7 @@ def __tst_log(s1, s2, k, track):
 
 def __mapOnNetwork (
     track, network, obs_noise=50, transition_cost=10, search_radius=50, 
-    debug=False):
+    debug=False, verbose=False):
     """TODO"""
     
     # print (search_radius, obs_noise, transition_cost)
@@ -123,7 +123,6 @@ def __mapOnNetwork (
         #f2 = open("transition.dat", "a")
 
     track.createAnalyticalFeature("obs_noise", obs_noise)
-    verbose = False
     global STATES
     global net
     STATES = []
@@ -167,7 +166,7 @@ def __mapOnNetwork (
         track,
         obs=["x", "y"],
         mode=MODE_OBS_AS_2D_POSITIONS,
-        verbose=verbose * MODE_VERBOSE_PROGRESS,
+        verbose=verbose*MODE_VERBOSE_PROGRESS,
     )
     
     #for k in progressbar.progressbar(range(len(track))):
@@ -197,7 +196,7 @@ def __mapOnNetwork (
 
 def mapOnNetwork(
     tracks, network, gps_noise=50, transition_cost=10, search_radius=50, debug=False,
-    report=None
+    report=None, verbose=False
 ):
     """
     Map-matching on a network.
@@ -206,7 +205,7 @@ def mapOnNetwork(
     if isinstance(tracks, tracklib.Track):
         tracks = tracklib.TrackCollection([tracks])
     for track in tracks:
-        __mapOnNetwork(track, network, gps_noise, transition_cost, search_radius, debug)
+        __mapOnNetwork(track, network, gps_noise, transition_cost, search_radius, debug, verbose)
         
     # Reporting
 #    print ('---------------------------------------------------------------------')

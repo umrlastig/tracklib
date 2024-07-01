@@ -1016,7 +1016,7 @@ class Network:
 
         return min(min(d1, d2), min(d3, d4))
 
-    def prepare(self, cut: Union[float, None] = 1e300, verbose=False):
+    def prepare(self, cut: Union[float, None] = 1e300, verbose=True):
         """Precomputes shortest distances between all pairs of nodes and saves the
         result in :attr:`DISTANCES` attribute.
 
