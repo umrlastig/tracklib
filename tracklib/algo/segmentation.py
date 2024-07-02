@@ -275,7 +275,7 @@ def splitReturnTripExhaustive(track, verbose=True):
             min_val = float(avg)
             argmin = return_point
 
-    first_part = track.extract(0, argmin-1)
+    first_part = track.extract(0, argmin)
     second_part = track.extract(argmin, track.size()-1)
     
     TRACKS = tracklib.TrackCollection()
