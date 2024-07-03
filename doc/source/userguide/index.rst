@@ -14,10 +14,10 @@ User Guide
   Core concept <1_coreconcept>
   Operation for manipulating track <2_operator>
   Read/Write track(s), network and raster <reader_writer>
+  
 
-
-Features
---------
+Useful Features
+----------------
 
 Here is a gallery of several examples demonstrating what ``tracklib`` can do. The examples are very short
 to get you using tracklib productively as quickly as possible.
@@ -34,25 +34,24 @@ to get you using tracklib productively as quickly as possible.
     
     UG_Selection
     UG_Segmentation
-    UG_Stdbscan
+    UG_ReturnTrip
     UG_Comparison
-    
+
     UG_ShapeMeasures
     UG_Simplification
     UG_Interpolation
     UG_Filtering
-    
+
+    UG_Stdbscan        
     UG_MapMatchingOnNetwork
     UG_MapOnRaster
-    
-    
-    
-.. Useful tools
-.. -------------
 
 
-
+    
+    
 .. Coding with tracklib in QGIS <qgis>
+
+
 .. Mopsi <Mopsi> (track's comparaison)
 .. Points caractéristiques 
 
