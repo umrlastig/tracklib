@@ -45,7 +45,7 @@ to get you using tracklib productively as quickly as possible.
     UG_Stdbscan        
     UG_MapMatchingOnNetwork
     UG_MapOnRaster
-
+    UG_AFMap
 
     
     
