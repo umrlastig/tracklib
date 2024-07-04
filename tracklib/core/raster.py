@@ -180,7 +180,7 @@ class RasterBand:
         '''
         Returns the grid converted in numpy array
         '''
-        reurn np.array(self.grid, dtype=np.float32)
+        return np.array(self.grid, dtype=np.float32)
 
     def bandStatistics(self):
         stats = np.array(self.grid)
