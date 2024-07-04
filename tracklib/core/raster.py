@@ -176,7 +176,7 @@ class RasterBand:
     def summary(self):
         print (self.__str__())
 
-    def asNumpy() -> np.ndarray:
+    def asNumpy(self) -> np.ndarray:
         '''
         Returns the grid converted in numpy array
         '''
