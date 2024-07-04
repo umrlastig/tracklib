@@ -175,8 +175,13 @@ class RasterBand:
     
     def summary(self):
         print (self.__str__())
-        
-    
+
+    def asNumpy() -> np.ndarray:
+        '''
+        Returns the grid converted in numpy array
+        '''
+        reurn np.array(self.grid, dtype=np.float32)
+
     def bandStatistics(self):
         stats = np.array(self.grid)
         if self.getNoDataValue() != None:
