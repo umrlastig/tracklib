@@ -61,7 +61,7 @@ class RasterReader:
     
     
     @staticmethod
-    def readMetadataFromAscFile(path: str, name: str ='')-> Raster:
+    def readMetadataFromAscFile(path: str, name: str ='', separator=" ")-> Raster:
         '''
         '''
         
@@ -79,16 +79,16 @@ class RasterReader:
         cptrowheader = 0
         novalue = NO_DATA_VALUE
         for line in lines:
-            cle = line.split(" ")[0].strip()
+            cle = line.split(separator)[0].strip()
+
             if cle in  ['ncols', 'nrows', 'xllcorner', 'yllcorner', 'cellsize', 'NODATA_value']:
                 cptrowheader += 1
-                    
                 i = 1
-                val = line.split(" ")[1].strip()
+                val = line.split(separator)[1].strip()
                 while val == '':
                     i += 1
-                    val = line.split(" ")[i].strip()
-                    
+                    val = line.split(separator)[i].strip()
+
                 if cle == 'ncols':
                     ncols = int(val)
                 if cle == 'nrows':
@@ -98,10 +98,10 @@ class RasterReader:
                 if cle == 'yllcorner':
                     yllcorner = float(val)
                 if cle == 'cellsize':
-                    
                     cellsize = int(float(val))
                 if cle == 'NODATA_value':
                     novalue = float(val)
+
             else:
                 break
                     
