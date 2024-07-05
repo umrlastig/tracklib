@@ -81,7 +81,7 @@ class RasterReader:
         for line in lines:
             cle = line.split(separator)[0].strip()
 
-            if cle in  ['ncols', 'nrows', 'xllcorner', 'yllcorner', 'cellsize', 'NODATA_value']:
+            if cle.lower() in  ['ncols', 'nrows', 'xllcorner', 'yllcorner', 'cellsize', 'nodata_value']:
                 cptrowheader += 1
                 i = 1
                 val = line.split(separator)[1].strip()
@@ -89,17 +89,17 @@ class RasterReader:
                     i += 1
                     val = line.split(separator)[i].strip()
 
-                if cle == 'ncols':
+                if cle.lower() == 'ncols':
                     ncols = int(val)
-                if cle == 'nrows':
+                if cle.lower() == 'nrows':
                     nrows = int(val)
-                if cle == 'xllcorner':
+                if cle.lower() == 'xllcorner':
                     xllcorner = float(val)
-                if cle == 'yllcorner':
+                if cle.lower() == 'yllcorner':
                     yllcorner = float(val)
-                if cle == 'cellsize':
+                if cle.lower() == 'cellsize':
                     cellsize = int(float(val))
-                if cle == 'NODATA_value':
+                if cle.lower() == 'NODATA_value':
                     novalue = float(val)
 
             else:
@@ -122,7 +122,7 @@ class RasterReader:
     
     
     @staticmethod
-    def readFromAscFile(path: str, name: str ='')-> Raster:
+    def readFromAscFile(path: str, name: str ='', separator=" ")-> Raster:
         '''
         Read grid data from an ASCII file. The first six lines of the file indicate the reference of the grid, 
         followed by the values listed in the order they would appear (left to right and top to bottom).
@@ -164,18 +164,18 @@ class RasterReader:
             lines = fichier.readlines()
             fichier.close()
             
-        grid = RasterReader.readMetadataFromAscFile(path, name)
+        grid = RasterReader.readMetadataFromAscFile(path, name, separator)
         
         cptrowheader = 0
         for line in lines:
-            cle = line.split(" ")[0].strip()
-            if cle in  ['ncols', 'nrows', 'xllcorner', 'yllcorner', 'cellsize', 'NODATA_value']:
+            cle = line.split(separator)[0].strip()
+            if cle.lower() in  ['ncols', 'nrows', 'xllcorner', 'yllcorner', 'cellsize', 'nodata_value']:
                 cptrowheader += 1
 
         # Read the values
         i = 0
         for line in lines[cptrowheader:]:
-            lineValues = line.split(" ")
+            lineValues = line.split(separator)
             j = 0
             for val in lineValues:
                 if val.strip() == '':
