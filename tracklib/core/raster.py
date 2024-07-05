@@ -89,12 +89,14 @@ class RasterBand:
         else:
             r = resolution
             resolution = (int(ax / r[0]), int(ay / r[1]))
-        #print (resolution)
+        if verbose:
+            print (resolution)
     
         # Nombre de dalles par cote
         self.ncol = resolution[0]
         self.nrow = resolution[1]
-        #print (self.nrow, self.ncol)
+        if verbose:
+            print (self.nrow, self.ncol)
     
         # Tableau de collections de features appartenant a chaque dalle.
         # Un feature peut appartenir a plusieurs dalles.
@@ -106,7 +108,8 @@ class RasterBand:
     
         self.XPixelSize = ax / self.ncol
         self.YPixelSize = ay / self.nrow
-        #print (self.XPixelSize, self.YPixelSize)
+        if verbose:
+            print (self.XPixelSize, self.YPixelSize)
         
         self.__noDataValue = novalue
         self.__name = name
