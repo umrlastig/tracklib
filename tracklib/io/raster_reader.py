@@ -53,7 +53,7 @@ from tracklib.util.exceptions import *
 from tracklib.core import (ENUCoords, Bbox, 
                            Raster, 
                            NO_DATA_VALUE,
-                           DEFAULT_NAME,
+                           DEFAULT_BAND_NAME,
                            RasterBand)
 
 
@@ -113,10 +113,10 @@ class RasterReader:
         marge = 0
         
         if name == '':
-            name = DEFAULT_NAME
+            name = DEFAULT_BAND_NAME
             
         grid = RasterBand(bbox, resolution=resolution, margin=marge, 
-                         novalue=novalue, name=name)
+                         novalue=novalue, name=name, verbose=False)
            
         return grid
     
