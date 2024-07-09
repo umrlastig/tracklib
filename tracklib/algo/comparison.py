@@ -54,7 +54,10 @@ import matplotlib.pyplot as plt
 
 
 import tracklib as tracklib
-#from tracklib.util.exceptions import *
+from tracklib.util import (UnknownModeError,
+                           SizeError,
+                           MissingArgumentError)
+
 from tracklib.util import dist_point_to_segment, Polygon, centerOfPoints
 from . import synchronize, computeRadialSignature
 from tracklib.core import (ENUCoords, TrackCollection, 
@@ -187,7 +190,7 @@ def _distance(p1, p2, dim):
 # ------------------------------------------------------------------------------
 def _compare_pointwise(track1, track2, p, dim) -> float:
     if (len(track1) != len(track2)):
-        raise SizeError("Error: tracks must have same size to be compared with pointwise method")
+        raise SizeError("tracks must have same size to be compared with pointwise method")
     N = len(track1)
     d = 0
     if p == 0:
