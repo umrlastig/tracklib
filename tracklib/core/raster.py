@@ -52,20 +52,32 @@ from typing import Union
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+
 import numpy as np
 
 from tracklib.core import listify
 from tracklib.core import ECEFCoords, ENUCoords, GeoCoords, getOffsetColorMap
 from tracklib.core import Bbox
+from tracklib.util import CoordTypeError, SizeError
 
 NO_DATA_VALUE = -9999
-DEFAULT_NAME = 'grid'
+DEFAULT_BAND_NAME = 'grid'
+
+# -----------------------------------------------------------------------------
+# Specific parameters for interpolation methods for upsampling
+# -----------------------------------------------------------------------------
+# List of available interpolate methods for upsampling grid
+MODE_NEAREST_NEIGHBOR       = 101   #
+MODE_BED_OF_NAILS_TECHNIQUE = 102
+MODE_MAX_UNPOOLING          = 103
+
 
 
 class RasterBand:
     
-    def __init__(self, bb: Bbox, resolution=None, margin:float=0.05, novalue:float=NO_DATA_VALUE,
-        name=DEFAULT_NAME, verbose:bool=True):
+    def __init__(self, bb: Bbox, resolution=None, margin:float=0.05,
+                 novalue:float=NO_DATA_VALUE,
+                 name=DEFAULT_BAND_NAME, verbose:bool=False):
         """
         Grid constructor.
         
@@ -89,12 +101,14 @@ class RasterBand:
         else:
             r = resolution
             resolution = (int(ax / r[0]), int(ay / r[1]))
-        #print (resolution)
+        if verbose:
+            print (resolution)
     
         # Nombre de dalles par cote
         self.ncol = resolution[0]
         self.nrow = resolution[1]
-        #print (self.nrow, self.ncol)
+        if verbose:
+            print (self.nrow, self.ncol)
     
         # Tableau de collections de features appartenant a chaque dalle.
         # Un feature peut appartenir a plusieurs dalles.
@@ -106,7 +120,8 @@ class RasterBand:
     
         self.XPixelSize = ax / self.ncol
         self.YPixelSize = ay / self.nrow
-        #print (self.XPixelSize, self.YPixelSize)
+        if verbose:
+            print (self.XPixelSize, self.YPixelSize)
         
         self.__noDataValue = novalue
         self.__name = name
@@ -117,6 +132,7 @@ class RasterBand:
 # TODO : impact dans le dictionnaire du raster à gérer
 #    def setName(self, name):
 #        self.__name = name
+
     def getName(self):
         return self.__name
     
@@ -175,8 +191,13 @@ class RasterBand:
     
     def summary(self):
         print (self.__str__())
-        
-    
+
+    def asNumpy(self) -> np.ndarray:
+        '''
+        Returns the grid converted in numpy array
+        '''
+        return np.array(self.grid, dtype=np.float32)
+
     def bandStatistics(self):
         stats = np.array(self.grid)
         if self.getNoDataValue() != None:
@@ -292,6 +313,48 @@ class RasterBand:
         cax = divider.append_axes('right', size='5%', pad=0.1)
         if fig != None:
             fig.colorbar(im, cax=cax, orientation='vertical', fraction=0.046)
+
+
+    def upSampling(self, resolution, interpolation=MODE_NEAREST_NEIGHBOR,
+                       name='Upsampling') -> RasterBand:
+        '''
+        Interpolation Methods for Upsampling:
+            - Nearest Neighbor: this method involves duplicating the existing 
+                                pixels to create new ones.
+            - Max Unpooling:
+        '''
+
+        if not isinstance(self.__bbox.ur, ENUCoords):
+            raise CoordTypeError('Only ENU coordinates system implemented')
+
+        if self.XPixelSize != self.YPixelSize:
+            raise SizeError('cells must be square.')
+
+        new_grid = RasterBand(self.__bbox,
+                            resolution=(resolution[0], resolution[1]),
+                            margin=0,
+                            novalue=self.__noDataValue,
+                            name='Upsampling', verbose=False)
+
+        # Il faut aussi une résoltion proportionnelle entre les deux rasters
+        N = int (self.XPixelSize / new_grid.XPixelSize)
+        if int(N - (self.XPixelSize / new_grid.XPixelSize)) != 0.0:
+            raise SizeError('Two grids resolution not proportional')
+        print ('N =', N)
+
+        if interpolation == MODE_NEAREST_NEIGHBOR:
+            for i in range(self.nrow):
+                for j in range(self.ncol):
+                    v = self.grid[i][j]
+                    for k in range(0, N):
+                        for l in range(0, N):
+                            new_grid.grid[i*N + k][j*N + l] = v
+            return new_grid
+
+        # MODE_MAX_UNPOOLING
+        # MODE_BED_OF_NAILS_TECHNIQUE
+
+        return None
 
 
 class Raster:

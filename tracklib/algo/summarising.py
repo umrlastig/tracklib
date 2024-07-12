@@ -54,7 +54,7 @@ from tracklib.core import (listify, isnan, NAN,
                            TrackCollection,
                            Raster, RasterBand, NO_DATA_VALUE,
                            co_count, co_sum, co_min, co_max, co_avg,
-                           co_dominant, co_median)
+                           co_dominant, co_median, co_count_distinct)
 
 
 class AFMap:

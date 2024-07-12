@@ -92,8 +92,8 @@ class RasterWriter:
 
         # ---------------------------------------------------------------------
         # Header data
-        ascContent = 'ncols\t\t' + str(grid.ncol) + '\n'
-        ascContent = ascContent + 'nrows\t\t' + str(grid.nrow) + '\n'
+        ascContent = 'ncols\t' + str(grid.ncol) + '\n'
+        ascContent = ascContent + 'nrows\t' + str(grid.nrow) + '\n'
         ascContent = ascContent + 'xllcorner\t' + str(grid.xmin) + '\n'
         ascContent = ascContent + 'yllcorner\t' + str(grid.ymin) + '\n'
         ascContent = ascContent + 'cellsize\t' + str(math.floor(grid.XPixelSize)) + '\n'

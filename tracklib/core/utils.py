@@ -453,7 +453,8 @@ class priority_dict(dict):
 
 
 # ------------------------------------------------------------------------------
-#    Aggregate array values Functions 
+#    Aggregate array values Functions
+#    co : cell_operator
 # ------------------------------------------------------------------------------
 def co_sum(tarray):
     """TODO"""
@@ -503,6 +504,17 @@ def co_count(tarray):
     count = 0
     for i in range(len(tarray)):
         val = tarray[i]
+        if isnan(val):
+            continue
+        count += 1
+    return count
+
+
+def co_count_distinct(tarray):
+    """TODO"""
+    tarray = set(listify(tarray))
+    count = 0
+    for val in tarray:
         if isnan(val):
             continue
         count += 1
