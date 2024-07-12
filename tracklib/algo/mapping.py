@@ -73,6 +73,20 @@ def __projOnTrack(point, track):
     # ENUCoords projete, distmin, iproj
     return ENUCoords(proj[1], proj[2], 0), proj[0], proj[3]
 
+def mapOnTrack(coord_or_track, track):
+    if "tracklib.core.track.Track" in str(type(coord_or_track)):
+        output = tracklib.Track()
+        dist = [0]*len(coord_or_track); 
+        edge = [0]*len(coord_or_track); 
+        for i in range(len(coord_or_track)):
+            proj = __projOnTrack(coord_or_track[i].position, track)
+            output.addObs(Obs(proj[0]))
+            dist[i] = proj[1]
+            edge[i] = proj[2]
+        output.createAnalyticalFeature("dist", dist)
+        output.createAnalyticalFeature("edge", edge)
+        return output
+    return __projOnTrack(coord_or_track, track)
 
 def __distToNode(track, coord, i, end=0):
     """TODO"""

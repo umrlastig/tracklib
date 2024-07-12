@@ -128,7 +128,7 @@ class NetworkReader:
 
         with open(path, encoding="utf-8") as csvfile:
             spamreader = csv.reader(csvfile, delimiter=fmt.separator, doublequote=True)
-
+            
             # Header
             cpt = 0
             for row in spamreader:
@@ -138,12 +138,9 @@ class NetworkReader:
 
             if verbose:
                 spamreader = progressbar.progressbar(spamreader, max_value=num_lines)
-
             for row in spamreader:
                 (edge, noeudIni, noeudFin) = readLineAndAddToNetwork(row, fmt)
                 network.addEdge(edge, noeudIni, noeudFin)
-
-
 
 
         # Return network loaded

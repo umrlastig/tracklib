@@ -948,8 +948,10 @@ class Network:
             and non-topologic vertices. If the node target has not been reached during
             forward step, None object is output
         """
+        NODES_PATH = []
         target = self.__correctInputNode(target)
         node = self.NODES[target]
+        NODES_PATH.append(node.id)
         track = Track()
         track.addObs(Obs(node.coord))
         if node.antecedent == "":
@@ -961,7 +963,9 @@ class Network:
                 edge_geom = edge_geom.reverse()
             track = track + (edge_geom > 1)
             node = node.antecedent
-        return track
+            NODES_PATH.append(node.id)
+        track.path = NODES_PATH[::-1]
+        return track.reverse()
 
     def shortest_path( self, source: Union[int, Node], target: Union[int, Node], cut: float = 1e300, output_dict: dict = None) -> Union[Track, None]:
         """Computes shortest path between source and target nodes
