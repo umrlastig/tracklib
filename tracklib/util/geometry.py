@@ -318,6 +318,9 @@ def proj_polyligne(Xp, Yp, x, y):
         y1 = Yp[i]
         x2 = Xp[i + 1]
         y2 = Yp[i + 1]
+        
+        if (abs(x1-x2) + abs(y1-y2) < 1e-16):
+            continue
 
         dist, xp, yp = proj_segment([x1, y1, x2, y2], x, y)
 

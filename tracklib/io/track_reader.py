@@ -68,6 +68,10 @@ class TrackReader:
     from GPX, CSV files. Geometry can be structured in coordinates or in a wkt.
     """
 
+
+    def readFromCsv2(path, track_format, verbose=False):   
+       return TrackReader.readFromCsv(path=path, id_E=track_format.id_E, id_N=track_format.id_N, id_U=track_format.id_U, id_T=track_format.id_T,separator=track_format.separator,DateIni=track_format.DateIni,timeUnit=track_format.timeUnit,h=track_format.h,com=track_format.com,no_data_value=track_format.no_data_value,srid=track_format.srid,read_all=track_format.read_all,selector=track_format.selector,verbose=verbose)
+
     @staticmethod
     def readFromCsv (path: str,
         id_E:int=-1, id_N:int=-1, id_U:int=-1, id_T:int=-1,

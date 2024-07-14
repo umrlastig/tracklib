@@ -136,9 +136,39 @@ class TrackFormat:
             self.DateIni = -1
             self.separator = ","
             self.h = 0
+            self.timeUnit = 1
+            self.selector = None
             self.com = "#"
             self.no_data_value = -999999
             self.srid = "ENUCoords"
             self.read_all = False
-
             self.time_fmt = ObsTime.getReadFormat()
+            self.af_names = []
+            
+            if 'dict' in str(type(arg)):    
+                if "id_E" in arg:
+                    self.id_E = arg["id_E"]
+                if "id_N" in arg:
+                    self.id_N =arg["id_N"]
+                if "id_U" in arg:
+                    self.id_U = arg["id_U"]
+                if "id_T" in arg:
+                    self.id_T = arg["id_T"]
+                if "DateIni" in arg:
+                    self.DateIni = arg["DateIni"]
+                if "separator" in arg:
+                    self.separator = arg["separator"]
+                if "h" in arg:
+                    self.h = arg["h"]
+                if "com" in arg:
+                    self.com = arg["com"]
+                if "no_data_value" in arg:
+                    self.no_data_value = arg["no_data_value"]
+                if "srid" in arg:
+                    self.srid = arg["srid"]
+                if "read_all" in arg:
+                    self.read_all = arg["read_all"]
+                if "time_fmt" in arg:
+                    self.time_fmt = arg["time_fmt"]
+                if "af_names" in arg:
+                    self.af_names = arg["af_names"]

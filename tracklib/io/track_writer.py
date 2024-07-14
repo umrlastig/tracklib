@@ -100,6 +100,25 @@ class TrackWriter:
     # =========================================================================
     #   CSV
     #
+    
+    def writeToCsv(tracks, path, track_format): 
+  
+        id_E       = track_format.id_E
+        id_N       = track_format.id_N
+        id_U       = track_format.id_U
+        id_T       = track_format.id_T
+        separator  = track_format.separator
+        h          = track_format.h
+        af_names   = track_format.af_names
+    
+        if isinstance(tracks, Track):
+            TrackWriter.writeToFile(tracks, path, id_E, id_N, id_U, id_T, separator, h, af_names)
+        else:
+            TrackWriter.writeToFile(tracks, path, "csv", id_E, id_N, id_U, id_T, separator, h)
+   
+            
+        
+    
     @staticmethod
     def writeToFile (track, path, id_E=-1, id_N=-1, id_U=-1, id_T=-1, 
                      separator=",", h=0, af_names=[]):
@@ -140,6 +159,7 @@ class TrackWriter:
             fmt.separator = separator
             fmt.h = h
 
+
         # -------------------------------------------------------
         # Data order
         # -------------------------------------------------------
@@ -169,6 +189,7 @@ class TrackWriter:
         # Header
         if fmt.h > 0:
             f.write(fmt.com + "srid: " + track.getSRID() + "\n")
+            f.write(fmt.com + "ref point: " + str(track.base) + "\n")
             if isinstance(fmt.DateIni, ObsTime):
                 f.write(fmt.com + "Reference epoch: " + fmt.DateIni + "\n")
             
