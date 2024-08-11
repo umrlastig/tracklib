@@ -128,8 +128,8 @@ class TestNetworkReader(TestCase):
         emprise = Bbox(GeoCoords(xmin, ymin), GeoCoords(xmax, ymax))
 
         tolerance=0.0001
-        network = NetworkReader.requestFromIgnGeoportail(emprise, margin=0.020,
-                                   tolerance=tolerance, spatialIndex=True, nomproxy=self.nomproxy)
+        network = NetworkReader.requestFromIgnGeoportail(emprise, tolerance=tolerance,
+                                        spatialIndex=True, proxy=self.nomproxy)
         
         if network != None:
             print ('nb edges=', len(network.EDGES))
