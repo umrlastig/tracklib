@@ -146,11 +146,8 @@ class NetworkReader:
         # Return network loaded
         return network
         
-    
     counter = 0
-
     NB_PER_PAGE = 1000
-
     URL_SERVER = "https://wxs.ign.fr/choisirgeoportail/geoportail/wfs?"
     URL_SERVER += "service=WFS&version=2.0.0&request=GetFeature&"
     URL_SERVER += "typeName=BDTOPO_V3:troncon_de_route&"
@@ -158,25 +155,12 @@ class NetworkReader:
     URL_SERVER += "outputFormat=json&"
     # URL_SERVER += "BBOX=44.538617443499014,5.808794912294471,45.05505710140573,6.644301708889899"
     # URL_SERVER += "&count=3&startIndex=0"
-    
-    
-
     resource_path = os.path.join(os.path.split(__file__)[0], "../..")
     PROXY_FILE_FORMAT = os.path.join(resource_path, "resources/proxy")
 
-    # self.id = id
-    # self.coords = coords
-    # self.nature = nature
-    # self.sens = sens
-    # self.fictif = fictif
-    # self.pos = pos
-
-    # ===========================
-    # tolerance
-    # ===========================
     @staticmethod
     def requestFromIgnGeoportail(
-        bbox:Bbox, margin=0.0, tolerance=0.1, spatialIndex=True, nomproxy=None
+        bbox:Bbox, tolerance=0.0001, spatialIndex=True, proxy=None
     ) -> Network:
         """
         
@@ -185,10 +169,8 @@ class NetworkReader:
 
         :param bbox: The bounding box of the selected area (The bounding box must
             be expressed in WGS84).
-        :param proj: projection of results, optional. Only 'EPSG:4326' is implemented
-        :param margin: f
         :param tolerance: parameter specifies the maximum distance accepted for merging two nodes (edge ends)
-        :param nomproxy: name of proxy which describes parameter connexion defined in the tracklib/resources/proxy file
+        :param proxy: name of proxy or proxy parameters in a dictionnary. parameter connexion defined in the tracklib/resources/proxy file
         """
 
         xmin = bbox.getXmin()
@@ -198,14 +180,6 @@ class NetworkReader:
         dx = (xmax - xmin) / 2
         dy = (ymax - ymin) / 2
         
-        # Adding margin
-        emprise = (
-            xmin - margin * dx,
-            xmax + margin * dx,
-            ymin - margin * dy,
-            ymax + margin * dy,
-        )
-
         network = Network()
 
         cptNode = 0
@@ -229,7 +203,7 @@ class NetworkReader:
 
         # PROXY
         proxyDict = {}
-        if nomproxy != None:
+        if proxy != None and isinstance(proxy, str):
             with open(NetworkReader.PROXY_FILE_FORMAT) as ffmt:
                 line = ffmt.readline().strip()
                 while line:
@@ -237,13 +211,16 @@ class NetworkReader:
                         line = ffmt.readline().strip()
                         continue
                     tab = line.split(",")
-                    if tab[0].strip() == nomproxy:
+                    if tab[0].strip() == proxy:
                         FIELDS = tab
                         proxyDict[FIELDS[1].lower()] = FIELDS[2]
                     line = ffmt.readline().strip()
             ffmt.close()
+        if proxy != None and isinstance(proxy, dict):
+            proxyDict = proxy
 
-        nbRoute = NetworkReader.__getNbRouteEmprise(emprise, proxyDict)
+        # print (proxyDict)
+        nbRoute = NetworkReader.__getNbRouteEmprise(bbox, proxyDict)
         if nbRoute == 0:
             return None
         
@@ -253,8 +230,8 @@ class NetworkReader:
         for j in range(nbiter):
             print("PAGE " + str(j + 1) + "/" + str(nbiter))
             URL_FEAT = NetworkReader.URL_SERVER
-            URL_FEAT += "BBOX=" + str(emprise[2]) + "," + str(emprise[0])
-            URL_FEAT += "," + str(emprise[3]) + "," + str(emprise[1])
+            URL_FEAT += "BBOX=" + str(bbox[2]) + "," + str(bbox[0])
+            URL_FEAT += "," + str(bbox[3]) + "," + str(bbox[1])
             URL_FEAT += "&count=" + str(NetworkReader.NB_PER_PAGE)
             URL_FEAT += "&startIndex=" + str(offset)
             URL_FEAT += "&RESULTTYPE=results"
@@ -346,7 +323,7 @@ class NetworkReader:
 
         if spatialIndex:
             network.spatial_index = SpatialIndex(
-                network, resolution=(dx / 1e3, dy / 1e3), margin=0.4
+                network, resolution=(dx / 1e3, dy / 1e3), margin=0.25
             )
             
             

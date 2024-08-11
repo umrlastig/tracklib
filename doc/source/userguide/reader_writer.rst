@@ -4,17 +4,14 @@
 :Date: 12/12/2022
 
 
-Read/Write track, network and raster
-########################################
+Read/Write track(s)
+***********************
+.. _planreadwritetrack:
+
 
 #. :ref:`Read/Write track(s) section <planreadwritetrack>`.
 #. :ref:`Read/Write network(s) section <planreadwritenetwork>`.
 
-
-
-1. Read/Write track(s)
-***********************
-.. _planreadwritetrack:
 
 Toutes les méthodes sont statiques dans la classe *TrackReader* pour la lecture 
 et dans la classe *TrackWriter* pour écrire les données.
@@ -239,76 +236,4 @@ Export track or track collection
     TrackWriter.writeToKml(trace, path=kmlpath, type="LINE", af='speed')
 
 
-
-
-2. Read/Write network(s)
-*************************
-.. _planreadwritenetwork:
-
-Toutes les méthodes sont statiques dans la classe *NetworkReader* pour la lecture 
-et dans la classe *NetworkWriter* pour écrire les données.
-
-
-Loading network
-=================
-
-The *NetworkReader* class offers static methods that loads a network either from a file or from the IGN FRANCE Web Service .
-
-
-loading network data from csv file
------------------------------------
-.. _examplescsvnetworkreader:
-
-
-Arguably the most common type of resource is a file. You specify it using the path to the file.
-To see all file import options, see :ref:`CSV Files section <csvnetworkreader>` in API Reference. 
-
-
-#. Example ::
-
-    from tracklib.io.NetworkReader import NetworkReader
-
-    network = NetworkReader.readFromFile('network_760850.csv', formatfile = 'IGNGEO')
-    network.toENUCoords(trace.base)
-    #print ('nb edges=', len(network.EDGES))
-    #print ('nb nodes=', len(network.NODES))
-
-
-
-French map agency web service import
---------------------------------------
-.. _exampleswfsnetworkreader:
-
-If you want road network data from France, an alternative way to load network data
-is to use french map agence web service (WFS ). 
-To see all file import options, see :ref:`WFS service section <wfsnetworkreader>` in API Reference. 
-
-
-
-#. Example ::
-    
-    import matplotlib.pyplot as plt
-
-	from tracklib.core.Bbox import Bbox
-	from tracklib.core import ObsCoords as Coords
-	from tracklib.io.NetworkReader import NetworkReader
-	from tracklib.io.NetworkWriter import NetworkWriter
-
-	xmin = 6.74168
-	xmax = 6.82568
-	ymin = 45.3485
-	ymax = 45.4029
-	emprise = Bbox(Coords.GeoCoords(xmin, ymin), Coords.GeoCoords(xmax, ymax))
-
-	proj = "EPSG:4326"
-
-	tolerance=0.0001
-
-	network = NetworkReader.requestFromIgnGeoportail(emprise, proj, margin=0.020, 
-                   tolerance=tolerance, spatialIndex=False, nomproxy='ENSG')
-
-
-	network.plot('k-', '', 'g-', 'r-', 0.5, plt)
-	print ('nb edges=', len(network.EDGES))
-	print ('nb nodes=', len(network.NODES))
 

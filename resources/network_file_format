@@ -35,3 +35,4 @@ VERNIQUET, 0, 2, 3, 4, -1, 0, c, 1, True, UTF-8, ENU
 VTT, 1, 2, 3, 0, -1, 4, c, 1, True, UTF-8, GEO
 PRALO, 0, 2, 3, 4, -1, 0, c, 1, True, UTF-8, ENU
 RENTILLY, 0, 1, 2, 3, -1, -1, c, 1, True, UTF-8, ENU
+BAUGES, 0, 1, 2, 4, -1, 3, s, 1, True, UTF-8, ENU
