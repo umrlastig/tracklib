@@ -6,15 +6,10 @@
 
 Read/Write track(s)
 ***********************
-.. _planreadwritetrack:
 
 
-#. :ref:`Read/Write track(s) section <planreadwritetrack>`.
-#. :ref:`Read/Write network(s) section <planreadwritenetwork>`.
-
-
-Toutes les méthodes sont statiques dans la classe *TrackReader* pour la lecture 
-et dans la classe *TrackWriter* pour écrire les données.
+Toutes les méthodes sont statiques dans les classes *TrackReader* pour la lecture 
+et *TrackWriter* pour stocker les données dans un fichier.
 
 
 Loading track or track collection
