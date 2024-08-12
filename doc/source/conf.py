@@ -23,7 +23,7 @@ sys.path.append(os.path.abspath("../../tracklib"))
 
 project = "TrackLib"
 copyright = (
-    "2023, LASTIG lab, French National Institute of Geographic and Forest Information"
+    "2024, LASTIG lab, French National Institute of Geographic and Forest Information"
 )
 author = "Yann Méneroux, Marie-Dominique Van Damme"
 

@@ -26,7 +26,7 @@ Read and write
 .. toctree::
   :maxdepth: 1
 
-  Read and write UG_IO_BDTOPO
+  Read and write <UG_IO_BDTOPO>
   
 
 Useful Features
