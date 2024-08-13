@@ -8,16 +8,12 @@
 User Guide
 ==========
 
-Here is a gallery of several examples demonstrating what ``tracklib`` can do. The examples are very short
-to get you using tracklib productively as quickly as possible.
-
-
 .. toctree::
   :maxdepth: 1
   
-  Core concept <1_coreconcept>
-..  Operation for manipulating track <2_operator>
-..  Read/Write track(s), network and raster <reader_writer>
+   Core concept <1_coreconcept>
+..   Operation for manipulating track <2_operator>
+
 
 
 Read and write
@@ -26,11 +22,20 @@ Read and write
 .. toctree::
   :maxdepth: 1
 
+  UG_IO_Network
   UG_IO_BDTOPO
-  
+.. Read/Write track(s) <reader_writer>
+
+
+.. It can be useful to rely on a road network when analyzing a collection of tracks.
+
+
 
 Useful Features
 ----------------
+
+Here is a gallery of several examples demonstrating what ``tracklib`` can do. The examples are very short
+to get you using tracklib productively as quickly as possible.
 
 
 .. nbgallery::

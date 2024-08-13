@@ -24,7 +24,6 @@ example/__pycache__/
 /doc/public/
 /doc/html/
 /public/
-/cotation/
 /source/
 .coverage
 /data_private/
@@ -82,3 +81,5 @@ example/
 enotebook/
 Main*.py
 fusion/
+reseau/
+cotation/

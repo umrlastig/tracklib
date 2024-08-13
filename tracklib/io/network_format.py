@@ -181,15 +181,14 @@ class NetworkFormat:
         out  = str(self.name) +", "
         out += str(self.pos_edge_id) +", "
         out += str(self.pos_source) +", "     
-        out += str(self.pos_edge_id) +", "      
-        out += str(self.pos_target) +", "      
-        out += str(self.pos_wkt) +", "     
-        out += str(self.pos_weight) +", "      
-        out += str(self.pos_direction) +", "     
-        out += str(sep) +", "     
-        out += str(self.header) +", "     
-        out += str(self.doublequote) +", "      
-        out += str(self.encoding) +", "     
+        out += str(self.pos_target) +", "
+        out += str(self.pos_wkt) +", "
+        out += str(self.pos_weight) +", "
+        out += str(self.pos_direction) +", "
+        out += str(sep) +", "
+        out += str(self.header) +", "
+        out += str(self.doublequote) +", "
+        out += str(self.encoding) +", "
         out += str(self.srid)
         return out      
 
