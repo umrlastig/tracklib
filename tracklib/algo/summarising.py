@@ -70,7 +70,6 @@ def summarize(collection: TrackCollection, af_algos, aggregates,
         return 0
 
     raster = Raster(bbox=collection.bbox(), resolution=resolution, margin=margin)
-    print (raster.bbox())
 
     # Pour chaque algo-agg on crée une grille vide
     for idx, af_algo in enumerate(af_algos):

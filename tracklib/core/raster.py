@@ -105,7 +105,7 @@ class Raster:
 
     def countAFMap(self):
         """Return the number of bands in this raster"""
-        return len(self.afmaps)
+        return len(self.__afmaps)
 
     def getNamesOfAFMap(self):
         """Return all names of raster bands in a list."""
