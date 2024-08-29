@@ -38,8 +38,6 @@ same conditions as regards security.
 The fact that you are presently reading this means that you have had
 knowledge of the CeCILL-C license and that you accept its terms.
 
-
-
     This class offer static methods to load raster data:
     - read raster from ascii files, 
     - get DTM data from IGN web services.    
@@ -53,15 +51,87 @@ from tracklib.util.exceptions import *
 from tracklib.core import (ENUCoords, Bbox, 
                            Raster, 
                            NO_DATA_VALUE,
-                           DEFAULT_BAND_NAME,
-                           RasterBand)
+                           AFMap)
 
 
 class RasterReader:
+
+    @staticmethod
+    def readFromAscFile(path:str, name:str, separator=" ")-> Raster:
+        '''
+        Read grid data from an ASCII file. The first six lines of the file indicate the reference of the grid, 
+        followed by the values listed in the order they would appear (left to right and top to bottom).
+        Where:
+            - ncols is the numbers of rows (represented as integers)
+            - nrows is the numbers of rows (represented as integers)
+            - Lower-left corner refers to a cell corner, and not to a data point
+            - xllcorner and yllcorner are the western (left) X coordinate and southern (bottom) Y coordinates, such as easting and northing (represented as real numbers with an optional decimal point)
+            - xllcorner and yllcorner are the X and Y coordinates for the lower left corner of the lower left grid cell. Some ESRI raster files use xllcenter and yllcenter instead for the XY reference point, which indicate the X and Y coordinates for the center of the lower left grid cell. These values are represented as real numbers with an optional decimal point
+            - cellsize is the length of one side of a square cell (a real number)
+            - nodata_value is the value that is regarded as "missing" or "not applicable"; this line is optional, but highly recommended as some programs expect this line to be declared (a real number)
+
+        
+        Example
+        *********
+        
+        .. code-block:: python
+        
+           raster = RasterReader.readFromAscFile('data/asc/RGEALTI_0930_6415_LAMB93_IGN69.asc')
+           grid = raster.getAFMap(1)
+           self.assertEqual(1000, grid.nrow)
+
+
+        Parameters
+        -----------
+        path : str
+            chemin du fichier.
+        name: str
+            nom de l'AF du raster, par exemple 'z, speed, etc.'
+
+        Returns
+        --------
+        Raster
+            DESCRIPTION.
+
+        '''
+        
+        with open (path, 'r') as fichier:
+            lines = fichier.readlines()
+            fichier.close()
+            
+        cptrowheader = 0
+        for line in lines:
+            cle = line.split(separator)[0].strip()
+            if cle.lower() in  ['ncols', 'nrows', 'xllcorner', 'yllcorner', 'cellsize', 'nodata_value']:
+                cptrowheader += 1
+
+        raster = RasterReader.readMetadataFromAscFile(path, separator)
+
+        grid = []
+        for i in range(raster.nrow):
+            grid.append([])
+            for j in range(raster.ncol):
+                grid[i].append(raster.getNoDataValue())
+
+        # Read the values
+        i = 0
+        for line in lines[cptrowheader:]:
+            lineValues = line.split(separator)
+            j = 0
+            for val in lineValues:
+                if val.strip() == '':
+                    continue
+                grid[i][j] = float(val)
+                j += 1
+            i += 1
+
+        # Return raster with one grid
+        raster.addAFMap(name, grid)
+        return raster
     
     
     @staticmethod
-    def readMetadataFromAscFile(path: str, name: str ='', separator=" ")-> Raster:
+    def readMetadataFromAscFile(path: str, separator=" ")-> Raster:
         '''
         '''
         
@@ -111,81 +181,13 @@ class RasterReader:
             
         resolution = (cellsize, cellsize)
         marge = 0
-        
-        if name == '':
-            name = DEFAULT_BAND_NAME
-            
-        grid = RasterBand(bbox, resolution=resolution, margin=marge, 
-                         novalue=novalue, name=name, verbose=False)
-           
-        return grid
+
+        return Raster(bbox, resolution=resolution, margin=marge,
+                          novalue=novalue)
+
     
     
-    @staticmethod
-    def readFromAscFile(path: str, name: str ='', separator=" ")-> Raster:
-        '''
-        Read grid data from an ASCII file. The first six lines of the file indicate the reference of the grid, 
-        followed by the values listed in the order they would appear (left to right and top to bottom).
-        Where:
-            - ncols is the numbers of rows (represented as integers)
-            - nrows is the numbers of rows (represented as integers)
-            - Lower-left corner refers to a cell corner, and not to a data point
-            - xllcorner and yllcorner are the western (left) X coordinate and southern (bottom) Y coordinates, such as easting and northing (represented as real numbers with an optional decimal point)
-            - xllcorner and yllcorner are the X and Y coordinates for the lower left corner of the lower left grid cell. Some ESRI raster files use xllcenter and yllcenter instead for the XY reference point, which indicate the X and Y coordinates for the center of the lower left grid cell. These values are represented as real numbers with an optional decimal point
-            - cellsize is the length of one side of a square cell (a real number)
-            - nodata_value is the value that is regarded as "missing" or "not applicable"; this line is optional, but highly recommended as some programs expect this line to be declared (a real number)
 
-        
-        Example
-        *********
-        
-        .. code-block:: python
-        
-           raster = RasterReader.readFromAscFile('data/asc/RGEALTI_0930_6415_LAMB93_IGN69.asc')
-           grid = raster.getRasterBand(1)
-           self.assertEqual(1000, grid.nrow)
-
-
-        Parameters
-        -----------
-        path : str
-            chemin du fichier.
-        name: str
-            nom de la band du raster, par exemple 'speed#avg'
-
-        Returns
-        --------
-        Raster
-            DESCRIPTION.
-
-        '''
-        
-        with open (path, 'r') as fichier:
-            lines = fichier.readlines()
-            fichier.close()
-            
-        grid = RasterReader.readMetadataFromAscFile(path, name, separator)
-        
-        cptrowheader = 0
-        for line in lines:
-            cle = line.split(separator)[0].strip()
-            if cle.lower() in  ['ncols', 'nrows', 'xllcorner', 'yllcorner', 'cellsize', 'nodata_value']:
-                cptrowheader += 1
-
-        # Read the values
-        i = 0
-        for line in lines[cptrowheader:]:
-            lineValues = line.split(separator)
-            j = 0
-            for val in lineValues:
-                if val.strip() == '':
-                    continue
-                grid.grid[i][j] = float(val)
-                j += 1
-            i += 1
-
-        # Return raster with one grid            
-        return Raster(grid)
         
 
       

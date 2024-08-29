@@ -41,116 +41,104 @@ knowledge of the CeCILL-C license and that you accept its terms.
 
 
 This module contains the class to manipulate rasters.
-A raster is defined as a collection of RasterBand.
+A raster is defined as a collection of AFMap.
 
 """
 
 # For type annotation
 from __future__ import annotations   
 from typing import Union
-#from tracklib.util.exceptions import *
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-
+import math
 import numpy as np
 
 from tracklib.core import listify
 from tracklib.core import ECEFCoords, ENUCoords, GeoCoords, getOffsetColorMap
 from tracklib.core import Bbox
-from tracklib.util import CoordTypeError, SizeError
+from tracklib.core import (isnan,
+                           co_count, co_sum, co_min, co_max, co_avg,
+                           co_dominant, co_median, co_count_distinct)
+from tracklib.util import AnalyticalFeatureError, CoordTypeError, SizeError, WrongArgumentError
+
 
 NO_DATA_VALUE = -9999
-DEFAULT_BAND_NAME = 'grid'
-
-# -----------------------------------------------------------------------------
-# Specific parameters for interpolation methods for upsampling
-# -----------------------------------------------------------------------------
-# List of available interpolate methods for upsampling grid
-MODE_NEAREST_NEIGHBOR       = 101   #
-MODE_BED_OF_NAILS_TECHNIQUE = 102
-MODE_MAX_UNPOOLING          = 103
 
 
-
-class RasterBand:
+class Raster:
     
-    def __init__(self, bb: Bbox, resolution=None, margin:float=0.05,
-                 novalue:float=NO_DATA_VALUE,
-                 name=DEFAULT_BAND_NAME, verbose:bool=False):
+    def __init__(self, bbox: Bbox,
+                 resolution:tuple[float, float]=(100, 100),
+                 margin:float=0.05,
+                 novalue:float=NO_DATA_VALUE):
         """
-        Grid constructor.
         
+        Parameters
+        ----------
         :param bbox: Bouding box
         :param resolution: Grid resolution
         :param margin: relative float. Default value is +5%
         :param novalue: value that is regarded as "missing" or "not applicable";
-        :param verbose: Verbose creation
+           
         """
-        
-        bb = bb.copy()
+
+        bb = bbox.copy()
         bb.addMargin(margin)
         self.__bbox = bb
         (self.xmin, self.xmax, self.ymin, self.ymax) = bb.asTuple()
         
+        self.resolution = resolution
         ax, ay = bb.getDimensions()
-        if resolution is None:
-            am = max(ax, ay)
-            r = am / 100
-            resolution = (int(ax / r), int(ay / r))
-        else:
-            r = resolution
-            resolution = (int(ax / r[0]), int(ay / r[1]))
-        if verbose:
-            print (resolution)
-    
+
         # Nombre de dalles par cote
-        self.ncol = resolution[0]
-        self.nrow = resolution[1]
-        if verbose:
-            print (self.nrow, self.ncol)
-    
-        # Tableau de collections de features appartenant a chaque dalle.
-        # Un feature peut appartenir a plusieurs dalles.
-        self.grid = []
-        for i in range(self.nrow):
-            self.grid.append([])
-            for j in range(self.ncol):
-                self.grid[i].append(NO_DATA_VALUE)
-    
-        self.XPixelSize = ax / self.ncol
-        self.YPixelSize = ay / self.nrow
-        if verbose:
-            print (self.XPixelSize, self.YPixelSize)
-        
+        self.ncol = math.ceil(ax / resolution[0])
+        self.nrow = math.ceil(ay / resolution[1])
+
         self.__noDataValue = novalue
-        self.__name = name
-        
+
+        self.__afmaps = {}
+
+
     def bbox(self):
         return self.__bbox
-        
-# TODO : impact dans le dictionnaire du raster à gérer
-#    def setName(self, name):
-#        self.__name = name
 
-    def getName(self):
-        return self.__name
+    def countAFMap(self):
+        """Return the number of bands in this raster"""
+        return len(self.afmaps)
+
+    def getNamesOfAFMap(self):
+        """Return all names of raster bands in a list."""
+        return list(self.__afmaps.keys())
     
-    def setNoDataValue(self, noDataValue):
-        # On récupere l'ancienne valeur
-        oldvalue = self.__noDataValue
-        self.__noDataValue = noDataValue
-        
-        for i in range(self.nrow):
-            for j in range(self.ncol):
-                if self.grid[i][j] == oldvalue:
-                    self.grid[i][j] = self.__noDataValue
-        
-        
+    def getAFMap(self, identifier: Union[int, str]) -> AFMap:
+        """Return the raster band according to index or name"""
+        if isinstance(identifier, int):
+            name = list(self.__afmaps.keys())[identifier]
+            return self.__afmaps[name]
+        return self.__afmaps[identifier]
+
     def getNoDataValue(self):
         return self.__noDataValue
+
+    def __str__(self):
+        output  = "-------------------------------------\n"
+        output += "Raster:\n"
+        output += "-------------------------------------\n"
+        output += "       nrows = " + str(self.nrow) + "\n"
+        output += "       ncols = " + str(self.ncol) + "\n"
+        output += "       XPixelSize = " + str(self.resolution[0]) + "\n"
+        output += "       YPixelSize = " + str(self.resolution[1]) + "\n"
+        output += "   Bounding box: \n"
+        output += "       Lower left corner : " + str(self.xmin) + ", " + str(self.ymin) + "\n"
+        output += "       Upper right corner: " + str(self.xmax) + ", " + str(self.ymax) + "\n"
+        output += "-------------------------------------\n"
         
+        return output
     
+    def summary(self):
+        print (self.__str__())
+
     def isIn(self, coord: Union[ENUCoords]):
         '''
         Return true if coord is in spatial grid, false else.
@@ -172,54 +160,11 @@ class RasterBand:
             return False
         
         return True
-    
-    
-    def __str__(self):
-        output  = "-------------------------------------\n"
-        output += "Grid '" + self.__name + "':\n"
-        output += "-------------------------------------\n"
-        output += "       nrows = " + str(self.nrow) + "\n"
-        output += "       ncols = " + str(self.ncol) + "\n"
-        output += "       XPixelSize = " + str(self.XPixelSize) + "\n"
-        output += "       YPixelSize = " + str(self.YPixelSize) + "\n"
-        output += "   Bounding box: \n"
-        output += "       Lower left corner : " + str(self.xmin) + "," + str(self.ymin) + "\n"
-        output += "       Upper right corner: " + str(self.xmax) + "," + str(self.ymax) + "\n"
-        output += "-------------------------------------\n"
-        
-        return output
-    
-    def summary(self):
-        print (self.__str__())
 
-    def asNumpy(self) -> np.ndarray:
-        '''
-        Returns the grid converted in numpy array
-        '''
-        return np.array(self.grid, dtype=np.float32)
-
-    def bandStatistics(self):
-        stats = np.array(self.grid)
-        if self.getNoDataValue() != None:
-            stats[stats == self.getNoDataValue()] = None
-        
-        print("-------------------------------------")
-        print("Grid '" + self.__name + "':")
-        print("-------------------------------------")
-        print("    Minimum value: ", np.nanmin(stats))
-        print("    Maximum value: ", np.nanmax(stats))
-        print("    Mean value:    ", np.nanmean(stats))
-        print("    Median value:  ", np.nanmedian(stats))
-        print("-------------------------------------\n")
-        
-        if self.getNoDataValue() != None:
-            stats[stats == None] = self.getNoDataValue()
-
-    
-    def getCell(self, coord: Union[ENUCoords, ECEFCoords, GeoCoords]) -> Union[tuple[float, float], None]:   
+    def getCell(self, coord: Union[ENUCoords, ECEFCoords, GeoCoords])-> Union[tuple[int, int], None]:
         """Normalized coordinates of coord
     
-        (x,) -> (i,j) with:   
+        (x,y) -> (i,j) with:   
     
             - i = (x-xmin)/(xmax-xmin)*nb_cols
             - j = (y-ymin)/(ymax-ymin)*nb_rows
@@ -242,34 +187,195 @@ class RasterBand:
             print("Warning: y overflow " + str(coord) + "  OVERFLOW = " + str(overflow))
             return None
     
-        idx = (float(coord.getX()) - self.xmin) / self.XPixelSize
-        idy = (self.nrow-1) - (float(coord.getY()) - self.ymin) / self.YPixelSize
+        idx = (float(coord.getX()) - self.xmin) / self.resolution[0]
+        idy = (self.nrow-1) - (float(coord.getY()) - self.ymin) / self.resolution[1]
+
+        # Cas des bordures
+        if idx == self.ncol:
+            column = math.floor(idx) - 1
+        else:
+            column = math.floor(idx)
+
+        if idy.is_integer() and int(idy) > -1:
+            line = int(idy)
+        elif idy.is_integer() and int(idy) == -1:
+            line = int(idy) + 1
+        else:
+            line = math.floor(idy) + 1 # il faut arrondir par le dessus!
     
-        return (idx, idy)
+        return (column, line)
+
+
+    def plot(self, identifier:Union[int, str], append=False):
+        """For now, juste one band of raster, that's why the name is needeed."""
+        if isinstance(identifier, int):
+            name = list(self.__afmaps.keys())[identifier]
+            self.__afmaps[name].plotAsImage(append)
+        else:
+            self.__afmaps[identifier].plotAsImage(append)
+            
+
+    def addAFMap(self, name, grid=None):
+        if grid is None:
+            grid = []
+            for i in range(self.nrow):
+                grid.append([])
+                for j in range(self.ncol):
+                    grid[i].append([])
+
+        afmap = AFMap(self, name, grid)
+        self.__afmaps[name] = afmap
+
+
+    def addCollectionToRaster(self, collection):
+        '''
+        L'enjeu ici est de stocker qu'une fois chaque AF. Il faut donc que les maps
+        soient déjà créées.
+
+        Parameters
+        ----------
+        collection : TrackCollection
+            tracks collection.
+
+        Returns
+        -------
+        None.
+
+        '''
+
+        AFs = set()
+        for mapname in self.getNamesOfAFMap():
+            if '#' in mapname:
+                AFs.add(mapname.split('#')[0])
+            else:
+                AFs.add(mapname)
+
+        self.collectionValuesGrid = {}
+        for afname in AFs:
+            self.collectionValuesGrid[afname] = []
+            for i in range(self.nrow):
+                self.collectionValuesGrid[afname].append([])
+                for j in range(self.ncol):
+                    self.collectionValuesGrid[afname][i].append([])
+                    self.collectionValuesGrid[afname][i][j] = []
+
+        # On vérifie que les AF sont calculés
+        for trace in collection.getTracks():
+            for afname in AFs:
+                if not trace.hasAnalyticalFeature(afname) and afname != 'uid':
+                    raise AnalyticalFeatureError("Error: track does not contain analytical feature '" + afname + "'")
+
+        for trace in collection.getTracks():
+            for afname in AFs:
+                # On éparpille dans les cellules
+                for i in range(trace.size()):
+                    obs = trace.getObs(i)
+                    (column, line) = self.getCell(obs.position)
+
+                    if (0 <= column and column <= self.ncol
+                        and 0 <= line and line <= self.nrow):
+
+                        if afname != "uid":
+                            val = trace.getObsAnalyticalFeature(afname, i)
+                        else:
+                            val = trace.uid
+
+                        self.collectionValuesGrid[afname][line][column].append(val)
+
+
+
+    def computeAggregates(self):
+        for i in range(self.countAFMap()):
+            afmap = self.getAFMap(i)
+            names = afmap.getName().split('#')
+            afname = names[0]
+            aggregate = names[1]
+
+            # On calcule les agregats
+            for i in range(self.nrow):
+                for j in range(self.ncol):
+                    tarray = self.collectionValuesGrid[afname][i][j]
+                    sumval = eval(aggregate + '(tarray)')
+                    if isnan(sumval):
+                        afmap.grid[i][j] = NO_DATA_VALUE
+                    else:
+                        afmap.grid[i][j] = sumval
+
+
+
+
+class AFMap:
+    '''
+    Represents a matrix of values: name (AF name) + array 2x2
+    '''
+
+    def __init__(self, raster, af_name, grid):
+
+        if not isinstance(raster, Raster):
+            raise WrongArgumentError("First parameter need to be a Raster.")
+
+        # Nom n'est pas déjà pris
+        if af_name is None or af_name.strip() == '':
+            raise WrongArgumentError("Parameter (af_name) is empty.")
+        if af_name in raster.getNamesOfAFMap():
+            raise WrongArgumentError("Parameter (af_name) is already taken.")
+
+        # Il faut que la taille de la grille correspondent au raster
+        if not isinstance(grid, list) or not isinstance(grid[0], list):
+            raise WrongArgumentError("grid must be a 2x2 list")
+        if len(grid) != raster.nrow or len(grid[0]) != raster.ncol:
+            raise WrongArgumentError("Size of grid must be " + str(raster.nrow)
+                                     + "x" + str(raster.ncol) + ":"
+                                     + str(len(grid)) + "x" + str(len(grid[0])))
+
+        self.raster = raster
+        self.af_name = af_name
+        self.grid = grid
     
-    
+
+    def getName(self):
+        return self.af_name
+
+    @staticmethod
+    def getMeasureName(af_algo:Union[int, str], aggregate=None):
+        """
+        Return the identifier of the measure defined by: af + aggregate operator
+        """
+        if af_algo != "uid":
+            if isinstance(af_algo, str):
+                cle = af_algo + "#" + aggregate.__name__
+            else:
+                cle = af_algo.__name__ + "#" + aggregate.__name__
+        else:
+            cle = "uid" + "#" + aggregate.__name__
+                
+        return cle
+
+
     def plotAsGraphic(self, backgroundcolor="lightcyan", bordercolor="lightgray"):   
         """ Plot as vector grid. """
         fig = plt.figure()
         ax = fig.add_subplot(
-            111, xlim=(self.xmin, self.xmax), ylim=(self.ymin, self.ymax)
+            111,
+            xlim=(self.raster.xmin, self.raster.xmax),
+            ylim=(self.raster.ymin, self.raster.ymax)
         )
     
-        for i in range(1, self.ncol):
-            xi = i * self.XPixelSize + self.xmin
-            ax.plot([xi, xi], [self.ymin, self.ymax], "-", color=bordercolor)
-        for j in range(1, self.nrow):
-            yj = j * self.YPixelSize + self.ymin
-            ax.plot([self.xmin, self.xmax], [yj, yj], "-", color=bordercolor)
-    
-        for i in range(self.nrow):
-            y1 = self.ymin + (self.nrow - 1 - i) * self.YPixelSize
-            y2 = self.ymin + (self.nrow - i) * self.YPixelSize
-            for j in range(self.ncol):
-                x1 = self.xmin + j * self.XPixelSize
-                x2 = x1 + self.XPixelSize
+        for i in range(1, self.raster.ncol):
+            xi = i * self.raster.resolution[0] + self.raster.xmin
+            ax.plot([xi, xi], [self.raster.ymin, self.raster.ymax], "-", color=bordercolor)
+        for j in range(1, self.raster.nrow):
+            yj = j * self.raster.resolution[1] + self.raster.ymin
+            ax.plot([self.raster.xmin, self.raster.xmax], [yj, yj], "-", color=bordercolor)
+
+        for i in range(self.raster.nrow):
+            y1 = self.raster.ymin + (self.raster.nrow - 1 - i) * self.raster.resolution[1]
+            y2 = self.raster.ymin + (self.raster.nrow - i) * self.raster.resolution[1]
+            for j in range(self.raster.ncol):
+                x1 = self.raster.xmin + j * self.raster.resolution[0]
+                x2 = x1 + self.raster.resolution[0]
+
                 if self.grid[i][j] != NO_DATA_VALUE:
-                    #print (self.xmin, x1, y1, x2, y2)
                     polygon = plt.Polygon(
                         [[x1, y1], [x2, y1], [x2, y2], [x1, y2], [x1, y1]]
                     )
@@ -281,6 +387,7 @@ class RasterBand:
                     xm = (x2 - x1) / 2
                     ym = (y2 - y1) / 2
                     plt.text(x1 + xm, y1 + ym, val, **text_kwargs)
+
         plt.title(self.getName())
 
 
@@ -300,8 +407,8 @@ class RasterBand:
             fig = ax1.get_figure()
         
         tab = np.array(self.grid, dtype=np.float32)
-        if self.getNoDataValue() != None:
-            tab[tab == self.getNoDataValue()] = np.nan
+        if self.raster.getNoDataValue() != None:
+            tab[tab == self.raster.getNoDataValue()] = np.nan
 
         cmap = getOffsetColorMap(color1, color2, 0)
         cmap.set_bad(color=novaluecolor)
@@ -315,13 +422,31 @@ class RasterBand:
             fig.colorbar(im, cax=cax, orientation='vertical', fraction=0.046)
 
 
-    def upSampling(self, resolution, interpolation=MODE_NEAREST_NEIGHBOR,
-                       name='Upsampling') -> RasterBand:
+    def bandStatistics(self):
+        stats = np.array(self.grid, dtype=np.float32)
+        if self.raster.getNoDataValue() != None:
+            stats[stats == self.raster.getNoDataValue()] = np.nan
+
+        print("-------------------------------------")
+        print("Grid '" + self.af_name + "':")
+        print("-------------------------------------")
+        print("    Minimum value: ", np.nanmin(stats))
+        print("    Maximum value: ", np.nanmax(stats))
+        print("    Mean value:    ", np.nanmean(stats))
+        print("    Median value:  ", np.nanmedian(stats))
+        print("-------------------------------------\n")
+        
+        if self.raster.getNoDataValue() != None:
+            stats[stats == None] = self.raster.getNoDataValue()
+
+
+
+
+    def upSampling(self, resolution, name='Upsampling') -> AFMap:
         '''
         Interpolation Methods for Upsampling:
             - Nearest Neighbor: this method involves duplicating the existing 
                                 pixels to create new ones.
-            - Max Unpooling:
         '''
 
         if not isinstance(self.__bbox.ur, ENUCoords):
@@ -330,17 +455,19 @@ class RasterBand:
         if self.XPixelSize != self.YPixelSize:
             raise SizeError('cells must be square.')
 
-        new_grid = RasterBand(self.__bbox,
+
+        newafmap = AFMap(self.__bbox,
                             resolution=(resolution[0], resolution[1]),
                             margin=0,
                             novalue=self.__noDataValue,
-                            name='Upsampling', verbose=False)
+                            name=name, verbose=False)
 
+        '''
         # Il faut aussi une résoltion proportionnelle entre les deux rasters
         N = int (self.XPixelSize / new_grid.XPixelSize)
         if int(N - (self.XPixelSize / new_grid.XPixelSize)) != 0.0:
             raise SizeError('Two grids resolution not proportional')
-        print ('N =', N)
+        # print ('N =', N)
 
         if interpolation == MODE_NEAREST_NEIGHBOR:
             for i in range(self.nrow):
@@ -351,63 +478,6 @@ class RasterBand:
                             new_grid.grid[i*N + k][j*N + l] = v
             return new_grid
 
-        # MODE_MAX_UNPOOLING
-        # MODE_BED_OF_NAILS_TECHNIQUE
-
+        '''
         return None
 
-
-class Raster:
-    
-    def __init__(self, grids:Union[RasterBand, list]):
-        """
-        On crée un raster avec une ou plusieurs grilles géographiques 
-        déjà chargées avec des données.
-        
-        Parameters
-        ----------
-        grids : list or RasterBand
-           A list of RasterBand or one RasterBand.
-           
-        """
-        if isinstance(grids, RasterBand):
-            grids = listify(grids)
-        
-        self.__idxBands = []
-        self.__bands = {}
-        for idx, itergrid in enumerate(grids):
-            self.__bands[itergrid.getName()] = itergrid
-            self.__idxBands.append(itergrid.getName())
-
-    def bandCount(self):
-        """Return the number of bands in this raster"""
-        return len(self.__bands)
-
-    def getNamesOfRasterBand(self):
-        """Return all names of raster bands in a list."""
-        return list(self.__bands.keys())
-    
-    def getRasterBand(self, identifier: Union[int, str]) -> RasterBand:
-        """Return the raster band according to index or name"""
-        if isinstance(identifier, int):
-            name = self.__idxBands[identifier]
-            return self.__bands[name]
-        return self.__bands[identifier]
-
-#    def summary(self):
-#        pass
-    
-#    def bandStatistics(self, name: Union[int, str]):
-#        pass
-    
-    def plot(self, identifier:Union[int, str], append=False):
-        """For now, juste one band of raster, that's why the name is needeed."""
-        if isinstance(identifier, int):
-            name = self.__idxBands[identifier]
-            self.__bands[name].plotAsImage(append)
-        else:
-            self.__bands[identifier].plotAsImage(append)
-            
-
-
-            

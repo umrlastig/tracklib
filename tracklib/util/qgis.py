@@ -110,9 +110,18 @@ class LineStyle:
     def simpleVert2(layerLine):
         symbolL1 = QgsLineSymbol.createSimple({
             'penstyle':'solid',
-            'width':'0.6',
+            'width':'0.4',
             'color': QColor.fromRgb(41, 171, 135)})
         layerLine.renderer().setSymbol(symbolL1)
+
+    @staticmethod
+    def simpleNavy(layerLine):
+        symbolL1 = QgsLineSymbol.createSimple({
+            'penstyle':'solid',
+            'width':'0.4',
+            'color': QColor.fromRgb(0, 0, 80)})
+        layerLine.renderer().setSymbol(symbolL1)
+
     @staticmethod
     def simpleVert3(layerLine):
         symbolL1 = QgsLineSymbol.createSimple({
@@ -134,7 +143,7 @@ class LineStyle:
     def simpleLightCyan(layerLine):
         symbolL1 = QgsLineSymbol.createSimple({
             'penstyle':'solid',
-            'width':'0.6',
+            'width':'0.4',
             'color': QColor.fromRgb(10, 222, 236)})
         layerLine.renderer().setSymbol(symbolL1)
 
@@ -142,7 +151,7 @@ class LineStyle:
     def simpleLightVertFonce(layerLine):
         symbolL1 = QgsLineSymbol.createSimple({
             'penstyle':'solid',
-            'width':'0.6',
+            'width':'0.4',
             'color': QColor.fromRgb(51, 160, 44)})
         layerLine.renderer().setSymbol(symbolL1)
 
@@ -152,6 +161,22 @@ class LineStyle:
             'penstyle':'solid',
             'width':'0.6',
             'color': QColor.fromRgb(255, 0, 0)})
+        layerLine.renderer().setSymbol(symbolL1)
+
+    @staticmethod
+    def simpleLightRed(layerLine):
+        symbolL1 = QgsLineSymbol.createSimple({
+            'penstyle':'solid',
+            'width':'0.4',
+            'color': QColor.fromRgb(255, 0, 0)})
+        layerLine.renderer().setSymbol(symbolL1)
+
+    @staticmethod
+    def simpleLightOrange(layerLine):
+        symbolL1 = QgsLineSymbol.createSimple({
+            'penstyle':'solid',
+            'width':'0.4',
+            'color': QColor.fromRgb(255, 164, 37)})
         layerLine.renderer().setSymbol(symbolL1)
 
 
@@ -179,6 +204,15 @@ class PointStyle:
             'name': 'square', 
             'color': QColor.fromRgb(190, 207, 80), 
             'size':'1.4'})
+        layerPoint.renderer().setSymbol(symbol)
+
+
+    @staticmethod
+    def circleYellow(layerPoint):
+        symbol = QgsMarkerSymbol.createSimple({
+            'name': 'circle',
+            'color': QColor.fromRgb(249, 239, 43),
+            'size':'2.4'})
         layerPoint.renderer().setSymbol(symbol)
 
 
@@ -243,6 +277,8 @@ class QGIS:
         
         QgsProject.instance().addMapLayer(layerEdges)
         QgsProject.instance().addMapLayer(layerNodes)
+
+        return (layerEdges, layerNodes)
 
 
     @staticmethod
@@ -309,6 +345,8 @@ class QGIS:
                 style(layer)
                 
             QgsProject.instance().addMapLayer(layer)
+
+        return layer
 
     def __createTablePoints(collection, type):
         FEATURES = []

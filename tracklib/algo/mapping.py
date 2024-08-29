@@ -60,6 +60,7 @@ from . import (HMM,
                MODE_OBS_AS_2D_POSITIONS, 
                MODE_VERBOSE_PROGRESS,
                computeAbsCurv)
+from tracklib.util import AnalyticalFeatureError
 
 # --------------------------------------------------------------------------
 # Utils function for map-matching
@@ -266,30 +267,33 @@ def mapOnRaster(track, raster):
     :return: void
     """
     
-    # create a new empty analytical feature for each raster band
-    for i in range(raster.bandCount()):
-        band = raster.getRasterBand(i)
-        name = band.getName()
-        track[name] = band.getNoDataValue()
+    # create a new empty analytical feature for each afmap
+    for i in range(raster.countAFMap()):
+        afmap = raster.getAFMap(i)
+        name = afmap.getName()
 
-    # for each point         
+        # On vérifie que l'AF n'existe pas déjà
+        if track.hasAnalyticalFeature(name) or name in ["x", "y", "z", "t", "timestamp", "idx"]:
+            raise AnalyticalFeatureError("Error: track does already contain analytical feature '" + name + "'")
+
+        track.createAnalyticalFeature(name, raster.getNoDataValue())
+
+
+    # for each point
     for j in range(track.size()):
         pos = track.getObs(j).position
-                
-        # for each band        
-        for i in range(raster.bandCount()):
-            band = raster.getRasterBand(i)
-            name = band.getName()
-            
-            if band.isIn(pos):
-                cell = band.getCell(pos)
+        # for each band
+        for i in range(raster.countAFMap()):
+            afmap = raster.getAFMap(i)
+            name = afmap.getName()
+            if afmap.raster.isIn(pos):
+                cell = afmap.raster.getCell(pos)
                 if cell == None:
                     message = "Warning: point is not located in the spatial grid. "
                     print(message)
                     continue
-                cx = math.floor(cell[0])
-                cy = math.floor(cell[1])
-                val = band.grid[cy][cx]
+
+                val = afmap.grid[cell[1]][cell[0]]
                 track.setObsAnalyticalFeature(name, j, val)
 
 

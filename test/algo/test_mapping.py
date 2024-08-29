@@ -5,12 +5,13 @@ import matplotlib.pyplot as plt
 import os.path
 import unittest
 from tracklib import (Obs, ObsTime, ENUCoords, 
-                      Track, 
+                      Track, Bbox, Raster,
                       Network, Node, Edge, 
                       SpatialIndex,
                       computeAbsCurv,
                       mapOnRaster, mapOnNetwork, mapOn,
-                      TrackReader, RasterReader)
+                      TrackReader, RasterReader,
+                      AnalyticalFeatureError)
 
 
 class TestAlgoMappingMethods(unittest.TestCase):
@@ -176,30 +177,60 @@ class TestAlgoMappingMethods(unittest.TestCase):
         
     def testMapOnRaster(self):
         resource_path = os.path.join(os.path.split(__file__)[0], "../..")
-        
-        mntpath = os.path.join(resource_path, 'data/asc/test.asc')
-        self.raster = RasterReader.readFromAscFile(mntpath)
-        self.band = self.raster.getRasterBand(0)
 
         ObsTime.setReadFormat("4Y/2M/2D 2h:2m:2s")
         tracepath = os.path.join(resource_path, 'data/asc/8961191_v3.csv')
-        self.trace = TrackReader.readFromCsv(tracepath, 
-                                        id_E=0, id_N=1, id_U=3, id_T=4, 
+        trace = TrackReader.readFromCsv(tracepath,
+                                        id_E=0, id_N=1, id_U=3, id_T=4,
                                         separator=",", h=1)
-        #self.trace.plot()
-        
-        self.assertEqual(self.band.grid[1151][465], 2007.0, 'ele MNT VT')
-        self.assertEqual(self.trace.size(), 363, 'track size')
-        
-        mapOnRaster(self.trace, self.raster)
-        
-        for j in range(self.trace.size()):
-            pos = self.trace.getObs(j).position
+        trace.plot()
+
+
+        mntpath = os.path.join(resource_path, 'data/asc/test.asc')
+
+        with self.assertRaises(AnalyticalFeatureError):
+            raster = RasterReader.readFromAscFile(mntpath, 'z')
+            mapOnRaster(trace, raster)
+
+
+        raster = RasterReader.readFromAscFile(mntpath, 'mnt')
+        afmap = raster.getAFMap(0)
+
+        self.assertEqual(afmap.grid[1151][465], 2007.0, 'ele MNT VT')
+        self.assertEqual(trace.size(), 363, 'track size')
+
+        mapOnRaster(trace, raster)
+
+        for j in range(trace.size()):
+            pos = trace.getObs(j).position
             if pos.getX() == 942323.41762134002055973:
-                self.assertEqual(2006.0, self.trace.getObsAnalyticalFeature('grid', j), 
+                self.assertEqual(2007.0, trace.getObsAnalyticalFeature('mnt', j),
                                  'ele MNT AF:')
                 self.assertEqual(2002.007, pos.getZ(), 'ele Z:')
-        
+
+
+        # ---------------------------------------------------------------------
+
+        trace1 = Track([], 1)
+        trace1.addObs(Obs(ENUCoords(8.5, 8.5, 0), ObsTime()))
+        trace1.addObs(Obs(ENUCoords(10, 10, 0), ObsTime()))
+        trace1.addObs(Obs(ENUCoords(11.5, 11.5, 0), ObsTime()))
+
+        ll = ENUCoords(8, 8)
+        ur = ENUCoords(12, 12)
+        emprise = Bbox(ll, ur)
+        raster = Raster(bbox=emprise, resolution=(1,1), margin=0)
+
+        raster.addAFMap('abcd', [[1,2,3,4], [10,20,30,40],
+                                  [100,200,300,400],
+                                  [1000,2000,3000,4000]])
+        raster.getAFMap(0).plotAsGraphic()
+
+        mapOnRaster(trace1, raster)
+        self.assertEqual(trace1.getObsAnalyticalFeature('abcd', 0), 1000)
+        self.assertEqual(trace1.getObsAnalyticalFeature('abcd', 1), 30)
+        self.assertEqual(trace1.getObsAnalyticalFeature('abcd', 2), 4)
+
 
     def testMapOnNetwork(self):
         trace = self.getDataset1()
