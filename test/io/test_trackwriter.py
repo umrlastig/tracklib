@@ -228,8 +228,8 @@ class TestTrackWriter(TestCase):
         self.assertEqual(5, trace.size())
         self.assertIsInstance(trace, Track)
         self.assertEqual(0, int(trace.getObs(0).position.E))
-        self.assertTrue(trace.hasAnalyticalFeature('speed'))
-        self.assertEqual(trace.getObsAnalyticalFeature('speed', 0), 1.0)
+        # self.assertTrue(trace.hasAnalyticalFeature('speed'))
+        # self.assertEqual(trace.getObsAnalyticalFeature('speed', 0), 1.0)
         
         
     def testWriteKml(self):

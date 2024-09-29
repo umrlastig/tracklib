@@ -147,11 +147,19 @@ class TrackWriter:
         # -------------------------------------------------------
         if id_N == -1:
             if id_E == -1:
-                fmt = TrackFormat(path, -1)  # Read by extension
+                #fmt = TrackFormat(path, -1)  # Read by extension
+                fmt = TrackFormat({'ext': 'CSV',
+                                   'id_E': 0,
+                                   'id_N': 1,
+                                   'id_U': -1,
+                                   'id_T': -1,
+                                   'separator': ',',
+                                   'header': 0})
             else:
                 fmt = TrackFormat(id_E, 0)  # Read by name
         else:
-            fmt = TrackFormat("", -1)  # Read from input parameters
+            # fmt = TrackFormat("", -1)  # Read from input parameters
+            fmt = TrackFormat({'ext': 'CSV'})
             fmt.id_E = id_E
             fmt.id_N = id_N
             fmt.id_U = id_U
@@ -187,7 +195,7 @@ class TrackWriter:
         f = open(path, "w")
 
         # Header
-        if fmt.h > 0:
+        if fmt.header > 0:
             f.write(fmt.com + "srid: " + track.getSRID() + "\n")
             f.write(fmt.com + "ref point: " + str(track.base) + "\n")
             if isinstance(fmt.DateIni, ObsTime):
@@ -261,7 +269,7 @@ class TrackWriter:
                 t = None
             else:
                 t = track.getObs(i).timestamp
-            if isinstance(fmt.DateIni, ObsTime):
+            if isinstance(fmt.time_ini, ObsTime):
                 t = t.toAbsTime() - fmt.DateIni.toAbsTime()
             
             afs = ""

@@ -36,5 +36,7 @@ to get you using tracklib productively as quickly as possible.
     mapping/UG_MapOnRaster
     summarising/UG_AFMap
 
+    comparison/UG_Matching
+    comparison/UG_Fusion
     
   
