@@ -22,9 +22,14 @@ class TestFiltering(TestCase):
         
         self.resource_path = os.path.join(os.path.split(__file__)[0], "../..")
         self.csvpath = os.path.join(self.resource_path, 'data/trace0.gps')
-        
         ObsTime.setPrintFormat("2D/2M/4Y 2h:2m:2s.3z")
-        param = TrackFormat({'ext': 'GPX'})
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        param = TrackFormat({'ext': 'CSV',
+                             'id_E': 2,
+                             'id_N': 3,
+                             'id_T': 1,
+                             'header': 0,
+                             'srid': 'ENU'})
         self.track = TrackReader.readFromFile(self.csvpath, param) % 10
         self.track.plot('kx')
         
