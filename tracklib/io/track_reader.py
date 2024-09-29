@@ -114,7 +114,7 @@ class TrackReader:
 
         if fmt.ext is None:
             raise WrongArgumentError("Track format need have the EXT initialised (CSV, GPX, WKT)")
-        if fmt.ext not in ['CSV', 'GPX', 'WKT']:
+        if fmt.ext not in ['CSV', 'GPX', 'WKT'] and isinstance(track_format, TrackFormat):
             raise WrongArgumentError("Tracklib only read CSV, GPX and WKT files.")
 
         # num_lines = sum(1 for line in open(path))
@@ -142,9 +142,11 @@ class TrackReader:
                     if not fmt.selector.contains(trace):
                         continue
 
-                # for i in range(collection.size()):
-                #      TRACES.addTrack(collection[i])
-                TRACES.addTrack(trace)
+                if isinstance(trace, TrackCollection):
+                    for i in range(trace.size()):
+                        TRACES.addTrack(trace[i])
+                else:
+                    TRACES.addTrack(trace)
 
             return TRACES
 
@@ -163,7 +165,7 @@ class TrackReader:
         elif fmt.ext == "WKT":
             return TrackReader.__readFromWkt(path, fmt, verbose)
         else:
-            print ('TODO')
+            return TrackReader.__readFromCsv(path, fmt, verbose)
 
 
 

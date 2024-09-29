@@ -12,7 +12,7 @@ import unittest
 
 from tracklib import (Track, Obs, ENUCoords, ObsTime, 
                       Operator, GaussianKernel,
-                      TrackReader,
+                      TrackReader, TrackFormat,
                       segmentation, split,
                       computeAbsCurv,
                       generate,
@@ -45,7 +45,19 @@ class TestOperateurMethods(unittest.TestCase):
     def test_abs_curv1(self):
         ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, 'data/trace1.dat')
-        track = TrackReader.readFromCsv(chemin, 2, 3, -1, 4, separator=",", DateIni=-1, h=0, com="#", no_data_value=-999999, srid="ENUCoords")
+        param = TrackFormat({'ext': 'CSV',
+                             'id_E': 2,
+                             'id_N': 3,
+                             'id_U': -1,
+                             'id_T': 4,
+                             'separator': ',',
+                             'cmt': '#',
+                             'time_ini': -1,
+                             'no_data_value': -999999,
+                             'srid': 'ENUCoords',
+                             'header': 0,
+                             'srid': 'ENU'})
+        track = TrackReader.readFromFile(chemin, param)
         
         track.addAnalyticalFeature(diffJourAnneeTrace)
         track.operate(Operator.INVERTER, "diffJourAnneeTrace", "rando_jour_neg")
@@ -148,15 +160,15 @@ class TestOperateurMethods(unittest.TestCase):
         # Trajectoire calculee par GPS (mode standard)
         # ----------------------------------------------
         path = os.path.join(self.resource_path, 'data/rawGps1Data.pos')
-        track1 = TrackReader.readFromCsv(path, "RTKLIB")            # Lecture du fichier
-        track1.toProjCoords(2154)                                   # Projection Lambert 93
-        track1 = track1 > 400                                       # Suppression 400 derniers points
+        track1 = TrackReader.readFromFile(path, "RTKLIB")     # Lecture du fichier
+        track1.toProjCoords(2154)                             # Projection Lambert 93
+        track1 = track1 > 400                                 # Suppression 400 derniers points
 
         # ----------------------------------------------
         # Trajectoire de reference IMU
         # ----------------------------------------------
         path = os.path.join(self.resource_path, "data/imu_opk_Vincennes1909121306.txt")
-        track3 = TrackReader.readFromCsv(path, "IMU_STEREOPOLIS")   # Lecture du fichier
+        track3 = TrackReader.readFromFile(path, "IMU_STEREOPOLIS")   # Lecture du fichier
         track3 = track3 < 400                                       # Suppression 400 derniers points
         track3.incrementTime(0, 18)                                 # Ajout 18 secondes UTC -> GPS Time
         track3.translate(0, 0, 47.66)                               # Conversion altitude -> hauteur

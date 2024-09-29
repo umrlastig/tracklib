@@ -8,7 +8,7 @@ from tracklib import (ENUCoords, ObsTime, Obs, Track,
                       Polygon, TrackCollection,
                       computeAbsCurv, sample,
                       ds, speed, heading,
-                      TrackReader)
+                      TrackReader, TrackFormat)
 
 
 class TestTrack(TestCase):
@@ -608,7 +608,17 @@ class TestTrack(TestCase):
         
     def test_getCentroid(self):
         chemin1 = os.path.join(self.resource_path, './data/demicercle.csv')
-        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        param = TrackFormat({'ext': 'CSV',
+                             'id_E': 0,
+                             'id_N': 1,
+                             'id_U': 2,
+                             'id_T': 3,
+                             'header': 1,
+                             'srid': 'ENU',
+                             'separator': ",",
+                             'read_all': True
+                             })
+        trace1 = TrackReader.readFromFile(chemin1, param)
         trace1.plot('b-')
         trace1.plot('bs')
         
@@ -622,7 +632,17 @@ class TestTrack(TestCase):
     
     def test_getFurthestObs(self):
         chemin1 = os.path.join(self.resource_path, './data/demicercle.csv')
-        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        param = TrackFormat({'ext': 'CSV',
+                             'id_E': 0,
+                             'id_N': 1,
+                             'id_U': 2,
+                             'id_T': 3,
+                             'header': 1,
+                             'srid': 'ENU',
+                             'separator': ",",
+                             'read_all': True
+                             })
+        trace1 = TrackReader.readFromFile(chemin1, param)
         trace1.plot('b-')
         trace1.plot('bs')
         
@@ -640,7 +660,17 @@ class TestTrack(TestCase):
         # ======================================================================
         # Cas 1
         chemin1 = os.path.join(self.resource_path, './data/demicercle.csv')
-        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        param = TrackFormat({'ext': 'CSV',
+                             'id_E': 0,
+                             'id_N': 1,
+                             'id_U': 2,
+                             'id_T': 3,
+                             'header': 1,
+                             'srid': 'ENU',
+                             'separator': ",",
+                             'read_all': True
+                             })
+        trace1 = TrackReader.readFromFile(chemin1, param)
         trace1.plot('b-')
         trace1.plot('bs')
         
@@ -655,7 +685,17 @@ class TestTrack(TestCase):
         # ======================================================================
         # Cas 2
         chemin1 = os.path.join(self.resource_path, 'test/data/demicercle1.csv')
-        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        param = TrackFormat({'ext': 'CSV',
+                             'id_E': 0,
+                             'id_N': 1,
+                             'id_U': 2,
+                             'id_T': 3,
+                             'header': 1,
+                             'srid': 'ENU',
+                             'separator': ",",
+                             'read_all': True
+                             })
+        trace1 = TrackReader.readFromFile(chemin1, param)
         trace1.plot('r-')
         trace1.plot('rs')
         
@@ -671,7 +711,17 @@ class TestTrack(TestCase):
         # Cas 3
         # 
         chemin1 = os.path.join(self.resource_path, 'test/data/demicercle2.csv')
-        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        param = TrackFormat({'ext': 'CSV',
+                             'id_E': 0,
+                             'id_N': 1,
+                             'id_U': 2,
+                             'id_T': 3,
+                             'header': 1,
+                             'srid': 'ENU',
+                             'separator': ",",
+                             'read_all': True
+                             })
+        trace1 = TrackReader.readFromFile(chemin1, param)
         trace1.plot('g-')
         trace1.plot('gs')
         
@@ -686,7 +736,17 @@ class TestTrack(TestCase):
     def test_getMedianObsInTime(self):
         # Cas 1
         chemin1 = os.path.join(self.resource_path, 'test/data/demicercle1.csv')
-        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        param = TrackFormat({'ext': 'CSV',
+                             'id_E': 0,
+                             'id_N': 1,
+                             'id_U': 2,
+                             'id_T': 3,
+                             'header': 1,
+                             'srid': 'ENU',
+                             'separator': ",",
+                             'read_all': True
+                             })
+        trace1 = TrackReader.readFromFile(chemin1, param)
         trace1.plot('r-')
         trace1.plot('rs')
         
@@ -702,7 +762,17 @@ class TestTrack(TestCase):
         # Cas 2
         # 
         chemin1 = os.path.join(self.resource_path, 'test/data/demicercle2.csv')
-        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        param = TrackFormat({'ext': 'CSV',
+                             'id_E': 0,
+                             'id_N': 1,
+                             'id_U': 2,
+                             'id_T': 3,
+                             'header': 1,
+                             'srid': 'ENU',
+                             'separator': ",",
+                             'read_all': True
+                             })
+        trace1 = TrackReader.readFromFile(chemin1, param)
         trace1.plot('g-')
         trace1.plot('gs')
         
