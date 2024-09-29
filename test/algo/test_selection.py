@@ -5,7 +5,7 @@ import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
 
 from tracklib import (Obs, ObsTime, ENUCoords, Track,
-                      Circle, Rectangle, TrackReader,
+                      Circle, Rectangle, TrackReader, TrackFormat,
                       Selector, GlobalSelector,
                       Constraint, TimeConstraint, TrackConstraint, TollGateConstraint,
                       MODE_INSIDE, MODE_CROSSES, MODE_GETS_IN, MODE_GETS_OUT,
@@ -19,7 +19,8 @@ class TestSelection(TestCase):
         
         ObsTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
         chemin = os.path.join(self.resource_path, './data/gpx/activity_5807084803.gpx')
-        tracks = TrackReader.readFromGpx(chemin)
+        param = TrackFormat({'ext': 'GPX'})
+        tracks = TrackReader.readFromFile(chemin, param)
         self.trace = tracks.getTrack(0)
 
         # Transformation GEO coordinates to ENU

@@ -10,7 +10,7 @@ from tracklib import (Obs, ObsTime, ENUCoords,
                       SpatialIndex,
                       computeAbsCurv,
                       mapOnRaster, mapOnNetwork, mapOn,
-                      TrackReader, RasterReader,
+                      TrackReader, RasterReader, TrackFormat,
                       AnalyticalFeatureError)
 
 
@@ -180,9 +180,14 @@ class TestAlgoMappingMethods(unittest.TestCase):
 
         ObsTime.setReadFormat("4Y/2M/2D 2h:2m:2s")
         tracepath = os.path.join(resource_path, 'data/asc/8961191_v3.csv')
-        trace = TrackReader.readFromCsv(tracepath,
-                                        id_E=0, id_N=1, id_U=3, id_T=4,
-                                        separator=",", h=1)
+        param = TrackFormat({'ext': 'CSV',
+                             'id_E': 0,
+                             'id_N': 1,
+                             'id_U': 3,
+                             'id_T': 4,
+                             'separator': ",",
+                             'header': 1})
+        trace = TrackReader.readFromFile(tracepath, param)
         trace.plot()
 
 
@@ -268,9 +273,15 @@ class TestAlgoMappingMethods(unittest.TestCase):
         
         ObsTime.setReadFormat("2D/2M/4Y-2h:2m:2s.3z")
         
-        
-        track_cam = TrackReader.readFromCsv(path_cam, 1, 2, 3, 0, " ", srid="ENUCoords")
-        track_gps = TrackReader.readFromCsv(path_gps, 1, 2, 3, 0, " ", srid="ENUCoords")
+        param = TrackFormat({'ext': 'CSV',
+                             'id_E': 1,
+                             'id_N': 2,
+                             'id_U': 3,
+                             'id_T': 0,
+                             'separator': " ",
+                             'srid': 'ENU'})
+        track_cam = TrackReader.readFromFile(path_cam, param)
+        track_gps = TrackReader.readFromFile(path_gps, param)
         
         track_cam.incrementTime(0, 18-3600)
         
