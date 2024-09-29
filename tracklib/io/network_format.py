@@ -44,6 +44,8 @@ Write Networks
 """
 
 import os.path
+from typing import Union
+
 from tracklib.util.exceptions import *
 
 
@@ -56,7 +58,7 @@ class NetworkFormat:
     # -------------------------------------------------------------
     # Load file format from network_file_format
     # -------------------------------------------------------------
-    def __init__(self, name=None):
+    def __init__(self, name:Union[str, dict]="DEFAULT"):
         """TODO"""
 
         # Base default features
@@ -74,7 +76,7 @@ class NetworkFormat:
         self.srid = "ENU"
         
         # Features updated from file
-        if 'str' in str(type(name)):
+        if isinstance (name, str) and name != 'DEFAULT':
             self.createFromFile(name)
             return
          

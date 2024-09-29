@@ -111,7 +111,7 @@ class NetworkReader:
         #print ("!!!", formatfile)
 
         # Use format or read from resources
-        if 'NetworkFormat' in str(type(formatfile)):
+        if isinstance(formatfile, NetworkFormat):
             fmt = formatfile
         else:
             fmt = NetworkFormat(formatfile)

@@ -3,7 +3,7 @@
 import matplotlib.pyplot as plt
 import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
-from tracklib import (ObsTime, TrackReader,
+from tracklib import (ObsTime, TrackReader, TrackFormat,
                       DiracKernel, 
                       GaussianKernel, 
                       TriangularKernel, 
@@ -24,7 +24,8 @@ class TestFiltering(TestCase):
         self.csvpath = os.path.join(self.resource_path, 'data/trace0.gps')
         
         ObsTime.setPrintFormat("2D/2M/4Y 2h:2m:2s.3z")
-        self.track = TrackReader.readFromCsv(self.csvpath) % 10
+        param = TrackFormat({'ext': 'GPX'})
+        self.track = TrackReader.readFromFile(self.csvpath, param) % 10
         self.track.plot('kx')
         
     def view(self, track, sym):

@@ -8,6 +8,7 @@ import os
 import unittest
 
 from tracklib import (Obs, ObsTime, ENUCoords, getColorMap,
+                      TrackFormat,
                       BIAF_ABS_CURV, 
                       Operator,
                       computeInflection, 
@@ -349,8 +350,12 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
     def testComputeRadialSignature(self):
         resource_path = os.path.join(os.path.split(__file__)[0], "../..")
         path = os.path.join(resource_path, 'data/wkt/chambord.wkt')
-        TRACES = TrackReader.readFromWkt(path, id_geom=0, separator="#", h=1, doublequote=True)
-
+        param = TrackFormat({'ext': 'WKT',
+                             'id_geom': 0,
+                             'separator': "#",
+                             'header': 1,
+                             'doublequote': True})
+        TRACES = TrackReader.readFromFile(path, param)
         trace = TRACES[0]
         #trace.plot('c-')
         #plt.show()

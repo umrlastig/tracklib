@@ -64,45 +64,15 @@ from tracklib.core import Track
 
 class TrackReader:
     """
-    This class offers static methods to load track or track collection
-    from GPX, CSV files. Geometry can be structured in coordinates or in a wkt.
+    This class offer a static method to load track or track collection
+    from GPX, CSV or WKT files. 
+    Geometry can be structured in coordinates or in a wkt.
     """
 
 
-    def readFromCsv2(path, track_format, verbose=False):
-       return TrackReader.readFromCsv(
-           path = path,
-           id_E = track_format.id_E,
-           id_N = track_format.id_N,
-           id_U = track_format.id_U,
-           id_T = track_format.id_T,
-           separator = track_format.separator,
-           DateIni = track_format.DateIni,
-           timeUnit = track_format.timeUnit,
-           h = track_format.h,
-           com = track_format.com,
-           no_data_value = track_format.no_data_value,
-           srid = track_format.srid,
-           read_all = track_format.read_all,
-           selector = track_format.selector,
-           verbose = verbose)
-
-    @staticmethod
-    def readFromCsv (path: str,
-        id_E:int=-1, id_N:int=-1, id_U:int=-1, id_T:int=-1,
-        separator:str=",",
-        DateIni=-1,
-		timeUnit=1,
-        h=0,
-        com="#",
-        no_data_value=-999999,
-        srid="ENUCoords",
-        read_all=False,
-        selector=None,
-        verbose=False,
-    ) -> Union(Track, TrackCollection):
-        """
-        Read track(s) from CSV file(s) with geometry structured in coordinates.
+    def readFromFile(path, track_format:Union[str, TrackFormat]="DEFAULT", verbose=False):
+        '''
+        Read track(s) from file(s) with geometry structured in coordinates or wkt.
         
         The method assumes a single track in file.
         
@@ -111,92 +81,105 @@ class TrackReader:
         
         If only path and a string s parameters are provied, the name of file format 
         is set equal to s.
-        
+
+
         Parameters
-        -----------
-        
-        :param str path: file or directory
-        :param int id_E: index (starts from 0) of column containing coordinate X (for ECEF), 
-                         longitude (GEO) or E (ENU)
-                         -1 if file format is used
-        :param int id_N: index (starts from 0) of column containing coordinate Y (for ECEF), 
-                         latitude (GEO) or N (ENU)
-                         -1 if file format is used
-        :param int id_U: index (starts from 0) of column containing Z (for ECEF), 
-                         height or altitude (GEO/ENU)
-                         -1 if file format is used
-        :param int id_T: index (starts from 0) of column containing timestamp 
-                         (in seconds x timeUnit or in time_fmt format)
-                         -1 if file format is used
-        :param str separator: separating characters (can be multiple characters). 
-                              Can be c (comma), b (blankspace), s (semi-column)
-        :param GPSTime DateIni: initial date (in time_fmt format) if timestamps 
-                                are provided in seconds (-1 if not used)
-        :param float timeUnit: number of seconds per unit of time in id_T column
-        :param int h: number of heading line
-        :param str com: comment character (lines starting with cmt on the top left 
-                        are skipped)
-        :param int no_data_value: a special float or integer indicating 
-                                  that record is non-valid and should be skipped
-        :param str srid: coordinate system of points ("ENU", "Geo" or "ECEF") 
-        :param bool read_all: if flag read_all is True, read AF in the tag extension 
-        :param Selector selector: to select track with a Selection which combine 
-                                  different constraint
-                                  
-        :return: a track or a collection of tracks contains in wkt files.
-        """
-        
+        ----------
+        path : file or directory
+            DESCRIPTION.
+        track_format : str or dict
+            name of format which describes metadata of the file
+        verbose : TYPE, optional
+            DESCRIPTION. The default is False.
+
+        Returns
+        -------
+        TrackCollection
+            collection of tracks contains in file(s).
+
+        '''
+
+        if not (os.path.isfile(path) or os.path.isdir(path)):
+            raise WrongArgumentError("First parameter (path) doesn't refers to a file or a dir.")
+
+        if not isinstance(track_format, str) and not isinstance(track_format, TrackFormat):
+            raise WrongArgumentError("The second parameter is not an instantiation of a str or a TrackFormat: "
+                                     + str(type(track_format)))
+
+        if isinstance(track_format, TrackFormat):
+            fmt = track_format
+        else:
+            # dict or str for name in ressource files
+            fmt = TrackFormat(track_format)
+
+        if fmt.ext is None:
+            raise WrongArgumentError("Track format need have the EXT initialised (CSV, GPX, WKT)")
+        if fmt.ext not in ['CSV', 'GPX', 'WKT']:
+            raise WrongArgumentError("Tracklib only read CSV, GPX and WKT files.")
+
+        # num_lines = sum(1 for line in open(path))
+
+        fmt.controlFormat()
+
+        if verbose:
+            print("Loading track(s) ...")
+
         if os.path.isdir(path):
             TRACES = TrackCollection()
-            
             LISTFILE = os.listdir(path)
             for f in LISTFILE:
-                
+                # if path[len(path)-1:] == '/':
+                #                     collection = TrackReader.readFromGpxFast(path + f)
+                #                 else:
+                #                     collection = TrackReader.readFromGpxFast(path + '/' + f)
                 p = path + "/" + f
-                trace = TrackReader.readFromCsv(
-                    p, id_E, id_N, id_U, id_T,
-                    separator, DateIni, timeUnit, h, com, no_data_value,
-                    srid, read_all, selector, verbose,
-                )
-                
+
+                trace = TrackReader.readFromFile(p, track_format, verbose)
                 if trace is None:
                     continue
-                
-                if not selector is None:
-                    if not selector.contains(trace):
+
+                if not fmt.selector is None:
+                    if not fmt.selector.contains(trace):
                         continue
-                    
+
+                # for i in range(collection.size()):
+                #      TRACES.addTrack(collection[i])
                 TRACES.addTrack(trace)
 
             return TRACES
-            
+
         elif not os.path.isfile(path):
             return None
-        
-        if verbose:
-            print("Loading file " + path)
 
-        # -------------------------------------------------------
-        # Infering file format from extension or name
-        # -------------------------------------------------------
-        if id_N == -1:
-            if id_E == -1:
-                fmt = TrackFormat(path, 1)  # Read by extension
-            else:
-                fmt = TrackFormat(id_E, 0)  # Read by name
+        if verbose:
+             print("Loading file " + path)
+             print("Extension: " + fmt.ext)
+
+        # On redirige suivant l'extension: CSV, GPX or WKT
+        if fmt.ext == "CSV":
+            return TrackReader.__readFromCsv(path, fmt, verbose)
+        elif fmt.ext == "GPX":
+            return TrackReader.__readFromGpx(path, fmt, verbose)
+        elif fmt.ext == "WKT":
+            return TrackReader.__readFromWkt(path, fmt, verbose)
         else:
-            fmt = TrackFormat("", -1)  # Read from input parameters
-            fmt.id_E = id_E
-            fmt.id_N = id_N
-            fmt.id_U = id_U
-            fmt.id_T = id_T
-            fmt.DateIni = DateIni
-            fmt.separator = separator
-            fmt.h = h
-            fmt.com = com
-            fmt.no_data_value = no_data_value
-            fmt.srid = srid
-            fmt.read_all = read_all
+            print ('TODO')
+
+
+
+    @staticmethod
+    def __readFromCsv(path: str, fmt:TrackFormat, verbose) -> Union(Track, TrackCollection):
+        """
+        Read track(s) from CSV file(s) with geometry structured in coordinates.
+
+            path : file or directory
+                DESCRIPTION.
+            track_format : str or dict
+                name of format which describes metadata of the file
+            verbose : TYPE, optional
+                DESCRIPTION. The default is False.
+            :return: a Track contains in csv files.
+        """
 
         # -------------------------------------------------------
         # Reading data according to file format
@@ -218,9 +201,9 @@ class TrackReader:
         with open(path) as fp:
 
             # Header
-            for i in range(fmt.h):
+            for i in range(fmt.header):
                 line = fp.readline()
-                if line[0] == fmt.com:
+                if line[0] == fmt.cmt:
                     line = line[1:]
                 name_non_special = line.split(fmt.separator)
 
@@ -229,7 +212,7 @@ class TrackReader:
             # Obs per line
             while line:
 
-                if line.strip()[0] == fmt.com:
+                if line.strip()[0] == fmt.cmt:
                     name_non_special = line[1:].split(fmt.separator)
                     line = fp.readline().strip()
                     continue
@@ -240,7 +223,7 @@ class TrackReader:
                     print(fields)
                     
                 if fmt.id_T != -1:
-                    if isinstance(fmt.DateIni, int):
+                    if isinstance(fmt.time_ini, int):
                         try:
                             T = fields[fmt.id_T].strip().replace('"', '')
                             time = ObsTime.readTimestamp(T)
@@ -249,7 +232,7 @@ class TrackReader:
                             if verbose:
                                 print (fields[fmt.id_T].strip().replace('"', ''))
                     else:
-                        time = fmt.DateIni.addSec((float)(fields[fmt.id_T])*timeUnit)
+                        time = fmt.time_ini.addSec((float)(fields[fmt.id_T])*fmt.time_unit)
                 else:
                     time = ObsTime()
                 
@@ -260,22 +243,24 @@ class TrackReader:
                     fields[fmt.id_N] = fmt.no_data_value
                 if (fmt.id_U >= 0 and fields[fmt.id_U].strip() == ''):
                     fields[fmt.id_U] = fmt.no_data_value
-                
-                E = (float)(fields[fmt.id_E])
-                N = (float)(fields[fmt.id_N])
-    
+
+                try:
+                    E = (float)(fields[fmt.id_E])
+                    N = (float)(fields[fmt.id_N])
+                except:
+                    raise WrongArgumentError("Parameter E or N is not an instantiation of a float (" + path + ")")
+
                 if (int(E) != fmt.no_data_value) and (int(N) != fmt.no_data_value):
     
                     if fmt.id_U >= 0:
                         U = (float)(fields[fmt.id_U])
                     else:
                         U = 0
-    
+
                     if not fmt.srid.upper() in [
                         "ENUCOORDS", "ENU", "GEOCOORDS", "GEO", "ECEFCOORDS", "ECEF",
                     ]:
-                        print("Error: unknown coordinate type [" + str(srid) + "]")
-                        exit()
+                        raise WrongArgumentError("Error: unknown coordinate type [" + str(srid) + "]")
                     if fmt.srid.upper() in ["ENUCOORDS", "ENU"]:
                         point = Obs(ENUCoords(E, N, U), time)
                     if fmt.srid.upper() in ["GEOCOORDS", "GEO"]:
@@ -285,7 +270,7 @@ class TrackReader:
     
                     track.addObs(point)
                         
-                else: 
+                else:
                     no_data = fmt.no_data_value
                     track.addObs(Obs(makeCoords(no_data, no_data, no_data, fmt.srid.upper()), time))
 
@@ -303,18 +288,15 @@ class TrackReader:
                     track.createAnalyticalFeature(name_non_special[i])
 
             with open(path) as fp:
-
                 # Header
-                for i in range(fmt.h):
+                for i in range(fmt.header):
                     fp.readline()
 
                 line = fp.readline()
 
                 counter = 0
-
                 while line:
-
-                    if line.strip()[0] == fmt.com:
+                    if line.strip()[0] == fmt.cmt:
                         line = fp.readline().strip()
                         continue
 
@@ -336,7 +318,6 @@ class TrackReader:
 
                     line = fp.readline().strip()
                     counter += 1
-
             fp.close()
 
         ObsTime.setReadFormat(time_fmt_save)
@@ -344,8 +325,8 @@ class TrackReader:
         if track is None:
             return None
 
-        if not selector is None:
-            if not selector.contains(track):
+        if not fmt.selector is None:
+            if not fmt.selector.contains(track):
                 return None
 
         track.no_data_value = fmt.no_data_value
@@ -420,44 +401,29 @@ class TrackReader:
     
     
     @staticmethod
-    def readFromWkt(path:str, 
-                        id_geom, id_user=-1, id_track=-1,
-                        separator=";", h=0, srid="ENUCoords",
-                        bboxFilter=None, 
-                        doublequote:bool=False, 
-                        verbose=False) -> TrackCollection:
+    def __readFromWkt(path:str, fmt:TrackFormat, verbose=False) -> TrackCollection:
         """
         Read track(s) (one per line) from a CSV file, with geometry provided in wkt.
-        
+
         Parameters
         -----------
-        
-        :param str path: csv file
-        :param int id_geom: index of the column that contains the geometry
-        :param int id_user: index of the column that contains the id of the user of the track
-        :param int id_track: index of the column that contains the id of the track
-        :param str separator: separating characters (can be multiple characters). 
-                              Can be c (comma), b (blankspace), s (semi-column)
-        :param int h: number of heading line
-        :param str srid: coordinate system of points ("ENU", "Geo" or "ECEF") 
-        :param ?? bboxFilter: 
-        :param bool doublequote: when True, quotechar is doubled. 
-                                 When False, the escapechar is used as a prefix to the quotechar
-        
+
+        :param str path of wkt file
+        :param track_format : str or dict
+               name of format which describes metadata of the file
+        :param verbose : TYPE, optional
+               The default is False.
+       
         :return: collection of tracks contains in wkt files.
         """
-
-        if separator == " ":
-            print("Error: separator must not be space for reading WKT file")
-            exit()
 
         TRACES = TrackCollection()
 
         with open(path, newline="") as csvfile:
-            spamreader = csv.reader(csvfile, delimiter=separator, doublequote=doublequote)
+            spamreader = csv.reader(csvfile, delimiter=fmt.separator, doublequote=fmt.doublequote)
 
             # Header
-            for i in range(h):
+            for i in range(fmt.header):
                 next(spamreader)
 
             for fields in spamreader:
@@ -465,26 +431,26 @@ class TrackReader:
                     continue
 
                 track = Track()
-                if id_user >= 0:
-                    track.uid = fields[id_user]
-                if id_track >= 0:
-                    track.tid = fields[id_track]
+                if fmt.id_user >= 0:
+                    track.uid = fields[fmt.id_user]
+                if fmt.id_track >= 0:
+                    track.tid = fields[fmt.id_track]
 
-                wkt = fields[id_geom]
+                wkt = fields[fmt.id_wkt]
                 if wkt[0:4] == "POLY":
-                    wkt = fields[id_geom].split("((")[1].split("))")[0]
+                    wkt = fields[fmt.id_wkt].split("((")[1].split("))")[0]
                     wkt = wkt.split(",")
                 elif wkt[0:4] == "LINE":
-                    wkt = fields[id_geom].split("(")[1].split(")")[0]
+                    wkt = fields[fmt.id_wkt].split("(")[1].split(")")[0]
                     wkt = wkt.split(",")
                 elif wkt[0:7] == "MULTIPO":
-                    wkt = fields[id_geom].split("((")[1].split("))")[0]
+                    wkt = fields[fmt.id_wkt].split("((")[1].split("))")[0]
                     wkt = wkt.split(",")
                     if wkt[0] == "(":
                         wkt = wkt[1:]
                     wkt = wkt.split("),(")[0]  # Multipolygon not handled yet
                 else:
-                    print("this type of wkt is not yet implemented")
+                    raise WrongArgumentError("This type of wkt is not yet implemented.")
 
                 for s in wkt:
                     sl = s.strip().split(" ")
@@ -495,24 +461,11 @@ class TrackReader:
                     else:
                         z = 0.0
                         
-                    point = Obs(makeCoords(x, y, z, srid.upper()), ObsTime())   
+                    point = Obs(makeCoords(x, y, z, fmt.srid.upper()), ObsTime())
                     track.addObs(point)
-                    
 
-                if not (bboxFilter is None):
-                    xmin = bboxFilter[0]
-                    ymin = bboxFilter[1]
-                    xmax = bboxFilter[2]
-                    ymax = bboxFilter[3]
-                    for j in range(len(track)):
-                        inside = True
-                        inside = inside & (track[j].position.getX() > xmin)
-                        inside = inside & (track[j].position.getY() > ymin)
-                        inside = inside & (track[j].position.getX() < xmax)
-                        inside = inside & (track[j].position.getY() < ymax)
-                        if not inside:
-                            break
-                    if not inside:
+                if not fmt.selector is None:
+                    if not fmt.selector.contains(track):
                         continue
 
                 TRACES.addTrack(track)
@@ -520,164 +473,159 @@ class TrackReader:
                     print(len(TRACES), " wkt tracks loaded")
 
         return TRACES
-    
+
+
     # =========================================================================
     #   GPX
     #
-    
-    def readFromGpxFast(path:str,
-                        srid:Literal["GEO", "ENU"] ="GEO", 
-                        type: Literal["trk", "rte"]="trk",
-                        read_all=False, verbose=False) -> TrackCollection:					
-        if os.path.isdir(path):
-            TRACES = TrackCollection()
-            LISTFILE = os.listdir(path)
-            for f in LISTFILE:
-                if verbose:
-                    print(f)
-                if path[len(path)-1:] == '/':
-                    collection = TrackReader.readFromGpxFast(path + f)
-                else:
-                    collection = TrackReader.readFromGpxFast(path + '/' + f)
-                for i in range(collection.size()):
-                    TRACES.addTrack(collection[i])
-            return TRACES
-            
+    @staticmethod
+    def __readFromGpx(path:str, fmt:TrackFormat, verbose) -> TrackCollection:
         fichier = open(path, 'r')
         LINES = fichier.readlines()
         tracks = TrackCollection()
         new_track = False
-        for line in LINES:
-            if ('<trk>' in line):
-                new_track = True
-                new_point = False
-                tracks.addTrack(Track())
-            if ('</trk>' in line):
-                new_track = False
-            if new_track:
-                if ('<trkpt ' in line):
-                    new_point = True
-                    splits = line.split("\"")
-                    pos = makeCoords(float(splits[3]), float(splits[1]), 0, srid)
-                if ('</trkpt>' in line):
+
+        if fmt.type == 'trk':
+            for line in LINES:
+                if ('<'+fmt.type+'>' in line):
+                    new_track = True
                     new_point = False
-                    tracks[-1].addObs(Obs(pos, tps))
-                if new_point:
-                    if '<ele>' in line:
-                        pos.hgt = float(line.split('>')[1].split('<')[0])
-                    if '<time>' in line:
-                        tps = ObsTime(line.split('>')[1].split('<')[0])             
+                    tracks.addTrack(Track())
+                if ('</'+fmt.type+'>' in line):
+                    new_track = False
+                if new_track:
+                    if ('<'+fmt.type+'pt ' in line):
+                        new_point = True
+                        splits = line.split("\"")
+                        pos = makeCoords(float(splits[3]), float(splits[1]), 0, fmt.srid)
+                    if ('</'+fmt.type+'pt>' in line):
+                        new_point = False
+                        tracks[-1].addObs(Obs(pos, tps))
+                    if new_point:
+                        if '<ele>' in line:
+                            pos.hgt = float(line.split('>')[1].split('<')[0])
+                        if '<time>' in line:
+                            tps = ObsTime(line.split('>')[1].split('<')[0])
+
+        if fmt.type == 'rte':
+            tracks.addTrack(Track())
+            for line in LINES:
+                if ('<'+fmt.type+'pt' in line):
+                    splits = line.split("\"")
+                    pos = makeCoords(float(splits[3]), float(splits[1]), 0, fmt.srid)
+                    tracks[-1].addObs(Obs(pos))
+
         fichier.close()
         return tracks
-							
-					
-    @staticmethod
-    def readFromGpx(path:str, 
-                    srid:Literal["GEO", "ENU"] ="GEO", 
-                    type: Literal["trk", "rte"]="trk",
-                    read_all=False, verbose=False) -> TrackCollection:
-        """
-        Reads (multiple) tracks or routes from gpx file(s).
+
+
+#     @staticmethod
+#     def readFromGpx(path:str, 
+#                     srid:Literal["GEO", "ENU"] ="GEO", 
+#                     type: Literal["trk", "rte"]="trk",
+#                     read_all=False, verbose=False) -> TrackCollection:
+#         """
+#         Reads (multiple) tracks or routes from gpx file(s).
         
-        Parameters
-        -----------
+#         Parameters
+#         -----------
         
-        :param str path: file or directory
-        :param str srid: coordinate system of points ("ENU", "Geo" or "ECEF") 
-        :param str type: may be “trk” to load track points or 
-                         “rte” to load vertex from the route
-        :param bool read_all: if flag read_all is True, read AF in the tag extension 
+#         :param str path: file or directory
+#         :param str srid: coordinate system of points ("ENU", "Geo" or "ECEF") 
+#         :param str type: may be “trk” to load track points or 
+#                          “rte” to load vertex from the route
+#         :param bool read_all: if flag read_all is True, read AF in the tag extension 
                    
-        :return: collection of tracks contains in Gpx files.
-        """
+#         :return: collection of tracks contains in Gpx files.
+#         """
              
-        if os.path.isdir(path):
-            TRACES = TrackCollection()
-            LISTFILE = os.listdir(path)
-            for f in LISTFILE:
-                if verbose:
-                    print(f)
-                if path[len(path)-1:] == '/':
-                    collection = TrackReader.readFromGpx(path + f)
-                else:
-                    collection = TrackReader.readFromGpx(path + '/' + f)
-                for i in range(collection.size()):
-                    TRACES.addTrack(collection[i])
-            return TRACES
+#         if os.path.isdir(path):
+#             TRACES = TrackCollection()
+#             LISTFILE = os.listdir(path)
+#             for f in LISTFILE:
+#                 if verbose:
+#                     print(f)
+#                 if path[len(path)-1:] == '/':
+#                     collection = TrackReader.readFromGpx(path + f)
+#                 else:
+#                     collection = TrackReader.readFromGpx(path + '/' + f)
+#                 for i in range(collection.size()):
+#                     TRACES.addTrack(collection[i])
+#             return TRACES
         
-        elif os.path.isfile(path) or isinstance(io.StringIO(path), io.IOBase):
-            #format_old = ObsTime.getReadFormat()
-            #ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+#         elif os.path.isfile(path) or isinstance(io.StringIO(path), io.IOBase):
+#             #format_old = ObsTime.getReadFormat()
+#             #ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
             
-            collection = TrackCollection()
+#             collection = TrackCollection()
     
-            doc = minidom.parse(path)
-            trks = doc.getElementsByTagName(type)
+#             doc = minidom.parse(path)
+#             trks = doc.getElementsByTagName(type)
 
-            for trk in trks:
-                if os.path.basename(path).split(".")[0] != None:
-                    trace = Track(track_id=os.path.basename(path).split(".")[0])
-                else:
-                    trace = Track()
+#             for trk in trks:
+#                 if os.path.basename(path).split(".")[0] != None:
+#                     trace = Track(track_id=os.path.basename(path).split(".")[0])
+#                 else:
+#                     trace = Track()
                 
-                extensions = dict()
-                trkpts = trk.getElementsByTagName(type + "pt")
-                for trkpt in trkpts:
-                    lon = float(trkpt.attributes["lon"].value)
-                    lat = float(trkpt.attributes["lat"].value)
+#                 extensions = dict()
+#                 trkpts = trk.getElementsByTagName(type + "pt")
+#                 for trkpt in trkpts:
+#                     lon = float(trkpt.attributes["lon"].value)
+#                     lat = float(trkpt.attributes["lat"].value)
     
-                    hgt = -1 # TODO: utils.NAN
-                    eles = trkpt.getElementsByTagName("ele")
-                    if eles.length > 0:
-                        hgt = float(eles[0].firstChild.data)
+#                     hgt = -1 # TODO: utils.NAN
+#                     eles = trkpt.getElementsByTagName("ele")
+#                     if eles.length > 0:
+#                         hgt = float(eles[0].firstChild.data)
     
-                    time = ""
-                    times = trkpt.getElementsByTagName("time")
-                    if times.length > 0:
-                        time = ObsTime(times[0].firstChild.data)
-                    else:
-                        time = ObsTime()
+#                     time = ""
+#                     times = trkpt.getElementsByTagName("time")
+#                     if times.length > 0:
+#                         time = ObsTime(times[0].firstChild.data)
+#                     else:
+#                         time = ObsTime()
     
-                    point = Obs(makeCoords(lon, lat, hgt, srid), time)
-                    trace.addObs(point)
+#                     point = Obs(makeCoords(lon, lat, hgt, srid), time)
+#                     trace.addObs(point)
                     
-                    if read_all:
-                        tagextentions = trkpt.getElementsByTagName("extensions")
-                        for tagextention in tagextentions:
-                            for ext in tagextention.childNodes:
-                                if ext.nodeType == minidom.Node.ELEMENT_NODE: 
-                                    if ext.tagName not in extensions:
-                                        extensions[ext.tagName] = []
-                                    val = ext.firstChild.nodeValue
-                                    if isfloat(val):
-                                        extensions[ext.tagName].append(float(val))
-                                    elif islist(val):
-                                        extensions[ext.tagName].append(json.loads(val))
-                                    else:
-                                        extensions[ext.tagName].append(val)
+#                     if read_all:
+#                         tagextentions = trkpt.getElementsByTagName("extensions")
+#                         for tagextention in tagextentions:
+#                             for ext in tagextention.childNodes:
+#                                 if ext.nodeType == minidom.Node.ELEMENT_NODE: 
+#                                     if ext.tagName not in extensions:
+#                                         extensions[ext.tagName] = []
+#                                     val = ext.firstChild.nodeValue
+#                                     if isfloat(val):
+#                                         extensions[ext.tagName].append(float(val))
+#                                     elif islist(val):
+#                                         extensions[ext.tagName].append(json.loads(val))
+#                                     else:
+#                                         extensions[ext.tagName].append(val)
                     
-                    # ..
-                    # 
+#                     # ..
+#                     # 
     
-                if read_all:
-                    for key in extensions.keys():
-                        trace.createAnalyticalFeature(key)
-                        for i in range(trace.size()):
-                            trace.setObsAnalyticalFeature(key, i, extensions[key][i])
+#                 if read_all:
+#                     for key in extensions.keys():
+#                         trace.createAnalyticalFeature(key)
+#                         for i in range(trace.size()):
+#                             trace.setObsAnalyticalFeature(key, i, extensions[key][i])
                         
-                collection.addTrack(trace)
+#                 collection.addTrack(trace)
 
-            # pourquoi ?
-            # --> pour remettre le format comme il etait avant la lecture :)   
-            #ObsTime.setReadFormat(format_old)
+#             # pourquoi ?
+#             # --> pour remettre le format comme il etait avant la lecture :)   
+#             #ObsTime.setReadFormat(format_old)
     
-            #collection = TrackCollection([trace])
-            return collection
+#             #collection = TrackCollection([trace])
+#             return collection
         
-        else:
-            print ('path is not a file, not a dir')
-            return None
-    
+#         else:
+#             print ('path is not a file, not a dir')
+#             return None
+
     
     
         

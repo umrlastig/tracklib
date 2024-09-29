@@ -45,130 +45,337 @@ File format to read and write GPS tracks to CSV file(s).
 """
 
 import os.path
+from typing import Union
+
 from tracklib.util.exceptions import *
-
 from tracklib.core import ObsTime
-
+from tracklib.algo.selection import Selector
 
 class TrackFormat:
-    """TODO"""
+    '''
+        A format is a structure to store paramaters needeed to load a Track
+
+        Mandatory parameter
+        -------------------
+
+        # ext:       file having this extension will be automatically read and written in this format
+           default value is CSV
+           value in {CVS, GPX, WKT}
+        #   name:      format name (used as input in FileReader and FileWriter)
+        
+        
+        #   col_id_X:  index (starts from 0) of column containing coordinate X (for ECEF), longitude (GEO) or E (ENU)
+        #   col_id_Y:  index (starts from 0) of column containing coordinate Y (for ECEF), latitude (GEO) or N (ENU)
+        #   col_id_Z:  index (starts from 0) of column containing Z (for ECEF), height or altitude (GEO/ENU)
+        #   col_id_T:  index (starts from 0) of column containing timestamp (in seconds or in time_fmt format)
+
+        #   srid:      coordinate system of points (ENU, Geo or ECEF) 
+        
+        #   date_ini:  initial date (in time_fmt format) if timestamps are provided in seconds (-1 if not used)
+        #   time_fmt:  timestamp format (format definition according to GPSTime class)
+
+        #   sep:       separating characters (can be multiple characters). Can be c (comma), b (blankspace), s (semi-column)
+        #   header:    number of heading line in format 
+        #   cmt:       comment character (lines starting with cmt on the top left are skipped)
+        #   no_data:   a special float or integer indicating that record is non-valid and should be skipped
+        #   read_all:  read all fields in data file (registered as analytical features) 
+
+    '''
 
     resource_path = os.path.join(os.path.split(__file__)[0], "../..")
     TRACK_FILE_FORMAT = os.path.join(resource_path, "resources/track_file_format")
 
-    @staticmethod
-    def __search_fmt_from_ext_or_name(file_format_path, arg, ext=0):
+
+    # -------------------------------------------------------------
+    # Load file format from track_file_format
+    # -------------------------------------------------------------
+    def __init__(self, name:Union[str, dict]="DEFAULT"):
         """TODO"""
-        # ext = 0 for search by name and 1 for search by ext
-        if ext == 1:
-            arg = arg.split(".")[-1]
-        with open(file_format_path) as ffmt:
+
+        self.ext = None
+
+        # Base default features
+        self.name = "UNDEFINED"
+
+        self.id_user = -1
+        self.id_track = -1
+
+        self.id_E = -1
+        self.id_N = -1
+        self.id_U = -1
+        self.id_T = -1
+
+        self.type = 'trk' # rteType, wptType
+        self.id_wkt = -1
+
+        if isinstance(name, dict) and name['ext'] == "CSV":
+            self.srid = "ENU"
+        elif isinstance(name, dict) and name['ext'] == "GPX":
+            self.srid = "GEO"
+        elif isinstance(name, dict) and name['ext'] == "WKT":
+            self.srid = "ENU"
+        else:
+            self.srid = "ENU"
+
+
+        self.time_ini = -1
+        self.time_fmt = ObsTime.getReadFormat()
+        self.time_unit = 1
+
+        self.separator = ","
+        self.header = 0
+        self.cmt = "#"
+        self.no_data_value = -999999
+        self.doublequote = False
+        self.encoding = "UTF-8"
+
+        self.selector = None
+
+        self.af_names = []
+        self.read_all = False
+
+        if isinstance(name, dict):
+            # Features updated from hashtable
+            self.createFromDict(name)
+
+        elif isinstance (name, str) and name != 'DEFAULT':
+            # Features updated from file
+            self.createFromFile(name)
+
+
+
+    def createFromDict(self, param):
+        """TODO"""
+        list_of_fields = []
+
+        if "name" in param:
+            self.name = param["name"]
+        if "ext" in param:
+            self.ext = param["ext"]
+
+        if "srid" in param:
+            self.srid = param["srid"]
+        if "time_ini" in param:
+            self.time_ini = param["time_ini"]
+        if "time_fmt" in param:
+            self.time_fmt = param["time_fmt"]
+        if "time_unit" in param:
+            self.time_unit = param["time_unit"]
+
+        if "id_user" in param:
+            self.id_user = param["id_user"]
+        if "id_track" in param:
+            self.id_track = param["id_track"]
+
+        if "id_E" in param:
+            self.id_E = param["id_E"]
+        if "id_N" in param:
+            self.id_N = param["id_N"]
+        if "id_U" in param:
+            self.id_U = param["id_U"]
+        if "id_T" in param:
+            self.id_T = param["id_T"]
+        if "id_wkt" in param:
+            self.id_wkt = param["id_wkt"]
+        if "type" in param:
+            self.type = param["type"]
+            # type: Literal["trk", "rte"]="trk"
+
+        if "separator" in param:
+            self.separator = param["separator"]            
+        if "header" in param:
+            self.header = param["header"]
+        if "cmt" in param:
+            self.cmt = param["cmt"]
+        if "no_data_value" in param:
+            self.no_data_value = param["no_data_value"]
+        if "doublequote" in param:
+            self.doublequote = param["doublequote"]
+        if "encoding" in param:
+            self.encoding = param["encoding"]
+
+        if "selector" in param:
+            self.selector = param["selector"]
+
+#        if "af_names" in param:
+#            self.af_names = af_names
+        if "read_all" in param:
+            self.read_all = param['read_all']
+
+
+
+    def createFromFile(self, name):
+        """TODO"""
+
+        FIELDS = []
+        with open(TrackFormat.TRACK_FILE_FORMAT) as ffmt:
             line = ffmt.readline().strip()
             while line:
                 if line[0] == "#":
                     line = ffmt.readline().strip()
                     continue
-                fields = line.split(",")
-                if fields[ext].strip() == arg:
-                    return fields
+                tab = line.split(",")
+                if tab[0].strip() == name:
+                    FIELDS = tab
+                    break
                 line = ffmt.readline().strip()
-        word = "extension"
-        if ext == 0:
-            word = "format"
-        print(
-            "ERROR: "
-            + word
-            + " ["
-            + arg
-            + "] is not a standard format in "
-            + file_format_path
-        )
-        exit()
+        ffmt.close()
 
-    # -------------------------------------------------------------
-    # Load file format from track_file_format
-    # ext:
-    #    1 to infer format through extension
-    #    0 to infer format directly through name
-    #   -1 no format inference
-    # -------------------------------------------------------------
-    def __init__(self, arg, ext=-1):
-        """TODO"""
+        if len(FIELDS) < 1:
+            print("Error: import format not recognize")
+            exit()
 
-        if ext >= 0:
+        self.name = name
+        self.ext = str(FIELDS[1].strip())
 
-            fields = TrackFormat.__search_fmt_from_ext_or_name(
-                TrackFormat.TRACK_FILE_FORMAT, arg, ext
-            )
+        self.id_E = int(FIELDS[2].strip())
+        self.id_N = int(FIELDS[3].strip())
+        self.id_U = int(FIELDS[4].strip())
+        self.id_T = int(FIELDS[5].strip())
 
-            self.name = fields[0].strip()
-            self.id_E = int(fields[2].strip())
-            self.id_N = int(fields[3].strip())
-            self.id_U = int(fields[4].strip())
-            self.id_T = int(fields[5].strip())
-            self.DateIni = fields[6].strip()
-            self.separator = fields[7].strip()
-            self.h = int(fields[8].strip())
-            self.com = fields[9].strip()
-            self.no_data_value = float(fields[10].strip())
-            self.srid = fields[11].strip()
-            self.read_all = fields[13].strip().upper() == "TRUE"
-
-            self.time_fmt = fields[12].strip()
-
-            self.separator = self.separator.replace("b", " ")
-            self.separator = self.separator.replace("c", ",")
-            self.separator = self.separator.replace("s", ";")
-
-            if self.DateIni == "-1":
-                self.DateIni = -1
-            else:
-                fmt_temp = ObsTime.getReadFormat()
-                ObsTime.setReadFormat(self.time_fmt)
-                self.DateIni = ObsTime(self.DateIni)
-                ObsTime.setReadFormat(fmt_temp)
+        self.time_ini = FIELDS[6].strip()
+        if self.time_ini == "-1":
+            self.time_ini = -1
         else:
+            fmt_temp = ObsTime.getReadFormat()
+            ObsTime.setReadFormat(self.time_fmt)
+            self.time_ini = ObsTime(self.time_ini)
+            ObsTime.setReadFormat(fmt_temp)
+        self.time_unit = 1
+        self.time_fmt = FIELDS[12].strip()
 
-            self.id_E = -1
-            self.id_N = -1
-            self.id_U = -1
-            self.id_T = -1
-            self.DateIni = -1
-            self.separator = ","
-            self.h = 0
-            self.timeUnit = 1
-            self.selector = None
-            self.com = "#"
-            self.no_data_value = -999999
-            self.srid = "ENUCoords"
-            self.read_all = False
-            self.time_fmt = ObsTime.getReadFormat()
-            self.af_names = []
-            
-            if 'dict' in str(type(arg)):    
-                if "id_E" in arg:
-                    self.id_E = arg["id_E"]
-                if "id_N" in arg:
-                    self.id_N =arg["id_N"]
-                if "id_U" in arg:
-                    self.id_U = arg["id_U"]
-                if "id_T" in arg:
-                    self.id_T = arg["id_T"]
-                if "DateIni" in arg:
-                    self.DateIni = arg["DateIni"]
-                if "separator" in arg:
-                    self.separator = arg["separator"]
-                if "h" in arg:
-                    self.h = arg["h"]
-                if "com" in arg:
-                    self.com = arg["com"]
-                if "no_data_value" in arg:
-                    self.no_data_value = arg["no_data_value"]
-                if "srid" in arg:
-                    self.srid = arg["srid"]
-                if "read_all" in arg:
-                    self.read_all = arg["read_all"]
-                if "time_fmt" in arg:
-                    self.time_fmt = arg["time_fmt"]
-                if "af_names" in arg:
-                    self.af_names = arg["af_names"]
+        self.header = int(FIELDS[8].strip())
+        self.cmt = FIELDS[9].strip()
+        self.doublequote = True
+        self.encoding = "utf-8"
+        self.no_data_value = float(FIELDS[10].strip())
+
+        self.srid = FIELDS[11].strip()
+
+        self.separator = FIELDS[7].strip()
+        self.separator = self.separator.replace("b", " ")
+        self.separator = self.separator.replace("c", ",")
+        self.separator = self.separator.replace("s", ";")
+
+        self.read_all = FIELDS[13].strip().upper() == "TRUE"
+
+
+    def __str__(self):
+        output  = "----------------------------------------\n"
+        output += "Track file format:\n"
+        output += "----------------------------------------\n"
+        output += "Name:         " + str(self.name) + "\n"
+        output += "Ext:          " + str(self.ext) + "\n"
+        output += "\n"
+        output += "SRID:         " + str(self.srid) + "\n"
+        output += "\n"
+        output += "CSV format: \n"
+        output += "----------- \n"
+        output += "id_E:         " + str(self.id_E) + "\n"
+        output += "id_N:         " + str(self.id_N) + "\n"
+        output += "id_U:         " + str(self.id_U) + "\n"
+        output += "id_T:         " + str(self.id_T) + "\n"
+        #output += "Source:       " + str(self.pos_source) + "\n"
+        #output += "Target:       " + str(self.pos_target) + "\n"
+        #output += "Geom:         " + str(self.pos_wkt) + "\n"
+        #output += "Weight:       " + str(self.pos_weight) + "\n"
+        #output += "Direction:    " + str(self.pos_direction) + "\n"
+        #output += "Seperator:    [" + str(self.separator) + "]\n"
+        #output += "Header:       " + str(self.header) + "\n"
+        #output += "Double-quote: " + str(self.doublequote) + "\n"
+        #output += "Encoding:     " + str(self.encoding) + "\n"
+
+        output += "\n"
+        output += "GPX format: \n"
+
+        output += "----------------------------------------\n"
+
+
+        '''
+
+        self.id_user = -1
+        self.id_track = -1
+
+        self.id_E = -1
+        self.id_N = -1
+        self.id_U = -1
+        self.id_T = -1
+
+        self.type = 'trkType' # rteType, wptType
+        self.id_wkt = -1
+
+        self.srid = "ENUCoords"
+
+        self.time_ini = -1
+        self.time_fmt = ObsTime.getReadFormat()
+
+        self.separator = ","
+        self.header = 0
+        self.cmt = "#"
+        self.no_data_value = -999999
+        self.doublequote = False
+        self.encoding = "UTF-8"
+
+        self.selector = None
+
+        self.af_names = []
+        self.read_all = False
+        
+        '''
+
+        return output
+
+
+    def asString(self):
+        sep = self.separator 
+        sep = sep.replace(" ", "b")
+        sep = sep.replace(",", "c")
+        sep = sep.replace(";", "s")
+        
+        out  = str(self.name) +", "
+        #out += str(self.pos_edge_id) +", "
+        #out += str(self.pos_source) +", "
+        #out += str(self.pos_target) +", "
+        #out += str(self.pos_wkt) +", "
+        #out += str(self.pos_weight) +", "
+        #out += str(self.pos_direction) +", "
+        #out += str(sep) +", "
+        #out += str(self.header) +", "
+        #out += str(self.doublequote) +", "
+        #out += str(self.encoding) +", "
+        #out += str(self.srid)
+        return out
+
+
+    def controlFormat(self):
+        '''
+        '''
+
+        if self.separator == "":
+            raise WrongArgumentError("Incorrect value for 'separator' in track file format: " + str(self.separator))
+
+        if self.selector != None and not isinstance(self.selector, Selector):
+            raise WrongArgumentError("Incorrect value for 'selector' in track file format: " + str(type(self.selector)))
+
+
+        # ---------------------------------------------------------------------
+        #     CSV file
+        if self.ext == "CSV":
+            if self.id_E < 0:
+                raise WrongArgumentError("Incorrect value for 'id_E' in track file format: " + str(self.id_E))
+            if self.id_N < 0:
+                raise WrongArgumentError("Incorrect value for 'id_N' in track file format: " + str(self.id_N))
+        
+        '''
+        # ---------------------------------------------------------------------
+        #     WKT file
+        if self.ext == "WKT":
+            if self.separator == " ":
+                raise WrongArgumentError("Error: separator must not be space for reading WKT file")
+        '''
+
+
+
+
+
+

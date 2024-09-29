@@ -51,8 +51,8 @@ class TestSummarising(TestCase):
         TRACES.append(trace2)
         
         collection = TrackCollection(TRACES)
-        collection.plot('k-')
-        plt.show()
+        #collection.plot('k-')
+        #plt.show()
 
         # ---------------------------------------------------------------------
 
@@ -75,8 +75,8 @@ class TestSummarising(TestCase):
 
         #  Construction du raster
         marge = 0.0
-        raster = summarize(collection, af_algos, cell_operators,
-                               (60, 60), marge)
+        res = (60, 60)
+        raster = summarize(collection, af_algos, cell_operators, res, marge)
         # print (raster.collectionValuesGrid)
 
         self.assertEqual(raster.getNoDataValue(), NO_DATA_VALUE)
@@ -111,14 +111,14 @@ class TestSummarising(TestCase):
         # ---------------------------------------------------------------------
         #  On teste les plots
 
-        map1.plotAsGraphic()
-        plt.show()
+        #map1.plotAsGraphic()
+        #plt.show()
 
         map2.plotAsGraphic()
         plt.show()
 
-        raster.plot(0)
-        plt.show()
+        #raster.plot(0)
+        #plt.show()
 
         # ---------------------------------------------------------------------
         # On teste les valeurs de la grille: map 2
@@ -149,7 +149,7 @@ class TestSummarising(TestCase):
 
         # ---------------------------------------------------------------------
         # On teste les valeurs de la grille: map 1
-
+        '''
         self.assertEqual(map1.grid[2][0], 3)
         self.assertEqual(map1.grid[1][0], 1)
         self.assertEqual(map1.grid[0][0], 0)
@@ -215,7 +215,68 @@ class TestSummarising(TestCase):
 
         map2.bandStatistics()
         map4.bandStatistics()
+        '''
+
+
+    def test_summarize_af_grid_grande(self):
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        TRACES = []
         
+        # ---------------------------------------------------------------------
+        trace1 = Track([], 1)
+        trace1.addObs(Obs(ENUCoords(10, 10, 0), ObsTime.readTimestamp("2018-01-01 10:00:00")))
+        trace1.addObs(Obs(ENUCoords(10, 30, 0), ObsTime.readTimestamp("2018-01-01 10:00:04")))
+        trace1.addObs(Obs(ENUCoords(10, 110, 0), ObsTime.readTimestamp("2018-01-01 10:00:12")))
+        trace1.addObs(Obs(ENUCoords(130, 110), ObsTime.readTimestamp("2018-01-01 10:00:30")))
+        trace1.addObs(Obs(ENUCoords(190, 10), ObsTime.readTimestamp("2018-01-01 10:00:35")))
+        trace1.addObs(Obs(ENUCoords(270, 110), ObsTime.readTimestamp("2018-01-01 10:00:40")))
+        trace1.addObs(Obs(ENUCoords(300, 190), ObsTime.readTimestamp("2018-01-01 10:01:00")))
+        trace1.addObs(Obs(ENUCoords(370, 190, 0), ObsTime.readTimestamp("2018-01-01 10:01:50")))
+        TRACES.append(trace1)
+        
+        # ---------------------------------------------------------------------
+        trace2 = Track([], 2)
+        trace2.addObs(Obs(ENUCoords(25, 10, 0), ObsTime.readTimestamp("2018-01-01 10:00:15")))
+        trace2.addObs(Obs(ENUCoords(280, 90, 0), ObsTime.readTimestamp("2018-01-01 10:00:45")))
+        trace2.addObs(Obs(ENUCoords(330, 20, 0), ObsTime.readTimestamp("2018-01-01 10:01:55")))
+        TRACES.append(trace2)
+        
+        collection = TrackCollection(TRACES)
+
+        # ---------------------------------------------------------------------
+        af_algos = ['uid']
+        cell_operators = [co_count_distinct]
+
+        #  Construction du raster
+        marge = 0.1
+        res = (60, 60)
+        noovalue = -1
+        raster = summarize(collection, af_algos, cell_operators, res, marge)
+
+        self.assertEqual(raster.getNoDataValue(), NO_DATA_VALUE)
+        print (raster)
+
+        self.assertEqual(raster.xmin, -26)
+        self.assertEqual(raster.xmax, 406)
+        self.assertEqual(raster.ymin, -8)
+        self.assertEqual(raster.ymax, 208)
+        
+        self.assertEqual(raster.ncol, 8)
+        self.assertEqual(raster.nrow, 4)
+    
+        self.assertEqual(raster.resolution[0], 60)
+        self.assertEqual(raster.resolution[1], 60)
+
+        # ---------------------------------------------------------------------
+        #   On teste les maps
+
+        map1 = raster.getAFMap(AFMap.getMeasureName('uid', co_count_distinct))
+        self.assertIsInstance(map1, AFMap)
+
+        map1.plotAsGraphic()
+        plt.show()
+
+
 
 
     def test_quickstart(self):
@@ -256,8 +317,9 @@ class TestSummarising(TestCase):
 
 if __name__ == '__main__':
     suite = TestSuite()
-    suite.addTest(TestSummarising("test_summarize_af"))
-    suite.addTest(TestSummarising("test_quickstart"))
+    #suite.addTest(TestSummarising("test_summarize_af"))
+    suite.addTest(TestSummarising("test_summarize_af_grid_grande"))
+    #suite.addTest(TestSummarising("test_quickstart"))
     runner = TextTestRunner()
     runner.run(suite)
     

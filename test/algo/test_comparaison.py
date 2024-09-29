@@ -7,7 +7,7 @@ import math
 import os.path
 import random
 from tracklib import (Obs, ObsTime, ENUCoords, Track,
-                      TrackReader,
+                      TrackReader, TrackFormat,
                       compare, match,
                       plotMatching, MARKERS_TYPE_WARNING,
                       MODE_COMPARISON_HAUSDORFF,
@@ -173,12 +173,20 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         
     def testMatchDTWL2(self):
         chemin1 = os.path.join(self.resource_path, 'test/data/compare/dtw1.csv')
-        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        param = TrackFormat({'ext': 'CSV',
+                             'id_E': 0,
+                             'id_N': 1,
+                             'id_U': 2,
+                             'id_T': 3,
+                             'separator': ",",
+                             'header': 1,
+                             'read_all': True})
+        trace1 = TrackReader.readFromFile(chemin1, param)
         trace1.plot('m-')
         trace1.plotAsMarkers(type=MARKERS_TYPE_WARNING)
         
         chemin2 = os.path.join(self.resource_path, 'test/data/compare/dtw2.csv')
-        trace2 = TrackReader.readFromCsv(chemin2, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        trace2 = TrackReader.readFromFile(chemin2, param)
         trace2.plot('c-')
         trace2.plotAsMarkers(bkg='w', frg='c', sym_frg = " ", sym_bkg = "v")
 
@@ -216,12 +224,20 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         
     def testMatchDTWL1(self):
         chemin1 = os.path.join(self.resource_path, 'test/data/compare/dtw1.csv')
-        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        param = TrackFormat({'ext': 'CSV',
+                             'id_E': 0,
+                             'id_N': 1,
+                             'id_U': 2,
+                             'id_T': 3,
+                             'separator': ",",
+                             'header': 1,
+                             'read_all': True})
+        trace1 = TrackReader.readFromFile(chemin1, param)
         trace1.plot('m-')
         trace1.plotAsMarkers(type=MARKERS_TYPE_WARNING)
         
         chemin2 = os.path.join(self.resource_path, 'test/data/compare/dtw2.csv')
-        trace2 = TrackReader.readFromCsv(chemin2, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        trace2 = TrackReader.readFromFile(chemin2, param)
         trace2.plot('c-')
         trace2.plotAsMarkers(bkg='w', frg='c', sym_frg = " ", sym_bkg = "v")
         
@@ -259,12 +275,20 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         
     def testMatchDTWLInf(self):
         chemin1 = os.path.join(self.resource_path, 'test/data/compare/dtw1.csv')
-        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        param = TrackFormat({'ext': 'CSV',
+                             'id_E': 0,
+                             'id_N': 1,
+                             'id_U': 2,
+                             'id_T': 3,
+                             'separator': ",",
+                             'header': 1,
+                             'read_all': True})
+        trace1 = TrackReader.readFromFile(chemin1, param)
         trace1.plot('m-')
         trace1.plotAsMarkers(type=MARKERS_TYPE_WARNING)
         
         chemin2 = os.path.join(self.resource_path, 'test/data/compare/dtw2.csv')
-        trace2 = TrackReader.readFromCsv(chemin2, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        trace2 = TrackReader.readFromFile(chemin2, param)
         trace2.plot('c-')
         trace2.plotAsMarkers(bkg='w', frg='c', sym_frg = " ", sym_bkg = "v")
         
@@ -302,12 +326,20 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         
     def testMatchFDTWL2(self):
         chemin1 = os.path.join(self.resource_path, 'test/data/compare/dtw1.csv')
-        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        param = TrackFormat({'ext': 'CSV',
+                             'id_E': 0,
+                             'id_N': 1,
+                             'id_U': 2,
+                             'id_T': 3,
+                             'separator': ",",
+                             'header': 1,
+                             'read_all': True})
+        trace1 = TrackReader.readFromFile(chemin1, param)
         trace1.plot('m-')
         trace1.plotAsMarkers(type=MARKERS_TYPE_WARNING)
         
         chemin2 = os.path.join(self.resource_path, 'test/data/compare/dtw2.csv')
-        trace2 = TrackReader.readFromCsv(chemin2, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        trace2 = TrackReader.readFromFile(chemin2, param)
         trace2.plot('c-')
         trace2.plotAsMarkers(bkg='w', frg='c', sym_frg = " ", sym_bkg = "v")
         
@@ -358,10 +390,18 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
 
         chemin1 = os.path.join(self.resource_path, 'test/data/compare/dtw3.csv')
-        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        param = TrackFormat({'ext': 'CSV',
+                             'id_E': 0,
+                             'id_N': 1,
+                             'id_U': 2,
+                             'id_T': 3,
+                             'separator': ",",
+                             'header': 1,
+                             'read_all': True})
+        trace1 = TrackReader.readFromFile(chemin1, param)
 
         chemin2 = os.path.join(self.resource_path, 'test/data/compare/dtw4.csv')
-        trace2 = TrackReader.readFromCsv(chemin2, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        trace2 = TrackReader.readFromFile(chemin2, param)
 
         trace1.plot('m-')
         trace1.plotAsMarkers(type=MARKERS_TYPE_WARNING)
@@ -383,12 +423,20 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
 
     def testMatchFrechet(self):
         chemin1 = os.path.join(self.resource_path, 'test/data/compare/dtw1.csv')
-        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        param = TrackFormat({'ext': 'CSV',
+                             'id_E': 0,
+                             'id_N': 1,
+                             'id_U': 2,
+                             'id_T': 3,
+                             'separator': ",",
+                             'header': 1,
+                             'read_all': True})
+        trace1 = TrackReader.readFromFile(chemin1, param)
         trace1.plot('m-')
         trace1.plotAsMarkers(type=MARKERS_TYPE_WARNING)
         
         chemin2 = os.path.join(self.resource_path, 'test/data/compare/dtw2.csv')
-        trace2 = TrackReader.readFromCsv(chemin2, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        trace2 = TrackReader.readFromFile(chemin2, param)
         trace2.plot('c-')
         trace2.plotAsMarkers(bkg='w', frg='c', sym_frg = " ", sym_bkg = "v")
         
@@ -432,9 +480,17 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
     
     def testCompareFrechet(self):
         chemin1 = os.path.join(self.resource_path, 'test/data/compare/dtw1.csv')
-        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        param = TrackFormat({'ext': 'CSV',
+                             'id_E': 0,
+                             'id_N': 1,
+                             'id_U': 2,
+                             'id_T': 3,
+                             'separator': ",",
+                             'header': 1,
+                             'read_all': True})
+        trace1 = TrackReader.readFromFile(chemin1, param)
         chemin2 = os.path.join(self.resource_path, 'test/data/compare/dtw2.csv')
-        trace2 = TrackReader.readFromCsv(chemin2, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        trace2 = TrackReader.readFromFile(chemin2, param)
         
         a = compare(trace1, trace2, mode=MODE_COMPARISON_FRECHET, 
                     dim=2)
@@ -443,9 +499,17 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         
     def testCompareDTW(self):
         chemin1 = os.path.join(self.resource_path, 'test/data/compare/dtw1.csv')
-        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        param = TrackFormat({'ext': 'CSV',
+                             'id_E': 0,
+                             'id_N': 1,
+                             'id_U': 2,
+                             'id_T': 3,
+                             'separator': ",",
+                             'header': 1,
+                             'read_all': True})
+        trace1 = TrackReader.readFromFile(chemin1, param)
         chemin2 = os.path.join(self.resource_path, 'test/data/compare/dtw2.csv')
-        trace2 = TrackReader.readFromCsv(chemin2, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        trace2 = TrackReader.readFromFile(chemin2, param)
         
         b = compare(trace1, trace2, mode=MODE_COMPARISON_DTW,
                     p=math.inf, dim=2)
@@ -605,12 +669,20 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         # Cas 2
     
         chemin1 = os.path.join(self.resource_path, 'test/data/compare/dtw1.csv')
-        trace1 = TrackReader.readFromCsv(chemin1, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        param = TrackFormat({'ext': 'CSV',
+                             'id_E': 0,
+                             'id_N': 1,
+                             'id_U': 2,
+                             'id_T': 3,
+                             'separator': ",",
+                             'header': 1,
+                             'read_all': True})
+        trace1 = TrackReader.readFromFile(chemin1, param)
         trace1.plot('m-')
         trace1.plotAsMarkers(type=MARKERS_TYPE_WARNING)
         
         chemin2 = os.path.join(self.resource_path, 'test/data/compare/dtw2.csv')
-        trace2 = TrackReader.readFromCsv(chemin2, 0, 1, 2, 3, separator=",",read_all=True, h=1)
+        trace2 = TrackReader.readFromFile(chemin2, param)
         trace2.plot('c-')
         trace2.plotAsMarkers(bkg='w', frg='c', sym_frg = " ", sym_bkg = "v")
         
