@@ -361,7 +361,11 @@ class QGIS:
             for j in range(track.size()):
                 obs = track.getObs(j)
                 X = float(obs.position.getX())
+                if X == -999999:
+                    continue
                 Y = float(obs.position.getY())
+                if X == -999999:
+                    continue
                 pt = QgsPointXY(X, Y)
                 POINTS.append(pt)
                 gPoint = QgsGeometry.fromPointXY(pt)
