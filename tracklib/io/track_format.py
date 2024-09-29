@@ -268,6 +268,7 @@ class TrackFormat:
         output += "Ext:          " + str(self.ext) + "\n"
         output += "\n"
         output += "SRID:         " + str(self.srid) + "\n"
+        
         output += "\n"
         output += "CSV format: \n"
         output += "----------- \n"

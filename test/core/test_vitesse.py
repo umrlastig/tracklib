@@ -7,7 +7,7 @@ import math
 import os.path
 import unittest
 
-from tracklib import ObsTime, Operator, TrackReader
+from tracklib import ObsTime, Operator, TrackReader, TrackFormat
 
 
 class TestVitesseMethods(unittest.TestCase):
@@ -19,7 +19,13 @@ class TestVitesseMethods(unittest.TestCase):
 
         ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, './data/trace1.dat')
-        track = TrackReader.readFromCsv(chemin, 2, 3, -1, 4, separator=",")
+        param = TrackFormat({'ext': 'CSV',
+                             'id_E': 2,
+                             'id_N': 3,
+                             'id_U': -1,
+                             'id_T': 4,
+                             'separator': ','})
+        track = TrackReader.readFromFile(chemin, param)
 
         track.estimate_speed()
 
@@ -53,7 +59,14 @@ class TestVitesseMethods(unittest.TestCase):
 
         ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, './data/trace0.gps')
-        track = TrackReader.readFromCsv(chemin, 2, 3, -1, 1, separator=",")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        param = TrackFormat({'ext': 'CSV',
+                             'id_E': 2,
+                             'id_N': 3,
+                             'id_T': 1,
+                             'header': 0,
+                             'srid': 'ENU'})
+        track = TrackReader.readFromFile(chemin, param)
 
         track.estimate_speed()
 
@@ -92,7 +105,14 @@ class TestVitesseMethods(unittest.TestCase):
         
         ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
         chemin = os.path.join(self.resource_path, './data/trace0.gps')
-        track = TrackReader.readFromCsv(chemin, 2, 3, -1, 1, separator=",")
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        param = TrackFormat({'ext': 'CSV',
+                             'id_E': 2,
+                             'id_N': 3,
+                             'id_T': 1,
+                             'header': 0,
+                             'srid': 'ENU'})
+        track = TrackReader.readFromFile(chemin, param)
         
         # 1ère méthode
         track.estimate_speed()

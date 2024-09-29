@@ -5,7 +5,7 @@ import filecmp
 from unittest import TestCase, TestSuite, TextTestRunner
 from tracklib import (Track, ENUCoords, Obs,
                       TrackCollection, ObsTime,
-                      TrackWriter, TrackReader,
+                      TrackWriter, TrackReader, TrackFormat,
                       speed, computeAbsCurv)
 
 
@@ -218,7 +218,12 @@ class TestTrackWriter(TestCase):
         TrackWriter.writeToGpx(self.collection, path=gpxpath, af=True, oneFile=False)
         
         gpxpath = os.path.join(self.resource_path, 'data/test/gpx3/11.gpx')
-        tracks = TrackReader.readFromGpx(gpxpath, srid='ENU', type="trk", read_all=True)
+        param = TrackFormat({'ext': 'GPX',
+                             'srid': 'ENU',
+                             'type': 'trk',
+                             'read_all': True})
+        tracks = TrackReader.readFromFile(gpxpath, param)
+
         trace = tracks[0]
         self.assertEqual(5, trace.size())
         self.assertIsInstance(trace, Track)
@@ -231,7 +236,11 @@ class TestTrackWriter(TestCase):
         resource_path = os.path.join(os.path.split(__file__)[0], "../..")
         ObsTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
         gpxpath = os.path.join(resource_path, 'data/gpx/activity_5807084803.gpx')
-        tracks = TrackReader.readFromGpx(gpxpath)
+        param = TrackFormat({'ext': 'GPX',
+                             'srid': 'ENU',
+                             'type': 'trk',
+                             'read_all': True})
+        tracks = TrackReader.readFromFile(gpxpath, param)
         trace = tracks.getTrack(0)
        
         trace.addAnalyticalFeature(speed)
