@@ -14,7 +14,8 @@ Getting Started
   Installation <install>
   Jupyter Notebook <jupyter>
 
-
+.. QGIS
+.. Les ressources
   
   
 

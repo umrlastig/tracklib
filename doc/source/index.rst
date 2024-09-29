@@ -64,8 +64,8 @@ Documentation
   
   Getting Started <started/index>
   User Guide <userguide/index>
+  Quick Examples <userguide/gallery>
   Use Cases <usecase/index>
-  API Reference <api/index>
 
 
 

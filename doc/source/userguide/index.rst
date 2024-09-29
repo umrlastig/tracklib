@@ -6,75 +6,36 @@
 
 
 User Guide
-==========
+------------
+
+..   Core concept <1_coreconcept>
+   
+
+Load and Save Data from files
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. toctree::
-  :maxdepth: 1
+   :maxdepth: 1
+
+   io/index
+
+
+Algorithms
+^^^^^^^^^^^
+
+.. toctree::
+   :maxdepth: 1
   
-   Core concept <1_coreconcept>
+   segmentation/index
+   summarising/index
+   comparison/index
+   mapping/index   
+   
+
 ..   Operation for manipulating track <2_operator>
 
-
-
-Read and write
----------------
-
-.. toctree::
-  :maxdepth: 1
-
-  UG_IO_Network
-  UG_IO_BDTOPO
-.. Read/Write track(s) <reader_writer>
-
-
 .. It can be useful to rely on a road network when analyzing a collection of tracks.
-
-
-
-Useful Features
-----------------
-
-Here is a gallery of several examples demonstrating what ``tracklib`` can do. The examples are very short
-to get you using tracklib productively as quickly as possible.
-
-
-.. nbgallery::
-    :name: userguide-features-gallery
-    :glob:
-
-    UG_Operation
-    UG_TrackPlot
-    UG_Synthetics
-    UG_Query
-    
-    UG_Selection
-    UG_Segmentation
-    UG_ReturnTrip
-    UG_Comparison
-
-    UG_ShapeMeasures
-    UG_Simplification
-    UG_Interpolation
-    UG_Filtering
-
-    UG_Stdbscan        
-    UG_MapMatchingOnNetwork
-    UG_MapOnRaster
-    UG_AFMap
-
-    
-    
 .. Coding with tracklib in QGIS <qgis>
-
-
 .. Mopsi <Mopsi> (track's comparaison)
 .. Points caractéristiques 
-
-
-
-
-  
-  
-
-  
 
