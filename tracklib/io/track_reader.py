@@ -55,9 +55,7 @@ from xml.dom import minidom
 
 from . import TrackFormat
 from tracklib.core import (ObsTime, ENUCoords, ECEFCoords, GeoCoords, Obs, 
-                           islist, isfloat,
-                           makeCoords,
-                           TrackCollection)
+                           islist, isfloat, makeCoords,TrackCollection)
 from tracklib.core import Track
 
 

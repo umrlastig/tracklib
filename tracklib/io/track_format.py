@@ -262,90 +262,69 @@ class TrackFormat:
 
     def __str__(self):
         output  = "----------------------------------------\n"
-        output += "Track file format:\n"
-        output += "----------------------------------------\n"
-        output += "Name:         " + str(self.name) + "\n"
-        output += "Ext:          " + str(self.ext) + "\n"
+        output += "Track file format for CSV, WKT and GPX files:\n"
+        output += "---------------------------------------------\n"
+        output += "Name:                              " + str(self.name) + "\n"
+        output += "Ext:                               " + str(self.ext) + "\n"
         output += "\n"
-        output += "SRID:         " + str(self.srid) + "\n"
-        
+        output += "SRID:                              " + str(self.srid) + "\n"
+        output += "\n"
+        output += "Read all fields:                   " + str(self.read_all) + "\n"
+        output += "Selection track:                   " + str(self.selector) + "\n"
         output += "\n"
         output += "CSV format: \n"
-        output += "----------- \n"
-        output += "id_E:         " + str(self.id_E) + "\n"
-        output += "id_N:         " + str(self.id_N) + "\n"
-        output += "id_U:         " + str(self.id_U) + "\n"
-        output += "id_T:         " + str(self.id_T) + "\n"
-        #output += "Source:       " + str(self.pos_source) + "\n"
-        #output += "Target:       " + str(self.pos_target) + "\n"
-        #output += "Geom:         " + str(self.pos_wkt) + "\n"
-        #output += "Weight:       " + str(self.pos_weight) + "\n"
-        #output += "Direction:    " + str(self.pos_direction) + "\n"
-        #output += "Seperator:    [" + str(self.separator) + "]\n"
-        #output += "Header:       " + str(self.header) + "\n"
-        #output += "Double-quote: " + str(self.doublequote) + "\n"
-        #output += "Encoding:     " + str(self.encoding) + "\n"
-
+        output += "---------------------------------------------\n"
+        output += "id_E:                              " + str(self.id_E) + "\n"
+        output += "id_N:                              " + str(self.id_N) + "\n"
+        output += "id_U:                              " + str(self.id_U) + "\n"
+        output += "id_T:                              " + str(self.id_T) + "\n"
+        output += "Seperator:                        [" + str(self.separator) + "]\n"
+        output += "Header:                            " + str(self.header) + "\n"
+        output += "Double-quote:                      " + str(self.doublequote) + "\n"
+        output += "Comment character:                 " + str(self.cmt) + "\n"
+        output += "No data value:                     " + str(self.no_data_value) + "\n"
+        output += "Initial date:                      " + str(self.time_ini) + "\n"
+        output += "Number of seconds per unit of time:" + str(self.time_ini) + "\n"
         output += "\n"
-        output += "GPX format: \n"
-
-        output += "----------------------------------------\n"
-
-
-        '''
-
-        self.id_user = -1
-        self.id_track = -1
-
-        self.id_E = -1
-        self.id_N = -1
-        self.id_U = -1
-        self.id_T = -1
-
-        self.type = 'trkType' # rteType, wptType
-        self.id_wkt = -1
-
-        self.srid = "ENUCoords"
-
-        self.time_ini = -1
-        self.time_fmt = ObsTime.getReadFormat()
-
-        self.separator = ","
-        self.header = 0
-        self.cmt = "#"
-        self.no_data_value = -999999
-        self.doublequote = False
-        self.encoding = "UTF-8"
-
-        self.selector = None
-
-        self.af_names = []
-        self.read_all = False
-        
-        '''
-
+        output += "GPX format:   \n"
+        output += "---------------------------------------------\n"
+        output += "Type of point (wpt, rtept, trk):  [" + str(self.type) + "]\n"
+        output += "\n"
+        output += "WKT format: \n"
+        output += "---------------------------------------------\n"
+        output += "id_wkt:                            " + str(self.id_wkt) + "\n"
+        output += "id_user:                           " + str(self.id_user) + "\n"
+        output += "id_track:                          " + str(self.id_track) + "\n"
+        output += "Seperator:                        [" + str(self.separator) + "]\n"
+        output += "Header:                            " + str(self.header) + "\n"
+        output += "Double-quote:                      " + str(self.doublequote) + "\n"
+        output += "---------------------------------------------\n"
         return output
 
 
     def asString(self):
-        sep = self.separator 
-        sep = sep.replace(" ", "b")
-        sep = sep.replace(",", "c")
-        sep = sep.replace(";", "s")
+        if self.ext == 'CSV':
+            sep = self.separator
+            sep = sep.replace(" ", "b")
+            sep = sep.replace(",", "c")
+            sep = sep.replace(";", "s")
         
-        out  = str(self.name) +", "
-        #out += str(self.pos_edge_id) +", "
-        #out += str(self.pos_source) +", "
-        #out += str(self.pos_target) +", "
-        #out += str(self.pos_wkt) +", "
-        #out += str(self.pos_weight) +", "
-        #out += str(self.pos_direction) +", "
-        #out += str(sep) +", "
-        #out += str(self.header) +", "
-        #out += str(self.doublequote) +", "
-        #out += str(self.encoding) +", "
-        #out += str(self.srid)
-        return out
+            out  = str(self.name) +", "
+            out  = str(self.ext) +", "
+            out += str(self.id_E) +", "
+            out += str(self.id_N) +", "
+            out  = str(self.id_U) +", "
+            out  = str(self.id_T) +", "
+            out  = str(self.time_ini) +", "
+            out += str(sep) +", "
+            out += str(self.header) +", "
+            out += str(self.cmt) +", "
+            out += str(self.no_data) +", "
+            out += str(self.srid)
+            out += str(self.time_fmt) +", "
+            out += str(self.read_all) +", "
+            return out
+        raise UnknownModeError("No resource mode for WKT and GPX files")
 
 
     def controlFormat(self):
@@ -367,9 +346,10 @@ class TrackFormat:
             if self.id_N < 0:
                 raise WrongArgumentError("Incorrect value for 'id_N' in track file format: " + str(self.id_N))
         
-        '''
+
         # ---------------------------------------------------------------------
         #     WKT file
+        '''
         if self.ext == "WKT":
             if self.separator == " ":
                 raise WrongArgumentError("Error: separator must not be space for reading WKT file")

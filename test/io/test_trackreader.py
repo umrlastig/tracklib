@@ -19,7 +19,7 @@ class TestTrackReader(TestCase):
 
     def test_track_format_default_parameter(self):
         fmt = TrackFormat()
-        #print (fmt)
+        print (fmt)
 
         self.assertEqual(fmt.name, "UNDEFINED")
         self.assertEqual(fmt.ext, None)
