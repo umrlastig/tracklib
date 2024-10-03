@@ -148,7 +148,7 @@ class NetworkReader:
         
     counter = 0
     NB_PER_PAGE = 1000
-    URL_SERVER = "https://wxs.ign.fr/choisirgeoportail/geoportail/wfs?"
+    URL_SERVER = "https://data.geopf.fr/wfs/ows?"
     URL_SERVER += "service=WFS&version=2.0.0&request=GetFeature&"
     URL_SERVER += "typeName=BDTOPO_V3:troncon_de_route&"
     # URL_SERVER += "srsName=EPSG:2154&"
