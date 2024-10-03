@@ -303,8 +303,37 @@ class TestTrackReader(TestCase):
         self.assertEqual(6418873.1726411795, track.getObs(2).position.getY())
 
 
+    def test_format_astring(self):
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+        param = TrackFormat({'name': 'CHAMOIS',
+                             'ext': 'CSV',
+                             'id_E': 5,
+                             'id_N': 6,
+                             'id_U' : -1,
+                             'id_T' : 4,
+                             'time_ini': -1,
+                             'separator': 'c',
+                             'header': 1,
+                             'srid': 'ENU',
+                             'read_all': True,
+                             'no_data_value': -1})
+        self.assertEqual(param.asString(),
+        "CHAMOIS, CSV, 5, 6, -1, 4, -1, c, 1, #, -1, ENU, 4Y-2M-2D 2h:2m:2s, True")
+
+
+    def test_read_csv_verbose(self):
+        csvpath = os.path.join(self.resource_path, 'data/csv/22245.csv')
+        param = TrackFormat({'ext': 'CSV',
+                             'id_E': 0,
+                             'id_N': 1,
+                             'id_U': 2,
+                             'id_T': 3,
+                             'header': 1})
+        trace = TrackReader.readFromFile(csvpath, param, verbose=True)
+        self.assertEqual(trace.size(), 52)
+
+
 if __name__ == '__main__':
-    #unittest.main()
     suite = TestSuite()
 
     # TrackFormat: dict
@@ -318,6 +347,7 @@ if __name__ == '__main__':
     suite.addTest(TestTrackReader("testReadCsvWithAFTrack"))
     suite.addTest(TestTrackReader("testReadCsvDir"))
     suite.addTest(TestTrackReader("testReadCsvSelect"))
+    suite.addTest(TestTrackReader("test_read_csv_verbose"))
 
     # WKT
     suite.addTest(TestTrackReader("test_read_wkt_polygon"))
@@ -331,6 +361,9 @@ if __name__ == '__main__':
     suite.addTest(TestTrackReader("test_read_gpx_dir"))
     #suite.addTest(TestTrackReader("testReadGpxWithAF"))
     suite.addTest(TestTrackReader("test_read_millisecond"))
+
+    # for resource
+    suite.addTest(TestTrackReader("test_format_astring"))
 
     runner = TextTestRunner()
     runner.run(suite)

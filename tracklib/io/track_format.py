@@ -310,19 +310,19 @@ class TrackFormat:
             sep = sep.replace(";", "s")
         
             out  = str(self.name) +", "
-            out  = str(self.ext) +", "
+            out += str(self.ext) +", "
             out += str(self.id_E) +", "
             out += str(self.id_N) +", "
-            out  = str(self.id_U) +", "
-            out  = str(self.id_T) +", "
-            out  = str(self.time_ini) +", "
+            out += str(self.id_U) +", "
+            out += str(self.id_T) +", "
+            out += str(self.time_ini) +", "
             out += str(sep) +", "
             out += str(self.header) +", "
             out += str(self.cmt) +", "
-            out += str(self.no_data) +", "
-            out += str(self.srid)
+            out += str(self.no_data_value) +", "
+            out += str(self.srid) + ", "
             out += str(self.time_fmt) +", "
-            out += str(self.read_all) +", "
+            out += str(self.read_all)
             return out
         raise UnknownModeError("No resource mode for WKT and GPX files")
 
