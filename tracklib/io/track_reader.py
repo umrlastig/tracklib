@@ -644,7 +644,7 @@ class TrackReader:
         return TrackReader.readFromFile(path, track_format, verbose)
 
     @staticmethod
-    def readFromGpx(path:str, 
+    def readFromGpx(path:str,
             srid:Literal["GEO", "ENU"] ="GEO", 
             type: Literal["trk", "rte"]="trk",
             read_all=False, verbose=False) -> TrackCollection:
