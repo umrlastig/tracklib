@@ -100,8 +100,12 @@ def generate (x_t=0.3, y_t=None, z_t=None, date_ini=None, date_fin=None, dt=None
     if randomTrack:
         track = track.noise(50, kernel)
     if verbose:
-        print("Generated track from", date_ini, "to", date_fin, "["+str(len(track))+" pts]")
-    
+        if track.getSRID() == 'ENU':
+            info = "[" + str(len(track)) + " pts, " + str(round(track.length(),2)) + "m]"
+            print("Generated track from", date_ini, "to", date_fin, info)
+        else:
+            print("Generated track from", date_ini, "to", date_fin, "["+str(len(track))+" pts]")
+
     return track
 
 
