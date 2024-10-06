@@ -626,6 +626,55 @@ class TrackReader:
 #             print ('path is not a file, not a dir')
 #             return None
 
-    
-    
-        
+
+    @staticmethod
+    def readFromWkt(path:str, id_geom, id_user=-1, id_track=-1,
+                        separator=";", h=0, srid="ENUCoords",
+                        bboxFilter=None, 
+                        doublequote:bool=False, 
+                        verbose=False):
+        track_format = TrackFormat({'ext': 'WKT',
+                                    'id_wkt': id_geom,
+                                    'id_user': id_user,
+                                    'id_track': id_track,
+                                    'separator': separator,
+                                    'header': h,
+                                    'srid': srid,
+                                    'doublequote': doublequote})
+        return TrackReader.readFromFile(path, track_format, verbose)
+
+    @staticmethod
+    def readFromGpx(path:str, 
+            srid:Literal["GEO", "ENU"] ="GEO", 
+            type: Literal["trk", "rte"]="trk",
+            read_all=False, verbose=False) -> TrackCollection:
+        track_format = TrackFormat({'ext': 'GPX',
+                                    'type': type,
+                                    'srid': srid,
+                                    'read_all': read_all})
+        return TrackReader.readFromFile(path, track_format, verbose)
+
+    @staticmethod
+    def readFromCsv (path: str,
+                     id_E:int=-1, id_N:int=-1, id_U:int=-1, id_T:int=-1,
+                     separator:str=",", DateIni=-1,  timeUnit=1,   h=0,
+                     com="#", no_data_value=-999999, srid="ENUCoords",
+                     read_all=False, selector=None, verbose=False):
+        track_format = TrackFormat({'ext': 'CSV',
+                                    'id_E': id_E,
+                                    'id_N': id_N,
+                                    'id_U': id_U,
+                                    'id_T': id_T,
+                                    'separator': separator,
+                                    'time_ini': DateIni,
+                                    'time_unit': timeUnit,
+                                    'header': h,
+                                    'com': com,
+                                    'no_data_value': no_data_value,
+                                    'srid': srid,
+                                    'read_all': read_all,
+                                    'selector': selector})
+        return TrackReader.readFromFile(path, track_format, verbose)
+
+
+
