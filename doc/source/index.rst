@@ -29,9 +29,8 @@ Welcome to tracklib’s documentation!
                    :alt Software License
 				   :target https://github.com/umrlastig/tracklib/blob/main/LICENCE
 .. |PyPIVersion| image:: https://img.shields.io/pypi/v/tracklib.svg
-                   :alt PyPI Version
-           :target https://pypi.python.org/pypi/tracklib/
-
+                       :alt PyPI Version
+                       :target https://pypi.python.org/pypi/tracklib/
 
 Background
 ***********
