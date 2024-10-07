@@ -95,10 +95,13 @@ class Raster:
         self.ncol = math.ceil(ax / resolution[0])
         self.nrow = math.ceil(ay / resolution[1])
 
+        #self.xsize = ax / resolution[0]
+        #self.ysize = ay / resolution[1]
+        #print (self.xsize, self.ysize)
+
         self.__noDataValue = novalue
 
         self.__afmaps = {}
-
 
     def bbox(self):
         return self.__bbox
@@ -120,6 +123,8 @@ class Raster:
 
     def getNoDataValue(self):
         return self.__noDataValue
+    def setNoDataValue(self, novalue):
+        self.__noDataValue = novalue
 
     def __str__(self):
         output  = "-------------------------------------\n"
@@ -190,6 +195,9 @@ class Raster:
         idx = (float(coord.getX()) - self.xmin) / self.resolution[0]
         idy = (self.nrow-1) - (float(coord.getY()) - self.ymin) / self.resolution[1]
 
+        #idx = (float(coord.getX()) - self.xmin) / self.xsize
+        #idy = (float(coord.getY()) - self.ymin) / self.ysize
+
         # Cas des bordures
         if idx == self.ncol:
             column = math.floor(idx) - 1
@@ -202,7 +210,9 @@ class Raster:
             line = int(idy) + 1
         else:
             line = math.floor(idy) + 1 # il faut arrondir par le dessus!
-    
+
+        #line = math.floor(idy)
+        #column = math.floor(idx)
         return (column, line)
 
 
@@ -250,6 +260,7 @@ class Raster:
             else:
                 AFs.add(mapname)
 
+        # On initialise le dictionnaire qui va contenir toutes les valeurs
         self.collectionValuesGrid = {}
         for afname in AFs:
             self.collectionValuesGrid[afname] = []
@@ -271,16 +282,17 @@ class Raster:
                 for i in range(trace.size()):
                     obs = trace.getObs(i)
                     (column, line) = self.getCell(obs.position)
+                    #print (column, line, obs.position)
 
-                    if (0 <= column and column <= self.ncol
-                        and 0 <= line and line <= self.nrow):
+#                    if (0 <= column and column <= self.ncol
+#                        and 0 <= line and line <= self.nrow):
 
-                        if afname != "uid":
-                            val = trace.getObsAnalyticalFeature(afname, i)
-                        else:
-                            val = trace.uid
+                    if afname != "uid":
+                        val = trace.getObsAnalyticalFeature(afname, i)
+                    else:
+                        val = trace.uid
 
-                        self.collectionValuesGrid[afname][line][column].append(val)
+                    self.collectionValuesGrid[afname][line][column].append(val)
 
 
 
@@ -353,29 +365,34 @@ class AFMap:
 
 
     def plotAsGraphic(self, backgroundcolor="lightcyan", bordercolor="lightgray"):   
-        """ Plot as vector grid. """
+        """ 
+        Plot as vector grid. 
+        """
         fig = plt.figure()
-        ax = fig.add_subplot(
-            111,
-            xlim=(self.raster.xmin, self.raster.xmax),
-            ylim=(self.raster.ymin, self.raster.ymax)
-        )
+        ax = fig.add_subplot(111)
     
-        for i in range(1, self.raster.ncol):
+        for i in range(0, self.raster.ncol):
             xi = i * self.raster.resolution[0] + self.raster.xmin
             ax.plot([xi, xi], [self.raster.ymin, self.raster.ymax], "-", color=bordercolor)
-        for j in range(1, self.raster.nrow):
+
+        for j in range(0, self.raster.nrow):
             yj = j * self.raster.resolution[1] + self.raster.ymin
             ax.plot([self.raster.xmin, self.raster.xmax], [yj, yj], "-", color=bordercolor)
 
-        for i in range(self.raster.nrow):
-            y1 = self.raster.ymin + (self.raster.nrow - 1 - i) * self.raster.resolution[1]
-            y2 = self.raster.ymin + (self.raster.nrow - i) * self.raster.resolution[1]
-            for j in range(self.raster.ncol):
-                x1 = self.raster.xmin + j * self.raster.resolution[0]
+
+        for j in range(self.raster.nrow):
+            ysize = self.raster.resolution[1]
+            y1 = self.raster.ymin + (self.raster.nrow - 1 - j) * ysize
+            y2 = self.raster.ymin + (self.raster.nrow - j) * ysize
+
+            for i in range(self.raster.ncol):
+                xsize = self.raster.resolution[0]
+                x1 = self.raster.xmin + i * xsize
                 x2 = x1 + self.raster.resolution[0]
 
-                if self.grid[i][j] != NO_DATA_VALUE:
+                if self.grid[j][i] != NO_DATA_VALUE:
+                    pass
+                    '''
                     polygon = plt.Polygon(
                         [[x1, y1], [x2, y1], [x2, y2], [x1, y2], [x1, y1]]
                     )
@@ -387,11 +404,11 @@ class AFMap:
                     xm = (x2 - x1) / 2
                     ym = (y2 - y1) / 2
                     plt.text(x1 + xm, y1 + ym, val, **text_kwargs)
-
+                    '''
         plt.title(self.getName())
 
 
-    def plotAsImage(self, append=False, 
+    def plotAsImage(self, append=False,
                     color1 = (0, 0, 0), color2 = (255, 255, 255),
                     novaluecolor='white'):
         """ Plot raster band as an image. """
@@ -442,42 +459,52 @@ class AFMap:
 
 
 
-    def upSampling(self, resolution, name='Upsampling') -> AFMap:
-        '''
-        Interpolation Methods for Upsampling:
-            - Nearest Neighbor: this method involves duplicating the existing 
-                                pixels to create new ones.
-        '''
+    # def upSampling(self, resolution, name='Upsampling') -> AFMap:
+    #     '''
+    #     Interpolation Methods for Upsampling:
+    #         - Nearest Neighbor: this method involves duplicating the existing 
+    #                             pixels to create new ones.
+    #     '''
 
-        if not isinstance(self.__bbox.ur, ENUCoords):
-            raise CoordTypeError('Only ENU coordinates system implemented')
+    #     if not isinstance(self.__bbox.ur, ENUCoords):
+    #         raise CoordTypeError('Only ENU coordinates system implemented')
 
-        if self.XPixelSize != self.YPixelSize:
-            raise SizeError('cells must be square.')
+    #     if self.XPixelSize != self.YPixelSize:
+    #         raise SizeError('cells must be square.')
 
 
-        newafmap = AFMap(self.__bbox,
-                            resolution=(resolution[0], resolution[1]),
-                            margin=0,
-                            novalue=self.__noDataValue,
-                            name=name, verbose=False)
+    #     newafmap = AFMap(self.__bbox,
+    #                         resolution=(resolution[0], resolution[1]),
+    #                         margin=0,
+    #                         novalue=self.__noDataValue,
+    #                         name=name, verbose=False)
 
-        '''
-        # Il faut aussi une résoltion proportionnelle entre les deux rasters
-        N = int (self.XPixelSize / new_grid.XPixelSize)
-        if int(N - (self.XPixelSize / new_grid.XPixelSize)) != 0.0:
-            raise SizeError('Two grids resolution not proportional')
-        # print ('N =', N)
+    #     '''
+    #     # Il faut aussi une résoltion proportionnelle entre les deux rasters
+    #     N = int (self.XPixelSize / new_grid.XPixelSize)
+    #     if int(N - (self.XPixelSize / new_grid.XPixelSize)) != 0.0:
+    #         raise SizeError('Two grids resolution not proportional')
+    #     # print ('N =', N)
 
-        if interpolation == MODE_NEAREST_NEIGHBOR:
-            for i in range(self.nrow):
-                for j in range(self.ncol):
-                    v = self.grid[i][j]
-                    for k in range(0, N):
-                        for l in range(0, N):
-                            new_grid.grid[i*N + k][j*N + l] = v
-            return new_grid
+    #     if interpolation == MODE_NEAREST_NEIGHBOR:
+    #         for i in range(self.nrow):
+    #             for j in range(self.ncol):
+    #                 v = self.grid[i][j]
+    #                 for k in range(0, N):
+    #                     for l in range(0, N):
+    #                         new_grid.grid[i*N + k][j*N + l] = v
+    #         return new_grid
 
-        '''
-        return None
+    #     '''
+    #     return None
+
+
+    # def asNumpy(self) -> np.ndarray:
+    #     '''
+    #     Returns the grid converted in numpy array
+    #     '''
+    #     return np.array(self.grid, dtype=np.float32)
+
+
+
 

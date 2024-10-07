@@ -16,6 +16,7 @@ class TestRasterReader(TestCase):
         raster = RasterReader.readFromAscFile(csvpath, name='MNT')
 
         grid = raster.getAFMap(0)
+        grid.plotAsGraphic()
         self.assertEqual('MNT', grid.getName())
 
         self.assertEqual(1000, raster.nrow)

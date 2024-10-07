@@ -41,7 +41,7 @@ knowledge of the CeCILL-C license and that you accept its terms.
 
 
 
-Moduke to manage mapping of GPS tracks on geographic features
+Module to manage mapping of GPS tracks on geographic features
 
 """
 
