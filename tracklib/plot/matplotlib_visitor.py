@@ -82,7 +82,7 @@ class MatplotlibVisitor(IPlotVisitor):
     
     def plotTrackAsMarkers(
         self, track, size=8, frg="k", bkg="w", sym_frg="+", sym_bkg="o", 
-        type=None, append=True
+        type=None, label='', append=True
     ):
         """TODO"""
         
@@ -135,14 +135,16 @@ class MatplotlibVisitor(IPlotVisitor):
                 bkg = "w"
                 sym_frg = r'$\bowtie$'  # clubsuit
                 sym_bkg = "o"    
-            
 
-        ax1.plot(track.getX(), track.getY(), marker=sym_bkg, color=frg, 
+        if label== '':
+            label = '_nolegend_'
+
+        ax1.plot(track.getX(), track.getY(), marker=sym_bkg, color=frg,
                  markersize=size, linestyle='None')
         ax1.plot(track.getX(), track.getY(), marker=sym_bkg, color=bkg, 
                  markersize=int(0.8 * size), linestyle='None')
         ax1.plot(track.getX(), track.getY(), marker=sym_frg, color=frg, 
-                 markersize=int(0.8 * size), linestyle='None')
+                 markersize=int(0.8 * size), linestyle='None', label=label)
         
         return ax1
     

@@ -55,7 +55,7 @@ class IPlotVisitor(ABC):
     @abstractmethod
     def plotTrackAsMarkers(
         self, track, size=8, frg="k", bkg="w", sym_frg="+", sym_bkg="o", type=None, 
-        append=True
+        label='', append=True
     ):
         """
         Plot a track as markers.

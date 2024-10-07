@@ -1488,12 +1488,12 @@ class Track:
     # =========================================================================
     def plotAsMarkers(
         self, size=8, frg="k", bkg="w", sym_frg="+", sym_bkg="o", type=None, 
-        append=True, v:IPlotVisitor=None
+        label='', append=True, v:IPlotVisitor=None
     ):
         """TODO"""
         if v == None:
             v = MatplotlibVisitor()
-        return v.plotTrackAsMarkers(self, size, frg, bkg, sym_frg, sym_bkg, type, append)
+        return v.plotTrackAsMarkers(self, size, frg, bkg, sym_frg, sym_bkg, type, label, append)
     
     def plotEllipses(self, sym="r-", factor=3, af=None, append=True,
                      v:IPlotVisitor=None):
