@@ -135,6 +135,8 @@ class TrackReader:
                 trace = TrackReader.readFromFile(p, track_format, verbose)
                 if trace is None:
                     continue
+                if trace.size() <= 0:
+                    continue
 
                 if not fmt.selector is None:
                     if not fmt.selector.contains(trace):
@@ -142,6 +144,10 @@ class TrackReader:
 
                 if isinstance(trace, TrackCollection):
                     for i in range(trace.size()):
+                        if trace[i] is None:
+                            continue
+                        if trace[i].size() <= 0:
+                            continue
                         TRACES.addTrack(trace[i])
                 else:
                     TRACES.addTrack(trace)
