@@ -63,7 +63,7 @@ from tracklib.core import (isnan,
 from tracklib.util import AnalyticalFeatureError, CoordTypeError, SizeError, WrongArgumentError
 
 
-NO_DATA_VALUE = -9999
+NO_DATA_VALUE = -99999.0
 
 
 class Raster:
