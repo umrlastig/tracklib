@@ -22,21 +22,24 @@ to get you using tracklib productively as quickly as possible.
     UG_ShapeMeasures    
     
     UG_Selection
-    segmentation/UG_Segmentation
-    segmentation/UG_ReturnTrip
-    comparison/UG_Comparison
+    UG_Segmentation
+    UG_ReturnTrip
+    UG_Stdbscan
     
     UG_Synthetics
     UG_Simplification
     UG_Interpolation
     UG_Filtering
 
-    segmentation/UG_Stdbscan        
-    mapping/UG_MapMatchingOnNetwork
-    mapping/UG_MapOnRaster
-    summarising/UG_AFMap
+    UG_MapMatchingOnNetwork
+    UG_MapOnRaster
+    UG_MapOn
+    UG_AFMap
 
-    comparison/UG_Matching
-    comparison/UG_Fusion
-    
-  
+    UG_Matching
+    UG_Fusion
+    UG_Noise
+..     comparison/UG_Comparison  
+
+
+.. Example Gallery
