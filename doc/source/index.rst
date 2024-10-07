@@ -25,12 +25,13 @@ Welcome to tracklib’s documentation!
 .. |codecov| image:: https://codecov.io/gh/umrlastig/tracklib/branch/main/graph/badge.svg?token=pHLaV21j2O
                    :alt: Code coverage
                    :target: https://codecov.io/gh/umrlastig/tracklib
-.. |rtd| image:: https://readthedocs.org/projects/tracklib/badge/?version=latest
-               :alt: Documentation status
-               :target: https://tracklib.readthedocs.io/en/latest/?badge=latest
 .. |licence| image:: https://img.shields.io/badge/Licence-Cecill--C-blue.svg?style=flat
                    :alt Software License
 				   :target https://github.com/umrlastig/tracklib/blob/main/LICENCE
+.. |PyPI Version| image:: https://img.shields.io/pypi/v/tracklib.svg
+                   :alt PyPI
+           :target https://pypi.python.org/pypi/tracklib/
+
 
 Background
 ***********
