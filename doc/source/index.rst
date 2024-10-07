@@ -17,20 +17,17 @@ Welcome to tracklib’s documentation!
 :View the source code of tracklib: https://github.com/umrlastig/tracklib
 
 
-|TracklibBuildTest| |codecov| |licence| |PyPIVersion|
+|TracklibBuildTest| |codecov| |licence|
 
 .. |TracklibBuildTest| image:: https://github.com/umrlastig/tracklib/actions/workflows/ci.yml/badge.svg
-                  :alt: Tracklib build & test
-                  :target: https://github.com/umrlastig/tracklib/actions/workflows/ci.yml
+                             :alt: Tracklib build & test
+                             :target: https://github.com/umrlastig/tracklib/actions/workflows/ci.yml
 .. |codecov| image:: https://codecov.io/gh/umrlastig/tracklib/branch/main/graph/badge.svg?token=pHLaV21j2O
                    :alt: Code coverage
                    :target: https://codecov.io/gh/umrlastig/tracklib
 .. |licence| image:: https://img.shields.io/badge/Licence-Cecill--C-blue.svg?style=flat
                    :alt Software License
-				   :target https://github.com/umrlastig/tracklib/blob/main/LICENCE
-.. |PyPIVersion| image:: https://img.shields.io/pypi/v/tracklib.svg
-                       :alt PyPI Version
-                       :target https://pypi.python.org/pypi/tracklib/
+                   :target https://github.com/umrlastig/tracklib/blob/main/LICENCE
 
 Background
 ***********
