@@ -28,8 +28,8 @@ Welcome to tracklib’s documentation!
 .. |licence| image:: https://img.shields.io/badge/Licence-Cecill--C-blue.svg?style=flat
                    :alt Software License
 				   :target https://github.com/umrlastig/tracklib/blob/main/LICENCE
-.. |PyPI Version| image:: https://img.shields.io/pypi/v/tracklib.svg
-                   :alt PyPI
+.. |PyPIVersion| image:: https://img.shields.io/pypi/v/tracklib.svg
+                   :alt PyPI Version
            :target https://pypi.python.org/pypi/tracklib/
 
 
