@@ -410,7 +410,7 @@ class AFMap:
 
     def plotAsImage(self, append=False,
                     color1 = (0, 0, 0), color2 = (255, 255, 255),
-                    novaluecolor='white'):
+                    novaluecolor='white', cmap=None):
         """ Plot raster band as an image. """
       
         if isinstance(append, bool):
@@ -427,8 +427,10 @@ class AFMap:
         if self.raster.getNoDataValue() != None:
             tab[tab == self.raster.getNoDataValue()] = np.nan
 
-        cmap = getOffsetColorMap(color1, color2, 0)
-        cmap.set_bad(color=novaluecolor)
+        if cmap is None:
+            cmap = getOffsetColorMap(color1, color2, 0)
+            cmap.set_bad(color=novaluecolor)
+
 
         im = ax1.imshow(tab, cmap=cmap)
         ax1.set_title(self.getName())
