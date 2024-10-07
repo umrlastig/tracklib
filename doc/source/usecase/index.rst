@@ -23,6 +23,8 @@ library.
     Switchbacks
     Summarize
     Quickstart
+
+.. AggregatedTrajectory    
     
 
 .. note::
