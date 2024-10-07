@@ -63,10 +63,10 @@ Documentation
   :maxdepth: 2
   
   Getting Started <started/index>
-  User Guide <userguide/index>
   Quick Examples <userguide/gallery>
   Use Cases <usecase/index>
-
+  
+.. User Guide <userguide/index>
 
 
 
@@ -76,6 +76,7 @@ Documentation
 .. * Structured data to store GPS data
 .. * Load GPS data from files (GPX, CSV) 
 .. * Operation classes for manipulating track
+
 .. * Propose generic method to simplify a track. For example (Douglas Peucker, 
 .. Visvalingram algorithms or kernel Filter (Gaussian, Uniform, Dirac, etc.)).
 .. * Resample, interpolation and smoothing functions
