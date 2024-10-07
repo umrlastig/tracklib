@@ -17,7 +17,7 @@ Welcome to tracklib’s documentation!
 :View the source code of tracklib: https://github.com/umrlastig/tracklib
 
 
-|TracklibBuildTest| |codecov| |rtd| |licence|
+|TracklibBuildTest| |codecov| |licence| |PyPIVersion|
 
 .. |TracklibBuildTest| image:: https://github.com/umrlastig/tracklib/actions/workflows/ci.yml/badge.svg
                   :alt: Tracklib build & test
