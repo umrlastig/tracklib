@@ -631,7 +631,7 @@ class TrackReader:
     def readFromWkt(path:str, id_geom, id_user=-1, id_track=-1,
                         separator=";", h=0, srid="ENUCoords",
                         bboxFilter=None, 
-                        doublequote:bool=False, 
+                        doublequote:bool=False,
                         verbose=False):
         track_format = TrackFormat({'ext': 'WKT',
                                     'id_wkt': id_geom,
