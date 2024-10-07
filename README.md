@@ -16,8 +16,7 @@
 [![Supported Python Versions](https://img.shields.io/pypi/pyversions/tracklib.svg)](https://www.python.org/downloads/)
 [![PyPI Version](https://img.shields.io/pypi/v/tracklib.svg)](https://pypi.python.org/pypi/tracklib/)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/tracklib?color=blue)](https://pypistats.org/packages/tracklib)
-[![zenodo](https://zenodo.org/badge/DOI/10.5281/zenodo.10065979.svg)](https://doi.org/10.5281/zenodo.10065979)
-
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13899752.svg)](https://doi.org/10.5281/zenodo.13899752)
 
 
 More and more datasets of GPS trajectories are now available and they are studied very frequently in many scientific domains. Currently available Python libraries for trajectories can separately load, simplify, interpolate, summarize or visualize them. But, as far as we know, there is no Python library that would contain all these basic functionalities. This is what tracklib is modestly trying to do. The library provides  some conventions, capabilities and techniques to manipulate GPS trajectories.
