@@ -33,8 +33,11 @@ In tracklib, the core model supports a wide range of trajectory  applications:
 
 Furthermore, adding analytical features (e.g. speed, curvilinear abscissa, inflection point, heading, acceleration, speed change, etc.) on a observation or on all observations of a trajectory (function of coordinates or timestamp) is, in general, a complex and a boring task. So, to make it easier, _Tracklib_ module offers a multitude of operators and  predicates to simplify the creation of analytical features on a GPS tracks.
 
+## Documentation
 
-The official documentation is available at **[ReadTheDocs](https://tracklib.readthedocs.io)**
+The official online documentation is available at **[ReadTheDocs](https://tracklib.readthedocs.io)**
+
+In particular, the docs include an **[example gallery](https://tracklib.readthedocs.io/en/latest/userguide/gallery.html) ** and some **[Use cases](https://tracklib.readthedocs.io/en/latest/usecase/index.html)**
 
 ## Installation
 
@@ -50,12 +53,19 @@ If you use tracklib, please cite the following references:
 
 Yann Méneroux, Marie-Dominique van Damme. Tracklib: a python library with a variety of tools, operators and functions to manipulate GPS trajectories. 2022, [HAL Id](https://hal.science/hal-04356178v1)
 
+
+## Scientific papers whose experiments use the Tracklib library
+<ul>
+<li>Méneroux, Y., Maidaneh Abdi, I., Le Guilcher, A., & Olteanu-Raimond, A. M. (2022). Is the radial distance really a distance? An analysis of its properties and interest for the matching of polygon features. International Journal of Geographical Information Science, 37(2), 438–475. https://doi.org/10.1080/13658816.2022.2123487</li>
+</ul>
+
+
 ## About
 
 |                |                                                           |
 | -------------- | --------------------------------------------------------- |
 | _version_      | See [pypi](https://pypi.org/project/tracklib/#history)    |
-| _status_       | Since 2020 November 1st, 2020                             |
+| _status_       | Active since 2020 November 1st, 2020                      |
 | _license_      | Cecill C                                                  |
 
 ## Development
