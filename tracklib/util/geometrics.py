@@ -669,9 +669,9 @@ def __circle(p1, p2=None, p3=None):
                 argmin = i
         return CANDIDATS[argmin]
 
-    x = np.complex(p1.getX(), p1.getY())
-    y = np.complex(p2.getX(), p2.getY())
-    z = np.complex(p3.getX(), p3.getY())
+    x = complex(p1.getX(), p1.getY())
+    y = complex(p2.getX(), p2.getY())
+    z = complex(p3.getX(), p3.getY())
 
     w = z - x
     w /= y - x
