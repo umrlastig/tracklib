@@ -142,8 +142,6 @@ class TrackFormat:
             # Features updated from file
             self.createFromFile(name)
 
-
-
     def createFromDict(self, param):
         """TODO"""
         list_of_fields = []

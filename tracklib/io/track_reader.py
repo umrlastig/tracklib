@@ -645,7 +645,7 @@ class TrackReader:
 
     @staticmethod
     def readFromGpx(path:str,
-            srid:Literal["GEO", "ENU"] ="GEO", 
+            srid: Literal["GEO", "ENU"] ="GEO", 
             type: Literal["trk", "rte"]="trk",
             read_all=False, verbose=False) -> TrackCollection:
         track_format = TrackFormat({'ext': 'GPX',
