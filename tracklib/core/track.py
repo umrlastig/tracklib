@@ -1140,9 +1140,9 @@ class Track:
         if "X" in code:
             same = same and (self[k1].position.getX() == self[k2].position.getX())
         if "Y" in code:
-            same = same and (self[k1].position.getX() == self[k2].position.getX())
+            same = same and (self[k1].position.getY() == self[k2].position.getY())
         if "Z" in code:
-            same = same and (self[k1].position.getX() == self[k2].position.getX())
+            same = same and (self[k1].position.getZ() == self[k2].position.getZ())
         if "T" in code:
             same = same and (self[k1].timestamp - self[k2].timestamp == 0)
         if "AF" in code:
