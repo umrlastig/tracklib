@@ -18,13 +18,14 @@ library.
     :glob:
     :reversed:
 
+    AggregatedTrajectory
     StopPoints
     KalmanFiltering
     Switchbacks
     Summarize
     Quickstart
 
-.. AggregatedTrajectory    
+
     
 
 .. note::
