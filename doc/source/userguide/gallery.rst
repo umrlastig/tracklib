@@ -38,7 +38,8 @@ to get you using tracklib productively as quickly as possible.
 
     UG_Matching
     UG_Fusion
-    UG_Noise
+    UG_SyntheticRealistic
+    UG_IllustrateNoiseModel
 ..     comparison/UG_Comparison  
 
 
