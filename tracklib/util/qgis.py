@@ -39,12 +39,12 @@ The fact that you are presently reading this means that you have had
 knowledge of the CeCILL-C license and that you accept its terms.
 """
 
-from tracklib import Track, TrackCollection
+from tracklib import Track, TrackCollection, ENUCoords, ObsTime, Obs
 
 try:
     from qgis.PyQt.QtCore import QVariant
     from qgis.core import QgsProject, QgsVectorLayer, QgsField
-    from qgis.core import QgsPointXY, QgsFeature, QgsGeometry
+    from qgis.core import QgsPointXY, QgsFeature, QgsGeometry, QgsWkbTypes
     from qgis.core import QgsMarkerSymbol, QgsLineSymbol, QgsSimpleLineSymbolLayer
     #from qgis.core import QgsFillSymbol
     from PyQt5.QtGui import QColor
@@ -464,6 +464,31 @@ class QGIS:
         layerMatching.renderer().setSymbol(symbolL)
 
         QgsProject.instance().addMapLayer(layerMatching)
+
+    @staticmethod
+    def layerToTrack(layer):
+        track = Track()
+
+        if layer.wkbType() == QgsWkbTypes.Point:
+            for f in layer.getFeatures():
+                pt = f.geometry().asPoint()
+                time = ObsTime()
+                E = pt.x()
+                N = pt.y()
+                point = Obs(ENUCoords(E, N, 0), time)
+                track.addObs(point)
+
+        if layer.wkbType() == QgsWkbTypes.LineString:
+            for f in layer.getFeatures():
+                ligne = f.geometry()
+                for vertex in ligne.vertices():
+                    time = ObsTime()
+                    E = vertex.x()
+                    N = vertex.y()
+                    point = Obs(ENUCoords(E, N, 0), time)
+                    track.addObs(point)
+
+        return track
 
 
 '''
