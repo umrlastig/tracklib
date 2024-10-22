@@ -379,7 +379,7 @@ class TestTrack(TestCase):
         self.trace2.summary()
         
         wkt = self.trace1.toWKT()
-        self.assertEquals(wkt, "LINESTRING(1.0 5.0)")
+        self.assertEqual(wkt, "LINESTRING(1.0 5.0)")
         
     
     def test_create_and_init_af(self):
