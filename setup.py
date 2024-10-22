@@ -5,14 +5,14 @@ from setuptools import setup
 current_path = os.path.abspath(os.path.dirname(__file__))
 
 requirements = (
-        "numpy==1.23.5", 
+        "numpy", 
         "matplotlib", 
         "scikit-image", 
         "progressbar2"
 )
 
 dev_requirements = (
-        "numpy==1.23.5", 
+        "numpy", 
         "pytest", 
         "pytest-runner", 
         "coverage"
