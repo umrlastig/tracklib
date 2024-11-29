@@ -57,6 +57,7 @@ Yann Méneroux, Marie-Dominique van Damme. Tracklib: a python library with a var
 ## Scientific papers whose experiments use the Tracklib library
 <ul>
 <li>Méneroux, Y., Maidaneh Abdi, I., Le Guilcher, A., & Olteanu-Raimond, A. M. (2022). Is the radial distance really a distance? An analysis of its properties and interest for the matching of polygon features. International Journal of Geographical Information Science, 37(2), 438–475. https://doi.org/10.1080/13658816.2022.2123487</li>
+<li>Marie-Dominique Van Damme, Yann Méneroux, and Ana-Maria Olteanu-Raimond. 2024. A metrological analysis of a modular and iterative aggregation algorithm of GNSS trajectories. In Proceedings of the 32nd ACM International Conference on Advances in Geographic Information Systems (SIGSPATIAL '24). Association for Computing Machinery, New York, NY, USA, 633–636. https://doi.org/10.1145/3678717.3691325</li>
 </ul>
 
 
