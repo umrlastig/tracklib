@@ -436,39 +436,13 @@ class TrackReader:
                 if len(fields) <= 0:
                     continue
 
-                track = Track()
+                wkt = fields[fmt.id_wkt]
+                track = TrackReader.parseWkt(wkt)
+
                 if fmt.id_user >= 0:
                     track.uid = fields[fmt.id_user]
                 if fmt.id_track >= 0:
                     track.tid = fields[fmt.id_track]
-
-                wkt = fields[fmt.id_wkt]
-                if wkt[0:4] == "POLY":
-                    wkt = fields[fmt.id_wkt].split("((")[1].split("))")[0]
-                    wkt = wkt.split(",")
-                elif wkt[0:4] == "LINE":
-                    wkt = fields[fmt.id_wkt].split("(")[1].split(")")[0]
-                    wkt = wkt.split(",")
-                elif wkt[0:7] == "MULTIPO":
-                    wkt = fields[fmt.id_wkt].split("((")[1].split("))")[0]
-                    wkt = wkt.split(",")
-                    if wkt[0] == "(":
-                        wkt = wkt[1:]
-                    wkt = wkt.split("),(")[0]  # Multipolygon not handled yet
-                else:
-                    raise WrongArgumentError("This type of wkt is not yet implemented.")
-
-                for s in wkt:
-                    sl = s.strip().split(" ")
-                    x = float(sl[0])
-                    y = float(sl[1])
-                    if len(sl) == 3:
-                        z = float(sl[2])
-                    else:
-                        z = 0.0
-                        
-                    point = Obs(makeCoords(x, y, z, fmt.srid.upper()), ObsTime())
-                    track.addObs(point)
 
                 if not fmt.selector is None:
                     if not fmt.selector.contains(track):
@@ -479,6 +453,62 @@ class TrackReader:
                     print(len(TRACES), " wkt tracks loaded")
 
         return TRACES
+
+
+    @staticmethod
+    def parseWkt(wkt:str) -> Track:
+        """
+        Read track from a str, with geometry provided in wkt. 
+        Only LineString and Polygon are handled yet.
+
+        Parameters
+        ----------
+        wkt : TYPE
+            DESCRIPTION.
+
+        Raises
+        ------
+        WrongArgumentError
+            DESCRIPTION.
+
+        Returns
+        -------
+        track : TYPE
+            DESCRIPTION.
+
+        """
+
+        track = Track()
+
+        wkt = wkt.upper()
+        if wkt[0:4] == "POLY":
+            wkt = wkt.split("((")[1].split("))")[0]
+            wkt = wkt.split(",")
+        elif wkt[0:4] == "LINE":
+            wkt = wkt.split("(")[1].split(")")[0]
+            wkt = wkt.split(",")
+        elif wkt[0:7] == "MULTIPO":
+            wkt = wkt.split("((")[1].split("))")[0]
+            wkt = wkt.split(",")
+            if wkt[0] == "(":
+                wkt = wkt[1:]
+            wkt = wkt.split("),(")[0]  # Multipolygon not handled yet
+        else:
+            raise WrongArgumentError("This type of wkt is not yet implemented.")
+
+        for s in wkt:
+            sl = s.strip().split(" ")
+            x = float(sl[0])
+            y = float(sl[1])
+            if len(sl) == 3:
+                z = float(sl[2])
+            else:
+                z = 0.0
+                
+            point = Obs(makeCoords(x, y, z, 'ENU'), ObsTime())
+            track.addObs(point)
+
+        return track
 
 
     # =========================================================================
