@@ -48,14 +48,14 @@ Class to manage cinematic computations on GPS tracks
 from numpy import pi
 #from tracklib.util.exceptions import *
 
-from tracklib.util import angleBetweenThreePoints, distance_to_segment
+from tracklib.util import angleBetweenThreePoints, distance_to_segment, proj_polyligne
 from . import (anglegeom,
                BIAF_SPEED, speed,
                BIAF_HEADING, heading,
                BIAF_DS, ds,
                BIAF_ABS_CURV)
 
-from tracklib.core import Operator
+from tracklib.core import Operator, Obs, ObsTime, ENUCoords
 
 
 def estimate_speed(track):
@@ -157,6 +157,17 @@ def computeCurvAbsBetweenTwoPoints(track, id_ini=0, id_fin=None):
     s = 0
     for i in range(id_ini, id_fin):
         s = s + track[i].position.distance2DTo(track[i + 1].position)
+    return s
+
+
+def computeAbsCurvAnotherPoint(track, x, y):
+    """Computes the curvilinear abscissa of the projection of a point onto a track"""
+    distmin, xproj, yproj, iproj = proj_polyligne(track.getX(), track.getY(), x, y)
+    if iproj == 0:
+        return track.getFirstObs().distanceTo(Obs(ENUCoords(xproj, yproj), ObsTime()))
+
+    d = track[iproj].distanceTo(Obs(ENUCoords(xproj, yproj), ObsTime()))
+    s = computeCurvAbsBetweenTwoPoints(track, 0, iproj) + d
     return s
 
 

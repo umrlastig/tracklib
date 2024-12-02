@@ -18,6 +18,7 @@ from tracklib import (Obs, ObsTime, ENUCoords, getColorMap,
                       computeSwitchbacks,
                       smoothed_speed_calculation,
                       computeAbsCurv,
+                      computeAbsCurvAnotherPoint,
                       estimate_heading,
                       computeAvgSpeed,
                       computeAvgAscSpeed,
@@ -271,15 +272,22 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         self.assertLessEqual(err, self.__epsilon, 'erreur pour 6')
         
         
-    def testCompareAbsCurv(self):
-        speeds1 = computeAbsCurv(self.trace1)
-        #print (speeds1)
-        
+    def testAbsCurv(self):
+        ac1 = computeAbsCurv(self.trace1)
         computeAbsCurv(self.trace1)
         for i in range(self.trace1.size()):
-            self.assertEqual(speeds1[i], 
+            self.assertEqual(ac1[i],
                 self.trace1.getObsAnalyticalFeature(BIAF_ABS_CURV, i))
-            
+
+        self.assertEqual(self.trace1.getObsAnalyticalFeature(BIAF_ABS_CURV, 0), 0)
+        self.assertEqual(self.trace1.getObsAnalyticalFeature(BIAF_ABS_CURV, 1), 10)
+        self.assertEqual(self.trace1.getObsAnalyticalFeature(BIAF_ABS_CURV, 2), 20)
+        self.assertEqual(self.trace1.getObsAnalyticalFeature(BIAF_ABS_CURV, 8), 90)
+
+        self.assertEqual(computeAbsCurvAnotherPoint(self.trace1, 1, 1), 1)
+        self.assertEqual(computeAbsCurvAnotherPoint(self.trace1, 18, 8), 28)
+        self.assertEqual(computeAbsCurvAnotherPoint(self.trace1, 57, 35), 87)
+
             
     def testEstimateHeading(self):
         
@@ -417,7 +425,7 @@ if __name__ == '__main__':
     suite.addTest(TestAlgoCinematicsMethods("testBends"))
     suite.addTest(TestAlgoCinematicsMethods("testSwitchbacks"))
     suite.addTest(TestAlgoCinematicsMethods("testSmoothedSpeedCalculation"))
-    suite.addTest(TestAlgoCinematicsMethods("testCompareAbsCurv"))
+    suite.addTest(TestAlgoCinematicsMethods("testAbsCurv"))
     suite.addTest(TestAlgoCinematicsMethods("testEstimateHeading"))
     suite.addTest(TestAlgoCinematicsMethods("testComputeNetDeniv"))
     suite.addTest(TestAlgoCinematicsMethods("testComputeAscDeniv"))
