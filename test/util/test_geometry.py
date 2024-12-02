@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
+import matplotlib.pyplot as plt
 from tracklib import (Obs, ObsTime, ENUCoords, 
                       Track, 
 #                      TimeConstraint,
@@ -9,7 +10,8 @@ from tracklib import (Obs, ObsTime, ENUCoords,
                       proj_segment,
                       proj_polyligne,
                       dist_point_droite,
-                      intersection)
+                      intersection,
+                      detect_side)
 
 
 class TestGeometry(unittest.TestCase):
@@ -166,6 +168,9 @@ class TestGeometry(unittest.TestCase):
         p  = ENUCoords(18, 8, 0)
         distmin, xproj, yproj, iproj = proj_polyligne(trace1.getX(), trace1.getY(), 
                                     p.getX(), p.getY())
+        #trace1.plot('r-')
+        #plt.plot(18, 8, 'bo')
+        #plt.xlim([-5,25])
         
         self.assertEqual(distmin, 2)
         self.assertEqual(xproj, 18)
@@ -227,8 +232,39 @@ class TestGeometry(unittest.TestCase):
         self.assertEqual(T[1].position.getX(), 15.0)
         self.assertEqual(T[1].position.getY(), 0.0)
         self.assertEqual(str(T[1].timestamp), '01/01/2018 10:30:00')
-    
-        
+
+    def testSide(self):
+        ObsTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
+
+        # Droite
+        trace1 = Track([], 1)
+        p1 = Obs(ENUCoords(0, 0, 0), ObsTime.readTimestamp("2018-01-01 10:00:00"))
+        trace1.addObs(p1)
+        p2 = Obs(ENUCoords(10, 0, 0), ObsTime.readTimestamp("2018-01-01 10:00:12"))
+        trace1.addObs(p2)
+        p3 = Obs(ENUCoords(10, 10, 0), ObsTime.readTimestamp("2018-01-01 10:00:13"))
+        trace1.addObs(p3)
+        p4 = Obs(ENUCoords(20, 10, 0), ObsTime.readTimestamp("2018-01-01 10:00:14"))
+        trace1.addObs(p4)
+
+        s = detect_side(trace1, 18, 8)
+        self.assertEqual(s, -1)
+
+        # Gauche
+        trace2 = trace1.reverse()
+        s = detect_side(trace2, 18, 8)
+        self.assertEqual(s, 1)
+
+        # Line
+        s = detect_side(trace1, 22, 10)
+        self.assertEqual(s, 0)
+
+        s = detect_side(trace1, 15, 5)
+        self.assertEqual(s, -1)
+
+
+
+
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     suite.addTest(TestGeometry("testIntersectionCelluleSegment"))
@@ -237,5 +273,6 @@ if __name__ == '__main__':
     suite.addTest(TestGeometry("testProjSegment"))
     suite.addTest(TestGeometry("testDistPointDroite"))
     suite.addTest(TestGeometry("testIntersection"))
+    suite.addTest(TestGeometry("testSide"))
     runner = unittest.TextTestRunner()
     runner.run(suite)

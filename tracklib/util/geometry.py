@@ -300,14 +300,14 @@ def proj_segment(segment, x, y):
             return distance2, x2, y2
 
 
-# ----------------------------------------
+# -----------------------------------------------
 # Fonction complète de projection entre un
-# point et une polyligne
-# Entree : polyligne, coordonnées x et y du
-# point
+#          point et une polyligne
+#
+# Entree : polyligne, coordonnées x et y du point
 # Sortie : distance du point ) la polyligne
-# et coordonnées du projeté
-# ----------------------------------------
+#          et coordonnées du projeté
+# -----------------------------------------------
 def proj_polyligne(Xp, Yp, x, y):
 
     distmin = 1e400
@@ -331,6 +331,35 @@ def proj_polyligne(Xp, Yp, x, y):
             iproj = i
 
     return distmin, xproj, yproj, iproj
+
+
+# --------------------------------------------------------------------------
+# Function to detect if a point is on left or right side of track
+# --------------------------------------------------------------------------
+# Input :
+#   - track       :: Track
+#   - x,y         :: coordinate of the point we want to detect the side
+# --------------------------------------------------------------------------
+# Output : 0 if P is on the line
+#         +1 if P is on left side of the track
+#         -1 if P is on right side of the track
+# --------------------------------------------------------------------------
+def detect_side(track, x, y):
+    # First, get the coordinate of the projected point on track
+    distmin, xproj, yproj, iproj = proj_polyligne(track.getX(), track.getY(), x, y)
+    xa = track[iproj].position.getX()
+    ya = track[iproj].position.getY()
+    xb = track[iproj+1].position.getX()
+    yb = track[iproj+1].position.getY()
+
+    pdt = (xb-xa)*(y-ya) - (yb-ya)*(x-xa)
+    if pdt > 0:
+        return 1
+    elif pdt < 0:
+        return -1
+    else:
+        return 0
+
 
 
 # --------------------------------------------------------------------------
