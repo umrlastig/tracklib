@@ -323,7 +323,6 @@ def proj_polyligne(Xp, Yp, x, y):
             continue
 
         dist, xp, yp = proj_segment([x1, y1, x2, y2], x, y)
-
         if dist < distmin:
             distmin = dist
             xproj = xp
@@ -340,26 +339,54 @@ def proj_polyligne(Xp, Yp, x, y):
 #   - track       :: Track
 #   - x,y         :: coordinate of the point we want to detect the side
 # --------------------------------------------------------------------------
-# Output : 0 if P is on the line
+# Output : list of sides
+#          0 if P is on the line
 #         +1 if P is on left side of the track
 #         -1 if P is on right side of the track
 # --------------------------------------------------------------------------
-def detect_side(track, x, y):
-    # First, get the coordinate of the projected point on track
-    distmin, xproj, yproj, iproj = proj_polyligne(track.getX(), track.getY(), x, y)
-    xa = track[iproj].position.getX()
-    ya = track[iproj].position.getY()
-    xb = track[iproj+1].position.getX()
-    yb = track[iproj+1].position.getY()
+def detect_side(track, x, y, seuilMemeProj=0.1):
+    SIDES = []
 
-    pdt = (xb-xa)*(y-ya) - (yb-ya)*(x-xa)
-    if pdt > 0:
-        return 1
-    elif pdt < 0:
-        return -1
-    else:
-        return 0
+    Xp = track.getX()
+    Yp = track.getY()
 
+    distmin = 1e400
+    INDICES = []
+    for i in range(len(Xp) - 1):
+        x1 = Xp[i]
+        y1 = Yp[i]
+        x2 = Xp[i + 1]
+        y2 = Yp[i + 1]
+        
+        if (abs(x1-x2) + abs(y1-y2) < 1e-16):
+            continue
+
+        dist, xp, yp = proj_segment([x1, y1, x2, y2], x, y)
+
+        if abs(dist - distmin) < seuilMemeProj:
+            if dist < distmin:
+                distmin = dist
+            INDICES.append(i)
+        elif dist < distmin:
+            distmin = dist
+            INDICES = []
+            INDICES.append(i)
+
+    for iproj in INDICES:
+        xa = track[iproj].position.getX()
+        ya = track[iproj].position.getY()
+        xb = track[iproj+1].position.getX()
+        yb = track[iproj+1].position.getY()
+
+        pdt = (xb-xa)*(y-ya) - (yb-ya)*(x-xa)
+        if pdt > 0:
+            SIDES.append(1)
+        elif pdt < 0:
+            SIDES.append(-1)
+        else:
+            SIDES.append(0)
+
+    return SIDES
 
 
 # --------------------------------------------------------------------------
