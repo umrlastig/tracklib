@@ -382,12 +382,14 @@ def detect_side(track, x, y, seuilMemeProj=0.1):
 
         dist, xp, yp = proj_segment([xa, ya, xb, yb], x, y)
 
+        abscurv = tracklib.computeAbsCurvAnotherPoint(track, xp, yp)
+
         if pdt > 0:
-            SIDES.append((dist, xp, yp, 1, iproj))
+            SIDES.append((dist, xp, yp, 1, abscurv))
         elif pdt < 0:
-            SIDES.append((dist, xp, yp, -1, iproj))
+            SIDES.append((dist, xp, yp, -1, abscurv))
         else:
-            SIDES.append((dist, xp, yp, 0, iproj))
+            SIDES.append((dist, xp, yp, 0, abscurv))
 
     return SIDES
 
