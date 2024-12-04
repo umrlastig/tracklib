@@ -248,26 +248,44 @@ class TestGeometry(unittest.TestCase):
         trace1.addObs(p4)
 
         s = detect_side(trace1, 18, 8)
-        self.assertEqual(s, [-1])
+        self.assertEqual(len(s), 1)
+        self.assertEqual(s[0][0], 2)
+        self.assertEqual(s[0][1], 18)
+        self.assertEqual(s[0][2], 10)
+        self.assertEqual(s[0][3], -1)
 
         # Gauche
         trace2 = trace1.reverse()
         s = detect_side(trace2, 18, 8)
-        self.assertEqual(s, [1])
+        self.assertEqual(len(s), 1)
+        self.assertEqual(s[0][0], 2)
+        self.assertEqual(s[0][1], 18)
+        self.assertEqual(s[0][2], 10)
+        self.assertEqual(s[0][3], 1)
 
         # Line
         s = detect_side(trace1, 22, 10)
-        self.assertEqual(s, [0])
+        self.assertEqual(len(s), 1)
+        self.assertEqual(s[0][0], 2)
+        self.assertEqual(s[0][1], 20)
+        self.assertEqual(s[0][2], 10)
+        self.assertEqual(s[0][3], 0)
 
         s = detect_side(trace1, 15, 5)
-        self.assertEqual(s, [-1])
+        self.assertEqual(len(s), 1)
+        self.assertEqual(s[0][0], 5)
+        self.assertEqual(s[0][1], 15)
+        self.assertEqual(s[0][2], 10)
+        self.assertEqual(s[0][3], -1)
 
         # Cas réél - Gauche
         x = 904436.02026022097561508
         y = 6435693.33668548986315727
         trace3 = TrackReader.parseWkt("LineString (904449.30000000004656613 6435691.5, 904445.59999999997671694 6435692, 904442.19999999995343387 6435692.70000000018626451, 904438.90000000002328306 6435692.40000000037252903, 904438.40000000002328306 6435692.5, 904438.40000000002328306 6435692.5, 904437.19999999995343387 6435696, 904435.59999999997671694 6435699.70000000018626451, 904434.69999999995343387 6435704, 904434 6435708.40000000037252903, 904433.5 6435712.70000000018626451, 904433.09999999997671694 6435716.79999999981373549, 904432.5 6435720.79999999981373549, 904432.09999999997671694 6435722.29999999981373549, 904432.09999999997671694 6435722.29999999981373549, 904431.30000000004656613 6435724.90000000037252903, 904428.59999999997671694 6435728.20000000018626451, 904425.40000000002328306 6435730.5, 904422.09999999997671694 6435733, 904418.80000000004656613 6435735.40000000037252903)")
         s = detect_side(trace3, x, y)
-        self.assertEqual(s, [1])
+        self.assertEqual(len(s), 1)
+        self.assertEqual(s[0][3], 1)
+
 
 
 if __name__ == '__main__':
@@ -281,3 +299,4 @@ if __name__ == '__main__':
     suite.addTest(TestGeometry("testSide"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
+

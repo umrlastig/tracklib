@@ -379,12 +379,15 @@ def detect_side(track, x, y, seuilMemeProj=0.1):
         yb = track[iproj+1].position.getY()
 
         pdt = (xb-xa)*(y-ya) - (yb-ya)*(x-xa)
+
+        dist, xp, yp = proj_segment([xa, ya, xb, yb], x, y)
+
         if pdt > 0:
-            SIDES.append(1)
+            SIDES.append((dist, xp, yp, 1))
         elif pdt < 0:
-            SIDES.append(-1)
+            SIDES.append((dist, xp, yp, -1))
         else:
-            SIDES.append(0)
+            SIDES.append((dist, xp, yp, 0))
 
     return SIDES
 
