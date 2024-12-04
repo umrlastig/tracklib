@@ -160,6 +160,7 @@ def computeCurvAbsBetweenTwoPoints(track, id_ini=0, id_fin=None):
     return s
 
 
+'''
 def computeAbsCurvAnotherPoint(track, x, y):
     """Computes the curvilinear abscissa of the projection of a point onto a track"""
     distmin, xproj, yproj, iproj = proj_polyligne(track.getX(), track.getY(), x, y)
@@ -169,7 +170,7 @@ def computeAbsCurvAnotherPoint(track, x, y):
     d = track[iproj].distanceTo(Obs(ENUCoords(xproj, yproj), ObsTime()))
     s = computeCurvAbsBetweenTwoPoints(track, 0, iproj) + d
     return s
-
+'''
 
 def computeNetDeniv(track, id_ini=0, id_fin=None):
     """Computes net denivellation (in meters)"""

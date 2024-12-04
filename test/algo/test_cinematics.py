@@ -18,7 +18,7 @@ from tracklib import (Obs, ObsTime, ENUCoords, getColorMap,
                       computeSwitchbacks,
                       smoothed_speed_calculation,
                       computeAbsCurv,
-                      computeAbsCurvAnotherPoint,
+#                      computeAbsCurvAnotherPoint,
                       estimate_heading,
                       computeAvgSpeed,
                       computeAvgAscSpeed,
@@ -284,9 +284,9 @@ class TestAlgoCinematicsMethods(unittest.TestCase):
         self.assertEqual(self.trace1.getObsAnalyticalFeature(BIAF_ABS_CURV, 2), 20)
         self.assertEqual(self.trace1.getObsAnalyticalFeature(BIAF_ABS_CURV, 8), 90)
 
-        self.assertEqual(computeAbsCurvAnotherPoint(self.trace1, 1, 1), 1)
-        self.assertEqual(computeAbsCurvAnotherPoint(self.trace1, 18, 8), 28)
-        self.assertEqual(computeAbsCurvAnotherPoint(self.trace1, 57, 35), 87)
+        #self.assertEqual(computeAbsCurvAnotherPoint(self.trace1, 1, 1), 1)
+        #self.assertEqual(computeAbsCurvAnotherPoint(self.trace1, 18, 8), 28)
+        #self.assertEqual(computeAbsCurvAnotherPoint(self.trace1, 57, 35), 87)
 
             
     def testEstimateHeading(self):
