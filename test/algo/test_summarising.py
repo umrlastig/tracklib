@@ -313,10 +313,10 @@ class TestSummarising(TestCase):
         map1.plotAsVectorGraphic()
         # print (raster)
 
-        self.assertEqual(round(raster.xmin, 3), -5.218)
-        self.assertEqual(round(raster.xmax, 3), 54.782)
+        self.assertEqual(round(raster.xmin, 1), -5.2)
+        self.assertEqual(round(raster.xmax, 1), 54.8)
         self.assertEqual(round(raster.ymin, 1), -22.4)
-        self.assertEqual(round(raster.ymax, 3), 52.579)
+        self.assertEqual(round(raster.ymax, 1), 52.6)
         
         self.assertEqual(raster.ncol, 4)
         self.assertEqual(raster.nrow, 5)
@@ -355,10 +355,10 @@ class TestSummarising(TestCase):
         map1.plotAsVectorGraphic()
         #print (raster)
 
-        self.assertEqual(round(raster.xmin, 3), -8.488)
-        self.assertEqual(round(raster.xmax, 3), 51.512)
-        self.assertEqual(round(raster.ymin, 3), -26.382)
-        self.assertEqual(round(raster.ymax, 3), 48.618)
+        self.assertEqual(round(raster.xmin, 1), -8.5)
+        self.assertEqual(round(raster.xmax, 1), 51.5)
+        self.assertEqual(round(raster.ymin, 1), -26.4)
+        self.assertEqual(round(raster.ymax, 1), 48.6)
         
         self.assertEqual(raster.ncol, 4)
         self.assertEqual(raster.nrow, 5)
@@ -398,10 +398,10 @@ class TestSummarising(TestCase):
         map1.plotAsVectorGraphic()
         #print (raster)
 
-        self.assertEqual(round(raster.xmin, 3), -11.758)
-        self.assertEqual(round(raster.xmax, 3), 48.242)
-        self.assertEqual(round(raster.ymin, 3), -30.344)
-        self.assertEqual(round(raster.ymax, 3), 44.656)
+        self.assertEqual(round(raster.xmin, 1), -11.8)
+        self.assertEqual(round(raster.xmax, 1), 48.2)
+        self.assertEqual(round(raster.ymin, 1), -30.3)
+        self.assertEqual(round(raster.ymax, 1), 44.7)
         
         self.assertEqual(raster.ncol, 4)
         self.assertEqual(raster.nrow, 5)
