@@ -63,7 +63,18 @@ from tracklib.core import (isnan,
 from tracklib.util import AnalyticalFeatureError, CoordTypeError, SizeError, WrongArgumentError
 
 
+
+# -----------------------------------------------------------------------------
+#  Value that is regarded as "missing" or "not applicable"
+# -----------------------------------------------------------------------------
 NO_DATA_VALUE = -99999.0
+
+# -----------------------------------------------------------------------------
+#
+# -----------------------------------------------------------------------------
+BBOX_ALIGN_CENTER = 1
+BBOX_ALIGN_LL= 2
+BBOX_ALIGN_UR= 3
 
 
 class Raster:
@@ -71,6 +82,7 @@ class Raster:
     def __init__(self, bbox: Bbox,
                  resolution:tuple[float, float]=(100, 100),
                  margin:float=0.05,
+                 align=BBOX_ALIGN_LL,
                  novalue:float=NO_DATA_VALUE):
         """
         
@@ -85,26 +97,35 @@ class Raster:
 
         bb = bbox.copy()
         bb.addMargin(margin)
-        self.__bbox = bb
-        (self.xmin, self.xmax, self.ymin, self.ymax) = bb.asTuple()
-        
-        self.resolution = resolution
         ax, ay = bb.getDimensions()
 
-        # Nombre de dalles par cote
+        self.resolution = resolution
+
         self.ncol = math.ceil(ax / resolution[0])
         self.nrow = math.ceil(ay / resolution[1])
 
-        #self.xsize = ax / resolution[0]
-        #self.ysize = ay / resolution[1]
-        #print (self.xsize, self.ysize)
+        if align == BBOX_ALIGN_LL:
+            (self.xmin, self.xmax, self.ymin, self.ymax) = bb.asTuple()
+            self.xmax = self.xmin + float(self.resolution[0]) * self.ncol
+            self.ymax = self.ymin + float(self.resolution[1]) * self.nrow
+        elif align == BBOX_ALIGN_CENTER:
+            diffx = (float(self.resolution[0]) * self.ncol - ax) / 2
+            self.xmin = bb.getXmin() - diffx
+            self.xmax = bb.getXmax() + diffx
+            diffy = (float(self.resolution[1]) * self.nrow - ay) / 2
+            self.ymin = bb.getYmin() - diffy
+            self.ymax = bb.getYmax() + diffy
+        elif align == BBOX_ALIGN_UR:
+            (self.xmin, self.xmax, self.ymin, self.ymax) = bb.asTuple()
+            self.xmin = self.xmax - float(self.resolution[0]) * self.ncol
+            self.ymin = self.ymax - float(self.resolution[1]) * self.nrow
+        else:
+            raise WrongArgumentError("e value of the ‘align’ parameter is not recognizd.")
 
         self.__noDataValue = novalue
 
         self.__afmaps = {}
 
-    def bbox(self):
-        return self.__bbox
 
     def countAFMap(self):
         """Return the number of bands in this raster"""
@@ -128,12 +149,15 @@ class Raster:
 
     def __str__(self):
         output  = "-------------------------------------\n"
-        output += "Raster:\n"
+        output += "Raster:                              \n"
         output += "-------------------------------------\n"
         output += "       nrows = " + str(self.nrow) + "\n"
         output += "       ncols = " + str(self.ncol) + "\n"
         output += "       XPixelSize = " + str(self.resolution[0]) + "\n"
         output += "       YPixelSize = " + str(self.resolution[1]) + "\n"
+        w = float(self.resolution[0]) * self.ncol
+        h = float(self.resolution[1]) * self.nrow
+        output += "       Extent: width = " + str(w) + ", height = " + str(h) + "\n"
         output += "   Bounding box: \n"
         output += "       Lower left corner : " + str(self.xmin) + ", " + str(self.ymin) + "\n"
         output += "       Upper right corner: " + str(self.xmax) + ", " + str(self.ymax) + "\n"
@@ -318,7 +342,11 @@ class Raster:
 
 class AFMap:
     '''
-    Represents a matrix of values: name (AF name) + array 2x2
+    Represents a named matrix of values.
+        Attributes: 
+            - name (AF name) follows template: algo_name + '#' + aggregate operator name
+            - 2D array
+            - raster which defines spatial information
     '''
 
     def __init__(self, raster, af_name, grid):
@@ -344,7 +372,6 @@ class AFMap:
         self.af_name = af_name
         self.grid = grid
     
-
     def getName(self):
         return self.af_name
 
@@ -364,21 +391,24 @@ class AFMap:
         return cle
 
 
-    def plotAsGraphic(self, backgroundcolor="lightcyan", bordercolor="lightgray"):   
+    def plotAsVectorGraphic(self, backgroundcolor="lightsteelblue", bordercolor="lightgray"):
         """ 
         Plot as vector grid. 
         """
         fig = plt.figure()
         ax = fig.add_subplot(111)
-    
-        for i in range(0, self.raster.ncol):
-            xi = i * self.raster.resolution[0] + self.raster.xmin
-            ax.plot([xi, xi], [self.raster.ymin, self.raster.ymax], "-", color=bordercolor)
 
-        for j in range(0, self.raster.nrow):
+        for i in range(0, self.raster.ncol+1):
+            xi = self.raster.xmin + i * self.raster.resolution[0]
+            y1 = self.raster.ymin
+            y2 = self.raster.ymin + self.raster.nrow * self.raster.resolution[1]
+            ax.plot([xi, xi], [y1, y2], "-", color=bordercolor)
+
+        for j in range(0, self.raster.nrow+1):
             yj = j * self.raster.resolution[1] + self.raster.ymin
-            ax.plot([self.raster.xmin, self.raster.xmax], [yj, yj], "-", color=bordercolor)
-
+            x1 = self.raster.xmin
+            x2 = self.raster.xmin + self.raster.ncol * self.raster.resolution[0]
+            ax.plot([x1, x2], [yj, yj], "-", color=bordercolor)
 
         for j in range(self.raster.nrow):
             ysize = self.raster.resolution[1]
@@ -390,21 +420,19 @@ class AFMap:
                 x1 = self.raster.xmin + i * xsize
                 x2 = x1 + self.raster.resolution[0]
 
-                if self.grid[j][i] != NO_DATA_VALUE:
-                    pass
-                    '''
+                if self.grid[j][i] != self.raster.getNoDataValue():
                     polygon = plt.Polygon(
                         [[x1, y1], [x2, y1], [x2, y2], [x1, y2], [x1, y1]]
                     )
                     ax.add_patch(polygon)
                     polygon.set_facecolor(backgroundcolor)
                     
-                    text_kwargs = dict(ha='center', va='center', fontsize=12, color='C1')
-                    val = str(round(self.grid[i][j], 2))
+                    text_kwargs = dict(ha='center', va='center', fontsize=12, color='r')
+                    val = str(round(self.grid[j][i], 2))
                     xm = (x2 - x1) / 2
                     ym = (y2 - y1) / 2
                     plt.text(x1 + xm, y1 + ym, val, **text_kwargs)
-                    '''
+
         plt.title(self.getName())
 
 
@@ -458,47 +486,6 @@ class AFMap:
         if self.raster.getNoDataValue() != None:
             stats[stats == None] = self.raster.getNoDataValue()
 
-
-
-
-    # def upSampling(self, resolution, name='Upsampling') -> AFMap:
-    #     '''
-    #     Interpolation Methods for Upsampling:
-    #         - Nearest Neighbor: this method involves duplicating the existing 
-    #                             pixels to create new ones.
-    #     '''
-
-    #     if not isinstance(self.__bbox.ur, ENUCoords):
-    #         raise CoordTypeError('Only ENU coordinates system implemented')
-
-    #     if self.XPixelSize != self.YPixelSize:
-    #         raise SizeError('cells must be square.')
-
-
-    #     newafmap = AFMap(self.__bbox,
-    #                         resolution=(resolution[0], resolution[1]),
-    #                         margin=0,
-    #                         novalue=self.__noDataValue,
-    #                         name=name, verbose=False)
-
-    #     '''
-    #     # Il faut aussi une résoltion proportionnelle entre les deux rasters
-    #     N = int (self.XPixelSize / new_grid.XPixelSize)
-    #     if int(N - (self.XPixelSize / new_grid.XPixelSize)) != 0.0:
-    #         raise SizeError('Two grids resolution not proportional')
-    #     # print ('N =', N)
-
-    #     if interpolation == MODE_NEAREST_NEIGHBOR:
-    #         for i in range(self.nrow):
-    #             for j in range(self.ncol):
-    #                 v = self.grid[i][j]
-    #                 for k in range(0, N):
-    #                     for l in range(0, N):
-    #                         new_grid.grid[i*N + k][j*N + l] = v
-    #         return new_grid
-
-    #     '''
-    #     return None
 
 
     # def asNumpy(self) -> np.ndarray:

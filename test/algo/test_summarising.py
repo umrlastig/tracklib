@@ -8,7 +8,9 @@ from tracklib import (Obs, ObsTime, ENUCoords, TrackCollection,
                       speed,NO_DATA_VALUE,
                       Track, TrackReader,
                       co_avg, co_max, co_count, co_min, co_count_distinct,
-                      summarize, AFMap)
+                      summarize, AFMap, seed, generate, noise, MODE_DIRECTION_ORTHO,
+                      SincKernel, DiracKernel,
+                      BBOX_ALIGN_LL, BBOX_ALIGN_CENTER, BBOX_ALIGN_UR)
 
 
 class TestSummarising(TestCase):
@@ -111,10 +113,10 @@ class TestSummarising(TestCase):
         # ---------------------------------------------------------------------
         #  On teste les plots
 
-        #map1.plotAsGraphic()
+        #map1.plotAsVectorGraphic()
         #plt.show()
 
-        map2.plotAsGraphic()
+        map2.plotAsVectorGraphic()
         plt.show()
 
         #raster.plot(0)
@@ -257,9 +259,9 @@ class TestSummarising(TestCase):
         print (raster)
 
         self.assertEqual(raster.xmin, -26)
-        self.assertEqual(raster.xmax, 406)
+        self.assertEqual(raster.xmax, 454)
         self.assertEqual(raster.ymin, -8)
-        self.assertEqual(raster.ymax, 208)
+        self.assertEqual(raster.ymax, 232)
         
         self.assertEqual(raster.ncol, 8)
         self.assertEqual(raster.nrow, 4)
@@ -273,53 +275,170 @@ class TestSummarising(TestCase):
         map1 = raster.getAFMap(AFMap.getMeasureName('uid', co_count_distinct))
         self.assertIsInstance(map1, AFMap)
 
-        map1.plotAsGraphic()
+        map1.plotAsVectorGraphic()
         plt.show()
 
 
 
 
-    def test_quickstart(self):
+    def test_synthetic_dataset(self):
 
-        ObsTime.setReadFormat("4Y-2M-2DT2h:2m:2sZ")
-        '''
-        gpxpath = os.path.join(self.resource_path, 'data/gpx/activity_5807084803.gpx')
-        tracks = TrackReader.readFromGpx(gpxpath)
-        trace = tracks.getTrack(0)
-        # Transformation GEO coordinates to ENU
-        trace.toENUCoords()
-        # Display
-        trace.plot()
-        plt.show()
+        seed(123)
 
-        # speed
-        trace.estimate_speed()
+        base_lacets = generate(0.4, dt=10)
+        chemin = noise(base_lacets, 20, SincKernel(20), direction=MODE_DIRECTION_ORTHO)[::3]
+        chemin = chemin[80:250]
+        chemin.scale(3)
+
+        N = 3
+        tracks = TrackCollection([chemin]*N)
+        tracks.noise(2, DiracKernel())
+        cpt = 1
+        for track in tracks:
+            track.uid = str(cpt)
+            cpt += 1
         
-        collection = TrackCollection([trace])
+        af_algos = ['uid']
+        cell_operators = [co_count_distinct]
 
-        af_algos = [speed, speed, speed]
-        cell_operators = [co_avg, co_min, co_max]
-        marge = 0.000005
-        raster = summarize(collection, af_algos, cell_operators, (5, 5), margin=marge)
-        raster.getAFMap(0).noDataValue = 0
+        SIZE = 15
+        marge = 0
+        resolution = (SIZE, SIZE)
+        bbox = tracks.bbox()
 
-        raster.getAFMap(0).plotAsGraphic()
-        raster.getAFMap(0).summary()
-        raster.plot(0)
+        # ---------------------------------------------------------------------
+        raster = summarize(tracks, af_algos, cell_operators,
+                               resolution, marge, align=BBOX_ALIGN_LL)
+        map1 = raster.getAFMap('uid#co_count_distinct')
+        map1.plotAsVectorGraphic()
+        # print (raster)
+
+        self.assertEqual(round(raster.xmin, 3), -5.218)
+        self.assertEqual(round(raster.xmax, 3), 54.782)
+        self.assertEqual(round(raster.ymin, 3), -22.421)
+        self.assertEqual(round(raster.ymax, 3), 52.579)
         
-        raster.plot(AFMap.getMeasureName(speed, co_avg))
-        raster.plot(AFMap.getMeasureName(speed, co_min))
-        raster.plot(AFMap.getMeasureName(speed, co_max))
-        plt.show()
-        '''
+        self.assertEqual(raster.ncol, 4)
+        self.assertEqual(raster.nrow, 5)
+    
+        self.assertEqual(raster.resolution[0], 15)
+        self.assertEqual(raster.resolution[1], 15)
 
+        self.assertEqual(map1.grid[0][0], 3)
+        self.assertEqual(map1.grid[1][0], 3)
+        self.assertEqual(map1.grid[2][0], 3)
+        self.assertEqual(map1.grid[3][0], 3)
+        self.assertEqual(map1.grid[4][0], 1)
+
+        self.assertEqual(map1.grid[0][1], 3)
+        self.assertEqual(map1.grid[1][1], 3)
+        self.assertEqual(map1.grid[2][1], 3)
+        self.assertEqual(map1.grid[3][1], 1)
+        self.assertEqual(map1.grid[4][1], 0)
+
+        self.assertEqual(map1.grid[0][2], 0)
+        self.assertEqual(map1.grid[1][2], 0)
+        self.assertEqual(map1.grid[2][2], 2)
+        self.assertEqual(map1.grid[3][2], 3)
+        self.assertEqual(map1.grid[4][2], 3)
+
+        self.assertEqual(map1.grid[0][3], 0)
+        self.assertEqual(map1.grid[1][3], 0)
+        self.assertEqual(map1.grid[2][3], 0)
+        self.assertEqual(map1.grid[3][3], 3)
+        self.assertEqual(map1.grid[4][3], 1)
+
+        # ---------------------------------------------------------------------
+        raster = summarize(tracks, af_algos, cell_operators,
+                               resolution, marge, align=BBOX_ALIGN_CENTER)
+        map1 = raster.getAFMap('uid#co_count_distinct')
+        map1.plotAsVectorGraphic()
+        #print (raster)
+
+        self.assertEqual(round(raster.xmin, 3), -8.488)
+        self.assertEqual(round(raster.xmax, 3), 51.512)
+        self.assertEqual(round(raster.ymin, 3), -26.382)
+        self.assertEqual(round(raster.ymax, 3), 48.618)
+        
+        self.assertEqual(raster.ncol, 4)
+        self.assertEqual(raster.nrow, 5)
+    
+        self.assertEqual(raster.resolution[0], 15)
+        self.assertEqual(raster.resolution[1], 15)
+
+        self.assertEqual(map1.grid[0][0], 3)
+        self.assertEqual(map1.grid[1][0], 3)
+        self.assertEqual(map1.grid[2][0], 3)
+        self.assertEqual(map1.grid[3][0], 3)
+        self.assertEqual(map1.grid[4][0], 0)
+
+        self.assertEqual(map1.grid[0][1], 3)
+        self.assertEqual(map1.grid[1][1], 3)
+        self.assertEqual(map1.grid[2][1], 1)
+        self.assertEqual(map1.grid[3][1], 0)
+        self.assertEqual(map1.grid[4][1], 0)
+
+        self.assertEqual(map1.grid[0][2], 0)
+        self.assertEqual(map1.grid[1][2], 0)
+        self.assertEqual(map1.grid[2][2], 3)
+        self.assertEqual(map1.grid[3][2], 3)
+        self.assertEqual(map1.grid[4][2], 3)
+
+        self.assertEqual(map1.grid[0][3], 0)
+        self.assertEqual(map1.grid[1][3], 0)
+        self.assertEqual(map1.grid[2][3], 3)
+        self.assertEqual(map1.grid[3][3], 3)
+        self.assertEqual(map1.grid[4][3], 3)
+
+
+        # ---------------------------------------------------------------------
+        raster = summarize(tracks, af_algos, cell_operators,
+                               resolution, marge, align=BBOX_ALIGN_UR)
+        map1 = raster.getAFMap('uid#co_count_distinct')
+        map1.plotAsVectorGraphic()
+        #print (raster)
+
+        self.assertEqual(round(raster.xmin, 3), -11.758)
+        self.assertEqual(round(raster.xmax, 3), 48.242)
+        self.assertEqual(round(raster.ymin, 3), -30.344)
+        self.assertEqual(round(raster.ymax, 3), 44.656)
+        
+        self.assertEqual(raster.ncol, 4)
+        self.assertEqual(raster.nrow, 5)
+    
+        self.assertEqual(raster.resolution[0], 15)
+        self.assertEqual(raster.resolution[1], 15)
+
+        self.assertEqual(map1.grid[0][0], 3)
+        self.assertEqual(map1.grid[1][0], 3)
+        self.assertEqual(map1.grid[2][0], 3)
+        self.assertEqual(map1.grid[3][0], 3)
+        self.assertEqual(map1.grid[4][0], 0)
+
+        self.assertEqual(map1.grid[0][1], 3)
+        self.assertEqual(map1.grid[1][1], 2)
+        self.assertEqual(map1.grid[2][1], 1)
+        self.assertEqual(map1.grid[3][1], 0)
+        self.assertEqual(map1.grid[4][1], 0)
+
+        self.assertEqual(map1.grid[0][2], 1)
+        self.assertEqual(map1.grid[1][2], 3)
+        self.assertEqual(map1.grid[2][2], 3)
+        self.assertEqual(map1.grid[3][2], 3)
+        self.assertEqual(map1.grid[4][2], 3)
+
+        self.assertEqual(map1.grid[0][3], 0)
+        self.assertEqual(map1.grid[1][3], 0)
+        self.assertEqual(map1.grid[2][3], 3)
+        self.assertEqual(map1.grid[3][3], 3)
+        self.assertEqual(map1.grid[4][3], 3)
 
 
 if __name__ == '__main__':
     suite = TestSuite()
-    #suite.addTest(TestSummarising("test_summarize_af"))
+    suite.addTest(TestSummarising("test_summarize_af"))
     suite.addTest(TestSummarising("test_summarize_af_grid_grande"))
-    #suite.addTest(TestSummarising("test_quickstart"))
+    suite.addTest(TestSummarising("test_synthetic_dataset"))
     runner = TextTestRunner()
     runner.run(suite)
     

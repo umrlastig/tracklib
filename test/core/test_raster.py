@@ -17,12 +17,6 @@ class TestRaster(TestCase):
         # ---------------------------------------------------------------------
         grid1 = Raster(bbox=emprise, resolution=(1,1), margin=0.1, novalue=-1)
 
-        b1 = grid1.bbox()
-        self.assertEqual(b1.getLowerLeft().getX(), -1)
-        self.assertEqual(b1.getLowerLeft().getY(), -1)
-        self.assertEqual(b1.getUpperRight().getX(), 11)
-        self.assertEqual(b1.getUpperRight().getY(), 11)
-
         self.assertEqual(grid1.xmin, -1)
         self.assertEqual(grid1.ymin, -1)
         self.assertEqual(grid1.xmax, 11)
@@ -43,11 +37,10 @@ class TestRaster(TestCase):
         # ---------------------------------------------------------------------
         grid2 = Raster(bbox=emprise, resolution=(1,1))
 
-        b2 = grid2.bbox()
-        self.assertEqual(b2.getLowerLeft().getX(), -0.5)
-        self.assertEqual(b2.getLowerLeft().getY(), -0.5)
-        self.assertEqual(b2.getUpperRight().getX(), 10.5)
-        self.assertEqual(b2.getUpperRight().getY(), 10.5)
+        self.assertEqual(grid2.xmin, -0.5)
+        self.assertEqual(grid2.ymin, -0.5)
+        self.assertEqual(grid2.xmax, 10.5)
+        self.assertEqual(grid2.ymax, 10.5)
 
         self.assertEqual(grid2.resolution[0], 1)
         self.assertEqual(grid2.resolution[1], 1)
@@ -105,7 +98,7 @@ class TestRaster(TestCase):
         raster.addAFMap('grille1', [[1,1,1,1,1,1,1,1,1,1], [3,3,3,3,3,3,3,3,3,3],
                                   [5,5,5,5,5,5,5,5,5,5], [7,7,7,7,7,7,7,7,7,7]])
 
-        raster.getAFMap('grille1').plotAsGraphic()
+        raster.getAFMap('grille1').plotAsVectorGraphic()
         raster.getAFMap('grille1').plotAsImage()
 
 
@@ -152,81 +145,16 @@ class TestRaster(TestCase):
         self.assertEqual(grid1.nrow, 3)
         self.assertEqual(grid1.resolution[1], 3)
 
-        self.assertEqual(grid1.bbox().getLowerLeft().getX(), -2)
-        self.assertEqual(grid1.bbox().getLowerLeft().getY(), -1)
-        self.assertEqual(grid1.bbox().getUpperRight().getX(), 12)
-        self.assertEqual(grid1.bbox().getUpperRight().getY(), 6)
+        self.assertEqual(grid1.xmin, -2)
+        self.assertEqual(grid1.ymin, -1)
+        self.assertEqual(grid1.xmax, 12)
+        self.assertEqual(grid1.ymax, 8)
 
         self.assertIsNone(grid1.getCell(ENUCoords(-2.5, 7)))
-        self.assertIsNone(grid1.getCell(ENUCoords(0, 7)))
+        self.assertIsNone(grid1.getCell(ENUCoords(0, 8.1)))
         self.assertIsNone(grid1.getCell(ENUCoords(-2, -2)))
 
 
-    def test_raster_upsampling(self):
-        """
-        Ajouter tests:
-            - no data value
-            - taille des grilles, plus petit plus grand
-
-        """
-        ll = ENUCoords(0, 0)
-        ur = ENUCoords(10, 10)
-        emprise = Bbox(ll, ur)
-        '''
-        g = AFMap(bb=emprise, resolution=(4, 4),
-                        margin=0, novalue=-1, name='g')
-
-        self.assertEqual(g.ncol, 2)
-        self.assertEqual(g.XPixelSize, 5)
-        self.assertEqual(g.nrow, 2)
-        self.assertEqual(g.YPixelSize, 5)
-        self.assertEqual(g.bbox().ll.getX(), 0)
-        self.assertEqual(g.bbox().ll.getY(), 0)
-        self.assertEqual(g.bbox().ur.getX(), 10)
-        self.assertEqual(g.bbox().ur.getY(), 10)
-        plt.show()
-
-        values = [[1,2], [3,4]]
-        g.grid = values
-        # g.plotAsGraphic()
-
-        g1 = g.upSampling(resolution=(1,1),
-                          interpolation=MODE_NEAREST_NEIGHBOR,
-                          name='g1')
-        self.assertEqual(g1.getName(), 'g1')
-        for i in range(5):
-            for j in range(5):
-                self.assertEqual(g1.grid[i][j], 1)
-        for i in range(5, 10):
-            for j in range(5):
-                self.assertEqual(g1.grid[i][j], 3)
-        for i in range(5):
-            for j in range(5, 10):
-                self.assertEqual(g1.grid[i][j], 2)
-        for i in range(5, 10):
-            for j in range(5, 10):
-                self.assertEqual(g1.grid[i][j], 4)
-        # g1.plotAsGraphic()
-        # plt.show()
-
-        g2 = g.upSampling(resolution=(1,1),
-                          interpolation=MODE_BED_OF_NAILS_TECHNIQUE,
-                          name='g2')
-        self.assertEqual(g2.getName(), 'g2')
-        for i in range(10):
-            for j in range(10):
-                if i == 0 and j == 0:
-                    self.assertEqual(g2.grid[i][j], 1)
-                elif i == 0 and j == 5:
-                    self.assertEqual(g2.grid[i][j], 2)
-                elif i == 5 and j == 0:
-                    self.assertEqual(g2.grid[i][j], 3)
-                elif i == 5 and j == 5:
-                    self.assertEqual(g2.grid[i][j], 4)
-                else:
-                    self.assertEqual(g2.grid[i][j], 0)
-        # g2.plotAsGraphic()
-        '''
 
 
 if __name__ == '__main__':
@@ -237,7 +165,6 @@ if __name__ == '__main__':
     suite.addTest(TestRaster("test_plot_afmap"))
     suite.addTest(TestRaster("test_raster_band_is_in"))
     suite.addTest(TestRaster("test_raster_band_gell_cell"))
-    #suite.addTest(TestRaster("test_raster_upsampling"))
 
     runner = TextTestRunner()
     runner.run(suite)

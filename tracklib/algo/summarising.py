@@ -46,12 +46,14 @@ Operator to aggregate analytical features and create raster and render image
 from __future__ import annotations   
 from typing import Union
 import math
+
 from tracklib.core import (AFMap, TrackCollection, listify,
-                           Raster)
+                           Raster, BBOX_ALIGN_LL)
+
 
 
 def summarize(collection: TrackCollection, af_algos, aggregates,
-              resolution=None, margin:float=0.05, verbose:bool=True):
+              resolution=None, margin:float=0.05, align=BBOX_ALIGN_LL, verbose:bool=True):
     """
     Example:
         af_algos = [algo.speed, algo.speed]
@@ -69,7 +71,7 @@ def summarize(collection: TrackCollection, af_algos, aggregates,
         print("Error: af_names and aggregates must have the same number elements")
         return 0
 
-    raster = Raster(bbox=collection.bbox(), resolution=resolution, margin=margin)
+    raster = Raster(bbox=collection.bbox(), resolution=resolution, margin=margin, align=align)
 
     # Pour chaque algo-agg on crée une grille vide
     for idx, af_algo in enumerate(af_algos):
