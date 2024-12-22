@@ -229,7 +229,7 @@ class TestAlgoMappingMethods(unittest.TestCase):
         raster.addAFMap('abcd', [[1,2,3,4], [10,20,30,40],
                                   [100,200,300,400],
                                   [1000,2000,3000,4000]])
-        raster.getAFMap(0).plotAsGraphic()
+        raster.getAFMap(0).plotAsVectorGraphic()
 
         mapOnRaster(trace1, raster)
         self.assertEqual(trace1.getObsAnalyticalFeature('abcd', 0), 1000)

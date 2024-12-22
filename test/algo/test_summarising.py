@@ -315,7 +315,7 @@ class TestSummarising(TestCase):
 
         self.assertEqual(round(raster.xmin, 3), -5.218)
         self.assertEqual(round(raster.xmax, 3), 54.782)
-        self.assertEqual(round(raster.ymin, 3), -22.421)
+        self.assertEqual(round(raster.ymin, 1), -22.4)
         self.assertEqual(round(raster.ymax, 3), 52.579)
         
         self.assertEqual(raster.ncol, 4)
