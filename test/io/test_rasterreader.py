@@ -16,8 +16,8 @@ class TestRasterReader(TestCase):
         raster = RasterReader.readFromAscFile(csvpath, name='MNT')
 
         grid = raster.getAFMap(0)
-        grid.plotAsVectorGraphic()
         self.assertEqual('MNT', grid.getName())
+        grid.plotAsImage(cmap='jet')
 
         self.assertEqual(1000, raster.nrow)
         self.assertEqual(1000, raster.ncol)
