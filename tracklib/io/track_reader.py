@@ -223,11 +223,21 @@ class TrackReader:
                     line = fp.readline().strip()
                     continue
 
-                fields = line.strip().split(fmt.separator)
+                # TODO: corriger la gestion de la tabulation en dure
+                if fmt.separator == 't':
+                    fields = line.strip().split('\t')
+                else:
+                    fields = line.strip().split(fmt.separator)
                 fields = [s for s in fields if s]
                 if (verbose):
                     print(fields)
-                    
+
+                # if id_user is in data
+                if fmt.id_user > 0:
+                    track.uid = fields[fmt.id_user].strip()
+                if fmt.id_track > 0:
+                    track.tid = fields[fmt.id_track].strip()
+
                 if fmt.id_T != -1:
                     if isinstance(fmt.time_ini, int):
                         try:

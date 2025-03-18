@@ -161,9 +161,9 @@ class TrackFormat:
             self.time_unit = param["time_unit"]
 
         if "id_user" in param:
-            self.id_user = param["id_user"]
+            self.id_user = int(param["id_user"])
         if "id_track" in param:
-            self.id_track = param["id_track"]
+            self.id_track = int(param["id_track"])
 
         if "id_E" in param:
             self.id_E = param["id_E"]
@@ -256,6 +256,9 @@ class TrackFormat:
         self.separator = self.separator.replace("s", ";")
 
         self.read_all = FIELDS[13].strip().upper() == "TRUE"
+
+        self.id_user = int(FIELDS[14].strip())
+        self.id_track = int(FIELDS[15].strip())
 
 
     def __str__(self):
