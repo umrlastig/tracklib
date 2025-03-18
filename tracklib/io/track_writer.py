@@ -165,7 +165,7 @@ class TrackWriter:
             fmt.id_U = id_U
             fmt.id_T = id_T
             fmt.separator = separator
-            fmt.h = h
+            fmt.header = h
 
 
         # -------------------------------------------------------
