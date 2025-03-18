@@ -166,6 +166,8 @@ class TrackWriter:
             fmt.id_T = id_T
             fmt.separator = separator
             fmt.header = h
+            fmt.com = "#"
+            fmt.time_ini = -1
 
 
         # -------------------------------------------------------
@@ -198,8 +200,8 @@ class TrackWriter:
         if fmt.header > 0:
             f.write(fmt.com + "srid: " + track.getSRID() + "\n")
             f.write(fmt.com + "ref point: " + str(track.base) + "\n")
-            if isinstance(fmt.DateIni, ObsTime):
-                f.write(fmt.com + "Reference epoch: " + fmt.DateIni + "\n")
+            if isinstance(fmt.time_ini, ObsTime):
+                f.write(fmt.com + "Reference epoch: " + fmt.time_ini + "\n")
             
             if track.getSRID().upper() == "ENU":
                 if fmt.id_U == -1:
@@ -270,7 +272,7 @@ class TrackWriter:
             else:
                 t = track.getObs(i).timestamp
             if isinstance(fmt.time_ini, ObsTime):
-                t = t.toAbsTime() - fmt.DateIni.toAbsTime()
+                t = t.toAbsTime() - fmt.time_ini.toAbsTime()
             
             afs = ""
             if len(af_names) > 0:
