@@ -27,5 +27,4 @@ MAPMATCHER, dat, 2, 3, -1, 1, -1, c, 1, #, -1, ENU, 2D/2M/4Y 2h:2m:2s, TRUE, -1,
 COTATION_RANDO, CSV, 1, 2, -1, 3, -1, c, 0, #, -999999, ENU, 2D/2M/4Y 2h:2m:2s, FALSE, -1, -1
 COLLIER_N4, n4, 3, 2, 4, 1, -1, c, 1, #, 0, GEO, 2D/2M/4Y 2h:2m:2s, TRUE, -1, -1
 CHAMOIS, CSV, 5, 6, -1, 4, -1, c, 1, #, -999999, ENU, 4Y-2M-2D 2h:2m:2s, TRUE, -1, -1
-STRAVAI, CSV, 1, 0, -1, 2, -1, t, 0, #, -999999, GEO, 4Y-2M-2D 2h:2m:2s, FALSE, -1, -1
-STRAVAO, CSV, 0, 1, 2, 3, -1, s, 0, #, -999999, ENU, 2D/2M/4Y 2h:2m:2s, TRUE, 5, 4
+
