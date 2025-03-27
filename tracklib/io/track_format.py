@@ -254,6 +254,8 @@ class TrackFormat:
         self.separator = self.separator.replace("b", " ")
         self.separator = self.separator.replace("c", ",")
         self.separator = self.separator.replace("s", ";")
+        self.separator = self.separator.replace("t", "\t")
+
 
         self.read_all = FIELDS[13].strip().upper() == "TRUE"
 
