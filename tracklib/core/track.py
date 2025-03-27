@@ -132,6 +132,43 @@ class Track:
         """TODO"""
         return self.getLastObs().timestamp - self.getFirstObs().timestamp
 
+    def nanduration(self, no_data_value = None):
+        """ToDo"""
+        save_print = ObsTime.getPrintFormat()
+        ObsTime.setPrintFormat("4Y-2M-2D 2h:2m:2s")
+        
+        if (no_data_value == None):
+            no_data_value = '1970-01-01 00:00:00'
+        
+        if self.getFirstObs().timestamp.__str__() != no_data_value:
+            obs_1_time = self.getFirstObs().timestamp
+        else:
+            # Find the next valid observation after the first one
+            j = 1
+            while j < self.size() and self.getObs(j).timestamp.__str__() == no_data_value:
+                j += 1
+            if j < self.size():
+                obs_1_time = self.getObs(j).timestamp
+            else:
+                ObsTime.setPrintFormat(save_print)
+                return self.getLastObs().timestamp - self.getFirstObs().timestamp 
+                
+        if self.getLastObs().timestamp.__str__() != no_data_value:
+            obs_2_time = self.getLastObs().timestamp
+        elif self.getLastObs().timestamp.__str__() == no_data_value:
+            # Find the next valid observation after i-1
+            j = 1
+            while j < self.size() and self[self.size()-j].timestamp.__str__() == no_data_value:
+                j += 1
+            if j < self.size():
+                obs_2_time = self.getObs(self.size()-j).timestamp
+            else:
+                ObsTime.setPrintFormat(save_print)
+                return self.getLastObs().timestamp - self.getFirstObs().timestamp
+
+        ObsTime.setPrintFormat(save_print)
+        return obs_2_time - obs_1_time
+
     def frequency(self, mode: Literal["temporal", "spatial"] = "temporal") -> float:
         """
         Average frequency in Hz (resp. m/pt) for temporal (resp. spatial) mode
