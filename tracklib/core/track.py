@@ -324,7 +324,42 @@ class Track:
     def size(self):
         """TODO"""
         return len(self.__POINTS)
+        
+    def count_missing_geom(self, no_data_value = None):
+        if (no_data_value == None):
+            no_data_value = self.no_data_value
+        to_count = []
+        for i in range(self.size()):
+            if (self.__POINTS[i].position.getX() == no_data_value):
+                to_count.append(i)
+                continue
+            if (self.__POINTS[i].position.getY() == no_data_value):
+                to_count.append(i)
+                continue
+            if (self.__POINTS[i].position.getZ() == no_data_value):
+                to_count.append(i)
+                continue
+        return len(to_count)
+        
+    def count_missing_temps(self):
+        to_count = []
+        for i in range(self.size()):
+            if (self.__POINTS[i].timestamp.toAbsTime() == 0.0):
+                to_count.append(i)
+        return len(to_count)      
 
+    def count_af_value(self, af_name, val):
+        if not af_name in self.__analyticalFeaturesDico:
+            raise AnalyticalFeatureError("track does not contain analytical feature '" + af_name + "'")
+        
+        index = self.__analyticalFeaturesDico[af_name]
+        to_count = []
+        for i in range(self.size()):
+
+            if (self.__POINTS[i].features[index] == val):
+                to_count.append(i)
+        return len(to_count)
+        
     def getFirstObs(self):
         """TODO"""
         return self.__POINTS[0]
@@ -400,7 +435,17 @@ class Track:
         else:
             T = self.__POINTS[i].timestamp
         return T
-
+        
+    def getTimestamps_str(self, i=None):
+        """TODO"""
+        if i is None:
+            T = []
+            for i in range(self.size()):
+                T.append(self.__POINTS[i].timestamp.__str__())
+        else:
+            T = self.__POINTS[i].timestamp.__str__()
+        return T        
+        
     def getCentroid(self):
         """TODO"""
         m = self.getObs(0).position.copy()
