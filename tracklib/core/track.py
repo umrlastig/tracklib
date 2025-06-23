@@ -1204,6 +1204,31 @@ class Track:
         for k in keys:
             if self.__analyticalFeaturesDico[k] > idAF:
                 self.__analyticalFeaturesDico[k] -= 1
+    
+    # -----------------------------------------------------
+    # Fill values of analytical features of a timestamped 
+    # track with timestamped observations:
+    #  - name: name of AF to fill
+    #  - X   : vector of values (need not be numerical)
+    #  - T   : timestamps of values (same size as X)
+    #  - tol : time tolerance (in seconds)
+    #  - agg : aggregating lambda function
+    # -----------------------------------------------------
+    # For each point in track, all values whose timestamp
+    # is closer than tol second(s), are aggregated with 
+    # agg function, and filled in the AF af_name    
+    # -----------------------------------------------------
+    def fillAnalyticalFeature(self, af_name, X, T, tol = 1, agg = lambda V : np.mean(V)):
+        register = {}
+        for i in range(len(self)):
+            register[int(self[i].timestamp.toAbsTime()/tol)] = []
+        for i in range(len(X)):
+            key = int((T[i].toAbsTime() + tol/2)/tol)
+            if key in register:
+                register[key].append(X[i])
+        for i in range(len(self)):
+            key = int(self[i].timestamp.toAbsTime()/tol)
+            self.setObsAnalyticalFeature(af_name, i, agg(register[key]))
 
     # -------------------------------------------------------------------------
     # Remove duplicate observations in a track. When two observations are
