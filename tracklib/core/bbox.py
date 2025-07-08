@@ -68,9 +68,9 @@ class Bbox:
         self.ll = ll
         self.ur = ur
 
-        if instance(ll, ENUCoords):
+        if isinstance(ll, ENUCoords):
             self.srid = 'ENU'
-        elif instance(ll, GeoCoords):
+        elif isinstance(ll, GeoCoords):
             self.srid = 'GEO'
         else:
             self.srid = 'ECEF'
