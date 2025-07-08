@@ -68,6 +68,13 @@ class Bbox:
         self.ll = ll
         self.ur = ur
 
+        if instance(ll, ENUCoords):
+            self.srid = 'ENU'
+        elif instance(ll, GeoCoords):
+            self.srid = 'GEO'
+        else:
+            self.srid = 'ECEF'
+
     def __str__(self) -> str:
         """String representation of :class:`Bbox`
 
@@ -84,6 +91,9 @@ class Bbox:
         :return: Copy of bbox
         """
         return copy.deepcopy(self)
+
+    def srid(self):
+        return self.srid
 
     def getLowerLeft(
         self,
