@@ -164,6 +164,9 @@ class Raster:
         output += "-------------------------------------\n"
         
         return output
+
+    def getResolution(self):
+        return self.resolution
     
     def summary(self):
         print (self.__str__())
@@ -469,7 +472,7 @@ class AFMap:
             fig.colorbar(im, cax=cax, orientation='vertical', fraction=0.046)
 
 
-    def bandStatistics(self):
+    def statistics(self):
         stats = np.array(self.grid, dtype=np.float32)
         if self.raster.getNoDataValue() != None:
             stats[stats == self.raster.getNoDataValue()] = np.nan
