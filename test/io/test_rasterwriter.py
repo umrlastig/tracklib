@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import matplotlib.pyplot as plt
+import numpy as np
 import os
 
 import filecmp
@@ -62,8 +63,8 @@ class TestRasterWriter(TestCase):
         emprise = Bbox(ll, ur)
         raster = Raster(bbox=emprise, resolution=(1,1), margin=0.5)
 
-        raster.addAFMap('grille1', [[1,2,1,2,1,2,1,2,1,2], [3,4,3,4,3,4,3,4,3,4],
-                                  [1,2,3,4,5,6,7,8,9,0], [7,8,7,8,7,8,7,8,7,8]])
+        raster.addAFMap('grille1', np.array([[1,2,1,2,1,2,1,2,1,2], [3,4,3,4,3,4,3,4,3,4],
+                                  [1,2,3,4,5,6,7,8,9,0], [7,8,7,8,7,8,7,8,7,8]]))
 
         raster.getAFMap(0).plotAsImage()
         plt.show()
