@@ -53,6 +53,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import math
 import numpy as np
+from scipy.sparse import lil_matrix
 
 from tracklib.core import listify
 from tracklib.core import ECEFCoords, ENUCoords, GeoCoords, getOffsetColorMap
@@ -68,6 +69,7 @@ from tracklib.util import AnalyticalFeatureError, CoordTypeError, SizeError, Wro
 #  Value that is regarded as "missing" or "not applicable"
 # -----------------------------------------------------------------------------
 NO_DATA_VALUE = -99999.0
+
 
 # -----------------------------------------------------------------------------
 #
@@ -193,6 +195,7 @@ class Raster:
         
         return True
 
+
     def getCell(self, coord: Union[ENUCoords, ECEFCoords, GeoCoords])-> Union[tuple[int, int], None]:
         """Normalized coordinates of coord
     
@@ -254,12 +257,7 @@ class Raster:
 
     def addAFMap(self, name, grid=None):
         if grid is None:
-            grid = []
-            for i in range(self.nrow):
-                grid.append([])
-                for j in range(self.ncol):
-                    grid[i].append([])
-
+            grid = np.full([self.nrow, self.ncol], self.__noDataValue,  dtype=np.float32)
         afmap = AFMap(self, name, grid)
         self.__afmaps[name] = afmap
 
@@ -303,37 +301,34 @@ class Raster:
                 if not trace.hasAnalyticalFeature(afname) and afname != 'uid':
                     raise AnalyticalFeatureError("Error: track does not contain analytical feature '" + afname + "'")
 
+
         for trace in collection.getTracks():
-            for afname in AFs:
-                # On éparpille dans les cellules
-                for i in range(trace.size()):
-                    obs = trace.getObs(i)
-                    (column, line) = self.getCell(obs.position)
-                    #print (column, line, obs.position)
+            # On éparpille dans les cellules
+            for i in range(trace.size()):
+                obs = trace.getObs(i)
+                (column, line) = self.getCell(obs.position)
 
-#                    if (0 <= column and column <= self.ncol
-#                        and 0 <= line and line <= self.nrow):
-
+                for afname in AFs:
                     if afname != "uid":
                         val = trace.getObsAnalyticalFeature(afname, i)
                     else:
                         val = trace.uid
-
                     self.collectionValuesGrid[afname][line][column].append(val)
 
 
 
     def computeAggregates(self):
-        for i in range(self.countAFMap()):
-            afmap = self.getAFMap(i)
-            names = afmap.getName().split('#')
-            afname = names[0]
-            aggregate = names[1]
+        # On calcule les agregats
+        for i in range(self.nrow):
+            for j in range(self.ncol):
+                for k in range(self.countAFMap()):
+                    afmap = self.getAFMap(k)
+                    names = afmap.getName().split('#')
+                    afname = names[0]
+                    aggregate = names[1]
 
-            # On calcule les agregats
-            for i in range(self.nrow):
-                for j in range(self.ncol):
                     tarray = self.collectionValuesGrid[afname][i][j]
+
                     sumval = eval(aggregate + '(tarray)')
                     if isnan(sumval):
                         afmap.grid[i][j] = NO_DATA_VALUE
@@ -364,12 +359,14 @@ class AFMap:
             raise WrongArgumentError("Parameter (af_name) is already taken.")
 
         # Il faut que la taille de la grille correspondent au raster
-        if not isinstance(grid, list) or not isinstance(grid[0], list):
-            raise WrongArgumentError("grid must be a 2x2 list")
-        if len(grid) != raster.nrow or len(grid[0]) != raster.ncol:
+        if not isinstance(grid, np.ndarray):
+            raise WrongArgumentError("grid must be a ndarray")
+        dim = grid.shape
+        if dim[0] != raster.nrow or dim[1] != raster.ncol:
             raise WrongArgumentError("Size of grid must be " + str(raster.nrow)
                                      + "x" + str(raster.ncol) + ":"
                                      + str(len(grid)) + "x" + str(len(grid[0])))
+
 
         self.raster = raster
         self.af_name = af_name
@@ -489,13 +486,6 @@ class AFMap:
         if self.raster.getNoDataValue() != None:
             stats[stats == None] = self.raster.getNoDataValue()
 
-
-
-    # def asNumpy(self) -> np.ndarray:
-    #     '''
-    #     Returns the grid converted in numpy array
-    #     '''
-    #     return np.array(self.grid, dtype=np.float32)
 
 
 

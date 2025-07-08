@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import matplotlib.pyplot as plt
+import numpy as np
 from unittest import TestCase, TestSuite, TextTestRunner
 from tracklib import (ENUCoords, Bbox, Raster,
                       NO_DATA_VALUE, WrongArgumentError)
@@ -73,17 +74,17 @@ class TestRaster(TestCase):
         with self.assertRaises(WrongArgumentError):
             raster.addAFMap('', [[1,2,3,4,5,6,7], [1,2,3,4,5,6,7]])
 
-        raster.addAFMap('grille1', [[1,2,1,2,1,2,1,2,1,2], [3,4,3,4,3,4,3,4,3,4],
-                                  [1,2,3,4,5,6,7,8,9,0], [7,8,7,8,7,8,7,8,7,8]])
+        raster.addAFMap('grille1', np.array([[1,2,1,2,1,2,1,2,1,2], [3,4,3,4,3,4,3,4,3,4],
+                                  [1,2,3,4,5,6,7,8,9,0], [7,8,7,8,7,8,7,8,7,8]]))
 
         with self.assertRaises(WrongArgumentError):
-            raster.addAFMap('grille1', [[1,1,1,1,1,1,1], [1,1,1,1,1,1,1]])
+            raster.addAFMap('grille1', np.array([[1,1,1,1,1,1,1], [1,1,1,1,1,1,1]]))
 
 
-        raster.addAFMap('grille2', [[1,1,1,1,1,1,1,1,1,1],
+        raster.addAFMap('grille2', np.array([[1,1,1,1,1,1,1,1,1,1],
                                   [1,1,1,1,1,1,1,1,1,1],
                                   [1,1,1,1,1,1,1,1,1,1],
-                                  [1,1,1,1,1,1,1,1,1,1]])
+                                  [1,1,1,1,1,1,1,1,1,1]]))
 
         self.assertEqual(raster.countAFMap(), 3)
         self.assertListEqual(raster.getNamesOfAFMap(), ["grille0", "grille1", "grille2"])
@@ -95,8 +96,8 @@ class TestRaster(TestCase):
         emprise = Bbox(ll, ur)
         raster = Raster(bbox=emprise, resolution=(1,1), margin=0.5)
 
-        raster.addAFMap('grille1', [[1,1,1,1,1,1,1,1,1,1], [3,3,3,3,3,3,3,3,3,3],
-                                  [5,5,5,5,5,5,5,5,5,5], [7,7,7,7,7,7,7,7,7,7]])
+        raster.addAFMap('grille1', np.array([[1,1,1,1,1,1,1,1,1,1], [3,3,3,3,3,3,3,3,3,3],
+                                  [5,5,5,5,5,5,5,5,5,5], [7,7,7,7,7,7,7,7,7,7]]))
 
         raster.getAFMap('grille1').plotAsVectorGraphic()
         raster.getAFMap('grille1').plotAsImage()

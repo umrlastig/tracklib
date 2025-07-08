@@ -52,7 +52,7 @@ from tracklib.core import (AFMap, TrackCollection, listify,
 
 
 
-def summarize(collection: TrackCollection, af_algos, aggregates,
+def summarize(collection, af_algos, aggregates,
               resolution=None, margin:float=0.05, align=BBOX_ALIGN_LL, verbose:bool=True):
     """
     Example:
@@ -79,11 +79,11 @@ def summarize(collection: TrackCollection, af_algos, aggregates,
         cle = AFMap.getMeasureName(af_algo, aggregate)
         raster.addAFMap(cle)
 
-    # add collection
     raster.addCollectionToRaster(collection)
-
+    print ('--- fin du add ---')
     # compute aggregate
     raster.computeAggregates()
+    print ('--- fin du aggregate ---')
 
     return raster
 

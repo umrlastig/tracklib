@@ -92,7 +92,7 @@ class Bbox:
         """
         return copy.deepcopy(self)
 
-    def srid(self):
+    def getSrid(self):
         return self.srid
 
     def getLowerLeft(

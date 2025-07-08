@@ -103,6 +103,7 @@ class SpatialIndex:
         bb = bb.copy()
         bb.addMargin(margin)
         (self.xmin, self.xmax, self.ymin, self.ymax) = bb.asTuple()
+        self.srid = bb.getSrid()
 
         ax, ay = bb.getDimensions()
 
@@ -165,6 +166,18 @@ class SpatialIndex:
         output = "[" + str(self.csize) + " x " + str(self.lsize) + "] "
         output += "spatial index centered on [" + str(c[0]) + "; " + str(c[1]) + "]"
         return output
+
+    def bbox(self):
+        """TODO"""
+        if self.srid == 'GEO':
+            ll = GeoCoords(self.xmin, self.ymin)
+            ur = GeoCoords(self.xmin, self.ymin)
+            return Bbox(ll, ur)
+        if self.srid == 'ENU':
+            ll = ENUCoords(self.xmin, self.ymin)
+            ur = ENUCoords(self.xmin, self.ymin)
+            return Bbox(ll, ur)
+        return None
 
     def addFeature(self, track, num):
         """TODO"""
