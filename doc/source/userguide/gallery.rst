@@ -18,28 +18,32 @@ to get you using tracklib productively as quickly as possible.
 
     UG_Operation
     UG_TrackPlot
+    UG_LoadGpkg
     UG_Query
-    UG_ShapeMeasures    
     
+    UG_ShapeMeasures    
     UG_Selection
     UG_Segmentation
     UG_ReturnTrip
+
     UG_Stdbscan
-    
     UG_Synthetics
     UG_Simplification
     UG_Interpolation
-    UG_Filtering
 
+    UG_Filtering
     UG_MapMatchingOnNetwork
     UG_MapOnRaster
     UG_MapOn
-    UG_AFMap
 
+    UG_AFMap
     UG_Matching
     UG_Fusion
     UG_SyntheticRealistic
+
     UG_IllustrateNoiseModel
+
+..     UG_DynamicSegmentation
 ..     comparison/UG_Comparison  
 
 
