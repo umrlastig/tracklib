@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import matplotlib.pyplot as plt
+import numpy as np
 import os.path
 import unittest
 from tracklib import (Obs, ObsTime, ENUCoords, 
@@ -226,9 +227,9 @@ class TestAlgoMappingMethods(unittest.TestCase):
         emprise = Bbox(ll, ur)
         raster = Raster(bbox=emprise, resolution=(1,1), margin=0)
 
-        raster.addAFMap('abcd', [[1,2,3,4], [10,20,30,40],
+        raster.addAFMap('abcd', np.array([[1,2,3,4], [10,20,30,40],
                                   [100,200,300,400],
-                                  [1000,2000,3000,4000]])
+                                  [1000,2000,3000,4000]]))
         raster.getAFMap(0).plotAsVectorGraphic()
 
         mapOnRaster(trace1, raster)

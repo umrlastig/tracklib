@@ -46,9 +46,10 @@ knowledge of the CeCILL-C license and that you accept its terms.
 
 # For type annotation
 from __future__ import annotations   
-from tracklib.util.exceptions import *
+import numpy as np
 
-from tracklib.core import (ENUCoords, Bbox, 
+from tracklib.util.exceptions import *
+from tracklib.core import (ENUCoords, Bbox,
                            Raster, 
                            NO_DATA_VALUE,
                            AFMap)
@@ -107,11 +108,7 @@ class RasterReader:
 
         raster = RasterReader.readMetadataFromAscFile(path, separator)
 
-        grid = []
-        for i in range(raster.nrow):
-            grid.append([])
-            for j in range(raster.ncol):
-                grid[i].append(raster.getNoDataValue())
+        grid = np.full([raster.nrow, raster.ncol], raster.getNoDataValue(),  dtype=np.float32)
 
         # Read the values
         i = 0
