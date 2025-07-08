@@ -150,6 +150,7 @@ class TrackReader:
                             continue
                         TRACES.addTrack(trace[i])
                 else:
+                    trace.tid = f
                     TRACES.addTrack(trace)
 
             return TRACES
