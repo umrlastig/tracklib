@@ -506,7 +506,7 @@ class TrackWriter:
             f.write("</kml>\n")
 
         f.close()
-        print("KML written in file [" + path + "]")
+        #print("KML written in file [" + path + "]")
 
     def __writeCollectionToKml(tracks, path, c1=[1, 1, 1, 1]):
         """TODO"""

@@ -132,6 +132,43 @@ class Track:
         """TODO"""
         return self.getLastObs().timestamp - self.getFirstObs().timestamp
 
+    def nanduration(self, no_data_value = None):
+        """ToDo"""
+        save_print = ObsTime.getPrintFormat()
+        ObsTime.setPrintFormat("4Y-2M-2D 2h:2m:2s")
+        
+        if (no_data_value == None):
+            no_data_value = '1970-01-01 00:00:00'
+        
+        if self.getFirstObs().timestamp.__str__() != no_data_value:
+            obs_1_time = self.getFirstObs().timestamp
+        else:
+            # Find the next valid observation after the first one
+            j = 1
+            while j < self.size() and self.getObs(j).timestamp.__str__() == no_data_value:
+                j += 1
+            if j < self.size():
+                obs_1_time = self.getObs(j).timestamp
+            else:
+                ObsTime.setPrintFormat(save_print)
+                return self.getLastObs().timestamp - self.getFirstObs().timestamp 
+                
+        if self.getLastObs().timestamp.__str__() != no_data_value:
+            obs_2_time = self.getLastObs().timestamp
+        elif self.getLastObs().timestamp.__str__() == no_data_value:
+            # Find the next valid observation after i-1
+            j = 1
+            while j < self.size() and self[self.size()-j].timestamp.__str__() == no_data_value:
+                j += 1
+            if j < self.size():
+                obs_2_time = self.getObs(self.size()-j).timestamp
+            else:
+                ObsTime.setPrintFormat(save_print)
+                return self.getLastObs().timestamp - self.getFirstObs().timestamp
+
+        ObsTime.setPrintFormat(save_print)
+        return obs_2_time - obs_1_time
+
     def frequency(self, mode: Literal["temporal", "spatial"] = "temporal") -> float:
         """
         Average frequency in Hz (resp. m/pt) for temporal (resp. spatial) mode
@@ -287,7 +324,42 @@ class Track:
     def size(self):
         """TODO"""
         return len(self.__POINTS)
+        
+    def count_missing_geom(self, no_data_value = None):
+        if (no_data_value == None):
+            no_data_value = self.no_data_value
+        to_count = []
+        for i in range(self.size()):
+            if (self.__POINTS[i].position.getX() == no_data_value):
+                to_count.append(i)
+                continue
+            if (self.__POINTS[i].position.getY() == no_data_value):
+                to_count.append(i)
+                continue
+            if (self.__POINTS[i].position.getZ() == no_data_value):
+                to_count.append(i)
+                continue
+        return len(to_count)
+        
+    def count_missing_temps(self):
+        to_count = []
+        for i in range(self.size()):
+            if (self.__POINTS[i].timestamp.toAbsTime() == 0.0):
+                to_count.append(i)
+        return len(to_count)      
 
+    def count_af_value(self, af_name, val):
+        if not af_name in self.__analyticalFeaturesDico:
+            raise AnalyticalFeatureError("track does not contain analytical feature '" + af_name + "'")
+        
+        index = self.__analyticalFeaturesDico[af_name]
+        to_count = []
+        for i in range(self.size()):
+
+            if (self.__POINTS[i].features[index] == val):
+                to_count.append(i)
+        return len(to_count)
+        
     def getFirstObs(self):
         """TODO"""
         return self.__POINTS[0]
@@ -363,7 +435,17 @@ class Track:
         else:
             T = self.__POINTS[i].timestamp
         return T
-
+        
+    def getTimestamps_str(self, i=None):
+        """TODO"""
+        if i is None:
+            T = []
+            for i in range(self.size()):
+                T.append(self.__POINTS[i].timestamp.__str__())
+        else:
+            T = self.__POINTS[i].timestamp.__str__()
+        return T        
+        
     def getCentroid(self):
         """TODO"""
         m = self.getObs(0).position.copy()
@@ -1122,6 +1204,31 @@ class Track:
         for k in keys:
             if self.__analyticalFeaturesDico[k] > idAF:
                 self.__analyticalFeaturesDico[k] -= 1
+    
+    # -----------------------------------------------------
+    # Fill values of analytical features of a timestamped 
+    # track with timestamped observations:
+    #  - name: name of AF to fill
+    #  - X   : vector of values (need not be numerical)
+    #  - T   : timestamps of values (same size as X)
+    #  - tol : time tolerance (in seconds)
+    #  - agg : aggregating lambda function
+    # -----------------------------------------------------
+    # For each point in track, all values whose timestamp
+    # is closer than tol second(s), are aggregated with 
+    # agg function, and filled in the AF af_name    
+    # -----------------------------------------------------
+    def fillAnalyticalFeature(self, af_name, X, T, tol = 1, agg = lambda V : np.mean(V)):
+        register = {}
+        for i in range(len(self)):
+            register[int(self[i].timestamp.toAbsTime()/tol)] = []
+        for i in range(len(X)):
+            key = int((T[i].toAbsTime() + tol/2)/tol)
+            if key in register:
+                register[key].append(X[i])
+        for i in range(len(self)):
+            key = int(self[i].timestamp.toAbsTime()/tol)
+            self.setObsAnalyticalFeature(af_name, i, agg(register[key]))
 
     # -------------------------------------------------------------------------
     # Remove duplicate observations in a track. When two observations are

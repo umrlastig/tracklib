@@ -271,6 +271,15 @@ class TrackCollection:
                 values = removeNan(values)
             valuesAF = valuesAF + values
         return valuesAF
+        
+    def getTimestamps_str(self,withNan=True):
+        """Return the timestamps in a list format."""
+        T = []
+        for track in self:
+            for i in range(track.size()):
+                T.append(track.getObs(i).timestamp.__str__())
+        return T
+    
             
     def operate(self, operator, arg1=None, arg2=None, arg3=None):
         """TODO"""

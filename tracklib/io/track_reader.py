@@ -356,63 +356,72 @@ class TrackReader:
         return track
 
 
-    NMEA_GGA = "GGA"
-    NMEA_RMC = "RMC"
-    NMEA_GPGGA = "GPGGA"
-    NMEA_GNGGA = "GNGGA"
-    NMEA_GPRMC = "GPRMC"
-    NMEA_GNRMC = "GNRMC"
-
     @staticmethod
-    def readFromNMEA(path, frame=NMEA_GGA):
+    def readFromNMEA(path):
         """The method assumes a single track in file."""
 
         track = Track()
 
-        if frame.upper() == TrackReader.NMEA_GGA:
-            pattern = ["$GNGGA"]
-            TMP_NB_SATS = []
-            TMP_HDOP = []
+        TMP_NB_SATS = []
+        TMP_HDOP = []
 
-            with open(path, "rb") as fp:
+        current_date = ObsTime()
+
+        with open(path, "rb") as fp:
+            line = str(fp.readline())
+            while not (line in ["", "b''"]):
+            
+                # For date
+                if ("$GPRMC" in line) or ("$GNRMC" in line):
+                    date_chiffres = line.split(",")[9]
+                    current_date.day   = int(date_chiffres[0:2])
+                    current_date.month = int(date_chiffres[2:4])
+                    current_date.year  = 2000 + int(date_chiffres[4:6])
+                
+                # For position, time in day, etc.
+                if ("$GPGGA" in line) or ("$GNGGA" in line):
+                    code = "$GPGGA"
+                    if "$GNGGA" in line:
+                        code = "$GNGGA"
+                    frame = line.split(code)[1]
+                    fields = frame.split(",")
+                    h = int(fields[1][0:2])
+                    m = int(fields[1][2:4])
+                    s = int(fields[1][4:6])
+                    ms = int(fields[1][7:9])
+                    time = current_date.copy()
+                    time.hour = h
+                    time.min = m
+                    time.sec = s
+                    time.ms = ms
+                    if fields[4] == "":
+                        line = str(fp.readline())
+                        continue
+                    if fields[2] == "":
+                        line = str(fp.readline())
+                        continue
+                    lon = float(fields[4]) / 100
+                    lat = float(fields[2]) / 100
+                    lon = int(lon) + (lon - int(lon)) * 100 / 60
+                    lat = int(lat) + (lat - int(lat)) * 100 / 60
+                    hgt = float(fields[9])
+                    if fields[5] == "W":
+                        lon = -lon
+                    if fields[3] == "S":
+                        lat = -lat
+                    track.addObs(Obs(GeoCoords(lon, lat, hgt), time))
+                    TMP_NB_SATS.append(int(fields[7]))
+                    TMP_HDOP.append(float(fields[8]))
+                    # print(fields)
+
                 line = str(fp.readline())
-                while not (line in ["", "b''"]):
-                    if pattern[0] in line:
-                        frame = line.split(pattern[0])[1]
-                        fields = frame.split(",")
-                        h = int(fields[1][0:2])
-                        m = int(fields[1][2:4])
-                        s = int(fields[1][4:6])
-                        ms = int(fields[1][7:9])
-                        time = ObsTime(hour=h, min=m, sec=s, ms=ms)
-                        if fields[4] == "":
-                            line = str(fp.readline())
-                            continue
-                        if fields[2] == "":
-                            line = str(fp.readline())
-                            continue
-                        lon = float(fields[4]) / 100
-                        lat = float(fields[2]) / 100
-                        lon = int(lon) + (lon - int(lon)) * 100 / 60
-                        lat = int(lat) + (lat - int(lat)) * 100 / 60
-                        hgt = float(fields[9])
-                        if fields[5] == "W":
-                            lon = -lon
-                        if fields[3] == "S":
-                            lat = -lat
-                        track.addObs(Obs(GeoCoords(lon, lat, hgt), time))
-                        TMP_NB_SATS.append(int(fields[7]))
-                        TMP_HDOP.append(float(fields[8]))
-                        # print(fields)
 
-                    line = str(fp.readline())
+        track.createAnalyticalFeature("nb_sats")
+        track.createAnalyticalFeature("hdop")
 
-            track.createAnalyticalFeature("nb_sats")
-            track.createAnalyticalFeature("hdop")
-
-            for i in range(len(TMP_NB_SATS)):
-                track.setObsAnalyticalFeature("nb_sats", i, TMP_NB_SATS[i])
-                track.setObsAnalyticalFeature("hdop", i, TMP_HDOP[i])
+        for i in range(len(TMP_NB_SATS)):
+            track.setObsAnalyticalFeature("nb_sats", i, TMP_NB_SATS[i])
+            track.setObsAnalyticalFeature("hdop", i, TMP_HDOP[i])
 
         return track
     
