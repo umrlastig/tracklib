@@ -53,7 +53,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import math
 import numpy as np
-from scipy.sparse import lil_matrix
+from collections import defaultdict
 
 from tracklib.core import listify
 from tracklib.core import ECEFCoords, ENUCoords, GeoCoords, getOffsetColorMap
@@ -256,16 +256,21 @@ class Raster:
             
 
     def addAFMap(self, name, grid=None):
+        '''
+        grid peut-être vide (si on summarize) ou non (via reader)
+        '''
         if grid is None:
-            grid = np.full([self.nrow, self.ncol], self.__noDataValue,  dtype=np.float32)
+            grid = np.full([self.nrow, self.ncol],
+                           self.getNoDataValue(),
+                           dtype=np.float32)
         afmap = AFMap(self, name, grid)
         self.__afmaps[name] = afmap
 
 
     def addCollectionToRaster(self, collection):
         '''
-        L'enjeu ici est de stocker qu'une fois chaque AF. Il faut donc que les maps
-        soient déjà créées.
+        L'enjeu ici est de stocker qu'une fois chaque AF. 
+        Il faut donc que les maps soient déjà créées.
 
         Parameters
         ----------
@@ -285,16 +290,6 @@ class Raster:
             else:
                 AFs.add(mapname)
 
-        # On initialise le dictionnaire qui va contenir toutes les valeurs
-        self.collectionValuesGrid = {}
-        for afname in AFs:
-            self.collectionValuesGrid[afname] = []
-            for i in range(self.nrow):
-                self.collectionValuesGrid[afname].append([])
-                for j in range(self.ncol):
-                    self.collectionValuesGrid[afname][i].append([])
-                    self.collectionValuesGrid[afname][i][j] = []
-
         # On vérifie que les AF sont calculés
         for trace in collection.getTracks():
             for afname in AFs:
@@ -302,40 +297,35 @@ class Raster:
                     raise AnalyticalFeatureError("Error: track does not contain analytical feature '" + afname + "'")
 
 
+        # On initialise le dictionnaire qui va contenir toutes les valeurs
+        self.collectionValuesGrid = {}
+        for afname in AFs:
+            self.collectionValuesGrid[afname] = defaultdict(list)
+
         for trace in collection.getTracks():
             # On éparpille dans les cellules
             for i in range(trace.size()):
                 obs = trace.getObs(i)
                 (column, line) = self.getCell(obs.position)
-
                 for afname in AFs:
                     if afname != "uid":
                         val = trace.getObsAnalyticalFeature(afname, i)
                     else:
                         val = trace.uid
-                    self.collectionValuesGrid[afname][line][column].append(val)
-
+                    self.collectionValuesGrid[afname][(line, column)].append(val)
 
 
     def computeAggregates(self):
-        # On calcule les agregats
-        for i in range(self.nrow):
-            for j in range(self.ncol):
-                for k in range(self.countAFMap()):
-                    afmap = self.getAFMap(k)
-                    names = afmap.getName().split('#')
-                    afname = names[0]
-                    aggregate = names[1]
+        for k in range(self.countAFMap()):
+            afmap = self.getAFMap(k)
+            names = afmap.getName().split('#')
+            afname = names[0]
+            aggregate = names[1]
 
-                    tarray = self.collectionValuesGrid[afname][i][j]
-
-                    sumval = eval(aggregate + '(tarray)')
-                    if isnan(sumval):
-                        afmap.grid[i][j] = NO_DATA_VALUE
-                    else:
-                        afmap.grid[i][j] = sumval
-
-
+            for (i, j), tarray in self.collectionValuesGrid[afname].items():
+                sumval = eval(aggregate + '(tarray)')
+                if not isnan(sumval):
+                    afmap.grid[i][j] = sumval
 
 
 class AFMap:
@@ -450,19 +440,24 @@ class AFMap:
         else:
             ax1 = append
             fig = ax1.get_figure()
-        
-        tab = np.array(self.grid, dtype=np.float32)
+
+        matrice = np.full((self.raster.nrow, self.raster.ncol),
+                          self.raster.getNoDataValue(), dtype=np.float32)
+        for i in range(self.raster.nrow):
+            for j in range(self.raster.ncol):
+                val = float(self.grid[i][j])
+                if val != self.raster.getNoDataValue():
+                    matrice[i][j] = val
         if self.raster.getNoDataValue() != None:
-            tab[tab == self.raster.getNoDataValue()] = np.nan
+            matrice[matrice == self.raster.getNoDataValue()] = np.nan
 
         if cmap is None:
             cmap = getOffsetColorMap(color1, color2, 0)
             cmap.set_bad(color=novaluecolor)
 
-
-        im = ax1.imshow(tab, cmap=cmap)
+        im = ax1.imshow(matrice, cmap=cmap)
         ax1.set_title(self.getName())
-        
+
         divider = make_axes_locatable(ax1)
         cax = divider.append_axes('right', size='5%', pad=0.1)
         if fig != None:

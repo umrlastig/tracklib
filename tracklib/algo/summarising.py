@@ -80,10 +80,9 @@ def summarize(collection, af_algos, aggregates,
         raster.addAFMap(cle)
 
     raster.addCollectionToRaster(collection)
-    print ('--- fin du add ---')
+
     # compute aggregate
     raster.computeAggregates()
-    print ('--- fin du aggregate ---')
 
     return raster
 
