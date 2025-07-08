@@ -48,12 +48,13 @@ from typing import Union
 import math
 
 from tracklib.core import (AFMap, TrackCollection, listify,
-                           Raster, BBOX_ALIGN_LL)
+                           Raster, BBOX_ALIGN_LL, NO_DATA_VALUE)
 
 
 
 def summarize(collection, af_algos, aggregates,
-              resolution=None, margin:float=0.05, align=BBOX_ALIGN_LL, verbose:bool=True):
+              resolution=None, margin:float=0.05, align=BBOX_ALIGN_LL, verbose:bool=True,
+              novalue=NO_DATA_VALUE):
     """
     Example:
         af_algos = [algo.speed, algo.speed]
@@ -71,7 +72,8 @@ def summarize(collection, af_algos, aggregates,
         print("Error: af_names and aggregates must have the same number elements")
         return 0
 
-    raster = Raster(bbox=collection.bbox(), resolution=resolution, margin=margin, align=align)
+    raster = Raster(bbox=collection.bbox(), resolution=resolution, margin=margin, align=align,
+                    novalue=novalue)
 
     # Pour chaque algo-agg on crée une grille vide
     for idx, af_algo in enumerate(af_algos):

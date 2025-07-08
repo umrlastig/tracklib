@@ -78,10 +78,11 @@ class TestSummarising(TestCase):
         #  Construction du raster
         marge = 0.0
         res = (60, 60)
-        raster = summarize(collection, af_algos, cell_operators, res, marge)
+        raster = summarize(collection, af_algos, cell_operators, res, marge,
+                           novalue=0)
         # print (raster.collectionValuesGrid)
 
-        self.assertEqual(raster.getNoDataValue(), NO_DATA_VALUE)
+        self.assertEqual(raster.getNoDataValue(), 0)
 
         self.assertEqual(raster.xmin, 10.0 - marge*(370-10))
         self.assertEqual(raster.xmax, 370.0 + marge*(370-10))
@@ -308,7 +309,8 @@ class TestSummarising(TestCase):
 
         # ---------------------------------------------------------------------
         raster = summarize(tracks, af_algos, cell_operators,
-                               resolution, marge, align=BBOX_ALIGN_LL)
+                               resolution, marge, align=BBOX_ALIGN_LL,
+                               novalue=0)
         map1 = raster.getAFMap('uid#co_count_distinct')
         map1.plotAsVectorGraphic()
         # print (raster)
@@ -370,22 +372,22 @@ class TestSummarising(TestCase):
         self.assertEqual(map1.grid[1][0], 3)
         self.assertEqual(map1.grid[2][0], 3)
         self.assertEqual(map1.grid[3][0], 3)
-        self.assertEqual(map1.grid[4][0], 0)
+        self.assertEqual(map1.grid[4][0], NO_DATA_VALUE)
 
         self.assertEqual(map1.grid[0][1], 3)
         self.assertEqual(map1.grid[1][1], 3)
         self.assertEqual(map1.grid[2][1], 1)
-        self.assertEqual(map1.grid[3][1], 0)
-        self.assertEqual(map1.grid[4][1], 0)
+        self.assertEqual(map1.grid[3][1], NO_DATA_VALUE)
+        self.assertEqual(map1.grid[4][1], NO_DATA_VALUE)
 
-        self.assertEqual(map1.grid[0][2], 0)
-        self.assertEqual(map1.grid[1][2], 0)
+        self.assertEqual(map1.grid[0][2], NO_DATA_VALUE)
+        self.assertEqual(map1.grid[1][2], NO_DATA_VALUE)
         self.assertEqual(map1.grid[2][2], 3)
         self.assertEqual(map1.grid[3][2], 3)
         self.assertEqual(map1.grid[4][2], 3)
 
-        self.assertEqual(map1.grid[0][3], 0)
-        self.assertEqual(map1.grid[1][3], 0)
+        self.assertEqual(map1.grid[0][3], NO_DATA_VALUE)
+        self.assertEqual(map1.grid[1][3], NO_DATA_VALUE)
         self.assertEqual(map1.grid[2][3], 3)
         self.assertEqual(map1.grid[3][3], 3)
         self.assertEqual(map1.grid[4][3], 3)
@@ -413,13 +415,13 @@ class TestSummarising(TestCase):
         self.assertEqual(map1.grid[1][0], 3)
         self.assertEqual(map1.grid[2][0], 3)
         self.assertEqual(map1.grid[3][0], 3)
-        self.assertEqual(map1.grid[4][0], 0)
+        self.assertEqual(map1.grid[4][0], NO_DATA_VALUE)
 
         self.assertEqual(map1.grid[0][1], 3)
         self.assertEqual(map1.grid[1][1], 2)
         self.assertEqual(map1.grid[2][1], 1)
-        self.assertEqual(map1.grid[3][1], 0)
-        self.assertEqual(map1.grid[4][1], 0)
+        self.assertEqual(map1.grid[3][1], NO_DATA_VALUE)
+        self.assertEqual(map1.grid[4][1], NO_DATA_VALUE)
 
         self.assertEqual(map1.grid[0][2], 1)
         self.assertEqual(map1.grid[1][2], 3)
@@ -427,8 +429,8 @@ class TestSummarising(TestCase):
         self.assertEqual(map1.grid[3][2], 3)
         self.assertEqual(map1.grid[4][2], 3)
 
-        self.assertEqual(map1.grid[0][3], 0)
-        self.assertEqual(map1.grid[1][3], 0)
+        self.assertEqual(map1.grid[0][3], NO_DATA_VALUE)
+        self.assertEqual(map1.grid[1][3], NO_DATA_VALUE)
         self.assertEqual(map1.grid[2][3], 3)
         self.assertEqual(map1.grid[3][3], 3)
         self.assertEqual(map1.grid[4][3], 3)
