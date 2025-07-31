@@ -597,6 +597,8 @@ def computeBend(track, angle_min = pi/2):
     '''
     
     track.createAnalyticalFeature('bend', 0)
+    track.createAnalyticalFeature('angle', 0)
+
     if not track.hasAnalyticalFeature('inflection'):
         computeInflection(track)
     if not track.hasAnalyticalFeature('vertex'):
@@ -625,13 +627,15 @@ def computeBend(track, angle_min = pi/2):
             angle_virage = angleBetweenThreePoints(track.getObs(deb), track.getObs(i), 
                                                    track.getObs(fin))
             # print (angle_virage*180/pi, angle_min*180/pi)
-            if angle_virage < angle_min:
+            if angle_virage < angle_min and 0 < angle_virage:
                 # print (deb, fin, angle_virage, garde)
                 # Le virage est un bon virage, on prend tous les points
                 for j in range(deb, fin):
                     track.setObsAnalyticalFeature('bend', j, 1)
+                    track.setObsAnalyticalFeature('angle', j, angle_virage)
                 if fin < track.size():
                     track.setObsAnalyticalFeature('bend', fin, 1)
+                    track.setObsAnalyticalFeature('angle', fin, angle_virage)
             
 
 
