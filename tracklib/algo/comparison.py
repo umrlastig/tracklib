@@ -210,7 +210,7 @@ def _compare_pointwise(track1, track2, p, dim) -> float:
 # ------------------------------------------------------------------------------
 # Auxiliary function for Haussdorf computation
 # ------------------------------------------------------------------------------
-def _premiereComposanteHausdorff(track1, track2):
+def premiereComposanteHausdorff(track1, track2):
     result = 0
     for p in range(track1.size()):
         point = track1.getObs(p)
@@ -235,8 +235,8 @@ def _premiereComposanteHausdorff(track1, track2):
 # Haussdorf distance computation
 # ------------------------------------------------------------------------------
 def _hausdorff(track1, track2):
-    return max(_premiereComposanteHausdorff(track1, track2),
-        _premiereComposanteHausdorff(track2, track1))
+    return max(premiereComposanteHausdorff(track1, track2),
+        premiereComposanteHausdorff(track2, track1))
 
 # ------------------------------------------------------------------------------
 # Aeral distance computation
