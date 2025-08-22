@@ -50,6 +50,7 @@ from __future__ import annotations
 from typing import Literal, Union, Dict, Tuple
 #from tracklib.util.exceptions import *
 
+import copy
 import random
 #from typing import Union
 import progressbar
@@ -158,6 +159,14 @@ class Edge:
     def __str__(self) -> str:
         """Print the edge"""
         return "Edge #" + str(self.id)
+    
+    def copy(self):
+        """Copy the current object
+
+        :return: Copy of edge
+        """
+        return copy.deepcopy(self)
+
 
 
 class Network:
