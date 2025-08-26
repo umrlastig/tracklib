@@ -501,18 +501,24 @@ class TrackReader:
         track = Track()
 
         wkt = wkt.upper()
-        if wkt[0:4] == "POLY":
+        if wkt[0:4].upper() == "POLY":
             wkt = wkt.split("((")[1].split("))")[0]
             wkt = wkt.split(",")
-        elif wkt[0:4] == "LINE":
+        elif wkt[0:4].upper() == "LINE":
             wkt = wkt.split("(")[1].split(")")[0]
             wkt = wkt.split(",")
-        elif wkt[0:7] == "MULTIPO":
+        elif wkt[0:7].upper() == "MULTIPO":
             wkt = wkt.split("((")[1].split("))")[0]
             wkt = wkt.split(",")
             if wkt[0] == "(":
                 wkt = wkt[1:]
             wkt = wkt.split("),(")[0]  # Multipolygon not handled yet
+        elif wkt[0:15].upper() == "MULTILINESTRING":
+            wkt = wkt.split("((")[1].split("))")[0]
+            wkt = wkt.split(",")
+            if wkt[0] == "(":
+                wkt = wkt[1:]
+            wkt = wkt.split("),(")[0]  # Multilinestring not handled yet
         else:
             raise WrongArgumentError("This type of wkt is not yet implemented.")
 
