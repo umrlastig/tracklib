@@ -176,10 +176,6 @@ class Network:
     ROUTING_ALGO_DIJKSTRA = 0
     ROUTING_ALGO_ASTAR = 1
 
-    # Analytical features
-    # AF_LINK = "#link"
-    # AF_WEIGHT = "#weight"
-
     def __init__(self):
         """:class:`Network` constructor"""
 
