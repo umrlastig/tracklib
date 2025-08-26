@@ -60,7 +60,7 @@ from . import (ObsTime, ENUCoords, GeoCoords, Obs,
                Bbox,
                co_median)
 from tracklib.util import intersection, Polygon
-from tracklib.util.exceptions import QueryError, AnalyticalFeatureError 
+from tracklib.util.exceptions import QueryError, AnalyticalFeatureError, OperatorError 
 from tracklib.plot import IPlotVisitor, MatplotlibVisitor
 from tracklib.algo import (BIAF_SPEED, BIAF_ABS_CURV, 
                            computeAbsCurv, 
