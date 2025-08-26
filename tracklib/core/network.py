@@ -177,8 +177,8 @@ class Network:
     ROUTING_ALGO_ASTAR = 1
 
     # Analytical features
-    AF_LINK = "#link"
-    AF_WEIGHT = "#weight"
+    # AF_LINK = "#link"
+    # AF_WEIGHT = "#weight"
 
     def __init__(self):
         """:class:`Network` constructor"""
@@ -538,7 +538,7 @@ class Network:
         return id in self.NODES
 
     def hasEdge(self, id: int) -> bool:
-        """Check if a node with a given id exist
+        """Check if a edge with a given id exist
 
         :param id: edge id to test
         """
