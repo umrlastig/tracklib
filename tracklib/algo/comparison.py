@@ -84,15 +84,16 @@ MODE_MATCHING_FRECHET = 4   # Discrete Frechet macthing                   [s]
 # For infinite norm: set p = float('inf')
 # All methods (except aeral distance) are parameterized by a distance d.
 # ------------------------------------------------------------------------------
-MODE_COMPARISON_POINTWISE = 101 # Distances btw points at each index [p][m][s]
-MODE_COMPARISON_NN        = 102 # Distances btw nearest neighbours   [p][m]
-MODE_COMPARISON_HAUSDORFF = 103 # Haussdorf distance                       [s]
-MODE_COMPARISON_AREAL     = 104 # Mac Master aeral distance                [s]
-MODE_COMPARISON_RADIAL    = 105 # Radial distance (for closed loops)       [s]
-MODE_COMPARISON_DTW       = 106 # Distances between DTW pairs        [p][m][s]
-MODE_COMPARISON_FDTW      = 107 # Distances between FDTW pairs       [p][m][s]
-MODE_COMPARISON_FRECHET   = 108 # Distance between Frechet pairs        [m][s] 
-MODE_COMPARISON_SYNC      = 109 # Time-synchronized comparison       [p][m][s]
+MODE_COMPARISON_POINTWISE    = 101      # Distances btw points at each index [p][m][s]
+MODE_COMPARISON_NN           = 102      # Distances btw nearest neighbours      [p][m]
+MODE_COMPARISON_HAUSDORFF    = 103      # Haussdorf distance                       [s]
+MODE_COMPARISON_DI_HAUSDORFF = 110      # Directed Hausdorff distance from A to B
+MODE_COMPARISON_AREAL        = 104      # Mac Master aeral distance                [s]
+MODE_COMPARISON_RADIAL       = 105      # Radial distance (for closed loops)       [s]
+MODE_COMPARISON_DTW          = 106      # Distances between DTW pairs        [p][m][s]
+MODE_COMPARISON_FDTW         = 107      # Distances between FDTW pairs       [p][m][s]
+MODE_COMPARISON_FRECHET      = 108      # Distance between Frechet pairs        [m][s] 
+MODE_COMPARISON_SYNC         = 109      # Time-synchronized comparison       [p][m][s]
 # ------------------------------------------------------------------------------
 
 
@@ -143,6 +144,8 @@ def compare(track1, track2, mode=MODE_COMPARISON_POINTWISE, p=1, dim=2, verbose=
         return _dtw_comparison(track1, track2, p, dim, verbose, plot)
     if (mode == MODE_COMPARISON_FDTW):
         return _fdtw_comparison(track1, track2, p, dim, verbose, plot)
+    if (mode == MODE_COMPARISON_DI_HAUSDORFF):
+        return premiereComposanteHausdorff(track1, track2)
     raise UnknownModeError("Unavailable mode for comparison of 2 tracks")
 
 
@@ -215,6 +218,12 @@ def premiereComposanteHausdorff(track1, track2):
     for p in range(track1.size()):
         point = track1.getObs(p)
         distmin = track2.getFirstObs().distance2DTo(point);
+        for i in range(1, track2.size()): 
+            obs2i = track2.getObs(i)
+            dist = obs2i.distance2DTo(point)
+            distmin = min(dist, distmin)
+        result = max(distmin, result)
+        '''
         for i in range(0, track2.size() - 1): 
             obs2i = track2.getObs(i)
             obs2ip1 = track2.getObs(i+1)
@@ -228,6 +237,7 @@ def premiereComposanteHausdorff(track1, track2):
                         obs2ip1.position.getX(), obs2ip1.position.getY()])
             distmin = min(dist, distmin)
         result = max(distmin, result)
+        '''
     return result
   
 
