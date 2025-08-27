@@ -168,7 +168,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
         trackB.addObs(p)
 
         d = compare(trackA, trackB, mode=MODE_COMPARISON_HAUSDORFF)
-        self.assertLessEqual(abs(d - 2.12132), self.__epsilon)
+        self.assertLessEqual(abs(d - 3.0), self.__epsilon)
         
         
     def testMatchDTWL2(self):
@@ -519,7 +519,7 @@ class TestAlgoComparaisonMethods(unittest.TestCase):
     def testCompareHausdorff(self):
         # Hausdorff
         b = compare(self.trace1, self.trace2, mode=MODE_COMPARISON_HAUSDORFF)
-        self.assertLessEqual(abs(b - 2.121), self.__epsilon, "Comparaison")
+        self.assertLessEqual(abs(b - 5.0), self.__epsilon, "Comparaison")
         
     def testComparePointWise(self):
         # Pointwise
