@@ -175,7 +175,7 @@ class TrackReader:
 
 
     @staticmethod
-    def __readFromCsv(path: str, fmt:TrackFormat, verbose) -> Union(Track, TrackCollection):
+    def __readFromCsv(path: str, fmt:TrackFormat, verbose) -> Union(Track, TrackCollection): # type: ignore
         """
         Read track(s) from CSV file(s) with geometry structured in coordinates.
 
@@ -277,7 +277,7 @@ class TrackReader:
                     if not fmt.srid.upper() in [
                         "ENUCOORDS", "ENU", "GEOCOORDS", "GEO", "ECEFCOORDS", "ECEF",
                     ]:
-                        raise WrongArgumentError("Error: unknown coordinate type [" + str(srid) + "]")
+                        raise WrongArgumentError("Error: unknown coordinate type [" + str(fmt.srid) + "]")
                     if fmt.srid.upper() in ["ENUCOORDS", "ENU"]:
                         point = Obs(ENUCoords(E, N, U), time)
                     if fmt.srid.upper() in ["GEOCOORDS", "GEO"]:
