@@ -50,7 +50,7 @@ from tracklib.core import Network
 
 class NetworkWriter:
     """
-    Write Network to CSV or KML files.
+    Write Network to CSV files.
     """
 
     @staticmethod
