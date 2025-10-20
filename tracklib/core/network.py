@@ -123,9 +123,16 @@ class Node:
         """
         return self.coord.distance2DTo(node.coord)
 
-    def plot(self, sym="r+"):
+    def plot(self, sym="r+", append=False):
         """Plot the node"""
-        plt.plot(self.coord.getX(), self.coord.getY(), sym)
+        if isinstance(append, bool):
+            if append:
+                ax1 = plt.gca()
+            else:
+                fig, ax1 = plt.subplots(figsize=(10, 3))
+        else:
+            ax1 = plt
+        ax1.plot(self.coord.getX(), self.coord.getY(), sym)
 
 
 class Edge:
@@ -149,12 +156,12 @@ class Edge:
         self.orientation = 0
         self.weight = 0
 
-    def plot(self, sym: str = "k-"):
+    def plot(self, sym: str = "k-", append=False):
         """Plot the edge
 
         :param sym: TODO
         """
-        self.geom.plot(sym)
+        self.geom.plot(sym, append=append)
 
     def __str__(self) -> str:
         """Print the edge"""
