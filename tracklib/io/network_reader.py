@@ -246,7 +246,8 @@ class NetworkReader:
 
                 row = []
 
-                idd = feature["id"]
+                # idd = feature["id"]
+                idd = feature['properties']['cleabs']
                 # nature = feature['properties']['nature']
                 fictif = feature["properties"]["fictif"]
                 if fictif == "True":
