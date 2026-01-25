@@ -114,7 +114,7 @@ class TrackWriter:
         if isinstance(tracks, Track):
             TrackWriter.writeToFile(tracks, path, id_E, id_N, id_U, id_T, separator, h, af_names)
         else:
-            TrackWriter.writeToFile(tracks, path, "csv", id_E, id_N, id_U, id_T, separator, h)
+            TrackWriter.writeToFile(tracks, path, "csv", id_E, id_N, id_U, id_T, separator, h, af_names=af_names)
    
             
         
@@ -277,6 +277,8 @@ class TrackWriter:
             afs = ""
             if len(af_names) > 0:
                 for af_name in af_names:
+                    #if af_name == 'num':
+                    #    print ('    ', type(track.getObsAnalyticalFeature(af_name, i)))
                     afs += fmt.separator + str(track.getObsAnalyticalFeature(af_name, i))
                     
             f.write(TrackWriter.__printInOrder(x, y, z, t,
@@ -287,7 +289,7 @@ class TrackWriter:
     
     @staticmethod
     def writeToFiles(trackCollection, pathDir, ext='csv', id_E=-1, id_N=-1, id_U=-1,
-                     id_T=-1, separator=",", h=0):
+                     id_T=-1, separator=",", h=0, af_names=[]):
         """TODO"""
 
         root = "track_output"
@@ -303,7 +305,7 @@ class TrackWriter:
                     TrackWriter.writeToFile(track, path, id_E)  # Write by name
             else:
                 TrackWriter.writeToFile(
-                    track, path, id_E, id_N, id_U, id_T, separator, h
+                    track, path, id_E, id_N, id_U, id_T, separator, h, af_names
                 )  # Write from input parameters
 
 
