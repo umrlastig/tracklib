@@ -47,11 +47,11 @@ This module contain a class to manage the collections of tracks
 
 from typing import Literal   
 import matplotlib.pyplot as plt
-#from tracklib.util.exceptions import *
+from random import randint
 
 import tracklib as tracklib
 from tracklib.core import removeNan, listify, compLike
-
+#from tracklib.util.exceptions import *
 
 
 class TrackCollection:
@@ -584,3 +584,43 @@ class TrackCollection:
         for i in range(len(self)):
             L.append(self.__TRACES[i].length())
         return L
+
+
+    # =========================================================================
+    #
+    def randNTracks(self, N):
+        """
+        Return a sample of n tracks from the collection.
+
+
+        Parameters
+        ----------
+        N : int
+            
+
+        Returns
+        -------
+        TrackCollection with n Tracks.
+
+        """
+        if self.size() <= 0:
+            return None
+        if self.size() < N:
+            return None
+        if self.size() == N:
+            return self
+
+
+        TAB = set()
+        while len(TAB) < N:
+            n = randint(0, self.size()-1)
+            TAB.add(n)
+
+        sets = TrackCollection()
+        for idx in TAB:
+            sets.addTrack(self.getTrack(idx))
+
+        return sets
+
+
+

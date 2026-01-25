@@ -1175,7 +1175,8 @@ class Track:
         else:
             for i in range(self.size()):
                 self.getObs(i).features.append(val_init)
-                
+
+
     def updateAnalyticalFeature(self, name, new_val):
         """
         Update values of an AF.
