@@ -48,7 +48,6 @@ This module contains the class to manage Network
 # For type annotation
 from __future__ import annotations
 from typing import Literal, Union, Dict, Tuple
-#from tracklib.util.exceptions import *
 
 import copy
 import random
@@ -57,6 +56,7 @@ import progressbar
 import numpy as np
 import matplotlib.pyplot as plt
 
+from tracklib.util.exceptions import NetworkError
 import tracklib as tracklib
 from tracklib.core import (ECEFCoords, ENUCoords, GeoCoords,
                       Obs,
@@ -211,6 +211,8 @@ class Network:
 
         :param Node: Node to add
         """
+        if node is None:
+            raise NetworkError("Cannot create node in the network: node is None.")
         if node.id not in self.NODES:
             self.NODES[node.id] = node
             self.__idx_nodes.append(node.id)
@@ -228,11 +230,18 @@ class Network:
         :param source: Source Node
         :param target: Target Node
         """
-        self.addNode(source)
-        self.addNode(target)
-        if target.id not in self.NODES:
-            self.NODES[target.id] = target
-            self.__idx_nodes.append(target.id)
+        try:
+            self.addNode(source)
+        except NetworkError as ex:
+            print(f"Cannot create source node for the edge: " + str(edge.id) + ". {ex}")
+        try:
+            self.addNode(target)
+        except NetworkError as ex:
+            print(f"Cannot create target node for the edge: " + str(edge.id) + ". {ex}")
+
+        #if target.id not in self.NODES:
+        #    self.NODES[target.id] = target
+        #    self.__idx_nodes.append(target.id)
 
         edge.source = self.NODES[source.id]
         edge.target = self.NODES[target.id]
@@ -253,8 +262,32 @@ class Network:
         self.NBGR_EDGES[target.id].append(edge.id)
         self.NBGR_NODES[source.id].append(target.id)
         self.NBGR_NODES[target.id].append(source.id)
+
         if not self.spatial_index is None:
             self.spatial_index.addFeature(edge.geom, self.getNumberOfEdges() - 1)
+
+    def removeEdge(self, edge: Edge):
+        """Remove a :class:`Edge` to the current :class:`Network`
+        Topology is not handled here and must be managed by the caller.
+
+        :param edge: Edge to remove
+        """
+
+        del self.EDGES[edge.id]
+        self.__idx_edges.remove(edge.id)
+
+        # TODO
+        # if not self.spatial_index is None:
+        #    self.spatial_index.addFeature(edge.geom, self.getNumberOfEdges() - 1)
+
+    def removeNode(self, node: Node):
+        """Remove a class:`Node` to the current :class:`Network`
+        Topology is not handled here and must be managed by the caller.
+
+        :param node: node to remove
+        """
+        del self.NODES[node.id]
+        self.__idx_nodes.remove(node.id)
 
     def __iter__(self):
         """Define an iterator on Network"""
@@ -307,6 +340,13 @@ class Network:
             self.NODES[id].coord = self.NODES[id].coord.toENUCoords(base)
         for id in self.__idx_edges:
             self.EDGES[id].geom.toENUCoords(base)
+
+    def toProjCoords(self, srid):
+        """TODO"""
+        for id in self.__idx_nodes:
+            self.NODES[id].coord = self.NODES[id].coord.toProjCoords(srid)
+        for id in self.__idx_edges:
+            self.EDGES[id].geom.toProjCoords(srid)
 
     def getSRID(self) -> int:
         """Return the SRID of network
@@ -470,6 +510,13 @@ class Network:
         """
         return self.__idx_nodes
 
+    def getIndexEdges(self) -> list[int]:
+        """Return the list of seted edges
+
+        :return: A list of edges id
+        """
+        return self.__idx_edges
+
     def getNumberOfNodes(self) -> int:
         """Number of nodes in the network
 
@@ -596,7 +643,7 @@ class Network:
             if append:
                 ax1 = plt.gca()
             else:
-                fig, ax1 = plt.subplots(figsize=(10, 3))
+                fig, ax1 = plt.subplots(figsize=(10, 8))
         else:
             ax1 = plt
 

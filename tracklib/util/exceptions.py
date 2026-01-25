@@ -30,3 +30,5 @@ class IOPathError(Exception):
     pass
 class WrongArgumentError(Exception):
     pass
+class NetworkError(Exception):
+    pass
