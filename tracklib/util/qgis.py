@@ -43,7 +43,7 @@ from tracklib import Track, TrackCollection, ENUCoords, ObsTime, Obs
 
 try:
     from qgis.PyQt.QtCore import QVariant
-    from qgis.core import QgsProject, QgsVectorLayer, QgsField
+    from qgis.core import QgsProject, QgsVectorLayer, QgsField, QgsRasterLayer
     from qgis.core import QgsPointXY, QgsFeature, QgsGeometry, QgsWkbTypes
     from qgis.core import QgsMarkerSymbol, QgsLineSymbol, QgsSimpleLineSymbolLayer
     #from qgis.core import QgsFillSymbol
@@ -307,19 +307,27 @@ class QGIS:
         elif title is None and type == 'POINT':
             title = "Tracks points"
             
-        FEATURES = QGIS.__createTablePoints(collection, type)
+        FEATURES = QGIS.__createTablePoints(collection, type, AF)
         
         if type == 'POINT':
             layer = QgsVectorLayer("Point?" + crs, title, "memory")
             pr = layer.dataProvider()
-            pr.addAttributes([QgsField("idtrace", QVariant.Int)])
+            pr.addAttributes([QgsField("idtrace", QVariant.String)])
             pr.addAttributes([QgsField("idpoint", QVariant.Int)])
-            #if AF:
-            #    for af_name in collection.getTrack(0).getListAnalyticalFeatures():
-            #        pr.addAttributes([QgsField(af_name, QVariant.Double)])
+            if AF:
+                for af_name in collection.getTrack(0).getListAnalyticalFeatures():
+                    pr.addAttributes([QgsField(af_name, QVariant.Double)])
             layer.updateFields()
-            for f in FEATURES:
-                pr.addFeatures([f])
+
+            for i in range(len(FEATURES)):
+                f = FEATURES[i]
+                #ATTs = [f[0], f[1]]
+                #if AF:
+                #    for af_name in collection.getTrack(i).getListAnalyticalFeatures():
+                #        val = collection.getTrack(i).getObsAnalyticalFeature(af_name, i)
+                #        ATTs.append(float(val))
+                #    f.setAttributes(ATTs)
+                pr.addFeature(f)
             layer.updateExtents()
             
             if style == None:
@@ -332,8 +340,12 @@ class QGIS:
         elif type == 'LINE':
             layer = QgsVectorLayer("LineString?" + crs, title, "memory")
             pr = layer.dataProvider()
-            pr.addAttributes([QgsField("idtrace", QVariant.Int)])
+            pr.addAttributes([QgsField("idtrace", QVariant.String)])
             pr.addAttributes([QgsField("nbpoint", QVariant.Int)])
+            #if AF:
+            #    for af_name in collection.getTrack(0).getListAnalyticalFeatures():
+            #        print (af_name)
+            #        pr.addAttributes([QgsField(af_name, QVariant.String)])
             layer.updateFields()
             for f in FEATURES:
                 pr.addFeatures([f])
@@ -348,7 +360,7 @@ class QGIS:
 
         return layer
 
-    def __createTablePoints(collection, type):
+    def __createTablePoints(collection, type, AF=False):
         FEATURES = []
         for i in range(collection.size()):
             track = collection.getTrack(i)
@@ -356,7 +368,7 @@ class QGIS:
             #if tid > 0:
             #    id = tid
             #else:
-            id = i
+            id = track.uid
             POINTS = []
             for j in range(track.size()):
                 obs = track.getObs(j)
@@ -370,11 +382,11 @@ class QGIS:
                 POINTS.append(pt)
                 gPoint = QgsGeometry.fromPointXY(pt)
                 
-                attrs = [id, j]
+                attrs = [str(id), j]
                 # AF
-                #if AF:
-                #    for af_name in track.getListAnalyticalFeatures():
-                #        attrs.append(track.getObsAnalyticalFeature(af_name, j))
+                if AF:
+                    for af_name in track.getListAnalyticalFeatures():
+                        attrs.append(track.getObsAnalyticalFeature(af_name, j))
                         
                 if type == 'POINT':                
                     fet = QgsFeature()
@@ -489,6 +501,8 @@ class QGIS:
                     track.addObs(point)
 
         return track
+
+
 
 
 '''

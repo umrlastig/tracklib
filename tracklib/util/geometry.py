@@ -332,6 +332,8 @@ def proj_polyligne(Xp, Yp, x, y):
     return distmin, xproj, yproj, iproj
 
 
+
+
 # --------------------------------------------------------------------------
 # Function to detect if a point is on left or right side of track
 # --------------------------------------------------------------------------
