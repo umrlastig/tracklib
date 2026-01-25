@@ -62,17 +62,40 @@ class NetworkWriter:
             output += "source" + separator
             output += "target" + separator
             output += "direction" + separator
-            output += "wkt\n"
+            output += "wkt" + separator
+            output += "wkt_source" + separator
+            output += "wkt_target\n"
+
         else:
             output = ""
 
         for idedge in network.EDGES:
             edge = network.EDGES[idedge]
-            output += edge.id + separator
-            output += edge.source.id + separator
-            output += edge.target.id + separator
+            output += str(edge.id) + separator
+            output += str(edge.source.id) + separator
+            output += str(edge.target.id) + separator
             output += str(edge.orientation) + separator
-            output += '"' + edge.geom.toWKT() + '"'
+
+            output += '"' + edge.geom.toWKT() + '"' + separator
+
+            output += ' POINT('
+            if edge.geom.getSRID() == "Geo":
+                output += (str)(edge.source.coord.lon) + " "
+                output += (str)(edge.source.coord.lat)
+            elif edge.geom.getSRID() == "ENU":
+                output += (str)(edge.source.coord.E) + " "
+                output += (str)(edge.source.coord.N)
+            output += ')' + separator
+
+            output += ' POINT('
+            if edge.geom.getSRID() == "Geo":
+                output += (str)(edge.target.coord.lon) + " "
+                output += (str)(edge.target.coord.lat)
+            elif edge.geom.getSRID() == "ENU":
+                output += (str)(edge.target.coord.E) + " "
+                output += (str)(edge.target.coord.N)
+            output += ')'
+
             output += "\n"
 
         if path:
