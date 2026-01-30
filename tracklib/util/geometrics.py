@@ -844,7 +844,7 @@ def fitCircle(track, iter_max=100, epsilon=1e-10):
             - X[2] ** 2
         )
         sign = -1 * (residuals[i] < 0) + 1 * (residuals[i] > 0)
-        residuals[i] = sign * math.sqrt(abs(residuals[i]))
+        residuals[i] = float(sign) * math.sqrt(abs(float(residuals[i])))
     track.createAnalyticalFeature("#circle_residual", residuals)
     return Circle(ENUCoords(X[0][0], X[1][0]), X[2])
 
