@@ -813,7 +813,7 @@ def fitCircle(track, iter_max=100, epsilon=1e-10):
             J[i, 0] = 2 * (X[0, 0] - x)
             J[i, 1] = 2 * (X[1, 0] - y)
             J[i, 2] = -2 * R
-            B[i, 0] = X[2] - R
+            B[i, 0] = X[2, 0] - R
         try:
             dX = np.linalg.solve(np.transpose(J) @ J, np.transpose(J) @ B)
             X = X + dX
