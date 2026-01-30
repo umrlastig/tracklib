@@ -9,10 +9,7 @@ requirements = (
         "matplotlib", 
         "scikit-image", 
         "progressbar2",
-        "csv",
-        "json",
-        "requests",
-        "xml.dom"
+        "requests"
 )
 
 dev_requirements = (
