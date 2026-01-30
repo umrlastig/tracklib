@@ -12,3 +12,6 @@ sphinx-autodoc-typehints
 nbsphinx
 autodocsumm
 pydata-sphinx-theme
+csv
+json
+requests
