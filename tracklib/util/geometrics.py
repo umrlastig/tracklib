@@ -839,9 +839,9 @@ def fitCircle(track, iter_max=100, epsilon=1e-10):
     residuals = [0.0] * len(track)
     for i in range(len(residuals)):
         residuals[i] = (
-            (track[i].position.getX() - X[0]) ** 2
-            + (track[i].position.getY() - X[1]) ** 2
-            - X[2] ** 2
+            (track[i].position.getX() - X[0,0]) ** 2
+            + (track[i].position.getY() - X[1,0]) ** 2
+            - X[2,0] ** 2
         )
         sign = -1 * (residuals[i] < 0) + 1 * (residuals[i] > 0)
         residuals[i] = sign * math.sqrt(abs(residuals[i]))
