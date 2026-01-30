@@ -507,7 +507,7 @@ def mapOn(
                 message = "ITERATION " + ("{:0" + str(N) + "d}").format(iter) + "  "
                 message += (
                     "RMSE = "
-                    + "{:10.5f}".format(np.sqrt(B.transpose() @ B / (2 * n)))
+                    + "{:10.5f}".format(math.sqrt((B.transpose() @ B / (2 * n)).item()))
                     + " m    "
                 )
                 message += "MAX = " + "{:10.5f}".format(np.max(B)) + " m    "
