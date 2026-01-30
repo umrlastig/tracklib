@@ -836,7 +836,7 @@ def fitCircle(track, iter_max=100, epsilon=1e-10):
         if max(max(NX0, NX1), NX2) < epsilon:
             break
 
-    residuals = [0] * len(track)
+    residuals = [0.0] * len(track)
     for i in range(len(residuals)):
         residuals[i] = (
             (track[i].position.getX() - X[0]) ** 2
@@ -844,7 +844,7 @@ def fitCircle(track, iter_max=100, epsilon=1e-10):
             - X[2] ** 2
         )
         sign = -1 * (residuals[i] < 0) + 1 * (residuals[i] > 0)
-        residuals[i] = float(sign) * math.sqrt(abs(float(residuals[i])))
+        residuals[i] = sign * math.sqrt(abs(residuals[i]))
     track.createAnalyticalFeature("#circle_residual", residuals)
     return Circle(ENUCoords(X[0][0], X[1][0]), X[2])
 
