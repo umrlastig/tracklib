@@ -190,6 +190,9 @@ def douglas_peucker (track, eps):
         ya = L[0].position.getY()
         xb = L[n - 1].position.getX()
         yb = L[n - 1].position.getY()
+        if abs(xa - xb) < 0.001 and abs(ya - yb) < 0.001:
+            continue
+
         d = distance_to_segment(x0, y0, xa, ya, xb, yb)
         if d > dmax:
             dmax = d
