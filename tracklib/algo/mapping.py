@@ -518,7 +518,7 @@ def mapOn(
             print("CONVERGENCE REACHED AFTER " + str(iter) + " ITERATIONS")
             glob_res = 0.0
             for l in range(0, 2 * n, 2):
-                res = math.sqrt(B[l] ** 2 + B[l + 1] ** 2)
+                res = math.sqrt((B[l] ** 2 + B[l + 1] ** 2).item())
                 glob_res += res
                 message = "RESIDUAL (2D) POINT " + str(int(l / 2)) + ":  "
                 message += "{:4.3f}".format(res) + " m"
