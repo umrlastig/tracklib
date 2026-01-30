@@ -4,7 +4,7 @@
 #import matplotlib.pyplot as plt
 
 
-__version__ = '0.7.2'
+__version__ = '0.7.3'
 __credits__ = 'IGN'
 
 

@@ -809,7 +809,7 @@ def fitCircle(track, iter_max=100, epsilon=1e-10):
             obs = track[i].position
             x = obs.getX()
             y = obs.getY()
-            R = math.sqrt((x - X[0]) ** 2 + (y - X[1]) ** 2)
+            R = math.sqrt((x - X[0, 0]) ** 2 + (y - X[1, 0]) ** 2)
             J[i, 0] = 2 * (X[0, 0] - x)
             J[i, 1] = 2 * (X[1, 0] - y)
             J[i, 2] = -2 * R
