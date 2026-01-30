@@ -1,0 +1,4 @@
+# Ignorer la documentation
+doc/** linguist-documentation
+data/** linguist-documentation
+resources/** linguist-documentation
