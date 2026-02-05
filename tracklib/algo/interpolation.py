@@ -842,6 +842,73 @@ def __bsplines_spatial(track, ds, degree=3, knots_nb=None):
         print(message)
 
 
+# ------------------------------------------------------------
+# Elastic conflation of a track on a list of points
+# ------------------------------------------------------------
+# Inputs: - track     : track to conflate
+#         - pts       : list of observation points
+#         - pts_index : list of observation points indices
+#		  - h         : the 'wavelength' of covariance h
+# Output: a track preserving the shape of input track while 
+# enforcing constraints set by the list of observation points
+# ------------------------------------------------------------
+# Conflation is performed with 'colocation least squares' 
+# method and gaussian covariogram of std. dev. h
+# ------------------------------------------------------------
+def conflate(track, pts, pts_index, h):
+	
+	output = track.copy()
+	
+	# ----------------------------------------------
+	# Number of observation nodes
+	# ----------------------------------------------
+	n = len(pts)
+
+	# ----------------------------------------------	
+	# Covariance matrix between obs nodes
+	# ----------------------------------------------
+	Cij = np.zeros((n,n))
+	for i in range(n-1):
+		for j in range(i, n):
+			Cij[i,j] = track[pts_index[i]].position.distance2DTo(track[pts_index[j]].position)
+	Cij = np.exp(-((Cij + Cij.T)/h)**2)
+	
+	# ----------------------------------------------	
+	# Loop on computation nodes
+	# ----------------------------------------------
+	for idx_t in range(len(track)):
+		
+		# ----------------------------------------------	
+		# Covariance vector obs/computation nodes
+		# ----------------------------------------------
+		Ci = np.zeros((n,1))
+		for i in range(n):
+			Ci[i] = track[pts_index[i]].position.distance2DTo(track[idx_t].position)
+		Ci = np.exp(-(Ci/h)**2)
+		
+		# ----------------------------------------------	
+		# Observation vectors	
+		# ----------------------------------------------	
+		Bx = np.zeros((n,1))
+		By = np.zeros((n,1))
+		Bz = np.zeros((n,1))
+		for i in range(n):
+			Bx[i] = pts[i].getX() - track[pts_index[i]].position.getX()
+			By[i] = pts[i].getY() - track[pts_index[i]].position.getY()
+			Bz[i] = pts[i].getZ() - track[pts_index[i]].position.getZ()
+			
+		# ----------------------------------------------	
+		# Computing solution
+		# ----------------------------------------------	
+		W = np.linalg.solve(Cij, Ci)
+		dx = (W.T @ Bx)[0,0]
+		dy = (W.T @ By)[0,0]
+		dz = (W.T @ Bz)[0,0]
+		output[idx_t].position.translate(dx, dy, dz)
+
+	return(output)
+
+
 def smooth_cv(track, smooth_function, params=[], verbose=True):
     """Cross validation for determining optimal parameters of
      smoothing/interpolating/simplifying functions
