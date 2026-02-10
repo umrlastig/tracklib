@@ -277,9 +277,14 @@ class TrackWriter:
             afs = ""
             if len(af_names) > 0:
                 for af_name in af_names:
+                    v = track.getObsAnalyticalFeature(af_name, i)
+                    if isinstance(v, int) or isinstance(v, float):
+                        afs += fmt.separator + str(f"{v:.0f}")
+                    else:
+                        afs += fmt.separator + str(v)
                     #if af_name == 'num':
                     #    print ('    ', type(track.getObsAnalyticalFeature(af_name, i)))
-                    afs += fmt.separator + str(track.getObsAnalyticalFeature(af_name, i))
+                    #afs += fmt.separator + str(track.getObsAnalyticalFeature(af_name, i))
                     
             f.write(TrackWriter.__printInOrder(x, y, z, t,
                                               afs, O, fmt.separator) + "\n")
