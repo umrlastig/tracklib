@@ -60,8 +60,9 @@ from tracklib.util import (UnknownModeError,
 
 from tracklib.util import dist_point_to_segment, Polygon, centerOfPoints
 from . import synchronize, computeRadialSignature
-from tracklib.core import (ENUCoords, TrackCollection, 
+from tracklib.core import (ENUCoords, TrackCollection,
                            priority_dict, co_median)
+
 
 # ------------------------------------------------------------------------------
 # List of available matching methods
@@ -112,9 +113,10 @@ MODE_AGG_L2     = 302         # Standard barycenter of points
 MODE_AGG_LInf   = 303         # Center of minimum enclosing circle
 # ------------------------------------------------------------------------
 # List of available methods to choose representative point selection
-MODE_MASTER_RANDOM = -200       # Random track
-MODE_MASTER_MEDIAN_LEN = -100   # Closest to the median of track lengths
-MODE_MASTER_MEDIAN_GEOM = -300  # Minimizes the sum of distances to other tracks
+MODE_MASTER_RANDOM = -200        # Random track
+MODE_MASTER_MEDIAN_LEN = -100    # Closest to the median of track lengths
+MODE_MASTER_MEDIAN_GEOM = -300   # Minimizes the sum of distances to other tracks
+MODE_MASTER_MORE_DETAILED = -400 # after simplification, which have greatest obs
 # ------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
@@ -680,6 +682,18 @@ def _getMasterTrack(tracks, mode, mode_compare=MODE_COMPARISON_DTW, p=1):
                 smax = S
                 ref = k
         return ref
+    if mode == MODE_MASTER_MORE_DETAILED:
+        nb = - sys.maxsize
+        ref = -1
+        for k in range(0, tracks.size()):
+            t = tracklib.simplify(tracks[k], tolerance=p, mode=tracklib.MODE_SIMPLIFY_DOUGLAS_PEUCKER, verbose=False)
+            if t.size() > nb:
+                nb = t.size()
+                ref = k
+        return ref
+
+
+
     return mode
 
 # ------------------------------------------------------------------------
@@ -819,7 +833,9 @@ def fusion(tracks, mode=MODE_MATCHING_DTW, master=MODE_MASTER_MEDIAN_LEN, p=1, d
 
     # Terminal case
     if N <= recursive:
-        return _fusion(tracks, mode=mode, master=master, p=p, dim=dim, represent_method=represent_method, agg_method=agg_method, constraint=constraint, iter_max=iter_max, verbose=verbose)
+        return _fusion(tracks, mode=mode, master=master, p=p, dim=dim,
+                       represent_method=represent_method, agg_method=agg_method,
+                       constraint=constraint, iter_max=iter_max, verbose=verbose)
 
     # Recursive call
     else: 
@@ -829,7 +845,13 @@ def fusion(tracks, mode=MODE_MATCHING_DTW, master=MODE_MASTER_MEDIAN_LEN, p=1, d
            ini = Npg*i; fin = Npg*(i+1)
            if i == (recursive-1):
                fin = len(tracks)
-           subtracks.addTrack(fusion(tracks[ini:fin], mode=mode, master=master, p=p, dim=dim, represent_method=represent_method, constraint=constraint, agg_method=agg_method, recursive=recursive, verbose=verbose))
-       return fusion(subtracks, mode=mode, master=master, p=p, dim=dim, represent_method=represent_method, constraint=constraint, agg_method=agg_method, recursive=recursive, verbose=verbose)
+           subtracks.addTrack(fusion(tracks[ini:fin], mode=mode, master=master, p=p, dim=dim,
+                                     represent_method=represent_method, constraint=constraint,
+                                     agg_method=agg_method,
+                                     iter_max=iter_max, recursive=recursive, verbose=verbose))
+       return fusion(subtracks, mode=mode, master=master, p=p, dim=dim,
+                     represent_method=represent_method, constraint=constraint,
+                     agg_method=agg_method,
+                     recursive=recursive, iter_max=iter_max, verbose=verbose)
 
 
