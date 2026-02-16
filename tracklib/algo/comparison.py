@@ -58,7 +58,9 @@ from tracklib.util import (UnknownModeError,
                            SizeError,
                            MissingArgumentError)
 
-from tracklib.util import dist_point_to_segment, Polygon, centerOfPoints
+from tracklib.util import (dist_point_to_segment, Polygon,
+                           centerOfPoints, boundingShape,
+                           MODE_ENCLOSING_MBR)
 from . import synchronize, computeRadialSignature
 from tracklib.core import (ENUCoords, TrackCollection,
                            priority_dict, co_median)
@@ -113,10 +115,11 @@ MODE_AGG_L2     = 302         # Standard barycenter of points
 MODE_AGG_LInf   = 303         # Center of minimum enclosing circle
 # ------------------------------------------------------------------------
 # List of available methods to choose representative point selection
-MODE_MASTER_RANDOM = -200        # Random track
-MODE_MASTER_MEDIAN_LEN = -100    # Closest to the median of track lengths
-MODE_MASTER_MEDIAN_GEOM = -300   # Minimizes the sum of distances to other tracks
+MODE_MASTER_RANDOM        = -200 # Random track
+MODE_MASTER_MEDIAN_LEN    = -100 # Closest to the median of track lengths
+MODE_MASTER_MEDIAN_GEOM   = -300 # Minimizes the sum of distances to other tracks
 MODE_MASTER_MORE_DETAILED = -400 # after simplification, which have greatest obs
+MODE_MASTER_LONGEST_MBR   = -500 # Longest MBR
 # ------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
@@ -676,7 +679,8 @@ def _getMasterTrack(tracks, mode, mode_compare=MODE_COMPARISON_DTW, p=1):
                     continue
                 track1 = tracks[k]
                 track2 = tracks[l]
-                d = compare(track1, track2, mode=mode_compare, p=p, verbose=False)
+                d = compare(track1, track2, mode=mode_compare, p=p,
+                            verbose=False)
                 S += d
             if S < smax:
                 smax = S
@@ -686,13 +690,24 @@ def _getMasterTrack(tracks, mode, mode_compare=MODE_COMPARISON_DTW, p=1):
         nb = - sys.maxsize
         ref = -1
         for k in range(0, tracks.size()):
-            t = tracklib.simplify(tracks[k], tolerance=p, mode=tracklib.MODE_SIMPLIFY_DOUGLAS_PEUCKER, verbose=False)
+            t = tracklib.simplify(tracks[k], tolerance=p,
+                                  mode=tracklib.MODE_SIMPLIFY_DOUGLAS_PEUCKER,
+                                  verbose=False)
             if t.size() > nb:
                 nb = t.size()
                 ref = k
         return ref
-
-
+    if mode == MODE_MASTER_LONGEST_MBR:
+        Lmax = - sys.maxsize
+        ref = -1
+        for k in range(0, tracks.size()):
+            track = tracks[k]
+            R = boundingShape(track, mode=MODE_ENCLOSING_MBR)
+            L = R[3]
+            if L > Lmax:
+                Lmax = L
+                ref = k
+        return ref
 
     return mode
 
