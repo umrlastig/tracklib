@@ -10,7 +10,8 @@ from tracklib import (Obs, ObsTime, ENUCoords, Track,
                       diameter, convexHull, plotPolygon,
                       minimumBoundingRectangle, geometricMedian,
                       seed, generate, minCircleOfPoints, centerOfPoints,
-                      MODE_AGG_MEDIAN, MODE_AGG_L1, MODE_AGG_L2, MODE_AGG_LInf)
+                      MODE_AGG_MEDIAN, MODE_AGG_L1, MODE_AGG_L2, MODE_AGG_LInf,
+                      boundingShape, MODE_ENCLOSING_MBR)
 
 
 class TestAlgoGeometricsMethods(unittest.TestCase):
@@ -439,6 +440,28 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
             center = centerOfPoints(points, mode=MODES[i])
             self.assertLessEqual((center-ctrls[i]).norm(), 1e-9, "")
 
+    def testMBR(self):
+        trace = Track()
+        trace.addObs(Obs(ENUCoords(1, 0), ObsTime()))
+        trace.addObs(Obs(ENUCoords(5.5, 3), ObsTime()))
+        trace.addObs(Obs(ENUCoords(2.5, 4.5), ObsTime()))
+        trace.addObs(Obs(ENUCoords(1.5, 4.5), ObsTime()))
+        trace.addObs(Obs(ENUCoords(0, 3.5), ObsTime()))
+        trace.addObs(Obs(ENUCoords(1, 0), ObsTime()))
+
+        trace.plot('b-')
+
+        R = boundingShape(trace, mode=MODE_ENCLOSING_MBR)
+        T = []
+        for coord in R[0]:
+            T.append(coord[0])
+            T.append(coord[1])
+        plotPolygon(T)
+
+        self.assertTrue(abs(R[3] - 5.41) < 0.01)
+        self.assertTrue(abs(R[2] - 3.47) < 0.01)
+
+
 if __name__ == '__main__':
     suite = unittest.TestSuite()
 
@@ -452,6 +475,7 @@ if __name__ == '__main__':
     suite.addTest(TestAlgoGeometricsMethods("testminCircle"))
     suite.addTest(TestAlgoGeometricsMethods("testgeometricMedian"))
     suite.addTest(TestAlgoGeometricsMethods("testcenterOfPoints"))
+    suite.addTest(TestAlgoGeometricsMethods("testMBR"))
 
     runner = unittest.TextTestRunner()
     runner.run(suite)
