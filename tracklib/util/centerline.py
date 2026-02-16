@@ -4,6 +4,7 @@ import datetime
 import progressbar
 import numpy as np
 
+from rtree import index
 from scipy.spatial import Voronoi
 
 import shapely
@@ -11,15 +12,17 @@ from shapely.ops import unary_union
 from shapely.geometry import mapping, shape
 from shapely.geometry import LineString, Point
 
+import matplotlib.pyplot as plt
 
 # =================================================================================================
 # CLASS FOR COMPUTING CENTER LINES
 # =================================================================================================
 class Centerline(object):
 
-    def __init__(self, inputGEOM, dist=0.5):
+    def __init__(self, inputGEOM, dist, clean_dist):
         self.inputGEOM = inputGEOM
         self.dist = abs(dist)
+        self.clean_dist = clean_dist
 
     def createCenterline(self):
         """
@@ -37,47 +40,44 @@ class Centerline(object):
         minx = int(min(self.inputGEOM.envelope.exterior.xy[0]))
         miny = int(min(self.inputGEOM.envelope.exterior.xy[1]))
 
-        print("\r\n*Upsampling polygon borders...")
+        print("\r\n*["+str(datetime.datetime.now())+"]  Upsampling polygon borders...")
         border = np.array(self.densifyBorder(self.inputGEOM, minx, miny))
 
         vor = Voronoi(border)
         vertex = vor.vertices
 
-        print("\r\n*Computing polygon skeleton...")
+        print("\r\n*["+str(datetime.datetime.now())+"]  Computing polygon skeleton...")
         lst_lines = []
         Nvor = len(list(vor.ridge_vertices))
         bar = progressbar.ProgressBar(max_value = Nvor)
         for j, ridge in enumerate(vor.ridge_vertices):
-            bar.update(j)
-            '''
-            if -1 not in ridge:
-                line = LineString([
-                    (vertex[ridge[0]][0] + minx, vertex[ridge[0]][1] + miny),
-                    (vertex[ridge[1]][0] + minx, vertex[ridge[1]][1] + miny)])
-
-                if line.within(self.inputGEOM) and len(line.coords[0]) > 1:
-                    lst_lines.append(line)
-            '''
-
+            bar.update(j)     
             if -1 not in ridge:
                 line = LineString([
                     (vertex[ridge[0]][0] + minx, vertex[ridge[0]][1] + miny),
                     (vertex[ridge[1]][0] + minx, vertex[ridge[1]][1] + miny)])
                 if len(line.coords[0]) > 1:
                     lst_lines.append(line)
+            
         
         bar.finish()
-            
-        print("\r\n*Filtering skeleton to form center line")            
+        
+        input_geom_buffer = shapely.buffer(self.inputGEOM, self.clean_dist)
+
+        print("\r\n*["+str(datetime.datetime.now())+"]  Filtering skeleton to form center line...")            
         lst_lines_out = []
         bar = progressbar.ProgressBar(max_value = len(lst_lines))
         for i in range(len(lst_lines)):
-            bar.update(i)
-            if (shapely.contains(self.inputGEOM, lst_lines[i])):
-                lst_lines_out.append(lst_lines[i])                   
+            bar.update(i)   
+            
+            if not (shapely.contains(input_geom_buffer, lst_lines[i])):
+                continue            
+  
+            lst_lines_out.append(lst_lines[i])
+             
         bar.finish()
-        
         return unary_union(lst_lines_out)
+        
 
     def densifyBorder(self, polygon, minx, miny):
         """
@@ -158,30 +158,31 @@ class Centerline(object):
 # =================================================================================================
 class Shp2centerline(object):
 
-    def __init__(self, inputSHP, outputSHP, dist):
+    def __init__(self, inputSHP, outputSHP, dist, clean_dist):
         self.inshp = inputSHP
         self.outshp = outputSHP
         self.dist = abs(dist)
+        self.clean_dist = clean_dist
         self.dct_polygons = {}
         self.dct_centerlines = {}
 
         # ------------------------------------------------------------------------
         # Load polygon from input file
         # ------------------------------------------------------------------------
-        print('*Importing polygons from: [' + self.inshp + ']... ', end='')
+        print('*['+str(datetime.datetime.now())+']  Importing polygons from: [' + self.inshp + ']... ', end='')
         self.importSHP()
         print("done\r\n")
         
         # ------------------------------------------------------------------------
         # Computing center line
         # ------------------------------------------------------------------------    
-        print('*Center line computation')
+        print('*['+str(datetime.datetime.now())+']  Center line computation')
         self.run()
         
         # ------------------------------------------------------------------------
         # Output center line
         # ------------------------------------------------------------------------  
-        print('\r\n*Exporting center line to: [' + self.outshp+ ']... ', end='')
+        print('\r\n*['+str(datetime.datetime.now())+']  Exporting center line to: [' + self.outshp+ ']... ', end='')
         self.export2SHP()
         print("done")
 
@@ -196,7 +197,7 @@ class Shp2centerline(object):
 
         for key in self.dct_polygons.keys():
             poly_geom = self.dct_polygons[key]
-            centerlineObj = Centerline(poly_geom, self.dist)
+            centerlineObj = Centerline(poly_geom, self.dist, self.clean_dist)
 
             self.dct_centerlines[key] = centerlineObj.createCenterline()
 
@@ -261,7 +262,8 @@ if __name__ == "__main__":
     usage_text += "Inputs:                                                               \r\n"
     usage_text += "      - <in>     : input shape file (.shp)                            \r\n" 
     usage_text += "      - <out>    : output shape file (.shp)     [def. <in>_ctl.shp]   \r\n"
-    usage_text += "      - <interp> : interpolation distance (m)   [def. 5]              \r\n"
+    usage_text += "      - <interp> : interpolation distance (m)   [def. 30 m]           \r\n"
+    usage_text += "      - <clean>  : cleaning distance (m)        [def.  0 m]           \r\n"
     usage_text += "----------------------------------------------------------------------\r\n"
     usage_text += "Output: shape file containing center line as a multi-linestring       \r\n" 
     usage_text += "----------------------------------------------------------------------\r\n"
@@ -277,22 +279,26 @@ if __name__ == "__main__":
     input_file  = sys.argv[1]
     output_file = input_file.split(".")[0] + "_ctl.shp"
     interp_dist = 25
+    clean_dist  = 0 
     
     
     if (len(sys.argv) > 2):
         output_file = sys.argv[2]
     if (len(sys.argv) > 3):
         interp_dist = float(sys.argv[3])
+    if (len(sys.argv) > 4):
+        clean_dist = float(sys.argv[4])
       
-    confirm_text  = "INPUT FILE            :  " +       input_file + "\r\n"  
-    confirm_text += "OUTPUT FILE           :  " +      output_file + "\r\n"  
-    confirm_text += "INTERPOLATION DISTANCE:  " + str(interp_dist) + " m\r\n"  
+    confirm_text  = "INPUT FILE         :  " +       input_file + "\r\n"  
+    confirm_text += "OUTPUT FILE        :  " +      output_file + "\r\n"  
+    confirm_text += "INTERP. DISTANCE   :  " + str(interp_dist) + " m\r\n"  
+    confirm_text += "CLEAN.  DISTANCE   :  " + str(clean_dist) + " m\r\n"  
     confirm_text += "----------------------------------------------------------------------\r\n"
     print(confirm_text, end='')
     
     t1 = datetime.datetime.now().timestamp()
 
-    Shp2centerline(input_file, output_file, interp_dist)
+    Shp2centerline(input_file, output_file, interp_dist, clean_dist)
     
     dt = datetime.datetime.now().timestamp()-t1
     end_text   = "----------------------------------------------------------------------\r\n"
@@ -300,3 +306,6 @@ if __name__ == "__main__":
     end_text  += "[Elapased time: " + str(round(dt, 3)) + " sec]                        \r\n"
     end_text  += "----------------------------------------------------------------------\r\n"
     print(end_text)
+
+
+    plt.show()
