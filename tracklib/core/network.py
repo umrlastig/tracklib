@@ -365,27 +365,41 @@ class Network:
             count += self.EDGES[id].geom.length()
         return count
 
-    def simplify(self, tolerance, mode: int = 1):
+    def simplify(self, tolerance, mode: int = 1, verbose: bool = False):
         """Simplification of current network
 
         :param tolerance: TODO
         :param mode: Mode of simplification. The possibles values are:
-
-            1. DOUGLAS_PEUCKER
-            2. VISVALINGAM
-            3. MINIMIZE_LARGEST_DEVIATION
-            4. MINIMIZE_ELONGATION_RATIO
-            5. PRECLUDE_LARGE_DEVIATION
-            6. FREE
-            7. FREE_MAXIMIZE
+        
+            0. MODE_SIMPLIFY_REM_POS_DUP
+            1. MODE_SIMPLIFY_DOUGLAS_PEUCKER
+            2. MODE_SIMPLIFY_VISVALINGAM
+            3. MODE_SIMPLIFY_MINIMIZE_LARGEST_DEVIATION
+            4. MODE_SIMPLIFY_MINIMIZE_ELONGATION_RATIO
+            5. MODE_SIMPLIFY_PRECLUDE_LARGE_DEVIATION
+            6. MODE_SIMPLIFY_FREE
+            7. MODE_SIMPLIFY_FREE_MAXIMIZE
 
             See :func:`algo.Simplification.simplify` documentation for more infos
 
         """
+        if (verbose):
+            print("---------------------------------------------------------------------------------------")
+            print("NETWORK SIMPLIFICATION")
+            print("---------------------------------------------------------------------------------------")
+            total_in = 0; total_out = 0
         for id in self.__idx_edges:
+            inp_nb = len(self.EDGES[id].geom); total_in += inp_nb
             self.EDGES[id].geom = simplify(
                 self.EDGES[id].geom, tolerance, mode
             )
+            total_out += len(self.EDGES[id].geom)
+            if (verbose):
+                print(("EDGE # {0}   INPUT NB OF VERTICES: {1:5}      OUTPUT NB OF VERTICES: {2:5}").format(id, inp_nb, len(self.EDGES[id].geom)))
+        if (verbose):
+            print("---------------------------------------------------------------------------------------")
+            print(("TOTAL INPUT NB OF VERTICES: {1:5}      TOTAL OUTPUT NB OF VERTICES: {2:5}   (-{3:2.1f}%)").format(id, total_in, total_out, 100*(1-total_out/total_in)))
+            print("---------------------------------------------------------------------------------------")
 
     # ------------------------------------------------------------
     # Spatial index creation, export and import functions

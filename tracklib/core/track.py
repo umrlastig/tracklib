@@ -865,14 +865,6 @@ class Track:
     # Track cleaning functions
     # =========================================================================
 
-    # -----------------------------------------------------
-    # Same timestamp (up to et, default 1 ms) and same
-    # position (up to ep, default 1 cm). All duplicate
-    # points are removed.
-    # -----------------------------------------------------
-    def removeObsDup(self, et = 1e-3, ep = 1e-2):
-        """TODO"""
-        return None
 
     # -----------------------------------------------------
     # Same timestamp (up to et, default 1 ms) and different
@@ -923,9 +915,22 @@ class Track:
     # timestamps. All intermediary points discarded
     # -----------------------------------------------------
     def removePosDup(self, ep = 1e-2):
-        """TODO"""
+        p = self[-1].position
+        for i in range(len(self)-2, -1, -1):
+            if (p.distanceTo(self[i].position) <= ep):
+                self.__removeObsById(i)
+            else:
+                p = self[i].position
         return None
-
+        
+    # -----------------------------------------------------
+    # Same timestamp (up to et, default 1 ms) and same
+    # position (up to ep, default 1 cm). All duplicate
+    # points are removed.
+    # -----------------------------------------------------
+    def removeObsDup(self, et = 1e-3, ep = 1e-2):
+        return None        
+        
     # =========================================================================
     # Basic private methods to handle track object
     # =========================================================================

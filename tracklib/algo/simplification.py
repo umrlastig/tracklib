@@ -59,7 +59,7 @@ from tracklib.algo import (MODE_SEGMENTATION_MINIMIZE, MODE_SEGMENTATION_MAXIMIZ
                            optimalSegmentation, compare,
                            MODE_COMPARISON_POINTWISE)
 
-
+MODE_SIMPLIFY_REM_POS_DUP = 0
 MODE_SIMPLIFY_DOUGLAS_PEUCKER = 1
 MODE_SIMPLIFY_VISVALINGAM = 2
 MODE_SIMPLIFY_SQUARING = 3
@@ -80,6 +80,8 @@ def simplify(track, tolerance, mode=MODE_SIMPLIFY_DOUGLAS_PEUCKER, verbose=True)
     
     Differents modes of simplification are implemented in tracklib:
         
+    - MODE_SIMPLIFY_REM_POS_DUP (0)
+          remove position duplicate up to a distance treshold  
     - MODE_SIMPLIFY_DOUGLAS_PEUCKER (1)
           tolerance is max allowed deviation with respect to straight line
     - MODE_SIMPLIFY_VISVALINGAM (2)
@@ -98,6 +100,10 @@ def simplify(track, tolerance, mode=MODE_SIMPLIFY_DOUGLAS_PEUCKER, verbose=True)
           tolerance is a customed function to maximize
 
     """
+    if mode == MODE_SIMPLIFY_REM_POS_DUP:
+        out = track.copy()
+        out.removePosDup(tolerance)
+        return out
     if mode == MODE_SIMPLIFY_DOUGLAS_PEUCKER:
         return douglas_peucker(track, tolerance)
     if mode == MODE_SIMPLIFY_VISVALINGAM:
@@ -140,6 +146,8 @@ def visvalingam (track, eps):
     """
     eps **= 2
     output = track.copy()
+    if (len(output) < 3):
+        return output
     output.addAnalyticalFeature(aire_visval, "@aire")
     while 1:
         id = output.operate(Operator.ARGMIN, "@aire")
