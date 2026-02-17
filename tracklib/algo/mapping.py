@@ -130,7 +130,7 @@ def __mapOnNetwork (
     track, network, obs_noise=50, transition_cost=10, search_radius=50, 
     debug=False, verbose=False):
     """TODO"""
-    
+
     # print (search_radius, obs_noise, transition_cost)
 
     if debug:
@@ -151,19 +151,17 @@ def __mapOnNetwork (
     for i in to_run:
         STATES.append([])
         p = track[i].position
-        #unit = 1
+
         cellsize = min(network.spatial_index.csize, network.spatial_index.lsize)
         newunit = math.ceil(search_radius / cellsize)
-        #print (newunit, search_radius, cellsize)
-        E = network.spatial_index.neighborhood(p, unit=newunit)
-        if E != None:
+
+        if (network.spatial_index.covers(p)):
+            E = network.spatial_index.neighborhood(p, unit=newunit)
             for elem in E:
                 eg = network.EDGES[network.getEdgeId(elem)].geom
                 p, d, v = __projOnTrack(track[i].position, eg)
                 if d < search_radius:
-                    STATES[-1].append (
-                        (p, elem, __distToNode(eg, p, v, 0), __distToNode(eg, p, v, 1))
-                    )
+                    STATES[-1].append((p, elem, __distToNode(eg, p, v, 0), __distToNode(eg, p, v, 1)))
                     if debug:
                         wkt = tracklib.Track([Obs(track[i].position), Obs(p)]).toWKT()
                         f1.write(str(i) + ' "' + wkt + '" ' + str(d) + "\n")

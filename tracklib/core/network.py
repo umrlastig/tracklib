@@ -64,6 +64,7 @@ from tracklib.core import (ECEFCoords, ENUCoords, GeoCoords,
                       TrackCollection,
                       Bbox)
 from tracklib.algo import simplify
+from tracklib.algo import computeAbsCurv
 from tracklib.core import Track
 
 
@@ -387,12 +388,11 @@ class Network:
             print("---------------------------------------------------------------------------------------")
             print("NETWORK SIMPLIFICATION")
             print("---------------------------------------------------------------------------------------")
-            total_in = 0; total_out = 0
+        total_in = 0; total_out = 0
         for id in self.__idx_edges:
             inp_nb = len(self.EDGES[id].geom); total_in += inp_nb
-            self.EDGES[id].geom = simplify(
-                self.EDGES[id].geom, tolerance, mode
-            )
+            self.EDGES[id].geom = simplify(self.EDGES[id].geom, tolerance, mode)
+            computeAbsCurv(self.EDGES[id].geom)
             total_out += len(self.EDGES[id].geom)
             if (verbose):
                 print(("EDGE # {0}   INPUT NB OF VERTICES: {1:5}      OUTPUT NB OF VERTICES: {2:5}").format(id, inp_nb, len(self.EDGES[id].geom)))
@@ -564,7 +564,7 @@ class Network:
         return self.__idx_nodes[n]
 
     def getEdgeId(self, n: int) -> int:
-        """The return the id of the n-est Edge
+        """Return the id of the n-est Edge
 
         :param n: Position of the Edge
         :return: Id of the Edge

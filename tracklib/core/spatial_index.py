@@ -178,6 +178,20 @@ class SpatialIndex:
             ur = ENUCoords(self.xmin, self.ymin)
             return Bbox(ll, ur)
         return None
+        
+    # ------------------------------------------------------------
+    # Returns true if a coord p is in grid extent
+    # ------------------------------------------------------------
+    def covers(self, p):
+        if (p.getX() < self.xmin):
+            return False
+        if (p.getY() < self.ymin):
+            return False
+        if (p.getX() > self.xmax):
+            return False
+        if (p.getY() > self.ymax):
+            return False
+        return True
 
     def addFeature(self, track, num):
         """TODO"""
