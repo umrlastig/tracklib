@@ -51,6 +51,7 @@ from typing import Union
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+import sys
 import math
 import numpy as np
 from collections import defaultdict
@@ -463,6 +464,26 @@ class AFMap:
         if fig != None:
             fig.colorbar(im, cax=cax, orientation='vertical', fraction=0.046)
 
+    # ------------------------------------------------------------------
+    # Filter operation on an AFMap
+    # ------------------------------------------------------------------
+    # Inputs (outputs void):
+    #     - mask        :      a (2n+1) x (2n+1) float number matrix 
+    #     - aggregation :      a python function [mask -> float number]
+    # ------------------------------------------------------------------
+    def filter(self, mask, aggregation):
+        if (mask.shape[0] != mask.shape[1]):
+            print("Error: mask must be a square matrix"); sys.exit()
+        if (mask.shape[0]%2 == 0):
+            print("Error: mask must be odd-size matrix"); sys.exit()
+        if (np.any(mask.T - mask) != 0):
+            print("Error: mask must be a symmetric matrix"); sys.exit()
+        output = self.grid*0; mask_temp = mask*0
+        s = int((mask.shape[0]-1)/2)
+        for i in range(s, output.shape[0]-s):
+            for j in range(s, output.shape[1]-s):
+                output[i,j] = aggregation(self.grid[(i-s):(i+s+1), (j-s):(j+s+1)]*mask)
+        self.grid = output
 
     def statistics(self):
         stats = np.array(self.grid, dtype=np.float32)
