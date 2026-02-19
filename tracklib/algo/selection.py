@@ -396,6 +396,9 @@ class Constraint:
                         to_remove.append(i)
                 t.removeObsList(to_remove)
                 if t.size() > 0:
+                    # on ajoute les AF
+                    #for afname in track.getListAnalyticalFeatures():
+                    #    t.createAnalyticalFeature(afname)
                     output.addTrack(t)
             return output
 
