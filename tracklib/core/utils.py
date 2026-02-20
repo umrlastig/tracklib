@@ -600,3 +600,120 @@ def co_median(tarray):
         mediane = 0.5 * (tab_sort[index1] + tab_sort[index2])
 
     return mediane
+    
+
+
+
+# -----------------------------------------------------------------------------
+# Essais élasticité
+# -----------------------------------------------------------------------------
+
+class Segment:
+	
+	def __init__(self, fx, fy, ti, tf):
+		self.fx = fx
+		self.fy = fy
+		self.ti = ti
+		self.tf = tf
+	
+	def eval(self, T):
+		out = []
+		for t in T:
+			out.append((self.fx(t), self.fy(t)))
+		return out
+
+	def discretize(self, dt, ti=None, tf=None):
+		if ti == None:
+			ti = self.ti
+		if tf == None:
+			tf = self.tf
+		T = np.arange(ti, tf+dt, dt)
+		return self.eval(T)
+
+	def plot(self, dt, ti=None, tf=None, sym='ko', lwd=1, markersize=1):
+		if ti == None:
+			ti = self.ti
+		if tf == None:
+			tf = self.tf
+		pts = self.discretize(dt, ti, tf)
+		X = [p[0] for p in pts]
+		Y = [p[1] for p in pts]
+		plt.plot(X, Y, sym, markersize, lwd)
+
+class Border:
+	
+	def __init__(self, segments = []):
+		self.segments = segments
+		
+	def addSegment(self, segment):
+		self.segments.append(segment)
+		
+	def discretize(self, dt):
+		out = []
+		for s in self.segments:
+			for p in s.discretize(dt)[:-1]:
+				out.append(p)
+		return out
+		
+	def plot(self, dt, sym='ko', lwd=1, markersize=1):
+		pts = self.discretize(dt)
+		X = [p[0] for p in pts]
+		Y = [p[1] for p in pts]
+		X.append(X[0])
+		Y.append(Y[0])
+		plt.plot(X, Y, sym, linewidth=lwd, markersize=markersize)
+
+
+class Domain:
+	
+	def __init__(self, outer, inner=[]):
+		self.outer = outer
+		self.inner = inner
+		
+	def setOuter(self, outer):
+		self.outer = outer
+	
+	def addInner(self, inner):
+		self.inner.append(inner)
+	
+	def discretize(self, dt):
+		outer_dis = self.outer.discretize(dt)
+		inner_dis = [inner.discretize(dt) for inner in self.inner]
+		return (outer_dis, inner_dis)
+
+	def plot(self, dt, sym='ko', lwd=1, markersize=1):
+		self.outer.plot(dt, sym, lwd, markersize)
+		for border in self.inner:
+			border.plot(dt, sym, lwd, markersize)
+
+	def triangulate(self, h, eps=1e-10, rand=True):
+		shell = self.outer.discretize(h)
+		holes = [inner.discretize(h) for inner in self.inner]
+		polygon = shapely.Polygon(shell=shell, holes=holes)
+		xmin = np.min(polygon.exterior.xy[0])
+		xmax = np.max(polygon.exterior.xy[0])
+		ymin = np.min(polygon.exterior.xy[1])
+		ymax = np.max(polygon.exterior.xy[1])
+		for ix in np.arange(xmin+h, xmax, h):
+			for jy in np.arange(ymin+h, ymax, h):
+				x = ix + rand*(random.random()-0.5)*h/2.0
+				y = jy + rand*(random.random()-0.5)*h/2.0
+				triangle = shapely.Polygon([(x-eps, y), (x+eps, y), (x, y+eps)])
+				if (triangle.within(polygon)):
+					holes.append(((x-eps, y), (x+eps, y), (x, y+eps)))
+		polygon = shapely.Polygon(shell=shell, holes=holes)
+		return Triangulation(shapely.constrained_delaunay_triangles(polygon))
+		
+
+class Triangulation:
+	
+	def __init__(self, triangles):
+		self.triangles = triangles
+
+	def plot(self, sym='k-', lwd=0.2):
+		for triangle in shapely.get_parts(self.triangles):
+			x,y = triangle.exterior.xy
+			plt.plot(x, y, 'k-', linewidth=lwd)
+
+
+
