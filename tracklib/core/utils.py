@@ -58,6 +58,12 @@ import matplotlib.colors as mcolors
 from heapq import heapify, heappush, heappop
 
 
+import math
+import random
+import shapely
+import itertools
+import matplotlib.pyplot as plt
+
 
 # =============================================================================
 #   Gestion des valeurs non renseignées et non calculées
@@ -608,6 +614,12 @@ def co_median(tarray):
 # Essais élasticité
 # -----------------------------------------------------------------------------
 
+
+eps = 1e-10
+
+random.seed(123457)
+
+
 class Segment:
 	
 	def __init__(self, fx, fy, ti, tf):
@@ -627,7 +639,7 @@ class Segment:
 			ti = self.ti
 		if tf == None:
 			tf = self.tf
-		T = np.arange(ti, tf+dt, dt)
+		T = np.arange(ti, tf+dt, dt*(tf-ti)/abs(tf-ti))
 		return self.eval(T)
 
 	def plot(self, dt, ti=None, tf=None, sym='ko', lwd=1, markersize=1):
@@ -686,7 +698,7 @@ class Domain:
 		for border in self.inner:
 			border.plot(dt, sym, lwd, markersize)
 
-	def triangulate(self, h, eps=1e-10, rand=True):
+	def triangulate(self, h, rand=True):
 		shell = self.outer.discretize(h)
 		holes = [inner.discretize(h) for inner in self.inner]
 		polygon = shapely.Polygon(shell=shell, holes=holes)
@@ -708,12 +720,60 @@ class Domain:
 class Triangulation:
 	
 	def __init__(self, triangles):
-		self.triangles = triangles
+		
+		self.geom = triangles
+		self.nodes = []
+		self.faces = []
+		self.edges = []
+		
+		
+		X = []; Y = []; count = 0
+		for triangle in shapely.get_parts(self.geom):
+			x,y = triangle.exterior.xy
+			X.append(x[0]); Y.append(y[0]);
+			X.append(x[1]); Y.append(y[1]);
+			X.append(x[2]); Y.append(y[2]);
+			self.faces.append((count, count+1, count+2)); count += 3
 
-	def plot(self, sym='k-', lwd=0.2):
-		for triangle in shapely.get_parts(self.triangles):
+		index  = shapely.STRtree([shapely.Point(X[i], Y[i]) for i in range(len(X))]);
+		assoc = [i for i in range(len(X))]
+
+		for i in range(len(X)):
+			assoc[i] = np.min(index.query(shapely.box(X[i]-3*eps, Y[i]-3*eps, X[i]+3*eps, Y[i]+3*eps)))	
+
+		indices = sorted(list(set(assoc)))	
+		rename_indices = {}
+		for i in range(len(indices)):
+			rename_indices[indices[i]] = i
+
+		for i in range(len(indices)):
+			self.nodes.append((X[indices[i]], Y[indices[i]]))
+		
+		edges_dict = {}
+		for i in range(len(self.faces)):
+			fold = self.faces[i] 
+			fnew = (rename_indices[assoc[fold[0]]], rename_indices[assoc[fold[1]]], rename_indices[assoc[fold[2]]])
+			self.faces[i] = fnew	
+			edges_dict[tuple(sorted([fnew[0], fnew[1]]))] = 1
+			edges_dict[tuple(sorted([fnew[1], fnew[2]]))] = 1
+			edges_dict[tuple(sorted([fnew[2], fnew[0]]))] = 1
+			
+		self.edges = list(edges_dict.keys())
+			
+	def plot_old(self, sym='k-', lwd=0.2):
+		for triangle in shapely.get_parts(self.geom):
 			x,y = triangle.exterior.xy
 			plt.plot(x, y, 'k-', linewidth=lwd)
 
+	def plot_old2(self, sym='k-', lwd=0.2, markersize=2):
+		for i in range(len(self.faces)):
+			face = self.faces[i]
+			plt.plot([self.nodes[face[0]][0], self.nodes[face[1]][0]], [self.nodes[face[0]][1], self.nodes[face[1]][1]], sym, linewidth=lwd, markersize=markersize)
+			plt.plot([self.nodes[face[1]][0], self.nodes[face[2]][0]], [self.nodes[face[1]][1], self.nodes[face[2]][1]], sym, linewidth=lwd, markersize=markersize)
+			plt.plot([self.nodes[face[2]][0], self.nodes[face[0]][0]], [self.nodes[face[2]][1], self.nodes[face[0]][1]], sym, linewidth=lwd, markersize=markersize)
+
+	def plot(self, sym='k-', lwd=0.2, markersize=2):
+		for e in self.edges:
+			plt.plot([self.nodes[e[0]][0], self.nodes[e[1]][0]], [self.nodes[e[0]][1], self.nodes[e[1]][1]], sym, linewidth=lwd, markersize=markersize)
 
 
