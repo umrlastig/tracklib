@@ -57,12 +57,15 @@ import matplotlib.colors as mcolors
 
 from heapq import heapify, heappush, heappop
 
-
 import math
 import random
-import shapely
 import itertools
 import matplotlib.pyplot as plt
+
+try:
+    import shapely
+except ImportError:
+    print ('Code running in a no shapely environment')
 
 
 # =============================================================================
