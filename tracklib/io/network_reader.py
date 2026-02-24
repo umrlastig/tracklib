@@ -139,7 +139,9 @@ class NetworkReader:
             if verbose:
                 spamreader = progressbar.progressbar(spamreader, max_value=num_lines)
             for row in spamreader:
-                (edge, noeudIni, noeudFin) = readLineAndAddToNetwork(row, fmt)
+                res = readLineAndAddToNetwork(row, fmt)
+                if res != None:
+                    (edge, noeudIni, noeudFin) = res
                 network.addEdge(edge, noeudIni, noeudFin)
 
 
@@ -381,7 +383,7 @@ def readLineAndAddToNetwork(row, fmt):
 
     # Au moins 2 points
     if len(TAB_OBS) < 2:
-        return
+        return None
 
     track = Track(TAB_OBS)
     computeAbsCurv(track)
