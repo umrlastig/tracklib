@@ -1,5 +1,12 @@
+# -*- coding: utf-8 -*-
+
 import sys
-import fiona
+
+try:
+    import fiona
+except ImportError:
+    print ('Code running in a no fiona environment')
+
 import datetime
 import progressbar
 import numpy as np
@@ -7,10 +14,13 @@ import numpy as np
 from rtree import index
 from scipy.spatial import Voronoi
 
-import shapely
-from shapely.ops import unary_union
-from shapely.geometry import mapping, shape
-from shapely.geometry import LineString, Point
+try:
+    import shapely
+    from shapely.ops import unary_union
+    from shapely.geometry import mapping, shape
+    from shapely.geometry import LineString, Point
+except ImportError:
+    print ('Code running in a no shapely environment')
 
 import matplotlib.pyplot as plt
 
@@ -236,8 +246,12 @@ class Shp2centerline(object):
 
             for i, key in enumerate(self.dct_centerlines):
                 geom = self.dct_centerlines[key]
-                newline = {}
+                #print(shapely.is_valid(geom))
+                #print (geom.length)
+                #print (geom.geom_type)
+                #print (shapely.to_wkt(geom))
 
+                newline = {}
                 newline['id'] = key
                 newline['geometry'] = mapping(geom)
                 newline['properties'] = {'id': key}
@@ -267,7 +281,7 @@ if __name__ == "__main__":
     usage_text += "----------------------------------------------------------------------\r\n"
     usage_text += "Output: shape file containing center line as a multi-linestring       \r\n" 
     usage_text += "----------------------------------------------------------------------\r\n"
-	
+
     if (len(sys.argv) == 1):
         print(usage_text)
         sys.exit(0)
@@ -280,15 +294,14 @@ if __name__ == "__main__":
     output_file = input_file.split(".")[0] + "_ctl.shp"
     interp_dist = 25
     clean_dist  = 0 
-    
-    
+
     if (len(sys.argv) > 2):
         output_file = sys.argv[2]
     if (len(sys.argv) > 3):
         interp_dist = float(sys.argv[3])
     if (len(sys.argv) > 4):
         clean_dist = float(sys.argv[4])
-      
+
     confirm_text  = "INPUT FILE         :  " +       input_file + "\r\n"  
     confirm_text += "OUTPUT FILE        :  " +      output_file + "\r\n"  
     confirm_text += "INTERP. DISTANCE   :  " + str(interp_dist) + " m\r\n"  
@@ -307,5 +320,5 @@ if __name__ == "__main__":
     end_text  += "----------------------------------------------------------------------\r\n"
     print(end_text)
 
-
     plt.show()
+
