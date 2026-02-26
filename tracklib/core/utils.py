@@ -692,11 +692,9 @@ def conflateOnNetwork(geom, network, threshold=1e300, h=30, verbose=True):
 # Essais élasticité
 # -----------------------------------------------------------------------------
 
-
 eps = 1e-10
 
 random.seed(123457)
-
 
 class Segment:
 	
@@ -779,6 +777,7 @@ class Domain:
 	def triangulate(self, h, rand=True):
 		shell = self.outer.discretize(h)
 		holes = [inner.discretize(h) for inner in self.inner]
+		holes = [hole for hole in holes if (len(hole) > 3)]
 		polygon = shapely.Polygon(shell=shell, holes=holes)
 		xmin = np.min(polygon.exterior.xy[0])
 		xmax = np.max(polygon.exterior.xy[0])
@@ -792,17 +791,18 @@ class Domain:
 				if (triangle.within(polygon)):
 					holes.append(((x-eps, y), (x+eps, y), (x, y+eps)))
 		polygon = shapely.Polygon(shell=shell, holes=holes)
-		return Triangulation(shapely.constrained_delaunay_triangles(polygon))
+		return Triangulation(shapely.constrained_delaunay_triangles(polygon), h)
 		
 
 class Triangulation:
 	
-	def __init__(self, triangles):
+	def __init__(self, triangles, resolution):
 		
 		self.geom = triangles
 		self.nodes = []
 		self.faces = []
 		self.edges = []
+		self.resolution = resolution
 		
 		
 		X = []; Y = []; count = 0
@@ -828,30 +828,257 @@ class Triangulation:
 			self.nodes.append((X[indices[i]], Y[indices[i]]))
 		
 		edges_dict = {}
+		faces = []
 		for i in range(len(self.faces)):
 			fold = self.faces[i] 
 			fnew = (rename_indices[assoc[fold[0]]], rename_indices[assoc[fold[1]]], rename_indices[assoc[fold[2]]])
 			self.faces[i] = fnew	
-			edges_dict[tuple(sorted([fnew[0], fnew[1]]))] = 1
-			edges_dict[tuple(sorted([fnew[1], fnew[2]]))] = 1
-			edges_dict[tuple(sorted([fnew[2], fnew[0]]))] = 1
-			
+			if (fnew[0] != fnew[1]):
+				if (fnew[1] != fnew[2]):
+					if (fnew[2] != fnew[0]):
+						faces.append(fnew)
+						edges_dict[tuple(sorted([fnew[0], fnew[1]]))] = 1
+						edges_dict[tuple(sorted([fnew[1], fnew[2]]))] = 1
+						edges_dict[tuple(sorted([fnew[2], fnew[0]]))] = 1
+		self.faces = faces
 		self.edges = list(edges_dict.keys())
+		
+
+
+	def plot(self, sym='k-', lwd=0.2, markersize=2, edge_color=False):
+		if (edge_color):
+			umin = np.min(self.node_values)
+			umax = np.max(self.node_values)
+			for e in self.edges:
+				t1 = (self.node_values[e[0]] - umin)/(umax-umin)
+				t2 = (self.node_values[e[1]] - umin)/(umax-umin)
+				t  = (t1+t2)/2
+				plt.plot([self.nodes[e[0]][0], self.nodes[e[1]][0]], [self.nodes[e[0]][1], self.nodes[e[1]][1]], sym[-1], linewidth=lwd, markersize=markersize, color=[1-t, t, 0])
+		else:
+			for e in self.edges:
+				plt.plot([self.nodes[e[0]][0], self.nodes[e[1]][0]], [self.nodes[e[0]][1], self.nodes[e[1]][1]], sym, linewidth=lwd, markersize=markersize)	
 			
-	def plot_old(self, sym='k-', lwd=0.2):
-		for triangle in shapely.get_parts(self.geom):
-			x,y = triangle.exterior.xy
-			plt.plot(x, y, 'k-', linewidth=lwd)
+			
+		
+	def summary(self):
+		txt  = "------------------------------------------------------\r\n"
+		txt += "DOMAIN MESH TRIANGULATION                             \r\n"
+		txt += "------------------------------------------------------\r\n"
+		txt += "Number of nodes: " + str(len(self.nodes)) +          "\r\n"
+		txt += "Number of edges: " + str(len(self.edges)) +          "\r\n"
+		txt += "Number of faces: " + str(len(self.faces)) +          "\r\n"
+		txt += "------------------------------------------------------\r\n"
+		txt += "Epsilon      : " + str(eps)               +          "\r\n"
+		txt += "Resolution   : " + str(self.resolution)   +          "\r\n"
+		txt += "------------------------------------------------------\r\n"
+		print(txt)
 
-	def plot_old2(self, sym='k-', lwd=0.2, markersize=2):
-		for i in range(len(self.faces)):
-			face = self.faces[i]
-			plt.plot([self.nodes[face[0]][0], self.nodes[face[1]][0]], [self.nodes[face[0]][1], self.nodes[face[1]][1]], sym, linewidth=lwd, markersize=markersize)
-			plt.plot([self.nodes[face[1]][0], self.nodes[face[2]][0]], [self.nodes[face[1]][1], self.nodes[face[2]][1]], sym, linewidth=lwd, markersize=markersize)
-			plt.plot([self.nodes[face[2]][0], self.nodes[face[0]][0]], [self.nodes[face[2]][1], self.nodes[face[0]][1]], sym, linewidth=lwd, markersize=markersize)
 
-	def plot(self, sym='k-', lwd=0.2, markersize=2):
-		for e in self.edges:
-			plt.plot([self.nodes[e[0]][0], self.nodes[e[1]][0]], [self.nodes[e[0]][1], self.nodes[e[1]][1]], sym, linewidth=lwd, markersize=markersize)
+class Treillis:
+	
+	def __init__(self, triangulation):
+		
+		# ---------------------------------------------------------
+		# Partial Differential Equation problem input data
+		# ---------------------------------------------------------
+		self.triangulation = triangulation
+		self.E = []								                 # Young modules of beams (in Pa or N/mm2)
+		self.S = []								                 # Beam sections (in m2)		
+		self.L = []												 # Beam length (in m)
+		self.DIRICHLET = {}                                      # Dictionnary of Dirichlet boundary conditions (imposed displacements in m)
+		self.NEUMANN   = {}                                      # Dictionnary of Neumann boundary conditions (imposed stress in N)
+		
+		# ---------------------------------------------------------
+		# Solution
+		# ---------------------------------------------------------
+		self.disp_u   = [0]*self.getNumberOfNodes()         # Displacement solution in x direction (in m) 
+		self.disp_v   = [0]*self.getNumberOfNodes()         # Displacement solution in v direction (in m) 
+		self.stress   = [0]*self.getNumberOfEdges()         # Stress solution in beams (in Pa)
+		self.strain   = [0]*self.getNumberOfEdges()         # Strain solution in beams (w/o unit)
+		self.REACTION = {}							        # Solution reaction on imposed nodes (in N)
+				
+		
+	def getNumberOfEdges(self):
+		return len(self.triangulation.edges)
+		
+	def getNumberOfNodes(self):
+		return len(self.triangulation.nodes)
+		
+	def getEdge(self, i):
+		return self.triangulation.edges[i]
+		
+	def getNode(self, i):
+		return self.triangulation.nodes[i]
+		
+	def setYoungModules(self, E):
+		self.E = E
+		
+	def setBeamSections(self, S):
+		self.S = S
+
+	def setDirichletConditionOnNode(self, i, dx=None, dy=None):
+		self.DIRICHLET[i] = (dx, dy)
+		
+	def setNeumannConditionOnNode(self, i, fx=None, fy=None):
+		self.NEUMANN[i] = (fx, fy)
+
+	def makeRigidityMatrix(self):
+		N = self.getNumberOfNodes()
+		R = np.zeros((2*N, 2*N))
+		self.L = [0]*self.getNumberOfEdges()
+		for i in range(self.getNumberOfEdges()):
+			i1 = self.getEdge(i)[0] ; i2 = self.getEdge(i)[1]
+			x1 = self.getNode(i1)[0]; x2 = self.getNode(i2)[0]
+			y1 = self.getNode(i1)[1]; y2 = self.getNode(i2)[1]
+			self.L[i] = ((x2-x1)**2+(y2-y1)**2)**0.5
+			phi = math.atan2(y2-y1, x2-x1)
+			c = math.cos(phi);s = math.sin(phi)
+			c2 = c*c; s2 = s*s; cs = c*s
+			k = self.E[i] * self.S[i] / self.L[i]
+
+			R[2*i1+0][2*i1+0] +=  c2*k;  R[2*i1+0][2*i1+1] +=  cs*k;  R[2*i1+0][2*i2+0] += -c2*k;  R[2*i1+0][2*i2+1] += -cs*k;
+			R[2*i1+1][2*i1+0] +=  cs*k;  R[2*i1+1][2*i1+1] +=  s2*k;  R[2*i1+1][2*i2+0] += -cs*k;  R[2*i1+1][2*i2+1] += -s2*k;
+			R[2*i2+0][2*i1+0] += -c2*k;  R[2*i2+0][2*i1+1] += -cs*k;  R[2*i2+0][2*i2+0] +=  c2*k;  R[2*i2+0][2*i2+1] +=  cs*k;
+			R[2*i2+1][2*i1+0] += -cs*k;  R[2*i2+1][2*i1+1] += -s2*k;  R[2*i2+1][2*i2+0] +=  cs*k;  R[2*i2+1][2*i2+1] +=  s2*k;
+
+		R = (np.abs(R)>1e-10)*R
+
+		return R
+		
+	def makeRightHandVector(self):
+		N = self.getNumberOfNodes()
+		F = np.zeros((2*N, 1))
+		for i in self.NEUMANN:
+			F[2*i  , 0] = self.NEUMANN[i][0]
+			F[2*i+1, 0] = self.NEUMANN[i][1]
+		return F
+		
+	def solve(self, R, F):
+		
+		K = R.copy()
+		
+		for i in self.DIRICHLET:
+			K[2*i  , :] = 0; K[:,2*i  ] = 0; K[2*i  , 2*i  ] = 1
+			K[2*i+1, :] = 0; K[:,2*i+1] = 0; K[2*i+1, 2*i+1] = 1
+			
+		U = np.linalg.solve(K, F)
+		FF = R @ U
+
+		self.disp_u = U[0::2,0]
+		self.disp_v = U[1::2,0]
+		
+		for i in range(self.getNumberOfEdges()):
+			n1 = self.getEdge(i)[0]; u1 = self.disp_u[n1]; v1 = self.disp_v[n1]; x1 = self.getNode(n1)[0]; y1 = self.getNode(n1)[1]
+			n2 = self.getEdge(i)[1]; u2 = self.disp_u[n2]; v2 = self.disp_v[n2]; x2 = self.getNode(n2)[0]; y2 = self.getNode(n2)[1]
+			LL = (((x1+u1) - (x2+u2))**2 + ((y1+v1) - (y2+v2))**2)**0.5
+			dL = LL-self.L[i]
+			self.strain[i] = dL/self.L[i]
+			self.stress[i] = self.E[i]*self.strain[i]
+			
+	def plot_solution(self, sym='ko', lwd=0.5, disp_factor=1e3, relax=True):
+		stress_min = np.min(self.stress)
+		stress_max = np.max(self.stress)
+		for i in range(self.getNumberOfEdges()):
+			if (self.stress[i] >= 0):
+				t = self.stress[i]/stress_max
+				color = [t, 1-t, 0.5*(1-t)]
+			else:
+				t = self.stress[i]/stress_min
+				color = [1-t, t, 0.5*(1-t)]
+			e = self.getEdge(i)
+			n1 = self.getNode(e[0]); u1 = disp_factor*self.disp_u[e[0]]; u2 = disp_factor*self.disp_u[e[1]];
+			n2 = self.getNode(e[1]); v1 = disp_factor*self.disp_v[e[0]]; v2 = disp_factor*self.disp_v[e[1]];
+			if relax:
+				plt.plot([n1[0], n2[0]], [n1[1], n2[1]], '-', linewidth=lwd, color=[t, 1-t, 0])
+				plt.plot(n1[0], n1[1], sym)
+				plt.plot(n2[0], n2[1], sym)
+			plt.plot([n1[0] + u1, n2[0] + u2], [n1[1] + v1, n2[1] + v2], '-', linewidth=lwd, color=color)
+			plt.plot(n1[0] + u1, n1[1] + v1, sym)
+			plt.plot(n2[0] + u2, n2[1] + v2, sym)
+		
+	def plot(self, sym='k-', lwd=0.2, markersize=2, stress_factor=1e-5, strain_factor=1e5):
+		smin = np.min(self.S)
+		smax = np.max(self.S) + 0.001
+		for i in range(self.getNumberOfEdges()):
+			e = self.getEdge(i)
+			lwd = 0.1 + (self.S[i]-smin)/(smax-smin)*10
+			plt.plot([self.getNode(e[0])[0], self.getNode(e[1])[0]], [self.getNode(e[0])[1], self.getNode(e[1])[1]], sym, linewidth=lwd, markersize=markersize)	
+		for i in self.DIRICHLET.keys():
+			imposed = self.DIRICHLET[i]
+			if (imposed[0] == 0 and imposed[1] == 0):
+				plt.plot(self.getNode(i)[0], self.getNode(i)[1], 'ko')
+			else:
+				plt.plot(self.getNode(i)[0], self.getNode(i)[1], 'bo')
+				plt.arrow(self.getNode(i)[0], self.getNode(i)[1], imposed[0]*strain_factor, imposed[1]*strain_factor, head_width=1e-2, color='b')
+		for i in self.NEUMANN.keys():
+			stress = self.NEUMANN[i]
+			plt.plot(self.getNode(i)[0], self.getNode(i)[1], 'ro')
+			plt.arrow(self.getNode(i)[0], self.getNode(i)[1], stress[0]*stress_factor, stress[1]*stress_factor, head_width=1e-2, color='r')
 
 
+def Main_elasticity_1():
+	
+	Rh = [0.03, 0.05, 0.02, 0.03]
+	Xh = [0.10, 0.50, 0.70, 0.85]
+	Yh = [0.05, 0.10, 0.15, 0.06]
+
+	s1 = Segment(lambda t : t  , lambda t : 0    , 0, 1)
+	s2 = Segment(lambda t : 1  , lambda t : t    , 0, 0.2)
+	s3 = Segment(lambda t : 1-t, lambda t : 0.2  , 0, 1)
+	s4 = Segment(lambda t : 0  , lambda t : 0.2-t, 0, 0.2)
+
+	outer = Border([s1, s2, s3, s4])
+
+	inner = [Border([Segment(lambda t, i=i: Xh[i] + Rh[i]*math.cos(t/Rh[i]), lambda t, i=i : Yh[i] + Rh[i]*math.sin(t/Rh[i]), 0, 2*math.pi*Rh[i])]) for i in range(len(Rh))]
+	domain = Domain(outer, inner)
+
+	Th = domain.triangulate(0.02)
+
+	plt.xlim(-0.05, 1.05)
+	plt.ylim(-0.05, 0.25)	
+	domain.plot(0.01, 'k-', lwd=1)
+	Th.plot('k-')
+
+	plt.show()
+
+
+
+def Main_elasticity_2():
+
+	s1 = Segment(lambda t : t  , lambda t : 0    , 0, 1)
+	s2 = Segment(lambda t : 1  , lambda t : t    , 0, 0.2)
+	s3 = Segment(lambda t : 1-t, lambda t : 0.2  , 0, 1)
+	s4 = Segment(lambda t : 0  , lambda t : 0.2-t, 0, 0.2)
+
+	domain = Domain(Border([s1, s2, s3, s4]))
+
+	Th = domain.triangulate(0.02)
+	
+	Th.nodes = [(0,0), (0.5,3**0.5/2), (1,0)]
+	Th.edges = [(0,1), (2,1)]
+	Th.faces = []
+
+
+	plt.xlim(-0.05, 1.05)
+	plt.ylim(-0.05, 1.05)	
+
+	Th.summary()
+
+	model = Treillis(Th)
+	model.setYoungModules([100*1e9]*model.getNumberOfEdges())
+	model.setBeamSections([1000*1e-6]*model.getNumberOfEdges())
+	model.setDirichletConditionOnNode(0, 0, 0)
+	model.setDirichletConditionOnNode(2, 0, 0)
+	model.setNeumannConditionOnNode(1, 10000, 20000) 
+
+	R = model.makeRigidityMatrix()
+	F = model.makeRightHandVector()
+
+	model.plot('k-', stress_factor=5e-6)
+
+	np.set_printoptions(precision=3)
+	model.solve(R, F)
+
+	model.plot_solution(relax=False)
+
+	plt.show()
