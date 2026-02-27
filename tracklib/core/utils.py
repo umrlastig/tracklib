@@ -953,16 +953,29 @@ class Treillis:
 			F[2*i+1, 0] = self.NEUMANN[i][1]
 		return F
 		
+		
 	def solve(self, R, F):
 		
 		K = R.copy()
+		G = F.copy()
 		
+		# -----------------------------------------------------------
+		# Méthode du terme diagonal unité
+		# -----------------------------------------------------------
+		for i in self.DIRICHLET:
+			G[:,0] = G[:,0] + K[2*i  ,:]*self.DIRICHLET[i][0]
+			G[:,0] = G[:,0] + K[2*i+1,:]*self.DIRICHLET[i][1]
 		for i in self.DIRICHLET:
 			K[2*i  , :] = 0; K[:,2*i  ] = 0; K[2*i  , 2*i  ] = 1
 			K[2*i+1, :] = 0; K[:,2*i+1] = 0; K[2*i+1, 2*i+1] = 1
+			G[2*i  , 0] = self.DIRICHLET[i][0]
+			G[2*i+1, 0] = self.DIRICHLET[i][1]
+		# -----------------------------------------------------------
 			
-		U = np.linalg.solve(K, F)
+		U = np.linalg.solve(K, G)
 		FF = R @ U
+		for i in self.DIRICHLET:
+			self.REACTION[i] = (FF[2*i][0], FF[2*i+1][0])
 
 		self.disp_u = U[0::2,0]
 		self.disp_v = U[1::2,0]
@@ -974,6 +987,64 @@ class Treillis:
 			dL = LL-self.L[i]
 			self.strain[i] = dL/self.L[i]
 			self.stress[i] = self.E[i]*self.strain[i]
+			
+	def print_solution(self, Rlim=1e300):
+		ok = True
+		print("                      SOLUTION                        ")
+		print("======================================================")
+		print("Nodes displacements:")
+		print("======================================================")
+		for i in range(self.getNumberOfNodes()):
+			u = self.disp_u[i]
+			v = self.disp_v[i]
+			if ((u != 0) or (v != 0)):
+				print("Node #{:d}  u = {:5.3f} mm   v = {:5.3f} mm".format(i, self.disp_u[i]*1e3, self.disp_v[i]*1e3))
+		print("------------------------------------------------------\r\n")
+		
+		print("======================================================")
+		print("Beam strain:")
+		print("======================================================")
+		for i in range(self.getNumberOfEdges()):
+			e = self.getEdge(i)
+			sym = '[+]'
+			if (self.strain[i] < 0):
+				sym = '[-]'
+			if (self.strain[i] != 0):
+				print("Beam #{:d} [from nodes {:d} to {:d}]  {:7.1f} ppm    ".format(i, e[0], e[1], abs(self.strain[i])*1e6) + sym)
+		print("------------------------------------------------------\r\n")
+		
+		print("======================================================")
+		print("Beam stress:")
+		print("======================================================")
+		for i in range(self.getNumberOfEdges()):
+			e = self.getEdge(i)
+			sym     = '[+]'
+			warning = ''
+			if (self.stress[i] < 0):
+				sym = '[-]'
+			if (abs(self.stress[i]) > Rlim):
+				warning = '[!]'
+				ok = False
+			if (self.stress[i] != 0):
+				print("Beam #{:d} [from nodes {:d} to {:d}]  {:7.1f} MPa    ".format(i, e[0], e[1], abs(self.stress[i])*1e-6) + sym + "  " + warning)
+		print("------------------------------------------------------\r\n")
+		
+		
+		print("======================================================")
+		print("Reactions on constrained nodes:")
+		print("======================================================")
+		for i in self.REACTION:
+			Rx = self.REACTION[i][0]
+			Ry = self.REACTION[i][1]
+			print("Node #{:d}  Rx = {:12.3f} N   Ry = {:12.3f} N".format(i, Rx, Ry))
+		print("------------------------------------------------------\r\n")
+		
+		print("======================================================")
+		if (ok):
+			print("All beam stress within structural limits")
+		else:
+			print("Warning: one or more beams are above structural limits")
+		print("======================================================")
 			
 	def plot_solution(self, sym='ko', lwd=0.5, disp_factor=1e3, relax=True):
 		stress_min = np.min(self.stress)
@@ -1044,6 +1115,8 @@ def Main_elasticity_1():
 
 
 def Main_elasticity_2():
+	
+	np.set_printoptions(precision=3)
 
 	s1 = Segment(lambda t : t  , lambda t : 0    , 0, 1)
 	s2 = Segment(lambda t : 1  , lambda t : t    , 0, 0.2)
@@ -1066,19 +1139,20 @@ def Main_elasticity_2():
 
 	model = Treillis(Th)
 	model.setYoungModules([100*1e9]*model.getNumberOfEdges())
-	model.setBeamSections([1000*1e-6]*model.getNumberOfEdges())
+	model.setBeamSections([100*1e-6]*model.getNumberOfEdges())
 	model.setDirichletConditionOnNode(0, 0, 0)
 	model.setDirichletConditionOnNode(2, 0, 0)
-	model.setNeumannConditionOnNode(1, 10000, 20000) 
+	model.setNeumannConditionOnNode(1, 0, 10000) 
 
 	R = model.makeRigidityMatrix()
 	F = model.makeRightHandVector()
 
 	model.plot('k-', stress_factor=5e-6)
 
-	np.set_printoptions(precision=3)
 	model.solve(R, F)
 
-	model.plot_solution(relax=False)
+	model.plot_solution(relax=False, disp_factor=2e2)
+	
+	model.print_solution()
 
 	plt.show()
