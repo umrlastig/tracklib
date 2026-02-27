@@ -796,52 +796,52 @@ class Domain:
 
 class Triangulation:
 	
-	def __init__(self, triangles, resolution):
+	def __init__(self, triangles=None, resolution=None):
 		
-		self.geom = triangles
 		self.nodes = []
 		self.faces = []
 		self.edges = []
 		self.resolution = resolution
 		
-		
-		X = []; Y = []; count = 0
-		for triangle in shapely.get_parts(self.geom):
-			x,y = triangle.exterior.xy
-			X.append(x[0]); Y.append(y[0]);
-			X.append(x[1]); Y.append(y[1]);
-			X.append(x[2]); Y.append(y[2]);
-			self.faces.append((count, count+1, count+2)); count += 3
-
-		index  = shapely.STRtree([shapely.Point(X[i], Y[i]) for i in range(len(X))]);
-		assoc = [i for i in range(len(X))]
-
-		for i in range(len(X)):
-			assoc[i] = np.min(index.query(shapely.box(X[i]-3*eps, Y[i]-3*eps, X[i]+3*eps, Y[i]+3*eps)))	
-
-		indices = sorted(list(set(assoc)))	
-		rename_indices = {}
-		for i in range(len(indices)):
-			rename_indices[indices[i]] = i
-
-		for i in range(len(indices)):
-			self.nodes.append((X[indices[i]], Y[indices[i]]))
-		
-		edges_dict = {}
-		faces = []
-		for i in range(len(self.faces)):
-			fold = self.faces[i] 
-			fnew = (rename_indices[assoc[fold[0]]], rename_indices[assoc[fold[1]]], rename_indices[assoc[fold[2]]])
-			self.faces[i] = fnew	
-			if (fnew[0] != fnew[1]):
-				if (fnew[1] != fnew[2]):
-					if (fnew[2] != fnew[0]):
-						faces.append(fnew)
-						edges_dict[tuple(sorted([fnew[0], fnew[1]]))] = 1
-						edges_dict[tuple(sorted([fnew[1], fnew[2]]))] = 1
-						edges_dict[tuple(sorted([fnew[2], fnew[0]]))] = 1
-		self.faces = faces
-		self.edges = list(edges_dict.keys())
+		if not (triangles == None):
+			self.geom = triangles			
+			X = []; Y = []; count = 0
+			for triangle in shapely.get_parts(self.geom):
+				x,y = triangle.exterior.xy
+				X.append(x[0]); Y.append(y[0]);
+				X.append(x[1]); Y.append(y[1]);
+				X.append(x[2]); Y.append(y[2]);
+				self.faces.append((count, count+1, count+2)); count += 3
+	
+			index  = shapely.STRtree([shapely.Point(X[i], Y[i]) for i in range(len(X))]);
+			assoc = [i for i in range(len(X))]
+	
+			for i in range(len(X)):
+				assoc[i] = np.min(index.query(shapely.box(X[i]-3*eps, Y[i]-3*eps, X[i]+3*eps, Y[i]+3*eps)))	
+	
+			indices = sorted(list(set(assoc)))	
+			rename_indices = {}
+			for i in range(len(indices)):
+				rename_indices[indices[i]] = i
+	
+			for i in range(len(indices)):
+				self.nodes.append((X[indices[i]], Y[indices[i]]))
+			
+			edges_dict = {}
+			faces = []
+			for i in range(len(self.faces)):
+				fold = self.faces[i] 
+				fnew = (rename_indices[assoc[fold[0]]], rename_indices[assoc[fold[1]]], rename_indices[assoc[fold[2]]])
+				self.faces[i] = fnew	
+				if (fnew[0] != fnew[1]):
+					if (fnew[1] != fnew[2]):
+						if (fnew[2] != fnew[0]):
+							faces.append(fnew)
+							edges_dict[tuple(sorted([fnew[0], fnew[1]]))] = 1
+							edges_dict[tuple(sorted([fnew[1], fnew[2]]))] = 1
+							edges_dict[tuple(sorted([fnew[2], fnew[0]]))] = 1
+			self.faces = faces
+			self.edges = list(edges_dict.keys())
 		
 
 
@@ -911,9 +911,13 @@ class Treillis:
 		return self.triangulation.nodes[i]
 		
 	def setYoungModules(self, E):
+		if not (isinstance(E, list)):
+			E = [E]*self.getNumberOfEdges()
 		self.E = E
 		
 	def setBeamSections(self, S):
+		if not (isinstance(S, list)):
+			S = [S]*self.getNumberOfEdges()
 		self.S = S
 
 	def setDirichletConditionOnNode(self, i, dx=None, dy=None):
@@ -954,10 +958,10 @@ class Treillis:
 		return F
 		
 		
-	def solve(self, R, F):
+	def solve(self):
 		
-		K = R.copy()
-		G = F.copy()
+		R = self.makeRigidityMatrix() ;  K = R.copy()
+		F = self.makeRightHandVector();  G = F.copy()
 		
 		# -----------------------------------------------------------
 		# Méthode du terme diagonal unité
@@ -1118,14 +1122,7 @@ def Main_elasticity_2():
 	
 	np.set_printoptions(precision=3)
 
-	s1 = Segment(lambda t : t  , lambda t : 0    , 0, 1)
-	s2 = Segment(lambda t : 1  , lambda t : t    , 0, 0.2)
-	s3 = Segment(lambda t : 1-t, lambda t : 0.2  , 0, 1)
-	s4 = Segment(lambda t : 0  , lambda t : 0.2-t, 0, 0.2)
-
-	domain = Domain(Border([s1, s2, s3, s4]))
-
-	Th = domain.triangulate(0.02)
+	Th = Triangulation()
 	
 	Th.nodes = [(0,0), (0.5,3**0.5/2), (1,0)]
 	Th.edges = [(0,1), (2,1)]
@@ -1138,21 +1135,99 @@ def Main_elasticity_2():
 	Th.summary()
 
 	model = Treillis(Th)
-	model.setYoungModules([100*1e9]*model.getNumberOfEdges())
-	model.setBeamSections([100*1e-6]*model.getNumberOfEdges())
+	model.setYoungModules(100*1e9)
+	model.setBeamSections(100*1e-6)
 	model.setDirichletConditionOnNode(0, 0, 0)
 	model.setDirichletConditionOnNode(2, 0, 0)
 	model.setNeumannConditionOnNode(1, 0, 10000) 
 
-	R = model.makeRigidityMatrix()
-	F = model.makeRightHandVector()
-
 	model.plot('k-', stress_factor=5e-6)
 
-	model.solve(R, F)
+	model.solve()
 
 	model.plot_solution(relax=False, disp_factor=2e2)
-	
 	model.print_solution()
 
 	plt.show()
+
+
+
+def Main_elasticity_3():
+	
+	np.set_printoptions(precision=3)
+	
+	Th = Triangulation()
+	Th.nodes = [(-1,0), (0,0), (1,0), (0,1)]
+	Th.edges = [(0, 3), (1, 3), (2, 3)]
+	
+	plt.xlim(-1.05, 1.05)
+	plt.ylim(-0.05, 1.15)
+	
+	Th.summary()
+	
+	model = Treillis(Th)
+	model.setYoungModules(210*1e9)
+	model.setBeamSections(100*1e-6)
+	model.setDirichletConditionOnNode(0, 0, 0)
+	model.setDirichletConditionOnNode(1, 0, 0)
+	model.setDirichletConditionOnNode(2, 0, 0)
+	model.setNeumannConditionOnNode(3, 0, 10000)
+	
+	model.plot('k-', stress_factor=5e-6)
+	
+	model.solve()
+	
+	model.plot_solution(relax=False, disp_factor=4e2)
+	model.print_solution()
+
+
+def Main_elasticity_4():
+	
+	
+	np.set_printoptions(precision=3)
+	
+	Th = Triangulation()
+	Th.nodes = [(-1,0), (0,0), (1,0), (0,1)]
+	Th.edges = [(0, 3), (1, 3), (2, 3)]
+	
+	plt.xlim(-1.05, 1.05)
+	plt.ylim(-0.05, 1.15)
+	
+	Th.summary()
+	
+	model = Treillis(Th)
+	model.setYoungModules(210*1e9)
+	model.setBeamSections(100*1e-6)
+	model.setDirichletConditionOnNode(0, 0, 0)
+	model.setDirichletConditionOnNode(1, 0, 0)
+	model.setDirichletConditionOnNode(2, 0, 0)
+	model.setNeumannConditionOnNode(3, 10000, 0)
+	
+	model.plot('k-', stress_factor=5e-6)
+	
+	model.solve()
+	
+	model.plot_solution(relax=False, disp_factor=4e2)
+	model.print_solution()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	
+	
+	
+	
+	
+	
