@@ -1166,12 +1166,14 @@ class Track:
         Initialise tous les obs.
         """
         if name == None:
-            return
+            raise AnalyticalFeatureError("Error: can't add AF '" + name + "', name is required")
         Track.__controlName(name)
+
         if self.size() <= 0:
             raise AnalyticalFeatureError("Error: can't add AF '" + name + "', there is no observation in track")
         if self.hasAnalyticalFeature(name):
-            return
+            raise AnalyticalFeatureError("Error: can't add AF '" + name + "', name already exists.")
+
         idAF = len(self.__analyticalFeaturesDico)
         self.__analyticalFeaturesDico[name] = idAF
         if isinstance(val_init, list):
@@ -1180,7 +1182,6 @@ class Track:
         else:
             for i in range(self.size()):
                 self.getObs(i).features.append(val_init)
-
 
     def updateAnalyticalFeature(self, name, new_val):
         """
