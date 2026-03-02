@@ -120,7 +120,7 @@ class TrackReader:
         fmt.controlFormat()
 
         if verbose:
-            print("Loading track(s) ...")
+            print("The input format is valid. Loading track(s) ...")
 
         if os.path.isdir(path):
             TRACES = TrackCollection()
@@ -175,7 +175,7 @@ class TrackReader:
 
 
     @staticmethod
-    def __readFromCsv(path: str, fmt:TrackFormat, verbose) -> Union(Track, TrackCollection): # type: ignore
+    def __readFromCsv(path: str, fmt:TrackFormat, verbose) -> Union(Track, TrackCollection):
         """
         Read track(s) from CSV file(s) with geometry structured in coordinates.
 
