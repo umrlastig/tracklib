@@ -698,11 +698,12 @@ random.seed(123457)
 
 class Segment:
 	
-	def __init__(self, fx, fy, ti, tf):
+	def __init__(self, fx, fy, ti, tf, dt=None):
 		self.fx = fx
 		self.fy = fy
 		self.ti = ti
 		self.tf = tf
+		self.dt = dt
 	
 	def eval(self, T):
 		out = []
@@ -710,11 +711,13 @@ class Segment:
 			out.append((self.fx(t), self.fy(t)))
 		return out
 
-	def discretize(self, dt, ti=None, tf=None):
+	def discretize(self, dt=None, ti=None, tf=None):
 		if ti == None:
 			ti = self.ti
 		if tf == None:
 			tf = self.tf
+		if dt == None:
+			dt = self.dt
 		T = np.arange(ti, tf+dt, dt*(tf-ti)/abs(tf-ti))
 		return self.eval(T)
 
@@ -736,7 +739,7 @@ class Border:
 	def addSegment(self, segment):
 		self.segments.append(segment)
 		
-	def discretize(self, dt):
+	def discretize(self, dt=None):
 		out = []
 		for s in self.segments:
 			for p in s.discretize(dt)[:-1]:
@@ -764,7 +767,7 @@ class Domain:
 	def addInner(self, inner):
 		self.inner.append(inner)
 	
-	def discretize(self, dt):
+	def discretize(self, dt=None):
 		outer_dis = self.outer.discretize(dt)
 		inner_dis = [inner.discretize(dt) for inner in self.inner]
 		return (outer_dis, inner_dis)
@@ -774,19 +777,20 @@ class Domain:
 		for border in self.inner:
 			border.plot(dt, sym, lwd, markersize)
 
-	def triangulate(self, h, rand=True):
-		shell = self.outer.discretize(h)
-		holes = [inner.discretize(h) for inner in self.inner]
+	def triangulate(self, h, fhy=1, rand=True):
+		hx = h; hy = h*fhy
+		shell = self.outer.discretize()
+		holes = [inner.discretize() for inner in self.inner]
 		holes = [hole for hole in holes if (len(hole) > 3)]
 		polygon = shapely.Polygon(shell=shell, holes=holes)
 		xmin = np.min(polygon.exterior.xy[0])
 		xmax = np.max(polygon.exterior.xy[0])
 		ymin = np.min(polygon.exterior.xy[1])
 		ymax = np.max(polygon.exterior.xy[1])
-		for ix in np.arange(xmin+h, xmax, h):
-			for jy in np.arange(ymin+h, ymax, h):
-				x = ix + rand*(random.random()-0.5)*h/2.0
-				y = jy + rand*(random.random()-0.5)*h/2.0
+		for ix in np.arange(xmin+hx, xmax, hx):
+			for jy in np.arange(ymin+hy, ymax, hy):
+				x = ix + rand*(random.random()-0.5)*hx/2
+				y = jy + rand*(random.random()-0.5)*hy/2
 				triangle = shapely.Polygon([(x-eps, y), (x+eps, y), (x, y+eps)])
 				if (triangle.within(polygon)):
 					holes.append(((x-eps, y), (x+eps, y), (x, y+eps)))
@@ -857,7 +861,6 @@ class Triangulation:
 		else:
 			for e in self.edges:
 				plt.plot([self.nodes[e[0]][0], self.nodes[e[1]][0]], [self.nodes[e[0]][1], self.nodes[e[1]][1]], sym, linewidth=lwd, markersize=markersize)	
-			
 			
 		
 	def summary(self):
@@ -992,6 +995,26 @@ class Treillis:
 			self.strain[i] = dL/self.L[i]
 			self.stress[i] = self.E[i]*self.strain[i]
 			
+		
+		# -----------------------------------------------------------	
+		# Critère de Von-Mises
+		# -----------------------------------------------------------
+		self.von_mises = [0]*self.getNumberOfNodes()
+		self.counts = [0]*self.getNumberOfNodes()
+		import matplotlib.cm as cm
+		cmap = cm.get_cmap('jet')
+		for i in range(len(self.triangulation.edges)):
+			e = self.triangulation.edges[i]
+			n1 = self.triangulation.nodes[e[0]]
+			n2 = self.triangulation.nodes[e[1]]
+			theta = math.atan2(n2[1]-n1[1], n2[0]-n1[0])
+			self.von_mises[e[0]] += self.stress[i]*math.sin(theta)**2/self.S[i]; self.counts[e[0]] += 1
+			self.von_mises[e[1]] += self.stress[i]*math.sin(theta)**2/self.S[i]; self.counts[e[1]] += 1
+		
+		for i in range(self.getNumberOfNodes()):
+			self.von_mises[i] /= self.counts[i]
+
+			
 	def print_solution(self, Rlim=1e300):
 		ok = True
 		print("                      SOLUTION                        ")
@@ -1002,7 +1025,7 @@ class Treillis:
 			u = self.disp_u[i]
 			v = self.disp_v[i]
 			if ((u != 0) or (v != 0)):
-				print("Node #{:d}  u = {:5.3f} mm   v = {:5.3f} mm".format(i, self.disp_u[i]*1e3, self.disp_v[i]*1e3))
+				print("Node #{:3d}  u = {:8.3f} mm   v = {:8.3f} mm".format(i, self.disp_u[i]*1e3, self.disp_v[i]*1e3))
 		print("------------------------------------------------------\r\n")
 		
 		print("======================================================")
@@ -1014,7 +1037,7 @@ class Treillis:
 			if (self.strain[i] < 0):
 				sym = '[-]'
 			if (self.strain[i] != 0):
-				print("Beam #{:d} [from nodes {:d} to {:d}]  {:7.1f} ppm    ".format(i, e[0], e[1], abs(self.strain[i])*1e6) + sym)
+				print("Beam #{:3d} [from nodes {:d} to {:d}]  {:7.1f} ppm    ".format(i, e[0], e[1], abs(self.strain[i])*1e6) + sym)
 		print("------------------------------------------------------\r\n")
 		
 		print("======================================================")
@@ -1030,7 +1053,7 @@ class Treillis:
 				warning = '[!]'
 				ok = False
 			if (self.stress[i] != 0):
-				print("Beam #{:d} [from nodes {:d} to {:d}]  {:7.1f} MPa    ".format(i, e[0], e[1], abs(self.stress[i])*1e-6) + sym + "  " + warning)
+				print("Beam #{:3d} [from nodes {:d} to {:d}]  {:7.1f} MPa    ".format(i, e[0], e[1], abs(self.stress[i])*1e-6) + sym + "  " + warning)
 		print("------------------------------------------------------\r\n")
 		
 		
@@ -1050,28 +1073,43 @@ class Treillis:
 			print("Warning: one or more beams are above structural limits")
 		print("======================================================")
 			
-	def plot_solution(self, sym='ko', lwd=0.5, disp_factor=1e3, relax=True):
-		stress_min = np.min(self.stress)
-		stress_max = np.max(self.stress)
+	def plot_solution(self, sym='ko', lwd=0.5, disp_factor=1e3, relax=True, von_mises=False):
+		import matplotlib.cm as cm
+		cmap = cm.get_cmap('jet')
+		stress_min = 1.15*np.min(self.stress)
+		stress_max = 1.15*np.max(self.stress)
+		vm_min = 1.15*np.min(self.von_mises)
+		vm_max = 1.15*np.max(self.von_mises)
+		
+		if (von_mises):
+			for i in range(self.getNumberOfNodes()):
+				t = (self.von_mises[i]-vm_min)/(vm_max-vm_min)
+				rgb = cmap(t)[0:3]
+				n = self.getNode(i); u = disp_factor*self.disp_u[i]; v = disp_factor*self.disp_v[i];
+				plt.plot(n[0] + u, n[1] + v, 'o', color=rgb)
+		
 		for i in range(self.getNumberOfEdges()):
 			if (self.stress[i] >= 0):
-				t = self.stress[i]/stress_max
-				color = [t, 1-t, 0.5*(1-t)]
+				t = 0.5*self.stress[i]/stress_max + 0.5
 			else:
-				t = self.stress[i]/stress_min
-				color = [1-t, t, 0.5*(1-t)]
+				t = 0.5*(1-self.stress[i]/stress_min)
+			rgb = cmap(t)[0:3]
+			if von_mises:
+				rgb = [0,0,0]
 			e = self.getEdge(i)
 			n1 = self.getNode(e[0]); u1 = disp_factor*self.disp_u[e[0]]; u2 = disp_factor*self.disp_u[e[1]];
 			n2 = self.getNode(e[1]); v1 = disp_factor*self.disp_v[e[0]]; v2 = disp_factor*self.disp_v[e[1]];
 			if relax:
-				plt.plot([n1[0], n2[0]], [n1[1], n2[1]], '-', linewidth=lwd, color=[t, 1-t, 0])
+				plt.plot([n1[0], n2[0]], [n1[1], n2[1]], '-', linewidth=lwd, color=rgb)
 				plt.plot(n1[0], n1[1], sym)
 				plt.plot(n2[0], n2[1], sym)
-			plt.plot([n1[0] + u1, n2[0] + u2], [n1[1] + v1, n2[1] + v2], '-', linewidth=lwd, color=color)
-			plt.plot(n1[0] + u1, n1[1] + v1, sym)
-			plt.plot(n2[0] + u2, n2[1] + v2, sym)
+			plt.plot([n1[0] + u1, n2[0] + u2], [n1[1] + v1, n2[1] + v2], '-', linewidth=lwd, color=rgb)
+			
+		#im = plt.imshow(np.zeros((1,1)), cmap='jet', vmin=stress_min*1e-6, vmax=stress_max*1e-6)
+		#im.set_visible(False) 
+		#plt.colorbar(im)
 		
-	def plot(self, sym='k-', lwd=0.2, markersize=2, stress_factor=1e-5, strain_factor=1e5):
+	def plot(self, sym='k-', lwd=0.2, markersize=2, txt=False, stress_factor=1e-5, strain_factor=1e5):
 		smin = np.min(self.S)
 		smax = np.max(self.S) + 0.001
 		for i in range(self.getNumberOfEdges()):
@@ -1081,14 +1119,19 @@ class Treillis:
 		for i in self.DIRICHLET.keys():
 			imposed = self.DIRICHLET[i]
 			if (imposed[0] == 0 and imposed[1] == 0):
-				plt.plot(self.getNode(i)[0], self.getNode(i)[1], 'ko')
+				plt.plot(self.getNode(i)[0], self.getNode(i)[1], 'k^')
 			else:
-				plt.plot(self.getNode(i)[0], self.getNode(i)[1], 'bo')
-				plt.arrow(self.getNode(i)[0], self.getNode(i)[1], imposed[0]*strain_factor, imposed[1]*strain_factor, head_width=1e-2, color='b')
+				plt.plot(self.getNode(i)[0], self.getNode(i)[1], 'b^')
+				plt.arrow(self.getNode(i)[0], self.getNode(i)[1], imposed[0]*strain_factor, imposed[1]*strain_factor, head_length=3e3*stress_factor, color='b')
 		for i in self.NEUMANN.keys():
 			stress = self.NEUMANN[i]
 			plt.plot(self.getNode(i)[0], self.getNode(i)[1], 'ro')
-			plt.arrow(self.getNode(i)[0], self.getNode(i)[1], stress[0]*stress_factor, stress[1]*stress_factor, head_width=1e-2, color='r')
+			plt.arrow(self.getNode(i)[0], self.getNode(i)[1], stress[0]*stress_factor, stress[1]*stress_factor, color='r')
+		if txt:
+			for i in range(self.getNumberOfNodes()):
+				plt.text(self.getNode(i)[0], self.getNode(i)[1], i)
+
+		
 
 
 def Main_elasticity_1():
@@ -1097,14 +1140,14 @@ def Main_elasticity_1():
 	Xh = [0.10, 0.50, 0.70, 0.85]
 	Yh = [0.05, 0.10, 0.15, 0.06]
 
-	s1 = Segment(lambda t : t  , lambda t : 0    , 0, 1)
-	s2 = Segment(lambda t : 1  , lambda t : t    , 0, 0.2)
-	s3 = Segment(lambda t : 1-t, lambda t : 0.2  , 0, 1)
-	s4 = Segment(lambda t : 0  , lambda t : 0.2-t, 0, 0.2)
+	s1 = Segment(lambda t : t  , lambda t : 0    , 0, 1.0, dt=0.02)
+	s2 = Segment(lambda t : 1  , lambda t : t    , 0, 0.2, dt=0.02)
+	s3 = Segment(lambda t : 1-t, lambda t : 0.2  , 0, 1.0, dt=0.02)
+	s4 = Segment(lambda t : 0  , lambda t : 0.2-t, 0, 0.2, dt=0.02)
 
 	outer = Border([s1, s2, s3, s4])
 
-	inner = [Border([Segment(lambda t, i=i: Xh[i] + Rh[i]*math.cos(t/Rh[i]), lambda t, i=i : Yh[i] + Rh[i]*math.sin(t/Rh[i]), 0, 2*math.pi*Rh[i])]) for i in range(len(Rh))]
+	inner = [Border([Segment(lambda t, i=i: Xh[i] + Rh[i]*math.cos(t/Rh[i]), lambda t, i=i : Yh[i] + Rh[i]*math.sin(t/Rh[i]), 0, 2*math.pi*Rh[i], dt=0.02)]) for i in range(len(Rh))]
 	domain = Domain(outer, inner)
 
 	Th = domain.triangulate(0.02)
@@ -1211,23 +1254,194 @@ def Main_elasticity_4():
 	model.print_solution()
 
 
+def Main_elasticity_5():
+	
+	np.set_printoptions(precision=3)
+
+	Th = Triangulation()
+	
+	Th.nodes = [(0,0), (1,0), (2,0), (3,0), (4,0), (0.5,1), (1.5,1), (2.5,1), (3.5,1)]
+	Th.edges = [(0,1), (1,2), (2,3), (3,4), (5,6), (6,7), (7,8), (0,5), (1,5), (1,6), (2,6), (2,7), (3,7), (3,8), (4,8)]
+	Th.faces = []
+
+
+	plt.xlim(-0.3, 4.3)
+	plt.ylim(-1, 2)	
+
+	Th.summary()
+
+	model = Treillis(Th)
+	model.setYoungModules(100*1e9)
+	model.setBeamSections(100*1e-6)
+	model.setDirichletConditionOnNode(0, 0, 0)
+	model.setDirichletConditionOnNode(4, 0, 0)
+	model.setNeumannConditionOnNode(5, 0, -10000) 
+	model.setNeumannConditionOnNode(6, 0, -10000) 
+	model.setNeumannConditionOnNode(7, 0, -10000) 
+	model.setNeumannConditionOnNode(8, 0, -10000) 
+
+	model.plot('k-', stress_factor=1e-5)
+
+	model.solve()
+	
+	model.plot_solution(relax=False, disp_factor=1e1)
+	model.print_solution()
 
 
 
 
+def Main_elasticity_6():
+	
+	np.set_printoptions(precision=3)
+	
+	d   = 0.03              # Barre de 30 mm
+	E   = 210*1e9           # Module de Young
+	L   = 2.00              # Longueur de la barre
+	Seq = math.pi*d**2/32   # Section équivalente des éléments
+
+	print(Seq)
+
+	Th = Triangulation()
+	
+	membrure_inf = [((2*i)/100  , 0) for i in range(101)]
+	membrure_sup = [((2*i+2)/100, d) for i in range(100)]
+	
+	for node in membrure_inf:
+		Th.nodes.append(node)
+	for node in membrure_sup:
+		Th.nodes.append(node)
+		
+	for i in range(100):
+		Th.edges.append((i  , 101+i))
+		Th.edges.append((i+1, 101+i))
+		
+	for i in range(100):
+		Th.edges.append((i, i+1))
+		
+	for i in range(99):
+		Th.edges.append((101+i, 101+i+1))
+
+
+	plt.xlim(-0.1, 2.1)
+	plt.ylim(-0.01, 0.04)	
+	
+	Th.summary()
+	
+	model = Treillis(Th)
+	
+	model.setYoungModules(E)
+	model.setBeamSections(Seq)
+	
+	model.setDirichletConditionOnNode(36, 0, 0)
+	model.setDirichletConditionOnNode(64, 0, 0)
+	model.setNeumannConditionOnNode(0, 0, -500) 
+	model.setNeumannConditionOnNode(100, 0, -500) 
+
+	model.plot('k-', stress_factor=1e-8)
+
+	model.solve()
+	
+	model.plot_solution(sym='k', relax=False, disp_factor=1e-1)
+	model.print_solution(Rlim=235*1e6)
+	
+	print("DEFLECTION: ", round(max(np.abs(model.disp_v))*1e3, 2), " mm")
 
 
 
-
-
-
-
-
-
+def Main_elasticity_7():
+	
+	np.set_printoptions(precision=3)
+	
+	d   = 0.03                  # Barre de 30 mm
+	E   = 210*1e9               # Module de Young
+	L   = 2.00                  # Longueur de la barre
+	Seq = math.pi*d**2/32       # Section équivalente des éléments
 	
 	
+	s1 = Segment(lambda t : t  , lambda t : 0  , 0, L, dt=0.100)
+	s2 = Segment(lambda t : L  , lambda t : t  , 0, d, dt=0.005)
+	s3 = Segment(lambda t : L-t, lambda t : d  , 0, L, dt=0.100)
+	s4 = Segment(lambda t : 0  , lambda t : d-t, 0, d, dt=0.005)
+
+	plt.xlim(-0.1, 2.1)
+	plt.ylim(-0.01, 0.04)	
+	
+
+	domain = Domain(Border([s1, s2, s3, s4]))
+	domain.plot(0.01, 'k-')
+
+	Th = domain.triangulate(0.05, fhy=0.05, rand=False)
+	
+	Th.plot()
+	
+	Th.summary()
+	
+	model = Treillis(Th)
+	
+	model.setYoungModules(E)
+	model.setBeamSections(Seq)
+	
+	model.setDirichletConditionOnNode(461, 0, 0)
+	model.setDirichletConditionOnNode(467, 0, 0)
+	model.setNeumannConditionOnNode(433, 0, -500) 
+	model.setNeumannConditionOnNode(473, 0, -500) 
+
+	model.plot('k-', txt=False, stress_factor=1e-8)
 	
 	
+	model.solve()
+	model.plot_solution(sym='k', relax=False, disp_factor=1)
+	model.print_solution(Rlim=235*1e6)
+
+
+
+
+
+def Main_elasticity_8():
+	
+	np.set_printoptions(precision=3)
+	
+	d   = 0.03                  # Barre de 30 mm
+	E   = 210*1e9               # Module de Young
+	L   = 2.00                  # Longueur de la barre
+	Seq = math.pi*0.005**2       # Section équivalente des éléments
 	
 	
+	s1 = Segment(lambda t : t  , lambda t : 0  , 0, L, dt=0.020)
+	s2 = Segment(lambda t : L  , lambda t : t  , 0, d, dt=0.002)
+	s3 = Segment(lambda t : L-t, lambda t : d  , 0, L, dt=0.020)
+	s4 = Segment(lambda t : 0  , lambda t : d-t, 0, d, dt=0.002)
+
+	plt.xlim(-0.1, 2.1)
+	plt.ylim(-0.01, 0.04)	
 	
+
+	domain = Domain(Border([s1, s2, s3, s4]))
+	domain.plot(0.01, 'k-')
+
+	Th = domain.triangulate(0.02, fhy=0.05, rand=False)
+	
+	Th.plot()
+	
+	Th.summary()
+	
+	model = Treillis(Th)
+	
+	model.setYoungModules(E)
+	model.setBeamSections(Seq)
+
+	model.setDirichletConditionOnNode(3033, 0, 0)
+	model.setDirichletConditionOnNode(3063, 0, 0)
+	model.setNeumannConditionOnNode(2898, 0, -500) 
+	model.setNeumannConditionOnNode(2899, 0, -500) 
+
+	model.plot('k-', txt=False, stress_factor=1e-8)
+	
+
+	model.solve()
+
+	
+	model.plot_solution(sym='k', relax=False, disp_factor=3)
+	model.print_solution(Rlim=235*1e6)
+	
+	print("DEFLECTION: ", round(max(np.abs(model.disp_v))*1e3, 2), " mm")
