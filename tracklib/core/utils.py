@@ -797,6 +797,46 @@ class Domain:
 		polygon = shapely.Polygon(shell=shell, holes=holes)
 		return Triangulation(shapely.constrained_delaunay_triangles(polygon), h)
 		
+		
+class PolygonDomain:
+	
+	def __init__(self, polygon):
+		self.polygon = polygon
+
+	def plot(self, sym='ko', lwd=1, markersize=1):
+		c = shapely.get_coordinates(self.polygon)
+		plt.plot(c[:,0], c[:,1], sym, linewidth=lwd, markersize=markersize)
+		
+	def triangulate(self, h, fhy=1, rand=True, add_points=[]):	
+		hx = h; hy = h*fhy	
+		holes = []
+		X = self.polygon.exterior.xy[0]
+		Y = self.polygon.exterior.xy[1]
+		xmin = np.min(X)
+		xmax = np.max(X)
+		ymin = np.min(Y)
+		ymax = np.max(Y)
+
+		for ix in np.arange(xmin+hx, xmax, hx):
+			for jy in np.arange(ymin+hy, ymax, hy):
+				x = ix + (random.random()-0.5)*hx/2
+				y = jy + (random.random()-0.5)*hy/2
+				triangle = shapely.Polygon([(x-eps, y), (x+eps, y), (x, y+eps)])
+				if (triangle.within(self.polygon)):
+					holes.append(((x-eps, y), (x+eps, y), (x, y+eps)))
+		
+		for p in add_points:
+			x = p[0]
+			y = p[1]
+			triangle = shapely.Polygon([(x-eps, y), (x+eps, y), (x, y+eps)])
+			if (triangle.within(self.polygon)):
+				holes.append(((x-eps, y), (x+eps, y), (x, y+eps)))
+		
+
+		shell = [(X[i], Y[i]) for i in range(len(X))]
+
+		return Triangulation(shapely.constrained_delaunay_triangles(shapely.Polygon(shell=shell, holes=holes)), h)
+
 
 class Triangulation:
 	
@@ -1063,7 +1103,7 @@ class Treillis:
 		for i in self.REACTION:
 			Rx = self.REACTION[i][0]
 			Ry = self.REACTION[i][1]
-			print("Node #{:d}  Rx = {:12.3f} N   Ry = {:12.3f} N".format(i, Rx, Ry))
+			print("Node #{:3d}  Rx = {:12.3f} N   Ry = {:12.3f} N".format(i, Rx, Ry))
 		print("------------------------------------------------------\r\n")
 		
 		print("======================================================")
@@ -1073,6 +1113,10 @@ class Treillis:
 			print("Warning: one or more beams are above structural limits")
 		print("======================================================")
 			
+			
+	# -----------------------------------------------------------------------------------------------------------	
+	# disp_factor:                dimension-less
+	# -----------------------------------------------------------------------------------------------------------	
 	def plot_solution(self, sym='ko', lwd=0.5, disp_factor=1e3, relax=True, von_mises=False):
 		import matplotlib.cm as cm
 		cmap = cm.get_cmap('jet')
@@ -1109,6 +1153,11 @@ class Treillis:
 		#im.set_visible(False) 
 		#plt.colorbar(im)
 		
+		
+	# -----------------------------------------------------------------------------------------------------------	
+	# stress_factor:               m/N
+	# strain_factor:    dimension-less
+	# -----------------------------------------------------------------------------------------------------------	
 	def plot(self, sym='k-', lwd=0.2, markersize=2, txt=False, stress_factor=1e-5, strain_factor=1e5):
 		smin = np.min(self.S)
 		smax = np.max(self.S) + 0.001
@@ -1121,12 +1170,14 @@ class Treillis:
 			if (imposed[0] == 0 and imposed[1] == 0):
 				plt.plot(self.getNode(i)[0], self.getNode(i)[1], 'k^')
 			else:
-				plt.plot(self.getNode(i)[0], self.getNode(i)[1], 'b^')
-				plt.arrow(self.getNode(i)[0], self.getNode(i)[1], imposed[0]*strain_factor, imposed[1]*strain_factor, head_length=3e3*stress_factor, color='b')
+				norm = 0.25*strain_factor*(imposed[0]**2 + imposed[1]**2)**0.5
+				plt.plot(self.getNode(i)[0], self.getNode(i)[1], 'b^', markersize=markersize)
+				plt.arrow(self.getNode(i)[0], self.getNode(i)[1], imposed[0]*strain_factor, imposed[1]*strain_factor, head_length=norm, width=0.01*lwd, head_width=0.2*lwd, length_includes_head=True, color='b')
 		for i in self.NEUMANN.keys():
 			stress = self.NEUMANN[i]
-			plt.plot(self.getNode(i)[0], self.getNode(i)[1], 'ro')
-			plt.arrow(self.getNode(i)[0], self.getNode(i)[1], stress[0]*stress_factor, stress[1]*stress_factor, color='r')
+			norm = 0.25*stress_factor*(stress[0]**2 + stress[1]**2)**0.5
+			plt.plot(self.getNode(i)[0], self.getNode(i)[1], 'ro', markersize=markersize)
+			plt.arrow(self.getNode(i)[0], self.getNode(i)[1], stress[0]*stress_factor, stress[1]*stress_factor, head_length=norm, width=0.01*lwd, head_width=0.2*lwd, length_includes_head=True, color='r')
 		if txt:
 			for i in range(self.getNumberOfNodes()):
 				plt.text(self.getNode(i)[0], self.getNode(i)[1], i)
@@ -1299,12 +1350,10 @@ def Main_elasticity_6():
 	L   = 2.00              # Longueur de la barre
 	Seq = math.pi*d**2/32   # Section équivalente des éléments
 
-	print(Seq)
-
 	Th = Triangulation()
 	
 	membrure_inf = [((2*i)/100  , 0) for i in range(101)]
-	membrure_sup = [((2*i+2)/100, d) for i in range(100)]
+	membrure_sup = [((2*i+1)/100, d) for i in range(100)]
 	
 	for node in membrure_inf:
 		Th.nodes.append(node)
@@ -1332,12 +1381,14 @@ def Main_elasticity_6():
 	model.setYoungModules(E)
 	model.setBeamSections(Seq)
 	
-	model.setDirichletConditionOnNode(36, 0, 0)
-	model.setDirichletConditionOnNode(64, 0, 0)
+		
+	model.setDirichletConditionOnNode(30, 0, 0)
+	model.setDirichletConditionOnNode(70, 0, 0)
 	model.setNeumannConditionOnNode(0, 0, -500) 
 	model.setNeumannConditionOnNode(100, 0, -500) 
 
-	model.plot('k-', stress_factor=1e-8)
+
+	model.plot('k-', stress_factor=1e-5)
 
 	model.solve()
 	
@@ -1352,27 +1403,35 @@ def Main_elasticity_7():
 	
 	np.set_printoptions(precision=3)
 	
-	d   = 0.03                  # Barre de 30 mm
-	E   = 210*1e9               # Module de Young
-	L   = 2.00                  # Longueur de la barre
-	Seq = math.pi*d**2/32       # Section équivalente des éléments
-	
-	
-	s1 = Segment(lambda t : t  , lambda t : 0  , 0, L, dt=0.100)
-	s2 = Segment(lambda t : L  , lambda t : t  , 0, d, dt=0.005)
-	s3 = Segment(lambda t : L-t, lambda t : d  , 0, L, dt=0.100)
-	s4 = Segment(lambda t : 0  , lambda t : d-t, 0, d, dt=0.005)
+	h   = 0.0090            # Hauteur de barre
+	E   = 15*1e9            # Module de Young
+	L   = 1.00              # Longueur de la barre
+	b   = 0.20              # Profondeur de barre
+	Seq = b*h/6             # Section équivalente des éléments
 
-	plt.xlim(-0.1, 2.1)
-	plt.ylim(-0.01, 0.04)	
+	Th = Triangulation()
 	
-
-	domain = Domain(Border([s1, s2, s3, s4]))
-	domain.plot(0.01, 'k-')
-
-	Th = domain.triangulate(0.05, fhy=0.05, rand=False)
+	membrure_inf = [((2*i)/200*L  , 0) for i in range(101)]
+	membrure_sup = [((2*i+1)/200*L, h) for i in range(100)]
 	
-	Th.plot()
+	for node in membrure_inf:
+		Th.nodes.append(node)
+	for node in membrure_sup:
+		Th.nodes.append(node)
+		
+	for i in range(100):
+		Th.edges.append((i  , 101+i))
+		Th.edges.append((i+1, 101+i))
+		
+	for i in range(100):
+		Th.edges.append((i, i+1))
+		
+	for i in range(99):
+		Th.edges.append((101+i, 101+i+1))
+
+
+	plt.xlim(-0.1, 1.1)
+	plt.ylim(-0.005, 0.015)	
 	
 	Th.summary()
 	
@@ -1381,18 +1440,24 @@ def Main_elasticity_7():
 	model.setYoungModules(E)
 	model.setBeamSections(Seq)
 	
-	model.setDirichletConditionOnNode(461, 0, 0)
-	model.setDirichletConditionOnNode(467, 0, 0)
-	model.setNeumannConditionOnNode(433, 0, -500) 
-	model.setNeumannConditionOnNode(473, 0, -500) 
-
-	model.plot('k-', txt=False, stress_factor=1e-8)
+		
+	model.setDirichletConditionOnNode(  0, 0, 0)
+	model.setDirichletConditionOnNode(100, 0, 0)	
 	
+	for i in range(101, 201, 3):
+		model.setNeumannConditionOnNode(i, 0, -9) 
+
+
+	model.plot('k-', stress_factor=3e-4, markersize=1)
+
 	
 	model.solve()
-	model.plot_solution(sym='k', relax=False, disp_factor=1)
-	model.print_solution(Rlim=235*1e6)
-
+	
+	model.plot_solution(sym='k', relax=False, disp_factor=3e-1)
+	model.print_solution(Rlim=20*1e6)
+	
+	print("DEFLECTION: ", round(max(np.abs(model.disp_v))*1e3, 2), " mm")
+	
 
 
 
@@ -1404,7 +1469,7 @@ def Main_elasticity_8():
 	d   = 0.03                  # Barre de 30 mm
 	E   = 210*1e9               # Module de Young
 	L   = 2.00                  # Longueur de la barre
-	Seq = math.pi*0.005**2       # Section équivalente des éléments
+	Seq = math.pi*0.005**2      # Section équivalente des éléments
 	
 	
 	s1 = Segment(lambda t : t  , lambda t : 0  , 0, L, dt=0.020)
@@ -1445,3 +1510,4 @@ def Main_elasticity_8():
 	model.print_solution(Rlim=235*1e6)
 	
 	print("DEFLECTION: ", round(max(np.abs(model.disp_v))*1e3, 2), " mm")
+
