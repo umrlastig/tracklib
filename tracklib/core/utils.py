@@ -62,6 +62,8 @@ import random
 import itertools
 import matplotlib.pyplot as plt
 
+from rtree import index
+
 try:
     import shapely
 except ImportError:
@@ -940,6 +942,15 @@ class Treillis:
 		self.strain   = [0]*self.getNumberOfEdges()         # Strain solution in beams (w/o unit)
 		self.REACTION = {}							        # Solution reaction on imposed nodes (in N)
 				
+		# ---------------------------------------------------------
+		# Spatial index on nodes
+		# ---------------------------------------------------------
+		self.index = index.Index()
+		for i in range(self.getNumberOfNodes()):
+			x = self.getNode(i)[0]
+			y = self.getNode(i)[1]
+			self.index.insert(i, (x-eps, y-eps, x+eps, y+eps))
+		
 		
 	def getNumberOfEdges(self):
 		return len(self.triangulation.edges)
@@ -952,6 +963,22 @@ class Treillis:
 		
 	def getNode(self, i):
 		return self.triangulation.nodes[i]
+		
+	def getNeighborNodes(self, x, y, tolerance=None):
+		if tolerance == None:
+			tolerance = eps
+		return list(self.index.intersection((x-tolerance, y-tolerance, x+tolerance, y+tolerance)))
+		 
+	def getNearestNode(self, x, y, radius=1e300):
+		N = self.getNeighborNodes(x, y, tolerance=radius)
+		d = 1e300; idx = 0
+		for i in range(len(N)):
+			ni = self.getNode(i)
+			di = ((x-ni[0])**2+(y-ni[1])**2)**0.5
+			if di < d:
+				idx = i
+				d = di
+		return idx
 		
 	def setYoungModules(self, E):
 		if not (isinstance(E, list)):
@@ -1453,7 +1480,7 @@ def Main_elasticity_7():
 	
 	model.solve()
 	
-	model.plot_solution(sym='k', relax=False, disp_factor=3e-1)
+	model.plot_solution(sym='k', relax=False, disp_factor=3e-1, von_mises=False)
 	model.print_solution(Rlim=20*1e6)
 	
 	print("DEFLECTION: ", round(max(np.abs(model.disp_v))*1e3, 2), " mm")
@@ -1511,3 +1538,75 @@ def Main_elasticity_8():
 	
 	print("DEFLECTION: ", round(max(np.abs(model.disp_v))*1e3, 2), " mm")
 
+
+
+def Main_elasticity_9():
+	
+	np.set_printoptions(precision=3)
+
+	Th = Triangulation()
+	
+	Th.nodes = [(0,0), (1,0), (2,0), (3,0), (4,0), (0.5,1), (1.5,1), (2.5,1), (3.5,1)]
+	Th.edges = [(0,1), (1,2), (2,3), (3,4), (5,6), (6,7), (7,8), (0,5), (1,5), (1,6), (2,6), (2,7), (3,7), (3,8), (4,8)]
+	Th.faces = []
+
+
+	plt.xlim(-0.3, 4.3)
+	plt.ylim(-1, 2)	
+
+	Th.summary()
+
+	model = Treillis(Th)
+	model.setYoungModules(100*1e9)
+	model.setBeamSections(100*1e-6)
+	model.setDirichletConditionOnNode(0, 0, 0)
+	model.setDirichletConditionOnNode(4, 0, 0)
+	model.setDirichletConditionOnNode(6, 0, -5e-3)
+
+
+
+	model.plot('k-', stress_factor=1e-5, strain_factor=1e2)
+	
+	
+	model.solve()
+	
+	model.plot_solution(relax=False, disp_factor=1e1)
+	model.print_solution()
+	
+
+
+def Main_elasticity_10():
+	
+	np.set_printoptions(precision=3)
+	
+	Th = Triangulation()
+	
+	Th.nodes = [(0,0.2), (0,-0.2), (0.2,0)]
+	Th.edges = [(0,1), (1,2), (0,2)]
+	Th.faces = []
+
+
+	plt.xlim(-0.1, 0.3)
+	plt.ylim(-0.3, 0.3)	
+	
+	Th.summary()
+
+	model = Treillis(Th)
+	
+	Th.summary()
+
+	model = Treillis(Th)
+	model.setYoungModules(200*1e9)
+	model.setBeamSections(100*1e-6)
+	model.setDirichletConditionOnNode(0, 0, 0)
+	model.setDirichletConditionOnNode(1, 0, 0)
+	model.setNeumannConditionOnNode(2, 0, -1e4)
+	
+	model.plot('k-', stress_factor=1e-5)
+	
+		
+	model.solve()
+	
+	model.plot_solution(relax=False, disp_factor=1e1)
+	model.print_solution()
+	
