@@ -207,7 +207,7 @@ class Shp2centerline(object):
 
         for key in self.dct_polygons.keys():
             poly_geom = self.dct_polygons[key]
-            centerlineObj = CenterlineCenterline(poly_geom, self.dist, self.clean_dist)
+            centerlineObj = Centerline(poly_geom, self.dist, self.clean_dist)
 
             self.dct_centerlines[key] = centerlineObj.createCenterline()
 

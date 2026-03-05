@@ -320,7 +320,6 @@ def noise(
 	:param force: force definite-positive matrix with removal of negative eigen values
     :param control: control points (list of coords) for conditional simulations 
     :param N: number of tracks to generate (returns track collection if N > 1)"""
-
     if n == 1:
         return __noise(track, sigma, kernel, distribution, mode, force, cycle, control, direction)
     else:
@@ -386,7 +385,7 @@ def __noise(
         # Zero-amplitude case
         if (sigma[ik] == 0):
             continue
-
+       
         # Building covariance matrix
         SIGMA_S  = makeCovarianceMatrixFromKernel(kernel[ik], noised_track, force=force, mode=mode, control=control)
         SIGMA_S += np.identity(SIGMA_S.shape[0]) * 1e-12
@@ -410,7 +409,7 @@ def __noise(
             Yy = np.matmul(L22, __randomSampler(N, distribution)) + np.matmul(L12, np.linalg.solve(L11, Yc))
         if (direction in [MODE_DIRECTION_Z, MODE_DIRECTION_YZ, MODE_DIRECTION_XZ, MODE_DIRECTION_XYZ, MODE_DIRECTION_ORTHO]):
             Yz = np.matmul(L22, __randomSampler(N, distribution)) + np.matmul(L12, np.linalg.solve(L11, Zc))
-        
+      
         # Building noised track
         if (direction == MODE_DIRECTION_ORTHO):
             for i in range(N-1):
@@ -422,12 +421,18 @@ def __noise(
         else:
             for i in range(N):
                 noised_track.getObs(i).position.translate(Yx[i], Yy[i], Yz[i])
-           
+         
         if mode == 'circular':
             noised_track.loop()
             
+        # Cast to real float    
+        for p in noised_track:
+            p.position.E = p.position.E.real
+            p.position.N = p.position.N.real
+            p.position.U = p.position.U.real
+           
     noised_track.removeAnalyticalFeature("abs_curv")
-          
+     
     return noised_track
 
 def randomizer(input, f, sigma=[7], kernel=[GaussianKernel(650)], N=10):

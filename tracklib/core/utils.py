@@ -62,7 +62,12 @@ import random
 import itertools
 import matplotlib.pyplot as plt
 
-from rtree import index
+try:
+    from rtree import index
+except ImportError:
+    print ('Code running in a no rtree environment')
+
+
 
 try:
     import shapely
@@ -630,7 +635,8 @@ def co_median(tarray):
 # covariogram of standard deviation h
 # ---------------------------------------------------------------------------------
 def conflateOnNetwork(geom, network, threshold=1e300, h=30, verbose=True):
-	
+
+	from tracklib.core import ENUCoords
 	from tracklib.core import TrackCollection
 	from tracklib.algo.interpolation import conflate
 	from tracklib.algo.comparison import compare, MODE_COMPARISON_POINTWISE
@@ -646,13 +652,14 @@ def conflateOnNetwork(geom, network, threshold=1e300, h=30, verbose=True):
 	
 	for segment in geom:
 		edge = network.getEdge(segment.tid)
+		
 		p1 = edge.source.coord
 		p2 = edge.target.coord
 		
 		h11 = p1.distance2DTo(segment[ 0].position); h12 = p2.distance2DTo(segment[-1].position); h1 = (h11**2+h12**2)**0.5/1.414
 		h21 = p1.distance2DTo(segment[-1].position); h22 = p2.distance2DTo(segment[ 0].position); h2 = (h21**2+h22**2)**0.5/1.141
 		HMIN = min(h1, h2)
-	
+
 		if (h2 < h1):
 			ptemp = p1; p1 = p2; p2 = ptemp
 		
