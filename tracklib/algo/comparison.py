@@ -804,13 +804,6 @@ def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constrai
     evolution = 1e300  # Initial evolution factor
 
     for iteration in range(iter_max):
-		
-        subtracks = tracklib.TrackCollection()
-        fraction = int(min((iteration+1)/(11), 1)*len(tracks))
-        print("FRACTION =", fraction)
-        for i in range(fraction):
-            subtracks.addTrack(tracks[i])
-            	
 
         if verbose:
             print("[" + str(datetime.datetime.now()) + "]   ITERATION", iteration)
@@ -819,7 +812,7 @@ def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constrai
             central.iterations.append(tracklib.Track([obs.copy() for obs in central]))
         central_before = central.copy()
 
-        _fusion_iteration(central, subtracks, mode, p, dim, represent_method, agg_method, constraint, verbose, log=log)
+        _fusion_iteration(central, tracks, mode, p, dim, represent_method, agg_method, constraint, verbose, log=log)
         evolution = compare(central, central_before, mode=MODE_COMPARISON_POINTWISE, p=1)
         
         if log:
