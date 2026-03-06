@@ -461,17 +461,11 @@ def _fdtw(track1, track2, weight = lambda A, B : A + B, dim=2, verbose = True, p
         D[0,0] = T[0,0]
 
     # Forward step 
-    counter = 0
-    #step_to_run = range(1, N1)
     if verbose:
-        counter = 0
-        #bar = progressbar.ProgressBar(max_value=N1-1)
+        bar = progressbar.ProgressBar(max_value=100)
 
     while(1):
         node = F.pop_smallest(); i = node[0]; j = node[1]; 
-        if verbose:
-            counter = max(i, counter); 
-            #bar.update(counter)
         V[node] = 1
         if ((i == N2-1) and (j == N1-1)):
             break
@@ -501,6 +495,10 @@ def _fdtw(track1, track2, weight = lambda A, B : A + B, dim=2, verbose = True, p
         for i in range(len(S)):
             plt.plot(S[i][1], S[i][0], 'r.', markersize=2)
         plt.show()
+        
+    if verbose:
+        bar.update(100)
+        bar.finish()
 
     return _fillAF_dtw(output, track1, track2, S, T, dim)
     
@@ -542,9 +540,9 @@ def _dtw_matching(track1, track2, p, dim, verbose, plot):
 #    - p = float('inf')       weight = lambda A, B : max(A, B)
 # ------------------------------------------------------------------------------
 def _dtw(track1, track2, weight = lambda A, B : A + B, dim=2, verbose = True, plot=False):   
-    
-    output = track1.copy()
 
+    output = track1.copy()
+    
     output.createAnalyticalFeature("diff")
     output.createAnalyticalFeature("pair")
     output.createAnalyticalFeature("ex")
@@ -556,7 +554,7 @@ def _dtw(track1, track2, weight = lambda A, B : A + B, dim=2, verbose = True, pl
     step_to_run = range(1, N1)
     if verbose:
         step_to_run = progressbar.progressbar(step_to_run)
-
+    
     # Forming distance matrix
     D = np.zeros((N2, N1))
     for i in range(N2):
@@ -595,7 +593,6 @@ def _dtw(track1, track2, weight = lambda A, B : A + B, dim=2, verbose = True, pl
         for i in range(len(S)):
             plt.plot(S[i][1], S[i][0], 'r.', markersize=2)
         plt.show()
-
     return _fillAF_dtw(output, track1, track2, S, T, dim)
     
 
@@ -770,8 +767,7 @@ def printMatching(matching):
 # ------------------------------------------------------------------------
 # One iteration for fusion algorithm
 # ------------------------------------------------------------------------
-def _fusion_iteration(central, tracks, mode, p, dim, represent_method, agg_method, constraint, verbose):
-
+def _fusion_iteration(central, tracks, mode, p, dim, represent_method, agg_method, constraint, verbose, log):
     matchings = tracklib.TrackCollection()
     for i in range(len(tracks)):
         matching = match(central, tracks[i], mode=mode, p=p, dim=dim, verbose=verbose)
@@ -785,35 +781,49 @@ def _fusion_iteration(central, tracks, mode, p, dim, represent_method, agg_metho
         cluster = [matchings[i]["homologous", j] for i in range(len(matchings))]
         anchors = [tracks[k][i].position for k in range(len(tracks)) for i in matchings[k][j, "pair"]]
         central[j].position = _aggregate(cluster, agg_method, constraint, anchors)
-        CLS.append(cluster)
-    central.clusters.append(CLS)
+        if log:
+            CLS.append(cluster)
+    if log:
+        central.clusters.append(CLS)
 
 # ------------------------------------------------------------------------
 # Algorithme fusion L. Etienne : trajectoire médiane
 # ------------------------------------------------------------------------
-def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constraint, iter_max, verbose):
+def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constraint, iter_max, verbose, log):
 
     start_time = datetime.datetime.now()
 
     master = _getMasterTrack(tracks, mode=master)
     central = tracks[master].copy()
     
-    central.clusters    = []       # logging
-    central.iterations  = []       # logging
-    central.convergence = []       # logging
+    if log:
+       central.clusters    = []       # logging
+       central.iterations  = []       # logging
+       central.convergence = []       # logging
+       
+    evolution = 1e300  # Initial evolution factor
 
     for iteration in range(iter_max):
+		
+        subtracks = tracklib.TrackCollection()
+        fraction = int(min((iteration+1)/(11), 1)*len(tracks))
+        print("FRACTION =", fraction)
+        for i in range(fraction):
+            subtracks.addTrack(tracks[i])
+            	
 
         if verbose:
             print("[" + str(datetime.datetime.now()) + "]   ITERATION", iteration)
-            
-        central.iterations.append(tracklib.Track([obs.copy() for obs in central]))
+        
+        if log:    
+            central.iterations.append(tracklib.Track([obs.copy() for obs in central]))
         central_before = central.copy()
 
-        _fusion_iteration(central, tracks, mode, p, dim, represent_method, agg_method, constraint, verbose)
-
+        _fusion_iteration(central, subtracks, mode, p, dim, represent_method, agg_method, constraint, verbose, log=log)
         evolution = compare(central, central_before, mode=MODE_COMPARISON_POINTWISE, p=1)
-        central.convergence.append(evolution)
+        
+        if log:
+            central.convergence.append(evolution)
         
         if verbose:
             print("CV = ", evolution)
@@ -821,18 +831,19 @@ def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constrai
             break
          
     if ((iteration == iter_max-1) and (evolution > 0)):
-        print("WARNING: TRAJECTORY FUSION HAS NOT CONVERGED (#ITER = " + str(iter_max) + " - CV = " + str(central.convergence[-1]) + ")")    
+        print("WARNING: TRAJECTORY FUSION HAS NOT CONVERGED (#ITER = " + str(iter_max) + " - CV = " + str(evolution) + ")")    
     
     end_time = datetime.datetime.now()
     
     if verbose:
         print("[" + str(end_time) + "]    COMPUTATION DONE IN " + str(end_time-start_time))
     
-    central.iteration = iteration
-    central.master = master
-    central.time = str(end_time-start_time)
-    central.start_time = start_time
-    central.end_time = end_time
+    if log:
+        central.iteration = iteration
+        central.master = master
+        central.time = str(end_time-start_time)
+        central.start_time = start_time
+        central.end_time = end_time
 
     return central
 
@@ -842,7 +853,7 @@ def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constrai
 # ------------------------------------------------------------------------ 
 def fusion(tracks, mode=MODE_MATCHING_DTW, master=MODE_MASTER_MEDIAN_LEN, p=1, dim=2,
            represent_method=MODE_REP_BARYCENTRE, agg_method=MODE_AGG_MEDIAN, constraint=True,
-           recursive=1e300, iter_max=100, verbose=True):
+           recursive=1e300, iter_max=100, verbose=True, log=False):
     
     N = len(tracks)
 
@@ -850,7 +861,7 @@ def fusion(tracks, mode=MODE_MATCHING_DTW, master=MODE_MASTER_MEDIAN_LEN, p=1, d
     if N <= recursive:
         return _fusion(tracks, mode=mode, master=master, p=p, dim=dim,
                        represent_method=represent_method, agg_method=agg_method,
-                       constraint=constraint, iter_max=iter_max, verbose=verbose)
+                       constraint=constraint, iter_max=iter_max, verbose=verbose, log=log)
 
     # Recursive call
     else: 
@@ -863,10 +874,10 @@ def fusion(tracks, mode=MODE_MATCHING_DTW, master=MODE_MASTER_MEDIAN_LEN, p=1, d
            subtracks.addTrack(fusion(tracks[ini:fin], mode=mode, master=master, p=p, dim=dim,
                                      represent_method=represent_method, constraint=constraint,
                                      agg_method=agg_method,
-                                     iter_max=iter_max, recursive=recursive, verbose=verbose))
+                                     iter_max=iter_max, recursive=recursive, verbose=verbose, log=log))
        return fusion(subtracks, mode=mode, master=master, p=p, dim=dim,
                      represent_method=represent_method, constraint=constraint,
                      agg_method=agg_method,
-                     recursive=recursive, iter_max=iter_max, verbose=verbose)
+                     recursive=recursive, iter_max=iter_max, verbose=verbose, log=log)
 
 
