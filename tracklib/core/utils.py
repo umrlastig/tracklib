@@ -1000,7 +1000,7 @@ class Treillis:
 	def setDirichletConditionOnNode(self, i, dx=None, dy=None):
 		self.DIRICHLET[i] = (dx, dy)
 		
-	def setNeumannConditionOnNode(self, i, fx=None, fy=None):
+	def setNeumannConditionOnNode(self, i, fx, fy):
 		self.NEUMANN[i] = (fx, fy)
 
 	def makeRigidityMatrix(self):
@@ -1040,18 +1040,20 @@ class Treillis:
 		R = self.makeRigidityMatrix() ;  K = R.copy()
 		F = self.makeRightHandVector();  G = F.copy()
 		
-		# -----------------------------------------------------------
+		# -------------------------------------------------------------------------------------------------
 		# Méthode du terme diagonal unité
-		# -----------------------------------------------------------
+		# -------------------------------------------------------------------------------------------------
 		for i in self.DIRICHLET:
-			G[:,0] = G[:,0] + K[2*i  ,:]*self.DIRICHLET[i][0]
-			G[:,0] = G[:,0] + K[2*i+1,:]*self.DIRICHLET[i][1]
+			if (not self.DIRICHLET[i][0] is None):
+				G[:,0] = G[:,0] + K[2*i  ,:]*self.DIRICHLET[i][0]
+			if (not self.DIRICHLET[i][1] is None):
+				G[:,0] = G[:,0] + K[2*i+1,:]*self.DIRICHLET[i][1]
 		for i in self.DIRICHLET:
-			K[2*i  , :] = 0; K[:,2*i  ] = 0; K[2*i  , 2*i  ] = 1
-			K[2*i+1, :] = 0; K[:,2*i+1] = 0; K[2*i+1, 2*i+1] = 1
-			G[2*i  , 0] = self.DIRICHLET[i][0]
-			G[2*i+1, 0] = self.DIRICHLET[i][1]
-		# -----------------------------------------------------------
+			if (not self.DIRICHLET[i][0] is None):
+				K[2*i  , :] = 0; K[:,2*i  ] = 0; K[2*i  , 2*i  ] = 1; G[2*i  , 0] = self.DIRICHLET[i][0]
+			if (not self.DIRICHLET[i][1] is None):
+				K[2*i+1, :] = 0; K[:,2*i+1] = 0; K[2*i+1, 2*i+1] = 1; G[2*i+1, 0] = self.DIRICHLET[i][1]
+		# -------------------------------------------------------------------------------------------------
 			
 		U = np.linalg.solve(K, G)
 		FF = R @ U
@@ -1201,12 +1203,12 @@ class Treillis:
 			plt.plot([self.getNode(e[0])[0], self.getNode(e[1])[0]], [self.getNode(e[0])[1], self.getNode(e[1])[1]], sym, linewidth=lwd, markersize=markersize)	
 		for i in self.DIRICHLET.keys():
 			imposed = self.DIRICHLET[i]
-			if (imposed[0] == 0 and imposed[1] == 0):
-				plt.plot(self.getNode(i)[0], self.getNode(i)[1], 'k^')
-			else:
-				norm = 0.25*strain_factor*(imposed[0]**2 + imposed[1]**2)**0.5
-				plt.plot(self.getNode(i)[0], self.getNode(i)[1], 'b^', markersize=markersize)
-				plt.arrow(self.getNode(i)[0], self.getNode(i)[1], imposed[0]*strain_factor, imposed[1]*strain_factor, head_length=norm, width=0.01*lwd, head_width=0.2*lwd, length_includes_head=True, color='b')
+			plt.plot(self.getNode(i)[0], self.getNode(i)[1], 'k^')
+			if (not imposed[0] is None) and (not imposed[1] is None):
+				if (imposed[0] != 0 or imposed[1] != 0):
+					norm = 0.25*strain_factor*(imposed[0]**2 + imposed[1]**2)**0.5
+					plt.plot(self.getNode(i)[0], self.getNode(i)[1], 'b^', markersize=markersize)
+					plt.arrow(self.getNode(i)[0], self.getNode(i)[1], imposed[0]*strain_factor, imposed[1]*strain_factor, head_length=norm, width=0.01*lwd, head_width=0.2*lwd, length_includes_head=True, color='b')
 		for i in self.NEUMANN.keys():
 			stress = self.NEUMANN[i]
 			norm = 0.25*stress_factor*(stress[0]**2 + stress[1]**2)**0.5
@@ -1606,7 +1608,7 @@ def Main_elasticity_10():
 	model.setYoungModules(200*1e9)
 	model.setBeamSections(100*1e-6)
 	model.setDirichletConditionOnNode(0, 0, 0)
-	model.setDirichletConditionOnNode(1, 0, 0)
+	model.setDirichletConditionOnNode(1, 0, None)
 	model.setNeumannConditionOnNode(2, 0, -1e4)
 	
 	model.plot('k-', stress_factor=1e-5)
@@ -1614,6 +1616,75 @@ def Main_elasticity_10():
 		
 	model.solve()
 	
-	model.plot_solution(relax=False, disp_factor=1e1)
+	model.plot_solution(relax=False, disp_factor=1e2)
 	model.print_solution()
+	
+
+def Main_elasticity_11():
+	
+	from tracklib.algo import stochastics
+	from tracklib.algo import synthetics
+	
+	stochastics.seed(123)
+	track = synthetics.generate(0.15)
+	track.resample(1)
+	
+	plt.plot(track["x"], track["y"], 'r')
+	
+	pt_index = [0, -1]
+	points = [track[idx].position.copy() for idx in pt_index]
+	
+	points[0].E += 1; points[0].N += 4
+	points[1].E +=-5; points[1].N += 10
+	
+	
+	for p in points:
+		plt.plot(p.E, p.N, 'ko')
+	
+	line = shapely.LineString([[p.position.E, p.position.N] for p in track])
+	
+	domain = PolygonDomain(shapely.buffer(line, 5, cap_style='square'))
+	Th = domain.triangulate(1, add_points=[(p.position.E, p.position.N) for p in track])
+	domain.plot('k-')
+	Th.summary()
+	
+	model = Treillis(Th)
+	model.setYoungModules(210*1e9)
+	model.setBeamSections(0.01)
+	
+	m = int(len(track)/2)
+	
+	i1 = model.getNearestNode(track[ 0].position.E, track[ 0].position.N)
+	i2 = model.getNearestNode(track[-1].position.E, track[-1].position.N)
+	i3 = model.getNearestNode(track[m-10].position.E, track[m-10].position.N)
+	i4 = model.getNearestNode(track[m+10].position.E, track[m+10].position.N)
+	
+	#model.setDirichletConditionOnNode(i1, points[ 0].E-track[ 0].position.E, points[ 0].N-track[ 0].position.N)
+	#model.setDirichletConditionOnNode(i2, points[-1].E-track[-1].position.E, points[-1].N-track[-1].position.N)
+	
+	F = 3e8
+	model.setNeumannConditionOnNode(i1,   -0.8*F,   F)
+	model.setNeumannConditionOnNode(i2,   2*F, 2*F)
+	model.setDirichletConditionOnNode(i3, 0,  0)
+	model.setDirichletConditionOnNode(i4, 0,  0)
+	
+	
+	
+	model.plot('k-', txt=False, stress_factor=1e-10, strain_factor=1)
+	
+	
+	model.solve()
+		
+	model.plot_solution(sym='k', relax=False, disp_factor=1, von_mises=False)
+	model.print_solution(Rlim=20*1e6)
+	
+	X = []
+	Y = []
+	for p in track:
+		idx = model.getNearestNode(p.position.E, p.position.N)
+		x  = model.getNode(idx)[0] + model.disp_u[idx]
+		y  = model.getNode(idx)[1] + model.disp_v[idx]
+		X.append(x)
+		Y.append(y)
+	plt.plot(X, Y,'b-')
 	

@@ -789,7 +789,7 @@ def _fusion_iteration(central, tracks, mode, p, dim, represent_method, agg_metho
 # ------------------------------------------------------------------------
 # Algorithme fusion L. Etienne : trajectoire médiane
 # ------------------------------------------------------------------------
-def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constraint, iter_max, verbose, log):
+def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constraint, iter_max, verbose, log, cv=1e-16):
 
     start_time = datetime.datetime.now()
 
@@ -820,7 +820,7 @@ def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constrai
         
         if verbose:
             print("CV = ", evolution)
-        if (evolution < 1e-16):
+        if (evolution < cv):
             break
          
     if ((iteration == iter_max-1) and (evolution > 0)):
@@ -846,15 +846,25 @@ def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constrai
 # ------------------------------------------------------------------------ 
 def fusion(tracks, mode=MODE_MATCHING_DTW, master=MODE_MASTER_MEDIAN_LEN, p=1, dim=2,
            represent_method=MODE_REP_BARYCENTRE, agg_method=MODE_AGG_MEDIAN, constraint=True,
-           recursive=1e300, iter_max=100, verbose=True, log=False):
+           recursive=1e300, iter_max=100, verbose=True, log=False, quality=False, cv=1e-16):
     
     N = len(tracks)
 
     # Terminal case
     if N <= recursive:
-        return _fusion(tracks, mode=mode, master=master, p=p, dim=dim,
+        central = _fusion(tracks, mode=mode, master=master, p=p, dim=dim,
                        represent_method=represent_method, agg_method=agg_method,
-                       constraint=constraint, iter_max=iter_max, verbose=verbose, log=log)
+                       constraint=constraint, iter_max=iter_max, verbose=verbose, log=log, cv=cv)
+        if quality:
+            central.quality = 0
+            step_to_run = range(N)
+            if verbose:
+                print("[" + str(datetime.datetime.now()) + "]    EVALUATING QUALITY METRICS")
+                step_to_run = progressbar.progressbar(step_to_run)
+            for i in step_to_run:
+                central.quality += compare(central, tracks[i], mode=MODE_COMPARISON_DTW, p=2)**2
+            central.quality = (central.quality/N)**0.5
+        return central
 
     # Recursive call
     else: 
@@ -867,10 +877,10 @@ def fusion(tracks, mode=MODE_MATCHING_DTW, master=MODE_MASTER_MEDIAN_LEN, p=1, d
            subtracks.addTrack(fusion(tracks[ini:fin], mode=mode, master=master, p=p, dim=dim,
                                      represent_method=represent_method, constraint=constraint,
                                      agg_method=agg_method,
-                                     iter_max=iter_max, recursive=recursive, verbose=verbose, log=log))
+                                     iter_max=iter_max, recursive=recursive, verbose=verbose, log=log, cv=cv))
        return fusion(subtracks, mode=mode, master=master, p=p, dim=dim,
                      represent_method=represent_method, constraint=constraint,
                      agg_method=agg_method,
-                     recursive=recursive, iter_max=iter_max, verbose=verbose, log=log)
+                     recursive=recursive, iter_max=iter_max, verbose=verbose, log=log, cv=cv)
 
 
