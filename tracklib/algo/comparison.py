@@ -884,3 +884,68 @@ def fusion(tracks, mode=MODE_MATCHING_DTW, master=MODE_MASTER_MEDIAN_LEN, p=1, d
                      recursive=recursive, iter_max=iter_max, verbose=verbose, log=log, cv=cv)
 
 
+# ------------------------------------------------------------------------
+# Benchmark fusion algorithm
+# ------------------------------------------------------------------------ 
+def benchmark():
+	from tracklib.core import TrackCollection, kernel
+	from tracklib.algo import stochastics, synthetics
+	
+	stochastics.seed(123)
+	
+	kernel = kernel.GaussianKernel(50)
+	
+	
+	import time
+	
+	Ntraj = [3, 5, 10, 25, 50, 100]                                            # Number of trajectories
+	MODES = [MODE_AGG_MEDIAN, MODE_AGG_L1, MODE_AGG_L2, MODE_AGG_LInf]         # Computation modes
+	
+	Ntraj = [2, 3, 4, 5, 10, 25, 50, 100, 250, 500, 1000]
+	MODES = [MODE_AGG_L2]
+	
+	rec = 10
+	cv  = 1e-3
+	
+	fichier = open("out.txt", 'w')
+	fichier.close()
+	
+	for ntraj in Ntraj:
+		for mode in MODES:
+			
+			TIME = []
+			PERF = []
+			
+			for rep in range(10):
+				print("")
+				print("========================================================================================")
+				print("")
+				print("")
+				print("                      NB OF TRAJ:", ntraj, "    AGG MODE:", mode,  "    REP:", rep)
+				print("")
+				print("")
+				print("========================================================================================")
+				time.sleep(1)
+				
+				track = synthetics.generate(0.30)
+				for p in track:
+					p.position.setZ(0)
+				tracks = TrackCollection()
+				for i in range(ntraj):
+					noised = track.noise(3, kernel)
+					for p in noised:
+						p.position.setZ(0)
+					tracks.addTrack(noised)
+		
+				t1 = time.time()
+				central = fusion(tracks, mode=MODE_MATCHING_FDTW, iter_max=100, recursive=rec, agg_method=mode, constraint=False, cv=cv, verbose=True)
+				t2 = time.time()-t1
+				perf = compare(central, track, MODE_COMPARISON_DTW, p=2)
+				
+				TIME.append(t2)
+				PERF.append(perf)
+				
+			fichier = open("out.txt", 'a')
+			fichier.write(str(ntraj) + " " + str(mode) + " " + str(round(np.mean(TIME), 2)) + " " + str(round(np.std(TIME), 2)) + " " + str(round(np.mean(PERF), 3)) + " " + str(round(np.std(PERF), 3)) + "\r\n")
+			fichier.close()
+

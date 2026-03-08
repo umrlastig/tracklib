@@ -1113,7 +1113,7 @@ class Treillis:
 			if (self.strain[i] < 0):
 				sym = '[-]'
 			if (self.strain[i] != 0):
-				print("Beam #{:3d} [from nodes {:d} to {:d}]  {:7.1f} ppm    ".format(i, e[0], e[1], abs(self.strain[i])*1e6) + sym)
+				print("Beam #{:3d}  [{:d} -> {:d}]  {:7.1f} ppm    ".format(i, e[0], e[1], abs(self.strain[i])*1e6) + sym)
 		print("------------------------------------------------------\r\n")
 		
 		print("======================================================")
@@ -1129,7 +1129,7 @@ class Treillis:
 				warning = '[!]'
 				ok = False
 			if (self.stress[i] != 0):
-				print("Beam #{:3d} [from nodes {:d} to {:d}]  {:7.1f} MPa    ".format(i, e[0], e[1], abs(self.stress[i])*1e-6) + sym + "  " + warning)
+				print("Beam #{:3d}  [{:d} -> {:d}]  {:7.1f} kN  {:7.1f} MPa    ".format(i, e[0], e[1], abs(self.stress[i])*self.S[i]*1e-3, abs(self.stress[i])*1e-6) + sym + "  " + warning)
 		print("------------------------------------------------------\r\n")
 		
 		
@@ -1601,17 +1601,13 @@ def Main_elasticity_10():
 	Th.summary()
 
 	model = Treillis(Th)
-	
-	Th.summary()
-
-	model = Treillis(Th)
 	model.setYoungModules(200*1e9)
 	model.setBeamSections(100*1e-6)
 	model.setDirichletConditionOnNode(0, 0, 0)
 	model.setDirichletConditionOnNode(1, 0, None)
 	model.setNeumannConditionOnNode(2, 0, -1e4)
 	
-	model.plot('k-', stress_factor=1e-5)
+	model.plot('k-', stress_factor=1e-5, txt=True)
 	
 		
 	model.solve()
@@ -1619,8 +1615,35 @@ def Main_elasticity_10():
 	model.plot_solution(relax=False, disp_factor=1e2)
 	model.print_solution()
 	
-
+	
 def Main_elasticity_11():
+	
+	Th = Triangulation()
+	Th.nodes = [(0,0), (0,0.7), (0.7,0)]
+	Th.edges = [(0,1), (1,2), (2,0)]
+	
+	
+	plt.xlim(-0.1, 0.8)
+	plt.ylim(-0.1, 0.8)	
+	
+	Th.summary()
+	
+	model = Treillis(Th)
+	model.setYoungModules(200*1e9)
+	model.setBeamSections(100*1e-4)
+	model.setDirichletConditionOnNode(0, 0, 0)
+	model.setDirichletConditionOnNode(1, 0, None)
+	model.setNeumannConditionOnNode(2, -120*1e3, -360*1e3)
+	
+	model.plot('k-', stress_factor=5e-7, txt=True)
+	
+	model.solve()
+	
+	model.plot_solution(relax=False, disp_factor=1e2)
+	model.print_solution()
+	
+
+def Main_elasticity_12():
 	
 	from tracklib.algo import stochastics
 	from tracklib.algo import synthetics
