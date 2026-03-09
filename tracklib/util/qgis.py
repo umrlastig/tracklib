@@ -316,17 +316,16 @@ class QGIS:
             pr.addAttributes([QgsField("idpoint", QVariant.Int)])
             if AF:
                 for af_name in collection.getTrack(0).getListAnalyticalFeatures():
-                    pr.addAttributes([QgsField(af_name, QVariant.Double)])
+                    v = collection.getTrack(0).getObsAnalyticalFeature(af_name, 1)
+                    if isinstance(v, int):
+                        pr.addAttributes([QgsField(af_name, QVariant.Int)])
+                    elif isinstance(v, float):
+                        pr.addAttributes([QgsField(af_name, QVariant.Double)])
+                    else:
+                        pr.addAttributes([QgsField(af_name, QVariant.String)])
             layer.updateFields()
 
-            for i in range(len(FEATURES)):
-                f = FEATURES[i]
-                #ATTs = [f[0], f[1]]
-                #if AF:
-                #    for af_name in collection.getTrack(i).getListAnalyticalFeatures():
-                #        val = collection.getTrack(i).getObsAnalyticalFeature(af_name, i)
-                #        ATTs.append(float(val))
-                #    f.setAttributes(ATTs)
+            for f in FEATURES:
                 pr.addFeature(f)
             layer.updateExtents()
             
@@ -342,13 +341,20 @@ class QGIS:
             pr = layer.dataProvider()
             pr.addAttributes([QgsField("idtrace", QVariant.String)])
             pr.addAttributes([QgsField("nbpoint", QVariant.Int)])
-            #if AF:
-            #    for af_name in collection.getTrack(0).getListAnalyticalFeatures():
-            #        print (af_name)
-            #        pr.addAttributes([QgsField(af_name, QVariant.String)])
+            if AF:
+                for af_name in collection.getTrack(0).getListAnalyticalFeatures():
+                    # pr.addAttributes([QgsField(af_name, QVariant.Double)])
+                    v = collection.getTrack(0).getObsAnalyticalFeature(af_name, 1)
+                    if isinstance(v, int):
+                        pr.addAttributes([QgsField(af_name, QVariant.Int)])
+                    elif isinstance(v, float):
+                        pr.addAttributes([QgsField(af_name, QVariant.Double)])
+                    else:
+                        pr.addAttributes([QgsField(af_name, QVariant.String)])
             layer.updateFields()
+
             for f in FEATURES:
-                pr.addFeatures([f])
+                pr.addFeature(f)
             layer.updateExtents()
             
             if style == None:
@@ -396,7 +402,11 @@ class QGIS:
                     
             if type == 'LINE':
                 fet = QgsFeature()
-                fet.setAttributes([id, track.size()]) 
+                attrs = [id, track.size()]
+                if AF:
+                    for af_name in track.getListAnalyticalFeatures():
+                        attrs.append(track.getObsAnalyticalFeature(af_name, 0))
+                fet.setAttributes(attrs)
                 fet.setGeometry(QgsGeometry.fromPolylineXY(POINTS))
                 FEATURES.append(fet)
                 
