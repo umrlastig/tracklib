@@ -901,9 +901,6 @@ def benchmark():
 	Ntraj = [3, 5, 10, 25, 50, 100]                                            # Number of trajectories
 	MODES = [MODE_AGG_MEDIAN, MODE_AGG_L1, MODE_AGG_L2, MODE_AGG_LInf]         # Computation modes
 	
-	Ntraj = [2, 3, 4, 5, 10, 25, 50, 100, 250, 500, 1000]
-	MODES = [MODE_AGG_L2]
-	
 	rec = 10
 	cv  = 1e-3
 	
@@ -927,7 +924,7 @@ def benchmark():
 				print("========================================================================================")
 				time.sleep(1)
 				
-				track = synthetics.generate(0.30)
+				track = synthetics.generate(0.15)
 				for p in track:
 					p.position.setZ(0)
 				tracks = TrackCollection()

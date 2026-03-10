@@ -2324,6 +2324,42 @@ class Track:
                 return track
             return track.extract(0, i - 4)
 
+
+    # ------------------------------------------------------------
+    # Digitization of a track 
+    # Input: 
+    #   - r        resolution parameter 
+    #   - clean    remove duplicates      [def. True]
+    # Output: digitized track
+    # ------------------------------------------------------------
+    def digitize(self, r, clean=True):
+       out = self.copy()
+       for p in out:
+           p.position.setX(math.floor(p.position.getX()/r + 0.5)*r)
+           p.position.setY(math.floor(p.position.getY()/r + 0.5)*r)
+           p.position.setZ(math.floor(p.position.getZ()/r + 0.5)*r)
+       if clean:
+           out.removePosDup(r/2)
+       return out
+       
+    # ------------------------------------------------------------
+    # Dual of a track 
+    # Input: a track
+    # Output: track where all points are mid-segments or the 
+    # original input track (len n -> n - 1)
+    # ------------------------------------------------------------
+    def dual(self):
+        out = self.copy()[:-1]
+        for i in range(0, len(self)-1):
+            x1 = self[i  ].position.getX(); y1 = self[i  ].position.getY(); z1 = self[i  ].position.getZ(); t1 = self[i  ].timestamp.toAbsTime()
+            x2 = self[i+1].position.getX(); y2 = self[i+1].position.getY(); z2 = self[i+1].position.getZ(); t2 = self[i+1].timestamp.toAbsTime()
+            out[i].position.setX((x1+x2)/2)
+            out[i].position.setY((y1+y2)/2)
+            out[i].position.setZ((z1+z2)/2)
+            out[i].timestamp = ObsTime.readUnixTime((t1+t2)/2)
+        return out
+
+
     # ------------------------------------------------------------
     # [+] Concatenation of two tracks
     # ------------------------------------------------------------
