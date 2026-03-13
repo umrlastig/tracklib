@@ -62,7 +62,7 @@ from tracklib.core import Track
 
 
 
-class TrackCollectionIterator:
+class TrackSource:
     """
     Iterator that yields Track objects from a folder.
     """
