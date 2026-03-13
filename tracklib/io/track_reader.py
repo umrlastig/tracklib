@@ -77,6 +77,8 @@ class TrackCollectionIterator:
             yield track
 
     def __len__(self):
+        if self.fmt.ext is not None:
+            return len(list(Path(self.folder).glob('*.' + self.fmt.ext.lower())))
         return len(list(Path(self.folder).glob('*')))
 
 
