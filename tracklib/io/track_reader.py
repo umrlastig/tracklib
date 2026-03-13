@@ -51,12 +51,34 @@ import csv
 import io
 import json
 import os
+from pathlib import Path
 from xml.dom import minidom
+
 
 from . import TrackFormat
 from tracklib.core import (ObsTime, ENUCoords, ECEFCoords, GeoCoords, Obs, 
                            islist, isfloat, makeCoords,TrackCollection)
 from tracklib.core import Track
+
+
+
+class TrackCollectionIterator:
+    """
+    Iterator that yields Track objects from a folder.
+    """
+
+    def __init__(self, folder, fmt):
+        self.folder = folder
+        self.fmt = fmt
+
+    def __iter__(self):
+        for file in Path(self.folder).iterdir():
+            track = TrackReader.readFromFile(file, self.fmt)
+            yield track
+
+    def __len__(self):
+        return len(list(Path(self.folder).glob('*')))
+
 
 
 
