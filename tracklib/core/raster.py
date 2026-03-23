@@ -291,17 +291,17 @@ class Raster:
             else:
                 AFs.add(mapname)
 
+        # On initialise le dictionnaire qui va contenir toutes les valeurs
+        if not hasattr(self, "collectionValuesGrid"):
+            self.collectionValuesGrid = {}
+            for afname in AFs:
+                self.collectionValuesGrid[afname] = defaultdict(list)
+
         # On vérifie que les AF sont calculés
         for trace in collection.getTracks():
             for afname in AFs:
                 if not trace.hasAnalyticalFeature(afname) and afname != 'uid':
                     raise AnalyticalFeatureError("Error: track does not contain analytical feature '" + afname + "'")
-
-
-        # On initialise le dictionnaire qui va contenir toutes les valeurs
-        self.collectionValuesGrid = {}
-        for afname in AFs:
-            self.collectionValuesGrid[afname] = defaultdict(list)
 
         for trace in collection.getTracks():
             # On éparpille dans les cellules
