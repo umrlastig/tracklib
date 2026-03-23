@@ -23,12 +23,12 @@ sys.path.append(os.path.abspath("../../tracklib"))
 
 project = "TrackLib"
 copyright = (
-    "2024, LASTIG lab, French National Institute of Geographic and Forest Information"
+    "2026, LASTIG lab, French National Institute of Geographic and Forest Information"
 )
 author = "Yann Méneroux, Marie-Dominique Van Damme"
 
 # The full version, including alpha/beta/rc tags
-release = "1.0"
+release = "0.8"
 
 
 # -- General configuration ---------------------------------------------------

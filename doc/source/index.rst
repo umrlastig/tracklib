@@ -53,18 +53,24 @@ to simplify the creation of analytical features on a GPS tracks.
 
 
 
-Documentation
-**************
+.. figure:: img/abstracttracklib.png
+   :width: 700
+   :align: center
+   
+   Some Features of the Tracklib Library
+
+
+
 
 .. toctree::
-  :maxdepth: 2
+  :maxdepth: 1
+  :hidden:
   
   Getting Started <started/index>
-  Quick Examples <userguide/gallery>
+  Example Gallery <examples/gallery>
   Use Cases <usecase/index>
+  API reference <api/index>
   
-.. User Guide <userguide/index>
-
 
 
 .. Main functionalities
