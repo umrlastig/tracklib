@@ -16,5 +16,5 @@ Examples of using functions to manage comparisons, distance measures and aggrega
 
     UG_Matching
     UG_Fusion
-
+    ../../usecase/AggregatedTrajectory
 

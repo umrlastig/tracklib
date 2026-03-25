@@ -19,6 +19,18 @@ Comparison
 
    comparison/UG_Matching
    comparison/UG_Fusion
+   ../../usecase/AggregatedTrajectory
+
+
+Filtering
+----------
+
+.. nbgallery::
+   :name: filtering-gallery
+   :glob:
+
+   filtering/UG_Filtering
+   ../../usecase/KalmanFiltering
 
 
 Mapping
@@ -42,17 +54,30 @@ Segmentation
 
    segmentation/UG_Segmentation
    segmentation/UG_Stdbscan
+   ../../usecase/StopPoints
    segmentation/UG_ReturnTrip
-
+   
 
 Selection
-------------
+----------
 
 .. nbgallery::
    :name: selection-gallery
    :glob:
 
    selection/UG_Selection
+
+
+
+Simplification
+---------------
+
+.. nbgallery::
+   :name: simplification-gallery
+   :glob:
+
+   simplification/UG_Simplification
+
 
 
 Summarising
@@ -63,7 +88,7 @@ Summarising
    :glob:
 
    summarising/UG_AFMap
-
+   ../../usecase/Summarize
 
 
 
@@ -72,9 +97,11 @@ Summarising
    :hidden:
 
    comparison/index
+   filtering/index
    mapping/index
    segmentation/index
    selection/index
+   simplification/index
    summarising/index
 
 

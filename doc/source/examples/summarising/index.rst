@@ -11,6 +11,6 @@ Summarising examples
    :name: summarising-gallery
 
    UG_AFMap
-
+   ../../usecase/Summarize
 
 
