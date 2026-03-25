@@ -21,6 +21,16 @@ Comparison
    comparison/UG_Fusion
 
 
+Filtering
+----------
+
+.. nbgallery::
+   :name: comparison-gallery
+   :glob:
+
+   filtering/UG_Filtering
+
+
 Mapping
 -------
 
