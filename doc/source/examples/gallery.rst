@@ -29,6 +29,7 @@ Filtering
    :glob:
 
    filtering/UG_Filtering
+   ../../usecase/KalmanFiltering
 
 
 Mapping
