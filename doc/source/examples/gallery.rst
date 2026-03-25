@@ -51,13 +51,12 @@ Segmentation
 .. nbgallery::
    :name: segmentation-gallery
    :glob:
-   :columns: 3
 
    segmentation/UG_Segmentation
    segmentation/UG_Stdbscan
-   segmentation/UG_ReturnTrip
    ../../usecase/StopPoints
-
+   segmentation/UG_ReturnTrip
+   
 
 Selection
 ------------
