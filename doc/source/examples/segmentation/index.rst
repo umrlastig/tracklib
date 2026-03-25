@@ -12,10 +12,11 @@ Functions to manage segmentation of GPS tracks
 
 .. nbgallery::
    :name: segmentation-gallery
+   :columns: 3
 
    UG_Segmentation
    UG_Stdbscan
-   UG_ReturnTrip
    ../../usecase/StopPoints
+   UG_ReturnTrip
 
 
