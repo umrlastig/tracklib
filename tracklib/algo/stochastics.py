@@ -319,7 +319,7 @@ def noise(
 	:param mode: 'linear' (default), 'circular' or 'euclidian'
 	:param force: force definite-positive matrix with removal of negative eigen values
     :param control: control points (list of coords) for conditional simulations 
-    :param N: number of tracks to generate (returns track collection if N > 1)"""
+    :param n: number of tracks to generate (returns track collection if n > 1)"""
     if n == 1:
         return __noise(track, sigma, kernel, distribution, mode, force, cycle, control, direction)
     else:

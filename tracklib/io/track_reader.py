@@ -51,6 +51,7 @@ import csv
 import io
 import json
 import os
+import progressbar
 from pathlib import Path
 from xml.dom import minidom
 
@@ -136,8 +137,12 @@ class TrackReader:
 
         if fmt.ext is None:
             raise WrongArgumentError("Track format need have the EXT initialised (CSV, GPX, WKT)")
+            
+        '''
         if fmt.ext not in ['CSV', 'GPX', 'WKT'] and isinstance(track_format, TrackFormat):
             raise WrongArgumentError("Tracklib only read CSV, GPX and WKT files.")
+        '''
+
 
         # num_lines = sum(1 for line in open(path))
 
@@ -149,7 +154,7 @@ class TrackReader:
         if os.path.isdir(path):
             TRACES = TrackCollection()
             LISTFILE = os.listdir(path)
-            for f in LISTFILE:
+            for f in progressbar.progressbar(LISTFILE):
                 # if path[len(path)-1:] == '/':
                 #                     collection = TrackReader.readFromGpxFast(path + f)
                 #                 else:

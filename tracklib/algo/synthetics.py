@@ -45,6 +45,7 @@ Class to manage GPS tracks synthetic generations
 """
 
 import random
+import progressbar
 #from tracklib.util.exceptions import *
 
 import tracklib as tracklib
@@ -180,7 +181,68 @@ def generateReturnTrip(track, kernelNoise=None):
     t3 = t1 + segment + t2
     return t3
 
-    
+
+# ----------------------------------------------------------------------------------------
+# Method to generate a set of tracks on a network
+# ----------------------------------------------------------------------------------------
+# Inputs:
+#	- network      :    base network to generate track
+#   - N            :    max number of tracks to generate                    [default 100]
+#   - p_round_trip :    probability of round trip   (btw 0 and 1)             [default 0]
+#   - p_cplx_trip  :    probability of complex trip (btw 0 and 1 excluded)    [default 0]
+#   - resolution   :    final resolution of tracks (in m)                    [default 10]
+# 	- noiser       :    a noise process to noise tracks                    [default None]
+# Output: a track collection with at most N tracks
+# ----------------------------------------------------------------------------------------
+# Note: if network is connected and non-directed, the output track collection should 
+# contain exactly N tracks.
+# ----------------------------------------------------------------------------------------
+def generateTracksOnNetwork(network, N=100, p_round_trip=0, p_cplx_trip=0, resolution=10, noiser=None):
+	
+	if (p_cplx_trip == 1):
+		print("Error: generation of synthetic tracks on network")
+		print(" -> probability of complex trip (p_cplx_trip) parameter must be strictly lower than 1")
+		sys.exit(1)
+
+	out = TrackCollection()
+
+	for i in progressbar.progressbar(range(N)):
+	
+		# Chemin de base
+		id_node_1 = random.sample(list(network.NODES.keys()), 1)[0]
+		id_node_2 = random.sample(list(network.NODES.keys()), 1)[0]
+		route = network.shortest_path(id_node_1, id_node_2)
+		if route is None:
+			continue
+		
+		# Chemin complexe
+		while (random.random() < p_cplx_trip):
+			id_node_1b = id_node_2
+			id_node_2b = random.sample(list(network.NODES.keys()), 1)[0]
+			new_route = network.shortest_path(id_node_1b, id_node_2b)
+			if new_route is None:
+				continue
+			route = route + new_route
+			id_node_1 = id_node_1b
+			id_node_2 = id_node_2b
+		
+		# Chemin aller-retour
+		if random.random() < p_round_trip:
+			route = route[:-1] + route.reverse()
+			
+		# Bruitage
+		if not noiser is None:
+			route = noiser.noise(route)
+		route.resample(resolution)
+		
+		out.addTrack(route)
+		
+	print("------------------------------------------------------------")	
+	print(len(out), "("+str(round(100*len(out)/N, 2))+" %)", "tracks generated on network")
+	print("------------------------------------------------------------")
+		
+	return(out)
+
     
     
     

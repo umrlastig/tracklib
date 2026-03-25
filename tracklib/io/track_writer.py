@@ -108,13 +108,13 @@ class TrackWriter:
         id_U       = track_format.id_U
         id_T       = track_format.id_T
         separator  = track_format.separator
-        h          = track_format.h
+        h          = track_format.header
         af_names   = track_format.af_names
     
         if isinstance(tracks, Track):
             TrackWriter.writeToFile(tracks, path, id_E, id_N, id_U, id_T, separator, h, af_names)
         else:
-            TrackWriter.writeToFile(tracks, path, "csv", id_E, id_N, id_U, id_T, separator, h, af_names=af_names)
+            TrackWriter.writeToFiles(tracks, path, "csv", id_E, id_N, id_U, id_T, separator, h, af_names=af_names)
    
             
         
