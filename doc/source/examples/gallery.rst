@@ -19,6 +19,7 @@ Comparison
 
    comparison/UG_Matching
    comparison/UG_Fusion
+   ../../usecase/AggregatedTrajectory
 
 
 Filtering
@@ -54,6 +55,7 @@ Segmentation
    segmentation/UG_Segmentation
    segmentation/UG_Stdbscan
    segmentation/UG_ReturnTrip
+   ../../usecase/StopPoints
 
 
 Selection
@@ -74,7 +76,7 @@ Summarising
    :glob:
 
    summarising/UG_AFMap
-
+   ../../usecase/Summarize
 
 
 
@@ -83,6 +85,7 @@ Summarising
    :hidden:
 
    comparison/index
+   filtering/index
    mapping/index
    segmentation/index
    selection/index
