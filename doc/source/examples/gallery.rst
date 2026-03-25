@@ -25,7 +25,7 @@ Filtering
 ----------
 
 .. nbgallery::
-   :name: comparison-gallery
+   :name: filtering-gallery
    :glob:
 
    filtering/UG_Filtering
