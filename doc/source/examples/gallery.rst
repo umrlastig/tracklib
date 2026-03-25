@@ -59,13 +59,25 @@ Segmentation
    
 
 Selection
-------------
+----------
 
 .. nbgallery::
    :name: selection-gallery
    :glob:
 
    selection/UG_Selection
+
+
+
+Simplification
+---------------
+
+.. nbgallery::
+   :name: simplification-gallery
+   :glob:
+
+   simplification/UG_Simplification
+
 
 
 Summarising
@@ -89,6 +101,7 @@ Summarising
    mapping/index
    segmentation/index
    selection/index
+   simplification/index
    summarising/index
 
 
