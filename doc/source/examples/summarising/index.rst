@@ -9,7 +9,6 @@ Summarising examples
 
 .. nbgallery::
    :name: summarising-gallery
-   :columns: 3
 
    UG_AFMap
    ../../usecase/Summarize
