@@ -173,6 +173,11 @@ class TrackWriter:
         # -------------------------------------------------------
         # Data order
         # -------------------------------------------------------
+        if (min(min(abs(fmt.id_E), abs(fmt.id_N)), min(abs(fmt.id_T), abs(fmt.id_U)))):
+            print("Track Writer: error cannot write track file with the following indices.")
+            print("id_E: ", fmt.id_E, "id_N: ", fmt.id_N, "id_U: ", fmt.id_U, "id_T: ", fmt.id_T)
+            print("Indices must start at 0")
+            sys.exit(1)
         O = [(fmt.id_E, 0), (fmt.id_N, 1)]
         start = 2
         if fmt.id_U != -1:
