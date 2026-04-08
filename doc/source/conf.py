@@ -25,7 +25,7 @@ project = "TrackLib"
 copyright = (
     "2026, LASTIG lab, French National Institute of Geographic and Forest Information"
 )
-author = "Yann Méneroux, Marie-Dominique Van Damme"
+author = "Marie-Dominique Van Damme, Yann Méneroux"
 
 # The full version, including alpha/beta/rc tags
 release = "0.8"
