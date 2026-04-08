@@ -40,7 +40,7 @@ setup (
     author_email="todo@ign.fr",
     keywords=['GPS track', 'Python library', 'Map-matching', 'Trajectory fusion', 'Synthetic trajectory', 'Segmenting GPS tracks', 'Summarizing GPS tracks', 'Stop positions', 'Kalman filter'],
     license="Cecill-C",
-    python_requires=">=3.7",
+    python_requires=">=3.8",
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
