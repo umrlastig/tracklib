@@ -33,6 +33,16 @@ Filtering
    ../../usecase/KalmanFiltering
 
 
+Interpolation
+--------------
+
+.. nbgallery::
+   :name: interpolation-gallery
+   :glob:
+
+   interpolation/UG_Interpolation
+
+
 Mapping
 -------
 
@@ -91,6 +101,16 @@ Summarising
    ../../usecase/Summarize
 
 
+Synthetics
+-----------
+
+.. nbgallery::
+   :name: synthetics-gallery
+
+   synthetics/UG_Synthetics
+   synthetics/UG_SyntheticRealistic
+   synthetics/UG_IllustrateNoiseModel
+
 
 
 .. toctree:: 
@@ -98,10 +118,11 @@ Summarising
 
    comparison/index
    filtering/index
+   interpolation/index
    mapping/index
    segmentation/index
    selection/index
    simplification/index
    summarising/index
-
+   synthetics/index
 
