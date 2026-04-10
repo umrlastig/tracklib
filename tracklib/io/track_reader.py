@@ -505,7 +505,7 @@ class TrackReader:
 
 
     @staticmethod
-    def parseWkt(wkt:str) -> Track:
+    def parseWkt(wkt:str, srid='ENU') -> Track:
         """
         Read track from a str, with geometry provided in wkt. 
         Only LineString and Polygon are handled yet.
@@ -560,7 +560,7 @@ class TrackReader:
             else:
                 z = 0.0
                 
-            point = Obs(makeCoords(x, y, z, 'ENU'), ObsTime())
+            point = Obs(makeCoords(x, y, z, srid), ObsTime())
             track.addObs(point)
 
         return track
