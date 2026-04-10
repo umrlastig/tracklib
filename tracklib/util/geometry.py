@@ -311,6 +311,9 @@ def proj_segment(segment, x, y):
 def proj_polyligne(Xp, Yp, x, y):
 
     distmin = 1e400
+    xproj = None
+    yproj = None
+    iproj = -1
 
     for i in range(len(Xp) - 1):
 
