@@ -154,7 +154,11 @@ class TrackReader:
         if os.path.isdir(path):
             TRACES = TrackCollection()
             LISTFILE = os.listdir(path)
-            for f in progressbar.progressbar(LISTFILE):
+            step_to_run = LISTFILE
+            if verbose:
+                step_to_run = progressbar.progressbar(LISTFILE)
+            for f in step_to_run:
+
                 # if path[len(path)-1:] == '/':
                 #                     collection = TrackReader.readFromGpxFast(path + f)
                 #                 else:
@@ -259,8 +263,8 @@ class TrackReader:
                 else:
                     fields = line.strip().split(fmt.separator)
                 fields = [s for s in fields if s]
-                if (verbose):
-                    print(fields)
+                # if (verbose):
+                #    print(fields)
 
                 # if id_user is in data
                 if fmt.id_user > 0:
@@ -275,8 +279,8 @@ class TrackReader:
                             time = ObsTime.readTimestamp(T)
                         except ValueError:
                             time = ObsTime()
-                            if verbose:
-                                print (fields[fmt.id_T].strip().replace('"', ''))
+                            # if verbose:
+                            #    print (fields[fmt.id_T].strip().replace('"', ''))
                     else:
                         time = fmt.time_ini.addSec((float)(fields[fmt.id_T])*fmt.time_unit)
                 else:
@@ -348,8 +352,8 @@ class TrackReader:
 
                     fields = line.split(fmt.separator)
                     fields = [s for s in fields if s]
-                    if (verbose):
-                        print(fields)
+                    #if (verbose):
+                    #    print(fields)
                     for i in range(len(fields)):
                         if not (i in id_special):
                             val = fields[i].strip()
