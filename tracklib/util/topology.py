@@ -186,7 +186,7 @@ class Network:
             line += ")\""
             out.write(line+"\n")
         out.close()
-        print("Network written in ["+path+"]")
+        #print("Network written in ["+path+"]")
     def removeNode(self, i):
         node_geom = self.getNodeGeom(i)
         self.idx.delete(i, [node_geom[0], node_geom[1], node_geom[0], node_geom[1]])
