@@ -456,7 +456,7 @@ class AFMap:
             cmap = getOffsetColorMap(color1, color2, 0)
             cmap.set_bad(color=novaluecolor)
 
-        if vmin not is None:
+        if vmin is not None:
             im = ax1.imshow(matrice, cmap=cmap, vmin=vmin)
         else:
             im = ax1.imshow(matrice, cmap=cmap)
