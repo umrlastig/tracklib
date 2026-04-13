@@ -13,3 +13,4 @@ nbsphinx
 autodocsumm
 pydata-sphinx-theme
 requests
+rtree

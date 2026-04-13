@@ -9,7 +9,8 @@ requirements = (
         "matplotlib", 
         "scikit-image", 
         "progressbar2",
-        "requests"
+        "requests",
+        "rtree"
 )
 
 dev_requirements = (
