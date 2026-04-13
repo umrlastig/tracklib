@@ -429,7 +429,7 @@ class AFMap:
 
     def plotAsImage(self, append=False,
                     color1 = (0, 0, 0), color2 = (255, 255, 255),
-                    novaluecolor='white', cmap=None):
+                    novaluecolor='white', cmap=None, vmin=None):
         """ Plot raster band as an image. """
       
         if isinstance(append, bool):
@@ -456,7 +456,10 @@ class AFMap:
             cmap = getOffsetColorMap(color1, color2, 0)
             cmap.set_bad(color=novaluecolor)
 
-        im = ax1.imshow(matrice, cmap=cmap)
+        if vmin not is None:
+            im = ax1.imshow(matrice, cmap=cmap, vmin=vmin)
+        else:
+            im = ax1.imshow(matrice, cmap=cmap)
         ax1.set_title(self.getName())
 
         divider = make_axes_locatable(ax1)
