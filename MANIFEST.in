@@ -4,8 +4,10 @@ include *.txt *.md
 include setup.py
 include setup.cfg
 
+recursive-include tracklib/resources *
+
 recursive-include doc *
 
-recursive-include resources *
+recursive-include example *
 
 recursive-include data *
