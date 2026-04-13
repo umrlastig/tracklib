@@ -157,7 +157,7 @@ class NetworkReader:
     URL_SERVER += "outputFormat=json&"
     # URL_SERVER += "BBOX=44.538617443499014,5.808794912294471,45.05505710140573,6.644301708889899"
     # URL_SERVER += "&count=3&startIndex=0"
-    resource_path = os.path.join(os.path.split(__file__)[0], "../..")
+    resource_path = os.path.join(os.path.split(__file__)[0], "..")
     PROXY_FILE_FORMAT = os.path.join(resource_path, "resources/proxy")
 
     @staticmethod
@@ -172,7 +172,8 @@ class NetworkReader:
         :param bbox: The bounding box of the selected area (The bounding box must
             be expressed in WGS84).
         :param tolerance: parameter specifies the maximum distance accepted for merging two nodes (edge ends)
-        :param proxy: name of proxy or proxy parameters in a dictionnary. parameter connexion defined in the tracklib/resources/proxy file
+        :param proxy: name of proxy or proxy parameters in a dictionnary. 
+                      parameter connexion defined in the tracklib/resources/proxy file
         """
 
         xmin = bbox.getXmin()

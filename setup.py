@@ -49,8 +49,9 @@ setup (
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.12",
     ],
-    packages = ['tracklib','tracklib.algo','tracklib.core','tracklib.io','tracklib.plot','tracklib.util',
-                'resources'],
+    packages = ['tracklib','tracklib.algo','tracklib.core','tracklib.io',
+                'tracklib.plot','tracklib.util',
+                'tracklib.resources'],
     install_requires=requirements,
     test_suite="tests",
     extras_require={

@@ -52,7 +52,7 @@ from tracklib.util.exceptions import *
 class NetworkFormat:
     """TODO"""
 
-    resource_path = os.path.join(os.path.split(__file__)[0], "../..")
+    resource_path = os.path.join(os.path.split(__file__)[0], "..")
     NETWORK_FILE_FORMAT = os.path.join(resource_path, "resources/network_file_format")
 
     # -------------------------------------------------------------

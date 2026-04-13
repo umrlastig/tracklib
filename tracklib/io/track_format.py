@@ -82,7 +82,7 @@ class TrackFormat:
 
     '''
 
-    resource_path = os.path.join(os.path.split(__file__)[0], "../..")
+    resource_path = os.path.join(os.path.split(__file__)[0], "..")
     TRACK_FILE_FORMAT = os.path.join(resource_path, "resources/track_file_format")
 
 
