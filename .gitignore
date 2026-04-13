@@ -13,6 +13,7 @@ test/__pycache__/
 test/algo/observation.dat
 doc/source/__pycache__/
 example/__pycache__/
+example2/__pycache__/
 /tracklib/*.pyc
 /.spyproject/
 /data/resultat/
@@ -77,7 +78,7 @@ data/test/gpx3/11.gpx
 data/test/gpx3/12.gpx
 data/test/network_22245_copie.csv
 data/asc/mnt_XYZBRAVOSANSFIDOUTEST_2.asc.aux.xml
-example/
+example2/
 enotebook/
 Main*.py
 fusion/
