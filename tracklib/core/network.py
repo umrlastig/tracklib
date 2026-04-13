@@ -640,7 +640,7 @@ class Network:
     # Graphics
     # ------------------------------------------------------------
 
-    def plot(self, edges:str="k-", nodes:str="", 
+    def plot(self, edges:str="k-", nodes:str="",
              direct:str="k--", indirect:str="k--", size:float=0.5, append=False):
         """
         Plot network
