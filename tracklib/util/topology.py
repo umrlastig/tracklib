@@ -1,35 +1,115 @@
+# -*- coding: utf-8 -*-
 
-import sys
+"""
+© Copyright Institut National de l'Information Géographique et Forestière (2020)
+Contributors: 
+    Yann Méneroux
+Creation date: 1th november 2020
+
+tracklib library provides a variety of tools, operators and 
+functions to manipulate GPS trajectories. It is a open source contribution 
+of the LASTIG laboratory at the Institut National de l'Information 
+Géographique et Forestière (the French National Mapping Agency).
+See: https://tracklib.readthedocs.io
+ 
+This software is governed by the CeCILL-C license under French law and
+abiding by the rules of distribution of free software. You can  use, 
+modify and/ or redistribute the software under the terms of the CeCILL-C
+license as circulated by CEA, CNRS and INRIA at the following URL
+"http://www.cecill.info". 
+
+As a counterpart to the access to the source code and rights to copy,
+modify and redistribute granted by the license, users are provided only
+with a limited warranty  and the software's author,  the holder of the
+economic rights,  and the successive licensors  have only  limited
+liability. 
+
+In this respect, the user's attention is drawn to the risks associated
+with loading,  using,  modifying and/or developing or reproducing the
+software by the user in light of its specific status of free software,
+that may mean  that it is complicated to manipulate,  and  that  also
+therefore means  that it is reserved for developers  and  experienced
+professionals having in-depth computer knowledge. Users are therefore
+encouraged to load and test the software's suitability as regards their
+requirements in conditions enabling the security of their systems and/or 
+data to be ensured and,  more generally, to use and operate it in the 
+same conditions as regards security. 
+
+The fact that you are presently reading this means that you have had
+knowledge of the CeCILL-C license and that you accept its terms.
+
+
+
+Classes to create topology.
+
+"""
+
 import math
 import cmath
 from rtree import index
 
-
-# -------------------------------------------------------
-# PARAMETERS
-# -------------------------------------------------------
-dps = 1.0       # Simplification threshold (m)
-ter = 10        # Terminal edge removing (m)
+#dps = 1.0       # Simplification threshold (m)
+#ter = 10        # Terminal edge removing (m)
 tbp = 1e-6      # Tolerance between points (m)
-tsl = 30        # Length of "trisquels" (m)
-# -------------------------------------------------------
+#tsl = 30        # Length of "trisquels" (m)
 
+LOOPS = []
 
-input_file = sys.argv[1]
-output_file = sys.argv[2]
+class Topology:
 
-f = open(input_file, "r")
+    @staticmethod
+    def create_topology(input_file, srid, output_file, verbose=False):
+        '''
+          Create base topology network
+        '''
 
-# Reading data
-lines = f.readlines()
+        network = Network()
 
-splits = []
-ids = []
-for i in range(1, len(lines)):
-	entry = lines[i].split("MULTILINESTRING")[1].split(")")[0]
-	splits.append(entry)
-	ids.append(lines[i].split("\"")[2].split(",")[1])
-	
+        f = open(input_file, "r")
+        # Reading data
+        lines = f.readlines()
+        for i in range(0, len(lines)):
+            wkt = lines[i]
+            wkt = wkt.upper()
+
+            if "MULTILINESTRING" in wkt:
+                wkt = wkt.split("((")[1]
+                wktlines = wkt.split(")")
+                for line in wktlines:
+                    geom = []
+                    coords = line.replace(',(', '').strip()
+                    if coords == '':
+                        continue
+                    for coord in coords.split(","):
+                        sl = coord.strip().split(" ")
+                        x = float(sl[0])
+                        y = float(sl[1])
+                        geom.append((float(x), float(y)))
+                    network.addEdge(geom)
+
+            elif "LINESTRING" in wkt:
+                wkt = wkt.split("(")[1].split(")")[0]
+                if wkt.strip() == '':
+                    continue
+                geom = []
+                for coord in wkt.split(","):
+                    sl = coord.strip().split(" ")
+                    x = float(sl[0])
+                    y = float(sl[1])
+                    geom.append((float(x), float(y)))
+                network.addEdge(geom)
+
+        NODES = network.getListOfNodes()
+        TOREM = []
+        for i, node in enumerate(NODES):
+            deg = network.getDegree(i)
+            if deg == 2:
+                TOREM.append(i)
+        for idx in TOREM:
+            network.removeDeg2Node(idx)
+
+        network.writeAsWkt(output_file)
+
 
 
 
@@ -48,6 +128,7 @@ class Edge:
             x2 = self.geom[i][0]; y2 = self.geom[i][1]
             L += math.sqrt((x2-x1)**2+(y2-y1)**2)
         return L
+
 class Network:
     def __init__(self):
         self.idx = index.Index()
@@ -144,8 +225,10 @@ class Network:
             geom2.reverse()
             geom2 = geom2[1:]
             return self.__mergeEdgesGeom(geom1, geom2)
+
     def getDegree(self, i):
         return len(self.adjacency[i])
+
     def removeDeg2Node(self, i):
         deg = self.getDegree(i)
         if  deg != 2:
@@ -168,31 +251,3 @@ class Network:
         self.addEdge(fusion)
 
     
-network = Network()    
-    
-LOOPS = []    
-    
-    
- 
-    
-# -----------------------------------------------------------
-# Create base topology network
-# -----------------------------------------------------------
-N = len(splits)
-for i in range(N):
-    print("["+str(i)+"/"+str(N)+"] -> "+str(network.getNumberOfNodes()))
-    s = splits[i].replace('(', '').replace(')', '').replace(',',' ').strip()
-    values = s.split(' ')
-    X = values[0::2]
-    Y = values[1::2]
-    geom = []
-    for j in range(len(X)):
-        geom.append((float(X[j]), float(Y[j])))
-    network.addEdge(geom)
-    
-    
-
-print(network)
-
-network.writeAsWkt(output_file)    
-
