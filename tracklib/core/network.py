@@ -480,7 +480,7 @@ class Network:
         :param node_id: id of a node
         :return: in degree
         """
-        return self.getAdjacentNodes(node_id).size()
+        return len(self.getAdjacentNodes(node_id))
 
     def degreeIn(self, node_id: int) -> int:
         """Compute the in degree of a node
