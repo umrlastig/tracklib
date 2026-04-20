@@ -217,12 +217,18 @@ class Network:
         if node.id not in self.NODES:
             self.NODES[node.id] = node
             self.__idx_nodes.append(node.id)
-            self.NEXT_EDGES[node.id] = []
-            self.PREV_EDGES[node.id] = []
-            self.NBGR_EDGES[node.id] = []
-            self.NEXT_NODES[node.id] = []
-            self.PREV_NODES[node.id] = []
-            self.NBGR_NODES[node.id] = []
+            if node.id not in self.NEXT_EDGES.keys():
+                self.NEXT_EDGES[node.id] = []
+            if node.id not in self.PREV_EDGES.keys():
+                self.PREV_EDGES[node.id] = []
+            if node.id not in self.NBGR_EDGES.keys():
+                self.NBGR_EDGES[node.id] = []
+            if node.id not in self.NEXT_NODES.keys():
+                self.NEXT_NODES[node.id] = []
+            if node.id not in self.PREV_NODES.keys():
+                self.PREV_NODES[node.id] = []
+            if node.id not in self.NBGR_NODES.keys():
+                self.NBGR_NODES[node.id] = []
 
     def addEdge(self, edge: Edge, source: Node, target: Node):
         """Add a :class:`Edge` to the current :class:`Network`
@@ -274,6 +280,41 @@ class Network:
         :param edge: Edge to remove
         """
 
+        ni = edge.source
+        nf = edge.target
+
+        if edge.id in self.NBGR_EDGES[ni.id]:
+            self.NBGR_EDGES[ni.id].remove(edge.id)
+        if edge.id in self.NBGR_EDGES[nf.id]:
+            self.NBGR_EDGES[nf.id].remove(edge.id)
+
+        if ni.id in self.NBGR_NODES and nf.id in self.NBGR_NODES[ni.id]:
+            self.NBGR_NODES[ni.id].remove(nf.id)
+        if nf.id in self.NBGR_NODES and ni.id in self.NBGR_NODES[nf.id]:
+            self.NBGR_NODES[nf.id].remove(ni.id)
+
+        if edge.orientation >= 0:
+            if edge.id in self.NEXT_EDGES[ni.id]:
+                self.NEXT_EDGES[ni.id].remove(edge.id)
+            if edge.id in self.PREV_EDGES[nf.id]:
+                self.PREV_EDGES[nf.id].remove(edge.id)
+
+            if ni.id in self.NEXT_NODES and nf.id in self.NEXT_NODES[ni.id]:
+                self.NEXT_NODES[ni.id].append(nf.id)
+            if nf.id in self.PREV_NODES and ni.id in self.PREV_NODES[nf.id]:
+                self.PREV_NODES[nf.id].append(ni.id)
+
+        if edge.orientation <= 0:
+            if edge.id in self.NEXT_EDGES[nf.id]:
+                self.NEXT_EDGES[nf.id].remove(edge.id)
+            if edge.id in self.PREV_EDGES[ni.id]:
+                self.PREV_EDGES[ni.id].remove(edge.id)
+
+            if nf.id in self.NEXT_NODES and ni.id in self.NEXT_NODES[nf.id]:
+                self.NEXT_NODES[nf.id].remove(ni.id)
+            if ni.id in self.PREV_NODES and nf.id in self.PREV_NODES[ni.id]:
+                self.PREV_NODES[ni.id].remove(nf.id)
+
         del self.EDGES[edge.id]
         self.__idx_edges.remove(edge.id)
 
@@ -287,6 +328,14 @@ class Network:
 
         :param node: node to remove
         """
+
+        if node.id in self.NEXT_NODES.keys():
+            del self.NEXT_NODES[node.id]
+        if node.id in self.PREV_NODES.keys():
+            del self.PREV_NODES[node.id]
+        if node.id in self.NBGR_NODES.keys():
+            del self.NBGR_NODES[node.id]
+
         del self.NODES[node.id]
         self.__idx_nodes.remove(node.id)
 
