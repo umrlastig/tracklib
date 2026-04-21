@@ -50,7 +50,7 @@ from rtree import index
 
 #dps = 1.0       # Simplification threshold (m)
 #ter = 10        # Terminal edge removing (m)
-tbp = 1e-6      # Tolerance between points (m)
+#tbp = 1e-3      # Tolerance between points (m)  -- 1e-6
 #tsl = 30        # Length of "trisquels" (m)
 
 LOOPS = []
@@ -58,12 +58,14 @@ LOOPS = []
 class Topology:
 
     @staticmethod
-    def create_topology(input_file, srid, output_file, verbose=False):
+    def create_topology(input_file, srid, output_file, tbp=1e-6, verbose=False):
         '''
           Create base topology network
+
+        @param tbp 
         '''
 
-        network = Network()
+        network = Network(tbp)
 
         f = open(input_file, "r")
         # Reading data
@@ -99,6 +101,7 @@ class Topology:
                     geom.append((float(x), float(y)))
                 network.addEdge(geom)
 
+
         NODES = network.getListOfNodes()
         TOREM = []
         for i, node in enumerate(NODES):
@@ -130,24 +133,27 @@ class Edge:
         return L
 
 class Network:
-    def __init__(self):
+    def __init__(self, tbp):
         self.idx = index.Index()
         self.vertices = {}
         self.edges = {}
         self.node_counter = 0
         self.edge_counter = 0
         self.adjacency = {}
+        self.tbp = tbp
+
     def __str__(self):
         return "Network with [" + str(self.getNumberOfNodes()) + "] nodes and [" + str(self.getNumberOfEgdes()) + "] edges"
+
     def addNode(self, x, y):
-        L = list(self.idx.intersection((x-tbp, y-tbp, x+tbp, y+tbp)))
+        L = list(self.idx.intersection((x-self.tbp, y-self.tbp, x+self.tbp, y+self.tbp)))
         if len(L) == 0:
-            self.idx.insert(self.node_counter, (x-tbp, y-tbp, x+tbp, y+tbp))
+            self.idx.insert(self.node_counter, (x-self.tbp, y-self.tbp, x+self.tbp, y+self.tbp))
             self.vertices[self.node_counter] = (x, y)
             self.adjacency[self.node_counter] = []
             self.node_counter += 1
     def queryNodeIndex(self, x, y):
-        L = list(self.idx.intersection((x-tbp, y-tbp, x+tbp, y+tbp)))
+        L = list(self.idx.intersection((x-self.tbp, y-self.tbp, x+self.tbp, y+self.tbp)))
         if len(L) == 0:
             return -1
         return L[0]
@@ -159,13 +165,19 @@ class Network:
         return self.vertices[i]
     def getEdgeGeom(self, i):
         return self.edges[i]
+
     def addEdge(self, geom):
-        self.addNode(geom[ 0][0], geom[ 0][1]); idx1 = self.queryNodeIndex(geom[ 0][0], geom[ 0][1])
-        self.addNode(geom[-1][0], geom[-1][1]); idx2 = self.queryNodeIndex(geom[-1][0], geom[-1][1])
+        self.addNode(geom[0][0], geom[0][1])
+        idx1 = self.queryNodeIndex(geom[0][0], geom[0][1])
+
+        self.addNode(geom[-1][0], geom[-1][1])
+        idx2 = self.queryNodeIndex(geom[-1][0], geom[-1][1])
+
         self.edges[self.edge_counter] = Edge(idx1, idx2, geom)
         self.adjacency[idx1].append(self.edge_counter)
         self.adjacency[idx2].append(self.edge_counter)
         self.edge_counter += 1
+
     def getNumberOfEgdes(self):
         return len(self.edges)
     def getNumberOfNodes(self):
@@ -199,7 +211,7 @@ class Network:
         self.adjacency[edge.end].remove(i)
         del self.edges[i]
     def __samePt(self, p1, p2):
-        return (abs(p1[0]-p2[0]) + abs(p1[1]-p2[1]) < tbp)
+        return (abs(p1[0]-p2[0]) + abs(p1[1]-p2[1]) < self.tbp)
     def __mergeEdgesGeom(self, geom1, geom2):
         for i in range(len(geom2)):
             geom1.append(geom2[i])
