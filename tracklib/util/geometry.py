@@ -539,8 +539,8 @@ def intersection(track1, track2, withTime=-1):
                 # Linear interpolation on track 2
                 w1 = p.distance2DTo(track2[j].position)
                 w2 = p.distance2DTo(track2[j + 1].position)
-                t1 = track2[i].timestamp.toAbsTime()
-                t2 = track2[i].timestamp.toAbsTime()
+                t1 = track2[j].timestamp.toAbsTime()
+                t2 = track2[j+1].timestamp.toAbsTime()
                 tb = (w1 * t2 + w2 * t1) / (w1 + w2)
 
                 # Add intersection
