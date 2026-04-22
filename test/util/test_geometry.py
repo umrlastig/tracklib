@@ -218,13 +218,20 @@ class TestGeometry(unittest.TestCase):
         T = intersection(trace1 ,trace2, 1000)
         self.assertEqual(T.size(), 0)
         
-        T = intersection(trace1 ,trace2, 2000)
+        T = intersection(trace1 ,trace2, -1)
+        self.assertEqual(T.size(), 2)
+        self.assertEqual(T[0].position.getX(), 5.0)
+        self.assertEqual(T[0].position.getY(), 0.0)
+        self.assertEqual(T[1].position.getX(), 15.0)
+        self.assertEqual(T[1].position.getY(), 0.0)
+
+        T = intersection(trace1 ,trace2, 3000)
         self.assertEqual(T.size(), 1)
         self.assertEqual(T[0].position.getX(), 15.0)
         self.assertEqual(T[0].position.getY(), 0.0)
         self.assertEqual(str(T[0].timestamp), '01/01/2018 10:30:00')
         
-        T = intersection(trace1 ,trace2, 3000)
+        T = intersection(trace1 ,trace2, 5401)
         self.assertEqual(T.size(), 2)
         self.assertEqual(T[0].position.getX(), 5.0)
         self.assertEqual(T[0].position.getY(), 0.0)
