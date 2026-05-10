@@ -29,6 +29,7 @@ Filtering
    :name: filtering-gallery
    :glob:
 
+   filtering/Band-stopFourierFilter
    filtering/UG_Filtering
    ../../usecase/KalmanFiltering
 

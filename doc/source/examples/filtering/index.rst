@@ -12,6 +12,7 @@ Filtering examples
    :name: filtering-gallery
 
 
+   Band-stopFourierFilter
    UG_Filtering
    ../../usecase/KalmanFiltering
 
