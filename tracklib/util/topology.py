@@ -182,9 +182,10 @@ class Network:
         return len(self.edges)
     def getNumberOfNodes(self):
         return len(self.vertices)
+
     def writeAsWkt(self, path):
         out = open(path, "w")
-        out.write("id,i1,i2,wkt\n")
+        out.write("edge_id,source_id,target_id,wkt\n")
         for i in range(self.edge_counter):
             if not i in self.edges:
                 continue
@@ -199,6 +200,7 @@ class Network:
             out.write(line+"\n")
         out.close()
         #print("Network written in ["+path+"]")
+
     def removeNode(self, i):
         node_geom = self.getNodeGeom(i)
         self.idx.delete(i, [node_geom[0], node_geom[1], node_geom[0], node_geom[1]])
