@@ -76,6 +76,7 @@ Selection
    :name: selection-gallery
    :glob:
 
+   selection/UG_Query
    selection/UG_Selection
 
 

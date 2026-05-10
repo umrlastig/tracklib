@@ -13,6 +13,7 @@ GPS tracks can be selected using multiple constraints (Time, Shape, Track, etc.)
 .. nbgallery::
    :name: selection-gallery
 
+   UG_Query
    UG_Selection
 
 
