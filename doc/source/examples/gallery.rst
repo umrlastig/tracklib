@@ -111,6 +111,7 @@ Synthetics
 
    synthetics/UG_Synthetics
    synthetics/UG_SyntheticRealistic
+   synthetics/SyntheticCollectionIssuedFromNetwork
    synthetics/UG_IllustrateNoiseModel
 
 

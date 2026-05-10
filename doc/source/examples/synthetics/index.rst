@@ -12,5 +12,6 @@ Synthetics examples
 
    UG_Synthetics
    UG_SyntheticRealistic
+   SyntheticCollectionIssuedFromNetwork
    UG_IllustrateNoiseModel
 
