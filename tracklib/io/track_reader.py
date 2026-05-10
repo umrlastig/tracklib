@@ -490,18 +490,35 @@ class TrackReader:
                     continue
 
                 wkt = fields[fmt.id_wkt]
-                track = TrackReader.parseWkt(wkt)
+                if wkt[0:5].upper() != "MULTI":
+                    track = TrackReader.parseWkt(wkt)
 
-                if fmt.id_user >= 0:
-                    track.uid = fields[fmt.id_user]
-                if fmt.id_track >= 0:
-                    track.tid = fields[fmt.id_track]
+                    if fmt.id_user >= 0:
+                        track.uid = fields[fmt.id_user]
+                    if fmt.id_track >= 0:
+                        track.tid = fields[fmt.id_track]
 
-                if not fmt.selector is None:
-                    if not fmt.selector.contains(track):
-                        continue
+                    if not fmt.selector is None:
+                        if not fmt.selector.contains(track):
+                            continue
 
-                TRACES.addTrack(track)
+                    TRACES.addTrack(track)
+
+                else:
+                    collection = TrackReader.parsMultiWkt(wkt)
+                    for track in collection:
+                        if fmt.id_user >= 0:
+                            track.uid = fields[fmt.id_user]
+                        if fmt.id_track >= 0:
+                            track.tid = fields[fmt.id_track]
+
+                        if not fmt.selector is None:
+                            if not fmt.selector.contains(track):
+                                continue
+
+                        TRACES.addTrack(track)
+
+
                 if verbose:
                     print(len(TRACES), " wkt tracks loaded")
 
@@ -540,18 +557,6 @@ class TrackReader:
         elif wkt[0:4].upper() == "LINE":
             wkt = wkt.split("(")[1].split(")")[0]
             wkt = wkt.split(",")
-        elif wkt[0:7].upper() == "MULTIPO":
-            wkt = wkt.split("((")[1].split("))")[0]
-            wkt = wkt.split(",")
-            if wkt[0] == "(":
-                wkt = wkt[1:]
-            wkt = wkt.split("),(")[0]  # Multipolygon not handled yet
-        elif wkt[0:15].upper() == "MULTILINESTRING":
-            wkt = wkt.split("((")[1].split("))")[0]
-            wkt = wkt.split(",")
-            if wkt[0] == "(":
-                wkt = wkt[1:]
-            wkt = wkt.split("),(")[0]  # Multilinestring not handled yet
         else:
             raise WrongArgumentError("This type of wkt is not yet implemented.")
 
@@ -568,6 +573,80 @@ class TrackReader:
             track.addObs(point)
 
         return track
+
+
+    @staticmethod
+    def parsMultiWkt(wkt:str, srid='ENU') -> TrackCollection:
+        """
+        Read tracks from a str, with geometry provided in wkt. 
+        Only MultiLineString and MultiPolygon are handled yet.
+
+        Parameters
+        ----------
+        wkt : TYPE
+            DESCRIPTION.
+
+        Raises
+        ------
+        WrongArgumentError
+            DESCRIPTION.
+
+        Returns
+        -------
+        collection of tracks : TrackCollection
+            one track represented by a single WKT geometry in the collection.
+
+        """
+
+        collection = TrackCollection()
+
+        wkt = wkt.upper()
+        if wkt[0:5].upper() != "MULTI":
+            raise WrongArgumentError("This type of wkt is not yet implemented.")
+            return
+
+        if wkt[0:7].upper() == "MULTIPO":
+            wkt = wkt.split("((")[1].split("))")[0]
+            wkt = wkt.split(",")
+            if wkt[0] == "(":
+                wkt = wkt[1:]
+            wkt = wkt.split("),(")[0]  # Multipolygon not handled yet
+
+        elif wkt[0:15].upper() == "MULTILINESTRING":
+
+            # wkt = wkt.split("((")[1].split("))")[0]
+            wkt = wkt[16:-1]
+            wkt = wkt.split(")")
+            for i in range(0, len(wkt)):
+                if wkt[i] == "":
+                    continue
+                wkt[i] = wkt[i].strip()
+                if wkt[i][0] == "(":
+                    wkt[i] = wkt[i][1:]
+                if wkt[i][1] == "(":
+                    wkt[i] = wkt[i][2:]
+                if wkt[i][2] == "(":
+                    wkt[i] = wkt[i][3:]
+                if wkt[i][-1] == ")":
+                    wkt[i] = wkt[i][0:-2]
+
+                track = Track()
+                tab = wkt[i].split(",")
+                for s in tab:
+                    sl = s.strip().split(" ")
+                    x = float(sl[0])
+                    y = float(sl[1])
+                    if len(sl) == 3:
+                        z = float(sl[2])
+                    else:
+                        z = 0.0
+                        
+                    point = Obs(makeCoords(x, y, z, srid), ObsTime())
+                    track.addObs(point)
+                collection.addTrack(track)
+
+        return collection
+        
 
 
     # =========================================================================
