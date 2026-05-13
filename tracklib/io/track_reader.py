@@ -558,7 +558,7 @@ class TrackReader:
             wkt = wkt.split("(")[1].split(")")[0]
             wkt = wkt.split(",")
         else:
-            raise WrongArgumentError("This type of wkt is not yet implemented.")
+            raise WrongArgumentError("This type of wkt is not yet implemented: " + wkt[0:4].upper())
 
         for s in wkt:
             sl = s.strip().split(" ")
