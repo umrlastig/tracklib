@@ -94,6 +94,12 @@ class TrackCollection:
         """TODO"""
         return self.__TRACES[i]
 
+    def getTrackWithTid(self, tid):
+        for i in range(self.size()):
+            if self.getTrack(i).tid == tid:
+                return self.getTrack(i)
+        return None
+
     def copy(self):
         """TODO"""
         TRACKS = TrackCollection()
