@@ -46,6 +46,7 @@ Class to manage GPS tracks. Points are referenced in geodetic coordinates
 # For type annotation
 from __future__ import annotations
 from typing import Any, Literal#, Union
+import warnings
 
 import sys
 import math
@@ -61,7 +62,8 @@ from . import (ObsTime, ENUCoords, GeoCoords, Obs,
                Bbox,
                co_median)
 from tracklib.util import intersection, Polygon
-from tracklib.util.exceptions import QueryError, AnalyticalFeatureError, OperatorError 
+from tracklib.util.exceptions import QueryError, AnalyticalFeatureError, OperatorError
+from tracklib.util.exceptions import AnalyticalFeatureWarning
 from tracklib.plot import IPlotVisitor, MatplotlibVisitor
 from tracklib.algo import (BIAF_SPEED, BIAF_ABS_CURV, 
                            computeAbsCurv, 
@@ -1173,7 +1175,12 @@ class Track:
         if self.size() <= 0:
             raise AnalyticalFeatureError("Error: can't add AF '" + name + "', there is no observation in track")
         if self.hasAnalyticalFeature(name):
-            raise AnalyticalFeatureError("Error: can't add AF '" + name + "', name already exists.")
+            #raise AnalyticalFeatureError("Error: can't add AF '" + name + "', name already exists.")
+            #return
+            warnings.warn(
+                "Warning: AF '" + name + "' already exists.",
+                AnalyticalFeatureWarning
+            )
 
         idAF = len(self.__analyticalFeaturesDico)
         self.__analyticalFeaturesDico[name] = idAF

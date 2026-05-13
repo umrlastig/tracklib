@@ -32,3 +32,10 @@ class WrongArgumentError(Exception):
     pass
 class NetworkError(Exception):
     pass
+
+
+# =============================================================================
+#   List of custom warnings for Tracklib
+# =============================================================================
+class AnalyticalFeatureWarning(Warning):
+    pass
