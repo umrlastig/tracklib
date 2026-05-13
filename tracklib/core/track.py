@@ -1176,11 +1176,11 @@ class Track:
             raise AnalyticalFeatureError("Error: can't add AF '" + name + "', there is no observation in track")
         if self.hasAnalyticalFeature(name):
             #raise AnalyticalFeatureError("Error: can't add AF '" + name + "', name already exists.")
-            #return
             warnings.warn(
                 "Warning: AF '" + name + "' already exists.",
                 AnalyticalFeatureWarning
             )
+            return
 
         idAF = len(self.__analyticalFeaturesDico)
         self.__analyticalFeaturesDico[name] = idAF
