@@ -54,6 +54,26 @@ If you use tracklib, please cite the following references:
 <div style="background-color:rgba(200, 200, 200, 0.0470588); text-align:left; vertical-align: middle; padding:10px;">
 Yann Méneroux, Marie-Dominique van Damme. Tracklib: a python library with a variety of tools, operators and functions to manipulate GPS trajectories. 2022, [HAL Id](https://hal.science/hal-04356178v1)
 </div>
+```bibtex
+@softwareversion{meneroux:hal-04356178v3,
+  TITLE = {{Tracklib: a python library  with a variety of tools, operators and functions to manipulate GPS trajectories}},
+  AUTHOR = {M{\'e}neroux, Yann and van Damme, Marie-Dominique},
+  URL = {https://hal.science/hal-04356178},
+  NOTE = {},
+  INSTITUTION = {{Laboratoire sciences et technologies de l'information g{\'e}ographique}},
+  YEAR = {2024},
+  MONTH = Dec,
+  DOI = {10.5281/zenodo.19556814},
+  SWHID = {swh:1:dir:315fb3ee21367d92767906fbdea7c380d5fa5ea0;origin=https://hal.archives-ouvertes.fr/hal-04356178;visit=swh:1:snp:3a6cbb574ce276c4bd97a74e6a21f2fc77ae9149;anchor=swh:1:rel:d3d2d6a6b0411f01dc2063280e2ad916eeed17a7;path=/},
+  VERSION = {v0.8.2},
+  REPOSITORY = {https://github.com/umrlastig/tracklib},
+  LICENSE = {CeCILL-C Free Software License Agreement},
+  KEYWORDS = {Open Source ; Segmenting GPS tracks ; Synthetic trajectory ; Trajectory aggregation ; Map-matching ; Python library ; GPS track},
+  FILE = {https://hal.science/hal-04356178v3/file/tracklib-0.8.2.zip},
+  HAL_ID = {hal-04356178},
+  HAL_VERSION = {v3},
+}
+```
 
 
 
