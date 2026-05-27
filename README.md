@@ -54,6 +54,7 @@ If you use tracklib, please cite the following references:
 <div style="background-color:rgba(200, 200, 200, 0.0470588); text-align:left; vertical-align: middle; padding:10px;">
 Yann Méneroux, Marie-Dominique van Damme. Tracklib: a python library with a variety of tools, operators and functions to manipulate GPS trajectories. 2022, [HAL Id](https://hal.science/hal-04356178v1)
 </div>
+
 ```bibtex
 @softwareversion{meneroux:hal-04356178v3,
   TITLE = {{Tracklib: a python library  with a variety of tools, operators and functions to manipulate GPS trajectories}},
