@@ -114,6 +114,43 @@ class Topology:
         network.writeAsWkt(output_file)
 
 
+    @staticmethod
+    def create_geoms_topology(collection, tbp=1e-6, verbose=False):
+
+        network = Network(tbp)
+
+        for track in collection:
+            geom = []
+            for o in track:
+                x = o.position.getX()
+                y = o.position.getY()
+                geom.append((float(x), float(y)))
+            network.addEdge(geom)
+
+        NODES = network.getListOfNodes()
+        TOREM = []
+        for i, node in enumerate(NODES):
+            deg = network.getDegree(i)
+            if deg == 2:
+                TOREM.append(i)
+        #for idx in TOREM:
+        #    network.removeDeg2Node(idx)
+
+        GEOMS = []
+        for i in range(network.edge_counter):
+            if not i in network.edges:
+                continue
+            idx1 = str(network.edges[i].ini)
+            idx2 = str(network.edges[i].end)
+            idedge = str(i)
+            line  = "LINESTRING("
+            for j in range(len(network.edges[i].geom)):
+                line += str(network.edges[i].geom[j][0])+" "+str(network.edges[i].geom[j][1])
+                if j < len(network.edges[i].geom)-1:
+                    line += ","
+            line += ")\""
+            GEOMS.append((idedge, idx1, idx2, line))
+        return GEOMS
 
 
 # -----------------------------------------------------------
