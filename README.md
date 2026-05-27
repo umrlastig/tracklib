@@ -15,7 +15,7 @@
 
 [![Supported Python Versions](https://img.shields.io/pypi/pyversions/tracklib.svg)](https://www.python.org/downloads/)
 [![PyPI Version](https://img.shields.io/pypi/v/tracklib.svg)](https://pypi.python.org/pypi/tracklib/)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/tracklib?color=blue)](https://pypistats.org/packages/tracklib)
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/tracklib?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/tracklib)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13899752.svg)](https://doi.org/10.5281/zenodo.13899752)
 
 
