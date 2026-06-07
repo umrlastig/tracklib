@@ -670,6 +670,7 @@ class TrackReader:
                 if new_track:
                     if ('<'+fmt.type+'pt ' in line):
                         new_point = True
+                        tps = None
                         splits = line.split("\"")
                         pos = makeCoords(float(splits[3]), float(splits[1]), 0, fmt.srid)
                     if ('</'+fmt.type+'pt>' in line):
