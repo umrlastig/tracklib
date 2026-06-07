@@ -437,10 +437,10 @@ class AFMap:
                 ax1 = plt.gca()
                 fig = ax1.get_figure()
             else:
-                fig, ax1 = plt.subplots(figsize=(10, 3))
+                fig, ax1 = plt.subplots(figsize=(8, 8))
+                ax1.set_aspect('equal')
         else:
-            ax1 = append
-            fig = ax1.get_figure()
+            fig, ax1 = plt.subplots(figsize=(8, 8))
 
         matrice = np.full((self.raster.nrow, self.raster.ncol),
                           self.raster.getNoDataValue(), dtype=np.float32)
