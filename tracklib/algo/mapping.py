@@ -131,8 +131,6 @@ def __mapOnNetwork (
     debug=False, verbose=False):
     """TODO"""
 
-    # print (search_radius, obs_noise, transition_cost)
-
     if debug:
         f1 = open("observation.dat", "a")
         #f2 = open("transition.dat", "a")
@@ -182,14 +180,6 @@ def __mapOnNetwork (
         verbose=verbose*MODE_VERBOSE_PROGRESS,
     )
     
-    #for k in progressbar.progressbar(range(len(track))):
-    #    X = [track[k].position.getX(), track["hmm_inference", k][0].getX()]
-    #    Y = [track[k].position.getY(), track["hmm_inference", k][0].getY()]
-    #    plt.plot(X, Y, "r--", linewidth=1.4)
-    #    track[k].position.setX(track["hmm_inference", k][0].getX())
-    #    track[k].position.setY(track["hmm_inference", k][0].getY())
-    
-
     """
     for k in range(len(STATES)-1):
         S1 = __states(track, k)
@@ -220,41 +210,7 @@ def mapOnNetwork(
     for track in tracks:
         __mapOnNetwork(track, network, gps_noise, transition_cost, search_radius, debug, verbose)
         
-    # Reporting
-#    print ('---------------------------------------------------------------------')
-#    print ('                    MAP MATCHING REPORT FILE                         ')
-#    print ('---------------------------------------------------------------------')
-#    print ('* General information')
-#    print ('Date : ' + str(ObsTime.now()))
-#    try:
-#        print ('User : ' + os.getlogin())
-#        print ('System : ' + platform.system() + '-' + platform.processor()) 
-#        print ('Python version : ' + platform.python_version())
-#        process = psutil.Process(os.getpid())
-#        memory = math.floor(process.memory_info().rss / (1024*1024))
-#        print ('Heap memory : ' + str(memory) + ' Mo')
-#    except:
-#        pass
-#    print ('---------------------------------------------------------------------')
-#    print ('* Input tracks ')
-#    print ('Number of tracks = ' + str(1))
-##    print ('Number of points = '+ str(trace.size()))
-##    percentMM = (nbmm / trace.size() * 100)
-##    print ('Number of map-matched points = ' + str(nbmm) + ' (' + str(round(percentMM, 2)) + ' %)')
-##    percentHP = (nbhp / trace.size() * 100)
-##    print ('Number of off-road = '+ str(nbhp) + ' (' + str(round(percentHP, 2)) + ' %)') 
-#    print ('---------------------------------------------------------------------')
-#    print ('* Input network')
-#    print ('Number of edges = ' + str(len(network.EDGES))) 
-#    print ('Number of nodes = ' + str(len(network.NODES))) 
-#    # print ('Number of vertices = 64674')
-#    print ('---------------------------------------------------------------------')
-#    print ('* Computation parameters')
-##    rmse = round(math.sqrt(d/nbmm),2)
-##    print ('GPS standard error = ' + str(rmse) + ' m')
-##    #'''
-##    #Transition model factor beta = 0.2
-##    print ('Search radius = ' + str(searchradius) + ' m')
+
     
 
 def mapOnRaster(track, raster):
