@@ -151,6 +151,7 @@ class NetworkReader:
 
     @staticmethod
     def readNetworkFromListTuple(GEOMS:list)->Network:
+
         '''
             # (idedge, idx1, idx2, line)
         '''
@@ -158,10 +159,14 @@ class NetworkReader:
         tolerance = 0.0001
         cptNode = 1
         cptEdge = 1
-        network = tkl.Network()
+        network = Network()
         for res in GEOMS:
 
-            track = tkl.TrackReader().parseWkt(str(res[3]))
+            TAB_OBS = wktLineStringToObs(str(res[3]), 'ENU')
+            # Au moins 2 points
+            if len(TAB_OBS) < 2:
+                return None
+            track = Track(TAB_OBS)
 
             row = []
             row.append(cptEdge)
@@ -170,12 +175,12 @@ class NetworkReader:
             row.append(track.toWKT())
             row.append("ENU")
             row.append(track.length())
-            row.append(tkl.Edge.SENS_INVERSE)
+            row.append(Edge.SENS_INVERSE)
 
             # Source node
             idNoeudIni = str(cptNode)
             p1 = track.getFirstObs().position
-            candidates = tkl.selectNodes(network, tkl.Node("0", p1), tolerance)
+            candidates = selectNodes(network, Node("0", p1), tolerance)
             if len(candidates) > 0:
                 c = candidates[0]
                 idNoeudIni = c.id
@@ -185,7 +190,7 @@ class NetworkReader:
             # Target node
             idNoeudFin = str(cptNode)
             p2 = track.getLastObs().position
-            candidates = tkl.selectNodes(network, tkl.Node("0", p2), tolerance)
+            candidates = selectNodes(network, Node("0", p2), tolerance)
             if len(candidates) > 0:
                 c = candidates[0]
                 idNoeudFin = c.id
@@ -195,7 +200,7 @@ class NetworkReader:
             row.append(idNoeudIni)
             row.append(idNoeudFin)
 
-            fmt = tkl.NetworkFormat()
+            fmt = NetworkFormat()
             fmt.createFromDict(
                 {
                     "name": "WFS",
@@ -209,8 +214,9 @@ class NetworkReader:
                 }
             )
 
-            (edge, noeudIni, noeudFin) = tkl.readLineAndAddToNetwork(row, fmt)
+            (edge, noeudIni, noeudFin) = readLineAndAddToNetwork(row, fmt)
             network.addEdge(edge, noeudIni, noeudFin)
+
         return network
 
 

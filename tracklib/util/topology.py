@@ -148,7 +148,7 @@ class Topology:
                 line += str(network.edges[i].geom[j][0])+" "+str(network.edges[i].geom[j][1])
                 if j < len(network.edges[i].geom)-1:
                     line += ","
-            line += ")\""
+            line += ")"
             GEOMS.append((idedge, idx1, idx2, line))
         return GEOMS
 
