@@ -856,6 +856,19 @@ def __bsplines_spatial(track, ds, degree=3, knots_nb=None):
 # method and gaussian covariogram of std. dev. h
 # ------------------------------------------------------------
 def conflate(track, pts, pts_index, h):
+    '''
+    Elastic conflation of a track on a list of points.
+
+    Conflation is performed with 'colocation least squares' 
+               method and gaussian covariogram of std. dev. h
+
+    :param track: track to conflate
+    :param pts: list of observation points
+    :param pts_index: list of observation points indices
+    :param h : the 'wavelength' of covariance h
+    :return: Track, a track preserving the shape of input track while 
+             enforcing constraints set by the list of observation points
+    '''
 	
 	output = track.copy()
 	
