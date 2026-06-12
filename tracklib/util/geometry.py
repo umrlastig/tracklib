@@ -516,6 +516,11 @@ def intersection(track1, track2, withTime=-1):
                 A[1, 1] = P2[1]
                 B[1, 0] = -P2[2]
 
+                det = np.linalg.det(A)
+                if abs(det) < 1e-12:
+                    # print("Parallel lines")
+                    continue
+
                 X = np.linalg.solve(A, B)
 
                 x = X[0, 0]
