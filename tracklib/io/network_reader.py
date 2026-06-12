@@ -147,7 +147,77 @@ class NetworkReader:
 
         # Return network loaded
         return network
-        
+
+
+    @staticmethod
+    def readNetworkFromListTuple(GEOMS:list)->Network:
+        '''
+            # (idedge, idx1, idx2, line)
+        '''
+
+        tolerance = 0.0001
+        cptNode = 1
+        cptEdge = 1
+        network = tkl.Network()
+        for res in GEOMS:
+
+            track = tkl.TrackReader().parseWkt(str(res[3]))
+
+            row = []
+            row.append(cptEdge)
+            cptEdge += 1
+
+            row.append(track.toWKT())
+            row.append("ENU")
+            row.append(track.length())
+            row.append(tkl.Edge.SENS_INVERSE)
+
+            # Source node
+            idNoeudIni = str(cptNode)
+            p1 = track.getFirstObs().position
+            candidates = tkl.selectNodes(network, tkl.Node("0", p1), tolerance)
+            if len(candidates) > 0:
+                c = candidates[0]
+                idNoeudIni = c.id
+            else:
+                cptNode += 1
+
+            # Target node
+            idNoeudFin = str(cptNode)
+            p2 = track.getLastObs().position
+            candidates = tkl.selectNodes(network, tkl.Node("0", p2), tolerance)
+            if len(candidates) > 0:
+                c = candidates[0]
+                idNoeudFin = c.id
+            else:
+                cptNode += 1
+
+            row.append(idNoeudIni)
+            row.append(idNoeudFin)
+
+            fmt = tkl.NetworkFormat()
+            fmt.createFromDict(
+                {
+                    "name": "WFS",
+                    "pos_edge_id": 0,
+                    "pos_source": 5,
+                    "pos_target": 6,
+                    "pos_wkt": 1,
+                    "pos_weight": 3,
+                    "pos_direction": 4,
+                    "srid": "ENU",
+                }
+            )
+
+            (edge, noeudIni, noeudFin) = tkl.readLineAndAddToNetwork(row, fmt)
+            network.addEdge(edge, noeudIni, noeudFin)
+        return network
+
+
+
+    # =========================================================================
+    #      WFS
+
     counter = 0
     NB_PER_PAGE = 1000
     URL_SERVER = "https://data.geopf.fr/wfs/ows?"
