@@ -135,6 +135,13 @@ class Node:
             ax1 = plt
         ax1.plot(self.coord.getX(), self.coord.getY(), sym)
 
+    def copy(self):
+        """Copy the current object
+
+        :return: Copy of edge
+        """
+        return copy.deepcopy(self)
+
 
 class Edge:
     """Class to define an edge / arc"""
