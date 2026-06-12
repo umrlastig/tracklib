@@ -312,16 +312,16 @@ def gaussian_process(track, timestamps, kernel, factor=1.0, sigma=0.0, cp_var=Fa
     else:
         return gaussian_process_spatial(track, timestamps, kernel, factor, sigma, cp_var)
     
-	
+    
 def gaussian_process_spatial(track, delta, kernel, factor=1.0, sigma=0.0, cp_var=False):
-	
+    
     temp = track.copy()
 
     # Vector of observed and unknown points
     TO = temp.getT()
     temp.resample(delta, mode=MODE_SPATIAL)
     TU = temp.getT()
-	
+    
     return __gaussian_process(track, TO, TU, kernel, factor, sigma, cp_var)
 
 def gaussian_process_temporal(track, timestamps, kernel, factor=1.0, sigma=0.0, cp_var=False):
@@ -332,7 +332,7 @@ def gaussian_process_temporal(track, timestamps, kernel, factor=1.0, sigma=0.0, 
     # Vector of observed and unknown points
     TO = prepareTimeSampling(track, tini, tfin)
     TU = prepareTimeSampling(timestamps, tini, tfin)
-	
+    
     return __gaussian_process(track, TO, TU, kernel, factor, sigma, cp_var)
 
 def __gaussian_process(track, TO, TU, kernel, factor, sigma, cp_var):
@@ -390,7 +390,7 @@ def __gaussian_process(track, TO, TU, kernel, factor, sigma, cp_var):
 # --------------------------------------------------------------------------
 # Input :
 #   - input ::     a list of timestamps (list), an interval in sec (float),
-# 				   or a track
+#                    or a track
 #   - tini  ::     Initial timestamp (only if input is an interval in sec)
 #   - tfin  ::     Final timestamp (only if input is an interval in sec)
 # --------------------------------------------------------------------------
@@ -848,7 +848,7 @@ def __bsplines_spatial(track, ds, degree=3, knots_nb=None):
 # Inputs: - track     : track to conflate
 #         - pts       : list of observation points
 #         - pts_index : list of observation points indices
-#		  - h         : the 'wavelength' of covariance h
+#          - h         : the 'wavelength' of covariance h
 # Output: a track preserving the shape of input track while 
 # enforcing constraints set by the list of observation points
 # ------------------------------------------------------------
@@ -859,7 +859,7 @@ def conflate(track, pts, pts_index, h):
     '''
     Elastic conflation of a track on a list of points.
 
-    Conflation is performed with 'colocation least squares' 
+    Conflation is performed with "colocation least squares"
                method and gaussian covariogram of std. dev. h
 
     :param track: track to conflate
@@ -869,57 +869,57 @@ def conflate(track, pts, pts_index, h):
     :return: Track, a track preserving the shape of input track while 
              enforcing constraints set by the list of observation points
     '''
-	
-	output = track.copy()
-	
-	# ----------------------------------------------
-	# Number of observation nodes
-	# ----------------------------------------------
-	n = len(pts)
+    
+    output = track.copy()
+    
+    # ----------------------------------------------
+    # Number of observation nodes
+    # ----------------------------------------------
+    n = len(pts)
 
-	# ----------------------------------------------	
-	# Covariance matrix between obs nodes
-	# ----------------------------------------------
-	Cij = np.zeros((n,n))
-	for i in range(n-1):
-		for j in range(i, n):
-			Cij[i,j] = track[pts_index[i]].position.distance2DTo(track[pts_index[j]].position)
-	Cij = np.exp(-((Cij + Cij.T)/h)**2)
-	
-	# ----------------------------------------------	
-	# Loop on computation nodes
-	# ----------------------------------------------
-	for idx_t in range(len(track)):
-		
-		# ----------------------------------------------	
-		# Covariance vector obs/computation nodes
-		# ----------------------------------------------
-		Ci = np.zeros((n,1))
-		for i in range(n):
-			Ci[i] = track[pts_index[i]].position.distance2DTo(track[idx_t].position)
-		Ci = np.exp(-(Ci/h)**2)
-		
-		# ----------------------------------------------	
-		# Observation vectors	
-		# ----------------------------------------------	
-		Bx = np.zeros((n,1))
-		By = np.zeros((n,1))
-		Bz = np.zeros((n,1))
-		for i in range(n):
-			Bx[i] = pts[i].getX() - track[pts_index[i]].position.getX()
-			By[i] = pts[i].getY() - track[pts_index[i]].position.getY()
-			Bz[i] = pts[i].getZ() - track[pts_index[i]].position.getZ()
-			
-		# ----------------------------------------------	
-		# Computing solution
-		# ----------------------------------------------	
-		W = np.linalg.solve(Cij, Ci)
-		dx = (W.T @ Bx)[0,0]
-		dy = (W.T @ By)[0,0]
-		dz = (W.T @ Bz)[0,0]
-		output[idx_t].position.translate(dx, dy, dz)
+    # ----------------------------------------------    
+    # Covariance matrix between obs nodes
+    # ----------------------------------------------
+    Cij = np.zeros((n,n))
+    for i in range(n-1):
+        for j in range(i, n):
+            Cij[i,j] = track[pts_index[i]].position.distance2DTo(track[pts_index[j]].position)
+    Cij = np.exp(-((Cij + Cij.T)/h)**2)
+    
+    # ----------------------------------------------    
+    # Loop on computation nodes
+    # ----------------------------------------------
+    for idx_t in range(len(track)):
+        
+        # ----------------------------------------------    
+        # Covariance vector obs/computation nodes
+        # ----------------------------------------------
+        Ci = np.zeros((n,1))
+        for i in range(n):
+            Ci[i] = track[pts_index[i]].position.distance2DTo(track[idx_t].position)
+        Ci = np.exp(-(Ci/h)**2)
+        
+        # ----------------------------------------------    
+        # Observation vectors    
+        # ----------------------------------------------    
+        Bx = np.zeros((n,1))
+        By = np.zeros((n,1))
+        Bz = np.zeros((n,1))
+        for i in range(n):
+            Bx[i] = pts[i].getX() - track[pts_index[i]].position.getX()
+            By[i] = pts[i].getY() - track[pts_index[i]].position.getY()
+            Bz[i] = pts[i].getZ() - track[pts_index[i]].position.getZ()
+            
+        # ----------------------------------------------    
+        # Computing solution
+        # ----------------------------------------------    
+        W = np.linalg.solve(Cij, Ci)
+        dx = (W.T @ Bx)[0,0]
+        dy = (W.T @ By)[0,0]
+        dz = (W.T @ Bz)[0,0]
+        output[idx_t].position.translate(dx, dy, dz)
 
-	return(output)
+    return(output)
 
 
 def smooth_cv(track, smooth_function, params=[], verbose=True):
