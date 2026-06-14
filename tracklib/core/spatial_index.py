@@ -171,11 +171,11 @@ class SpatialIndex:
         """TODO"""
         if self.srid == 'GEO':
             ll = GeoCoords(self.xmin, self.ymin)
-            ur = GeoCoords(self.xmin, self.ymin)
+            ur = GeoCoords(self.xmax, self.ymax)
             return Bbox(ll, ur)
         if self.srid == 'ENU':
             ll = ENUCoords(self.xmin, self.ymin)
-            ur = ENUCoords(self.xmin, self.ymin)
+            ur = ENUCoords(self.xmax, self.ymax)
             return Bbox(ll, ur)
         return None
         
@@ -206,6 +206,22 @@ class SpatialIndex:
                     continue
                 self.__addSegment(p1, p2, num)
             coord1 = coord2
+
+
+    def removeFeature(self, num):
+        """TODO"""
+        for i in range(self.csize):
+            for j in range(self.lsize):
+                if num in self.grid[i][j]:
+                    self.grid[i][j] = [v for v in self.grid[i][j] if v != num]
+        '''
+        # A faire soi même après, directement dans la collection
+        feature = self.collection[num]
+        if isinstance(feature, Track):
+            self.collection.removeTrack(feature)
+        elif isinstance(feature, Edge):
+            self.collection.removeEdge(feature)
+        '''
 
     def __addSegment(self, coord1, coord2, data):
         """TODO
@@ -288,11 +304,11 @@ class SpatialIndex:
         #    111, xlim=(si.xmin, si.xmax), ylim=(si.ymin, si.ymax)
         #)
 
-        for i in range(0, self.csize):
+        for i in range(0, self.csize+1):
             xi = i * self.dX + self.xmin
             ax1.plot([xi, xi], [self.ymin, self.ymax], "-", color="gray")
         
-        for j in range(0, self.lsize):
+        for j in range(0, self.lsize+1):
             yj = j * self.dY + self.ymin
             ax1.plot([self.xmin, self.xmax], [yj, yj], "-", color="gray")
 

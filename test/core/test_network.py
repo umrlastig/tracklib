@@ -3,7 +3,10 @@
 import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
 
-from tracklib import (Track, Node, Edge, NetworkReader)
+from tracklib import (Track, ENUCoords,
+                      Node, Edge,
+                      NetworkReader,
+                      SpatialIndex)
 
 
 import matplotlib.pyplot as plt
@@ -114,13 +117,46 @@ class TestDijkstra(TestCase):
         
 
 
-        
+    def test_index(self):
+        chemin = os.path.join(self.resource_path, 'data/network/network_igast.csv')
+        network = NetworkReader.readFromFile(chemin, 'TEST_UNITAIRE', False)
+
+        index = SpatialIndex(network, (2,2))
+        network.spatial_index = index
+        index.plot()
+        plt.show()
+
+        self.assertEqual(network.getNumberOfNodes(), 21)
+
+        values = index.neighborhood(ENUCoords(7, 44), unit=0)
+        self.assertEqual(values[0], 4)
+
+        e4 = network[4]
+        self.assertEqual(e4.id, '5')
+        nf = e4.target
+        ni = e4.source
+
+        self.assertEqual(network.getIncidentEdges(ni.id), ['4', '5', '6'])
+
+        network.removeEdge(e4)
+
+        network.spatial_index.plot()
+
+        values = index.neighborhood(ENUCoords(7, 44), unit=0)
+        self.assertEqual(len(values), 0)
+
+        self.assertEqual(len(network.getIncidentEdges(e4.target.id)), 0)
+        self.assertEqual(len(network.getAdjacentNodes(nf)), 0)
+        self.assertEqual(network.getIncidentEdges(ni.id), ['4', '6'])
+        self.assertEqual(network.getNumberOfNodes(), 20)
+
 
 if __name__ == '__main__':
     suite = TestSuite()
     suite.addTest(TestDijkstra("test_dijkstra"))
     suite.addTest(TestDijkstra("test_igast"))
     suite.addTest(TestDijkstra("test_dijkstra_bdtopo"))
+    suite.addTest(TestDijkstra("test_index"))
     runner = TextTestRunner()
     runner.run(suite)
     

@@ -278,7 +278,8 @@ class Network:
         self.NBGR_NODES[target.id].append(source.id)
 
         if not self.spatial_index is None:
-            self.spatial_index.addFeature(edge.geom, self.getNumberOfEdges() - 1)
+            self.spatial_index.addFeature(edge.geom, self.getNumberOfEdges()-1)
+
 
     def removeEdge(self, edge: Edge):
         """Remove a :class:`Edge` to the current :class:`Network`
@@ -322,12 +323,18 @@ class Network:
             if ni.id in self.PREV_NODES and nf.id in self.PREV_NODES[ni.id]:
                 self.PREV_NODES[ni.id].remove(nf.id)
 
+        idx = self.__idx_edges.index(edge.id)
         del self.EDGES[edge.id]
         self.__idx_edges.remove(edge.id)
 
-        # TODO
-        # if not self.spatial_index is None:
-        #    self.spatial_index.addFeature(edge.geom, self.getNumberOfEdges() - 1)
+        if len(self.getIncidentEdges(nf.id)) == 0:
+            self.removeNode(nf)
+        if len(self.getIncidentEdges(ni.id)) == 0:
+            self.removeNode(ni)
+
+        if not self.spatial_index is None:
+            self.spatial_index.removeFeature(idx)
+
 
     def removeNode(self, node: Node):
         """Remove a class:`Node` to the current :class:`Network`
@@ -521,6 +528,8 @@ class Network:
 
         :param node_id: id of a node
         """
+        if node_id not in self.NBGR_NODES:
+            return []
         return self.NBGR_NODES[node_id]
 
     def getIncidentEdges(self, node_id: int):
@@ -528,6 +537,8 @@ class Network:
 
         :param node_id: id of a node
         """
+        if node_id not in self.NBGR_EDGES:
+            return []
         return self.NBGR_EDGES[node_id]
 
     def degree(self, node_id: int) -> int:

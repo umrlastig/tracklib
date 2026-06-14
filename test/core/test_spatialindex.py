@@ -6,7 +6,7 @@ import os.path
 
 from tracklib import (ENUCoords, ObsTime, Obs, Track,
                       TrackCollection,
-                      SpatialIndex)
+                      SpatialIndex, NetworkReader)
 
 
 class TestSpatialIndex(TestCase):
@@ -32,8 +32,8 @@ class TestSpatialIndex(TestCase):
         track.addObs(p4)
         p5 = Obs(ENUCoords(10, 10), ObsTime.readTimestamp('2020-01-01 10:25:00'))
         track.addObs(p5)
-                #track.plot()
-                #track.plotAsMarkers()
+        #track.plot()
+        track.plotAsMarkers()
                 
         TRACES = []
         TRACES.append(track)
@@ -41,7 +41,7 @@ class TestSpatialIndex(TestCase):
                 
         index = SpatialIndex(collection, (2, 2))
         index.plot()
-        
+
         # =====================================================================
         # =====================================================================
         self.assertEqual(index.request(0, 0), [0])
@@ -438,45 +438,101 @@ class TestSpatialIndex(TestCase):
         plt.show()
         
         
-    # def test_index_trackcollection(self):
-       
-    #     GPSTime.setReadFormat("4Y-2M-2D 2h:2m:2s")
-    #     chemindata = os.path.join(self.resource_path, "test/data/CSV_L93_VERCORS/")
-    #     collection = FileReader.readFromCsv(chemindata, 3, 4, 5, 6)
+    def test_index_network(self):
         
-    #     collection.addAnalyticalFeature(Analytics.speed)
-        
-    #     #print (collection.size())
-    #     #print (collection.bbox())
-    #     #collection.plot()
-    
-    #     index = SpatialIndex(collection, (30,30))
-    #     index.plot()
-    #     plt.show()
-        
-    
-    # def test_index_network(self):
-        
-    #      xmin = 2.34850
-    #      xmax = 2.35463
-    #      ymin = 48.83896
-    #      ymax = 48.84299
-    #      network = IgnReader.requestFromIgnGeoportail((xmin, ymin, xmax, ymax), "EPSG:2154")
-         
-    #      #NetworkReader.writeFromFile("ici.csv", network)
-        
-    #      # print (network.bbox())
-    #      # network.plot()
-        
-    #      index = SpatialIndex(network, (20, 20))
-    #      index.plot()
-         
-    
-    # def testIndexPoint(self):
-    #     ''' TODO '''
-    #     pass
-        
-        
+        chemin = os.path.join(self.resource_path, 'data/network/network_igast.csv')
+        network = NetworkReader.readFromFile(chemin, 'TEST_UNITAIRE', False)
+
+        index = SpatialIndex(network, (2,2))
+        index.plot()
+
+        self.assertCountEqual(index.neighborhood(ENUCoords(5, 46), unit=0),
+                              [5, 8, 9])
+        index.collection[5].geom.plot('b-', append=True)
+        index.collection[8].geom.plot('r-', append=True)
+        index.collection[9].geom.plot('k-', append=True)
+        # print (index.neighborhood(ENUCoords(5, 46), unit=1))
+        # print (index.neighborhood(ENUCoords(5, 46), unit=-1))
+
+        plt.xlim([-7, 10])
+        plt.ylim([42, 52])
+        plt.show()
+
+        index.removeFeature(5)
+        index.plot()
+        plt.show()
+
+        self.assertCountEqual(index.neighborhood(ENUCoords(5, 46), unit=0), [8, 9])
+
+        box = index.bbox()
+        self.assertTrue(abs(box.ur.N - 50.996) < 0.01)
+        self.assertTrue(abs(box.ur.E - 8.364) < 0.01)
+
+        self.assertFalse(index.covers(ENUCoords(-5.1, 48)))
+        self.assertFalse(index.covers(ENUCoords(0, 42.5)))
+        self.assertFalse(index.covers(ENUCoords(0, 51)))
+        self.assertFalse(index.covers(ENUCoords(10, 48)))
+
+
+    def test_remove_obj(self):
+        TRACES = []
+
+        track1 = Track()
+        track1.addObs(Obs(ENUCoords(0, 0), ObsTime()))
+        track1.addObs(Obs(ENUCoords(2.5, 3), ObsTime()))
+        track1.addObs(Obs(ENUCoords(2.5, 5), ObsTime()))
+        track1.addObs(Obs(ENUCoords(7, 5), ObsTime()))
+        track1.addObs(Obs(ENUCoords(10, 10), ObsTime()))
+        track1.plotAsMarkers()
+        TRACES.append(track1)
+
+        track2 = Track()
+        track2.addObs(Obs(ENUCoords(0, 2.5), ObsTime()))
+        track2.addObs(Obs(ENUCoords(3.5, 2.5), ObsTime()))
+        track2.addObs(Obs(ENUCoords(3.5, 5.5), ObsTime()))
+        track2.addObs(Obs(ENUCoords(6.5, 5.5), ObsTime()))
+        track2.addObs(Obs(ENUCoords(6.5, 7), ObsTime()))
+        track2.addObs(Obs(ENUCoords(9, 10), ObsTime()))
+        track2.plotAsMarkers()
+        TRACES.append(track2)
+
+        track3 = Track()
+        track3.addObs(Obs(ENUCoords(1, 9), ObsTime()))
+        track3.addObs(Obs(ENUCoords(1, 3.5), ObsTime()))
+        track3.addObs(Obs(ENUCoords(2, 3.5), ObsTime()))
+        track3.addObs(Obs(ENUCoords(2, 5.8), ObsTime()))
+        track3.addObs(Obs(ENUCoords(7.8, 5.8), ObsTime()))
+        track3.addObs(Obs(ENUCoords(7.8, 9.5), ObsTime()))
+        track3.plotAsMarkers()
+        TRACES.append(track3)
+
+        collection = TrackCollection(TRACES)
+        index = SpatialIndex(collection, (2, 2))
+        index.plot()
+        index.highlight(2,2)
+        plt.show()
+
+        self.assertCountEqual(index.neighborhood(ENUCoords(5, 5), None, 0), [0, 1, 2])
+        self.assertCountEqual(index.neighborhood(ENUCoords(5, 5), None, -1), [0, 1, 2])
+        self.assertCountEqual(index.neighborhood(ENUCoords(7, 9), None, -1), [0, 1, 2])
+        self.assertCountEqual(index.neighborhood(ENUCoords(7, 9), None, 0), [1, 2])
+        self.assertCountEqual(index.neighborhood(ENUCoords(1, 10), None, 0), [2])
+        self.assertCountEqual(index.neighborhood(ENUCoords(1, 10), None, -1), [2])
+        self.assertCountEqual(index.neighborhood(ENUCoords(1, 10), None, 2), [0, 1, 2])
+
+        index.removeFeature(2)
+        index.plot()
+        plt.show()
+
+        index.removeFeature(0)
+        index.plot()
+        plt.show()
+        # print (index.collection[0])
+
+
+
+
+
     
 if __name__ == '__main__':
     suite = TestSuite()
@@ -485,10 +541,8 @@ if __name__ == '__main__':
     suite.addTest(TestSpatialIndex("test_neighborhood_index"))
     suite.addTest(TestSpatialIndex("test_create_index_collection1"))
     suite.addTest(TestSpatialIndex("test_create_index_collection2"))
-    
-    #suite.addTest(TestSpatialIndex("test_index_trackcollection"))
-    #suite.addTest(TestSpatialIndex("test_index_network"))
-    #suite.addTest(TestSpatialIndex("testIndexPoint"))
+    suite.addTest(TestSpatialIndex("test_remove_obj"))
+    suite.addTest(TestSpatialIndex("test_index_network"))
     runner = TextTestRunner()
     runner.run(suite)
     
