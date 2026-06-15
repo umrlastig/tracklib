@@ -87,6 +87,22 @@ Yann Méneroux, Marie-Dominique van Damme. Tracklib: a python library with a var
 </ul>
 
 
+## Projects using Tracklib
+
+### [footprint2graph](https://footprint2graph.readthedocs.io)
+
+<img src="https://footprint2graph.readthedocs.io/en/latest/_static/footprint2graph.png" width="120" align="right">
+
+Automatic mobility network reconstruction from GPS trajectories.
+
+The project relies on Tracklib for trajectory processing, map matching,
+track aggregation and geometric operations (interpolation, smoothing, etc.).
+
+
+
+
+
+
 ## About
 
 |                |                                                           |
