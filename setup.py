@@ -45,7 +45,6 @@ setup (
     install_requires=requirements,
     test_suite="tests",
     extras_require={
-        "dev": dev_requirements, 
-        "doc": doc_requirements
+        "dev": dev_requirements
     },
 )
