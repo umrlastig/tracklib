@@ -20,15 +20,7 @@ dev_requirements = (
         "coverage"
 )
 
-doc_requirements = (
-    "sphinx",
-    "sphinx_rtd_theme",
-    "recommonmark",
-    "sphinx-autodoc-typehints",
-	"nbsphinx",
-	"ipykernel",
-    "autodocsumm"
-)
+
 
 setup (
     name="tracklib",

@@ -12,3 +12,4 @@ numpy
 matplotlib
 scikit-image
 progressbar2
+roman>=4
