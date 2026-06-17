@@ -165,7 +165,7 @@ class NetworkReader:
             TAB_OBS = wktLineStringToObs(str(res[3]), 'ENU')
             # Au moins 2 points
             if len(TAB_OBS) < 2:
-                return None
+                continue
             track = Track(TAB_OBS)
 
             row = []
