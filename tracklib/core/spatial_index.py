@@ -66,12 +66,10 @@ class SpatialIndex:
     def __init__(self, collection, resolution=None, margin=0.05, verbose=True):
         """Constructor of :class:`SaptialIndex` class
 
-        TODO: update documentation
-
         Parameters
         ----------
-        features : bbox() + iterable
-
+        collection : iterable
+            Iterable collection of tracks providing a ``bbox()`` method.
 
             TrackCollection : on construit une grille
                 dont l’emprise est calculée sur la fonction getBBox
@@ -117,7 +115,7 @@ class SpatialIndex:
 
         self.collection = collection
 
-        # Keeps track of registered features
+        # Keeps info of registered features
         self.inventaire = set()
 
         # Nombre de dalles par cote
@@ -167,8 +165,11 @@ class SpatialIndex:
         output += "spatial index centered on [" + str(c[0]) + "; " + str(c[1]) + "]"
         return output
 
+
     def bbox(self):
-        """TODO"""
+        """
+        Return the spatial extent covered by the index.
+        """
         if self.srid == 'GEO':
             ll = GeoCoords(self.xmin, self.ymin)
             ur = GeoCoords(self.xmax, self.ymax)
@@ -179,10 +180,23 @@ class SpatialIndex:
             return Bbox(ll, ur)
         return None
         
-    # ------------------------------------------------------------
-    # Returns true if a coord p is in grid extent
-    # ------------------------------------------------------------
+
     def covers(self, p):
+        """
+        Returns true if a coord p is in grid extent.
+
+        Parameters
+        ----------
+        p : {ENUCoords, GeoCoords, ECEFCoords}
+            Coordinates for which coverage is to be tested.
+        
+        Returns
+        -------
+        bool
+            True if the observation coordinates lie within the grid extent,
+            False otherwise.
+        """
+
         if (p.getX() < self.xmin):
             return False
         if (p.getY() < self.ymin):
@@ -193,8 +207,26 @@ class SpatialIndex:
             return False
         return True
 
+
     def addFeature(self, track, num):
-        """TODO"""
+        """
+        Add a new track to the index using the identifier ``num``, which
+        corresponds to the track index within the collection.
+        
+        The caller must ensure that the identifier ``num`` is not already in use
+        and corresponds exactely to the index of the collection.
+        
+        Parameters
+        ----------
+        track : Track
+            Track to be indexed.
+        num : str
+            Identifier corresponding to the track index in the collection.
+        
+        Returns
+        -------
+        None.
+        """
         coord1 = None
         for i in range(track.size()):
             obs = track.getObs(i)
@@ -209,19 +241,25 @@ class SpatialIndex:
 
 
     def removeFeature(self, num):
-        """TODO"""
+        """
+        Remove a track from the index but NONE in the collection.
+
+
+        Parameters
+        ----------
+        num : str
+            Identifier corresponding to the track index in the collection..
+
+        Returns
+        -------
+        None.
+
+        """
         for i in range(self.csize):
             for j in range(self.lsize):
                 if num in self.grid[i][j]:
                     self.grid[i][j] = [v for v in self.grid[i][j] if v != num]
-        '''
-        # A faire soi même après, directement dans la collection
-        feature = self.collection[num]
-        if isinstance(feature, Track):
-            self.collection.removeTrack(feature)
-        elif isinstance(feature, Edge):
-            self.collection.removeEdge(feature)
-        '''
+
 
     def __addSegment(self, coord1, coord2, data):
         """TODO
@@ -299,10 +337,6 @@ class SpatialIndex:
         else:
             ax1 = plt
             
-        #fig = plt.figure()
-        #ax = fig.add_subplot(
-        #    111, xlim=(si.xmin, si.xmax), ylim=(si.ymin, si.ymax)
-        #)
 
         for i in range(0, self.csize+1):
             xi = i * self.dX + self.xmin

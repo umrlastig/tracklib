@@ -143,7 +143,7 @@ class TestDijkstra(TestCase):
         network.spatial_index.plot()
 
         values = index.neighborhood(ENUCoords(7, 44), unit=0)
-        self.assertEqual(len(values), 0)
+        self.assertEqual(len(values), 1)
 
         self.assertEqual(len(network.getIncidentEdges(e4.target.id)), 0)
         self.assertEqual(len(network.getAdjacentNodes(nf)), 0)

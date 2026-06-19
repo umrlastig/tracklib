@@ -282,8 +282,10 @@ class Network:
 
 
     def removeEdge(self, edge: Edge):
-        """Remove a :class:`Edge` to the current :class:`Network`
-        Topology is not handled here and must be managed by the caller.
+        """
+        Remove a :class:`Edge` to the current :class:`Network`
+        
+        The index is not handled here and must be managed by the caller.
 
         :param edge: Edge to remove
         """
@@ -331,9 +333,6 @@ class Network:
             self.removeNode(nf)
         if len(self.getIncidentEdges(ni.id)) == 0:
             self.removeNode(ni)
-
-        if not self.spatial_index is None:
-            self.spatial_index.removeFeature(idx)
 
 
     def removeNode(self, node: Node):

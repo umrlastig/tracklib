@@ -458,8 +458,15 @@ class TestSpatialIndex(TestCase):
         plt.ylim([42, 52])
         plt.show()
 
+        self.assertCountEqual(index.neighborhood(ENUCoords(5, 46), unit=0), [5, 8, 9])
+
+        edge5 = network[5]
+        network.removeEdge(edge5)
         index.removeFeature(5)
+
         index.plot()
+        plt.xlim([-7, 10])
+        plt.ylim([42, 52])
         plt.show()
 
         self.assertCountEqual(index.neighborhood(ENUCoords(5, 46), unit=0), [8, 9])
