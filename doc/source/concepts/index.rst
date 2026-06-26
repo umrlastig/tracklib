@@ -4,11 +4,11 @@
 :Date: 25/06/2026
 
 
-Concepts et Principes
-======================
+Concepts
+=========
 
-La section Concepts et Principes permet de comprendre le fonctionnement interne de la librairie. 
-.. Elle décrit les concepts fondamentaux, le fonctionnement des algorithmes et les principaux points d’attention pouvant affecter la qualité des résultats.
+Learn the concepts and algorithms behind Tracklib, from the mathematical foundations to the design choices that drive its implementation.
+
 
 
 .. toctree::
@@ -17,4 +17,12 @@ La section Concepts et Principes permet de comprendre le fonctionnement interne 
   Kalman filtering <KalmanFiltering>
   
 
+.. |br| raw:: html
 
+   <br />
+   <br />
+   
+
+
+
+     
