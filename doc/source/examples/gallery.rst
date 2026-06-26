@@ -10,6 +10,16 @@ Example Gallery
 Here is a gallery of examples demonstrating what ``tracklib`` can do. The examples vary in complexity and level of explanation, to help you start using Tracklib productively as quickly as possible.
 
 
+Cinematics
+-----------
+
+.. nbgallery::
+   :name: cinematics-gallery
+   :glob:
+
+   cinematics/Switchbacks
+
+
 Comparison
 ----------
 
@@ -19,7 +29,7 @@ Comparison
 
    comparison/UG_Matching
    comparison/UG_Fusion
-   ../../usecase/AggregatedTrajectory
+   comparison/AggregatedTrajectory
 
 
 Filtering
@@ -31,7 +41,7 @@ Filtering
 
    filtering/Band-stopFourierFilter
    filtering/UG_Filtering
-   ../../usecase/KalmanFiltering
+   ../concepts/KalmanFiltering
 
 
 Interpolation
@@ -65,7 +75,7 @@ Segmentation
 
    segmentation/UG_Segmentation
    segmentation/UG_Stdbscan
-   ../../usecase/StopPoints
+   segmentation/StopPoints
    segmentation/UG_ReturnTrip
    
 
@@ -100,7 +110,7 @@ Summarising
    :glob:
 
    summarising/UG_AFMap
-   ../../usecase/Summarize
+   summarising/Summarize
 
 
 Synthetics
@@ -119,6 +129,7 @@ Synthetics
 .. toctree:: 
    :hidden:
 
+   cinematics/index
    comparison/index
    filtering/index
    interpolation/index

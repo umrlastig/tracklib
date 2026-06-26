@@ -15,6 +15,6 @@ Functions to manage segmentation of GPS tracks
 
    UG_Segmentation
    UG_Stdbscan
-   ../../usecase/StopPoints
+   StopPoints
    UG_ReturnTrip
 

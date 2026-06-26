@@ -14,6 +14,5 @@ Filtering examples
 
    Band-stopFourierFilter
    UG_Filtering
-   ../../usecase/KalmanFiltering
 
 
