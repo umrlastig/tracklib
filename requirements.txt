@@ -1,6 +1,5 @@
 numpy
 matplotlib
-scikit-image
 progressbar2
 pytest
 pytest-runner

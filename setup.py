@@ -7,7 +7,7 @@ current_path = os.path.abspath(os.path.dirname(__file__))
 requirements = (
         "numpy", 
         "matplotlib", 
-        "scikit-image", 
+        # "scikit-image", 
         "progressbar2",
         "requests",
         "rtree"
