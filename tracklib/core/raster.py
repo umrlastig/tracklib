@@ -51,6 +51,8 @@ from typing import Union
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from matplotlib.axes import Axes
+
 import sys
 import math
 import numpy as np
@@ -382,24 +384,39 @@ class AFMap:
         return cle
 
 
-    def plotAsVectorGraphic(self, backgroundcolor="lightsteelblue", bordercolor="lightgray"):
+    def plotAsVectorGraphic(self,
+                            backgroundcolor="lightsteelblue", bordercolor="lightgray",
+                            append=False):
         """ 
         Plot as vector grid. 
         """
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
+        if isinstance(append, bool):
+            if append:
+                ax1 = plt.gca()
+                fig = ax1.get_figure()
+            else:
+                fig, ax1 = plt.subplots(figsize=(8, 8))
+                ax1.set_aspect('equal')
+        elif isinstance(append, Axes):
+            ax1 = append
+            fig = ax1.get_figure()
+        else:
+            fig, ax1 = plt.subplots(figsize=(8, 8))
+
+        #fig = plt.figure()
+        #ax = fig.add_subplot(111)
 
         for i in range(0, self.raster.ncol+1):
             xi = self.raster.xmin + i * self.raster.resolution[0]
             y1 = self.raster.ymin
             y2 = self.raster.ymin + self.raster.nrow * self.raster.resolution[1]
-            ax.plot([xi, xi], [y1, y2], "-", color=bordercolor)
+            ax1.plot([xi, xi], [y1, y2], "-", color=bordercolor)
 
         for j in range(0, self.raster.nrow+1):
             yj = j * self.raster.resolution[1] + self.raster.ymin
             x1 = self.raster.xmin
             x2 = self.raster.xmin + self.raster.ncol * self.raster.resolution[0]
-            ax.plot([x1, x2], [yj, yj], "-", color=bordercolor)
+            ax1.plot([x1, x2], [yj, yj], "-", color=bordercolor)
 
         for j in range(self.raster.nrow):
             ysize = self.raster.resolution[1]
@@ -415,7 +432,7 @@ class AFMap:
                     polygon = plt.Polygon(
                         [[x1, y1], [x2, y1], [x2, y2], [x1, y2], [x1, y1]]
                     )
-                    ax.add_patch(polygon)
+                    ax1.add_patch(polygon)
                     polygon.set_facecolor(backgroundcolor)
                     
                     text_kwargs = dict(ha='center', va='center', fontsize=12, color='r')
@@ -439,6 +456,9 @@ class AFMap:
             else:
                 fig, ax1 = plt.subplots(figsize=(8, 8))
                 ax1.set_aspect('equal')
+        elif isinstance(append, Axes):
+            ax1 = append
+            fig = ax1.get_figure()
         else:
             fig, ax1 = plt.subplots(figsize=(8, 8))
 
