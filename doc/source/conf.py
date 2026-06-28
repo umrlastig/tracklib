@@ -17,6 +17,8 @@ import sys
 #sys.path.append(os.path.abspath(".."))
 sys.path.append(os.path.abspath("../.."))
 sys.path.append(os.path.abspath("../../tracklib"))
+sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('..'))
 #print (sys.path)
 
 # -- Project information -----------------------------------------------------
