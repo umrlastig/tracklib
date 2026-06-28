@@ -10,6 +10,8 @@ Concepts
 Learn the concepts and algorithms behind Tracklib, from the mathematical foundations to the design choices that drive its implementation.
 
 
+Available
+---------
 
 .. toctree::
   :maxdepth: 1
@@ -17,12 +19,18 @@ Learn the concepts and algorithms behind Tracklib, from the mathematical foundat
   Kalman filtering <KalmanFiltering>
   
 
-.. |br| raw:: html
+Coming Soon
+-----------
+
+The following topics will be documented in future releases:
+
+- Analytical Features
+- Spatial Indexing for Track Collections
+
+
+
+.. raw:: html
 
    <br />
-   <br />
-   
+   <br/>
 
-
-
-     

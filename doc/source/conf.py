@@ -44,7 +44,8 @@ extensions = [
     "sphinx_autodoc_typehints",
 	"nbsphinx",
     "autodocsumm",
-    "IPython.sphinxext.ipython_console_highlighting"
+    "IPython.sphinxext.ipython_console_highlighting",
+    "sphinx_design",
 ]
 # 'sphinx_gallery.load_style',
 
@@ -91,7 +92,8 @@ html_theme_options = {
             # The type of image to be used (see below for details)
             "type": "fontawesome",
         }
-   ]
+   ],
+    "show_toc_level": 2,
 }
 
 
