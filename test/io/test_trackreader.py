@@ -246,6 +246,22 @@ class TestTrackReader(TestCase):
         self.assertIsInstance(collection, TrackCollection)
         self.assertEqual(collection.size(), 2)
 
+
+        # On change l'ordre des paramètres pour voir
+        ObsTime.setReadFormat("2D/2M/4Y 2h:2m:2s")
+        chemin = os.path.join(self.resource_path, 'data/test/csv')
+        param = TrackFormat({'ext': 'CSV',
+                             'separator': ",",
+                             'id_T': -1,
+                 'id_N': 2,
+                 'id_U': -1,
+                 'id_E': 1
+                 })
+        collection = TrackReader.readFromFile(chemin, param)
+        
+        self.assertIsInstance(collection, TrackCollection)
+        self.assertEqual(collection.size(), 2)
+
     def testReadCsvSelect(self):
         Xmin = 29.72
         Xmax = 29.77

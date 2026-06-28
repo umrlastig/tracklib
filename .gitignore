@@ -87,4 +87,10 @@ cotation/
 aaa/
 
 doc/source/started/.ipynb_checkpoints/Quickstart-checkpoint.ipynb
+doc/source/howto/.ipynb_checkpoints/*.ipynb
+
+
+
+
+
 

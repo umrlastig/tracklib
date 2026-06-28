@@ -1319,7 +1319,7 @@ class Track:
         performs the sum of AFs X and Y, and returns the result as an AF named P
         in track.
 
-        - Available operators : +, -, /, *, ^ in scalar and AF versions.
+        - Available operators : +, -, /, \*, ^ in scalar and AF versions.
         - Available functions : almost all those listed in Operator class
         - Functions are expressed with ``'{}'``. E.g:
 
@@ -1638,16 +1638,19 @@ class Track:
         Method to plot a track (short cut from Plot)
         
         style and color has priority over sym.
+
+        af_name: test si isAFTransition
         
-        Append:
-            - True : append to the current plot
-            - False: create a new plot
-            - Ax   : append to the fiven ax object
-        # ----------------------------------------------------
-        Output:
+        Append
+        ------
+        - True: append to the current plot
+        - False: create a new plot
+        - Ax: append to the given Axes object
+        
+        Output
+        -------
             Ax object (may be input into append parameter)
     
-        af_name: test si isAFTransition
         """
         
         if v == None:
@@ -1690,10 +1693,13 @@ class Track:
 
     def isAFTransition(self, af_name):
         """
-        Return true if AF is transition marker.
-        For example return true if AF values are like:
+        Return True if the AF is a transition marker.
+        
+        A transition marker is defined as an AF whose values are binary (0 or 1),
+        where 1 indicates a regime change.
+        
+        For example, returns True if AF values look like:
             000000000000010000100000000000000000001000000100000
-        Values are contained in {0, 1}. 1 means there is a regime change
         """
         tabmarqueurs = self.getAnalyticalFeature(af_name)
         marqueurs = set(tabmarqueurs)

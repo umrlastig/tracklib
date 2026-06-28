@@ -367,7 +367,7 @@ class TrackCollection:
         for track in self:
             track.resample(delta, algo, mode)
 
-    def __collectionnify(tracks):
+    def _collectionnify(tracks):
         """TODO"""
         if isinstance(tracks, list):
             return TrackCollection(tracks)
@@ -530,7 +530,7 @@ class TrackCollection:
                     tracks.addTrack(track)
             return tracks
         
-        return TrackCollection.__collectionnify(self.__TRACES[n])
+        return TrackCollection._collectionnify(self.__TRACES[n])
 
 
     def __setitem__(self, n, track):

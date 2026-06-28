@@ -59,11 +59,22 @@ class Topology:
 
     @staticmethod
     def create_topology(input_file, srid, output_file, tbp=1e-6, verbose=False):
-        '''
-          Create base topology network
+        """
+        Create a base topological network.
 
-        @param tbp 
-        '''
+        Parameters
+        ----------
+        input_file : str
+            Path to a text file containing a list of line or multiline geometries in WKT format.
+        srid : str 
+            Coordinate reference system of the geometry vertices.
+        output_file : str
+            Path to the output file where the topology will be stored.
+        
+        Returns
+        -------
+        None
+        """
 
         network = Network(tbp)
 
@@ -116,6 +127,24 @@ class Topology:
 
     @staticmethod
     def create_geoms_topology(collection, tbp=1e-6, verbose=False):
+        """
+        Create a base topological network from a TrackCollection.
+
+        Parameters
+        ----------
+        collection : TrackCollection
+            Collection representing the geometry of the edges used to build the topology.
+        tbp : float, optional
+            Tolerance used for geometric matching (default is 1e-6).
+        verbose : bool, optional
+            If True, enables detailed logging during topology construction.
+    
+        Returns
+        -------
+        list of tuple
+            Each tuple contains:
+            (edge_id, source_node_id, target_node_id, line_wkt)
+        """
 
         network = Network(tbp)
 
