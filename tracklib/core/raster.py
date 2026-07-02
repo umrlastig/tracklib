@@ -705,7 +705,7 @@ class CountBand(Band):
 
     def __init__(self):
         self.name = "count"
-        elf._grid2d = None
+        self._grid2d = None
 
     def initialize(self, shape, noDataValue):
         """
