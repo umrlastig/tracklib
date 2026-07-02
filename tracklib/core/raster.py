@@ -456,7 +456,7 @@ class Grid2D:
     def __init__(self, nrow, ncol, dtype=float):
         self.values = np.zeros((nrow, ncol), dtype=dtype)
 
-    def plot(self, append=False, cmap='turbo', vmin=None, title=''):
+    def plot(self, append=False, cmap='turbo', vmin=None, title='', noDataValue= NO_DATA_VALUE):
         if isinstance(append, bool):
             if append:
                 ax1 = plt.gca()
@@ -476,6 +476,8 @@ class Grid2D:
         if cmap is None:
             cmap = getOffsetColorMap(color1, color2, 0)
             cmap.set_bad(color='white')
+
+        self.values[self.values == noDataValue] = numpy.nan
 
         if vmin is not None:
             im = ax1.imshow(self.values, cmap=cmap, vmin=vmin)
