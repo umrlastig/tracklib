@@ -881,7 +881,7 @@ class GridBand(Band):
 
     def initialize(self, shape, noDataValue):
         self.nodata = noDataValue
-        self._grid2d = Grid2D(shape[0], shape[1], np.uint32)
+        self._grid2d = Grid2D(shape[0], shape[1], np.float32)
 
     def accumulate(self, cell, iobs, track, afname):
         raise NotImplementedError()
