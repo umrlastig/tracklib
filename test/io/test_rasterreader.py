@@ -13,11 +13,11 @@ class TestRasterReader(TestCase):
     def test_read_ign_mnt(self):
         # =============================================================
         csvpath = os.path.join(self.resource_path, 'data/asc/RGEALTI_0930_6415_LAMB93_IGN69.asc')
-        raster = RasterReader.readFromAscFile(csvpath, name='MNT')
+        raster = RasterReader.readFromAscFile(csvpath, af_name='MNT')
 
-        grid = raster.getAFMap(0)
-        self.assertEqual('MNT', grid.getName())
-        grid.plotAsImage(cmap='jet')
+        grid = raster.getAFMap('MNT')['values']
+        self.assertEqual('values', grid.getName())
+        grid.plot(cmap='jet')
 
         self.assertEqual(1000, raster.nrow)
         self.assertEqual(1000, raster.ncol)
@@ -31,10 +31,10 @@ class TestRasterReader(TestCase):
     def test_read_asc(self):
         # =============================================================
         csvpath = os.path.join(self.resource_path, 'data/asc/test.asc')
-        raster = RasterReader.readFromAscFile(csvpath, name='z')
-        grid = raster.getAFMap(0)
+        raster = RasterReader.readFromAscFile(csvpath, af_name='z')
 
-        self.assertEqual('z', grid.getName())
+        self.assertEqual('values', raster.getAFMap(0)['values'].getName())
+        self.assertEqual('values', raster.getAFMap(0)[0].getName())
 
         self.assertEqual(2000, raster.nrow)
         self.assertEqual(2000, raster.ncol)
@@ -45,17 +45,20 @@ class TestRasterReader(TestCase):
         self.assertEqual(949997.5, raster.xmax)
         self.assertEqual(6440002.5, raster.ymax)
 
-        self.assertEqual(1418, grid.grid[0][1])
-        self.assertEqual(1419, grid.grid[1][0])
-        self.assertEqual(902, grid.grid[600][884])
-        self.assertEqual(1317, grid.grid[836][365])
-        self.assertEqual(1678, grid.grid[1102][935])
+        grid = raster.getAFMap(0)[0].getGrid()
+
+        self.assertEqual(1418, grid.values[0][1])
+        self.assertEqual(1419, grid.values[1][0])
+        self.assertEqual(902, grid.values[600][884])
+        self.assertEqual(1317, grid.values[836][365])
+        self.assertEqual(1678, grid.values[1102][935])
 
         # ---------------------------------------------------------------------
-        raster = RasterReader.readFromAscFile(csvpath, name='mnt')
-        grid = raster.getAFMap(0)
-        
-        self.assertEqual('mnt', grid.getName())
+        raster = RasterReader.readFromAscFile(csvpath, af_name='mnt')
+
+        self.assertEqual('mnt', raster.getAFMap(0).af_name)
+        self.assertEqual('values', raster.getAFMap(0)[0].getName())
+
         self.assertEqual(2000, raster.nrow)
         self.assertEqual(2000, raster.ncol)
         self.assertEqual(5.0, raster.resolution[0])
@@ -64,13 +67,16 @@ class TestRasterReader(TestCase):
         self.assertEqual(6430002.5, raster.ymin)
         self.assertEqual(949997.5, raster.xmax)
         self.assertEqual(6440002.5, raster.ymax)
+
+        grid = raster.getAFMap(0)[0].getGrid()
         
-        self.assertEqual(1418, grid.grid[0][1])
-        self.assertEqual(1419, grid.grid[1][0])
-        self.assertEqual(902, grid.grid[600][884])
-        self.assertEqual(1317, grid.grid[836][365])
-        self.assertEqual(1678, grid.grid[1102][935])
-        
+        self.assertEqual(1418, grid.values[0][1])
+        self.assertEqual(1419, grid.values[1][0])
+        self.assertEqual(902, grid.values[600][884])
+        self.assertEqual(1317, grid.values[836][365])
+        self.assertEqual(1678, grid.values[1102][935])
+
+
 
     def test_read_metadata_mnt(self):
          csvpath = os.path.join(self.resource_path, 'data/asc/RGEALTI_0930_6415_LAMB93_IGN69.asc')

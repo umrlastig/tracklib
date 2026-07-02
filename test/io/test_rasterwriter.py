@@ -9,7 +9,7 @@ from unittest import TestCase, TestSuite, TextTestRunner
 
 from tracklib import (ObsTime, Track, ENUCoords, Obs, TrackCollection, Bbox,
                       AFMap, co_count, summarize,
-                      RasterWriter, WrongArgumentError, Raster)
+                      RasterWriter, WrongArgumentError, Raster, Grid2D, GridBand)
 
 
 class TestRasterWriter(TestCase):
@@ -43,18 +43,18 @@ class TestRasterWriter(TestCase):
 
         # ---------------------------------------------------------------------
         # Test exception if the first parameter is not a filepath
-        self.assertRaises(WrongArgumentError, RasterWriter.writeMapToAscFile, "", None)
+        self.assertRaises(WrongArgumentError, RasterWriter.writeMapToAscFile, "", None, None)
 
         ascfile = os.path.join(self.resource_path, 'data/io/raster/test_write_asc_file.asc')
 
         # Test exception if the second parameter is not a RasterBand
-        self.assertRaises(WrongArgumentError, RasterWriter.writeMapToAscFile, ascfile, None)
+        self.assertRaises(WrongArgumentError, RasterWriter.writeMapToAscFile, ascfile, None, None)
 
         ll = ENUCoords(0, 0)
         ur = ENUCoords(10, 10)
         emprise = Bbox(ll, ur)
         grid1 = Raster(bbox=emprise, resolution=(1,1), margin=0.1, novalue=-1)
-        self.assertRaises(WrongArgumentError, RasterWriter.writeMapToAscFile, ascfile, grid1)
+        self.assertRaises(WrongArgumentError, RasterWriter.writeMapToAscFile, ascfile, grid1, None)
 
         # ---------------------------------------------------------------------
         # Test asc contents
@@ -63,13 +63,18 @@ class TestRasterWriter(TestCase):
         emprise = Bbox(ll, ur)
         raster = Raster(bbox=emprise, resolution=(1,1), margin=0.5)
 
-        raster.addAFMap('grille1', np.array([[1,2,1,2,1,2,1,2,1,2], [3,4,3,4,3,4,3,4,3,4],
-                                  [1,2,3,4,5,6,7,8,9,0], [7,8,7,8,7,8,7,8,7,8]]))
+        grid = np.array([[1,2,1,2,1,2,1,2,1,2], [3,4,3,4,3,4,3,4,3,4],
+                                  [1,2,3,4,5,6,7,8,9,0], [7,8,7,8,7,8,7,8,7,8]])
+        #band = GridBand()
+        #band.grid = grid2d
+        afmap = raster.addAFMap('grille1')
+        gridvalues = afmap.addValues()
+        gridvalues.setGrid(grid)
 
-        raster.getAFMap(0).plotAsImage()
+        raster.getAFMap("grille1")['values'].plot()
         plt.show()
 
-        RasterWriter.writeMapToAscFile(ascfile, raster.getAFMap(0))
+        RasterWriter.writeMapToAscFile(ascfile, raster, raster.getAFMap("grille1")['values'])
 
         vtpath = os.path.join(self.resource_path, 'data/io/raster/test1.asc')
         self.assertTrue(filecmp.cmp(ascfile, vtpath))

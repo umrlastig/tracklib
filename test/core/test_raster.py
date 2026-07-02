@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from unittest import TestCase, TestSuite, TextTestRunner
 from tracklib import (ENUCoords, Bbox, Raster,
+                      CountDistinctBand, GridBand, AFMap, Band, Grid2D,
                       NO_DATA_VALUE, WrongArgumentError)
 
 
@@ -64,30 +65,65 @@ class TestRaster(TestCase):
         raster = Raster(bbox=emprise, resolution=(1,1), margin=0.5)
         print (raster)
 
-        raster.addAFMap('grille0', None)
-        self.assertEqual(len(raster.getAFMap('grille0').grid), raster.nrow)
-        self.assertEqual(len(raster.getAFMap('grille0').grid[0]), raster.ncol)
+
+        grille1 = raster.addAFMap('grille1')
+        grille1.addValues()
+
+        self.assertEqual(raster.countAFMap(), 1)
+        self.assertEqual(raster.getNamesOfAFMap(), ['grille1'])
+        self.assertEqual(raster.getAFMap(0).af_name, 'grille1')
+        self.assertEqual(raster.getAFMap('grille1').af_name, 'grille1')
+        self.assertIsInstance(raster.getAFMap(0), AFMap)
+        self.assertIsInstance(raster.getAFMap(0)[0], Band)
+        self.assertEqual(raster.getAFMap(0)[0].getName(), 'values')
+        self.assertEqual(raster.getAFMap(0)['values'].getName(), 'values')
+        self.assertIsInstance(raster.getAFMap(0)[0].getGrid(), Grid2D)
+        self.assertEqual(len(raster.getAFMap(0)[0].getGrid().values), raster.nrow)
+        self.assertEqual(len(raster.getAFMap(0)[0].getGrid().values[0]), raster.ncol)
+
 
         with self.assertRaises(WrongArgumentError):
-            raster.addAFMap('grille1', [1,2,3,4,5,6,7])
+            afmap = raster.addAFMap('grille1')
+            gridvalues = afmap.addValues([1,2,3,4,5,6,7])
 
         with self.assertRaises(WrongArgumentError):
-            raster.addAFMap('', [[1,2,3,4,5,6,7], [1,2,3,4,5,6,7]])
-
-        raster.addAFMap('grille1', np.array([[1,2,1,2,1,2,1,2,1,2], [3,4,3,4,3,4,3,4,3,4],
-                                  [1,2,3,4,5,6,7,8,9,0], [7,8,7,8,7,8,7,8,7,8]]))
+            afmap = raster.addAFMap('grille1')
+            gridvalues = afmap.addValues()
+            gridvalues.setGrid([1,2,3,4,5,6,7])
 
         with self.assertRaises(WrongArgumentError):
-            raster.addAFMap('grille1', np.array([[1,1,1,1,1,1,1], [1,1,1,1,1,1,1]]))
+            afmap = raster.addAFMap('')
+            gridvalues = afmap.addValues([[1,2,3,4,5,6,7], [1,2,3,4,5,6,7]])
+
+        with self.assertRaises(WrongArgumentError):
+            afmap = raster.addAFMap('grille1')
+            gridvalues = afmap.addValues(np.array([[1,1,1,1,1,1,1], [1,1,1,1,1,1,1]]))
 
 
-        raster.addAFMap('grille2', np.array([[1,1,1,1,1,1,1,1,1,1],
+        # OK
+        grille2 = raster.addAFMap('grille2')
+        grille2.addValues(np.array([[1,2,1,2,1,2,1,2,1,2], [3,4,3,4,3,4,3,4,3,4],
+                                      [1,2,3,4,5,6,7,8,9,0], [7,8,7,8,7,8,7,8,7,8]]))
+
+        self.assertEqual(raster.countAFMap(), 2)
+        self.assertEqual(raster.getNamesOfAFMap(), ['grille1', 'grille2'])
+        self.assertEqual(raster.getAFMap(1).af_name, 'grille2')
+        self.assertEqual(raster.getAFMap('grille2').af_name, 'grille2')
+        self.assertIsInstance(raster.getAFMap(1), AFMap)
+        self.assertIsInstance(raster.getAFMap(1)[0], Band)
+        self.assertEqual(raster.getAFMap(1)[0].getName(), 'values')
+        self.assertEqual(raster.getAFMap(1)['values'].getName(), 'values')
+        self.assertIsInstance(raster.getAFMap(1)[0].getGrid(), Grid2D)
+
+
+        grille3 = raster.addAFMap('grille3')
+        grille3.addValues(np.array([[1,1,1,1,1,1,1,1,1,1],
                                   [1,1,1,1,1,1,1,1,1,1],
                                   [1,1,1,1,1,1,1,1,1,1],
                                   [1,1,1,1,1,1,1,1,1,1]]))
-
         self.assertEqual(raster.countAFMap(), 3)
-        self.assertListEqual(raster.getNamesOfAFMap(), ["grille0", "grille1", "grille2"])
+        self.assertListEqual(raster.getNamesOfAFMap(), ["grille1", "grille2", "grille3"])
+
 
 
     def test_plot_afmap(self):
@@ -96,11 +132,14 @@ class TestRaster(TestCase):
         emprise = Bbox(ll, ur)
         raster = Raster(bbox=emprise, resolution=(1,1), margin=0.5)
 
-        raster.addAFMap('grille1', np.array([[1,1,1,1,1,1,1,1,1,1], [3,3,3,3,3,3,3,3,3,3],
+        grille1 = raster.addAFMap('grille1')
+        grille1.addValues(np.array([[1,1,1,1,1,1,1,1,1,1], [3,3,3,3,3,3,3,3,3,3],
                                   [5,5,5,5,5,5,5,5,5,5], [7,7,7,7,7,7,7,7,7,7]]))
 
         raster.getAFMap('grille1').plotAsVectorGraphic()
-        raster.getAFMap('grille1').plotAsImage()
+        raster.getAFMap('grille1').plot()
+
+
 
 
     def test_raster_band_is_in(self):
@@ -139,7 +178,7 @@ class TestRaster(TestCase):
 
         grid1 = Raster(bbox=emprise, resolution=(2,3), margin=0.2, novalue=-1)
 
-        print (grid1)
+        # print (grid1)
 
         self.assertEqual(grid1.ncol, 7)
         self.assertEqual(grid1.resolution[0], 2)
@@ -156,6 +195,39 @@ class TestRaster(TestCase):
         self.assertIsNone(grid1.getCell(ENUCoords(-2, -2)))
 
 
+    def test_filter(self):
+
+        ll = ENUCoords(0, 0)
+        ur = ENUCoords(7, 7)
+        emprise = Bbox(ll, ur)
+        raster = Raster(bbox=emprise, resolution=(1,1), margin=0)
+        
+        grille1 = raster.addAFMap('grille1')
+        grid = np.array([[0,0,0,0,0,0,0],
+                         [1,1,1,0,1,1,1],
+                         [1,1,1,0,1,0,0],
+                         [0,0,1,1,1,0,0],
+                         [1,1,1,0,1,0,0],
+                         [1,1,1,0,1,1,1],
+                         [0,0,0,0,0,0,0]])
+        grille1.addValues(grid)
+
+        raster.getAFMap('grille1').plot(cmap='viridis')
+
+        mask = np.array([
+                [0,1,0],
+                [1,1,1],
+                [0,1,0]])
+
+        # Dilatation
+        raster.getAFMap('grille1').filter(mask=mask, aggregation=np.max)
+
+        # Erosion
+        raster.getAFMap('grille1')[0].getGrid().filter(np.array([[1]]), lambda x : 1-x)     # Dual de la carte
+        raster.getAFMap('grille1')[0].getGrid().filter(mask, np.max)                        # Dilatation
+        raster.getAFMap('grille1')[0].getGrid().filter(np.array([[1]]), lambda x : 1-x)     # Dual de la carte
+
+        raster.getAFMap('grille1').plot(cmap='viridis')
 
 
 if __name__ == '__main__':
@@ -166,6 +238,7 @@ if __name__ == '__main__':
     suite.addTest(TestRaster("test_plot_afmap"))
     suite.addTest(TestRaster("test_raster_band_is_in"))
     suite.addTest(TestRaster("test_raster_band_gell_cell"))
+    suite.addTest(TestRaster("test_filter"))
 
     runner = TextTestRunner()
     runner.run(suite)
