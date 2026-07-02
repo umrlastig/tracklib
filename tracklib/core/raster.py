@@ -624,8 +624,8 @@ class Band(metaclass=ABCMeta):
                                      + "x" + str(dim2[1]) + ":"
                                      + str(dim1[0]) + "x" + str(dim1[1]))
 
-        self._grid2d.values = grid
-
+        #self._grid2d.values = grid
+        self._grid2d.values[:, :] = grid
 
 class CountDistinctBand(Band):
 
