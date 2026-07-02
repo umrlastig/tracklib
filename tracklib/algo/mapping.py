@@ -247,7 +247,8 @@ def mapOnRaster(track, raster):
                     print(message)
                     continue
 
-                val = afmap.grid[cell[1]][cell[0]]
+                grid = raster.getAFMap(name)['values'].getGrid().values
+                val = grid[cell[1]][cell[0]]
                 track.setObsAnalyticalFeature(name, j, val)
 
 

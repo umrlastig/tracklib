@@ -360,6 +360,8 @@ class AFMap:
         self.af_name = af_name
         self.bands = {}
 
+    def getName(self):
+        return self.af_name
 
     def bandCount(self):
         return len(self.bands)
@@ -717,7 +719,7 @@ class CountBand(Band):
             value = track.uid
         else:
             value = track.getObsAnalyticalFeature(afname, iobs)
-            
+
         if value == self.nodata:
             return
 
