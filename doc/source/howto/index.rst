@@ -65,8 +65,35 @@ Interpolation
 Mapping
 """""""""""""""
 
+.. grid:: 3
+   :gutter: 2
+
+   .. grid-item-card:: Map-Match a Track to a Network
+      :link: MAP_MapMatchingOnNetwork.html
+
+      .. image:: ../_static/icons/maponnetwork.png
+         :width: 120px
+         :align: center
+
+
+   .. grid-item-card:: Map DTM Data onto a GNSS Track
+      :link: MAP_MapOnRaster.html
+
+      .. image:: ../_static/icons/maponraster.png
+         :width: 120px
+         :align: center
+
+
+   .. grid-item-card:: Align Two Tracks
+      :link: MAP_MapOn.html
+
+      .. image:: ../_static/icons/mapon.png
+         :width: 180px
+         :align: center
+
 .. toctree::
   :maxdepth: 1
+  :hidden:
 
    Map-Match a Track to a Network <MAP_MapMatchingOnNetwork>
    Map DTM Data onto a GNSS Track <MAP_MapOnRaster>
