@@ -66,11 +66,12 @@ to simplify the creation of analytical features on a GPS tracks.
   :maxdepth: 1
   :hidden:
   
-  Getting started <started/index>
-  Guides <howto/index>
-  Examples <examples/gallery>
+  Start <started/index>
+  Data <data/index>
+  Processing Guides <howto/index>
+  Use Cases <examples/gallery>
   Concepts <concepts/index>
-  Reference <api/index>
+  API Reference <api/index>
   
 
 

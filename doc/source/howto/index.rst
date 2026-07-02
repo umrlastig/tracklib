@@ -5,31 +5,40 @@
 
 
 
-Guides
-=======
+Processing Guides
+==================
 
-This section contains practical guides for common Tracklib operations and integrations.
+This section contains practical guides for common Tracklib processing tasks.
 
-
-Data I/O
----------
-
-.. toctree::
-  :maxdepth: 1
-
-  IO_ReadTrack
-  IO_TrackFormat
-  IO_LoadGpkg
-
-
-Processing Tracks
---------------------
 
 Comparison
 """""""""""
 
+..      Compare two trajectories and quantify their similarity.
+..      Merge several trajectories into a representative track.
+
+
+.. grid:: 2
+   :gutter: 3
+
+   .. grid-item-card:: Matching Two Tracks
+      :link: COMP_Matching.html
+
+      .. image:: ../_static/icons/match.png
+         :width: 120px
+         :align: center
+
+
+   .. grid-item-card:: Aggregate Trajectories
+      :link: COMP_Fusion.html
+
+      .. image:: ../_static/icons/merge.png
+         :width: 120px
+         :align: center
+
 .. toctree::
   :maxdepth: 1
+  :hidden:
 
    Matching Two Tracks <COMP_Matching>
    Aggregate Trajectories <COMP_Fusion>
@@ -107,8 +116,36 @@ Summarizing
 Synthetic Tracks
 """"""""""""""""""
 
+
+.. grid:: 3
+   :gutter: 2
+
+   .. grid-item-card:: Generate Synthetic Tracks
+      :link: SYN_Synthetics.html
+
+      .. image:: ../_static/icons/synthetics.png
+         :width: 120px
+         :align: center
+
+
+   .. grid-item-card:: Create a Realistic Synthetic Track
+      :link: SYN_SyntheticRealistic.html
+
+      .. image:: ../_static/icons/realistic.png
+         :width: 120px
+         :align: center
+
+
+   .. grid-item-card:: Generate Tracks on a Network
+      :link: SYN_SyntheticCollectionIssuedFromNetwork.html
+
+      .. image:: ../_static/icons/netgen.png
+         :width: 120px
+         :align: center
+
 .. toctree::
   :maxdepth: 1
+  :hidden:
 
    Generate Synthetic Tracks <SYN_Synthetics>
    Create a Realistic Synthetic Track <SYN_SyntheticRealistic>
@@ -119,33 +156,6 @@ Synthetic Tracks
 .. Creating custom analytical features   
    
    
-Visualization
----------------
-
-.. toctree::
-  :maxdepth: 1
-
-  Plot Tracks <VIZ_TrackPlot>
-  
-
-
-Network
----------
-
-.. toctree::
-  :maxdepth: 1
-
-  IO_Network
-  IO_BDTOPO
-
-
-Integration
--------------
-
-.. toctree::
-  :maxdepth: 1
-  
-  Using Tracklib in QGIS <qgis>
 
 
 
