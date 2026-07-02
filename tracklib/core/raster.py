@@ -477,12 +477,14 @@ class Grid2D:
             cmap = getOffsetColorMap(color1, color2, 0)
             cmap.set_bad(color='white')
 
-        self.values[self.values == noDataValue] = np.nan
+        # self.values[self.values == noDataValue] = np.nan
+        display = self.values.astype(float)
+        display[display == noDataValue] = np.nan
 
         if vmin is not None:
-            im = ax1.imshow(self.values, cmap=cmap, vmin=vmin)
+            im = ax1.imshow(display, cmap=cmap, vmin=vmin)
         else:
-            im = ax1.imshow(self.values, cmap=cmap)
+            im = ax1.imshow(display, cmap=cmap)
 
         ax1.set_title(title)
 
