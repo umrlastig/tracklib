@@ -457,7 +457,8 @@ class Grid2D:
     def __init__(self, nrow, ncol, dtype=float):
         self.values = np.zeros((nrow, ncol), dtype=dtype)
 
-    def plot(self, append=False, cmap='turbo', vmin=None, title='', noDataValue= NO_DATA_VALUE):
+    def plot(self, append=False, cmap='turbo', vmin=None, title='',
+             noDataValue= NO_DATA_VALUE):
         if isinstance(append, bool):
             if append:
                 ax1 = plt.gca()
