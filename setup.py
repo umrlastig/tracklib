@@ -24,11 +24,11 @@ dev_requirements = (
 
 setup (
     name="tracklib",
-    version="0.8.3.6",
+    version="0.8.3.7",
     description="tracklib library provides a variety of tools, operators and functions to manipulate GPS trajectories",
     long_description="See https://github.com/umrlastig/tracklib",
     url="https://github.com/umrlastig/tracklib",
-    download_url= 'https://github.com/umrlastig/tracklib/archive/refs/tags/v0.8.3.6.zip',
+    download_url= 'https://github.com/umrlastig/tracklib/archive/refs/tags/v0.8.3.7.zip',
     author="Yann Méneroux, Marie-Dominique Van Damme",
     author_email="todo@ign.fr",
     keywords=['GPS track', 'Python library', 'Map-matching', 'Trajectory fusion', 'Synthetic trajectory', 'Segmenting GPS tracks', 'Summarizing GPS tracks', 'Stop positions', 'Kalman filter'],
