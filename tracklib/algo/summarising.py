@@ -52,9 +52,7 @@ from tracklib.core import (AFMap, TrackCollection, listify,
 
 
 
-def summarize(collection, af_algos, aggregates,
-              resolution=None, margin:float=0.05, align=BBOX_ALIGN_LL, verbose:bool=True,
-              novalue=NO_DATA_VALUE):
+def summarize(collection, raster, verbose:bool=True):
     """
     Example:
         af_algos = [algo.speed, algo.speed]
@@ -62,31 +60,19 @@ def summarize(collection, af_algos, aggregates,
     
     """
 
-    af_algos = listify(af_algos)
-    aggregates = listify(aggregates)
-
+    '''
     if len(af_algos) == 0:
         raise WrongArgumentError("First parameter (af_algos) is empty.")
+    '''
 
-    if len(af_algos) != len(aggregates):
-        print("Error: af_names and aggregates must have the same number elements")
-        return 0
 
-    raster = Raster(bbox=collection.bbox(), resolution=resolution, margin=margin, align=align,
-                    novalue=novalue)
-
-    # Pour chaque algo-agg on crée une grille vide
-    for idx, af_algo in enumerate(af_algos):
-        aggregate = aggregates[idx]
-        cle = AFMap.getMeasureName(af_algo, aggregate)
-        raster.addAFMap(cle)
-
-    raster.addCollectionToRaster(collection)
+    for track in collection:
+        raster.accumulate(TrackCollection([track]))
 
     # compute aggregate
-    raster.computeAggregates()
+    raster.compute()
 
-    return raster
+
 
 
 

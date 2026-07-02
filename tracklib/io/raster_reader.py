@@ -50,7 +50,7 @@ import numpy as np
 
 from tracklib.util.exceptions import *
 from tracklib.core import (ENUCoords, Bbox,
-                           Raster, 
+                           Raster, GridBand, Grid2D,
                            NO_DATA_VALUE,
                            AFMap)
 
@@ -58,7 +58,7 @@ from tracklib.core import (ENUCoords, Bbox,
 class RasterReader:
 
     @staticmethod
-    def readFromAscFile(path:str, name:str, separator=" ")-> Raster:
+    def readFromAscFile(path:str, af_name:str, separator=" ")-> Raster:
         '''
         Read grid data from an ASCII file. The first six lines of the file indicate the reference of the grid, 
         followed by the values listed in the order they would appear (left to right and top to bottom).
@@ -108,7 +108,9 @@ class RasterReader:
 
         raster = RasterReader.readMetadataFromAscFile(path, separator)
 
-        grid = np.full([raster.nrow, raster.ncol], raster.getNoDataValue(),  dtype=np.float32)
+        grid = np.full([raster.nrow, raster.ncol],
+                       raster.getNoDataValue(),
+                       dtype=np.float32)
 
         # Read the values
         i = 0
@@ -123,7 +125,14 @@ class RasterReader:
             i += 1
 
         # Return raster with one grid
-        raster.addAFMap(name, grid)
+
+        #grid2d = Grid2D(raster.nrow, raster.ncol, np.float32)
+        #grid2d.values = grid
+
+        afmap = raster.addAFMap(af_name)
+        gridvalues = afmap.addValues()
+        gridvalues.setGrid(grid)
+
         return raster
     
     

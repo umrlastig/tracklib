@@ -45,7 +45,7 @@ Write Grid to Ascii Raster file (\\*.asc).
 
 import math
 import os
-from tracklib import NO_DATA_VALUE, AFMap
+from tracklib import NO_DATA_VALUE, Band
 from tracklib.util.exceptions import *
 
 
@@ -55,7 +55,7 @@ class RasterWriter:
     '''
     
     @staticmethod
-    def writeMapToAscFile(ascpath, grid):
+    def writeMapToAscFile(ascpath, raster, band):
         """
         Transform AFMap into ASCII raster format and write it to ASC file.
         The header data includes the following keywords and values:
@@ -70,7 +70,7 @@ class RasterWriter:
               This keyword and value is optional. The nodata_value defaults to -9999.
 
         :param path: File path with extension
-        :param grid: Raster band 
+        :param band: Raster band 
         """
 
         # ---------------------------------------------------------------------
@@ -83,31 +83,31 @@ class RasterWriter:
         if not str(filename) and len(filename) > 0:
             raise WrongArgumentError(filename + " filename is empty.")
 
-        if not isinstance(grid, AFMap):
+        if not isinstance(band, Band):
             raise WrongArgumentError("The second parameter is not an instantiation of a AFMap.")
 
-        if math.floor(grid.raster.resolution[0]) != math.floor(grid.raster.resolution[1]):
+        if math.floor(raster.resolution[0]) != math.floor(raster.resolution[1]):
             raise WrongArgumentError("XPixelSize and YPixelSize must have the same values in the grid metadata: ",
-                                     math.floor(grid.raster.resolution[0]),
-                                     math.floor(grid.raster.resolution[1]))
+                                     math.floor(raster.resolution[0]),
+                                     math.floor(raster.resolution[1]))
 
 
         # ---------------------------------------------------------------------
         # Header data
-        ascContent = 'ncols\t' + str(grid.raster.ncol) + '\n'
-        ascContent = ascContent + 'nrows\t' + str(grid.raster.nrow) + '\n'
-        ascContent = ascContent + 'xllcorner\t' + str(grid.raster.xmin) + '\n'
-        ascContent = ascContent + 'yllcorner\t' + str(grid.raster.ymin) + '\n'
-        ascContent = ascContent + 'cellsize\t' + str(math.floor(grid.raster.resolution[0])) + '\n'
-        ascContent = ascContent + 'nodata_value\t' + str(grid.raster.getNoDataValue()) + '\n'
+        ascContent = 'ncols\t' + str(raster.ncol) + '\n'
+        ascContent = ascContent + 'nrows\t' + str(raster.nrow) + '\n'
+        ascContent = ascContent + 'xllcorner\t' + str(raster.xmin) + '\n'
+        ascContent = ascContent + 'yllcorner\t' + str(raster.ymin) + '\n'
+        ascContent = ascContent + 'cellsize\t' + str(math.floor(raster.resolution[0])) + '\n'
+        ascContent = ascContent + 'nodata_value\t' + str(raster.getNoDataValue()) + '\n'
 
         # ---------------------------------------------------------------------
         # Grid data
-        for i in range(grid.raster.nrow):
-            for j in range(grid.raster.ncol):
+        for i in range(raster.nrow):
+            for j in range(raster.ncol):
                 if j > 0:
                     ascContent = ascContent + '\t'
-                val = grid.grid[i][j]
+                val = band.getGrid().values[i][j]
                 ascContent = ascContent + str(val)
             ascContent = ascContent + '\n'
 
