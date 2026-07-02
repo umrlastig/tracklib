@@ -108,7 +108,7 @@ Summarizing
 """"""""""""
 
 .. grid:: 1
-   :gutter: 3
+   :gutter: 2
 
    .. grid-item-card:: Build an Analytical Feature Map
       :link: SUM_AFMap.html
