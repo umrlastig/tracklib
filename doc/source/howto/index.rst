@@ -107,8 +107,20 @@ Simplification
 Summarizing
 """"""""""""
 
+.. grid:: 1
+   :gutter: 3
+
+   .. grid-item-card:: Build an Analytical Feature Map
+      :link: SUM_AFMap.html
+
+      .. image:: ../_static/icons/summarize.png
+         :width: 120px
+         :align: center
+
+
 .. toctree::
   :maxdepth: 1
+  :hidden:
 
    Build an Analytical Feature Map <SUM_AFMap>
 

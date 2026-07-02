@@ -648,6 +648,7 @@ class CountDistinctBand(Band):
 
     def __init__(self):
         self.name = "count_distinct"
+        self._grid2d = None
 
     def initialize(self, shape, noDataValue):
         """
@@ -704,6 +705,7 @@ class CountBand(Band):
 
     def __init__(self):
         self.name = "count"
+        elf._grid2d = None
 
     def initialize(self, shape, noDataValue):
         """
