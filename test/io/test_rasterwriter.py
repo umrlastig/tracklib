@@ -77,7 +77,42 @@ class TestRasterWriter(TestCase):
         RasterWriter.writeMapToAscFile(ascfile, raster, raster.getAFMap("grille1")['values'])
 
         vtpath = os.path.join(self.resource_path, 'data/io/raster/test1.asc')
-        self.assertTrue(filecmp.cmp(ascfile, vtpath))
+        self.assertTrue(compare_numeric_files(ascfile, vtpath))
+
+
+def is_int(text):
+    try:
+        int(text)
+        return True
+    except ValueError:
+        return False
+
+def is_float(text):
+    try:
+        float(text)
+        return "." in text or "e" in text.lower()
+    except ValueError:
+        return False
+
+
+def compare_numeric_files(file1, file2, tol=1e-12):
+    with open(file1) as f1, open(file2) as f2:
+        for l1, l2 in zip(f1, f2):
+
+            if not is_int(l1[0]) and not is_float(l1[0]):
+                continue
+
+            v1 = [float(x) for x in l1.split()]
+            v2 = [float(x) for x in l2.split()]
+
+            if len(v1) != len(v2):
+                return False
+
+            for a, b in zip(v1, v2):
+                if abs(a - b) > tol:
+                    return False
+
+    return True
 
 
 

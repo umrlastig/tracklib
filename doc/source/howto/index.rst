@@ -107,13 +107,15 @@ Simplification
 Summarizing
 """"""""""""
 
-.. card:: Build an Analytical Feature Map
-   :link: SUM_AFMap.html
-   :link-type: doc
+.. grid:: 1
+   :gutter: 2
 
-   .. image:: ../_static/icons/summarize.png
-      :width: 120px
-      :align: center
+   .. grid-item-card:: Build an Analytical Feature Map
+      :link: SUM_AFMap.html
+
+      .. image:: ../_static/icons/summarize.png
+         :width: 120px
+         :align: center
 
 
 .. toctree::
@@ -123,9 +125,9 @@ Summarizing
    Build an Analytical Feature Map <SUM_AFMap>
 
 
+
 Synthetic Tracks
 """"""""""""""""""
-
 
 .. grid:: 3
    :gutter: 2
