@@ -1,13 +1,7 @@
 # -*- coding: utf-8 -*-
 
-#import os
-#import sys
-
 # Matplotlib to create visualizations
-import matplotlib.pyplot as plt
-
-# Module to do progress reporting
-#import progressbar
+# import matplotlib.pyplot as plt
 
 # Import the Tracklib library
 import tracklib as tkl

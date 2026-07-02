@@ -284,6 +284,7 @@ class Raster:
         output += "       ncols = " + str(self.ncol) + "\n"
         output += "       XPixelSize = " + str(self.resolution[0]) + "\n"
         output += "       YPixelSize = " + str(self.resolution[1]) + "\n"
+        output += "       No data value = " + str(self.__noDataValue) + "\n"
         w = float(self.resolution[0]) * self.ncol
         h = float(self.resolution[1]) * self.nrow
         output += "       Extent: width = " + str(w) + ", height = " + str(h) + "\n"
@@ -880,7 +881,7 @@ class GridBand(Band):
 
     def initialize(self, shape, noDataValue):
         self.nodata = noDataValue
-        self._grid2d = Grid2D(shape[0], shape[1], np.uint32)
+        self._grid2d = Grid2D(shape[0], shape[1], np.float32)
 
     def accumulate(self, cell, iobs, track, afname):
         raise NotImplementedError()
