@@ -518,7 +518,20 @@ class Grid2D:
         s = int((mask.shape[0]-1)/2)
         for i in range(s, output.shape[0]-s):
             for j in range(s, output.shape[1]-s):
-                output[i,j] = aggregation(self.values[(i-s):(i+s+1), (j-s):(j+s+1)]*mask)
+                value = aggregation(
+                    self.values[(i-s):(i+s+1), (j-s):(j+s+1)] * mask
+                )
+                
+                if isinstance(value, np.ndarray):
+                    if value.size != 1:
+                        raise ValueError(
+                            "Aggregation function must return a scalar."
+                        )
+                    value = value.item()
+    
+                output[i, j] = value
+
+                # output[i,j] = aggregation(self.values[(i-s):(i+s+1), (j-s):(j+s+1)]*mask)
         self.values = output
 
     def _plotAsVectorGraphic(self, raster,
