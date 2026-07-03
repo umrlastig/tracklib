@@ -84,7 +84,7 @@ class RasterWriter:
             raise WrongArgumentError(filename + " filename is empty.")
 
         if not isinstance(band, Band):
-            raise WrongArgumentError("The second parameter is not an instantiation of a AFMap.")
+            raise WrongArgumentError("The third parameter is not an instantiation of a AFMap.")
 
         if math.floor(raster.resolution[0]) != math.floor(raster.resolution[1]):
             raise WrongArgumentError("XPixelSize and YPixelSize must have the same values in the grid metadata: ",

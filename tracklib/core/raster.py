@@ -447,7 +447,7 @@ class AFMap:
                mask = np.array([[0,1,0],[1,1,1],[0,1,0]]), aggregation=np.max):
 
         if band not in self.getNamesOfBand():
-            raise WrongArgumentError("Index '{band}' does not exist.")
+            raise WrongArgumentError("AF Name '{band}' does not exist.")
 
         self[band].getGrid().filter(mask, aggregation)
 
@@ -524,6 +524,16 @@ class Grid2D:
         s = int((mask.shape[0]-1)/2)
         for i in range(s, output.shape[0]-s):
             for j in range(s, output.shape[1]-s):
+                val = aggregation(self.values[(i-s):(i+s+1), (j-s):(j+s+1)]*mask)
+                output[i,j] = val.item()
+
+        self.values = output
+
+        '''
+        output = self.values*0; mask_temp = mask*0
+        s = int((mask.shape[0]-1)/2)
+        for i in range(s, output.shape[0]-s):
+            for j in range(s, output.shape[1]-s):
                 value = aggregation(
                     self.values[(i-s):(i+s+1), (j-s):(j+s+1)] * mask
                 )
@@ -536,9 +546,9 @@ class Grid2D:
                     value = value.item()
     
                 output[i, j] = value
-
                 # output[i,j] = aggregation(self.values[(i-s):(i+s+1), (j-s):(j+s+1)]*mask)
         self.values = output
+        '''
 
     def _plotAsVectorGraphic(self, raster,
                             backgroundcolor="lightsteelblue", bordercolor="lightgray",
