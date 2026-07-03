@@ -661,6 +661,10 @@ class CountDistinctBand(Band):
     def __init__(self):
         self.name = "count_distinct"
         self._grid2d = None
+        self._cells = None
+
+    def getCellUniqueValue(self):
+        return self._cells
 
     def initialize(self, shape, noDataValue):
         """
