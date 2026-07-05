@@ -307,9 +307,6 @@ class TestSummarising(TestCase):
             track.uid = str(cpt)
             cpt += 1
         
-        af_algos = ['uid']
-        cell_operators = [co_count_distinct]
-
         # ---------------------------------------------------------------------
 
         SIZE = 15

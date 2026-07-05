@@ -54,10 +54,7 @@ from tracklib.core import (AFMap, TrackCollection, listify,
 
 def summarize(collection, raster, verbose:bool=True):
     """
-    Example:
-        af_algos = [algo.speed, algo.speed]
-        cell_operators = [celloperator.co_avg, celloperator.co_max]
-    
+      TODO  
     """
 
     '''
