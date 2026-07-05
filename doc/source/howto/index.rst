@@ -18,27 +18,9 @@ Comparison
 ..      Merge several trajectories into a representative track.
 
 
-.. grid:: 2
-   :gutter: 3
-
-   .. grid-item-card:: Matching Two Tracks
-      :link: COMP_Matching.html
-
-      .. image:: ../_static/icons/match.png
-         :width: 120px
-         :align: center
-
-
-   .. grid-item-card:: Aggregate Trajectories
-      :link: COMP_Fusion.html
-
-      .. image:: ../_static/icons/merge.png
-         :width: 120px
-         :align: center
-
-.. toctree::
-  :maxdepth: 1
-  :hidden:
+.. nbgallery::
+   :name: comparison-gallery
+   :glob:
 
    Matching Two Tracks <COMP_Matching>
    Aggregate Trajectories <COMP_Fusion>
@@ -47,8 +29,9 @@ Comparison
 Filtering
 """"""""""
 
-.. toctree::
-  :maxdepth: 1
+.. nbgallery::
+   :name: filtering-gallery
+   :glob:
 
    Apply a Band-Stop Fourier filter <FIL_Band-stopFourierFilter>
 
@@ -56,8 +39,9 @@ Filtering
 Interpolation
 """""""""""""""
 
-.. toctree::
-  :maxdepth: 1
+.. nbgallery::
+   :name: interpolation-gallery
+   :glob:
 
    Interpolate a Track <INT_Interpolation>
 
@@ -65,35 +49,9 @@ Interpolation
 Mapping
 """""""""""""""
 
-.. grid:: 3
-   :gutter: 2
-
-   .. grid-item-card:: Map-Match a Track to a Network
-      :link: MAP_MapMatchingOnNetwork.html
-
-      .. image:: ../_static/icons/maponnetwork.png
-         :width: 120px
-         :align: center
-
-
-   .. grid-item-card:: Map DTM Data onto a GNSS Track
-      :link: MAP_MapOnRaster.html
-
-      .. image:: ../_static/icons/maponraster.png
-         :width: 120px
-         :align: center
-
-
-   .. grid-item-card:: Align Two Tracks
-      :link: MAP_MapOn.html
-
-      .. image:: ../_static/icons/mapon.png
-         :width: 180px
-         :align: center
-
-.. toctree::
-  :maxdepth: 1
-  :hidden:
+.. nbgallery::
+   :name: mapping-gallery
+   :glob:
 
    Map-Match a Track to a Network <MAP_MapMatchingOnNetwork>
    Map DTM Data onto a GNSS Track <MAP_MapOnRaster>
@@ -103,8 +61,9 @@ Mapping
 Segmentation
 """""""""""""""
 
-.. toctree::
-  :maxdepth: 1
+.. nbgallery::
+   :name: segmentation-gallery
+   :glob:
 
    Segment a Track <SEG_Segmentation>
    Detect Return Trips <SEG_ReturnTrip>
@@ -113,20 +72,20 @@ Segmentation
 Selection
 """""""""""""""
 
-.. toctree::
-  :maxdepth: 1
+.. nbgallery::
+   :name: selection-gallery
+   :glob:
 
    Query a Track with SQL-like Commands <SEL_Query>
    Select GNSS Tracks <SEL_Selection>
 
 
-
 Simplification
 """""""""""""""
 
-.. toctree::
-  :maxdepth: 1
-
+.. nbgallery::
+   :name: simplification-gallery
+   :glob:
 
    Simplify GNSS Tracks <SIMP_Simplification>
 
@@ -134,61 +93,25 @@ Simplification
 Summarizing
 """"""""""""
 
-.. grid:: 1
-   :gutter: 2
 
-   .. grid-item-card:: Build an Analytical Feature Map
-      :link: SUM_AFMap.html
-
-      .. image:: ../_static/icons/summarize.png
-         :width: 120px
-         :align: center
-
-
-.. toctree::
-  :maxdepth: 1
-  :hidden:
+.. nbgallery::
+   :name: summarizing-gallery
+   :glob:
 
    Build an Analytical Feature Map <SUM_AFMap>
-
 
 
 Synthetic Tracks
 """"""""""""""""""
 
-.. grid:: 3
-   :gutter: 2
-
-   .. grid-item-card:: Generate Synthetic Tracks
-      :link: SYN_Synthetics.html
-
-      .. image:: ../_static/icons/synthetics.png
-         :width: 120px
-         :align: center
-
-
-   .. grid-item-card:: Create a Realistic Synthetic Track
-      :link: SYN_SyntheticRealistic.html
-
-      .. image:: ../_static/icons/realistic.png
-         :width: 120px
-         :align: center
-
-
-   .. grid-item-card:: Generate Tracks on a Network
-      :link: SYN_SyntheticCollectionIssuedFromNetwork.html
-
-      .. image:: ../_static/icons/netgen.png
-         :width: 120px
-         :align: center
-
-.. toctree::
-  :maxdepth: 1
-  :hidden:
+.. nbgallery::
+   :name: synthetic-gallery
+   :glob:
 
    Generate Synthetic Tracks <SYN_Synthetics>
    Create a Realistic Synthetic Track <SYN_SyntheticRealistic>
    Generate a TrackCollection from a Network <SYN_SyntheticCollectionIssuedFromNetwork>
+
 
 
 .. Computing analytical features
