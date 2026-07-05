@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
+from pathlib import Path
 
-
-current_path = os.path.abspath(os.path.dirname(__file__))
-
+current_path = Path(__file__).parent
 long_description = (current_path / "README.md").read_text(encoding="utf-8")
+
+
 
 requirements = (
         "numpy", 
@@ -27,9 +28,10 @@ dev_requirements = (
 
 setup (
     name="tracklib",
-    version="0.8.4",
+    version="0.8.4.1",
     description="tracklib library provides a variety of tools, operators and functions to manipulate GPS trajectories",
     long_description=long_description,
+    long_description_content_type="text/markdown",
     url="https://github.com/umrlastig/tracklib",
     download_url= 'https://github.com/umrlastig/tracklib/archive/refs/tags/v0.8.4.zip',
     author="Yann Méneroux, Marie-Dominique Van Damme",

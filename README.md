@@ -2,7 +2,7 @@
 
 <p align="center">
 <table style="border:none;border:0;width:60%"><tr>
-  <td align="center" style="width:30%"><img width="200px" src="https://github.com/umrlastig/tracklib/blob/main/doc/source/img/TracklibLogo.png" /></td>
+  <td align="center" style="width:30%"><img width="200px" src="https://raw.githubusercontent.com/umrlastig/tracklib/main/doc/source/img/TracklibLogo.png" /></td>
   <td style="padding:16px;"><label>Tracklib</label> library provide a variety of tools, operators and functions to manipulate GPS trajectories</td>
 </tr></table>
 </p>
@@ -16,7 +16,7 @@
 [![Supported Python Versions](https://img.shields.io/pypi/pyversions/tracklib.svg)](https://www.python.org/downloads/)
 [![PyPI Version](https://img.shields.io/pypi/v/tracklib.svg)](https://pypi.python.org/pypi/tracklib/)
 [![PyPI Downloads](https://static.pepy.tech/personalized-badge/tracklib?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/tracklib)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13899752.svg)](https://doi.org/10.5281/zenodo.13899752)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20800161.svg)](https://doi.org/10.5281/zenodo.20800161)
 
 
 More and more datasets of GPS trajectories are now available and they are studied very frequently in many scientific domains. Currently available Python libraries for trajectories can separately load, simplify, interpolate, summarize or visualize them. But, as far as we know, there is no Python library that would contain all these basic functionalities. This is what tracklib is modestly trying to do. The library provides  some conventions, capabilities and techniques to manipulate GPS trajectories.
