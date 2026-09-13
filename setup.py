@@ -33,7 +33,7 @@ setup (
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/umrlastig/tracklib",
-    download_url= 'https://github.com/umrlastig/tracklib/archive/refs/tags/v0.8.4.zip',
+    download_url= 'https://github.com/umrlastig/tracklib/archive/refs/tags/v0.8.4.1.zip',
     author="Yann Méneroux, Marie-Dominique Van Damme",
     author_email="todo@ign.fr",
     keywords=['GPS track', 'Python library', 'Map-matching', 'Trajectory fusion', 'Synthetic trajectory', 'Segmenting GPS tracks', 'Summarizing GPS tracks', 'Stop positions', 'Kalman filter'],
