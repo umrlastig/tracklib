@@ -28,7 +28,7 @@ dev_requirements = (
 
 setup (
     name="tracklib",
-    version="0.8.4.2",
+    version="0.8.4.3",
     description="tracklib library provides a variety of tools, operators and functions to manipulate GPS trajectories",
     long_description=long_description,
     long_description_content_type="text/markdown",
