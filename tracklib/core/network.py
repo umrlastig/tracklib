@@ -695,7 +695,11 @@ class Network:
         """
         tracks = TrackCollection()
         for id in self.__idx_edges:
-            tracks.addTrack(self.EDGES[id].geom)
+            track = Track(self.EDGES[id].geom.getObsList())
+            track.uid = id
+            track.tid = id
+            tracks.addTrack(track)
+            # self.EDGES[id].geom
         return tracks
 
     def bbox(self) -> Bbox:
