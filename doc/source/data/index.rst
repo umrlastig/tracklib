@@ -12,7 +12,10 @@ This section provides practical guides for importing, exporting, displaying, and
 
 
 Data I/O
----------
+--------
+
+Tracks
+~~~~~~
 
 .. toctree::
   :maxdepth: 1
@@ -20,6 +23,16 @@ Data I/O
   IO_ReadTrack
   IO_TrackFormat
   IO_LoadGpkg
+
+
+Networks
+~~~~~~~~
+
+.. toctree::
+  :maxdepth: 1
+
+  IO_Network
+  IO_BDTOPO
 
 
 Visualization
@@ -30,17 +43,6 @@ Visualization
 
   Plot Tracks <VIZ_TrackPlot>
   
-
-
-Network
----------
-
-.. toctree::
-  :maxdepth: 1
-
-  IO_Network
-  IO_BDTOPO
-
 
 Integration
 -------------
