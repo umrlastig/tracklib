@@ -15,7 +15,7 @@ Data I/O
 --------
 
 Tracks
-~~~~~~
+""""""
 
 .. toctree::
   :maxdepth: 1
@@ -26,12 +26,13 @@ Tracks
 
 
 Networks
-~~~~~~~~
+""""""""
 
 .. toctree::
   :maxdepth: 1
 
   IO_Network
+  IO_NetworkTopology
   IO_BDTOPO
 
 

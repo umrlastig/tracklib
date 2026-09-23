@@ -1,5 +1,5 @@
 .. currentmodule:: util.topology
-
+.. _api-util-topology:
 
 
 Topology Builder
