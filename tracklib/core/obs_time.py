@@ -74,7 +74,7 @@ class ObsTime:
         ("2s", 17),
     ]
 
-    __fmt_nd = ["{:01d}", "{:02d}", "{:03d}", "{:04d}"]
+    __fmt_nd = ["{:01d}", "{:02d}", "{:03d}", "{:04d}", "{:05d}", "{:06d}", "{:07d}", "{:08d}", "{:09d}"]
     __codes = [
         "1D", "2D",
         "1M", "2M",
@@ -82,7 +82,7 @@ class ObsTime:
         "1h", "2h",
         "1m", "2m",
         "1s", "2s",
-        "1z", "2z", "3z",
+        "1z", "2z", "3z", "4z", "5z", "6z", "7z", "8z", "9z",
     ]
 
     __day_per_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
@@ -96,7 +96,7 @@ class ObsTime:
     __day_of_base_date = 3  # Thu 01/01/1970
     
 
-    def __init__(self, year: int = 1970, month: int = 1, day: int = 1, hour: int = 0, min: int = 0, sec: int = 0, ms: int = 0, zone: int = 0):
+    def __init__(self, year: int = 1970, month: int = 1, day: int = 1, hour: int = 0, min: int = 0, sec: int = 0, ms: int = 0, mus: int = 0, ns: int = 0, zone: int = 0):
         """__init__ Constructor of :class:`ObsTime` class
 
         Default value : 01/01/1970 00:00:00.000
@@ -108,6 +108,8 @@ class ObsTime:
         :param min: minute, defaults to 0
         :param sec: second, defaults to 0
         :param ms: millisecond, defaults to 0
+        :param mus: millisecond, defaults to 0
+        :param ns: millisecond, defaults to 0
         :param zone: time zone, defaults to 0
         """
 
@@ -121,6 +123,8 @@ class ObsTime:
             self.min = time.min
             self.sec = time.sec
             self.ms = time.ms
+            self.mus = time.ms
+            self.ns = time.ms
             self.zone = zone
 
         else:
@@ -132,6 +136,8 @@ class ObsTime:
             self.min = min
             self.sec = sec
             self.ms = ms
+            self.mus = mus
+            self.ns = ns
             self.zone = zone
 
     def copy(self) -> ObsTime:   
@@ -248,6 +254,15 @@ class ObsTime:
 
         # Milisecond
         time.ms = (int)(elapsed_seconds * 1000)
+        elapsed_seconds -= time.ms / 1000
+
+        # Microseconds
+        time.mus = (int)(elapsed_seconds * 1e6)
+        elapsed_seconds -= time.mus / 1e6
+
+        # Nanoseconds
+        time.nows = (int)(elapsed_seconds * 1e9)
+        elapsed_seconds -= time.ns / 1e9
 
         return time
 
@@ -272,6 +287,8 @@ class ObsTime:
         seconds += self.min * 60
         seconds += self.sec
         seconds += self.ms / 1000.0
+        seconds += self.mus / 1e6
+        seconds += self.ns / 1e9
 
         return seconds
 
@@ -344,10 +361,24 @@ class ObsTime:
         if code == "4Y":
             self.year = (int)(value)
         if code[1] == "z":
-            if value != "":
-                self.ms = (int)(value) * 10 ** (3 - (int)(code[0]))
-            else:
+            try:
+                int_value = (int)(value)
+                if int_value <= 3:
+                    self.ms = int_value * 10 ** (3 - (int)(code[0]))
+                    self.mus = 0
+                    self.ns = 0
+                elif int_value <= 6:
+                    self.ms = int(int_value // 1000) * 10 ** (3 - (int)(code[0]))
+                    self.mus = int(int_value % 1000)
+                    self.ns = 0
+                elif int_value <= 9:
+                    self.ms = int(int_value // 1000) * 10 ** (3 - (int)(code[0]))
+                    self.mus = int(int_value % 1000)
+                    self.ns = 0
+            except ValueError:
                 self.ms = 0
+                self.mus = 0
+                self.ns = 0
 
     @staticmethod
     def __takeSecond(elem):
@@ -460,6 +491,12 @@ class ObsTime:
             (int)((self.ms + 50) / 100),
             (int)((self.ms + 5) / 10),
             self.ms,
+            self.ms,
+            self.ms,
+            (int)(self.ms * 1e3 + self.mus),
+            (int)(self.ms * 1e3 + self.mus),
+            (int)(self.ms * 1e3 + self.mus),
+            (int)(self.ms * 1e6 + self.mus * 1e3 + self.ns)
         ]
 
         output = ObsTime.__PRINT_FMT
@@ -469,9 +506,13 @@ class ObsTime:
             index = output.find(code)
             while index >= 0:
                 value = (int)(code[0])
-                output = ObsTime.__replace(
-                    output, index, 2, ObsTime.__fmt_nd[value - 1].format(subst[i])
-                )
+                try:
+                    output = ObsTime.__replace(
+                        output, index, 2, ObsTime.__fmt_nd[value - 1].format(subst[i])
+                    )
+                except ValueError as e:
+                    print(e, code, index, value, subst[i], output)
+                    break
                 index = output.find(code)
         index = output.find("\\")
         while index >= 0:
