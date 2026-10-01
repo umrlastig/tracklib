@@ -417,8 +417,8 @@ class TestAlgoGeometricsMethods(unittest.TestCase):
         
         u = ENUCoords(0,0)
         for p in points:
-        	n = (p-g_median).norm2D()
-        	u = u + ENUCoords((p-g_median).E/n, (p-g_median).N/n)
+            n = (p-g_median).norm2D()
+            u = u + ENUCoords((p-g_median).E/n, (p-g_median).N/n)
  
         self.assertLessEqual(u.norm2D(), 1e-6, "l")
 

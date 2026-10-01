@@ -51,6 +51,7 @@ from __future__ import annotations
 import copy
 from datetime import datetime
 import random
+import numpy as np
 
 
 class ObsTime:
@@ -261,8 +262,8 @@ class ObsTime:
         elapsed_seconds -= time.mus / 1e6
 
         # Nanoseconds
-        time.nows = (int)(elapsed_seconds * 1e9)
-        elapsed_seconds -= time.ns / 1e9
+        time.ns = (int)(elapsed_seconds * 1e9)
+        #elapsed_seconds -= time.ns / 1e9
 
         return time
 
@@ -286,7 +287,7 @@ class ObsTime:
         seconds += self.hour * 3600
         seconds += self.min * 60
         seconds += self.sec
-        seconds += self.ms / 1000.0
+        seconds += self.ms / 1000
         seconds += self.mus / 1e6
         seconds += self.ns / 1e9
 
@@ -361,21 +362,21 @@ class ObsTime:
         if code == "4Y":
             self.year = (int)(value)
         if code[1] == "z":
-            try:
+            if value != "":
                 int_value = (int)(value)
-                if int_value <= 3:
+                if (int)(code[0]) <= 3:
                     self.ms = int_value * 10 ** (3 - (int)(code[0]))
                     self.mus = 0
                     self.ns = 0
-                elif int_value <= 6:
-                    self.ms = int(int_value // 1000) * 10 ** (3 - (int)(code[0]))
-                    self.mus = int(int_value % 1000)
+                elif (int)(code[0]) <= 6:
+                    self.ms = int(int_value // 1000)
+                    self.mus = int(int_value % 10 ** (6 - (int)(code[0]))) * 10 ** (6 - (int)(code[0]))
                     self.ns = 0
-                elif int_value <= 9:
-                    self.ms = int(int_value // 1000) * 10 ** (3 - (int)(code[0]))
-                    self.mus = int(int_value % 1000)
-                    self.ns = 0
-            except ValueError:
+                elif (int)(code[0]) <= 9:
+                    self.ms = int(int_value // 1e6) * 10 ** (3 - (int)(code[0]))
+                    self.mus = int((int_value % 1e6) // 1000)
+                    self.ns = int((int_value % 1e6) % 10 ** (9 - (int)(code[0]))) * 10 ** (9 - (int)(code[0]))
+            else:
                 self.ms = 0
                 self.mus = 0
                 self.ns = 0
@@ -446,6 +447,7 @@ class ObsTime:
   
         for i in range(len(PCL)):
             index = PCL[i][1]
+            #if index < len(timeAsString):
             time.__fillMember(
                 timeAsString[index : index + (int)(PCL[i][0][0])], PCL[i][0]
             )
@@ -563,7 +565,7 @@ class ObsTime:
         :param time: :class:`ObsTime` to substract
         :return: Difference (in floating point seconds) between 2 date
         """
-        return self.toAbsTime() - time.toAbsTime()
+        return round(self.toAbsTime() - time.toAbsTime(), ndigits=7)
 
     def __eq__(self, time: ObsTime) -> bool:   
         """Tests if two timestamps are strictly equal (up to 1 ms)
@@ -573,6 +575,10 @@ class ObsTime:
         if not isinstance(time, ObsTime):
             return False
         
+        if self.ns != time.ns:
+            return False
+        if self.mus != time.mus:
+            return False
         if self.ms != time.ms:
             return False
         if self.sec != time.sec:
@@ -614,7 +620,11 @@ class ObsTime:
             return self.min > time.min
         if self.sec != time.sec:
             return self.sec > time.sec
-        return self.ms > time.ms
+        if self.ms != time.ms:
+            return self.ms > time.ms
+        if self.mus != time.mus:
+            return self.mus > time.mus
+        return self.ns > time.ns
 
     def __lt__(self, time: ObsTime) -> bool:   
         """Tests chronological order of two timestamps
@@ -633,6 +643,10 @@ class ObsTime:
             return self.min < time.min
         if self.sec != time.sec:
             return self.sec < time.sec
+        if self.ms != time.ms:
+            return self.ms < time.ms
+        if self.mus != time.mus:
+            return self.mus < time.mus
         return self.ms < time.ms
 
     def __ge__(self, time: ObsTime) -> bool:   
