@@ -114,7 +114,7 @@ track aggregation, and geometric operations (e.g., interpolation and smoothing).
 
 ## Development
 
-Institute: LASTIG, Univ Gustave Eiffel, ENSG, IGN
+Institute: Univ Gustave Eiffel, Géodata Paris, IGN, LASTIG
 
 Authors
 - Yann Méneroux
