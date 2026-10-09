@@ -37,7 +37,7 @@ Furthermore, adding analytical features (e.g. speed, curvilinear abscissa, infle
 
 The official online documentation is available at **[ReadTheDocs](https://tracklib.readthedocs.io)**
 
-In particular, the docs include **[practical guides](https://tracklib.readthedocs.io/en/latest/howto/index.html)** and some **[Use cases](https://tracklib.readthedocs.io/en/latest/examples/gallery.html)**
+In particular, the docs include **[practical guides](https://tracklib.readthedocs.io/en/latest/howto/index.html)** and some **[use cases](https://tracklib.readthedocs.io/en/latest/examples/gallery.html)**
 
 ## Installation
 

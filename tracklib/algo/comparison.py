@@ -106,7 +106,7 @@ MODE_COMPARISON_SYNC         = 109      # Time-synchronized comparison       [p]
 # List of available methods to choose representative point selection
 MODE_REP_BARYCENTRE   = 201   # Average of coordinates
 MODE_REP_MEDIAN_TIME  = 202   # Position at median time of observations
-MODE_REP_FURTHEST_OBS = 203   # Furthest point from master track 
+MODE_REP_FURTHEST_OBS = 203   # Furthest point from master track
 # ------------------------------------------------------------------------
 # List of available aggregate points in cluster
 MODE_AGG_MEDIAN = 300         # Component-wise median of coordinates
@@ -114,7 +114,7 @@ MODE_AGG_L1     = 301         # Geometric median of points
 MODE_AGG_L2     = 302         # Standard barycenter of points
 MODE_AGG_LInf   = 303         # Center of minimum enclosing circle
 # ------------------------------------------------------------------------
-# List of available methods to choose representative point selection
+# List of available methods to choose master trajectory in the first iteration of the algorithm
 MODE_MASTER_RANDOM        = -200 # Random track
 MODE_MASTER_MEDIAN_LEN    = -100 # Closest to the median of track lengths
 MODE_MASTER_MEDIAN_GEOM   = -300 # Minimizes the sum of distances to other tracks
@@ -130,7 +130,47 @@ MODE_MASTER_LONGEST_MBR   = -500 # Longest MBR
 # comparison (no distance property). Note that dicrete frechet distance is 
 # obtained equivalently by DTW with Lp norm set to p = float('inf'). 
 # ------------------------------------------------------------------------------
-def compare(track1, track2, mode=MODE_COMPARISON_POINTWISE, p=1, dim=2, verbose=True, plot=False) -> float:
+def compare(track1, track2, mode=MODE_COMPARISON_POINTWISE, p=1, dim=2,
+            verbose=False, plot=False):
+    r"""
+    Compare two tracks to measure a distance (or pseudo-distance) between them.
+    
+    Note that discrete Fréchet distance is obtained equivalently by DTW with 
+    Lp norm set to p = float('inf'). 
+
+    Parameters
+    ----------
+    track1 : Track
+        First track to compare with track2. If mode is not symmetric, 
+        track1 is the reference track against which ``track2`` is compared.
+    track2 : Track
+        Second track to compare with track1. If mode is not symmetric, 
+        track2 is the track to be compared with the reference track ``track1``.
+    mode : int, optional
+        Comparison mode. Different comparison modes are available in Tracklib
+        (see the list of available distances and pseudo-distances between
+        tracks).
+        The default is ``MODE_COMPARISON_POINTWISE``.
+    p : int, optional
+        Parameter p in :math:`L_p`-norm.
+        The default is 1.
+    dim : int, optional
+        Space dimension. 
+        The default is 2.
+    verbose : boolean, optional
+        If True, display additional information during the computation.
+        The default is False.
+    plot : boolean, optional
+        If True, display a plot of the comparison.
+        The default is False.
+
+    Returns
+    -------
+    float
+        distance between track1 and track2.
+
+    """
+
     if (mode == MODE_COMPARISON_POINTWISE):
         return _compare_pointwise(track1, track2, p, dim)
     if (mode == MODE_COMPARISON_SYNC):
@@ -156,14 +196,59 @@ def compare(track1, track2, mode=MODE_COMPARISON_POINTWISE, p=1, dim=2, verbose=
 
 
 # ------------------------------------------------------------------------------
-# Match two tracks: returns an n:m coupling between track points. Each point has 
+# Match two tracks: returns an n:m coupling between track points. Each point has
 # at least one homologue point. Available methods are: Nearest Neihbour, 
 # (discrete) Frechet distance, dynamic time warping and fast approximate dynamic
 # time warping. Note that dicrete Frechet matching is obtained equivalently by 
 # DTW matching with Lp norm set to p = float('inf'). 
 # Output: a track with size of track1 and with links towards track2
 # ------------------------------------------------------------------------------
-def match(track1, track2, mode=MODE_MATCHING_DTW, p=1, dim=2, verbose=True, plot=False):
+def match(track1, track2, mode=MODE_MATCHING_DTW, p=1, dim=2, verbose=False, plot=False):
+    r"""
+    Match two tracks: returns an n:m coupling between track points. 
+
+    Each point has at least one homologue point. 
+
+    Note that dicrete Frechet matching is obtained equivalently by 
+    DTW matching with Lp norm set to p = float('inf'). 
+
+    Parameters
+    ----------
+    track1 : Track
+        First track to compare with track2. If mode is not symmetric, 
+        track1 is the reference track against which ``track2`` is compared.
+    track2 : Track
+        Second track to compare with track1. If mode is not symmetric, 
+        track2 is the track to be compared with the reference track ``track1``.
+    mode : int, optional
+        Matching mode used to compare trajectories with the refrence trajectory.
+        Possible values are the predefined constants:
+
+        - ``MODE_MATCHING_NN``: nearest-neighbor matching
+        - ``MODE_MATCHING_DTW``: Dynamic Time Warping
+        - ``MODE_MATCHING_FDTW``: Fast Dynamic Time Warping
+        - ``MODE_MATCHING_FRECHET``: Fréchet distance matching
+
+        The default is ``MODE_MATCHING_DTW``.
+    p : int, optional
+        Parameter p in :math:`L_p`-norm.
+        The default is 1.
+    dim : int, optional
+        Space dimension. 
+        The default is 2.
+    verbose : boolean, optional
+        If True, display additional information during the computation.
+        The default is False.
+    plot : boolean, optional
+        If True, display a plot of the comparison.
+        The default is False.
+
+    Returns
+    -------
+    Track
+        a track with size of track1 and with links towards track2.
+
+    """
     if (mode == MODE_MATCHING_NN):
         return _nn(track1, track2, dim, verbose)
     if (mode == MODE_MATCHING_FRECHET):
@@ -841,12 +926,90 @@ def _fusion(tracks, mode, master, p, dim, represent_method, agg_method, constrai
     return central
 
 
-# ------------------------------------------------------------------------
-# Algorithme récursif fusion L. Etienne : trajectoire médiane
-# ------------------------------------------------------------------------ 
 def fusion(tracks, mode=MODE_MATCHING_DTW, master=MODE_MASTER_MEDIAN_LEN, p=1, dim=2,
            represent_method=MODE_REP_BARYCENTRE, agg_method=MODE_AGG_MEDIAN, constraint=True,
-           recursive=1e300, iter_max=100, verbose=True, log=False, quality=False, cv=1e-16):
+           recursive=1e300, iter_max=100, verbose=False, log=False, quality=False, cv=1e-16):
+    """
+    
+    Recursive track fusion: recursively aggregates multiple tracks into a median trajectory, 
+    following the approach proposed by L. Etienne.
+
+    Parameters
+    ----------
+    tracks : TrackCollection
+        collection of tracks to be aggregated.
+    mode : int, optional
+        Mode used to match trajectories with the master trajectory.
+        Possible values are the predefined constants:
+
+        - ``MODE_MATCHING_NN``: nearest-neighbor matching
+        - ``MODE_MATCHING_DTW``: Dynamic Time Warping
+        - ``MODE_MATCHING_FDTW``: Fast Dynamic Time Warping
+        - ``MODE_MATCHING_FRECHET``: Fréchet distance matching
+
+        The default is ``MODE_MATCHING_DTW``.
+    master : int, optional
+        Method to choose master trajectory in the first iteration of the algorithm.
+        Possible values are the predefined constants:
+
+        - ``MODE_MASTER_RANDOM``: Random track
+        - ``MODE_MASTER_MEDIAN_LEN``: Closest to the median of track lengths
+        - ``MODE_MASTER_MEDIAN_GEOM``: Minimizes the sum of distances to other tracks
+        - ``MODE_MASTER_MORE_DETAILED``: After simplification, which have greatest obs
+        - ``MODE_MASTER_LONGEST_MBR``: Longest MBR
+
+        The default is MODE_MASTER_MEDIAN_LEN.
+    p : int, optional
+        Parameter p in :math:`L_p`-norm.
+        The default is 1.
+    dim : int, optional
+        Space dimension. 
+        The default is 2.
+    represent_method : int, optional
+        Method to choose representative point selection in n:m coupling after
+        the matching process. 
+
+        - ``MODE_REP_BARYCENTRE``: Average of coordinates
+        - ``MODE_REP_MEDIAN_TIME``: Position at median time of observations
+        - ``MODE_REP_FURTHEST_OBS``: Furthest point from master track
+
+        The default is MODE_REP_BARYCENTRE.
+    agg_method : int, optional
+        Method to aggregate points in cluster.
+        Possible values are the predefined constants:
+
+        - ``MODE_AGG_MEDIAN``: Component-wise median of coordinates
+        - ``MODE_AGG_L1``: Geometric median of points
+        - ``MODE_AGG_L2``: Standard barycenter of points
+        - ``MODE_AGG_LInf``: Center of minimum enclosing circle
+
+        The default is MODE_AGG_MEDIAN.
+    
+    constraint : TYPE, optional
+        DESCRIPTION. 
+        The default is True.
+    recursive : TYPE, optional
+        DESCRIPTION. 
+        The default is 1e300.
+    iter_max : TYPE, optional
+        DESCRIPTION. 
+        The default is 100.
+    verbose : boolean, optional
+        If True, display additional information during the computation.
+        The default is False.
+    log : TYPE, optional
+        DESCRIPTION. The default is False.
+    quality : TYPE, optional
+        DESCRIPTION. The default is False.
+    cv : TYPE, optional
+        DESCRIPTION. The default is 1e-16.
+
+    Returns
+    -------
+    Track
+        The aggregated trajectory.
+
+    """
     
     N = len(tracks)
 

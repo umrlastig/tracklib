@@ -74,30 +74,38 @@ SQUARING_RECALL = 0.1
 
 def simplify(track, tolerance, mode=MODE_SIMPLIFY_DOUGLAS_PEUCKER, verbose=True):
     """
-    Generic method to simplify a track. The process "Track simplification" 
-    generally returns a new simplified track. Tolerance is in the unit 
-    of track observation coordinates.
+    Generic method to simplify a track. 
     
     Differents modes of simplification are implemented in tracklib:
         
-    - MODE_SIMPLIFY_REM_POS_DUP (0)
-          remove position duplicate up to a distance treshold  
-    - MODE_SIMPLIFY_DOUGLAS_PEUCKER (1)
-          tolerance is max allowed deviation with respect to straight line
-    - MODE_SIMPLIFY_VISVALINGAM (2)
-          tolerance is maximal triangle area of 3 consecutive points
-    - MODE_SIMPLIFY_SQUARING (3)
-          tolerance is threshold on flat and right angles
-    - MODE_SIMPLIFY_MINIMIZE_LARGEST_DEVIATION (4)
-          tolerance is typical max deviation with respect to straight line
-    - MODE_SIMPLIFY_MINIMIZE_ELONGATION_RATIO (5)
-          tolerance is typical elongation ratio of min bounding rectangle
-    - MODE_SIMPLIFY_PRECLUDE_LARGE_DEVIATION (6)
-          tolerance is max allowed deviation with respect to straight line
-    - MODE_SIMPLIFY_FREE (7)
-          tolerance is a customed function to minimize
-    - MODE_SIMPLIFY_FREE_MAXIMIZE (8)
-          tolerance is a customed function to maximize
+    - ``MODE_SIMPLIFY_REM_POS_DUP`` : remove position duplicate up to a distance treshold  
+    - ``MODE_SIMPLIFY_DOUGLAS_PEUCKER`` : tolerance is max allowed deviation with respect to straight line
+    - ``MODE_SIMPLIFY_VISVALINGAM`` : tolerance is maximal triangle area of 3 consecutive points
+    - ``MODE_SIMPLIFY_SQUARING`` : tolerance is threshold on flat and right angles
+    - ``MODE_SIMPLIFY_MINIMIZE_LARGEST_DEVIATION`` : tolerance is typical max deviation with respect to straight line
+    - ``MODE_SIMPLIFY_MINIMIZE_ELONGATION_RATIO`` : tolerance is typical elongation ratio of min bounding rectangle
+    - ``MODE_SIMPLIFY_PRECLUDE_LARGE_DEVIATION`` : tolerance is max allowed deviation with respect to straight line
+    - ``MODE_SIMPLIFY_FREE`` : olerance is a customed function to minimize
+    - ``MODE_SIMPLIFY_FREE_MAXIMIZE`` : tolerance is a customed function to maximize
+
+    Parameters
+    ----------
+    track : Track
+        Collection of tracks to map-match.
+    tolerance : float
+        Tolerance is in the unit of track observation coordinates.
+    mode : int, optional
+        Comparison mode. Different comparison modes are available in Tracklib
+        (see the list of available distances and pseudo-distances between
+        tracks).
+    verbose : boolean, optional
+        If True, display additional information during the computation.
+        The default is False.
+
+    Returns
+    -------
+    Track
+        the simplified track.
 
     """
     if mode == MODE_SIMPLIFY_REM_POS_DUP:

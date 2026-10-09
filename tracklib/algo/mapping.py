@@ -75,6 +75,27 @@ def __projOnTrack(point, track):
     return ENUCoords(proj[1], proj[2], 0), proj[0], proj[3]
 
 def mapOnTrack(coord_or_track, track):
+    '''
+    Map observation coordinates on track.
+
+    Parameters
+    ----------
+    coord_or_track : Track
+        Observation coordinates to be mapped onto ``track`.
+    track : Track
+        Track onto which the observation coordinates are mapped.
+
+    Returns
+    -------
+    Track
+        The input observations with their coordinates projected onto
+        ``track``. Two Analytical Features are associated with each
+        observation point:
+
+        - ``dist``: distance between the observation point and its projection onto ``track``.
+        - ``edge``: index of the track segment onto which the observation point is projected.
+
+    '''
     if "tracklib.core.track.Track" in str(type(coord_or_track)):
         output = tracklib.Track()
         dist = [0]*len(coord_or_track); 
@@ -197,14 +218,47 @@ def __mapOnNetwork (
         #f2.close()
     
 
-def mapOnNetwork(
-    tracks, network, gps_noise=50, transition_cost=10, search_radius=50, debug=False,
-    report=None, verbose=False
-):
+def mapOnNetwork(tracks, network, gps_noise=50, transition_cost=10, search_radius=50, debug=False, verbose=False):
     """
-    Map-matching on a network.
+    Map-match a track collection on a network.
+
+    Parameters
+    ----------
+    tracks : TrackCollection
+        Collection of tracks to map-match.
+    network : Network
+        Network on which the tracks are map-matched.
+    gps_noise : float, optional
+        Estimated GPS noise in meters. The default is 50.
+    transition_cost : float, optional
+        Cost associated with a transition between network edges.
+        The default is 10.
+    search_radius : float, optional
+        Search radius around each track point, in meters. The default is 50.
+    debug : bool, optional
+        If True, write debugging information to a log file.
+        The default is False.
+    verbose : bool, optional
+        If True, display additional information during the computation.
+        The default is False.
+
+    Returns
+    -------
+    None
+        The map-matching results are stored as Analytical Features (AF)
+        associated with each track point:
+
+        - ``track[“hmm_inference”, k][0]``: geometric projection (ENUCoords)
+        - ``track[“hmm_inference”, k][1]``: index of the edge onto which the point is projected (int), 
+                                            -1 if the point is not map-matched
+        - ``track[“hmm_inference”, k][2]``: distance between the map-matched point and the start vertex
+        - ``track[“hmm_inference”, k][3]``: distance between the map-matched point and the end vertex
+        - ``track[“obs_noise”, k]``: observation noise (``int``)
+        - ``track[“hmm_cost”, k] ``: HMM cost (``float``).
+
     """
-    
+
+
     if isinstance(tracks, tracklib.Track):
         tracks = tracklib.TrackCollection([tracks])
     for track in tracks:
@@ -218,7 +272,19 @@ def mapOnRaster(track, raster):
     Raster data transfer to track.
     Add an analytical feature for each grid in the raster. 
     
-    :return: void
+    Parameters
+    ----------
+    tracks : TrackCollection
+        Collection of tracks to map-match.
+    raster : Raster
+        A raster with a collection of AFMap
+
+    Returns
+    -------
+    None
+        The mapOnRaster results are stored as Analytical Features (AF)
+        associated with each track point.
+
     """
     
     # create a new empty analytical feature for each afmap
@@ -252,19 +318,9 @@ def mapOnRaster(track, raster):
                 track.setObsAnalyticalFeature(name, j, val)
 
 
-def mapOn(
-    track,
-    reference,
-    TP1=[],
-    TP2=[],
-    init=[],
-    apply: bool = True,
-    N_ITER_MAX: int = 20,
-    NPTS: int = 30,
-    mode: str = "2D",
-    verbose: bool = True,
-):
-    """Geometric affine transformation to align two tracks with different
+def mapOn(track, reference, TP1=[], TP2=[], init=[], apply: bool = True, N_ITER_MAX: int = 20,
+    NPTS: int = 30, mode: str = "2D", verbose: bool = True):
+    r"""Geometric affine transformation to align two tracks with different
     coordinate systems.
 
     For "2D" mode, coordinates must be ENU or Geo. For "3D" mode, any type of
@@ -296,17 +352,36 @@ def mapOn(
 
     Note that mapOn does not handle negative determinant (symetries not allowed)
 
-    :param reference: another track we want to align on or a list of points
-    :param TP1: list of tie points indices (relative to track)
-    :param TP2: list of tie points indices (relative to reference). If TP2 is not
+    Parameters
+    -----------
+    track : Track
+        a track
+    reference : Track
+        another track we want to align on or a list of points.
+    TP1 : list
+        list of tie points indices (relative to track)
+    TP2 : list  
+        list of tie points indices (relative to reference). If TP2 is not
         specified, it is assumed equal to TP1.
-    :param init: "initial guess" vector : [rotation angle, scale, tx, ty]
-    :param N_ITER_MAX: maximal number of iterations (in least squares or ICP)
-    :param apply: boolean value to specify if estimated transfo must be performed
-    :param mode: could be "2D" (default) or "3D"
-    :param NPTS: integer specifying number of points to consider (for ICP only)
+    init : list
+        "initial guess" vector : [rotation angle, scale, tx, ty]
+    apply : boolean 
+        value to specify if estimated transfo must be performed
+    N_ITER_MAX : int
+        maximal number of iterations (in least squares or ICP)
+    NPTS : int
+        specifying number of points to consider (for ICP only)
+    mode : str
+        could be "2D" (default) or "3D"
+    verbose : boolean, optional
+        If True, display additional information during the computation.
+        The default is False.
 
-    :return: transformation parameters in the following format: [theta, k, tx, ty]
+    Returns
+    -------
+    tuple
+        Transformation parameters in the following format: [theta, k, tx, ty].
+
     """
 
     if len(TP2) == 0:
