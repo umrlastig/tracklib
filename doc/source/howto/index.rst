@@ -88,6 +88,7 @@ Simplification
    :glob:
 
    Simplify GNSS Tracks <SIMP_Simplification>
+   Squaring algorithm <SIMP_Squaring>
 
 
 Summarizing
