@@ -15,7 +15,7 @@ class TestAfType(TestCase):
 
 
     def test_af_num_version(self):
-        csvpath = os.path.join(self.resource_path, 'data/collection/')
+        csvpath = os.path.join(self.resource_path, 'data/collection/a/')
         fmt = TrackFormat({'ext': 'CSV',
                                'srid': 'ENU',
                                'id_E': 1, 'id_N': 0, 'id_U': 3, 'id_T': 2,
