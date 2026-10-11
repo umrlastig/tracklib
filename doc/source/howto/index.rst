@@ -44,6 +44,7 @@ Interpolation
    :glob:
 
    Interpolate a Track <INT_Interpolation>
+   Conflating Geometries onto a Network <INT_Conflate>
 
 
 Mapping
