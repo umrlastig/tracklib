@@ -629,7 +629,7 @@ class TrackWriter:
 
         # Time output management
         fmt_save = ObsTime.getPrintFormat()
-        ObsTime.setPrintFormat("4Y-2M-2DT2h:2m:2s")
+        #ObsTime.setPrintFormat("4Y-2M-2DT2h:2m:2s")
         
         if oneFile:
             f.write(TrackWriter.__getGpxHeader())
@@ -677,6 +677,4 @@ class TrackWriter:
             f.close()
         
         # re-initialize time format
-        ObsTime.setPrintFormat(fmt_save)
-
-
+        #ObsTime.setPrintFormat(fmt_save)
