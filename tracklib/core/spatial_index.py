@@ -262,12 +262,11 @@ class SpatialIndex:
 
 
     def __addSegment(self, coord1, coord2, data):
-        """TODO
-
-        data de type: int, liste, tuple, dictionnaire
+        """
+        data de type: int, liste, tuple, dictionnaire.
         ajoute les données data dans toutes les cellules de la grille
-               traversée par le segment [coord1, coord2] avec
-               coord1 : indices de la grille
+        traversée par le segment [coord1, coord2] avec
+        coord1 : indices de la grille.
         """
         CELLS = self.__cellsCrossSegment(coord1, coord2)
         if CELLS is None:
@@ -325,8 +324,8 @@ class SpatialIndex:
     def plot(self, base:bool=True, append=True):
         """
         Plot spatial index and collection structure together in the
-        same reference frame (geographic reference frame)
-            - base: plot support network or track collection if True
+        same reference frame (geographic reference frame).
+        base: plot support network or track collection if True
         """
         
         if isinstance(append, bool):
@@ -377,19 +376,32 @@ class SpatialIndex:
         plt.plot(X, Y, sym, linewidth=size)
     
     
-    def request(self, obj, j=None) -> list[Any]:   
-        """
-        Request function to get data registered in spatial index
-        Inputs:
-            - request(i,j) returns data registered in cell (i,j)
-               	- i: row index i of spatial index grid
-     		    - j: col index j of spatial index grid
-            - request(coord) returns data registered in the cell
-              containing GeoCoords or ENUCoors object coord
-            - request(list) returns data registered in all cells
-              crossed by a segment list=[coord1, coord2].
-     	    - request(track) returns data registered in all cells
-              crossed by a track.
+    def request(self, obj, j=None) -> list[Any]:
+        """Retrieve data registered in the spatial index.
+
+        The query can take several forms:
+    
+        * ``request(i, j)``: retrieve data registered in grid cell
+          at row ``i`` and column ``j``.
+    
+        * ``request(coord)``: retrieve data registered in the cell
+          containing the given ``GeoCoords`` or ``ENUCoords`` object.
+    
+        * ``request([coord1, coord2])``: retrieve data registered in
+          all cells crossed by the segment defined by ``coord1`` and
+          ``coord2``.
+    
+        * ``request(track)``: retrieve data registered in all cells
+          crossed by the given track.
+    
+        Args:
+            obj: Query specification. Can be a row index, a coordinate,
+                a list of two coordinates defining a segment, or a track.
+            j: Column index when querying a grid cell by its row and
+                column indices. Defaults to ``None``.
+    
+        Returns:
+            A list of data registered in the queried cell or cells.
         """
 
         if isinstance(obj, int):

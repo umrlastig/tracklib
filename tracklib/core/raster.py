@@ -329,21 +329,19 @@ class Raster:
 
 class AFMap:
     '''
-    Par exemple : AFMap(speed)
-                    ├── mean
-                    ├── max
-                    ├── std
-                    └── median
+    Represents an analytical feature as a collection of named matrices, 
+    each band storing an aggregate such as sum, count, or avg.
 
-                AFMap(altitude)
-                ├── mean
-                ├── max
+    Examples : 
+    
+    * AFMap(speed) with mean, max, std, median
+    * AFMap(altitude) with mean, max.
 
-    Represents all band for few named matrix of values.
-        Attributes: 
-            - name : the name of AF
-            - raster which defines spatial information
-            - mean, max, std, median
+    Attributes: 
+ 
+    * name : the name of AF
+    * raster which defines spatial information
+    * mean, max, std, median
     '''
 
     def __init__(self, raster, af_name):
@@ -626,6 +624,7 @@ class Band(metaclass=ABCMeta):
         """Accumulate one observation."""
         pass
 
+    @abstractmethod
     def finalize(self):
         """Finalize the computation."""
         pass
@@ -655,6 +654,7 @@ class Band(metaclass=ABCMeta):
 
         #self._grid2d.values = grid
         self._grid2d.values[:, :] = grid
+
 
 class CountDistinctBand(Band):
 

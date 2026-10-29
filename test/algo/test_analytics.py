@@ -11,7 +11,7 @@ from numpy import pi
 
 from tracklib import (Obs, ObsTime, ENUCoords, NAN,
                       speed, acceleration, ds, heading, slope,
-                      anglegeom, orientation, calculAngleOriente,
+                      geometricAngle, orientation, orientedAngle,
                       Track)
 
 
@@ -222,57 +222,57 @@ class TestAlgoAnalyticsMethods(unittest.TestCase):
         self.assertEqual(s6, 0.0)
 		
 		
-    def testAngleGeom(self):
+    def testGeometricAngle(self):
 		
-        a = anglegeom(self.trace1, 0)
+        a = geometricAngle(self.trace1, 0)
         self.assertEqual(math.isnan(a), math.isnan(NAN))
         
-        a = anglegeom(self.trace1, self.trace1.size() - 1)
+        a = geometricAngle(self.trace1, self.trace1.size() - 1)
         self.assertEqual(math.isnan(a), math.isnan(NAN))
 		
-        a = anglegeom(self.trace1, 1)
+        a = geometricAngle(self.trace1, 1)
         self.assertTrue(abs(a - pi/2) < 0.000001)
 		
-        a = anglegeom(self.trace1, 2)
+        a = geometricAngle(self.trace1, 2)
         self.assertTrue(abs(a - pi) < 0.000001)
         
-        a = anglegeom(self.trace1, 3)
+        a = geometricAngle(self.trace1, 3)
         self.assertTrue(abs(a - pi/2) < 0.000001)
 		
-        a = anglegeom(self.trace1, 4)
+        a = geometricAngle(self.trace1, 4)
         self.assertTrue(abs(a - pi/2) < 0.000001)
 		
-        a = anglegeom(self.trace1, 5)
+        a = geometricAngle(self.trace1, 5)
         self.assertTrue(abs(a - 0) < 0.000001)
 		
-        a = anglegeom(self.trace1, 6)
+        a = geometricAngle(self.trace1, 6)
         self.assertTrue(abs(a - pi/2) < 0.000001)
 		
 		
-    def testCalculAngleOriente(self):
+    def testOrientedAngle(self):
         
-        a = calculAngleOriente(self.trace1, 0)
+        a = orientedAngle(self.trace1, 0)
         self.assertEqual(math.isnan(a), math.isnan(NAN))
 		
-        a = calculAngleOriente(self.trace1, self.trace1.size() - 1)
+        a = orientedAngle(self.trace1, self.trace1.size() - 1)
         self.assertEqual(math.isnan(a), math.isnan(NAN))
 		
-        a = calculAngleOriente(self.trace1, 1)
+        a = orientedAngle(self.trace1, 1)
         self.assertTrue(abs(a + 90) < 0.000001)
         
-        a = calculAngleOriente(self.trace1, 2)
+        a = orientedAngle(self.trace1, 2)
         self.assertTrue(abs(a - 180) < 0.000001)
         
-        a = calculAngleOriente(self.trace1, 3)
+        a = orientedAngle(self.trace1, 3)
         self.assertTrue(abs(a + 90) < 0.000001)
 		
-        a = calculAngleOriente(self.trace1, 4)
+        a = orientedAngle(self.trace1, 4)
         self.assertTrue(abs(a + 90) < 0.000001)
 		
-        a = calculAngleOriente(self.trace1, 5)
+        a = orientedAngle(self.trace1, 5)
         self.assertTrue(abs(a - 0) < 0.000001)
 		
-        a = calculAngleOriente(self.trace1, 6)
+        a = orientedAngle(self.trace1, 6)
         self.assertTrue(abs(a - 90) < 0.000001)
 		
 		
@@ -285,8 +285,8 @@ if __name__ == '__main__':
     suite.addTest(TestAlgoAnalyticsMethods("testAcceleration"))
     suite.addTest(TestAlgoAnalyticsMethods("testOrientation"))
     suite.addTest(TestAlgoAnalyticsMethods("testSlope"))
-    suite.addTest(TestAlgoAnalyticsMethods("testAngleGeom"))
-    suite.addTest(TestAlgoAnalyticsMethods("testCalculAngleOriente"))
+    suite.addTest(TestAlgoAnalyticsMethods("testGeometricAngle"))
+    suite.addTest(TestAlgoAnalyticsMethods("testOrientedAngle"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

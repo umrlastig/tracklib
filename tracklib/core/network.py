@@ -84,6 +84,7 @@ class Node:
         """Node to string"""
         return "Node object: " + str(self.id)
 
+
     def __lt__(self, other: Node) -> bool:
         """Check if a node is bigger than the current node
 

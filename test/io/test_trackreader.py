@@ -230,7 +230,7 @@ class TestTrackReader(TestCase):
         self.assertIsInstance(track, Track)
         self.assertEqual(1593, track.size())
         self.assertEqual(track.getListAnalyticalFeatures(),
-                ['anglegeom', 'angledeg', 'sommet', 'sommet2', 'virage', 'serie'])
+                ['geometricAngle', 'angledeg', 'sommet', 'sommet2', 'virage', 'serie'])
 
     def testReadCsvDir(self):
         ObsTime.setReadFormat("2D/2M/4Y 2h:2m:2s")

@@ -41,6 +41,7 @@ release = "0.8"
 extensions = [
     "recommonmark",
     "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
     "sphinx_autodoc_typehints",
@@ -50,6 +51,7 @@ extensions = [
     "sphinx_design",
 ]
 # 'sphinx_gallery.load_style',
+autosummary_generate = False
 
 # I execute the notebooks manually in advance. If notebooks test the code,
 # they should be run at build time.
