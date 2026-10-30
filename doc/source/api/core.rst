@@ -59,6 +59,77 @@ Core Package
       Earth-Centered Earth-Fixed coordinate system.
 
 
+.. grid:: 3
+   :gutter: 2
+
+   .. grid-item-card:: ∿ Kernels
+      :link: ./core/kernel
+      :link-type: doc
+
+      Kernels for filtering, smoothing, and stochastic simulations.
+
+   .. grid-item-card:: ƒ Operators
+      :link: ./core/operator
+      :link-type: doc
+
+      Operators to perform computations on analytical features.
+
+
+.. grid:: 3
+   :gutter: 2
+
+   .. grid-item-card:: ▤ SpatialIndex
+      :link: ./core/spatialindex
+      :link-type: doc
+
+      Spatial index for efficient spatial queries.
+
+
+
+.. grid:: 3
+   :gutter: 2
+
+   .. grid-item-card:: ● Node
+      :link: ./core/node
+      :link-type: doc
+
+      A node (vertex) in a network.
+
+   .. grid-item-card:: ━ Edge
+      :link: ./core/edge
+      :link-type: doc
+
+      An edge connecting two nodes in a network.
+
+   .. grid-item-card:: 🕸️ Network
+      :link: ./core/network
+      :link-type: doc
+
+      A topological network composed of nodes and edges.
+
+
+
+.. grid:: 3
+   :gutter: 2
+
+   .. grid-item-card:: 🗺️ AFMap
+      :link: ./core/afmap
+      :link-type: doc
+
+      Represents an analytical feature as a collection of named value matrices.
+
+   .. grid-item-card:: ▦ Raster
+      :link: ./core/raster
+      :link-type: doc
+
+      Represents a collection of AFMaps, each describing a different analytical feature.
+
+   .. grid-item-card:: 📊 AFBand
+      :link: ./core/band
+      :link-type: doc
+
+      Represents an aggregate of matrix values, such as `sum`, `count`, or `avg`.
+
 
 .. toctree::
   :maxdepth: 1
@@ -67,8 +138,17 @@ Core Package
   GeoCoords <./core/geocoords>
   ENUCoords <./core/enucoords>
   ECEFCoords <./core/ecefcoords>
-  Bounding Box <./core/bbox>
   ObsTime <./core/obstime>
   Observation <./core/obs>
   Track <./core/track>
+  Bounding Box <./core/bbox>
   TrackCollection <./core/trackcollection>
+  Kernels <./core/kernel>
+  Operators <./core/operator>
+  SpatialIndex <./core/spatialindex>
+  Node <./core/node>
+  Edge <./core/edge>
+  Network <./core/network>
+  AFMap <./core/afmap>
+  AFBand <./core/band>
+  Raster <./core/raster>

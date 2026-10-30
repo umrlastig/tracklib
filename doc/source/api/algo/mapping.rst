@@ -7,8 +7,7 @@ Mapping
 .. py:module:: algo.mapping
 
 
-This page presents four methods for mapping GNSS trajectories on geographic features like transport network
-or inversement, mapping geographic features on GNSS trajectories like mnt or a another track.
+This page presents four methods for mapping GNSS trajectories onto geographic features, such as a transport network, and conversely, for mapping geographic features, such as a digital elevation model (DEM) or another track, onto GNSS trajectories.
 
 
 .. autosummary::
