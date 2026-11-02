@@ -1,4 +1,5 @@
 from unittest import TestCase, TestSuite, TextTestRunner
+import matplotlib.pyplot as plt
 import os.path
 
 from tracklib import (ENUCoords, ObsTime, Obs, 
@@ -146,6 +147,18 @@ class TestTrackCollection(TestCase):
         T = tracks[uids]
         self.assertEqual(T.size(), 2)
 
+
+    def test_attract_obs_to_other_tracks(self):
+        resource_path = os.path.join(self.resource_path, 'test/data/collection1/')
+        collection = TrackReader.readFromCsv(resource_path, 0, 1, 2, 3, h=1, separator=";")
+        # print ('    Number of tracks cutted: ', len(collection))
+
+        collection.plot()
+        plt.show()
+
+        collection.attract_obs_to_other_tracks(10, 0.8)
+        collection.plot()
+        plt.show()
         
         
 if __name__ == '__main__':
@@ -155,5 +168,9 @@ if __name__ == '__main__':
     suite.addTest(TestTrackCollection("test_collection_operation"))
     suite.addTest(TestTrackCollection("test_collection_segmentation"))
     suite.addTest(TestTrackCollection("test_collection_getitem"))
+    suite.addTest(TestTrackCollection("test_attract_obs_to_other_tracks"))
     runner = TextTestRunner()
     runner.run(suite)
+
+
+

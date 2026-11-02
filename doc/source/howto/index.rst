@@ -11,12 +11,25 @@ Processing Guides
 This section contains practical guides for common Tracklib processing tasks.
 
 
-Comparison
-"""""""""""
+:fas:`bezier-curve fa-1x` Geometry transformations 
+""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-..      Compare two trajectories and quantify their similarity.
-..      Merge several trajectories into a representative track.
+Smoothing, Filtering, Simplification, Resampling, ...
 
+.. nbgallery::
+   :name: geomtransform-gallery
+   :glob:
+
+   Apply a Band-Stop Fourier filter <FIL_Band-stopFourierFilter>
+   Interpolate a Track <INT_Interpolation>
+   Conflating Geometries onto a Network <INT_Conflate>
+   Simplify GNSS Tracks <SIMP_Simplification>
+   Squaring algorithm <SIMP_Squaring>
+
+
+
+:fas:`code-compare fa-1x` Trajectory comparison
+""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. nbgallery::
    :name: comparison-gallery
@@ -24,31 +37,26 @@ Comparison
 
    Matching Two Tracks <COMP_Matching>
    Aggregate Trajectories <COMP_Fusion>
-   
 
-Filtering
-""""""""""
-
-.. nbgallery::
-   :name: filtering-gallery
-   :glob:
-
-   Apply a Band-Stop Fourier filter <FIL_Band-stopFourierFilter>
+..      Compare two trajectories and quantify their similarity.
+..      Merge several trajectories into a representative track.
+..  and conflation
 
 
-Interpolation
-"""""""""""""""
+:fas:`scissors fa-1x` Trajectory segmentation
+""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. nbgallery::
-   :name: interpolation-gallery
+   :name: segmentation-gallery
    :glob:
 
-   Interpolate a Track <INT_Interpolation>
-   Conflating Geometries onto a Network <INT_Conflate>
+   Segment a Track <SEG_Segmentation>
+   Detect Return Trips <SEG_ReturnTrip>
 
 
-Mapping
-"""""""""""""""
+
+:fas:`link fa-1x` Mapping 
+""""""""""""""""""""""""""
 
 .. nbgallery::
    :name: mapping-gallery
@@ -59,52 +67,9 @@ Mapping
    Align two tracks <MAP_MapOn>
 
 
-Segmentation
-"""""""""""""""
 
-.. nbgallery::
-   :name: segmentation-gallery
-   :glob:
-
-   Segment a Track <SEG_Segmentation>
-   Detect Return Trips <SEG_ReturnTrip>
-
-
-Selection
-"""""""""""""""
-
-.. nbgallery::
-   :name: selection-gallery
-   :glob:
-
-   Query a Track with SQL-like Commands <SEL_Query>
-   Select GNSS Tracks <SEL_Selection>
-
-
-Simplification
-"""""""""""""""
-
-.. nbgallery::
-   :name: simplification-gallery
-   :glob:
-
-   Simplify GNSS Tracks <SIMP_Simplification>
-   Squaring algorithm <SIMP_Squaring>
-
-
-Summarizing
-""""""""""""
-
-
-.. nbgallery::
-   :name: summarizing-gallery
-   :glob:
-
-   Build an Analytical Feature Map <SUM_AFMap>
-
-
-Synthetic Tracks
-""""""""""""""""""
+:fas:`dna fa-1x` Synthetic trajectory generation
+""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. nbgallery::
    :name: synthetic-gallery
@@ -116,15 +81,36 @@ Synthetic Tracks
 
 
 
+:fas:`chart-line fa-1x` Trajectory summarization
+""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. nbgallery::
+   :name: summarizing-gallery
+   :glob:
+
+   Build an Analytical Feature Map <SUM_AFMap>
+
+
+
+:fas:`magnifying-glass fa-1x` Selection and Querying
+""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. nbgallery::
+   :name: selection-gallery
+   :glob:
+
+   Query a Track with SQL-like Commands <SEL_Query>
+   Select GNSS Tracks <SEL_Selection>
+
+
+
 .. Computing analytical features
 .. Creating custom analytical features   
    
    
 
-
-
 .. raw:: html
 
    <br />
    <br/>
-
+   <br/>

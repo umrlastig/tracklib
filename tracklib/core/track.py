@@ -57,7 +57,6 @@ import numpy as np
 from . import (ObsTime, ENUCoords, GeoCoords, Obs, 
                isnan, listify, NAN, isfloat,
                compLike, makeRPN,
-               TrackCollection,
                DiracKernel, GaussianKernel,
                Bbox,
                co_median)
@@ -65,6 +64,7 @@ from tracklib.util import intersection, Polygon
 from tracklib.util.exceptions import QueryError, AnalyticalFeatureError, OperatorError
 from tracklib.util.exceptions import AnalyticalFeatureWarning
 from tracklib.plot import IPlotVisitor, MatplotlibVisitor
+
 from tracklib.algo import (BIAF_SPEED, BIAF_ABS_CURV, 
                            computeAbsCurv, 
                            resample, MODE_SPATIAL,
@@ -2399,6 +2399,8 @@ class Track:
         """
         [/] Even split of tracks (returns n+1 segments)
         """
+        from tracklib.core.track_collection import TrackCollection
+
         N = (int)(self.size() / number)
         #R = self.size() - N * number
         SPLITS = TrackCollection()
