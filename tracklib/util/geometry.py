@@ -56,6 +56,9 @@ Definition of some geometric functions
 #    - proj_segment
 #    - proj_polyligne
 
+#    - segment_to_segment_distance
+#    - line_proximity
+
 #    - triangle_area
 #    - aire_visval
 
@@ -80,7 +83,7 @@ from __future__ import annotations
 import math
 import numpy as np
 
-import tracklib as tracklib
+import tracklib as tkl
 from tracklib.core import ObsTime, Obs, makeCoords, ENUCoords
 
 
@@ -367,6 +370,37 @@ def segment_to_segment_distance(a1:ENUCoords, a2:ENUCoords, b1:ENUCoords, b2:ENU
     )
 
 
+def line_proximity(track1: tkl.Track, track2: tkl.Track) -> float:
+    '''
+    Distance minimum entre deux traces, le point n'est pas forcément un vertex.
+
+    Parameters
+    ----------
+    track1 : Track
+        DESCRIPTION.
+    track2 : Track
+        DESCRIPTION.
+
+    Returns
+    -------
+    min_dist : TYPE
+        DESCRIPTION.
+
+    '''
+    min_dist = float('inf')
+
+    for i in range(track1.size() - 1):
+        p1i = track1.getObs(i).position
+        p1i1 = track1.getObs(i+1).position
+        for j in range(track2.size() - 1):
+            p2j = track2.getObs(j).position
+            p2j1 = track2.getObs(j+1).position
+            d = tkl.segment_to_segment_distance (p1i, p1i1, p2j, p2j1)
+            if d < min_dist:
+                min_dist = d
+
+    return min_dist
+
 
 # --------------------------------------------------------------------------
 # Function to detect if a point is on left or right side of track
@@ -418,12 +452,12 @@ def detect_side(track, x, y, seuilMemeProj=0.1):
 
         dist, xp, yp = proj_segment([xa, ya, xb, yb], x, y)
 
-        # abscurv = tracklib.computeAbsCurvAnotherPoint(track, xp, yp)
+        # abscurv = tkl.computeAbsCurvAnotherPoint(track, xp, yp)
         if iproj == 0:
-            abscurv = track.getFirstObs().distanceTo(tracklib.Obs(tracklib.ENUCoords(xp, yp), tracklib.ObsTime()))
+            abscurv = track.getFirstObs().distanceTo(tkl.Obs(tkl.ENUCoords(xp, yp), tkl.ObsTime()))
         else:
-            d = track[iproj].distanceTo(tracklib.Obs(tracklib.ENUCoords(xp, yp), tracklib.ObsTime()))
-            abscurv = tracklib.computeCurvAbsBetweenTwoPoints(track, 0, iproj) + d
+            d = track[iproj].distanceTo(tkl.Obs(tkl.ENUCoords(xp, yp), tkl.ObsTime()))
+            abscurv = tkl.computeCurvAbsBetweenTwoPoints(track, 0, iproj) + d
 
         if pdt > 0:
             SIDES.append((dist, xp, yp, 1, abscurv))
@@ -453,7 +487,7 @@ def triangle_area(x0, y0, x1, y1, x2, y2):
 """ Pour calculer l'aire des triangles dans Visvalingam """
 
 
-def aire_visval(track, i):
+def aire_visval(track: tkl.Track, i) -> float:
     x0 = track.getObs(i - 1).position.getX()
     y0 = track.getObs(i - 1).position.getY()
     x1 = track.getObs(i).position.getX()
@@ -530,7 +564,7 @@ def intersection(track1, track2, withTime=-1):
         print("Error: tracks must have same SRID to compute intersections")
         exit()
 
-    I = tracklib.Track()
+    I = tkl.Track()
     TMP_I = []
     TMP_J = []
     TMP_TPS2 = []
