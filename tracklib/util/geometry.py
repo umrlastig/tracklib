@@ -81,7 +81,7 @@ import math
 import numpy as np
 
 import tracklib as tracklib
-from tracklib.core import ObsTime, Obs, makeCoords
+from tracklib.core import ObsTime, Obs, makeCoords, ENUCoords
 
 
 def cartesienne(segment) -> list[float, float, float, float]:
@@ -302,6 +302,7 @@ def proj_segment(segment, x, y):
             return distance2, x2, y2
 
 
+
 # -----------------------------------------------
 # Fonction complète de projection entre un
 #          point et une polyligne
@@ -336,6 +337,34 @@ def proj_polyligne(Xp, Yp, x, y):
 
     return distmin, xproj, yproj, iproj
 
+
+def segment_to_segment_distance(a1:ENUCoords, a2:ENUCoords, b1:ENUCoords, b2:ENUCoords) -> float:
+    """
+    Compute the minimum distance between two line segments defined by observation coordinates.
+
+    Parameters
+    ----------
+    a1 : ENUCoords
+        DESCRIPTION.
+    a2 : ENUCoords
+        DESCRIPTION.
+    b1 : ENUCoords
+        DESCRIPTION.
+    b2 : ENUCoords
+        DESCRIPTION.
+
+    Returns
+    -------
+    float
+        the minimum distance between two line segments. 
+
+    """
+    return min (
+        distance_to_segment(a1.getX(), a1.getY(), b1.getX(), b1.getY(), b2.getX(), b2.getY()),
+        distance_to_segment(a2.getX(), a2.getY(), b1.getX(), b1.getY(), b2.getX(), b2.getY()),
+        distance_to_segment(b1.getX(), b1.getY(), a1.getX(), a1.getY(), a2.getX(), a2.getY()),
+        distance_to_segment(b2.getX(), b2.getY(), a1.getX(), a1.getY(), a2.getX(), a2.getY()),
+    )
 
 
 
