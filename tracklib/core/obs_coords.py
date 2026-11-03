@@ -88,7 +88,7 @@ class GeoCoords:
         return output
 
     def toWKT(self):
-        return "POINT (" + "{:12.9f}".format(self.lon) + " " + "{:11.9f}".format(self.lat) + ")"
+        return "POINT (" + "{:12.9f}".format(self.lon).strip() + " " + "{:11.9f}".format(self.lat).strip() + ")"
     
     def copy(self) -> GeoCoords:   
         """TODO"""
@@ -280,7 +280,7 @@ class ENUCoords:
         return output
 
     def toWKT(self):
-        return "POINT (" + "{:12.3f}".format(self.E) + " " + "{:12.3f}".format(self.N) + ")"
+        return "POINT (" + "{:12.3f}".format(self.E).strip() + " " + "{:12.3f}".format(self.N).strip() + ")"
 
     def __eq__(self, other):
         
@@ -537,7 +537,7 @@ class ECEFCoords:
         return output
 
     def toWKT(self):
-        return "POINT (" + "{:12.3f}".format(self.lon) + " " + "{:11.3f}".format(self.lat) + ")"
+        return "POINT (" + "{:12.3f}".format(self.lon).strip() + " " + "{:11.3f}".format(self.lat).strip() + ")"
 
     def copy(self) -> ECEFCoords:   
         """Copy the current object
