@@ -58,6 +58,7 @@ Definition of some geometric functions
 
 #    - segment_to_segment_distance
 #    - line_proximity
+#    - nearest_points
 
 #    - triangle_area
 #    - aire_visval
@@ -341,65 +342,37 @@ def proj_polyligne(Xp, Yp, x, y):
     return distmin, xproj, yproj, iproj
 
 
-def segment_to_segment_distance(a1:ENUCoords, a2:ENUCoords, b1:ENUCoords, b2:ENUCoords) -> float:
+def nearest_points(track1: tkl.Track, track2: tkl.Track) -> tuple[int, int, float]:
     """
-    Compute the minimum distance between two line segments defined by observation coordinates.
+    Return the indices of the two closest observations, one from each track,
+    along with the distance between them.
 
     Parameters
     ----------
-    a1 : ENUCoords
-        DESCRIPTION.
-    a2 : ENUCoords
-        DESCRIPTION.
-    b1 : ENUCoords
-        DESCRIPTION.
-    b2 : ENUCoords
-        DESCRIPTION.
+    track1 : tkl.Track
+        First input track.
+    track2 : tkl.Track
+        Second input track.
 
     Returns
     -------
-    float
-        the minimum distance between two line segments. 
+    tuple
+        A tuple containing the index in each track and the distance between the observations.
 
     """
-    return min (
-        distance_to_segment(a1.getX(), a1.getY(), b1.getX(), b1.getY(), b2.getX(), b2.getY()),
-        distance_to_segment(a2.getX(), a2.getY(), b1.getX(), b1.getY(), b2.getX(), b2.getY()),
-        distance_to_segment(b1.getX(), b1.getY(), a1.getX(), a1.getY(), a2.getX(), a2.getY()),
-        distance_to_segment(b2.getX(), b2.getY(), a1.getX(), a1.getY(), a2.getX(), a2.getY()),
-    )
-
-
-def line_proximity(track1: tkl.Track, track2: tkl.Track) -> float:
-    '''
-    Distance minimum entre deux traces, le point n'est pas forcément un vertex.
-
-    Parameters
-    ----------
-    track1 : Track
-        DESCRIPTION.
-    track2 : Track
-        DESCRIPTION.
-
-    Returns
-    -------
-    min_dist : TYPE
-        DESCRIPTION.
-
-    '''
-    min_dist = float('inf')
-
-    for i in range(track1.size() - 1):
-        p1i = track1.getObs(i).position
-        p1i1 = track1.getObs(i+1).position
-        for j in range(track2.size() - 1):
-            p2j = track2.getObs(j).position
-            p2j1 = track2.getObs(j+1).position
-            d = tkl.segment_to_segment_distance (p1i, p1i1, p2j, p2j1)
-            if d < min_dist:
-                min_dist = d
-
-    return min_dist
+    maxd = float('inf')
+    idxi = -1
+    idxj = -1
+    for i in range(track1.size()):
+        o1 = track1.getObs(i)
+        for j in range(track2.size()):
+            o2 = track2.getObs(j)
+            d = o1.position.distance2DTo(o2.position)
+            if d < maxd:
+                idxi = i
+                idxj = j
+                maxd = d
+    return (idxi, idxj, maxd)
 
 
 # --------------------------------------------------------------------------
