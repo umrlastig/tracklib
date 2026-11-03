@@ -388,6 +388,12 @@ class Network:
                 self.addEdge(e1, source, n1)
                 self.addEdge(e2, n1, target)
 
+        else:
+            # on crée juste le noeud avec le premier point
+            n1 = tracklib.Node(cptNode, od.position)
+            cptNode += 1
+
+
         #print (network.getNumberOfNodes())
 
         ## On raccroche l'Arrivée si besoin
@@ -455,6 +461,10 @@ class Network:
                 self.addEdge(e1, source, n2)
                 self.addEdge(e2, n2, target)
 
+        else:
+            # on crée juste le noeud avec le premier point
+            n2 = tracklib.Node(cptNode, oa.position)
+            cptNode += 1
 
         #print (network.getNumberOfNodes())
         #print ('')
