@@ -176,6 +176,8 @@ def distance_to_segment(x0: float, y0: float, x1: float, y1: float, x2: float, y
 
     # Segment length
     l = math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
+    if l == 0:
+        return float("nan")
 
     # Normalized scalar product
     psn = ((x0 - x1) * (x2 - x1) + (y0 - y1) * (y2 - y1)) / l
