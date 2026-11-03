@@ -56,8 +56,6 @@ Definition of some geometric functions
 #    - proj_segment
 #    - proj_polyligne
 
-#    - segment_to_segment_distance
-#    - line_proximity
 #    - nearest_points
 
 #    - triangle_area
@@ -510,25 +508,24 @@ def isSegmentIntersects(segment1, segment2):
     return (val1 <= 0) & (val2 <= 0)
 
 
-def intersection(track1, track2, withTime=-1):
+def intersection(track1: tkl.Track, track2: tkl.Track, withTime=-1):
     """
     Intersection between 2 tracks.
 
-    withTime: time constraint (in secs). 
-    (-1 if no time constraint)
+    withTime: time constraint (in secs). (-1 if no time constraint)
 
     Parameters
     ----------
-    track1 : TYPE
+    track1 : Track
         DESCRIPTION.
-    track2 : TYPE
+    track2 : Track
         DESCRIPTION.
     withTime : TYPE, optional
         DESCRIPTION. The default is -1.
 
     Returns
     -------
-    I : TYPE
+    I : Track
         DESCRIPTION.
 
     """
