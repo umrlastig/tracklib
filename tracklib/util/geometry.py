@@ -472,12 +472,28 @@ def isSegmentIntersects(segment1, segment2):
     return (val1 <= 0) & (val2 <= 0)
 
 
-# ----------------------------------------
-# Intersection between 2 tracks
-# withTime: time constraint (in secs)
-# (-1 if no time constraint)
-# ----------------------------------------
 def intersection(track1, track2, withTime=-1):
+    """
+    Intersection between 2 tracks.
+
+    withTime: time constraint (in secs). 
+    (-1 if no time constraint)
+
+    Parameters
+    ----------
+    track1 : TYPE
+        DESCRIPTION.
+    track2 : TYPE
+        DESCRIPTION.
+    withTime : TYPE, optional
+        DESCRIPTION. The default is -1.
+
+    Returns
+    -------
+    I : TYPE
+        DESCRIPTION.
+
+    """
 
     if not (track1.getSRID() == track2.getSRID()):
         print("Error: tracks must have same SRID to compute intersections")
