@@ -402,8 +402,9 @@ class TrackReader:
 
         with open(path, "rb") as fp:
             line = str(fp.readline())
+
             while not (line in ["", "b''"]):
-            
+
                 # For date
                 if ("$GPRMC" in line) or ("$GNRMC" in line):
                     date_chiffres = line.split(",")[9]
@@ -417,6 +418,9 @@ class TrackReader:
                     if "$GNGGA" in line:
                         code = "$GNGGA"
                     frame = line.split(code)[1]
+                    if (",,," in frame):
+                        line = str(fp.readline())
+                        continue
                     fields = frame.split(",")
                     h = int(fields[1][0:2])
                     m = int(fields[1][2:4])

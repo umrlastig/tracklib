@@ -256,6 +256,15 @@ def mapOnNetwork(
 ##    #Transition model factor beta = 0.2
 ##    print ('Search radius = ' + str(searchradius) + ' m')
     
+# Method to get map-matched coordinates 
+def unpack_mm(track):
+    out = track.copy()
+    for i in range(len(track)):
+        out["x", i] = track["hmm_inference", i][0].getX()
+        out["y", i] = track["hmm_inference", i][0].getY()
+    return out
+	
+    
 
 def mapOnRaster(track, raster):
     """
