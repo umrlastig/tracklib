@@ -59,11 +59,22 @@ class Topology:
 
     @staticmethod
     def create_topology(input_file, srid, output_file, tbp=1e-6, verbose=False):
-        '''
-          Create base topology network
+        """
+        Create a base topological network.
 
-        @param tbp 
-        '''
+        Parameters
+        ----------
+        input_file : str
+            Path to a text file containing a list of line or multiline geometries in WKT format.
+        srid : str 
+            Coordinate reference system of the geometry vertices.
+        output_file : str
+            Path to the output file where the topology will be stored.
+        
+        Returns
+        -------
+        None
+        """
 
         network = Network(tbp)
 
@@ -114,6 +125,61 @@ class Topology:
         network.writeAsWkt(output_file)
 
 
+    @staticmethod
+    def create_geoms_topology(collection, tbp=1e-6, verbose=False):
+        """
+        Create a base topological network from a TrackCollection.
+
+        Parameters
+        ----------
+        collection : TrackCollection
+            Collection representing the geometry of the edges used to build the topology.
+        tbp : float, optional
+            Tolerance used for geometric matching (default is 1e-6).
+        verbose : bool, optional
+            If True, enables detailed logging during topology construction.
+    
+        Returns
+        -------
+        list of tuple
+            Each tuple contains:
+            (edge_id, source_node_id, target_node_id, line_wkt)
+        """
+
+        network = Network(tbp)
+
+        for track in collection:
+            geom = []
+            for o in track:
+                x = o.position.getX()
+                y = o.position.getY()
+                geom.append((float(x), float(y)))
+            network.addEdge(geom)
+
+        NODES = network.getListOfNodes()
+        TOREM = []
+        for i, node in enumerate(NODES):
+            deg = network.getDegree(i)
+            if deg == 2:
+                TOREM.append(i)
+        #for idx in TOREM:
+        #    network.removeDeg2Node(idx)
+
+        GEOMS = []
+        for i in range(network.edge_counter):
+            if not i in network.edges:
+                continue
+            idx1 = str(network.edges[i].ini)
+            idx2 = str(network.edges[i].end)
+            idedge = str(i)
+            line  = "LINESTRING("
+            for j in range(len(network.edges[i].geom)):
+                line += str(network.edges[i].geom[j][0])+" "+str(network.edges[i].geom[j][1])
+                if j < len(network.edges[i].geom)-1:
+                    line += ","
+            line += ")"
+            GEOMS.append((idedge, idx1, idx2, line))
+        return GEOMS
 
 
 # -----------------------------------------------------------

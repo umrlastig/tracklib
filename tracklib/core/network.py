@@ -54,6 +54,7 @@ import random
 #from typing import Union
 import progressbar
 import numpy as np
+import math
 import matplotlib.pyplot as plt
 
 from tracklib.util.exceptions import NetworkError
@@ -83,6 +84,7 @@ class Node:
     def __str__(self) -> str:
         """Node to string"""
         return "Node object: " + str(self.id)
+
 
     def __lt__(self, other: Node) -> bool:
         """Check if a node is bigger than the current node
@@ -134,6 +136,13 @@ class Node:
         else:
             ax1 = plt
         ax1.plot(self.coord.getX(), self.coord.getY(), sym)
+
+    def copy(self):
+        """Copy the current object
+
+        :return: Copy of edge
+        """
+        return copy.deepcopy(self)
 
 
 class Edge:
@@ -229,6 +238,8 @@ class Network:
                 self.PREV_NODES[node.id] = []
             if node.id not in self.NBGR_NODES.keys():
                 self.NBGR_NODES[node.id] = []
+        #else:
+        #    raise NetworkError("Node id already exist.")
 
     def addEdge(self, edge: Edge, source: Node, target: Node):
         """Add a :class:`Edge` to the current :class:`Network`
@@ -271,11 +282,212 @@ class Network:
         self.NBGR_NODES[target.id].append(source.id)
 
         if not self.spatial_index is None:
-            self.spatial_index.addFeature(edge.geom, self.getNumberOfEdges() - 1)
+            self.spatial_index.addFeature(edge.geom, self.getNumberOfEdges()-1)
+
+
+    def addTrackAsEdge(self, track, tolerance=1):
+        """
+        Add a track as an edge to a network, snapping it to the network
+        within a given tolerance.
+
+        This operation handles the splitting of existing edges when snapping
+        occurs away from their endpoints. However, it does not handle the
+        short line segments that may be created by this splitting operation.
+
+        Note:
+            This operation does not handle cases where the track is very close
+            to an existing edge but does not intersect it.
+
+
+        Parameters
+        ----------
+        track : Track
+            Track representing the network edge to be added.
+        tolerance : float, optional
+            Maximum snapping distance. 
+            The default is 10.
+
+        Returns
+        -------
+        None.
+        """
+
+        proximity = 0.1
+
+        # Futurs identifiants
+        nodevalues = [int(x) for x in self.getIndexNodes() if str(x).strip() != '']
+        cptNode = max(nodevalues) + 1
+        edgevalues = [int(x) for x in self.getIndexEdges() if str(x).strip() != '']
+        cptEdge = max(edgevalues) + 1
+
+
+        ## On raccroche le Départ si besoin
+        od = track.getFirstObs()
+        do = float('inf')
+        io = -1
+        ed = None
+        xp = None
+        yp = None
+        for edge in self:
+            geomedge = edge.geom
+            distmin, xproj, yproj, iproj = tracklib.proj_polyligne(geomedge.getX(), geomedge.getY(),
+                                                              od.position.getX(), od.position.getY())
+            if distmin < do:
+                do = distmin
+                xp = xproj
+                yp = yproj
+                io = iproj
+                ed = edge
+
+        # print (network.getNumberOfNodes())
+        # print (ed.geom.toWKT())
+
+        if do < tolerance and do > 0:
+            # print ('OK départ')
+
+            plt.scatter(xp, yp, color='red')
+            od = tracklib.Obs(tracklib.ENUCoords(xp,  yp, 0), tracklib.ObsTime())
+            # print (od.position.toWKT())
+
+            # On ajoute la topologie
+            p1 = ed.source.coord
+            p2 = ed.target.coord
+            if od.position.distanceTo(p1) <= proximity or od.position.distanceTo(p2) <= proximity:
+                # Noeud existe
+                if od.position.distanceTo(p1) <= proximity:
+                    n1 = ed.source
+                if od.position.distanceTo(p2) <= proximity:
+                    n1 = ed.target
+
+                track.insertObs(tracklib.Obs(tracklib.ENUCoords(n1.coord.getX(),  n1.coord.getY(), 0), tracklib.ObsTime()), 0)
+
+            else:
+                track.insertObs(od, 0)
+
+                source = ed.source.copy()
+                target = ed.target.copy()
+
+                n1 = tracklib.Node(cptNode, od.position)
+                cptNode += 1
+
+                # On coupe
+                t1 = ed.geom.extract(0, io)
+                t1.addObs(od)
+                e1 = tracklib.Edge(cptEdge, t1)
+                # print ("e1:", e1.id)
+                cptEdge +=1
+
+                t2 = ed.geom.extract(io, ed.geom.size()-1)
+                t2.insertObs(od, 0)
+                e2 = tracklib.Edge(cptEdge, t2)
+                # print ("e2:", e2.id)
+                cptEdge +=1
+
+                # print ("supp:", ed.id)
+                self.removeEdge(ed)
+                self.addEdge(e1, source, n1)
+                self.addEdge(e2, n1, target)
+
+        else:
+            # on crée juste le noeud avec le premier point
+            n1 = tracklib.Node(cptNode, od.position)
+            cptNode += 1
+
+
+        #print (network.getNumberOfNodes())
+
+        ## On raccroche l'Arrivée si besoin
+        oa = track.getLastObs()
+        da = 1000000
+        ia = -1
+        ea = None
+        xp = None
+        yp = None
+        for edge in self:
+            # print (edge.id)
+            geomedge = edge.geom
+            distmin, xproj, yproj, iproj = tracklib.proj_polyligne(geomedge.getX(), geomedge.getY(),
+                                                              oa.position.getX(), oa.position.getY())
+            if distmin < da:
+                da = distmin
+                xp = xproj
+                yp = yproj
+                ia = iproj
+                ea = edge
+
+        # print (network.getNumberOfNodes())
+        # print (ea.geom.toWKT(), ea.id)
+
+        if da < tolerance and da > 0:
+            # print ('OK arrivée')
+
+            plt.scatter(xp, yp, color='blue')
+            oa = tracklib.Obs(tracklib.ENUCoords(xp,  yp, 0), tracklib.ObsTime())
+            # print (oa.position.toWKT())
+
+            # On ajoute la topologie
+            p1 = ea.source.coord
+            p2 = ea.target.coord
+            if oa.position.distanceTo(p1) <= proximity or oa.position.distanceTo(p2) <= proximity:
+                # Noeud existe
+                if oa.position.distanceTo(p1) <= proximity:
+                    n2 = ea.source
+                if oa.position.distanceTo(p2) <= proximity:
+                    n2 = ea.target
+
+                track.addObs(tracklib.Obs(tracklib.ENUCoords(n2.coord.getX(),  n2.coord.getY(), 0), tracklib.ObsTime()))
+
+            else:
+                track.addObs(oa)
+
+                source = ea.source.copy()
+                target = ea.target.copy()
+
+                n2 = tracklib.Node(cptNode, oa.position)
+                cptNode += 1
+
+                # On coupe
+                t1 = ea.geom.extract(0, ia)
+                t1.addObs(oa)
+                e1 = tracklib.Edge(cptEdge, t1)
+                cptEdge +=1
+
+                t2 = ea.geom.extract(ia, ea.geom.size()-1)
+                t2.insertObs(oa, 0)
+                e2 = tracklib.Edge(cptEdge, t2)
+                cptEdge +=1
+
+                self.removeEdge(ea)
+                self.addEdge(e1, source, n2)
+                self.addEdge(e2, n2, target)
+
+        else:
+            # on crée juste le noeud avec le premier point
+            n2 = tracklib.Node(cptNode, oa.position)
+            cptNode += 1
+
+        #print (network.getNumberOfNodes())
+        #print ('')
+
+
+        # -------------------------------------------------------------------------
+        # On ajoute le nouvel arc
+
+        e1 = tracklib.Edge(cptEdge, track)
+        cptEdge +=1
+
+        self.addEdge(e1, n1, n2)
+
+
+        # ---------------------------------------------------------------------
+        ## On gère les intersections
+
 
     def removeEdge(self, edge: Edge):
-        """Remove a :class:`Edge` to the current :class:`Network`
-        Topology is not handled here and must be managed by the caller.
+        """
+        Remove a :class:`Edge` to the current :class:`Network`
+        
+        The index is not handled here and must be managed by the caller.
 
         :param edge: Edge to remove
         """
@@ -315,12 +527,15 @@ class Network:
             if ni.id in self.PREV_NODES and nf.id in self.PREV_NODES[ni.id]:
                 self.PREV_NODES[ni.id].remove(nf.id)
 
+        idx = self.__idx_edges.index(edge.id)
         del self.EDGES[edge.id]
         self.__idx_edges.remove(edge.id)
 
-        # TODO
-        # if not self.spatial_index is None:
-        #    self.spatial_index.addFeature(edge.geom, self.getNumberOfEdges() - 1)
+        if len(self.getIncidentEdges(nf.id)) == 0:
+            self.removeNode(nf)
+        if len(self.getIncidentEdges(ni.id)) == 0:
+            self.removeNode(ni)
+
 
     def removeNode(self, node: Node):
         """Remove a class:`Node` to the current :class:`Network`
@@ -514,6 +729,8 @@ class Network:
 
         :param node_id: id of a node
         """
+        if node_id not in self.NBGR_NODES:
+            return []
         return self.NBGR_NODES[node_id]
 
     def getIncidentEdges(self, node_id: int):
@@ -521,6 +738,8 @@ class Network:
 
         :param node_id: id of a node
         """
+        if node_id not in self.NBGR_EDGES:
+            return []
         return self.NBGR_EDGES[node_id]
 
     def degree(self, node_id: int) -> int:
@@ -678,7 +897,11 @@ class Network:
         """
         tracks = TrackCollection()
         for id in self.__idx_edges:
-            tracks.addTrack(self.EDGES[id].geom)
+            track = Track(self.EDGES[id].geom.getObsList())
+            track.uid = id
+            track.tid = id
+            tracks.addTrack(track)
+            # self.EDGES[id].geom
         return tracks
 
     def bbox(self) -> Bbox:

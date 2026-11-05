@@ -66,12 +66,10 @@ class SpatialIndex:
     def __init__(self, collection, resolution=None, margin=0.05, verbose=True):
         """Constructor of :class:`SaptialIndex` class
 
-        TODO: update documentation
-
         Parameters
         ----------
-        features : bbox() + iterable
-
+        collection : iterable
+            Iterable collection of tracks providing a ``bbox()`` method.
 
             TrackCollection : on construit une grille
                 dont l’emprise est calculée sur la fonction getBBox
@@ -117,7 +115,7 @@ class SpatialIndex:
 
         self.collection = collection
 
-        # Keeps track of registered features
+        # Keeps info of registered features
         self.inventaire = set()
 
         # Nombre de dalles par cote
@@ -167,22 +165,38 @@ class SpatialIndex:
         output += "spatial index centered on [" + str(c[0]) + "; " + str(c[1]) + "]"
         return output
 
+
     def bbox(self):
-        """TODO"""
+        """
+        Return the spatial extent covered by the index.
+        """
         if self.srid == 'GEO':
             ll = GeoCoords(self.xmin, self.ymin)
-            ur = GeoCoords(self.xmin, self.ymin)
+            ur = GeoCoords(self.xmax, self.ymax)
             return Bbox(ll, ur)
         if self.srid == 'ENU':
             ll = ENUCoords(self.xmin, self.ymin)
-            ur = ENUCoords(self.xmin, self.ymin)
+            ur = ENUCoords(self.xmax, self.ymax)
             return Bbox(ll, ur)
         return None
         
-    # ------------------------------------------------------------
-    # Returns true if a coord p is in grid extent
-    # ------------------------------------------------------------
+
     def covers(self, p):
+        """
+        Returns true if a coord p is in grid extent.
+
+        Parameters
+        ----------
+        p : {ENUCoords, GeoCoords, ECEFCoords}
+            Coordinates for which coverage is to be tested.
+        
+        Returns
+        -------
+        bool
+            True if the observation coordinates lie within the grid extent,
+            False otherwise.
+        """
+
         if (p.getX() < self.xmin):
             return False
         if (p.getY() < self.ymin):
@@ -193,8 +207,26 @@ class SpatialIndex:
             return False
         return True
 
+
     def addFeature(self, track, num):
-        """TODO"""
+        """
+        Add a new track to the index using the identifier ``num``, which
+        corresponds to the track index within the collection.
+        
+        The caller must ensure that the identifier ``num`` is not already in use
+        and corresponds exactely to the index of the collection.
+        
+        Parameters
+        ----------
+        track : Track
+            Track to be indexed.
+        num : str
+            Identifier corresponding to the track index in the collection.
+        
+        Returns
+        -------
+        None.
+        """
         coord1 = None
         for i in range(track.size()):
             obs = track.getObs(i)
@@ -207,13 +239,34 @@ class SpatialIndex:
                 self.__addSegment(p1, p2, num)
             coord1 = coord2
 
-    def __addSegment(self, coord1, coord2, data):
-        """TODO
 
-        data de type: int, liste, tuple, dictionnaire
+    def removeFeature(self, num):
+        """
+        Remove a track from the index but NONE in the collection.
+
+
+        Parameters
+        ----------
+        num : str
+            Identifier corresponding to the track index in the collection..
+
+        Returns
+        -------
+        None.
+
+        """
+        for i in range(self.csize):
+            for j in range(self.lsize):
+                if num in self.grid[i][j]:
+                    self.grid[i][j] = [v for v in self.grid[i][j] if v != num]
+
+
+    def __addSegment(self, coord1, coord2, data):
+        """
+        data de type: int, liste, tuple, dictionnaire.
         ajoute les données data dans toutes les cellules de la grille
-               traversée par le segment [coord1, coord2] avec
-               coord1 : indices de la grille
+        traversée par le segment [coord1, coord2] avec
+        coord1 : indices de la grille.
         """
         CELLS = self.__cellsCrossSegment(coord1, coord2)
         if CELLS is None:
@@ -271,8 +324,8 @@ class SpatialIndex:
     def plot(self, base:bool=True, append=True):
         """
         Plot spatial index and collection structure together in the
-        same reference frame (geographic reference frame)
-            - base: plot support network or track collection if True
+        same reference frame (geographic reference frame).
+        base: plot support network or track collection if True
         """
         
         if isinstance(append, bool):
@@ -283,16 +336,12 @@ class SpatialIndex:
         else:
             ax1 = plt
             
-        #fig = plt.figure()
-        #ax = fig.add_subplot(
-        #    111, xlim=(si.xmin, si.xmax), ylim=(si.ymin, si.ymax)
-        #)
 
-        for i in range(0, self.csize):
+        for i in range(0, self.csize+1):
             xi = i * self.dX + self.xmin
             ax1.plot([xi, xi], [self.ymin, self.ymax], "-", color="gray")
         
-        for j in range(0, self.lsize):
+        for j in range(0, self.lsize+1):
             yj = j * self.dY + self.ymin
             ax1.plot([self.xmin, self.xmax], [yj, yj], "-", color="gray")
 
@@ -327,19 +376,32 @@ class SpatialIndex:
         plt.plot(X, Y, sym, linewidth=size)
     
     
-    def request(self, obj, j=None) -> list[Any]:   
-        """
-        Request function to get data registered in spatial index
-        Inputs:
-            - request(i,j) returns data registered in cell (i,j)
-               	- i: row index i of spatial index grid
-     		    - j: col index j of spatial index grid
-            - request(coord) returns data registered in the cell
-              containing GeoCoords or ENUCoors object coord
-            - request(list) returns data registered in all cells
-              crossed by a segment list=[coord1, coord2].
-     	    - request(track) returns data registered in all cells
-              crossed by a track.
+    def request(self, obj, j=None) -> list[Any]:
+        """Retrieve data registered in the spatial index.
+
+        The query can take several forms:
+    
+        * ``request(i, j)``: retrieve data registered in grid cell
+          at row ``i`` and column ``j``.
+    
+        * ``request(coord)``: retrieve data registered in the cell
+          containing the given ``GeoCoords`` or ``ENUCoords`` object.
+    
+        * ``request([coord1, coord2])``: retrieve data registered in
+          all cells crossed by the segment defined by ``coord1`` and
+          ``coord2``.
+    
+        * ``request(track)``: retrieve data registered in all cells
+          crossed by the given track.
+    
+        Args:
+            obj: Query specification. Can be a row index, a coordinate,
+                a list of two coordinates defining a segment, or a track.
+            j: Column index when querying a grid cell by its row and
+                column indices. Defaults to ``None``.
+    
+        Returns:
+            A list of data registered in the queried cell or cells.
         """
 
         if isinstance(obj, int):

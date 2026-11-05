@@ -17,6 +17,8 @@ import sys
 #sys.path.append(os.path.abspath(".."))
 sys.path.append(os.path.abspath("../.."))
 sys.path.append(os.path.abspath("../../tracklib"))
+sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('..'))
 #print (sys.path)
 
 # -- Project information -----------------------------------------------------
@@ -39,14 +41,17 @@ release = "0.8"
 extensions = [
     "recommonmark",
     "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
     "sphinx_autodoc_typehints",
 	"nbsphinx",
     "autodocsumm",
-    "IPython.sphinxext.ipython_console_highlighting"
+    "IPython.sphinxext.ipython_console_highlighting",
+    "sphinx_design",
 ]
 # 'sphinx_gallery.load_style',
+autosummary_generate = False
 
 # I execute the notebooks manually in advance. If notebooks test the code,
 # they should be run at build time.
@@ -91,7 +96,9 @@ html_theme_options = {
             # The type of image to be used (see below for details)
             "type": "fontawesome",
         }
-   ]
+   ],
+    "show_toc_level": 2,
+    "header_links_before_dropdown": 6,
 }
 
 

@@ -1,5 +1,6 @@
-sphinx
-sphinx_rtd_theme
+sphinx==7.3.7
+pydata-sphinx-theme
+sphinx_design
 recommonmark
 sphinx-autodoc-typehints
 pydata-sphinx-theme
@@ -12,3 +13,5 @@ numpy
 matplotlib
 scikit-image
 progressbar2
+roman>=4
+rtree

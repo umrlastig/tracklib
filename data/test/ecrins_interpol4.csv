@@ -1,5 +1,5 @@
 #srid: ENU
-#E;N;U;time;anglegeom;angledeg;sommet;sommet2;virage;serie
+#E;N;U;time;geometricAngle;angledeg;sommet;sommet2;virage;serie
 942748.809;6427627.008;0.000;01/01/1970 00:00:00;nan;nan;0;0;0;0
 942750.345;6427625.728;0.000;01/01/1970 00:00:00;180.0;10313.544485118573;0;0;0;0
 942751.882;6427624.447;0.000;01/01/1970 00:00:00;180.0;10313.544485118573;0;0;0;0

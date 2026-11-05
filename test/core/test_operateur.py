@@ -16,7 +16,7 @@ from tracklib import (Track, Obs, ENUCoords, ObsTime,
                       segmentation, split,
                       computeAbsCurv,
                       generate,
-                      diffJourAnneeTrace,
+                      dayOfYearChange,
                       MODE_SPATIAL,
                       NAN)
 
@@ -59,13 +59,13 @@ class TestOperateurMethods(unittest.TestCase):
                              'srid': 'ENU'})
         track = TrackReader.readFromFile(chemin, param)
         
-        track.addAnalyticalFeature(diffJourAnneeTrace)
-        track.operate(Operator.INVERTER, "diffJourAnneeTrace", "rando_jour_neg")
+        track.addAnalyticalFeature(dayOfYearChange)
+        track.operate(Operator.INVERTER, "dayOfYearChange", "rando_jour_neg")
         
         segmentation(track, ["rando_jour_neg"], "rando_jour", [-1])
         self.mafonct(track, "rando_jour")
         TRACES = split(track, "rando_jour")
-        
+
         self.assertTrue(len(TRACES) == 4)
         
         if len(TRACES) > 0:

@@ -49,7 +49,7 @@ from numpy import pi
 #from tracklib.util.exceptions import *
 
 from tracklib.util import angleBetweenThreePoints, distance_to_segment, proj_polyligne
-from . import (anglegeom,
+from . import (geometricAngle,
                BIAF_SPEED, speed,
                BIAF_HEADING, heading,
                BIAF_DS, ds,
@@ -551,7 +551,7 @@ def computeVertex(track):
         K = 400
         iK = -1
         for j in range(imin, imax+1):
-            kj = anglegeom(track, j)
+            kj = geometricAngle(track, j)
             if kj < K:
                 K = kj
                 iK = j

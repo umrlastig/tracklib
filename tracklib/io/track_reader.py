@@ -123,7 +123,7 @@ class TrackReader:
         '''
 
         if not (os.path.isfile(path) or os.path.isdir(path)):
-            raise WrongArgumentError("First parameter (path) doesn't refers to a file or a dir.")
+            raise WrongArgumentError("First parameter (path) doesn't refers to a file or a dir: " + path + ".")
 
         if not isinstance(track_format, str) and not isinstance(track_format, TrackFormat):
             raise WrongArgumentError("The second parameter is not an instantiation of a str or a TrackFormat: "
@@ -674,6 +674,7 @@ class TrackReader:
                 if new_track:
                     if ('<'+fmt.type+'pt ' in line):
                         new_point = True
+                        tps = None
                         splits = line.split("\"")
                         pos = makeCoords(float(splits[3]), float(splits[1]), 0, fmt.srid)
                     if ('</'+fmt.type+'pt>' in line):

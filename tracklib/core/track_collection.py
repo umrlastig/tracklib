@@ -45,8 +45,12 @@ This module contain a class to manage the collections of tracks
 
 """
 
-from typing import Literal   
+from typing import Literal
+
+import math
 import matplotlib.pyplot as plt
+import numpy as np
+import progressbar
 from random import randint
 
 import tracklib as tracklib
@@ -65,7 +69,10 @@ class TrackCollection:
         self.spatial_index = None
 
     def addTrack(self, track):
-        """TODO"""
+        """
+
+        """
+
         self.__TRACES.append(track)
 
     def size(self):
@@ -367,7 +374,7 @@ class TrackCollection:
         for track in self:
             track.resample(delta, algo, mode)
 
-    def __collectionnify(tracks):
+    def _collectionnify(tracks):
         """TODO"""
         if isinstance(tracks, list):
             return TrackCollection(tracks)
@@ -530,7 +537,7 @@ class TrackCollection:
                     tracks.addTrack(track)
             return tracks
         
-        return TrackCollection.__collectionnify(self.__TRACES[n])
+        return TrackCollection._collectionnify(self.__TRACES[n])
 
 
     def __setitem__(self, n, track):
@@ -627,6 +634,70 @@ class TrackCollection:
             sets.addTrack(self.getTrack(idx))
 
         return sets
+
+
+    def attract_obs_to_other_tracks(self, buffer_size=10, alpha=0.6):
+        """
+        Move trajectory points closer to neighboring trajectories to make
+        spatially close trajectories more tightly clustered.
+
+        For each trajectory point, neighboring trajectory points within a given
+        buffer are identified. The point is then moved towards the centroid of
+        these neighboring points. The displacement is controlled by `alpha`.
+
+        This operation is intended to bring trajectories closer together between
+        two successive iterations of the workflow, in order to assess whether
+        this improves the detection of spatial patterns in the resulting network.
+
+        Parameters
+        ----------
+        buffer_size : float, optional
+            Size of the buffer used to identify neighboring trajectory points,
+            in the units of the coordinate reference system. Default is 10.
+        alpha : float, optional
+            Weight controlling the displacement of each point towards the
+            centroid of neighboring points. A value of 0 leaves the point
+            unchanged, while a value of 1 moves it to the centroid.
+            Default is 0.6.
+
+        Returns
+        -------
+        None
+            The collection containing the trajectories with their points moved
+            towards neighboring trajectories.
+           
+        """
+
+        # print ('Attract points toward the centroid of neighboring trajectory points')
+
+        index = tracklib.SpatialIndex(self)
+        nbCellToSearchInIndex = math.ceil(buffer_size / index.dX)
+
+        boucle = progressbar.progressbar(range(self.size()))
+        for i in boucle:
+            track = self.getTrack(i)
+
+            for j in range(track.size()):
+                o = track.getObs(j)
+                x, y = o.position.getX(), o.position.getY()
+
+                cluster = tracklib.Track()
+
+                neightracks = index.neighborhood(o.position, unit=nbCellToSearchInIndex)
+                for idx in neightracks:
+                    if idx == i:
+                        continue
+                    voisin = self[idx]
+                    for k in range(voisin.size()):
+                        if voisin[k].distance2DTo(o) <= buffer_size:
+                            cluster.addObs(voisin[k])
+
+                if cluster.size() > 0:
+                    centre = cluster.getCentroid()
+                    x_new = o.position.getX() + alpha * (centre.getX() - o.position.getX())
+                    y_new = o.position.getY() + alpha * (centre.getY() - o.position.getY())
+                    o.position = tracklib.ENUCoords(x_new, y_new)
+
 
 
 

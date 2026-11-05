@@ -66,23 +66,18 @@ to simplify the creation of analytical features on a GPS tracks.
   :maxdepth: 1
   :hidden:
   
-  Getting Started <started/index>
-  Example Gallery <examples/gallery>
-  Use Cases <usecase/index>
-  API reference <api/index>
+  Start <started/index>
+  Data <data/index>
+  Processing Guides <howto/index>
+  Use Cases <examples/gallery>
+  Concepts <concepts/index>
+  API Reference <api/index>
   
 
 
-.. Main functionalities
-.. *********************
-
-.. * Structured data to store GPS data
-.. * Load GPS data from files (GPX, CSV) 
-.. * Operation classes for manipulating track
-
 .. * Propose generic method to simplify a track. For example (Douglas Peucker, 
 .. Visvalingram algorithms or kernel Filter (Gaussian, Uniform, Dirac, etc.)).
-.. * Resample, interpolation and smoothing functions
-.. * Summarize GPS information into a grid
+
+
 
 

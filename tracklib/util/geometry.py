@@ -56,6 +56,8 @@ Definition of some geometric functions
 #    - proj_segment
 #    - proj_polyligne
 
+#    - nearest_points
+
 #    - triangle_area
 #    - aire_visval
 
@@ -80,11 +82,11 @@ from __future__ import annotations
 import math
 import numpy as np
 
-import tracklib as tracklib
-from tracklib.core import ObsTime, Obs, makeCoords
+import tracklib as tkl
+from tracklib.core import ObsTime, Obs, makeCoords, ENUCoords
 
 
-def cartesienne(segment) -> list[float, float, float, float]:   
+def cartesienne(segment) -> list[float, float, float, float]:
     """Fonction equation cartesienne
 
     :return: liste de paramètres
@@ -161,7 +163,7 @@ def dist_point_to_segment(point, segment):
     return dist_point_droite(cartesienne(segment), point.getX(), point.getY())
 
 
-def distance_to_segment(x0: float, y0: float, x1: float, y1: float, x2: float, y2: float) -> float:   
+def distance_to_segment(x0: float, y0: float, x1: float, y1: float, x2: float, y2: float) -> float:
     """Function to compute distance between a point and a segment
 
     :param x0: point coordinate X
@@ -176,6 +178,8 @@ def distance_to_segment(x0: float, y0: float, x1: float, y1: float, x2: float, y
 
     # Segment length
     l = math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
+    if l == 0:
+        return float("nan")
 
     # Normalized scalar product
     psn = ((x0 - x1) * (x2 - x1) + (y0 - y1) * (y2 - y1)) / l
@@ -198,7 +202,7 @@ def distance_to_segment(x0: float, y0: float, x1: float, y1: float, x2: float, y
     return d
 
 
-def projection_droite(param: tuple[float, float, float], x: float, y: float) -> tuple[float, float]:   
+def projection_droite(param: tuple[float, float, float], x: float, y: float) -> tuple[float, float]:
     """
     Fonction projection orthogonale sur une droite
 
@@ -300,6 +304,7 @@ def proj_segment(segment, x, y):
             return distance2, x2, y2
 
 
+
 # -----------------------------------------------
 # Fonction complète de projection entre un
 #          point et une polyligne
@@ -335,6 +340,37 @@ def proj_polyligne(Xp, Yp, x, y):
     return distmin, xproj, yproj, iproj
 
 
+def nearest_points(track1: tkl.Track, track2: tkl.Track) -> tuple[int, int, float]:
+    """
+    Return the indices of the two closest observations, one from each track,
+    along with the distance between them.
+
+    Parameters
+    ----------
+    track1 : tkl.Track
+        First input track.
+    track2 : tkl.Track
+        Second input track.
+
+    Returns
+    -------
+    tuple
+        A tuple containing the index in each track and the distance between the observations.
+
+    """
+    maxd = float('inf')
+    idxi = -1
+    idxj = -1
+    for i in range(track1.size()):
+        o1 = track1.getObs(i)
+        for j in range(track2.size()):
+            o2 = track2.getObs(j)
+            d = o1.position.distance2DTo(o2.position)
+            if d < maxd:
+                idxi = i
+                idxj = j
+                maxd = d
+    return (idxi, idxj, maxd)
 
 
 # --------------------------------------------------------------------------
@@ -387,12 +423,12 @@ def detect_side(track, x, y, seuilMemeProj=0.1):
 
         dist, xp, yp = proj_segment([xa, ya, xb, yb], x, y)
 
-        # abscurv = tracklib.computeAbsCurvAnotherPoint(track, xp, yp)
+        # abscurv = tkl.computeAbsCurvAnotherPoint(track, xp, yp)
         if iproj == 0:
-            abscurv = track.getFirstObs().distanceTo(tracklib.Obs(tracklib.ENUCoords(xp, yp), tracklib.ObsTime()))
+            abscurv = track.getFirstObs().distanceTo(tkl.Obs(tkl.ENUCoords(xp, yp), tkl.ObsTime()))
         else:
-            d = track[iproj].distanceTo(tracklib.Obs(tracklib.ENUCoords(xp, yp), tracklib.ObsTime()))
-            abscurv = tracklib.computeCurvAbsBetweenTwoPoints(track, 0, iproj) + d
+            d = track[iproj].distanceTo(tkl.Obs(tkl.ENUCoords(xp, yp), tkl.ObsTime()))
+            abscurv = tkl.computeCurvAbsBetweenTwoPoints(track, 0, iproj) + d
 
         if pdt > 0:
             SIDES.append((dist, xp, yp, 1, abscurv))
@@ -422,7 +458,7 @@ def triangle_area(x0, y0, x1, y1, x2, y2):
 """ Pour calculer l'aire des triangles dans Visvalingam """
 
 
-def aire_visval(track, i):
+def aire_visval(track: tkl.Track, i) -> float:
     x0 = track.getObs(i - 1).position.getX()
     y0 = track.getObs(i - 1).position.getY()
     x1 = track.getObs(i).position.getX()
@@ -472,18 +508,33 @@ def isSegmentIntersects(segment1, segment2):
     return (val1 <= 0) & (val2 <= 0)
 
 
-# ----------------------------------------
-# Intersection between 2 tracks
-# withTime: time constraint (in secs)
-# (-1 if no time constraint)
-# ----------------------------------------
-def intersection(track1, track2, withTime=-1):
+def intersection(track1: tkl.Track, track2: tkl.Track, withTime=-1):
+    """
+    Intersection between 2 tracks.
+
+    withTime: time constraint (in secs). (-1 if no time constraint)
+
+    Parameters
+    ----------
+    track1 : Track
+        DESCRIPTION.
+    track2 : Track
+        DESCRIPTION.
+    withTime : TYPE, optional
+        DESCRIPTION. The default is -1.
+
+    Returns
+    -------
+    I : Track
+        DESCRIPTION.
+
+    """
 
     if not (track1.getSRID() == track2.getSRID()):
         print("Error: tracks must have same SRID to compute intersections")
         exit()
 
-    I = tracklib.Track()
+    I = tkl.Track()
     TMP_I = []
     TMP_J = []
     TMP_TPS2 = []
@@ -515,6 +566,11 @@ def intersection(track1, track2, withTime=-1):
                 A[1, 0] = P2[0]
                 A[1, 1] = P2[1]
                 B[1, 0] = -P2[2]
+
+                det = np.linalg.det(A)
+                if abs(det) < 1e-12:
+                    # print("Parallel lines")
+                    continue
 
                 X = np.linalg.solve(A, B)
 

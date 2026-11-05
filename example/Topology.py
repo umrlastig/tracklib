@@ -5,10 +5,10 @@ import matplotlib.pyplot as plt
 import tracklib as tkl
 
 
-NETPATH = r'/home/md_vandamme/res.csv'
+input_file = r'/home/md_vandamme/res.csv'
 output_file = r'/home/md_vandamme/res_topology.csv'
 
-tkl.Topology.create_topology(NETPATH, '2154', output_file)
+tkl.Topology.create_topology(input_file, '2154', output_file)
 
 
 fmt = tkl.NetworkFormat({
@@ -20,4 +20,7 @@ fmt = tkl.NetworkFormat({
        "separator": ",",
        "header": 1})
 network = tkl.NetworkReader.readFromFile(output_file, fmt, verbose=False)
+
+
 network.plot('k-', 'ro', 'g-', 'r-', 0.5, plt)
+

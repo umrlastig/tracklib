@@ -2,7 +2,7 @@
 
 <p align="center">
 <table style="border:none;border:0;width:60%"><tr>
-  <td align="center" style="width:30%"><img width="200px" src="https://github.com/umrlastig/tracklib/blob/main/doc/source/img/TracklibLogo.png" /></td>
+  <td align="center" style="width:30%"><img width="200px" src="https://raw.githubusercontent.com/umrlastig/tracklib/main/doc/source/img/TracklibLogo.png" /></td>
   <td style="padding:16px;"><label>Tracklib</label> library provide a variety of tools, operators and functions to manipulate GPS trajectories</td>
 </tr></table>
 </p>
@@ -15,8 +15,8 @@
 
 [![Supported Python Versions](https://img.shields.io/pypi/pyversions/tracklib.svg)](https://www.python.org/downloads/)
 [![PyPI Version](https://img.shields.io/pypi/v/tracklib.svg)](https://pypi.python.org/pypi/tracklib/)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/tracklib?color=blue)](https://pypistats.org/packages/tracklib)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13899752.svg)](https://doi.org/10.5281/zenodo.13899752)
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/tracklib?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/tracklib)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20800161.svg)](https://doi.org/10.5281/zenodo.20800161)
 
 
 More and more datasets of GPS trajectories are now available and they are studied very frequently in many scientific domains. Currently available Python libraries for trajectories can separately load, simplify, interpolate, summarize or visualize them. But, as far as we know, there is no Python library that would contain all these basic functionalities. This is what tracklib is modestly trying to do. The library provides  some conventions, capabilities and techniques to manipulate GPS trajectories.
@@ -37,7 +37,7 @@ Furthermore, adding analytical features (e.g. speed, curvilinear abscissa, infle
 
 The official online documentation is available at **[ReadTheDocs](https://tracklib.readthedocs.io)**
 
-In particular, the docs include **[quick examples](https://tracklib.readthedocs.io/en/latest/userguide/gallery.html)** and some **[Use cases](https://tracklib.readthedocs.io/en/latest/usecase/index.html)**
+In particular, the docs include **[practical guides](https://tracklib.readthedocs.io/en/latest/howto/index.html)** and some **[use cases](https://tracklib.readthedocs.io/en/latest/examples/gallery.html)**
 
 ## Installation
 
@@ -56,13 +56,52 @@ Yann Méneroux, Marie-Dominique van Damme. Tracklib: a python library with a var
 </div>
 
 
+```bibtex
+@softwareversion{meneroux:hal-04356178v3,
+  TITLE = {{Tracklib: a python library  with a variety of tools, operators and functions to manipulate GPS trajectories}},
+  AUTHOR = {M{\'e}neroux, Yann and van Damme, Marie-Dominique},
+  URL = {https://hal.science/hal-04356178},
+  NOTE = {},
+  INSTITUTION = {{Laboratoire sciences et technologies de l'information g{\'e}ographique}},
+  YEAR = {2024},
+  MONTH = Dec,
+  DOI = {10.5281/zenodo.19556814},
+  SWHID = {swh:1:dir:315fb3ee21367d92767906fbdea7c380d5fa5ea0;origin=https://hal.archives-ouvertes.fr/hal-04356178;visit=swh:1:snp:3a6cbb574ce276c4bd97a74e6a21f2fc77ae9149;anchor=swh:1:rel:d3d2d6a6b0411f01dc2063280e2ad916eeed17a7;path=/},
+  VERSION = {v0.8.2},
+  REPOSITORY = {https://github.com/umrlastig/tracklib},
+  LICENSE = {CeCILL-C Free Software License Agreement},
+  KEYWORDS = {Open Source ; Segmenting GPS tracks ; Synthetic trajectory ; Trajectory aggregation ; Map-matching ; Python library ; GPS track},
+  FILE = {https://hal.science/hal-04356178v3/file/tracklib-0.8.2.zip},
+  HAL_ID = {hal-04356178},
+  HAL_VERSION = {v3},
+}
+```
+
+
 
 ## Scientific papers whose experiments use the Tracklib library
 <ul>
+<li>Dawson, J., Peralta, V., Olteanu-Raimond, A.-M., Devogele, T., and Garel, M.: A Method for Spatializing Disturbance by Detecting Human-Wildlife Encounters from GNSS Trajectories, AGILE GIScience Ser., 7, 2, https://doi.org/10.5194/agile-giss-7-2-2026, 2026.</li>
 <li>Méneroux, Y., Muller, J.M., Seba, A., Bouquet, P., Ruaud, A., & Pierrot-Deseilligny, M.. 2025. Vers un couplage fort des approches topométrique et photogrammétrique pour le contrôle de trajectoire d’un véhicule autonome. XYZ : revue de l'Association française de topographie (n°183), 33-40.</li>
 <li>Marie-Dominique Van Damme, Yann Méneroux, and Ana-Maria Olteanu-Raimond. 2024. A metrological analysis of a modular and iterative aggregation algorithm of GNSS trajectories. In Proceedings of the 32nd ACM International Conference on Advances in Geographic Information Systems (SIGSPATIAL '24). Association for Computing Machinery, New York, NY, USA, 633–636. https://doi.org/10.1145/3678717.3691325</li>
 <li>Méneroux, Y., Maidaneh Abdi, I., Le Guilcher, A., & Olteanu-Raimond, A. M. (2022). Is the radial distance really a distance? An analysis of its properties and interest for the matching of polygon features. International Journal of Geographical Information Science, 37(2), 438–475. https://doi.org/10.1080/13658816.2022.2123487</li>
 </ul>
+
+
+## Projects using Tracklib
+
+### [footprint2graph](https://footprint2graph.readthedocs.io)
+
+<img src="https://footprint2graph.readthedocs.io/en/latest/_static/footprint2graph.png" width="350" align="right">
+
+Automatic mobility graph reconstruction from GPS trajectories.
+
+The project relies on Tracklib for trajectory processing, map matching, 
+track aggregation, and geometric operations (e.g., interpolation and smoothing).
+
+
+
+
 
 
 ## About
@@ -75,7 +114,7 @@ Yann Méneroux, Marie-Dominique van Damme. Tracklib: a python library with a var
 
 ## Development
 
-Institute: LASTIG, Univ Gustave Eiffel, ENSG, IGN
+Institute: Univ Gustave Eiffel, Géodata Paris, IGN, LASTIG
 
 Authors
 - Yann Méneroux

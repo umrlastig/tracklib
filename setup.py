@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
+from pathlib import Path
 
-current_path = os.path.abspath(os.path.dirname(__file__))
+current_path = Path(__file__).parent
+long_description = (current_path / "README.md").read_text(encoding="utf-8")
+
+
 
 requirements = (
         "numpy", 
         "matplotlib", 
-        "scikit-image", 
+        # "scikit-image", 
         "progressbar2",
         "requests",
         "rtree"
@@ -20,23 +24,16 @@ dev_requirements = (
         "coverage"
 )
 
-doc_requirements = (
-    "sphinx",
-    "sphinx_rtd_theme",
-    "recommonmark",
-    "sphinx-autodoc-typehints",
-	"nbsphinx",
-	"ipykernel",
-    "autodocsumm"
-)
+
 
 setup (
     name="tracklib",
-    version="0.8.4",
+    version="0.9.0",
     description="tracklib library provides a variety of tools, operators and functions to manipulate GPS trajectories",
-    long_description="See https://github.com/umrlastig/tracklib",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     url="https://github.com/umrlastig/tracklib",
-    download_url= 'https://github.com/umrlastig/tracklib/archive/refs/tags/v0.8.3.zip',
+    download_url= 'https://github.com/umrlastig/tracklib/archive/refs/tags/v0.8.4.1.zip',
     author="Yann Méneroux, Marie-Dominique Van Damme",
     author_email="todo@ign.fr",
     keywords=['GPS track', 'Python library', 'Map-matching', 'Trajectory fusion', 'Synthetic trajectory', 'Segmenting GPS tracks', 'Summarizing GPS tracks', 'Stop positions', 'Kalman filter'],
@@ -53,7 +50,6 @@ setup (
     install_requires=requirements,
     test_suite="tests",
     extras_require={
-        "dev": dev_requirements, 
-        "doc": doc_requirements
+        "dev": dev_requirements
     },
 )

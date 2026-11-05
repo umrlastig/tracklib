@@ -201,8 +201,9 @@ class TestAlgoMappingMethods(unittest.TestCase):
 
         raster = RasterReader.readFromAscFile(mntpath, 'mnt')
         afmap = raster.getAFMap(0)
+        grid = afmap['values'].getGrid().values
 
-        self.assertEqual(afmap.grid[1151][465], 2007.0, 'ele MNT VT')
+        self.assertEqual(grid[1151][465], 2007.0, 'ele MNT VT')
         self.assertEqual(trace.size(), 363, 'track size')
 
         mapOnRaster(trace, raster)
@@ -227,7 +228,8 @@ class TestAlgoMappingMethods(unittest.TestCase):
         emprise = Bbox(ll, ur)
         raster = Raster(bbox=emprise, resolution=(1,1), margin=0)
 
-        raster.addAFMap('abcd', np.array([[1,2,3,4], [10,20,30,40],
+        mapabcd = raster.addAFMap('abcd')
+        mapabcd.addValues(np.array([[1,2,3,4], [10,20,30,40],
                                   [100,200,300,400],
                                   [1000,2000,3000,4000]]))
         raster.getAFMap(0).plotAsVectorGraphic()

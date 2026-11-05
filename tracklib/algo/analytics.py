@@ -40,7 +40,6 @@ The fact that you are presently reading this means that you have had
 knowledge of the CeCILL-C license and that you accept its terms.
 
 
-
 Algorithm to create Analytical features: ds, speed, abs_curv.
 
 """
@@ -54,25 +53,43 @@ import numpy as np
 from tracklib.core import NAN
 from tracklib.util import angleBetweenThreePoints
 
-
 # Liste des AF algo intégrés à disposition
-BIAF_DS = "ds"
-BIAF_SPEED = "speed"
-BIAF_HEADING = "heading"
+BIAF_DS       = "ds"
+BIAF_SPEED    = "speed"
+BIAF_HEADING  = "heading"
 BIAF_ABS_CURV = "abs_curv"
-BUILT_IN_AF = [BIAF_DS, BIAF_SPEED, BIAF_ABS_CURV, BIAF_HEADING]
+BUILT_IN_AF   = [BIAF_DS, BIAF_SPEED, BIAF_ABS_CURV, BIAF_HEADING]
 
 
 def ds(track, i):
-    """TODO"""
+    """
+    Compute the distance between two consecutive observations of a track.
+
+    The distance is measured between the i-th observation and the
+    preceding observation. It is set to zero for the first observation.
+
+    Parameters
+    ----------
+    track : Track
+        Track on which the distance is computed.
+    i : int
+        Index of the observation.
+
+    Returns
+    -------
+    float
+        2D distance between the i-th observation and the preceding
+        observation, or zero if i is zero.
+    """
     if i == 0:
         return 0
+
     return track.getObs(i).distance2DTo(track.getObs(i - 1))
 
 
 def heading(track, i):
     """
-    Heading is the direction track is pointed in
+    Heading is the direction the track is moving in.
 
     Parameters
     ----------
@@ -96,7 +113,20 @@ def heading(track, i):
 
 def speed(track, i):
     """
-    Méthode calculant le paramètre 'speed' pour chaque point de la trace
+    Compute the speed at the i-th observation of the track.
+
+    Parameters
+    ----------
+    track : Track
+        Track on which the speed is computed.
+    i : int
+        Index of the observation.
+
+    Returns
+    -------
+    float
+        Speed computed from the distance between consecutive observations
+        and the elapsed time.
     """
 
     # On attribut au point d'indice [0] la vitesse du point d'indice [1]
@@ -132,7 +162,28 @@ def speed(track, i):
 
 def acceleration(track, i):
     """
-    Acceleration instantannée de la trace
+    Compute the instantaneous acceleration at the i-th observation of the track.
+
+    Returns NaN if:
+        - i = 0
+        - the time interval dt is zero.
+
+    For the last observation, acceleration is computed using only the
+    preceding observation. For all other observations (except the first),
+    acceleration is computed using the observations immediately preceding
+    and following the current one.
+
+    Parameters
+    ----------
+    track : Track
+        Track on which the acceleration is computed.
+    i : int
+        Index of the observation.
+
+    Returns
+    -------
+    float
+        Instantaneous acceleration at the i-th observation.
     """
 
     if i == 0:
@@ -157,6 +208,31 @@ def acceleration(track, i):
 
 
 def slope(track, i):
+    """
+    Compute the slope angle between two consecutive observations.
+
+    The slope is calculated from the elevation difference and the
+    horizontal distance between the current observation and the
+    preceding one.
+
+    Returns NaN if:
+        - i = 0
+        - the horizontal distance is zero or negative.
+
+    Parameters
+    ----------
+    track : Track
+        Track on which the acceleration is computed.
+    i : int
+        Index of the observation.
+
+    Returns
+    -------
+    float
+        Slope angle in degrees, computed as the arctangent of the
+        elevation difference divided by the horizontal distance.
+
+    """
     
     if i == 0:
         return NAN
@@ -165,12 +241,10 @@ def slope(track, i):
     z1 = track.getObs(i-1).position.getZ()
     rise = z2 - z1
     run = track.getObs(i).distance2DTo(track.getObs(i-1))
-    #print (rise, run)
-    
+
     if run <= 0:
         return NAN
     
-    # return rise/run * 100
     return math.atan(rise/run)*180/np.pi
     
 
@@ -178,10 +252,29 @@ def slope(track, i):
 # =============================================================================
 #    Des AF algo sur les angles
 # =============================================================================
-def anglegeom(track, i) -> float:
+def geometricAngle(track, i) -> float:
     """
-    Mesure l'angle  géométrique (non orienté) intérieur abc.
-    :return: Angle abc (degrees)
+    Compute the interior angle formed by three consecutive observations.
+    Is equivalent to turn angle.
+
+    The angle is measured at the i-th observation, between the
+    preceding and following observations. It is an unsigned angle
+    in the range [0, 180] degrees.
+
+    Returns NaN for the first and last observations, as three
+    consecutive observations are required to compute the angle.
+
+    Parameters
+    ----------
+    track : Track
+        Track on which the angle is computed.
+    i : int
+        Index of the central observation.
+
+    Returns
+    -------
+    float
+        Interior angle in degrees, measured at the i-th observation.
     """
     if i == 0:
         return NAN
@@ -193,8 +286,28 @@ def anglegeom(track, i) -> float:
     return angleBetweenThreePoints(track.getObs(i-1), track.getObs(i), track.getObs(i+1))
 
 
-def calculAngleOriente(track, i):
-    """Mesure l'angle orienté dans le sens trigonométrique abc."""
+def orientedAngle(track, i) -> float:
+    """
+    Compute the oriented angle formed by three consecutive observations.
+
+    The angle is measured at the i-th observation, from the direction
+    toward the preceding observation to the direction toward the
+    following observation, using the counterclockwise convention.
+
+    Returns NaN for the first and last observations.
+
+    Parameters
+    ----------
+    track : Track
+        Track on which the angle is computed.
+    i : int
+        Index of the central observation.
+
+    Returns
+    -------
+    float
+        Oriented angle in degrees, measured counterclockwise.
+    """
 
     if i == 0:
         return NAN
@@ -221,17 +334,36 @@ def calculAngleOriente(track, i):
 
 
 def orientation(track, i):
-    """Calcul l'orientation d'un point de la trace"""
-    """orientation_dictionnary = {
-        1: [-(1 / 8) * math.pi, (1 / 8) * math.pi],
-        2: [(1 / 8) * math.pi, (3 / 8) * math.pi],
-        3: [(3 / 8) * math.pi, (5 / 8) * math.pi],
-        4: [(5 / 8) * math.pi, (7 / 8) * math.pi],
-        5: [(-7 / 8) * math.pi, (7 / 8) * math.pi],
-        6: [-(7 / 8) * math.pi, -(5 / 8) * math.pi],
-        7: [-(5 / 8) * math.pi, -(3 / 8) * math.pi],
-        8: [-(3 / 8) * math.pi, -(1 / 8) * math.pi],
-    }"""
+    """
+    Classify the orientation of a track observation into one of eight
+    angular sectors.
+
+    The classification is based on angular intervals defined in radians.
+
+    Orientation dictionnary :
+
+        * 1: [-(1 / 8) * math.pi, (1 / 8) * math.pi],
+        * 2: [(1 / 8) * math.pi, (3 / 8) * math.pi],
+        * 3: [(3 / 8) * math.pi, (5 / 8) * math.pi],
+        * 4: [(5 / 8) * math.pi, (7 / 8) * math.pi],
+        * 5: [(-7 / 8) * math.pi, (7 / 8) * math.pi],
+        * 6: [-(7 / 8) * math.pi, -(5 / 8) * math.pi],
+        * 7: [-(5 / 8) * math.pi, -(3 / 8) * math.pi],
+        * 8: [-(3 / 8) * math.pi, -(1 / 8) * math.pi],
+
+    Parameters
+    ----------
+    track : Track
+        Track on which the angle is computed.
+    i : int
+        Index of the central observation.
+
+    Returns
+    -------
+    int
+        Identifier of the angular sector corresponding to the observation's
+        orientation.
+    """
 
     orientation_dictionnary = {
         1: [0, 22.5 + 0*45],
@@ -286,10 +418,35 @@ def orientation(track, i):
 # =============================================================================
 #    Des AF algo sur le timestamp
 # =============================================================================
-def diffJourAnneeTrace(track, i):
-    """For divide tracks by year day"""
+def dayOfYearChange(track, i):
+    """
+    Detect changes in the day of the year between consecutive observations.
+
+    This analytical feature is useful for segmenting a track into
+    daily tracks.
+
+    For the first observation (i = 0), returns 0.
+    For all other observations, returns 1 if the current observation
+    falls on a different day of the year than the preceding observation,
+    and 0 otherwise.
+
+    Parameters
+    ----------
+    track : Track
+        Track on which the computation is performed.
+    i : int
+        Index of the observation.
+
+    Returns
+    -------
+    int
+        1 if the day of the year differs from that of the preceding
+        observation, 0 otherwise.
+    """
+
     if i == 0:
         return 0
-    return track.getObs(i).timestamp.day - track.getObs(i - 1).timestamp.day
+
+    return min(1, track.getObs(i).timestamp.day - track.getObs(i - 1).timestamp.day)
 
 

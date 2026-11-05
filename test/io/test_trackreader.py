@@ -230,7 +230,7 @@ class TestTrackReader(TestCase):
         self.assertIsInstance(track, Track)
         self.assertEqual(1593, track.size())
         self.assertEqual(track.getListAnalyticalFeatures(),
-                ['anglegeom', 'angledeg', 'sommet', 'sommet2', 'virage', 'serie'])
+                ['geometricAngle', 'angledeg', 'sommet', 'sommet2', 'virage', 'serie'])
 
     def testReadCsvDir(self):
         ObsTime.setReadFormat("2D/2M/4Y 2h:2m:2s")
@@ -241,6 +241,22 @@ class TestTrackReader(TestCase):
                  'id_U': -1,
                  'id_T': -1,
                  'separator': ","})
+        collection = TrackReader.readFromFile(chemin, param)
+        
+        self.assertIsInstance(collection, TrackCollection)
+        self.assertEqual(collection.size(), 2)
+
+
+        # On change l'ordre des paramètres pour voir
+        ObsTime.setReadFormat("2D/2M/4Y 2h:2m:2s")
+        chemin = os.path.join(self.resource_path, 'data/test/csv')
+        param = TrackFormat({'ext': 'CSV',
+                             'separator': ",",
+                             'id_T': -1,
+                 'id_N': 2,
+                 'id_U': -1,
+                 'id_E': 1
+                 })
         collection = TrackReader.readFromFile(chemin, param)
         
         self.assertIsInstance(collection, TrackCollection)
