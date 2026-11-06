@@ -1417,6 +1417,11 @@ class Network:
             return self.DISTANCES[key]
         else:
             return 1e300
+            
+    # Method to define weights of all edges as edge geom length
+    def setWeightsAsLength(self):    
+        for idx in self.getEdgesId():
+            self.getEdge(idx).weight = self.getEdge(idx).geom.length()
 
     def save_prep(self, filename: str):
         """Saves DISTANCES attribute in a npy file for further use
