@@ -197,7 +197,7 @@ def generateReturnTrip(track, kernelNoise=None):
 # Note: if network is connected and non-directed, the output track collection should 
 # contain exactly N tracks.
 # ----------------------------------------------------------------------------------------
-def generateTracksOnNetwork(network, N=100, p_round_trip=0, p_cplx_trip=0, resolution=10, noiser=None):
+def generateTracksOnNetwork(network, N=10, p_round_trip=0, p_cplx_trip=0, resolution=10, noiser=None):
 	
 	if (p_cplx_trip == 1):
 		print("Error: generation of synthetic tracks on network")
@@ -209,7 +209,7 @@ def generateTracksOnNetwork(network, N=100, p_round_trip=0, p_cplx_trip=0, resol
 	for i in progressbar.progressbar(range(N)):
 	
 		# Chemin de base
-		id_node_1 = random.sample(list(network.NODES.keys()), 1)[0]
+		id_node_1 = random.sample(list(network.NODES.keys()), 1)[0]; print(id_node_1)
 		id_node_2 = random.sample(list(network.NODES.keys()), 1)[0]
 		route = network.shortest_path(id_node_1, id_node_2)
 		if route is None:

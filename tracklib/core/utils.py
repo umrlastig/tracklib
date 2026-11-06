@@ -703,7 +703,7 @@ def conflateOnNetwork(geom, network, threshold=1e300, h=30, verbose=True):
 
 eps = 1e-10
 
-random.seed(123457)
+#random.seed(1234578)
 
 class Segment:
 	
