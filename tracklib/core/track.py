@@ -1631,7 +1631,7 @@ class Track:
         return v.plotTrackEllipses(self, sym, factor, af, append)
 
     def plot(self, sym="k-", type="LINE", af_name="", cmap=-1, append=True, 
-             pointsize=5, style=None, color=None, w=6.4, h=4.8, title='', 
+             pointsize=5, style=None, color=None, w=6.4, h=4.8, title='',
              xlabel=None, ylabel=None, xlim=None, ylim=None,
              v:IPlotVisitor=None):
         """

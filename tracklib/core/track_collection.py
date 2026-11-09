@@ -299,13 +299,17 @@ class TrackCollection:
         for trace in self.__TRACES:
             trace.operate(operator, arg1, arg2, arg3)
 
-    def plot(self, symbols=None, markersize=[4], margin=0.05, append=False):
+    def plot(self, symbols=None, markersize=[4], margin=0.05,
+             color=None, linestyle=None, append=False):
         """TODO"""
-        if symbols is None:
-            symbols = ["r-", "g-", "b-", "c-", "m-", "y-", "k-"]
+
         if len(self) == 0:
             return
-        symbols = listify(symbols)
+
+        if symbols is None and linestyle is None:
+            symbols = ["r-", "g-", "b-", "c-", "m-", "y-", "k-"]
+            symbols = listify(symbols)
+
         markersize = listify(markersize)
         if not append:
             (xmin, xmax, ymin, ymax) = self.bbox().asTuple()
@@ -313,13 +317,18 @@ class TrackCollection:
             dy = margin * (ymax - ymin)
             plt.xlim([xmin - dx, xmax + dx])
             plt.ylim([ymin - dy, ymax + dy])
-        Ns = len(symbols)
+
         Ms = len(markersize)
         for i in range(len(self.__TRACES)):
             trace = self.__TRACES[i]
             X = trace.getX()
             Y = trace.getY()
-            plt.plot(X, Y, symbols[i % Ns], markersize=markersize[i % Ms])
+            if symbols is None:
+                plt.plot(X, Y, markersize=markersize[i % Ms],
+                     linestyle=linestyle, color=color)
+            else:
+                Ns = len(symbols)
+                plt.plot(X, Y, symbols[i % Ns], markersize=markersize[i % Ms])
 
     def filterOnBBox(self, bbox):
         """TODO"""
