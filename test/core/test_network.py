@@ -3,15 +3,15 @@
 import os.path
 from unittest import TestCase, TestSuite, TextTestRunner
 
-from tracklib import (Track, ENUCoords,
+from tracklib import (Track, ENUCoords, GeoCoords,
                       Node, Edge,
-                      NetworkReader,
+                      NetworkReader, NetworkFormat, TrackReader,
                       SpatialIndex)
 
 
 import matplotlib.pyplot as plt
 
-class TestDijkstra(TestCase):
+class TestNetwork(TestCase):
     
     __epsilon = 0.001
     
@@ -25,7 +25,7 @@ class TestDijkstra(TestCase):
         
         chemin = os.path.join(self.resource_path, 'data/network/network_ecrin_extrait.csv')
         network = NetworkReader.readFromFile(chemin, 'TEST2', False)
-        
+
         self.assertEqual(890, len(network.EDGES))
         self.assertEqual(738, len(network.NODES))
         
@@ -151,12 +151,89 @@ class TestDijkstra(TestCase):
         self.assertEqual(network.getNumberOfNodes(), 20)
 
 
+    def test_add_track_as_edge(self):
+        chemin = os.path.join(self.resource_path, 'data/network/network_test.csv')
+        fmt = NetworkFormat({
+            "pos_edge_id": 0,
+            "pos_source": 1,
+            "pos_target": 2,
+            "pos_wkt": 5,
+            "srid": "ENU",
+            "separator": ",",
+            "header": 1})
+        network = NetworkReader.readFromFile(chemin, fmt, False)
+        self.assertEqual(network.getNumberOfNodes(), 6)
+        self.assertEqual(network.getNumberOfEdges(), 8)
+        # for nid in network.getIndexNodes():
+        #    nC = network.getNode(nid)
+
+        network.plot('k-', 'ko', size=2)
+        plt.xlim([-6, 22])
+        plt.ylim([-4, 7])
+        plt.show()
+
+
+        nC = Node(str(9), ENUCoords(10, 4))
+        network.addNode(nC)
+        self.assertEqual(network.getNumberOfNodes(), 7)
+        self.assertEqual(network.getNumberOfEdges(), 8)
+        self.assertTrue(nC.id in network.NODES)
+
+        wkt = "LineString (10 4, 11 3, 12 3, 10 0)"
+        trace = TrackReader.parseWkt(wkt)
+        trace.base = 2154
+        network.addTrackAsEdge(trace, 1)
+
+        self.assertEqual(network.getNumberOfNodes(), 8)
+        self.assertEqual(network.getNumberOfEdges(), 9)
+
+        wkt = "LineString (10.5 6, 0.5 0.5)"
+        trace = TrackReader.parseWkt(wkt)
+        trace.base = 2154
+        network.addTrackAsEdge(trace, 1)
+
+        self.assertEqual(network.getNumberOfNodes(), 8)
+        self.assertEqual(network.getNumberOfEdges(), 10)
+
+        wkt = "LineString (2 3, 2 5)"
+        trace = TrackReader.parseWkt(wkt)
+        trace.base = 2154
+        network.addTrackAsEdge(trace, 1)
+
+        self.assertEqual(network.getNumberOfNodes(), 10)
+        self.assertEqual(network.getNumberOfEdges(), 11)
+
+        network.plot('k-', 'ko', size=2)
+        plt.xlim([-6, 22])
+        plt.ylim([-4, 7])
+        plt.show()
+
+
+    def test_transform_toENU(self):
+    
+        chemin = os.path.join(self.resource_path, 'data/network/network_igast.csv')
+        fmt = NetworkFormat({
+            "pos_edge_id": 0,
+            "pos_source": 1,
+            "pos_target": 2,
+            "pos_wkt": 5,
+            "srid": "GEO",
+            "separator": ",",
+            "header": 1})
+        network = NetworkReader.readFromFile(chemin, fmt, False)
+        network.toENUCoords(2154)
+        self.assertEqual(network.getNumberOfNodes(), 21)
+        self.assertEqual(network.getNumberOfEdges(), 34)
+
+
 if __name__ == '__main__':
     suite = TestSuite()
-    suite.addTest(TestDijkstra("test_dijkstra"))
-    suite.addTest(TestDijkstra("test_igast"))
-    suite.addTest(TestDijkstra("test_dijkstra_bdtopo"))
-    suite.addTest(TestDijkstra("test_index"))
+    suite.addTest(TestNetwork("test_dijkstra"))
+    suite.addTest(TestNetwork("test_igast"))
+    suite.addTest(TestNetwork("test_dijkstra_bdtopo"))
+    suite.addTest(TestNetwork("test_index"))
+    suite.addTest(TestNetwork("test_add_track_as_edge"))
+    suite.addTest(TestNetwork("test_transform_toENU"))
     runner = TextTestRunner()
     runner.run(suite)
     

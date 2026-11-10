@@ -57,6 +57,7 @@ data/traj_rm_remove_sat_all.pos
 data/traj_rm_sat_vertical.pos
 data/traj_rm_vertical.pos
 doc/source/usecase/.ipynb_checkpoints
+doc/source/concepts/.ipynb_checkpoints/
 doc/source/userguide/.ipynb_checkpoints
 doc/source/usecase/.ipynb_checkpoints/KalmanFiltering-checkpoint.ipynb
 data/test/couplage.kml
@@ -90,6 +91,17 @@ doc/source/started/.ipynb_checkpoints/Quickstart-checkpoint.ipynb
 doc/source/howto/.ipynb_checkpoints/*.ipynb
 doc/source/examples/.ipynb_checkpoints/*
 doc/source/data/.ipynb_checkpoints/*
+
+data/network/routes.*
+data/network/reseau_igast_2154.*
+data/network/villes.*
+data/network/routes_2154.*
+data/network/villes_2154.*
+data/network/villes-routes.qgz
+
+
+
+
 
 
 
